@@ -55,7 +55,7 @@
                         {if $refundAllowed}
                             <li class="qlo-item">
                                 <a class="qlo-action-card" href="{$link->getPageLink('order-follow', true)|escape:'html':'UTF-8'}" title="{l s='Booking refund requests'}">
-                                    <span class="qlo-action-card__icon" aria-hidden="true"><i class="icon-money"></i></span>
+                                    <span class="qlo-action-card__icon" aria-hidden="true"><i class="icon-money-bill"></i></span>
                                     <span class="qlo-action-card__title">{l s='Booking refund requests'}</span>
                                 </a>
                             </li>

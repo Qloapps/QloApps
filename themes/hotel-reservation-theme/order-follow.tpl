@@ -25,78 +25,73 @@
 
 {block name='order_follow'}
 	{capture name=path}
-		<a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-			{l s='My account'}
-		</a>
-		<span class="navigation-pipe">
-			{$navigationPipe}
-		</span>
-		<span class="navigation_page">
-			{l s='Refund requests'}
-		</span>
+		<li class="breadcrumb-item"><a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account'}</a></li>
+		<li class="breadcrumb-item"><span class="navigation_page">{l s='Booking refund requests'}</span></li>
 	{/capture}
-	<div class="panel">
-		{block name='order_follow_heading'}
-			<h1 class="page-heading bottom-indent">
-				<i class="icon-tasks"></i> &nbsp;{l s='Refund Requests'}
-			</h1>
-		{/block}
-		{if $ordersReturns && $ordersReturns|count}
-			<div class="table-responsive wk-datatable-wrapper">
-				<table class="table table-bordered">
-					<thead>
-						<tr>
-							<th>{l s='Order'}</th>
-							{if isset($hasRoomRefunds) && $hasRoomRefunds}
-                                <th>{l s='Total rooms'}</th>
-                            {/if}
-                            {if isset($hasProductRefunds) && $hasProductRefunds}
-                                <th>{l s='Total products'}</th>
-                            {/if}
-							<th>{l s='Refund status'}</th>
-							<th>{l s='Date requested'}</th>
-							<th>{l s='Actions'}</th>
-						</tr>
-					</thead>
-					<tbody>
-						{foreach from=$ordersReturns item=return}
-							<tr>
-								<td>
-									#{$return.reference|escape:'html':'UTF-8'}
-								</td>
-                                {if isset($hasRoomRefunds) && $hasRoomRefunds}
-                                    <td>
-                                        {$return.total_rooms|escape:'html':'UTF-8'}
-                                    </td>
-                                {/if}
-                                {if isset($hasProductRefunds) && $hasProductRefunds}
-                                    <td>
-                                        {$return.total_products|escape:'html':'UTF-8'}
-                                    </td>
-                                {/if}
-								<td>
-									<span class="badge wk-badge" style="background-color:{$return.state_color|escape:'html':'UTF-8'}">{$return.state_name|escape:'html':'UTF-8'}
-								</td>
-								<td>
-									{dateFormat date=$return.date_add full=0}
-								</td>
-								<td>
-									<a class="btn btn-default" href="{$link->getPageLink('order-return', true)|escape:'html':'UTF-8'}&amp;id_order_return={$return.id_order_return|escape:'html':'UTF-8'}"><i class="icon-search-plus"></i> {l s='View details'}</a>
-								</td>
-							</tr>
-						{/foreach}
-					</tbody>
-				</table>
+	<div class="container-md">
+		<div class="d-flex justify-content-center">
+			<div class="qlo-account-card card col-12 p-5 mb-md-4">
+				{block name='order_follow_heading'}
+					<h1 class="page-heading text-center text-bolder h5 font-weight-bold">{l s='Booking Refund Requests'}</h1>
+				{/block}
+				<hr>
+				{if $ordersReturns && $ordersReturns|count}
+					<div class="table-responsive wk-datatable-wrapper">
+						<table class="table table-striped footab">
+							<thead>
+								<tr>
+									<th>{l s='Order'}</th>
+									{if isset($hasRoomRefunds) && $hasRoomRefunds}
+	                                <th>{l s='Total rooms'}</th>
+	                            {/if}
+	                            {if isset($hasProductRefunds) && $hasProductRefunds}
+	                                <th>{l s='Total products'}</th>
+	                            {/if}
+									<th>{l s='Refund status'}</th>
+									<th>{l s='Date requested'}</th>
+									<th>{l s='Actions'}</th>
+								</tr>
+							</thead>
+							<tbody>
+								{foreach from=$ordersReturns item=return}
+									<tr>
+										<td>#{$return.reference|escape:'html':'UTF-8'}</td>
+	                                {if isset($hasRoomRefunds) && $hasRoomRefunds}
+	                                    <td>
+	                                        {if isset($return.total_rooms_refunds)}{$return.total_rooms_refunds|escape:'html':'UTF-8'}{else}{$return.total_rooms|escape:'html':'UTF-8'}{/if}
+	                                    </td>
+	                                {/if}
+	                                {if isset($hasProductRefunds) && $hasProductRefunds}
+	                                    <td>
+	                                        {if isset($return.total_products_refunds)}{$return.total_products_refunds|escape:'html':'UTF-8'}{else}{$return.total_products|escape:'html':'UTF-8'}{/if}
+	                                    </td>
+	                                {/if}
+										<td>
+											<span class="label{if isset($return.state_color) && Tools::getBrightness($return.state_color) > 128} dark{/if}"{if isset($return.state_color) && $return.state_color} style="background-color:{$return.state_color|escape:'html':'UTF-8'}; border-color:{$return.state_color|escape:'html':'UTF-8'};"{/if}>
+												{$return.state_name|escape:'html':'UTF-8'}
+											</span>
+										</td>
+										<td>{dateFormat date=$return.date_add full=0}</td>
+										<td>
+											<a class="btn btn-primary btn-sm" href="{$link->getPageLink('order-return', true)|escape:'html':'UTF-8'}&amp;id_order_return={$return.id_order_return|escape:'html':'UTF-8'}">
+												{l s='View Details'}
+											</a>
+										</td>
+									</tr>
+								{/foreach}
+							</tbody>
+						</table>
+					</div>
+				{else}
+					<div class="alert alert-warning">{l s='You have no booking refund requests.'}</div>
+				{/if}
 			</div>
-		{else}
-			<div class="alert alert-warning">{l s='You have no booking refund requests.'}</div>
-		{/if}
+		</div>
 	</div>
 
 	{block name='order_follow_footer_links'}
 		<ul class="footer_links clearfix">
-			<li><a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-chevron-left"></i> {l s='Back to My account'}</span></a></li>
-			<li><a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>
+			<li><a class="link text-secondary" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-angles-left"></i> {l s='Back to your account'}</span></a></li>
 		</ul>
 	{/block}
 {/block}
