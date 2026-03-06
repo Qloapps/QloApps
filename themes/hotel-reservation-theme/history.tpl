@@ -124,7 +124,7 @@
 												{block name='booking_state'}
 													<td {if isset($order.order_state)} data-value="{$order.id_order_state}" data-order-state-id="{$order.id_order_state|intval}"{/if} class="history_state">
 														{if isset($order.order_state)}
-															<span class="label{if isset($order.order_state_color) && Tools::getBrightness($order.order_state_color) > 128} dark{/if}"{if isset($order.order_state_color) && $order.order_state_color} style="background-color:{$order.order_state_color|escape:'html':'UTF-8'}; border-color:{$order.order_state_color|escape:'html':'UTF-8'};"{/if}>
+															<span class="label badge{if isset($order.order_state_color) && Tools::getBrightness($order.order_state_color) > 128} dark{/if}"{if isset($order.order_state_color) && $order.order_state_color} style="background-color:{$order.order_state_color|escape:'html':'UTF-8'}; border-color:{$order.order_state_color|escape:'html':'UTF-8'};"{/if}>
 																{if $order.current_state|in_array:$overbooking_order_states}
 																	{l s='Order Not Confirmed'}
 																{else}
@@ -147,7 +147,7 @@
 												{/block}
 												{block name='booking_detail'}
 													<td class="history_detail">
-														<a class="btn btn-primary" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}">
+														<a class="btn btn-primary btn-sm" href="{$link->getPageLink('order-detail', true, NULL, "id_order={$order.id_order|intval}")|escape:'html':'UTF-8'}">
 															<span>
 																{l s='Details'}<i class="icon-chevron-right right"></i>
 															</span>

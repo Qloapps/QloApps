@@ -24,10 +24,13 @@
 *}
 
 {block name='order_confirmation'}
-	{capture name=path}{l s='Order confirmation'}{/capture}
+	{capture name=path}
+		<li class="breadcrumb-item"><span class="navigation_page">{l s='Order confirmation'}</span></li>
+	{/capture}
 	{block name='order_confirmation_heading'}
-		<h1 class="page-heading">{l s='Booking confirmation'} : <span class="bold">{$order->reference}</span></h1>
+		<h1 class="page-heading text-bolder h5 font-weight-bold mb-3 text-center">{l s='Booking confirmation'} : <span class="font-weight-bold">{$order->reference}</span></h1>
 	{/block}
+	<div class="container-md qlo-order-confirmation-page">
 
 	{assign var='current_step' value='payment'}
 	{block name='order_steps'}
@@ -44,7 +47,7 @@
 
 	<div class="order-confirmation-column">
         {if $HOOK_PAYMENT_RETURN}
-            <div class="card">
+            <div class="qlo-account-card card mb-3">
                 <div class="card-body">
                 {block name='displayPaymentReturn'}
                     {$HOOK_PAYMENT_RETURN}
@@ -73,9 +76,9 @@
 				{block name='order_details'}
 					<div id="order-detail-content" class="">
 						<div class="row">
-							<div class="col-md-8 order-product-summary">
+							<div class="col-12 col-lg-8 order-product-summary mb-3 mb-lg-0">
 								{if isset($cart_htl_data)}
-									<div class="card">
+									<div class="qlo-account-card card mb-3">
 										<div class="card-header">{l s='Room Details'}</div>
 										<div class="card-body">
 											{foreach from=$cart_htl_data key=data_k item=data_v}
@@ -208,7 +211,7 @@
 									</div>
 								{/if}
 								{if isset($cart_standalone_service_products) || isset($cart_hotel_service_products)}
-									<div class="card">
+									<div class="qlo-account-card card">
 										<div class="card-header">{l s='Product Details'}</div>
 										<div class="card-body">
 											{if isset($cart_hotel_service_products)}
@@ -368,9 +371,9 @@
 									</div>
 								{/if}
 							</div>
-							<div class="col-md-4">
+							<div class="col-12 col-lg-4">
 								{block name='order_detail_payment_details'}
-									<div class="card">
+									<div class="qlo-account-card card mb-3">
 										<div class="card-header">
 											{l s='Payment Details'}
 										</div>
@@ -413,14 +416,15 @@
 									</div>
 								{/block}
 								{block name='order_detail_payment_summary'}
-									<div class="card">
+									<div class="qlo-account-card card">
 										<div class="card-header">
 											{l s='Payment Summary'}
 										</div>
 										<div class="card-body">
 											<div class="prices-breakdown-table">
-												<table class="table table-sm table-responsive table-summary">
-													<tbody>
+												<div class="table-responsive">
+													<table class="table table-sm table-summary mb-0">
+														<tbody>
 														{if isset($cart_htl_data)}
 															<tr class="item">
 																<td>
@@ -515,8 +519,9 @@
 														{/if}
 
 
-													</tbody>
-												</table>
+														</tbody>
+													</table>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -525,13 +530,13 @@
 						</div>
 					</div>
 				{/block}
-				<p>{l s='An email has been sent with this information.'}
+				<p class="mt-3">{l s='An email has been sent with this information.'}
 					<br /><strong>{l s='Your booking has been received successfully and we are looking forward to welcoming you.'}</strong>
 					<br />{l s='If you have questions, comments or concerns, please contact our'} <a class="cust_serv_lnk" href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team.'}</a>
 				</p>
-				<p class="cart_navigation exclusive">
-					<a class="btn" href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Go to your order history page'}"><i class="icon-chevron-left"></i>{l s='View your order history'}</a>
-				</p>
+				<div class="d-flex justify-content-start mb-3">
+					<a class="link text-secondary" href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Go to your order history page'}"><i class="icon-angles-left"></i> {l s='View your order history'}</a>
+				</div>
 			{/if}
 		{/if}
 	</div>
@@ -560,4 +565,5 @@
 			{addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for order cancellation.' js=1}{/addJsDefL}
 		{/strip}
 	{/block}
+	</div>
 {/block}

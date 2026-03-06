@@ -25,28 +25,15 @@
 
 {block name='order_detail'}
     {capture name=path}
-        <a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
-            {l s='My account'}
-        </a>
-        <span class="navigation-pipe">
-            {$navigationPipe}
-        </span>
-        <a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}">
-            {l s='Bookings'}
-        </a>
-        <span class="navigation-pipe">
-            {$navigationPipe}
-        </span>
-        <span class="navigation_page">
-            {l s='Booking details'}
-        </span>
+        <li class="breadcrumb-item"><a href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">{l s='My account'}</a></li>
+        <li class="breadcrumb-item"><a href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}">{l s='Order History'}</a></li>
+        <li class="breadcrumb-item"><span class="navigation_page">{l s='Booking details'}</span></li>
     {/capture}
 
-    {block name='order_detail_heading'}
-        <h1 class="page-heading bottom-indent">
-            {l s='Booking Details'}
-        </h1>
-    {/block}
+    <div class="container-md qlo-order-detail-page">
+        {block name='order_detail_heading'}
+            <h1 class="page-heading text-bolder h5 font-weight-bold mb-3">{l s='Order History'}</h1>
+        {/block}
 
 	{block name='errors'}
         {include file="$tpl_dir./errors.tpl"}
@@ -54,13 +41,8 @@
 
     {if isset($order) && $order}
         {block name='order_detail_subheading'}
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="well well-md well-order-date">
-                        {l s='Booking Reference ' sprintf=$order->getUniqReference()}<strong>{$order->getUniqReference()}</strong>{l s=' - placed on'}
-                        <span title="{dateFormat date=$order->date_add full=1}">{dateFormat date=$order->date_add}</span>
-                    </div>
-                </div>
+            <div class="alert alert-success well-order-date qlo-order-reference-bar">
+                {l s='Order Reference'} <strong>{$order->getUniqReference()}</strong> - {l s='Placed On'} <span title="{dateFormat date=$order->date_add full=1}">{dateFormat date=$order->date_add}</span>
             </div>
         {/block}
 
@@ -69,7 +51,7 @@
         {/block}
 
         <div class="row" id="order_detail_container">
-            <div class="col-md-8">
+            <div class="col-12 col-lg-8">
                 {block name='displayOrderDetailTopLeft'}
                     {hook h='displayOrderDetailTopLeft' id_order=$order->id}
                 {/block}
@@ -129,7 +111,7 @@
                 {/block}
 
                 {block name='order_details_payment_details_mobile'}
-                    <div class="card payment-details visible-xs visible-sm hidden-md hidden-lg">
+                    <div class="card payment-details d-block d-md-none">
                         <div class="card-header">
                             {l s='Payment Details'}
                         </div>
@@ -174,7 +156,7 @@
 
                 {block name='order_detail_hotel_location_mobile'}
                     {if isset($obj_hotel_branch_information)}
-                        <div class="card hotel-location visible-xs visible-sm hidden-md hidden-lg">
+                        <div class="card hotel-location d-block d-md-none">
                             <div class="card-header">
                                 {l s='Hotel Location'}
                             </div>
@@ -307,7 +289,7 @@
                 {/block}
 
                 {block name='order_detail_payment_summary_mobile'}
-                    <div class="card payment-summary visible-xs visible-sm hidden-md hidden-lg">
+                    <div class="card payment-summary d-block d-md-none">
                         <div class="card-header">
                             {l s='Payment Summary'}
                         </div>
@@ -418,7 +400,7 @@
                 {/block}
 
                 {block name='order_detail_guest_details_mobile'}
-                    <div class="card guest-details visible-xs visible-sm hidden-md hidden-lg">
+                    <div class="card guest-details d-block d-md-none">
                         <div class="card-header">
                             {l s='Guest Details'}
                         </div>
@@ -622,13 +604,13 @@
                     {hook h='displayOrderDetailBottomLeft' id_order=$order->id}
                 {/block}
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-lg-4">
                 {block name='displayOrderDetailTopRight'}
                     {hook h='displayOrderDetailTopRight' id_order=$order->id}
                 {/block}
 
                 {block name='order_detail_payment_details'}
-                    <div class="card payment-details hidden-xs hidden-sm visible-md">
+                    <div class="card payment-details d-none d-md-block">
                         <div class="card-header">
                             {l s='Payment Details'}
                         </div>
@@ -673,7 +655,7 @@
 
                 {block name='order_detail_hotel_location'}
                     {if isset($obj_hotel_branch_information)}
-                        <div class="card hotel-location hidden-xs hidden-sm visible-md">
+                        <div class="card hotel-location d-none d-md-block">
                             <div class="card-header">
                                 {l s='Hotel Location'}
                             </div>
@@ -715,7 +697,7 @@
                 {/block}
 
                 {block name='order_detail_payment_summary'}
-                    <div class="card payment-summary hidden-xs hidden-sm visible-md">
+                    <div class="card payment-summary d-none d-md-block">
                         <div class="card-header">
                             {l s='Payment Summary'}
                         </div>
@@ -826,7 +808,7 @@
                 {/block}
 
                 {block name='order_detail_guest_details'}
-                    <div class="card guest-details hidden-xs hidden-sm visible-md">
+                    <div class="card guest-details d-none d-md-block">
                         <div class="card-header">
                             {l s='Guest Details'}
                         </div>
@@ -1124,6 +1106,7 @@
             <div id="popup-view-extra-services" class="popup-view-extra-services" style="display: none;"></div>
         {/block}
     {/if}
+    </div>
 
     {block name='order_detail_js_vars'}
         {strip}

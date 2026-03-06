@@ -24,11 +24,12 @@
 *}
 
 {capture name=path}
-    <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='bankwire'}">{l s='Checkout' mod='bankwire'}</a><span class="navigation-pipe">{$navigationPipe}</span>{l s='Bank-wire payment' mod='bankwire'}
+    <li class="breadcrumb-item"><a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='bankwire'}">{l s='Checkout' mod='bankwire'}</a></li>
+    <li class="breadcrumb-item"><span class="navigation_page">{l s='Order summary' mod='bankwire'}</span></li>
 {/capture}
 <section id="wrapper">
-    <div class="container">
-        <p class="page-heading-light">{l s='Order summary' mod='bankwire'}</p>
+    <div class="container-md">
+        <h3 class="page-heading-light mb-md-3">{l s='Order Summary' mod='bankwire'}</h3>
 
         {assign var='current_step' value='payment'}
         {include file="$tpl_dir./errors.tpl"}
@@ -40,55 +41,54 @@
             </p>
         {else}
             <form action="{$link->getModuleLink('bankwire', 'validation', [], true)|escape:'html':'UTF-8'}" method="post">
-                <div class="box cheque-box qlo-card">
-                    <h3 class="page-subheading">{l s='Bank-wire payment' mod='bankwire'}</h3>
-                    <p class="cheque-indent">
-                        <strong class="dark">
-                            {l s='You have chosen to pay by bank wire.' mod='bankwire'} {l s='Here is a short summary of your order:' mod='bankwire'}
-                        </strong>
+                <div class="qlo-account-card card p-4 p-md-5 mb-3">
+                    <h3 class="page-subheading mb-3">{l s='Bank-Wire Payment' mod='bankwire'}</h3>
+                    <p class="mb-3">
+                        <strong>{l s='You have chosen to pay by bank wire. Here is a short summary of your order:' mod='bankwire'}</strong>
                     </p>
-                    <p>
+                    <p class="mb-2">
                         - {l s='The total amount of your order is' mod='bankwire'}
                         <span id="amount" class="price">{displayPrice price=$total}</span>
                         {if $use_taxes == 1 && $display_tax_label}
                             {l s='(tax incl.)' mod='bankwire'}
                         {/if}
                     </p>
-                    <p>
-                        -
-                        {if $currencies|@count > 1}
-                            {l s='We allow several currencies to be sent via bank wire.' mod='bankwire'}
-                            <div class="form-group">
-                                <strong class="col-12">{l s='Choose one of the following:' mod='bankwire'}</strong>
-                                <div class="col-md-4">
-                                    <select id="currency_payment" class="form-control" name="currency_payment">
-                                        {foreach from=$currencies item=currency}
-                                            <option value="{$currency.id_currency}" {if $currency.id_currency == $cust_currency}selected="selected"{/if}>
-                                                {$currency.name}
-                                            </option>
-                                        {/foreach}
-                                    </select>
-                                </div>
+                    <p class="mb-2">- {l s='We allow several currencies to be sent via bank wire.' mod='bankwire'}</p>
+
+                    {if $currencies|@count > 1}
+                        <div class="form-group row mb-3">
+                            <label class="col-12 font-weight-bold">{l s='Choose one of the following:' mod='bankwire'}</label>
+                            <div class="col-12 col-md-6 col-lg-5">
+                                <select id="currency_payment" class="form-control" name="currency_payment">
+                                    {foreach from=$currencies item=currency}
+                                        <option value="{$currency.id_currency}" {if $currency.id_currency == $cust_currency}selected="selected"{/if}>
+                                            {$currency.name}
+                                        </option>
+                                    {/foreach}
+                                </select>
                             </div>
-                        {else}
-                            {l s='We allow the following currency to be sent via bank wire:' mod='bankwire'}&nbsp;<b>{$currencies.0.name}</b>
-                            <input type="hidden" name="currency_payment" value="{$currencies.0.id_currency}" />
-                        {/if}
-                    </p>
-                    <p>- {l s='Bank wire account information will be displayed on the next page.' mod='bankwire'}</p>
-                    <p>- {l s='Please confirm your order by clicking "I confirm my order".' mod='bankwire'}</p>
-                </div><!-- .cheque-box -->
-                <p class="cart_navigation clearfix" id="cart_navigation">
-                    <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" class="button-exclusive btn btn-default">
-                        <i class="icon-chevron-left"></i>{l s='Other payment methods' mod='bankwire'}
+                        </div>
+                    {else}
+                        <p class="mb-2">
+                            - {l s='We allow the following currency to be sent via bank wire:' mod='bankwire'} <strong>{$currencies.0.name}</strong>
+                            <input type="hidden" name="currency_payment" value="{$currencies.0.id_currency}">
+                        </p>
+                    {/if}
+
+                    <p class="mb-2">- {l s='Bank wire account information will be displayed on the next page.' mod='bankwire'}</p>
+                    <p class="mb-0">- {l s='Please confirm your order by clicking "I confirm my order".' mod='bankwire'}</p>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mt-3">
+                    <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" class="link text-secondary mb-3 mb-sm-0">
+                        <i class="icon-angles-left"></i>{l s=' Other payment methods' mod='bankwire'}
                     </a>
-                    {*By webkul To Check Order restrict condition before Payment by the customer*}
                     {if !$restrict_order}
-                        <button class="btn pull-right btn-primary btn-medium confirm_order" type="submit">
-                            <span>{l s='I confirm my order' mod='bankwire'}&nbsp;<i class="icon-chevron-right right"></i></span>
+                        <button class="btn btn-primary btn-medium confirm_order" type="submit">
+                            <span>{l s='I confirm my order' mod='bankwire'}</span>
                         </button>
                     {/if}
-                </p>
+                </div>
             </form>
         {/if}
     </div>

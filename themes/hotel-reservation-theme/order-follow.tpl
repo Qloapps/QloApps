@@ -41,7 +41,7 @@
 							<thead>
 								<tr>
 									<th>{l s='Order'}</th>
-									{if isset($hasRoomRefunds) && $hasRoomRefunds}
+								{if isset($hasRoomRefunds) && $hasRoomRefunds}
 	                                <th>{l s='Total rooms'}</th>
 	                            {/if}
 	                            {if isset($hasProductRefunds) && $hasProductRefunds}
@@ -57,19 +57,13 @@
 									<tr>
 										<td>#{$return.reference|escape:'html':'UTF-8'}</td>
 	                                {if isset($hasRoomRefunds) && $hasRoomRefunds}
-	                                    <td>
-	                                        {if isset($return.total_rooms_refunds)}{$return.total_rooms_refunds|escape:'html':'UTF-8'}{else}{$return.total_rooms|escape:'html':'UTF-8'}{/if}
-	                                    </td>
+	                                    <td>{$return.total_rooms|escape:'html':'UTF-8'}</td>
 	                                {/if}
 	                                {if isset($hasProductRefunds) && $hasProductRefunds}
-	                                    <td>
-	                                        {if isset($return.total_products_refunds)}{$return.total_products_refunds|escape:'html':'UTF-8'}{else}{$return.total_products|escape:'html':'UTF-8'}{/if}
-	                                    </td>
+	                                    <td>{$return.total_products|escape:'html':'UTF-8'}</td>
 	                                {/if}
 										<td>
-											<span class="label{if isset($return.state_color) && Tools::getBrightness($return.state_color) > 128} dark{/if}"{if isset($return.state_color) && $return.state_color} style="background-color:{$return.state_color|escape:'html':'UTF-8'}; border-color:{$return.state_color|escape:'html':'UTF-8'};"{/if}>
-												{$return.state_name|escape:'html':'UTF-8'}
-											</span>
+											<span class="label badge{if isset($return.state_color) && Tools::getBrightness($return.state_color) > 128} dark{/if}"{if isset($return.state_color) && $return.state_color} style="background-color:{$return.state_color|escape:'html':'UTF-8'}; border-color:{$return.state_color|escape:'html':'UTF-8'};"{/if}>{$return.state_name|escape:'html':'UTF-8'}</span>
 										</td>
 										<td>{dateFormat date=$return.date_add full=0}</td>
 										<td>
@@ -87,11 +81,11 @@
 				{/if}
 			</div>
 		</div>
+		{block name='order_follow_footer_links'}
+			<ul class="footer_links clearfix">
+				<li><a class="link text-secondary" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-angles-left"></i> {l s='Back to your account'}</span></a></li>
+			</ul>
+		{/block}
 	</div>
 
-	{block name='order_follow_footer_links'}
-		<ul class="footer_links clearfix">
-			<li><a class="link text-secondary" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-angles-left"></i> {l s='Back to your account'}</span></a></li>
-		</ul>
-	{/block}
 {/block}
