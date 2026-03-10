@@ -2052,6 +2052,8 @@ class HotelCartBookingData extends ObjectModel
             $this->extra_demands = json_encode(array());
         }
 
+        $this->formatBookingDateRange();
+
         return parent::update($null_values);
     }
 
@@ -2061,7 +2063,24 @@ class HotelCartBookingData extends ObjectModel
             $this->extra_demands = json_encode(array());
         }
 
+        $this->formatBookingDateRange();
+
         return parent::add($auto_date, $null_values);
+    }
+
+    protected function formatBookingDateRange()
+    {
+        if (!$this->date_from || !$this->date_to) {
+            return;
+        }
+
+        $normalizedDateRange = HotelHelper::formatBookingDateRange(
+            $this->date_from,
+            $this->date_to,
+            (int)$this->id_hotel
+        );
+        $this->date_from = $normalizedDateRange['date_from'];
+        $this->date_to = $normalizedDateRange['date_to'];
     }
 
     // Webservice :: get extra demands for the cart booking

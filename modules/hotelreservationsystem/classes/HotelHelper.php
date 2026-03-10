@@ -2700,13 +2700,110 @@ class HotelHelper
             return 0;
         }
 
-        $startDate = new DateTime($dateFrom);
-        $endDate = new DateTime($dateTo);
-        $daysDifference = $startDate->diff($endDate)->days;
+        try {
+            $startDate = new DateTime($dateFrom);
+            $endDate = new DateTime($dateTo);
+        } catch (Exception $e) {
+            return 0;
+        }
+
+        $hasDateFromTime = self::hasNonZeroTime($dateFrom);
+        $hasDateToTime = self::hasNonZeroTime($dateTo);
+        if ($hasDateFromNonZeroTime && $hasDateToNonZeroTime) {
+            if ($startDate->format('Y-m-d') != $endDate->format('Y-m-d')) {
+                $hoursPerDay = self::getHourlyDurationInDay($startDate, $endDate);
+                if ($hoursPerDay > 0) {
+                    $totalDays = (int)$startDate->diff($endDate)->format('%a') + 1;
+                    $daysDifference = (int)($totalDays * $hoursPerDay);
+                } else {
+                    $startDate->setTime(0, 0, 0);
+                    $endDate->setTime(0, 0, 0);
+                    $daysDifference = (int)$startDate->diff($endDate)->format('%a');
+                }
+            } else {
+                $difference = $startDate->diff($endDate);
+                $daysDifference = (int)(($difference->days * 24) + $difference->h);
+            }
+        } else {
+            if ($startDate->format('Y-m-d') != $endDate->format('Y-m-d')) {
+                $startDate->setTime(0, 0, 0);
+                $endDate->setTime(0, 0, 0);
+            }
+
+            $daysDifference = (int)$startDate->diff($endDate)->format('%a');
+        }
         Hook::exec('actionDatesDifferenceModifier', array('date_from'=> $dateFrom, 'date_to'=> $dateTo, 'days_difference'=> &$daysDifference));
 
-        return $daysDifference;
+        return (int)$daysDifference;
     }
+
+    protected static function getHourlyDurationInDay(DateTime $startDate, DateTime $endDate)
+    {
+        $startTime = strtotime($startDate->format('H:i:s'));
+        $endTime = strtotime($endDate->format('H:i:s'));
+
+        if ($startTime === false || $endTime === false || $endTime <= $startTime) {
+            return 0;
+        }
+
+        return (int)floor(($endTime - $startTime) / 3600);
+    }
+
+    public static function formatBookingDateRange($dateFrom, $dateTo, $idHotel = 0)
+    {
+        $result = array(
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+        );
+
+        if (!$dateFrom || !$dateTo) {
+            return $result;
+        }
+
+        $dateFromTimestamp = strtotime($dateFrom);
+        $dateToTimestamp = strtotime($dateTo);
+        if ($dateFromTimestamp === false || $dateToTimestamp === false) {
+            return $result;
+        }
+
+        $hasDateFromTime = self::hasNonZeroTime($dateFrom);
+        $hasDateToTime = self::hasNonZeroTime($dateTo);
+        if (!$hasDateFromTime && !$hasDateToTime && $idHotel) {
+            $checkInTime = '12:00:00';
+            $checkOutTime = '11:00:00';
+            if (Validate::isLoadedObject($objHotel = new HotelBranchInformation((int)$idHotel))) {
+                if ($objHotel->check_in && ($ts = strtotime($objHotel->check_in)) !== false) {
+                    $checkInTime = date('H:i:s', $ts);
+                }
+
+                if ($objHotel->check_out && ($ts = strtotime($objHotel->check_out)) !== false) {
+                    $checkOutTime = date('H:i:s', $ts);
+                }
+            }
+
+            $result['date_from'] = date('Y-m-d', $dateFromTimestamp).' '.$checkInTime;
+            $result['date_to'] = date('Y-m-d', $dateToTimestamp).' '.$checkOutTime;
+        } else {
+            $result['date_from'] = date('Y-m-d H:i:s', $dateFromTimestamp);
+            $result['date_to'] = date('Y-m-d H:i:s', $dateToTimestamp);
+        }
+
+        return $result;
+    }
+
+    protected static function hasNonZeroTime($value)
+    {
+        if (!preg_match('/\s([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?$/', trim($value), $matches)) {
+            return false;
+        }
+
+        $hours = (int)$matches[1];
+        $minutes = (int)$matches[2];
+        $seconds = isset($matches[4]) ? (int)$matches[4] : 0;
+
+        return (bool)($hours || $minutes || $seconds);
+    }
+
 
     /**
      * Validate the date range for a hotel booking.

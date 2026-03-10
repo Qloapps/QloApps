@@ -2288,9 +2288,11 @@ class HotelBookingDetail extends ObjectModel
                 $objOldOrderDetail->reinjectQuantity($objOldOrderDetail, $objOldOrderDetail->product_quantity, $deleteQty);
 
                 // retrieve and delete HotelCartBookingData row
-                $idHotelCartBookingData = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
-                    WHERE date_from = "'.pSQL($objOldHotelBooking->date_from).'" AND date_to = "'.pSQL($objOldHotelBooking->date_to).'"
-                    AND id_room = '.(int) $objOldHotelBooking->id_room.' AND `id_order` = '.(int) $objOldHotelBooking->id_order
+                $idHotelCartBookingData = $this->getCartBookingDataIdByOrderRoomDateRange(
+                    (int)$objOldHotelBooking->id_order,
+                    (int)$objOldHotelBooking->id_room,
+                    $objOldHotelBooking->date_from,
+                    $objOldHotelBooking->date_to
                 );
                 $objCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
                 if ($idNewCartBookingData) {
@@ -2324,9 +2326,11 @@ class HotelBookingDetail extends ObjectModel
                 // If we are reallocating to the same room type then we need to update only the room details
                 // update in the cart booking data
                 // retrieve HotelCartBookingData row
-                $idHotelCartBookingData = Db::getInstance()->getValue('SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
-                    WHERE date_from = "'.pSQL($objOldHotelBooking->date_from).'" AND date_to = "'.pSQL($objOldHotelBooking->date_to).'"
-                    AND id_room = '.(int) $objOldHotelBooking->id_room.' AND `id_order` = '.(int) $objOldHotelBooking->id_order
+                $idHotelCartBookingData = $this->getCartBookingDataIdByOrderRoomDateRange(
+                    (int)$objOldHotelBooking->id_order,
+                    (int)$objOldHotelBooking->id_room,
+                    $objOldHotelBooking->date_from,
+                    $objOldHotelBooking->date_to
                 );
                 $objCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
                 $objCartBookingData->id_room = $idRoom;
@@ -2605,11 +2609,11 @@ class HotelBookingDetail extends ObjectModel
         $objHotelBookingDetail = new self((int) $idHotelBookingDetail);
         if (Validate::isLoadedObject($objHotelBookingDetail)) {
             // retrieve HotelCartBookingData row
-            $idHotelCartBookingData = Db::getInstance()->getValue(
-                'SELECT `id`
-                FROM `'._DB_PREFIX_.'htl_cart_booking_data`
-                WHERE date_from = "'.pSQL($oldDateFrom).'" AND date_to = "'.pSQL($oldDateTo).'"
-                AND id_room = '.(int) $idRoom.' AND `id_order` = '.(int) $idOrder
+            $idHotelCartBookingData = $this->getCartBookingDataIdByOrderRoomDateRange(
+                (int)$idOrder,
+                (int)$idRoom,
+                $oldDateFrom,
+                $oldDateTo
             );
 
             $objHotelCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
@@ -2641,6 +2645,29 @@ class HotelBookingDetail extends ObjectModel
         }
 
         return false;
+    }
+
+    protected function getCartBookingDataIdByOrderRoomDateRange($idOrder, $idRoom, $dateFrom, $dateTo)
+    {
+        $idCartBookingData = Db::getInstance()->getValue(
+            'SELECT `id`
+            FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE `date_from` = "'.pSQL($dateFrom).'" AND `date_to` = "'.pSQL($dateTo).'"
+            AND `id_room` = '.(int)$idRoom.' AND `id_order` = '.(int)$idOrder
+        );
+
+        // Backward compatibility: old cart rows may still store midnight datetimes.
+        if (!$idCartBookingData) {
+            $idCartBookingData = Db::getInstance()->getValue(
+                'SELECT `id`
+                FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                WHERE DATE(`date_from`) = "'.pSQL(date('Y-m-d', strtotime($dateFrom))).'"
+                AND DATE(`date_to`) = "'.pSQL(date('Y-m-d', strtotime($dateTo))).'"
+                AND `id_room` = '.(int)$idRoom.' AND `id_order` = '.(int)$idOrder
+            );
+        }
+
+        return (int)$idCartBookingData;
     }
 
     /**
