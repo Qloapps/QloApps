@@ -547,57 +547,72 @@ product_tabs['Informations'] = new function(){
 	};
 
 	this.switchProductType = function(){
+		function toggleAssociationFieldNames(containerSelector, shouldShow)
+		{
+			var $container = $(containerSelector);
+			if (shouldShow) {
+				$container.show('fast').find('input').each(function() {
+					$(this).attr('name', $(this).attr('data-name'));
+					$(this).removeAttr('data-name');
+				});
+			} else {
+				$container.hide('fast').find('input').each(function() {
+					$(this).attr('data-name', $(this).attr('name'));
+					$(this).removeAttr('name');
+				});
+			}
+		}
+
+		function applySellingPreferenceUIState()
+		{
+			var sellingPreference = parseInt($('#selling_preference_type').val(), 10);
+			var showHotelTree = $.inArray(sellingPreference, [
+				SELLING_PREFERENCE_HOTEL_STANDALONE,
+				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+			]) !== -1;
+			var showRoomTypeTree = $.inArray(sellingPreference, [
+				0,
+				SELLING_PREFERENCE_WITH_ROOM_TYPE,
+				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+				SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+			]) !== -1;
+			var showAutoAddToCart = $.inArray(sellingPreference, [
+				0,
+				SELLING_PREFERENCE_WITH_ROOM_TYPE,
+				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+				SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+			]) !== -1;
+			var $autoAddOff = $('#auto_add_to_cart_off');
+			var $autoAddCheckedInput;
+
+			toggleAssociationFieldNames('#associated_hotel_tree', showHotelTree);
+			toggleAssociationFieldNames('#associated_hotel_rooms_tree', showRoomTypeTree);
+
+			if (showAutoAddToCart) {
+				$('#auto_add_to_cart_container').show('fast');
+				$autoAddCheckedInput = $('input[name="auto_add_to_cart"]:checked');
+				if (!$autoAddCheckedInput.length) {
+					$autoAddOff.prop('checked', true);
+					$autoAddCheckedInput = $autoAddOff;
+				}
+			} else {
+				$autoAddOff.prop('checked', true);
+				$('#auto_add_to_cart_container').hide('fast');
+				$autoAddCheckedInput = $autoAddOff;
+			}
+
+			$autoAddCheckedInput.trigger('change');
+			$('#product_options').show('fast');
+		}
 
 		$('#selling_preference_type').on('change',function(){
-			if (parseInt($(this).val()) == SELLING_PREFERENCE_WITH_ROOM_TYPE) {
-				$('#associated_hotel_tree').hide('fast').find('input').each(function() {
-					$(this).attr('data-name', $(this).attr('name'));
-					$(this).removeAttr('name');
-				});
-				$('#associated_hotel_rooms_tree').show('fast').find('input').each(function() {
-					$(this).attr('name', $(this).attr('data-name'));
-					$(this).removeAttr('data-name');
-				});
-				$('#auto_add_to_cart_container').show('fast');
-				$('#show_at_front_container').show('fast');
-				$('#product_options').show('fast');
-			} else if (parseInt($(this).val()) == SELLING_PREFERENCE_HOTEL_STANDALONE) {
-				$('#associated_hotel_rooms_tree').hide('fast').find('input').each(function() {
-					$(this).attr('data-name', $(this).attr('name'));
-					$(this).removeAttr('name');
-				});
-				$('#associated_hotel_tree').show('fast').find('input').each(function() {
-					$(this).attr('name', $(this).attr('data-name'));
-					$(this).removeAttr('data-name');
-				});
-				$('#auto_add_to_cart_container').hide('fast');
-				$('#show_at_front_container').show('fast');
-				$('#product_options').show('fast');
-            } else if (parseInt($(this).val()) == SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE) {
-				$('#associated_hotel_rooms_tree').show('fast').find('input').each(function() {
-					$(this).attr('name', $(this).attr('data-name'));
-					$(this).removeAttr('data-name');
-				});
-				$('#associated_hotel_tree').show('fast').find('input').each(function() {
-					$(this).attr('name', $(this).attr('data-name'));
-					$(this).removeAttr('data-name');
-				});
-				$('#auto_add_to_cart_container').hide('fast');
-				$('#show_at_front_container').show('fast');
-				$('#product_options').show('fast');
-            } else if (parseInt($(this).val()) == SELLING_PREFERENCE_STANDALONE) {
-				$('#associated_hotel_rooms_tree').hide('fast').find('input').each(function() {
-					$(this).attr('data-name', $(this).attr('name'));
-					$(this).removeAttr('name');
-				});
-				$('#associated_hotel_tree').hide('fast').find('input').each(function() {
-					$(this).attr('data-name', $(this).attr('name'));
-					$(this).removeAttr('name');
-				});
-				$('#auto_add_to_cart_container').hide('fast');
-				$('#show_at_front_container').show('fast');
-				$('#product_options').show('fast');
-			}
+			setTimeout(function() {
+				applySellingPreferenceUIState();
+			}, 0);
 		});
 		$('#selling_preference_type').trigger('change');
 		$('#simple_product').attr('checked', true);

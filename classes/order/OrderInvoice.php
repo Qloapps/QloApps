@@ -480,12 +480,9 @@ class OrderInvoiceCore extends ObjectModel
         $breakdown = array();
         $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
-            return (
-                !$v['is_booking_product']
-                && !$v['product_auto_add']
-                && Product::isSellableWithRoomType($v['selling_preference_type'])
-            );
+            return (!$v['is_booking_product'] && !$v['product_auto_add'] && Product::isSellableWithRoomType($v['selling_preference_type']));
         });
+
         $details = $order->getProductTaxesDetails($order_detail, false);
 
         if ($sum_composite_taxes) {
@@ -612,14 +609,16 @@ class OrderInvoiceCore extends ObjectModel
         // 	- 'total_price_tax_excl'
         // 	- 'total_amount'
         $breakdown = array();
+        $order_detail = array();
+        $products = $this->getProducts();
         $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
-            return (
-                !$v['is_booking_product']
-                && (Product::isSellableAsStandalone($v['selling_preference_type'])
-                    || Product::isSellableWithHotel($v['selling_preference_type']))
-            );
+            return (!$v['is_booking_product'] && (
+                Product::isSellableAsStandalone($v['selling_preference_type'])
+                || Product::isSellableWithHotel($v['selling_preference_type'])
+            ));
         });
+      
 
         $details = $order->getProductTaxesDetails($order_detail, false);
 

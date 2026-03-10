@@ -58,10 +58,10 @@ class ServiceProductCartDetail extends ObjectModel
         if ($idProduct) {
             $sql .= ' AND `id_product` = '.(int)$idProduct;
         }
-        if ($idHotel) {
+        if ($idHotel !== false && $idHotel !== null) {
             $sql .= ' AND `id_hotel` = '.(int)$idHotel;
         }
-        if ($idHtlCartData) {
+        if ($idHtlCartData !== false && $idHtlCartData !== null) {
             $sql .= ' AND `htl_cart_booking_id` = '.(int)$idHtlCartData;
         }
         if ($idProductOption) {
@@ -348,7 +348,7 @@ class ServiceProductCartDetail extends ObjectModel
                             $productInfo['id_room'] = 0;
                         }
 
-                        if ($detailedInfo) {
+                        if ($detailedInfo && $product['id_hotel']) {
                             $objHotelBranchInformation = new HotelBranchInformation();
                             $hotelInfo = $objHotelBranchInformation->hotelBranchesInfo($language->id, 2, 1, $product['id_hotel']);
                             $hotelInfo['location'] = $hotelInfo['hotel_name'].', '.$hotelInfo['city'].

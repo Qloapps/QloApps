@@ -358,8 +358,11 @@ class Blockcart extends Module
                         $addedProduct['option_name'] = $productOption->name;
                     }
                 }
-                $addedProduct['price'] = Tools::displayPrice($addedProduct['unit_price'] * $addedProduct['qty']);
-                $addedProduct['unit_price'] = Tools::displayPrice($addedProduct['unit_price']);
+                $quantity = $addedProduct['qty'];
+                $totalPrice = (float) $addedProduct['unit_price'];
+                $unitPrice = $totalPrice / $quantity;
+                $addedProduct['price'] = Tools::displayPrice($totalPrice);
+                $addedProduct['unit_price'] = Tools::displayPrice($unitPrice);
             }
             unset($this->context->cookie->currentAddedProduct);
         }

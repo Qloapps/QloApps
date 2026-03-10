@@ -617,8 +617,7 @@ class OrderCore extends ObjectModel
         $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
-        $ids_order_detail = [],
-        $service_product_context = null
+        $ids_order_detail = []
     ) {
         $sql = 'SELECT *, od.`selling_preference_type` as selling_preference_type
             FROM `'._DB_PREFIX_.'order_detail` od
@@ -635,47 +634,11 @@ class OrderCore extends ObjectModel
             if (!$is_booking && $selling_preference_type !== null) {
                 $sql .= ' AND od.`selling_preference_type` = '. (int)$selling_preference_type;
             }
-            if (
-                !$is_booking
-                && $selling_preference_type !== null
-                && Product::isSellableWithRoomType($selling_preference_type)
-                && $product_auto_add !== null
-            ) {
+            if (!$is_booking && $selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product_auto_add !== null) {
                 $sql .= ' AND od.`product_auto_add` = '. (int)$product_auto_add;
             }
-            if (
-                !$is_booking
-                && $selling_preference_type !== null
-                && Product::isSellableWithRoomType($selling_preference_type)
-                && $product_auto_add == 1
-                && $product_price_addition_type !== null
-            ) {
+            if (!$is_booking && $selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product_auto_add == 1 && $product_price_addition_type !== null) {
                 $sql .= ' AND od.`product_price_addition_type` = '. (int)$product_price_addition_type;
-            }
-
-            if (!$is_booking && $service_product_context !== null) {
-                if ((int) $service_product_context === self::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED) {
-
-                    $sql .= '
-                        AND EXISTS (
-                            SELECT 1
-                            FROM ' . _DB_PREFIX_ . 'service_product_order_detail spod
-                            WHERE spod.id_order = od.id_order
-                            AND spod.id_order_detail = od.id_order_detail
-                            AND spod.id_htl_booking_detail > 0
-                        )';
-
-                } elseif ((int) $service_product_context === self::SERVICE_PRODUCT_CONTEXT_NON_ROOM) {
-
-                    $sql .= '
-                        AND EXISTS (
-                            SELECT 1
-                            FROM ' . _DB_PREFIX_ . 'service_product_order_detail spod
-                            WHERE spod.id_order = od.id_order
-                            AND spod.id_order_detail = od.id_order_detail
-                            AND spod.id_htl_booking_detail = 0
-                        )';
-                }
             }
         }
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
@@ -1165,11 +1128,10 @@ class OrderCore extends ObjectModel
         $product_auto_add = null,
         $product_price_addition_type = null,
         $ids_order_detail = [],
-        $service_product_context = null
     ) {
         // update
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail, $service_product_context);
+            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
@@ -1192,11 +1154,10 @@ class OrderCore extends ObjectModel
         $product_auto_add = null,
         $product_price_addition_type = null,
         $ids_order_detail = [],
-        $service_product_context = null
     ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
-            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail, $service_product_context);
+            $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
         $return = 0;
