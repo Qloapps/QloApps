@@ -923,42 +923,18 @@
                             {* Get total rooms prices *}
                             {assign var=total_rooms_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                             {assign var=total_rooms_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
-                            {assign var=all_services_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false)}
-                            {assign var=all_services_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false)}
-                            {assign var=room_linked_services_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)}
-                            {assign var=room_linked_services_price_tax_incl value=$order->getTotalProductsWithTaxes(false, false, null, null, null, null, Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED)}
 
                             {* Get total extra services including convenience fees prices *}
-                            {assign var=total_products_price_tax_excl value=(
-                                $all_services_price_tax_excl - $room_linked_services_price_tax_excl
-                            )}
-                            {assign var=total_products_price_tax_incl value=(
-                                $all_services_price_tax_incl - $room_linked_services_price_tax_incl
-                            )}
+                            {assign var=total_products_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE))}
+                            {assign var=total_products_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE))}
 
                             {* Get total of extra services and extra demands prices(excluding convenience fee) *}
-                            {assign var=total_room_services_and_demands_tax_excl value=(
-                                $room_linked_services_price_tax_excl
-                                + $totalDemandsPriceTE
-                            )}
-                            {assign var=total_room_services_and_demands_tax_incl value=(
-                                $room_linked_services_price_tax_incl
-                                + $totalDemandsPriceTI
-                            )}
+                            {assign var=total_room_services_and_demands_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $totalDemandsPriceTE)}
+                            {assign var=total_room_services_and_demands_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $totalDemandsPriceTI)}
 
                             {* Get total of only convenience fees prices *}
-                            {assign var=total_convenience_fee_tax_excl value=(
-                                $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)
-                                + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)
-                                + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)
-                                + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)
-                            )}
-                            {assign var=total_convenience_fee_tax_incl value=(
-                                $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)
-                                + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)
-                                + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)
-                                + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)
-                            )}
+                            {assign var=total_convenience_fee_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
+                            {assign var=total_convenience_fee_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
 
                             {assign var=order_total_price_tax_excl value=($total_rooms_price_tax_excl + $total_room_services_and_demands_tax_excl + $total_products_price_tax_excl)}
                             {assign var=order_total_price_tax_incl value=($total_rooms_price_tax_incl + $total_room_services_and_demands_tax_incl + $total_products_price_tax_incl)}

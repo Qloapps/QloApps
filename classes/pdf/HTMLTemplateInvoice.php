@@ -660,104 +660,14 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         $footer['service_products_price_tax_excl'] = 0;
         $footer['service_products_price_tax_incl'] = 0;
         if ($idsOrderDetail = array_column($order_details, 'id_order_detail')) {
-            $roomTypeSellingPreferenceTypes = array(
-                Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
-            );
-            $serviceSellingPreferenceTypes = array(
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_STANDALONE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
-                Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
-            );
-
-            $footer['room_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, true, null, null, null, $idsOrderDetail);
-            $footer['room_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, true, null, null, null, $idsOrderDetail);
-
-            foreach ($roomTypeSellingPreferenceTypes as $sellingPreferenceType) {
-                $footer['room_price_tax_excl'] += $this->order->getTotalProductsWithoutTaxes(
-                    false,
-                    false,
-                    $sellingPreferenceType,
-                    1,
-                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
-                    $idsOrderDetail,
-                    Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
-                );
-                $footer['room_price_tax_incl'] += $this->order->getTotalProductsWithTaxes(
-                    false,
-                    false,
-                    $sellingPreferenceType,
-                    1,
-                    Product::PRICE_ADDITION_TYPE_WITH_ROOM,
-                    $idsOrderDetail,
-                    Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
-                );
-                $footer['additional_service_price_tax_excl'] += $this->order->getTotalProductsWithoutTaxes(
-                    false,
-                    false,
-                    $sellingPreferenceType,
-                    0,
-                    null,
-                    $idsOrderDetail,
-                    Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
-                );
-                $footer['additional_service_price_tax_incl'] += $this->order->getTotalProductsWithTaxes(
-                    false,
-                    false,
-                    $sellingPreferenceType,
-                    0,
-                    null,
-                    $idsOrderDetail,
-                    Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
-                );
-                $footer['total_convenience_fee_te'] += $this->order->getTotalProductsWithoutTaxes(
-                    false,
-                    false,
-                    $sellingPreferenceType,
-                    1,
-                    Product::PRICE_ADDITION_TYPE_INDEPENDENT,
-                    $idsOrderDetail,
-                    Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
-                );
-                $footer['total_convenience_fee_ti'] += $this->order->getTotalProductsWithTaxes(
-                    false,
-                    false,
-                    $sellingPreferenceType,
-                    1,
-                    Product::PRICE_ADDITION_TYPE_INDEPENDENT,
-                    $idsOrderDetail,
-                    Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
-                );
-            }
-
-            foreach ($serviceSellingPreferenceTypes as $sellingPreferenceType) {
-                $footer['service_products_price_tax_excl'] += $this->order->getTotalProductsWithoutTaxes(
-                    false,
-                    false,
-                    $sellingPreferenceType,
-                    false,
-                    false,
-                    $idsOrderDetail,
-                    Order::SERVICE_PRODUCT_CONTEXT_NON_ROOM
-                );
-                $footer['service_products_price_tax_incl'] += $this->order->getTotalProductsWithTaxes(
-                    false,
-                    false,
-                    $sellingPreferenceType,
-                    false,
-                    false,
-                    $idsOrderDetail,
-                    Order::SERVICE_PRODUCT_CONTEXT_NON_ROOM
-                );
-            }
-
-            $footer['additional_service_price_tax_excl'] += $totalDemandsPriceTE;
-            $footer['additional_service_price_tax_incl'] += $totalDemandsPriceTI;
+            $footer['room_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, true, null, null, null, $idsOrderDetail) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM, $idsOrderDetail);
+            $footer['room_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, true, null, null, null, $idsOrderDetail) + $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM, $idsOrderDetail);
+            $footer['service_products_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE, false, false, $idsOrderDetail) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE, false, false, $idsOrderDetail);
+            $footer['service_products_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE, false, false, $idsOrderDetail) + $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE, false, false, $idsOrderDetail);
+            $footer['additional_service_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 0, null, $idsOrderDetail) + $totalDemandsPriceTE;
+            $footer['additional_service_price_tax_incl'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 0, null, $idsOrderDetail) + $totalDemandsPriceTI;
+            $footer['total_convenience_fee_te'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
+            $footer['total_convenience_fee_ti'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
         }
 
         $footer['total_paid_real'] = $this->order_invoice->getTotalPaid();

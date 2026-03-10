@@ -348,7 +348,7 @@ class ServiceProductCartDetail extends ObjectModel
                             $productInfo['id_room'] = 0;
                         }
 
-                        if ($detailedInfo) {
+                        if ($detailedInfo && $product['id_hotel']) {
                             $objHotelBranchInformation = new HotelBranchInformation();
                             $hotelInfo = $objHotelBranchInformation->hotelBranchesInfo($language->id, 2, 1, $product['id_hotel']);
                             $hotelInfo['location'] = $hotelInfo['hotel_name'].', '.$hotelInfo['city'].
