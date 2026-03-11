@@ -2709,7 +2709,7 @@ class HotelHelper
 
         $hasDateFromTime = self::hasNonZeroTime($dateFrom);
         $hasDateToTime = self::hasNonZeroTime($dateTo);
-        if ($hasDateFromNonZeroTime && $hasDateToNonZeroTime) {
+        if ($hasDateFromTime && $hasDateToTime) {
             if ($startDate->format('Y-m-d') != $endDate->format('Y-m-d')) {
                 $hoursPerDay = self::getHourlyDurationInDay($startDate, $endDate);
                 if ($hoursPerDay > 0) {

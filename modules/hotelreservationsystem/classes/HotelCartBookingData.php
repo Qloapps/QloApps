@@ -2074,13 +2074,13 @@ class HotelCartBookingData extends ObjectModel
             return;
         }
 
-        $normalizedDateRange = HotelHelper::formatBookingDateRange(
+        $dateRange = HotelHelper::formatBookingDateRange(
             $this->date_from,
             $this->date_to,
             (int)$this->id_hotel
         );
-        $this->date_from = $normalizedDateRange['date_from'];
-        $this->date_to = $normalizedDateRange['date_to'];
+        $this->date_from = $dateRange['date_from'];
+        $this->date_to = $dateRange['date_to'];
     }
 
     // Webservice :: get extra demands for the cart booking
