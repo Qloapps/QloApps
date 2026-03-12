@@ -52,7 +52,7 @@
 
 			{block name='room_types_search_action'}
 				<div class="form-group col-md-4 col-sm-12 mb-0 pr-0 pl-sm-2 pl-0">
-					<button type="button" id="filter_search_now_submit" class="btn btn-primary btn-medium btn-block header-rmsearch-input">
+					<button type="button" id="filter_search_now_submit" class="btn btn-primary btn-block header-rmsearch-input">
 						{l s='Search Now' mod='wkhotelfilterblock'}
 					</button>
 				</div>

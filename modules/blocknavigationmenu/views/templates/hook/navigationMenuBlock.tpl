@@ -45,6 +45,15 @@
 			{block name='displayDefaultNavigationHook'}
 				{hook h="displayDefaultNavigationHook"}
 			{/block}
+
+			<li class="nav-item nav-more d-none">
+				<div class="dropdown">
+					<button class="btn btn-link nav-more-toggle dropdown-toggle p-0" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="icon-ellipsis-h"></i>
+					</button>
+					<div class="dropdown-menu dropdown-menu-right nav-more-menu"></div>
+				</div>
+			</li>
 		</ul>
 
 		{block name='displayExternalNavigationHook'}

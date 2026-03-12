@@ -111,13 +111,13 @@
                 {/block}
 
                 {block name='order_details_payment_details_mobile'}
-                    <div class="card payment-details d-block d-md-none">
+                    <div class="card qlo-account-card payment-details d-block d-md-none">
                         <div class="card-header">
                             {l s='Payment Details'}
                         </div>
                         <div class="card-body">
-                            <div class="detail-row">
-                                <div class=" title">{l s='Payment Method'}</div>
+                            <div class="detail-row flex-column align-items-start pb-2 mb-2 border-bottom">
+                                <div class="title text-muted small font-weight-normal mb-1">{l s='Payment Method'}</div>
                                 <div class=" value payment-method">
                                     {if $invoice && $invoiceAllowed}
                                         <span class="icon-pdf"></span>
@@ -130,9 +130,9 @@
                                 </div>
                             </div>
 
-                            <div class="detail-row">
-                                <div class="pull-left title">{l s='Status'}</div>
-                                <div class="pull-right value status">
+                            <div class="detail-row flex-column align-items-start">
+                                <div class="title text-muted small font-weight-normal mb-1">{l s='Status'}</div>
+                                <div class="value status">
                                     {if isset($order_history[0]) && $order_history[0]}
                                         <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
                                             {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
@@ -156,7 +156,7 @@
 
                 {block name='order_detail_hotel_location_mobile'}
                     {if isset($obj_hotel_branch_information)}
-                        <div class="card hotel-location d-block d-md-none">
+                        <div class="card qlo-account-card hotel-location d-block d-md-none">
                             <div class="card-header">
                                 {l s='Hotel Location'}
                             </div>
@@ -289,13 +289,14 @@
                 {/block}
 
                 {block name='order_detail_payment_summary_mobile'}
-                    <div class="card payment-summary d-block d-md-none">
+                    <div class="card qlo-account-card payment-summary d-block d-md-none">
                         <div class="card-header">
                             {l s='Payment Summary'}
                         </div>
                         <div class="card-body">
                             <div class="prices-breakdown-table">
-                                <table class="table table-sm table-responsive table-summary">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-summary">
                                     <tbody>
                                         {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                                         {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
@@ -309,8 +310,8 @@
                                         {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
-                                                <td>{l s='Total rooms cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
-                                                <td class="text-right">
+                                                <td data-label="{l s='Item'}">{l s='Total rooms cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
+                                                <td class="text-right" data-label="{l s='Amount'}">
                                                     {if $priceDisplay && $use_tax}
                                                         <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $room_services_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
                                                     {else}
@@ -321,8 +322,8 @@
                                         {/if}
                                         {if (isset($hotel_service_products) && $hotel_service_products) || (isset($standalone_service_products) && $standalone_service_products)}
                                             <tr class="item">
-                                                <td>{l s='Total products cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
-                                                <td class="text-right">
+                                                <td data-label="{l s='Item'}">{l s='Total products cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
+                                                <td class="text-right" data-label="{l s='Amount'}">
                                                     {if $priceDisplay && $use_tax}
                                                         <span>{displayWtPriceWithCurrency price=$total_standard_products_tax_excl currency=$currency}</span>
                                                     {else}
@@ -334,8 +335,8 @@
 
                                         {if $total_convenience_fee_te || $total_convenience_fee_te}
                                              <tr class="item">
-                                                <td>{l s='Total Convenience Fees'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
-                                                <td class="text-right">
+                                                <td data-label="{l s='Item'}">{l s='Total Convenience Fees'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
+                                                <td class="text-right" data-label="{l s='Amount'}">
                                                     {if $priceDisplay && $use_tax}
                                                         <span class="price">{displayWtPriceWithCurrency price=$total_convenience_fee_te currency=$currency}</span>
                                                     {else}
@@ -346,31 +347,31 @@
                                         {/if}
 
                                         <tr class="totalprice item">
-                                            <td>{l s='Total Tax'}</td>
-                                            <td class="text-right">
+                                            <td data-label="{l s='Item'}">{l s='Total Tax'}</td>
+                                            <td class="text-right" data-label="{l s='Amount'}">
                                                 <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
                                             </td>
                                         </tr>
 
                                         {if $order->total_discounts > 0}
                                             <tr>
-                                                <td>{l s='Total Vouchers'}</td>
-                                                <td class="text-right">
+                                                <td data-label="{l s='Item'}">{l s='Total Vouchers'}</td>
+                                                <td class="text-right" data-label="{l s='Amount'}">
                                                     <span class="price price-discount">-{displayWtPriceWithCurrency price=$order->total_discounts currency=$currency convert=1}</span>
                                                 </td>
                                             </tr>
                                         {/if}
                                         <tr class="totalprice item">
-                                            <td><strong>{l s='Final Booking Total'}<strong></td>
-                                            <td class="text-right">
+                                            <td data-label="{l s='Item'}"><strong>{l s='Final Booking Total'}<strong></td>
+                                            <td class="text-right" data-label="{l s='Amount'}">
                                                 <strong><span class="price">{displayWtPriceWithCurrency price=$order->total_paid currency=$currency}</span></strong>
                                             </td>
                                         </tr>
 
                                         {if isset($refundReqBookings) && $refundReqBookings}
                                             <tr class="totalprice item">
-                                                <td>{l s='* Refunded Amount'}</td>
-                                                <td class="text-right">
+                                                <td data-label="{l s='Item'}">{l s='* Refunded Amount'}</td>
+                                                <td class="text-right" data-label="{l s='Amount'}">
                                                     <span class="price">{displayWtPriceWithCurrency price=$refundedAmount currency=$currency}</span>
                                                 </td>
                                             </tr>
@@ -378,8 +379,8 @@
 
                                         {if $order->total_paid_tax_incl > $order->total_paid_real}
                                             <tr class="totalprice item">
-                                                <td>{l s='Due Amount'}</td>
-                                                <td class="text-right">
+                                                <td data-label="{l s='Item'}">{l s='Due Amount'}</td>
+                                                <td class="text-right" data-label="{l s='Amount'}">
                                                     <span class="price">{displayWtPriceWithCurrency price=($order->total_paid_tax_incl - $order->total_paid_real) currency=$currency}</span>
                                                 </td>
                                             </tr>
@@ -389,7 +390,8 @@
                                             {hook h='displayOrderDetailPaymentSummaryRow' id_order=$order->id}
                                         {/block}
                                     </tbody>
-                                </table>
+                                    </table>
+                                </div>
                             </div>
 
                             {block name='displayOrderDetailPaymentSummaryAfter'}
@@ -400,37 +402,38 @@
                 {/block}
 
                 {block name='order_detail_guest_details_mobile'}
-                    <div class="card guest-details d-block d-md-none">
+                    <div class="card qlo-account-card guest-details d-block d-md-none">
                         <div class="card-header">
                             {l s='Guest Details'}
                         </div>
                         <div class="card-body">
                             <div class="guest-details-table">
-                                <table class="table table-sm table-responsive table-summary">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-summary">
                                     <tbody>
                                         {if $customerGuestDetail}
                                             {if isset($customerGuestDetail->firstname) && $customerGuestDetail->firstname}
                                                 <tr>
-                                                    <td>{l s='Name'}</td>
-                                                    <td class="text-right">{$customerGuestDetail->firstname|escape:'html':'UTF-8'} {$customerGuestDetail->lastname|escape:'html':'UTF-8'}</td>
+                                                    <td data-label="{l s='Field'}">{l s='Name'}</td>
+                                                    <td class="text-right" data-label="{l s='Value'}">{$customerGuestDetail->firstname|escape:'html':'UTF-8'} {$customerGuestDetail->lastname|escape:'html':'UTF-8'}</td>
                                                 </tr>
                                             {/if}
                                             {if isset($customerGuestDetail->email) && $customerGuestDetail->email}
                                                 <tr>
-                                                    <td>{l s='Email'}</td>
-                                                    <td class="text-right">{$customerGuestDetail->email|escape:'html':'UTF-8'}</td>
+                                                    <td data-label="{l s='Field'}">{l s='Email'}</td>
+                                                    <td class="text-right" data-label="{l s='Value'}">{$customerGuestDetail->email|escape:'html':'UTF-8'}</td>
                                                 </tr>
                                             {/if}
                                             {if isset($customerGuestDetail->phone) && $customerGuestDetail->phone}
                                                 <tr>
-                                                    <td>{l s='Mobile'}</td>
-                                                    <td class="text-right">{$customerGuestDetail->phone|escape:'html':'UTF-8'}</td>
+                                                    <td data-label="{l s='Field'}">{l s='Mobile'}</td>
+                                                    <td class="text-right" data-label="{l s='Value'}">{$customerGuestDetail->phone|escape:'html':'UTF-8'}</td>
                                                 </tr>
                                             {/if}
                                         {else}
                                             <tr>
-                                                <td>{l s='Name'}</td>
-                                                <td class="text-right">
+                                                <td data-label="{l s='Field'}">{l s='Name'}</td>
+                                                <td class="text-right" data-label="{l s='Value'}">
                                                     {if isset($address_invoice->firstname) && $address_invoice->firstname}
                                                         {$address_invoice->firstname|escape:'html':'UTF-8'} {$address_invoice->lastname|escape:'html':'UTF-8'}
                                                     {elseif isset($guestInformations['firstname']) && $guestInformations['firstname']}
@@ -440,14 +443,14 @@
                                             </tr>
 
                                             <tr>
-                                                <td>{l s='Email'}</td>
-                                                <td class="text-right">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
+                                                <td data-label="{l s='Field'}">{l s='Email'}</td>
+                                                <td class="text-right" data-label="{l s='Value'}">{$guestInformations['email']|escape:'html':'UTF-8'}</td>
                                             </tr>
 
                                             {if isset($guestInformations['phone']) && $guestInformations['phone']}
                                                 <tr>
-                                                    <td>{l s='Phone'}</td>
-                                                    <td class="text-right">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
+                                                    <td data-label="{l s='Field'}">{l s='Phone'}</td>
+                                                    <td class="text-right" data-label="{l s='Value'}">{$guestInformations['phone']|escape:'html':'UTF-8'} </td>
                                                 </tr>
                                             {/if}
                                         {/if}
@@ -456,7 +459,8 @@
                                             {hook h='displayOrderDetailGuestDetailsRow' id_order=$order->id}
                                         {/block}
                                     </tbody>
-                                </table>
+                                    </table>
+                                </div>
                             </div>
 
                             {block name='displayOrderDetailGuestDetailsAfter'}
@@ -520,7 +524,7 @@
 
                 {block name='order_detail_order_messages'}
                     {if !$is_guest}
-                        <div class="card order-messages {if !count($messages)}hide{/if}">
+                        <div class="card order-messages {if !count($messages)}unvisible{/if}">
                             <div class="card-header">
                                 {l s='Messages'}
                             </div>
@@ -567,7 +571,7 @@
                                                     {l s='To add a comment about a room type, please select one first.'}
                                                 {/if}
                                             </p>
-                                            <select name="id_product" class="form-control">
+                                            <select name="id_product" class="form-control col-md-6">
                                                 <option value="0">{l s='-- Choose --'}</option>
                                                 {if $roomTypes}
                                                     {foreach from=$roomTypes item=product}
@@ -591,7 +595,7 @@
                                         <div class="submit">
                                             <input type="hidden" name="id_order" value="{$order->id|intval|escape:'html':'UTF-8'}" />
                                             <input type="submit" class="unvisible" name="submitMessage" value="{l s='Send'}" />
-                                            <button type="submit" name="submitMessage" id="submitMessage" class="button btn btn-medium"><span>{l s='Send'}</span></button>
+                                            <button type="submit" name="submitMessage" id="submitMessage" class="btn btn-primary btn-medium"><span>{l s='Send'}</span></button>
                                         </div>
                                     </form>
                                 {/block}

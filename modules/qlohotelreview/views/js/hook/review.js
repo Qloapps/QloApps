@@ -211,7 +211,7 @@ $(document).on('click', '#btn-submit-review', function(e) {
     QhrReviewForm.submit();
 });
 
-$(document).on('click', '#btn-cancel-review', function(e) {
+$(document).on('click', '.btn-cancel-review', function(e) {
     e.preventDefault();
     QhrReviewForm.close();
 });

@@ -22,9 +22,12 @@
 
 {block name='hotel_review'}
     <div id="qlohotelreview" style="display: none;">
-        <div id="add-review-popup" class="card">
-            <div class="card-header">
-                <span class="hotel-name"></span>
+        <div id="add-review-popup" class="card qlo-account-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span class="hotel-name h6 mb-0"></span>
+                <button type="button" class="btn btn-link p-0 text-dark btn-cancel-review" aria-label="{l s='Close' mod='qlohotelreview'}">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             {block name='hotel_review_add_form'}
                 <form action="{$action}" id="add-review-form" method="post" enctype="multipart/form-data">
@@ -34,17 +37,18 @@
 
                         <div class="alert alert-danger" id="review-general-errors" style="display:none;"></div>
                         <div class="form-group images-field">
-                            <label>{l s='Images' mod='qlohotelreview'}</label>
+                            <label class="d-block mb-2">{l s='Images' mod='qlohotelreview'}</label>
                             <div class="inputs-wrap"></div>
-
-                            <div class="image-input-btn">
-                                <img class="img-camera-plus">
+                            <div class="border rounded bg-light p-3 text-center">
+                                <button type="button" class="image-input-btn btn btn-light border d-flex flex-column align-items-center justify-content-center w-100">
+                                    <span class="icon-camera h4 mb-2"></span>
+                                    <span class="small text-muted">{l s='Drop files here to upload' mod='qlohotelreview'}</span>
+                                </button>
                             </div>
-
-                            <div class="previews-wrap"></div>
+                            <div class="previews-wrap d-flex flex-wrap mt-2"></div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group mb-3">
                             <label>
                                 {l s='Tell us about your Overall experience' mod='qlohotelreview'}
                             </label>
@@ -55,13 +59,13 @@
 
                         {if isset($categories) && count($categories)}
                             <div class="categories-wrap">
-                                <div class="form-group">
+                                <div class="form-group mb-2">
                                     <label>
                                         {l s='Tell us more what went well?' mod='qlohotelreview'}
                                     </label>
                                 </div>
                                 {foreach $categories as $category}
-                                    <div class="form-group">
+                                    <div class="form-group mb-2">
                                         <label class="label-category">
                                             {$category.name|escape:'html':'UTF-8'}
                                         </label>
@@ -81,7 +85,7 @@
                             <p class="review-error subject"></p>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group mb-0">
                             <label>
                                 {l s='Write in detail' mod='qlohotelreview'}
                             </label>
@@ -91,15 +95,13 @@
                     </div>
 
                     {block name='hotel_review_add_form_actions'}
-                        <div class="card-footer clearfix review-actions-wrap">
-                            <div class="pull-right">
-                                <button class="btn btn-secondary" id="btn-cancel-review">
-                                    {l s='Cancel' mod='qlohotelreview'}
-                                </button>
-                                <button class="btn btn-primary" id="btn-submit-review">
-                                    {l s='Make Review' mod='qlohotelreview'}
-                                </button>
-                            </div>
+                        <div class="card-footer d-flex justify-content-end review-actions-wrap">
+                            <button class="btn btn-outline-secondary btn-cancel-review" id="btn-cancel-review">
+                                {l s='Cancel' mod='qlohotelreview'}
+                            </button>
+                            <button class="btn btn-primary ml-2" id="btn-submit-review">
+                                {l s='Make Review' mod='qlohotelreview'}
+                            </button>
                         </div>
                     {/block}
                 </form>
@@ -108,7 +110,7 @@
 
         {block name='hotel_review_submit_content'}
             <div id="popup-review-submit-success-no-approval" class="add-review-success-popup">
-                <div class="card">
+                <div class="card qlo-account-card">
                     <div class="text-center">
                         <div><i class="icon icon-check-circle text-info"></i></div>
                         <h3>{l s='Review added successfully.' mod='qlohotelreview'}</h3>
@@ -118,7 +120,7 @@
             </div>
 
             <div id="popup-review-submit-success-with-approval" class="add-review-success-popup">
-                <div class="card">
+                <div class="card qlo-account-card">
                     <div class="text-center">
                         <div><i class="icon icon-check-circle text-info"></i></div>
                         <h3>{l s='Review submitted successfully.' mod='qlohotelreview'}</h3>

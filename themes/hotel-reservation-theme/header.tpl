@@ -85,7 +85,7 @@
 		{/if}
 		<div id="page" style="{if $page_name == 'index'}height: 100%;{/if}">
 			<div class="header-container" style="{if $page_name == 'index'}height: 100%;{/if}">
-				<header id="header" class="{if $page_name == "index"}home-page-header home-header-image{else}secondary-page-header bg-white pb-2 shadow-sm border-bottom{/if}" style='{if $page_name == "index"}background-image:url("{$link->getMediaLink("`$smarty.const._PS_IMG_`{Configuration::get('WK_HOTEL_HEADER_IMAGE')}")}"); height: 100%;{/if}' >
+				<header id="header" class="{if $page_name == "index"}home-page-header home-header-image{else}secondary-page-header bg-white pb-2 shadow-sm border-bottom{/if}" style='{if $page_name == "index"}background-image:linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0) 100%), url("{$link->getMediaLink("`$smarty.const._PS_IMG_`{Configuration::get('WK_HOTEL_HEADER_IMAGE')}")}"); height: 100%;{/if}' >
 
 					{* <header id="header" class="{if $page_name == "index"}z-index-5000{/if}"><!--  @todo -->
 					{if $page_name == "index"}

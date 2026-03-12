@@ -858,7 +858,7 @@ class OrderDetailControllerCore extends FrontController
         if (Tools::getValue('ajax') != 'true') {
             parent::setMedia();
 
-            $this->addCSS(_THEME_CSS_DIR_.'order-detail.css');
+            // $this->addCSS(_THEME_CSS_DIR_.'order-detail.css');
 
             $this->addJS(array(
                 _THEME_JS_DIR_.'order-detail.js',
