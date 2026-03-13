@@ -34,7 +34,7 @@
 		{/if}
 		{block name='blockcart_shopping_cart'}
 			<div class="shopping_cart position-relative">
-				<a class="d-flex flex-nowrap mt-1" href="{$link->getPageLink($order_process, true)|escape:'html':'UTF-8'}" title="{l s='View my booking cart' mod='blockcart'}" rel="nofollow">
+				<a class="d-flex flex-nowrap mt-1" href="{$link->getPageLink($order_process, true)|escape:'html':'UTF-8'}" title="{l s='View my booking cart' mod='blockcart'}" rel="nofollow" aria-controls="cartDrawer" aria-expanded="false">
 					<i class="icon-cart-shopping {$text_class}"></i>
 					<i class="icon-caret-down {$text_class}"></i>
 						<span class="badge badge_style ajax_cart_quantity{if $cart_qties == 0} d-none{/if}">{$total_products_in_cart}</span>
@@ -57,131 +57,87 @@
 				</a>
 				{block name='blockcart_shopping_cart_content'}
 					{if !$PS_CATALOG_MODE}
-						<div class="cart_block exclusive position-absolute right-0 top-40 z-index-2000 min-width-400 max-width-400 bg-color-dark" style="display:none;">
-							<div class="block_content">
-								<!-- block list of products -->
-								<div class="cart_block_list{if isset($blockcart_top) && !$blockcart_top}{if isset($colapseExpandStatus) && $colapseExpandStatus eq 'expanded' || !$ajax_allowed || !isset($colapseExpandStatus)} expanded{else} collapsed d-none{/if}{/if}">
+						<div id="cartOverlay" class="cart-overlay" aria-hidden="true"></div>
+						<div id="cartDrawer" class="cart_block cart-sidebar" role="dialog" aria-modal="true" aria-label="{l s='Your Cart' mod='blockcart'}" aria-hidden="true">
+							<div class="cart-sidebar-header">
+								<div class="cart-sidebar-title">{l s='Your Cart' mod='blockcart'}</div>
+								<button type="button" class="cart-close" aria-label="{l s='Close' mod='blockcart'}">
+									<i class="icon-times" aria-hidden="true"></i>
+								</button>
+							</div>
+							<div class="cart-sidebar-body">
+								<div class="cart_block_list" aria-live="polite">
 									{block name='blockcart_shopping_cart_products'}
 										{if $products}
 											<dl class="products">
-												{foreach from=$products key=data_k item='product' name='myLoop'}
-												{* only show products that are booking or global without room *}
-													{if $product.booking_product || ($product.selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE)|| ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) || ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE)}
-														{if $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE || $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}
-                                                            {if isset($product.hotel_wise_data) && $product.hotel_wise_data}
-                                                                {foreach $product.hotel_wise_data as $hotel_wise_data}
-                                                                    {include file="./cartrow.tpl" hotel_wise_data=$hotel_wise_data}
-                                                                {/foreach}
-                                                            {/if}
-														{else}
-															{include file="./cartrow.tpl" hotel_wise_data=false}
-														{/if}
-													{/if}
-												{/foreach}
-											</dl>
-										{/if}
-									{/block}
-									<p class="cart_block_no_products{if $products} d-none{/if}">
-										{l s='No products' mod='blockcart'}
-									</p>
-									{block name='blockcart_shopping_cart_discounts'}
-										{if $discounts|@count > 0}
-											<table class="vouchers{if $discounts|@count == 0} d-none{/if}">
-												{foreach from=$discounts item=discount}
-													{if $discount.value_real > 0}
-														<tr class="bloc_cart_voucher" data-id="bloc_cart_voucher_{$discount.id_discount|intval}">
-															<td class="quantity">1x</td>
-															<td class="name" title="{$discount.description}">
-																{$discount.name|truncate:18:'...'|escape:'html':'UTF-8'}
-															</td>
-															<td class="price">
-																-{if $priceDisplay == 1}{convertPrice price=$discount.value_tax_exc}{else}{convertPrice price=$discount.value_real}{/if}
-															</td>
-															<td class="delete">
-																{if strlen($discount.code)}
-																	<a class="delete_voucher" href="{$link->getPageLink("$order_process", true)}?deleteDiscount={$discount.id_discount|intval}" title="{l s='Delete' mod='blockcart'}" rel="nofollow">
-																		<i class="icon-remove-sign"></i>
-																	</a>
-																{/if}
-															</td>
-														</tr>
-													{/if}
-												{/foreach}
-											</table>
-										{/if}
-									{/block}
-									{block name='blockcart_shopping_cart_prices'}
-										<div class="cart-prices bg-shadow-dark">
-											<!-- <div class="cart-prices-line first-line">
-												<span class="price cart_block_shipping_cost ajax_cart_shipping_cost{if !($page_name == 'order-opc') && $shipping_cost_float == 0 && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} d-none{/if}">
-													{if $shipping_cost_float == 0}
-														{if !($page_name == 'order-opc') && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)}{l s='To be determined' mod='blockcart'}{else}{l s='Free shipping!' mod='blockcart'}{/if}
+											{foreach from=$products item='product'}
+												{if $product.booking_product
+													|| ($product.selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE)
+													|| ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE)
+													|| ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE)}
+
+													{if $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
+													|| $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}
+														{foreach $product.hotel_wise_data as $hotel_wise_data}
+															{include file="./cartrow.tpl" hotel_wise_data=$hotel_wise_data}
+														{/foreach}
+
 													{else}
-														{$shipping_cost}
+
+														{include file="./cartrow.tpl" hotel_wise_data=false}
+
 													{/if}
-												</span>
-												<span{if !($page_name == 'order-opc') && $shipping_cost_float == 0 && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} class="d-none"{/if}>
-													{l s='Shipping' mod='blockcart'}
-												</span>
-											</div>
-											{if $show_wrapping}
-												<div class="cart-prices-line">
-													{assign var='cart_flag' value='Cart::ONLY_WRAPPING'|constant}
-													<span class="price cart_block_wrapping_cost">
-														{if $priceDisplay == 1}
-															{convertPrice price=$cart->getOrderTotal(false, $cart_flag)}{else}{convertPrice price=$cart->getOrderTotal(true, $cart_flag)}
-														{/if}
-													</span>
-													<span>
-														{l s='Wrapping' mod='blockcart'}
-													</span>
-											</div>
-											{/if} --><!-- commented by webkul unnecessary data -->
-											{block name='blockcart_shopping_cart_total_tax'}
-												{if $show_tax && $use_tax}
-													<div class="cart-prices-line">
-														<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
-														<span>{l s='Tax' mod='blockcart'}</span>
-													</div>
+
 												{/if}
-											{/block}
-											{block name='blockcart_shopping_cart_total_convenience_fee'}
-												{if isset($total_convenience_fee)}
-													<div class="cart-prices-line">
-														<span class="price cart_block_convenience_fee ajax_cart_convenience_fee">{convertPrice price=$total_convenience_fee}</span>
-														<span class="price">{l s='Convenience Fees' mod='blockcart'}</span>
-													</div>
-												{/if}
-											{/block}
-											{block name='blockcart_shopping_cart_total'}
-												<div class="cart-prices-line last-line">
-													<span class="price cart_block_total ajax_block_cart_total" total_cart_price="{$totalToPay}">{$total}</span>
-													<span>{l s='Total' mod='blockcart'}</span>
-												</div>
-												{if $use_taxes && $display_tax_label == 1 && $show_tax}
-													<p>
-													{if $priceDisplay == 0}
-														{l s='Prices are tax included' mod='blockcart'}
-													{elseif $priceDisplay == 1}
-														{l s='Prices are tax excluded' mod='blockcart'}
-													{/if}
-													</p>
-												{/if}
-											{/block}
-										</div>
+
+											{/foreach}
+
+											</dl>
+
+										{else}
+
+											<p class="cart_block_no_products qlo-cart-empty">
+												{l s='No products' mod='blockcart'}
+											</p>
+
+										{/if}
 									{/block}
-									{block name='blockcart_shopping_cart_checkout_action'}
-										<p class="cart-buttons bg-shadow-darker">
-											<a id="button_order_cart" class="btn btn-default button button-small" href="{$link->getPageLink("$order_process", true)|escape:"html":"UTF-8"}" title="{l s='Check out' mod='blockcart'}" rel="nofollow">
-												<span>
-													{l s='Check out' mod='blockcart'}<i class="icon-chevron-right right"></i>
-												</span>
-											</a>
-										</p>
-									{/block}
+
 								</div>
+
 							</div>
-						</div><!-- .cart_block -->
+							<!-- FOOTER -->
+							<div class="cart-sidebar-footer">
+								{block name='blockcart_shopping_cart_prices'}
+								<div class="cart-summary">
+									{if $show_tax && $use_tax}
+									<div class="summary-line">
+										<span>{l s='Tax' mod='blockcart'}</span>
+										<span class="price ajax_cart_tax_cost">{$tax_cost}</span>
+									</div>
+									{/if}
+									{if isset($total_convenience_fee)}
+									<div class="summary-line">
+										<span>{l s='Convenience Fees' mod='blockcart'}</span>
+										<span class="price ajax_cart_convenience_fee">{convertPrice price=$total_convenience_fee}</span>
+									</div>
+									{/if}
+									<div class="summary-line total">
+										<span>{l s='Total' mod='blockcart'}</span>
+										<span class="price ajax_block_cart_total">{$total}</span>
+									</div>
+									<div class="qlo-cart-note">
+										{l s='Prices are tax included' mod='blockcart'}
+									</div>
+								</div>
+								{/block}
+								{block name='blockcart_shopping_cart_checkout_action'}
+									<button class="btn btn-primary cart-checkout" href="{$link->getPageLink("$order_process", true)|escape:'html':'UTF-8'}">{l s='Check out' mod='blockcart'}
+										<i class="icon-angle-right" aria-hidden="true"></i>
+									</button>
+								{/block}
+							</div>
+						</div>
 					{/if}
 				{/block}
 			</div>

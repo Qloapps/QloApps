@@ -36,6 +36,17 @@
 	{/if}
 {/block}
 {block name='displayHome'}
+	{* Google Map Section *}
+	{if isset($displayHomePageMap) && $displayHomePageMap && isset($hotelLocationArray)}
+		<div class="container-fluid px-2 px-md-0 mb-4">
+			<div id="googleMapWrapper" class="home-page-map">
+				<div class="card qlo-account-card overflow-hidden">
+					<div id="map" class="w-100" style="min-height: 300px;"></div>
+				</div>
+			</div>
+		</div>
+	{/if}
+
 	{if isset($HOOK_HOME) && $HOOK_HOME|trim}
 		<div class="clearfix">{$HOOK_HOME}</div>
 	{/if}

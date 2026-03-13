@@ -82,7 +82,7 @@
                 <div id="testimonial-popup-{$tesimonial.id_testimonial_block}" style="display:none;">
                     <div class="testimonial_popup_card">
                         <div class="testimonial_popup_image">
-                            <img src="{$tesimonial.img_url|escape:'htmlall':'UTF-8'}" />
+                            <span class="btn-secondary">{$tesimonial.name|escape:'htmlall':'UTF-8'|truncate:1:"":true}</span>
                         </div>
                         <div class="testimonial_popup_content">
                             <div class="testimonial_content_quote">

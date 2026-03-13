@@ -48,7 +48,7 @@ $(document).ready(function(){
 		stagePadding: 50,
 		responsive: {
 			0: { items: 1, stagePadding: 20 },
-			800: { items: 2, stagePadding: 50 }
+			800: { items: 2, stagePadding: 90 }
 		},
         onInitialized: function (event) {
 			var nav = $(event.target).find('.owl-nav');

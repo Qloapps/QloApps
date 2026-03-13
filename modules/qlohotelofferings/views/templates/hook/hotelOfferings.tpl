@@ -22,7 +22,7 @@
 
 {block name='offering_block'}
     {if isset($offeringData) && $offeringData}
-        <div class="container">
+        <div class="qlo-container-fluid qlo-full-width">
             <div id="hotelofferingBlock" class="home_block_container">
                 <div class="col-12">
                     {if $OFFERING_BLOCK_HEADING && $OFFERING_BLOCK_CONTENT}
@@ -41,7 +41,7 @@
                         </div>
                     {/if}
                     {block name='offering_block_content'}
-                        <div class="home_block_content htlOfferings-owlCarousel container">
+                        <div class="home_block_content htlOfferings-owlCarousel qlo-container-fluid">
                             <div class="offering_container">
                                 <div class="offering_cards_container">
                                     <div class="owl-carousel owl-theme owl-loaded">

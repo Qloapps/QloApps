@@ -33,60 +33,98 @@ $(document).ready(function() {
         e.preventDefault();
         ajaxCart.expand();
     });
+    function openCartDrawer() {
+        var $drawer = $('.cart-sidebar');
+        if (!$drawer.length) return;
+        $drawer.addClass('open').attr('aria-hidden', 'false');
+        $('#cartOverlay').attr('aria-hidden', 'false').fadeIn(150);
+        $('body').addClass('cart-drawer-open');
+        $('#header .shopping_cart > a[aria-controls]').attr('aria-expanded', 'true');
+    }
+
+    function closeCartDrawer() {
+        var $drawer = $('.cart-sidebar');
+        if (!$drawer.length) return;
+        $drawer.removeClass('open').attr('aria-hidden', 'true');
+        $('#cartOverlay').attr('aria-hidden', 'true').fadeOut(150);
+        $('body').removeClass('cart-drawer-open');
+        $('#header .shopping_cart > a[aria-controls]').attr('aria-expanded', 'false');
+    }
+
+    $(document).on('click', '#header .shopping_cart > a', function(e) {
+        // Drawer replaces the legacy "hover dropdown" behavior.
+        if ($('.cart-sidebar').length) {
+            e.preventDefault();
+            e.stopPropagation();
+            openCartDrawer();
+        }
+    });
+
+    $(document).on('click', '.cart-close, #cartOverlay', function(e) {
+        e.preventDefault();
+        closeCartDrawer();
+    });
+
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') closeCartDrawer();
+    });
 
     var current_timestamp = parseInt(new Date().getTime() / 1000);
 
     if (typeof $('.ajax_cart_quantity').html() == 'undefined' || (typeof generated_date != 'undefined' && generated_date != null && (parseInt(generated_date) + 30) < current_timestamp))
         ajaxCart.refresh();
 
-    /* roll over cart */
-    var cart_block = new HoverWatcher('#header .cart_block');
-    var shopping_cart = new HoverWatcher('#header .shopping_cart');
-    var is_touch_enabled = false;
+    // Legacy hover dropdown (kept for themes that do not use the drawer).
+    if (!$('.cart-sidebar').length) {
+        /* roll over cart */
+        var cart_block = new HoverWatcher('#header .cart_block');
+        var shopping_cart = new HoverWatcher('#header .shopping_cart');
+        var is_touch_enabled = false;
 
-    if ('ontouchstart' in document.documentElement)
-        is_touch_enabled = true;
+        if ('ontouchstart' in document.documentElement)
+            is_touch_enabled = true;
 
-    $(document).on('click', '#header .shopping_cart > a:first', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+        $(document).on('click', '#header .shopping_cart > a:first', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
 
-        // Simulate hover when browser says device is touch based
-        if (is_touch_enabled) {
-            if ($(this).next('.cart_block:visible').length && !cart_block.isHoveringOver())
-                $("#header .cart_block").stop(true, true).slideUp(450);
-            else if (ajaxCart.nb_total_products > 0 || parseInt($('.ajax_cart_quantity').html()) > 0)
-                $("#header .cart_block").stop(true, true).slideDown(450);
-            return;
-        } else
-            window.location.href = $(this).attr('href');
-    });
-
-    $("#header .shopping_cart a:first").hover(
-        function() {
-            if (!is_touch_enabled) {
-                if (ajaxCart.nb_total_products > 0 || parseInt($('.ajax_cart_quantity').html()) > 0) {
+            // Simulate hover when browser says device is touch based
+            if (is_touch_enabled) {
+                if ($(this).next('.cart_block:visible').length && !cart_block.isHoveringOver())
+                    $("#header .cart_block").stop(true, true).slideUp(450);
+                else if (ajaxCart.nb_total_products > 0 || parseInt($('.ajax_cart_quantity').html()) > 0)
                     $("#header .cart_block").stop(true, true).slideDown(450);
-                }
-            }
-        },
-        function() {
-            setTimeout(function() {
-                if (!shopping_cart.isHoveringOver() && !cart_block.isHoveringOver())
-                    $("#header .cart_block").stop(true, true).slideUp(450);
-            }, 200);
-        }
-    );
+                return;
+            } else
+                window.location.href = $(this).attr('href');
+        });
 
-    $("#header .cart_block").hover(
-        function() {},
-        function() {
-            setTimeout(function() {
-                if (!shopping_cart.isHoveringOver())
-                    $("#header .cart_block").stop(true, true).slideUp(450);
-            }, 200);
-        }
-    );
+        $("#header .shopping_cart a:first").hover(
+            function() {
+                if (!is_touch_enabled) {
+                    if (ajaxCart.nb_total_products > 0 || parseInt($('.ajax_cart_quantity').html()) > 0) {
+                        $("#header .cart_block").stop(true, true).slideDown(450);
+                    }
+                }
+            },
+            function() {
+                setTimeout(function() {
+                    if (!shopping_cart.isHoveringOver() && !cart_block.isHoveringOver())
+                        $("#header .cart_block").stop(true, true).slideUp(450);
+                }, 200);
+            }
+        );
+
+        $("#header .cart_block").hover(
+            function() {},
+            function() {
+                setTimeout(function() {
+                    if (!shopping_cart.isHoveringOver())
+                        $("#header .cart_block").stop(true, true).slideUp(450);
+                }, 200);
+            }
+        );
+    }
 
     $(document).on('click', '.delete_voucher', function(e) {
         e.preventDefault();
@@ -175,7 +213,7 @@ var ajaxCart = {
             var id_product = $(this).attr('id_product');
             // this condition is added by webkul to delete a single room form current cart.
             if ($('#booking_dates_container_' + id_product).find('.rooms_remove_container .remove_rooms_from_cart_link').length == 1) {
-                $(this).closest(".rooms_remove_container").parents("div.cart_prod_cont").siblings(".remove_link").find("a.ajax_cart_block_remove_link").click();
+                $(this).closest('dt').find('a.ajax_cart_block_remove_link').first().trigger('click');
             } else {
 
                 var date_from = $(this).attr('date_from');
@@ -737,7 +775,14 @@ var ajaxCart = {
                                 // If the cart is now empty, show the 'no product in the cart' message and close detail
                                 if ($('.cart_block:first dl.products dt').length == 0) {
                                     $('.ajax_cart_quantity').html('0');
-                                    $("#header .cart_block").stop(true, true).slideUp(200);
+                                    if ($('.cart-sidebar').length) {
+                                        $('.cart-sidebar').removeClass('open').attr('aria-hidden', 'true');
+                                        $('#cartOverlay').attr('aria-hidden', 'true').fadeOut(150);
+                                        $('body').removeClass('cart-drawer-open');
+                                        $('#header .shopping_cart > a[aria-controls]').attr('aria-expanded', 'false');
+                                    } else {
+                                        $("#header .cart_block").stop(true, true).slideUp(200);
+                                    }
                                     $('.cart_block_no_products:hidden').slideDown(450);
                                     $('.cart_block dl.products').remove();
                                 }
@@ -868,29 +913,36 @@ var ajaxCart = {
 
         if ($('dt[data-id="cart_block_product_' + productDomId + '"]').length == 0) {
             var productAttributeId = (product.hasAttributes ? parseInt(product.attributes) : 0);
-            var content = '<dt class="d-none" data-id="cart_block_product_' + productDomId + '">';
+            var content = '<dt class="d-none qlo-cart-item" data-id="cart_block_product_' + productDomId + '">';
             var name = $.trim($('<span />').html(product.name).text());
             name = (name.length > 30 ? name.substring(0, 27) + '...' : name);
-            content += '<a class="cart-images" href="' + product.link + '" title="' + name + '"><img  src="' + product.image_cart + '" alt="' + product.name + '"></a>';
+            content += '<div class="qlo-cart-item__row">';
+            content += '<a class="qlo-cart-item__image" href="' + product.link + '" title="' + name + '"><img src="' + product.image_cart + '" alt="' + product.name + '"></a>';
 
-            content += '<div class="cart-info">';
-            content += '<div class="product-name">';
-            content += '<a href="' + product.link + '" title="' + product.name + '" class="cart_block_product_name">' + name + '</a>';
+            content += '<div class="qlo-cart-item__main">';
+            content += '<div class="qlo-cart-item__title-row">';
+            content += '<a href="' + product.link + '" title="' + product.name + '" class="qlo-cart-item__name">' + name + '</a>';
+
+            if (typeof(product.is_gift) == 'undefined' || product.is_gift == 0) {
+                content += '<a rel="nofollow" class="ajax_cart_block_remove_link qlo-cart-item__remove" href="' + baseUri + '?controller=cart&amp;delete=1&amp;id_product=' + productId + '&amp;token=' + static_token + (product.hasAttributes ? '&amp;ipa=' + parseInt(product.idCombination) : '') + (typeof(hotel_wise_data) != 'undefined' && hotel_wise_data && hotel_wise_data.id_hotel ? '&amp;id_hotel=' + parseInt(hotel_wise_data.id_hotel) : '') + '" title="' + remove_rm_title + '"><i class="icon-circle-xmark" aria-hidden="true"></i></a>';
+            }
             content += '</div>';
+
             if ((parseInt(product.selling_preference_type) == SELLING_PREFERENCE_HOTEL_STANDALONE
                 || parseInt(product.selling_preference_type) == SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE)
                 && (typeof(hotel_wise_data) != 'undefined' && typeof(hotel_wise_data.hotel_name) != 'undefined')
             ) {
-                content += '<div class="hotel-name">' + hotel_wise_data.hotel_name + '</div>';
+                content += '<div class="qlo-cart-item__subtext">' + hotel_wise_data.hotel_name + '</div>';
             }
 
-            if (product.hasAttributes)
-                content += '<div class="product-atributes"><a href="' + product.link + '" title="' + product.name + '">' + product.attributes + '</a></div>';
+            if (product.hasAttributes) {
+                content += '<div class="qlo-cart-item__subtext">' + product.attributes + '</div>';
+            }
 
-                if (typeof(freeProductTranslation) != 'undefined') {
-                content += '<div class="cart-info-sec rm_product_info_' + productId + '">';
-                content += '<span class="product_info_label">Price:</span>';
-                content += '<span class="price product_info_data">&nbsp;';
+            if (typeof(freeProductTranslation) != 'undefined') {
+                content += '<div class="qlo-cart-item__meta rm_product_info_' + productId + '">';
+                content += '<span class="qlo-cart-item__label">' + price_txt + ':</span>';
+                content += '<span class="price qlo-cart-item__value">&nbsp;';
 
                 if (product.booking_product) {
                     content += formatCurrency(parseFloat(product.bookingData.total_room_type_amount), currency_format, currency_sign, currency_blank);
@@ -905,39 +957,28 @@ var ajaxCart = {
                 content += '</span>';
                 content += '</div>';
             }
-            content += '<div class="cart-info-sec rm_product_info_' + productId + '">';
             if (product.booking_product || product.allow_multiple_quantity) {
-                content += '<span class="product_info_label">' + total_qty_txt + ':</span>';
-            }
-            content += '<span class="quantity-formated">';
-            content += '<span class="quantity product_info_data">';
-            if (product.booking_product) {
-                content += product.bookingData.total_num_rooms;
-            } else if (product.allow_multiple_quantity) {
-                if (typeof(hotel_wise_data) != 'undefined' && hotel_wise_data.total_qty) {
-                    content += hotel_wise_data.total_qty;
-                } else {
-                    content += product.cart_quantity;
+                content += '<div class="qlo-cart-item__meta rm_product_info_' + productId + '">';
+                content += '<span class="qlo-cart-item__label">' + total_qty_txt + ':</span>';
+                content += '<span class="qlo-cart-item__value"><span class="quantity">';
+                if (product.booking_product) {
+                    content += product.bookingData.total_num_rooms;
+                } else if (product.allow_multiple_quantity) {
+                    if (typeof(hotel_wise_data) != 'undefined' && hotel_wise_data.total_qty) {
+                        content += hotel_wise_data.total_qty;
+                    } else {
+                        content += product.cart_quantity;
+                    }
                 }
+                content += '</span></span>';
+                content += '</div>';
             }
-            content += '</span>';
-            content += '</span>';
-            content += '</div>';
-            content += '</div>';
-
-
-            if (typeof(product.is_gift) == 'undefined' || product.is_gift == 0)
-                content += '<span class="remove_link"><a rel="nofollow" class="ajax_cart_block_remove_link" href="' + baseUri + '?controller=cart&amp;delete=1&amp;id_product=' + productId + '&amp;token=' + static_token + (product.hasAttributes ? '&amp;ipa=' + parseInt(product.idCombination) : '') + (typeof(hotel_wise_data) != 'undefined' && hotel_wise_data && hotel_wise_data.id_hotel ? '&amp;id_hotel=' + parseInt(hotel_wise_data.id_hotel) : '') + '">&nbsp;</a></span>';
-            else
-                content += '<span class="remove_link"></span>';
-
-
-            content += '<div style="clear:both;"></div>';
+            content += '</div>'; // .qlo-cart-item__main
+            content += '</div>'; // .qlo-cart-item__row
             // data for rooms only
             if (product.booking_product) {
                 content += '<div id="booking_dates_container_' + productId + '" class="cart_prod_cont">';
-                content += '<div class="table-responsive">';
-                content += '<table class="table">';
+                content += '<table class="cart-booking-table">';
                 content += '<tbody>';
                 content += '<tr>';
                 content += '<th>' + duration_txt + '</th>';
@@ -955,8 +996,8 @@ var ajaxCart = {
                         content += '<td>' + moment(new Date(date_diff_v.data_form)).format(dateFormatToUse) + '&nbsp;-&nbsp;' + moment(new Date(date_diff_v.data_to)).format(dateFormatToUse) + '</td>';
                         content += '<td class="num_rooms_in_date">' + date_diff_v.num_rm + '</td>';
                         content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount) + parseFloat(date_diff_v.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
-                        content += '<td>';
-                        content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v.amount + ' id_product=' + productId + ' date_from=' + date_diff_v.data_form + ' date_to=' + date_diff_v.data_to + ' num_rooms=' + date_diff_v.num_rm + ' title="' + remove_rm_title + '"></a>';
+                        content += '<td class="qlo-cart-line-remove">';
+                        content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v.amount + ' id_product=' + productId + ' date_from=' + date_diff_v.data_form + ' date_to=' + date_diff_v.data_to + ' num_rooms=' + date_diff_v.num_rm + ' title="' + remove_rm_title + '"><i class="icon-trash" aria-hidden="true"></i></a>';
                         content += '</td>';
                         content += '</tr>';
                     });
@@ -964,16 +1005,15 @@ var ajaxCart = {
                 content += '</tbody>';
                 content += '</table>';
                 content += '</div>';
-                content += '</div>';
             } else if (product.hasOptions) {
                 content += '<div class="table-responsive cart_prod_cont">';
                 content += '<table class="table">';
                 content += '<tbody>';
                 content += '<tr>';
+                content += '<th>' + variant_txt + '</th>';
                 if (product.allow_multiple_quantity) {
-                    content += '<th>' + variant_txt + '</th>';
+                    content += '<th>' + qty_txt + '.</th>';
                 }
-                content += '<th>' + qty_txt + '.</th>';
                 content += '<th>' + price_txt + '</th>';
                 content += '<th>&nbsp;</th>';
                 content += '</tr>';
@@ -996,7 +1036,7 @@ var ajaxCart = {
                             content += '<td>' + data_v.quantity + '</td>';
                         }
                         content += '<td>' + formatCurrency(parseFloat(data_v.total_price_tax_excl), currency_format, currency_sign, currency_blank) + '</td>';
-                        content += '<td class="text-right"><a class="ajax_remove_product_option" href="#" id_product="' + product.id_product + '" id_hotel="' + data_v.id_hotel + '" id_product_option="' + data_v.id_product_option + '" title="' + remove_rm_title + '">&nbsp;</a></td>';
+                        content += '<td class="text-right"><a class="ajax_remove_product_option" href="#" id_product="' + product.id_product + '" id_hotel="' + data_v.id_hotel + '" id_product_option="' + data_v.id_product_option + '" title="' + remove_rm_title + '"><i class="icon-trash" aria-hidden="true"></i></a></td>';
                         content += '</tr>';
                     });
                 }
@@ -1021,7 +1061,7 @@ var ajaxCart = {
                 var booking_dates_content = '';
                 // $("#booking_dates_container_"+product.id).empty();
 
-                $("#booking_dates_container_" + product.id).find("table.table tbody tr.rooms_remove_container").remove();
+                $("#booking_dates_container_" + product.id).find("table.cart-booking-table tbody tr.rooms_remove_container").remove();
 
                 var product_price_float = product.price_float;
                 if (product.bookingData.date_diff !== 'undefined') {
@@ -1033,14 +1073,14 @@ var ajaxCart = {
                         booking_dates_content += '<td>' + moment(new Date(date_diff_v1.data_form)).format(dateFormatToUse) + '&nbsp;-&nbsp;' + moment(new Date(date_diff_v1.data_to)).format(dateFormatToUse) + '</td>';
                         booking_dates_content += '<td class="num_rooms_in_date">' + date_diff_v1.num_rm + '</td>';
                         booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount) + parseFloat(date_diff_v1.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
-                        booking_dates_content += '<td>';
-                        booking_dates_content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v1.amount + ' id_product=' + productId + ' date_from=' + date_diff_v1.data_form + ' date_to=' + date_diff_v1.data_to + ' num_rooms=' + date_diff_v1.num_rm + ' title="' + remove_rm_title + '"></a>';
+                        booking_dates_content += '<td class="qlo-cart-line-remove">';
+                        booking_dates_content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v1.amount + ' id_product=' + productId + ' date_from=' + date_diff_v1.data_form + ' date_to=' + date_diff_v1.data_to + ' num_rooms=' + date_diff_v1.num_rm + ' title="' + remove_rm_title + '"><i class="icon-trash" aria-hidden="true"></i></a>';
                         booking_dates_content += '</td>';
                         booking_dates_content += '</tr>';
                     });
                 }
 
-                $("#booking_dates_container_" + product.id).find("table.table tbody").append(booking_dates_content);
+                $("#booking_dates_container_" + product.id).find("table.cart-booking-table tbody").append(booking_dates_content);
             } else if (product.hasOptions) {
                 $('dt[data-id="cart_block_product_' + productDomId + '"] .cart_prod_cont tr.product_option_row').remove();
                 var product_options_content = '';
@@ -1063,7 +1103,7 @@ var ajaxCart = {
                             product_options_content += '<td>' + data_v.quantity + '</td>';
                         }
                         product_options_content += '<td>' + formatCurrency(parseFloat(data_v.total_price_tax_excl), currency_format, currency_sign, currency_blank) + '</td>';
-                        product_options_content += '<td class="text-right"><a class="ajax_remove_product_option" href="#" id_product="' + product.id_product + '" id_hotel="' + data_v.id_hotel + '" id_product_option="' + data_v.id_product_option + '" title="' + remove_rm_title + '">&nbsp;</a></td>';
+                        product_options_content += '<td class="text-right"><a class="ajax_remove_product_option" href="#" id_product="' + product.id_product + '" id_hotel="' + data_v.id_hotel + '" id_product_option="' + data_v.id_product_option + '" title="' + remove_rm_title + '"><i class="icon-trash" aria-hidden="true"></i></a></td>';
                         product_options_content += '</tr>';
                     });
                 }

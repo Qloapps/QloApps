@@ -100,8 +100,8 @@
     {/block}
     <div class="cat_cont container p-0">
         <div class="col-12">
-            <div class="category_info_block">
-                <div class="col-md-6 p-0">
+            <div class="category_info_block row">
+                <div class="col-12 col-md-6 pr-md-3">
                     <div class="category_heading">
                         <span class="block_title">
                             {$objHotel->hotel_name}
@@ -143,6 +143,19 @@
                         </div>
                     </div>
                 </div>
+                {block name='category_google_map'}
+                    <div class="col-12 col-md-6 pl-md-3 mt-3 mt-md-0">
+                        {if isset($hotel) && $hotel}
+                            <div class="row m-0 layered_filter_cont" id="search-results-wrap">
+                                <div class="col-sm-12 lf_sub_cont p-0">
+                                    {if ($hotel->latitude|floatval != 0 && $hotel->longitude|floatval != 0)}
+                                        <div class="map-wrap qlo-border-class"></div>
+                                    {/if}
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
+                {/block}
                 {* todo: google maps and cheapest room info block *}
             </div>
             {block name='category_tabs'}

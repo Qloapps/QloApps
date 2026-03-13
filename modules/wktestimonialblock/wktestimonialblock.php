@@ -73,15 +73,6 @@ class WkTestimonialBlock extends Module
 
         $objTestimonialData = new WkHotelTestimonialData();
         $testimonialsData = $objTestimonialData->getTestimonialData(1);
-        foreach($testimonialsData as &$testimonials) {
-            $imgUrl = $this->context->link->getMediaLink($this->getPathUri().'/views/img/hotels_testimonials_img/'.$testimonials['id_testimonial_block'].'.jpg');
-            if ((bool)Tools::file_get_contents($imgUrl)) {
-                $testimonials['img_url'] = $imgUrl;
-            } else {
-                $testimonials['img_url'] = $this->context->link->getMediaLink($this->getPathUri().'/views/img/default-user.jpg');
-            }
-        }
-
         $this->context->smarty->assign(
             array(
                 'HOTEL_TESIMONIAL_BLOCK_HEADING' => $HOTEL_TESIMONIAL_BLOCK_HEADING,
