@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium]
+        browser: [chromium, firefox, webkit]
 
     env:
       CI: true
