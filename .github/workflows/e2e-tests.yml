@@ -1,0 +1,232 @@
+name: Playwright E2E Tests
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  build_and_test:
+    name: E2E Tests - ${{ matrix.browser }}
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_DATABASE: qloapps
+          MYSQL_USER: qloapps
+          MYSQL_PASSWORD: qloapps
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium]
+
+    env:
+      CI: true
+      BASE_URL: http://127.0.0.1:8080/
+      CUSTOMER_EMAIL: pub@qloapps.com
+      CUSTOMER_PASSWORD: 123456789
+      INVALID_EMAIL: unregistered_user@example.com
+      INVALID_PASSWORD: WrongPassword@123
+      INVALID_EMAIL_FORMAT: invalid-email-format
+      SQL_INJECTION_EMAIL: "' OR '1'='1"
+      XSS_EMAIL: "<script>alert('xss')</script>"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.1
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: curl, dom, fileinfo, gd, iconv, intl, mbstring, mysqli, pdo_mysql, simplexml, soap, xml, zip
+          tools: composer:v2
+          coverage: none
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Wait for MySQL
+        run: |
+          php -r '$attempts = 30; for ($index = 0; $index < $attempts; $index++) { try { new PDO("mysql:host=127.0.0.1;port=3306;dbname=qloapps", "qloapps", "qloapps"); exit(0); } catch (Throwable $exception) { sleep(2); } } fwrite(STDERR, "MySQL did not become ready in time\n"); exit(1);'
+
+      - name: Install QloApps for CI
+        run: |
+          php install/index_cli.php \
+            --language=en \
+            --timezone=UTC \
+            --domain=127.0.0.1 \
+            --base_uri=/ \
+            --db_server=127.0.0.1 \
+            --db_user=qloapps \
+            --db_password=qloapps \
+            --db_name=qloapps \
+            --db_create=0 \
+            --db_clear=1 \
+            --prefix=qlo_ \
+            --engine=InnoDB \
+            --name=QloApps \
+            --activity=0 \
+            --country=fr \
+            --firstname=John \
+            --lastname=Doe \
+            --password=123456789 \
+            --email=pub@qloapps.com \
+            --newsletter=0
+
+      - name: Verify QloApps installation
+        run: |
+          if [ ! -f config/settings.inc.php ]; then
+            echo "❌ Installation failed: config/settings.inc.php not found"
+            php install/index_cli.php --help 2>&1 || true
+            exit 1
+          fi
+          echo "✅ config/settings.inc.php exists"
+
+      - name: Normalize shop URL and disable SSL redirects for CI
+        run: |
+          mysql -h 127.0.0.1 -u qloapps -pqloapps qloapps <<'SQL'
+          UPDATE qlo_configuration SET value='127.0.0.1:8080' WHERE name IN ('PS_SHOP_DOMAIN', 'PS_SHOP_DOMAIN_SSL');
+          UPDATE qlo_configuration SET value='/' WHERE name = 'PS_BASE_URI';
+          UPDATE qlo_configuration SET value='0' WHERE name IN ('PS_SSL_ENABLED', 'PS_SSL_ENABLED_EVERYWHERE');
+          UPDATE qlo_shop_url
+          SET domain='127.0.0.1:8080',
+              domain_ssl='127.0.0.1:8080',
+              physical_uri='/',
+              virtual_uri=''
+          WHERE main = 1;
+          SQL
+
+      - name: Create .env file
+        run: |
+          cat > tests/e2e/.env << EOF
+          BASE_URL=$BASE_URL
+          CUSTOMER_EMAIL=$CUSTOMER_EMAIL
+          CUSTOMER_PASSWORD=$CUSTOMER_PASSWORD
+          INVALID_EMAIL=$INVALID_EMAIL
+          INVALID_PASSWORD=$INVALID_PASSWORD
+          INVALID_EMAIL_FORMAT=$INVALID_EMAIL_FORMAT
+          SQL_INJECTION_EMAIL=$SQL_INJECTION_EMAIL
+          XSS_EMAIL=$XSS_EMAIL
+          EOF
+
+      - name: Start QloApps web server
+        run: |
+          mkdir -p /tmp/qloapps-php-sessions
+          php -d session.save_path=/tmp/qloapps-php-sessions -S 127.0.0.1:8080 -t "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/tests/e2e/ci-router.php" > /tmp/qloapps-php-server.log 2>&1 &
+          echo $! > /tmp/qloapps-php-server.pid
+
+          if ! ps -p "$(cat /tmp/qloapps-php-server.pid)" > /dev/null; then
+            echo "❌ PHP server process failed to start"
+            cat /tmp/qloapps-php-server.log || true
+            exit 1
+          fi
+
+      - name: Wait for QloApps to respond
+        run: |
+          health_url="${BASE_URL}index.php?controller=authentication"
+          server_pid="$(cat /tmp/qloapps-php-server.pid)"
+          health_file="/tmp/qloapps-health.html"
+          for attempt in $(seq 1 30); do
+            if ! ps -p "$server_pid" > /dev/null; then
+              echo "❌ PHP server process is no longer running"
+              cat /tmp/qloapps-php-server.log || true
+              exit 1
+            fi
+
+            : > "$health_file"
+            http_code="$(curl -sSL --max-time 10 -o "$health_file" -w "%{http_code}" "$health_url" 2>/dev/null || true)"
+            if grep -Eqi 'id="login_form"|name="SubmitLogin"|id="email"|id="passwd"' "$health_file"; then
+              echo "✅ QloApps authentication page is ready"
+              exit 0
+            fi
+
+            echo "Attempt $attempt: authentication page not ready yet (HTTP ${http_code:-n/a})..."
+            if [ "$http_code" = "302" ] || [ "$http_code" = "301" ]; then
+              redirect_location="$(curl -sS --max-time 10 -I "$health_url" 2>/dev/null | awk 'tolower($1)=="location:" {print $2}' | tr -d '\r' | head -1)"
+              echo "Redirect location: ${redirect_location:-<none>}"
+            fi
+            if [ "$attempt" -eq 1 ] || [ $((attempt % 5)) -eq 0 ]; then
+              echo "--- Response preview (attempt $attempt) ---"
+              head -40 "$health_file" || true
+            fi
+            sleep 2
+          done
+          echo "❌ QloApps did not become ready in time"
+          echo "--- Last response from $health_url ---"
+          cat "$health_file" 2>/dev/null | head -120
+          echo "--- PHP server log ---"
+          cat /tmp/qloapps-php-server.log || true
+          exit 1
+
+      - name: Run Playwright tests - ${{ matrix.browser }}
+        run: npx playwright test --config=tests/e2e/playwright.config.ts --project=${{ matrix.browser }}
+
+      - name: Upload test results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.browser }}
+          path: test-results/
+          retention-days: 30
+
+      - name: Upload server log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qloapps-server-log-${{ matrix.browser }}
+          path: /tmp/qloapps-php-server.log
+          retention-days: 30
+
+  test-summary:
+    name: Playwright E2E Status
+    if: always()
+    needs: build_and_test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.build_and_test.result }}" = "failure" ]; then
+            echo "❌ E2E Tests Failed"
+            exit 1
+          else
+            echo "✅ E2E Tests Passed"
+          fi
