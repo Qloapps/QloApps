@@ -3064,7 +3064,7 @@ class AdminProductsControllerCore extends AdminController
         if ($obj->id) {
             if ($this->product_exists_in_shop) {
                 $objHotelInfo = new HotelBranchInformation();
-                $hotelInfo = $objHotelInfo->hotelsNameAndId();
+                $hotelInfo = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
                 if ($hotelInfo) {
                     $objRoomInfo = new HotelRoomInformation();
                     $roomStatus = $objRoomInfo->getAllRoomStatus();
@@ -3111,7 +3111,7 @@ class AdminProductsControllerCore extends AdminController
                 $this->displayWarning($this->l('You must save the room type in this shop before managing hotel configuration.'));
             }
         } else {
-            $this->displayWarning($this->l('You must save this room type before managing hotel configuration.'));
+            $this->displayWarning($this->l('You must save this room type before managing rooms.'));
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -4527,7 +4527,7 @@ class AdminProductsControllerCore extends AdminController
 
         $objRoomType = new HotelRoomType();
         $objHotelInfo = new HotelBranchInformation();
-        $data->assign('htl_info', $objHotelInfo->hotelsNameAndId());
+        $data->assign('htl_info', HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1));
         if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($product->id)) {
             $data->assign('htl_room_type', $hotelRoomType);
             $hotelFullInfo = $objHotelInfo->hotelBranchInfoById($hotelRoomType['id_hotel']);

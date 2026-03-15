@@ -144,7 +144,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
 
             $totalRefunded = WkPaypalCommerceRefund::getTotalRefundedAmount((int)$idTrans, false);
             $remainingRefund = (float)($transactionData['pp_paid_total'] - $totalRefunded);
-            $response = Tools::jsonDecode($transactionData['response'], true);
+            $response = json_decode($transactionData['response'], true);
 
             // Buyer making a payment in a different currency (ex: EUR) which is different from the default currency of merchant (Ex: USD), In all those cross currency cases, After Capture, transaction will fall into Pending state and will require merchant to manually go to his PayPal account and accept the payment.
             $objPPOrder = new WKPayPalCommerceOrder();
@@ -156,7 +156,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                     $smartyVars['ppstatusDetailMsg'] = $objPPOrder->ppStatusDetail[$response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason']];
                 }
             }
-
+            $smartyVars['transaction_url'] = $this->context->link->getAdminLink('AdminPaypalCommerceTransaction',Tools::getAdminTokenLite('AdminPaypalCommerceTransaction')).'&viewwk_paypal_commerce_order&id_paypal_commerce_order=' . (int)$idTrans;
             $smartyVars['transaction_data'] = $transactionData;
             $smartyVars['refund_data'] = $refundData;
             $smartyVars['refunded_amount'] = $totalRefundedFormatted;
@@ -231,7 +231,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                 WkPaypalCommerceHelper::logMsg('refund', 'PayPal Transaction ID: '. $transactionData['pp_transaction_id']);
                                 WkPaypalCommerceHelper::logMsg('refund', 'PayPal Order ID: '. $transactionData['pp_order_id']);
                                 WkPaypalCommerceHelper::logMsg('refund', 'Refund request data: ');
-                                WkPaypalCommerceHelper::logMsg('refund', Tools::jsonEncode($postData));
+                                WkPaypalCommerceHelper::logMsg('refund', json_encode($postData));
 
                                 $objPPCommerce = new PayPalCommerce();
                                 $refundData = $objPPCommerce->orders->refund($postData);
@@ -243,7 +243,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                     WkPaypalCommerceHelper::logMsg('refund', 'Refund success: ', true);
                                     WkPaypalCommerceHelper::logMsg('refund', 'PayPal Refund Id: '. $refundID);
                                     WkPaypalCommerceHelper::logMsg('refund', 'Refund reponse data: ');
-                                    WkPaypalCommerceHelper::logMsg('refund', Tools::jsonEncode($refundData));
+                                    WkPaypalCommerceHelper::logMsg('refund', json_encode($refundData));
                                     WkPaypalCommerceHelper::logMsg('refund', '----------------------- ', true);
 
                                     $refundObj = new WkPaypalCommerceRefund();
@@ -253,7 +253,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                     $refundObj->refund_type = (int)$refundType;
                                     $refundObj->currency_code = $transactionData['pp_paid_currency'];
                                     $refundObj->refund_reason = $refundReason;
-                                    $refundObj->response = Tools::jsonEncode($refundData);
+                                    $refundObj->response = json_encode($refundData);
                                     $refundObj->refund_status = $refundData['data']['status'];
                                     if ($refundObj->save()) {
                                         $urlString = '&viewwk_paypal_commerce_order=&id_paypal_commerce_order=' . (int)Tools::getValue('id_paypal_commerce_order');
@@ -263,7 +263,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                 } else {
                                     WkPaypalCommerceHelper::logMsg('refund', 'Refund failed: ', true);
                                     WkPaypalCommerceHelper::logMsg('refund', 'Refund reponse data: ');
-                                    WkPaypalCommerceHelper::logMsg('refund', Tools::jsonEncode($refundData));
+                                    WkPaypalCommerceHelper::logMsg('refund', json_encode($refundData));
                                     WkPaypalCommerceHelper::logMsg('refund', '----------------------- ', true);
                                     $this->errors[] = $refundData['data']['message'];
                                 }

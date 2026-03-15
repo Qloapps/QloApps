@@ -28,6 +28,9 @@ abstract class ModuleGraphCore extends Module
 {
     protected $_employee;
 
+    /** @var string CSV data */
+    protected $_csv;
+
     /** @var array of integers graph data */
     protected $_values = array();
 

@@ -70,7 +70,7 @@ class HttpHelper {
 		$headerSize = curl_getinfo($this->_curl, CURLINFO_HEADER_SIZE);
 		$body = substr($result, $headerSize);
 
-		return Tools::jsonDecode($body, true);
+		return json_decode($body, true);
 	}
 
 	public function resetHelper() {
@@ -85,7 +85,7 @@ class HttpHelper {
 
 	public function setBody($postData) {
 		if(is_array($postData)) {
-			$postData = Tools::jsonEncode($postData);
+			$postData = json_encode($postData);
 		}
 		curl_setopt($this->_curl, CURLOPT_POSTFIELDS, $postData);
 		curl_setopt($this->_curl, CURLOPT_POST, true);

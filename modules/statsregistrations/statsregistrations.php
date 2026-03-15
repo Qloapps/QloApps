@@ -184,7 +184,11 @@ class StatsRegistrations extends ModuleGraph
     {
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query.$this->getDate());
         foreach ($result as $row) {
-            $this->_values[(int)Tools::substr($row['date_add'], 0, 4)]++;
+            $year = (int)Tools::substr($row['date_add'], 0, 4);
+            if (!isset($this->_values[$year])) {
+                $this->_values[$year] = 0;
+            }
+            $this->_values[$year]++;
         }
     }
 
@@ -204,7 +208,11 @@ class StatsRegistrations extends ModuleGraph
     {
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query.$this->getDate());
         foreach ($result as $row) {
-            $this->_values[(int)Tools::substr($row['date_add'], 8, 2)]++;
+            $days = (int)Tools::substr($row['date_add'], 8, 2);
+            if (!isset($this->_values[$days])) {
+                $this->_values[$days] = 0;
+            }
+            $this->_values[$days]++;
         }
     }
 
@@ -212,7 +220,11 @@ class StatsRegistrations extends ModuleGraph
     {
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query.$this->getDate());
         foreach ($result as $row) {
-            $this->_values[(int)Tools::substr($row['date_add'], 11, 2)]++;
+            $hour = (int)Tools::substr($row['date_add'], 11, 2);
+            if (!isset($this->_values[$hour])) {
+                $this->_values[$hour] = 0;
+            }
+            $this->_values[$hour]++;
         }
     }
 }
