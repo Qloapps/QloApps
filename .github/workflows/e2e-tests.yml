@@ -128,7 +128,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          cat > tests/e2e/.env << EOF
+          cat > tests/e2e/playwright/.env << EOF
           BASE_URL=$BASE_URL
           CUSTOMER_EMAIL=$CUSTOMER_EMAIL
           CUSTOMER_PASSWORD=$CUSTOMER_PASSWORD
@@ -142,7 +142,7 @@ jobs:
       - name: Start QloApps web server
         run: |
           mkdir -p /tmp/qloapps-php-sessions
-          php -d session.save_path=/tmp/qloapps-php-sessions -S 127.0.0.1:8080 -t "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/tests/e2e/ci-router.php" > /tmp/qloapps-php-server.log 2>&1 &
+          php -d session.save_path=/tmp/qloapps-php-sessions -S 127.0.0.1:8080 -t "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/tests/e2e/playwright/ci-router.php" > /tmp/qloapps-php-server.log 2>&1 &
           echo $! > /tmp/qloapps-php-server.pid
 
           if ! ps -p "$(cat /tmp/qloapps-php-server.pid)" > /dev/null; then
@@ -189,7 +189,7 @@ jobs:
           exit 1
 
       - name: Run Playwright tests - ${{ matrix.browser }}
-        run: npx playwright test --config=tests/e2e/playwright.config.ts --project=${{ matrix.browser }}
+        run: npx playwright test --config=tests/e2e/playwright/playwright.config.ts --project=${{ matrix.browser }}
 
       - name: Upload test results artifact
         if: always()

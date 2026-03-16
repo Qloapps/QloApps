@@ -5,17 +5,17 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, '../..');
+const rootDir = path.resolve(__dirname, '../../..');
 
 // Load environment variables from .env file
-configDotenv({ path: path.join(rootDir, 'tests/e2e/.env') });
+configDotenv({ path: path.join(rootDir, 'tests/e2e/playwright/.env') });
 
 /**
  * Playwright configuration
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: path.join(rootDir, 'tests/e2e/specs'),
+  testDir: path.join(rootDir, 'tests/e2e/playwright/specs'),
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

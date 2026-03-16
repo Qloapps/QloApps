@@ -51,7 +51,7 @@ Always explore the UI first.
 All dynamic values must come from:
 
 ```
-tests/e2e/.env
+tests/e2e/playwright/.env
 ```
 
 Examples may include:
@@ -103,7 +103,7 @@ For this repository, follow these rules to avoid local-vs-CI mismatches:
 * Keep Playwright retries disabled in CI (`retries: 0`) so failures are deterministic.
 * CI readiness checks must tolerate transient curl connection errors (`curl ... || true`) and retry.
 * CI must verify installation actually completed (`config/settings.inc.php` exists) before running tests.
-* When writing `tests/e2e/.env` in CI, use variable expansion (unquoted heredoc) so values are real, not literal `${VAR}` strings.
+* When writing `tests/e2e/playwright/.env` in CI, use variable expansion (unquoted heredoc) so values are real, not literal `${VAR}` strings.
 
 ---
 

@@ -1,6 +1,6 @@
 <?php
 
-$rootDirectory = dirname(__DIR__, 2);
+$rootDirectory = dirname(__DIR__, 3);
 $requestPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $targetPath = $rootDirectory.$requestPath;
 
