@@ -806,10 +806,25 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
             return;
         }
 
+        if (defined('PS_INSTALLATION_IN_PROGRESS') && PS_INSTALLATION_IN_PROGRESS) {
+            return;
+        }
+
         $context = Context::getContext();
+        if (!$context || !isset($context->language) || !is_object($context->language) || empty($context->language->iso_code)) {
+            return;
+        }
+
         $id_employee = (isset($context->employee) && Validate::isLoadedObject($context->employee)) ? (int)$context->employee->id : 0;
+        $translated = $message;
+        if (class_exists('Translate')) {
+            $translated = Translate::getAdminTranslation($message, 'AdminTab', false, false);
+        } elseif (class_exists('TranslateCore')) {
+            $translated = TranslateCore::getAdminTranslation($message, 'AdminTab', false, false);
+        }
+
         PrestaShopLogger::addLog(
-            sprintf(Translate::getAdminTranslation($message, 'AdminTab', false, false), get_class($this)),
+            sprintf($translated, get_class($this)),
             1,
             null,
             get_class($this),
