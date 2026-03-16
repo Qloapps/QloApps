@@ -10,11 +10,23 @@ You must **never guess selectors** or generate tests without first interacting w
 
 All browser interactions must be performed through **`playwright-cli` commands**.
 
+## Supporting Skill Dependency
+
+This skill may require a separately installed supporting skill named `playwright-cli` for browser interaction workflows.
+
+Before performing any browser interaction, scan the current project for `**/playwright-cli/SKILL.md` and load the discovered `playwright-cli` skill.
+
+If multiple matches are found, prefer the match closest to the project root.
+
+If the task requires opening pages, clicking, filling, snapshots, or selector discovery, the discovered `playwright-cli` skill must be loaded first as supporting context.
+
 ---
 
 # Critical Rules
 
 ### Strict Tool Usage
+
+When browser interaction is required, use the browser interaction workflow defined by the installed `playwright-cli` supporting skill.
 
 Browser interactions must **only use**:
 
