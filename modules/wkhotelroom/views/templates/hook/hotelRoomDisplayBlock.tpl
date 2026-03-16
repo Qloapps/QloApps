@@ -44,11 +44,11 @@
                                 <div class="owl-carousel owl-theme owl-loaded">
                                     {foreach from=$hotelRoomDisplay item=roomDisplay name=htlRoom}
                                         <div class="col-12">
-                                            <div class="card">
+                                            <div class="qlo-card p-0">
                                                 {block name='hotel_room_block_room_type_image'}
                                                     <div class="room_card_room_type_image">
                                                         <a href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}">
-                                                            <img src="{$roomDisplay.image|escape:'htmlall':'UTF-8'}" alt="{$roomDisplay.name|escape:'htmlall':'UTF-8'}">
+                                                            <img class="img-fluid" src="{$roomDisplay.image|escape:'htmlall':'UTF-8'}" alt="{$roomDisplay.name|escape:'htmlall':'UTF-8'}">
                                                         </a>
                                                         {block name='hotel_room_block_room_type_price'}
                                                             {if $roomDisplay.show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}

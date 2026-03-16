@@ -24,7 +24,7 @@
     {if isset($offeringData) && $offeringData}
         <div class="qlo-container-fluid qlo-full-width">
             <div id="hotelofferingBlock" class="home_block_container">
-                <div class="col-12">
+                <div>
                     {if $OFFERING_BLOCK_HEADING && $OFFERING_BLOCK_CONTENT}
                         <div class="home_block_desc_wrapper">
                             <div>

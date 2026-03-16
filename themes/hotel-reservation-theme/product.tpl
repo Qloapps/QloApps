@@ -78,6 +78,7 @@
 				{block name='product_container'}
 					<div class="col-12">
 						<div class="room_type_img_containter">
+							<div class="qlo-room-header">
 							<div class="room_type_name_block mb-4 {if isset($language_is_rtl) && $language_is_rtl}rtl{/if}">
 								{block name='product_name'}
 									<div class="hotel_name_block">
@@ -111,15 +112,16 @@
 									{/block}
 								{/block}
 							</div>
+							</div>
 							{block name='displayRoomTypeDetailRoomTypeImageBlockBefore'}
 								{hook h='displayRoomTypeDetailRoomTypeImageBlockBefore' id_product=$product->id}
 							{/block}
 							<!-- product img-->
 							{block name='product_images'}
-								<div class="row">
+								<div class="row qlo-room-gallery" data-room-gallery-urls="{if isset($images)}{foreach from=$images item=image name=gallery}{assign var=imageIds value="`$product->id`-`$image.id_image`"}{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}{if !$smarty.foreach.gallery.last}|{/if}{/foreach}{/if}">
 
 									{block name='product_cover_image'}
-										<div id="image-block-cont" class="col-12 col-sm-9 col-sm-push-3 col-md-10 col-md-push-2">
+										<div id="image-block-cont" class="col-12 col-lg-7 pr-lg-2 qlo-room-gallery__cover">
 											<div id="image-block" class="clearfix">
 												<!-- {if $product->new}
 													<span class="new-box">
@@ -163,10 +165,10 @@
 										</div>
 									{/block}
 									{block name='product_thumbnails'}
-										<div class="col-12 col-sm-3 col-sm-pull-9 col-md-2 col-md-pull-10">
+										<div class="col-12 col-lg-5 pl-lg-2 mt-3 mt-lg-0 qlo-room-gallery__thumbs">
 											{if isset($images) && count($images) > 0}
 												<!-- thumbnails -->
-													<div id="views_block" class="clearfix {if isset($images) && count($images) < 2}hidden{/if}">
+													<div id="views_block" class="clearfix qlo-room-gallery__views {if isset($images) && count($images) < 2}hidden{/if}">
 														{if isset($images) && count($images) > 2}
 															{* <span class="view_scroll_spacer"> *}
 																<a id="view_scroll_left" class="" title="{l s='Other views'}" href="javascript:{ldelim}{rdelim}">
@@ -175,8 +177,9 @@
 															{* </span> *}
 														{/if}
 														<div id="thumbs_list">
-															<ul id="thumbs_list_frame">
+															<ul id="thumbs_list_frame" class="qlo-room-gallery__thumb-grid">
 															{if isset($images)}
+																{assign var='visible_thumb_count' value=0}
 																{foreach from=$images item=image name=thumbnails}
 																	{assign var=imageIds value="`$product->id`-`$image.id_image`"}
 																	{if !empty($image.legend)}
@@ -184,10 +187,21 @@
 																	{else}
 																		{assign var=imageTitle value=$product->name|escape:'html':'UTF-8'}
 																	{/if}
-																	<li id="thumbnail_{$image.id_image}"{if $smarty.foreach.thumbnails.last} class="last"{/if}>
+																	{assign var='thumb_is_cover' value=($image.id_image == $cover.id_image)}
+																	{assign var='thumb_is_visible' value=false}
+																	{if !$thumb_is_cover && $visible_thumb_count < 4}
+																		{assign var='thumb_is_visible' value=true}
+																		{assign var='visible_thumb_count' value=$visible_thumb_count+1}
+																	{/if}
+																	<li id="thumbnail_{$image.id_image}" class="qlo-room-gallery__thumb{if !$thumb_is_visible} d-none{/if}{if $smarty.foreach.thumbnails.last} last{/if}">
 																		<a {if $jqZoomEnabled && $have_image && !$content_only} href="javascript:void(0);" rel="{ldelim}gallery: 'gal1', smallimage: '{$link->getImageLink($product->link_rewrite, $imageIds, 'large_default')|escape:'html':'UTF-8'}',largeimage: '{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}'{rdelim}"{else} href="{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}"	data-fancybox-group="other-views" class="fancybox{if $image.id_image == $cover.id_image} shown{/if}"{/if} title="{$imageTitle}">
 																			<img class="img-responsive" id="thumb_{$image.id_image}" src="{$link->getImageLink($product->link_rewrite, $imageIds, 'cart_default')|escape:'html':'UTF-8'}" alt="{$imageTitle}" title="{$imageTitle}"{if isset($cartSize)} height="{$cartSize.height}" width="{$cartSize.width}"{/if} itemprop="image" />
 																		</a>
+																		{if $thumb_is_visible && $visible_thumb_count == 4}
+																			<a href="#" class="qlo-room-gallery__full js-room-full-gallery-trigger">
+																				<span>{l s='See Full Gallery'}</span> <i class="icon-long-arrow-right"></i>
+																			</a>
+																		{/if}
 																	</li>
 																{/foreach}
 															{/if}
@@ -259,7 +273,7 @@
 											{block name='product_left_column'}
 												<div class="tab-content mt-4 col-md-8 col-12">
 													{block name='product_info_tab_content'}
-														<div id="product_info_tab" class=" active">
+														<div id="product_info_tab" class="tab-pane fade show active" role="tabpanel">
 															<div id="product_info_tab_information">
 																{block name='product_info_tab_room_description'}
 																	<div class="room_description_heading block_heading">
@@ -274,11 +288,10 @@
 																{/block}
 															</div>
 														</div>
-														<hr class="block_seperator"/>
 													{/block}
 													{block name='product_info_tab_room_features'}
 														{if isset($features) && $features}
-															<div id="room_features_tab" class="info_margin_div">
+															<div id="room_features_tab" class="tab-pane fade info_margin_div" role="tabpanel">
 																<div class="block_heading">
 																	<span>{l s='Amenities'}</span>
 																</div>
@@ -294,11 +307,10 @@
 																	{/foreach}
 																</div>
 															</div>
-															<hr class="block_seperator"/>
 														{/if}
 													{/block}
 													{if isset($service_products_exists) && $service_products_exists}
-														<div id="service_product_tab">
+														<div id="service_product_tab" class="tab-pane fade" role="tabpanel">
 															<div class="block_heading">
 																<span>{l s='Additional Services'}</span>
 															</div>
@@ -306,13 +318,12 @@
 																{include file="{$tpl_dir}_partials/service-products.tpl"}
 															{/block}
 														</div>
-														<hr class="block_seperator"/>
 													{/if}
 
 													{if isset($id_hotel) && $id_hotel}
 														{block name='product_info_tab_hotel_features'}
 															{if isset($hotel_features) && $hotel_features}
-																<div id="hotel_features_tab" class="info_margin_div">
+																<div id="hotel_features_tab" class="tab-pane fade info_margin_div" role="tabpanel">
 																	<div class="block_heading">
 																		<span>{l s='Hotel Amenities'}</span>
 																	</div>
@@ -322,14 +333,13 @@
 																		{/foreach}
 																	</div>
 																</div>
-																<hr class="block_seperator"/>
 															{/if}
 														{/block}
 													{/if}
 													{block name='product_refund_policies_tab_content'}
 														{* Block for booking products *}
 														{if isset($id_hotel) && $id_hotel}
-															<div id="refund_policies_tab" class="">
+															<div id="refund_policies_tab" class="tab-pane fade" role="tabpanel">
 																<div class="block_heading">
 																	<span>{l s='Refund Policies'}</span>
 																</div>
@@ -349,12 +359,11 @@
 																	<span class="non_refundable_txt error_msg">{l s='Non Refundable'}</span>
 																{/if}
 															</div>
-															<hr class="block_seperator"/>
 														{/if}
 													{/block}
 													{block name='product_info_tab_hotel_policies'}
 														{if isset($hotel_policies) && $hotel_policies}
-															<div id="hotel_policies_tab" class="info_margin_div">
+															<div id="hotel_policies_tab" class="tab-pane fade info_margin_div" role="tabpanel">
 																<div class="block_heading">
 																	<span>{l s='Hotel Policies'}</span>
 																</div>
@@ -362,12 +371,11 @@
 																	<p class="">{$hotel_policies}</p>
 																</div>
 															</div>
-															<hr class="block_seperator"/>
 														{/if}
 													{/block}
-													{* {block name='product_map_tab_content'}
+													{block name='product_map_tab_content'}
 														{if $display_google_maps && !empty($hotel_latitude) && !empty($hotel_longitude) && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
-															<div id="room_type_map_tab" class=" card">
+															<div id="room_type_map_tab" class="tab-pane fade card" role="tabpanel">
 																<div class="map-wrap"></div>
 																<div id="room-info-map-ui-content" style="display: none;">
 																	<div class="hotel-info-wrap">
@@ -388,7 +396,7 @@
 																</div>
 															</div>
 														{/if}
-													{/block} *}
+													{/block}
 													{block name='displayProductTabContent'}
 														{if isset($HOOK_PRODUCT_TAB_CONTENT) && $HOOK_PRODUCT_TAB_CONTENT}{$HOOK_PRODUCT_TAB_CONTENT}{/if}
 													{/block}

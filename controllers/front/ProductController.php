@@ -574,7 +574,8 @@ class ProductControllerCore extends FrontController
                         'category-'.(isset($this->category) ? $this->category->getFieldByLang('link_rewrite') : ''),
                     ),
                     'display_discount_price' => Configuration::get('PS_DISPLAY_DISCOUNT_PRICE'),
-                    'display_google_maps' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
+                    // Only show the map tab when Maps is enabled and required credentials are configured.
+                    'display_google_maps' => (bool) (Configuration::get('WK_GOOGLE_ACTIVE_MAP')&& Configuration::get('PS_API_KEY')&& Configuration::get('PS_MAP_ID')),
                 )
             );
         }

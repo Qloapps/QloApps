@@ -29,16 +29,6 @@ var onlineFlag = true;
 
 
 $(document).ready(function(){
-	$('.tab_container a[data-toggle="tab"]').on('click', function (e) {
-
-        let targetTab = $(this).attr('href');
-        if ($(targetTab).length) {
-            $('html, body').animate({
-                scrollTop: $(targetTab).offset().top - 10 // adjust header offset
-            }, 400);
-        }
-    });
-
 	highdpiInit();
 	responsiveResize();
 	$(window).resize(responsiveResize);

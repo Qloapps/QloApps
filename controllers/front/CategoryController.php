@@ -316,12 +316,14 @@ class CategoryControllerCore extends FrontController
             $hotelImageCategories = HotelImageCategory::getImageCategories($this->context->language->id);
 
             // Google Map on category page
+            $displayHotelLocation = false;
             if (($apiKey = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP') && ($PS_MAP_ID = Configuration::get('PS_MAP_ID'))) {
                 $idCategory = Tools::getValue('id_category');
                 $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idCategory);
                 $objHotel = new HotelBranchInformation($idHotel, $this->context->language->id);
 
                 if (floatval($objHotel->latitude) != 0 && floatval($objHotel->longitude) != 0) {
+                    $displayHotelLocation = true;
                     Media::addJsDef(array(
                         'hotel_location' => array(
                             'latitude' => $objHotel->latitude,
@@ -351,6 +353,7 @@ class CategoryControllerCore extends FrontController
                 'id_hotel' => $id_hotel,
                 'currency' => $currency,
                 'objHotel' => $objHotel,
+                'display_hotel_location' => $displayHotelLocation,
                 'hotel_contact' => $objHotelAddress->phone,
                 'hotel_address' => $formattedHotelAddress,
                 'hotel_cover_image' => $hotelCoverImage,

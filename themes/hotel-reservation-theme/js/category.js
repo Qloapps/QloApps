@@ -328,17 +328,24 @@ $(document).ready(function () {
 });
 
 function initMap() {
+    var mapContainer = $('#location_tab .map-wrap').get(0) || $('#search-results-wrap .map-wrap').get(0);
+    if (!mapContainer) {
+        return;
+    }
+
     const hotelLocation = {
         lat: Number(hotel_location.latitude),
         lng: Number(hotel_location.longitude),
     };
 
-    const map = new google.maps.Map($('#search-results-wrap .map-wrap').get(0), {
+    const map = new google.maps.Map(mapContainer, {
         zoom: 10,
         center: hotelLocation,
-        disableDefaultUI: true,
-        fullscreenControl: true,
-        mapId: PS_MAP_ID
+        mapId: PS_MAP_ID,
+        zoomControl: true,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: false,
     });
 
     let icon = document.createElement('img');

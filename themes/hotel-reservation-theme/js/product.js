@@ -1255,17 +1255,6 @@ $(document).ready(function() {
             ajax_check_var.abort();
         }
     }
-
-    $('.tab_container a[data-toggle="tab"]').on('click', function (e) {
-        e.stopPropagation();
-        e.preventDefault();
-        let targetTab = $(this).attr('href');
-        if ($(targetTab).length) {
-            $('html, body').animate({
-                scrollTop: $(targetTab).offset().top - 10 // adjust header offset
-            }, 400);
-        }
-    });
 });
 function addProductToRoomType(that) {
     var id_product = $(that).data('id-product');
@@ -1321,30 +1310,102 @@ function updateRoomServiceQuantity(that) {
 
 
 function initMap() {
-    const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), {
-        zoom: 10,
-        streetViewControl: false,
-        mapId: PS_MAP_ID
-    });
+    const $mapWrap = $('#room_type_map_tab .map-wrap');
+    // When JS is loaded in <head>, the Google callback can run before the map markup exists.
+    if (!$mapWrap.length) {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMap, { once: true });
+        }
+        return;
+    }
+
+    if (typeof google === 'undefined' || !google.maps) {
+        return;
+    }
 
     const hotelLatLng = {
-        lat: Number(hotel_location.latitude),
-        lng: Number(hotel_location.longitude),
+        lat: Number(hotel_location && hotel_location.latitude),
+        lng: Number(hotel_location && hotel_location.longitude),
     };
+    if (!isFinite(hotelLatLng.lat) || !isFinite(hotelLatLng.lng)) {
+        return;
+    }
 
-    map.setCenter(hotelLatLng);
-    let icon = document.createElement('img');
-    icon.src = PS_STORES_ICON;
-    icon.style.width = '24px';
-    icon.style.height = '24px';
-    let marker = new google.maps.marker.AdvancedMarkerElement({
-        position: hotelLatLng,
-        map: map,
-        content: icon,
-    });
+    // Persist across tab switches and guard against duplicate init.
+    window.qloRoomMapState = window.qloRoomMapState || {map: null, center: null, uiPushed: false, marker: null};
+    window.qloRoomMapState.center = hotelLatLng;
 
-    const uiContent = $('#room-info-map-ui-content .hotel-info-wrap').get(0);
-    map.controls[google.maps.ControlPosition.LEFT_TOP].push(uiContent);
+    function ensureRoomMap() {
+        if (window.qloRoomMapState.map) {
+            return window.qloRoomMapState.map;
+        }
+
+        const map = new google.maps.Map($mapWrap.get(0), {
+            zoom: 12,
+            streetViewControl: false,
+            mapId: (typeof PS_MAP_ID !== 'undefined' ? PS_MAP_ID : undefined),
+        });
+
+        map.setCenter(hotelLatLng);
+
+        try {
+            const icon = document.createElement('img');
+            icon.src = (typeof PS_STORES_ICON !== 'undefined' ? PS_STORES_ICON : '');
+            icon.style.width = '24px';
+            icon.style.height = '24px';
+
+            if (google.maps.marker && google.maps.marker.AdvancedMarkerElement) {
+                window.qloRoomMapState.marker = new google.maps.marker.AdvancedMarkerElement({
+                    position: hotelLatLng,
+                    map: map,
+                    content: icon,
+                });
+            } else {
+                window.qloRoomMapState.marker = new google.maps.Marker({
+                    position: hotelLatLng,
+                    map: map,
+                    icon: (typeof PS_STORES_ICON !== 'undefined' ? PS_STORES_ICON : undefined),
+                });
+            }
+        } catch (e) {
+            // Keep map usable even if marker library fails for any reason.
+        }
+
+        if (!window.qloRoomMapState.uiPushed) {
+            const uiContent = $('#room-info-map-ui-content .hotel-info-wrap').get(0);
+            if (uiContent) {
+                map.controls[google.maps.ControlPosition.LEFT_TOP].push(uiContent);
+                window.qloRoomMapState.uiPushed = true;
+            }
+        }
+
+        window.qloRoomMapState.map = map;
+        return map;
+    }
+
+    function refreshRoomMapSize() {
+        const map = window.qloRoomMapState.map;
+        if (!map || !google.maps.event) return;
+        // Tab transitions can leave the map with a 0px viewport unless we resize/recenter after it becomes visible.
+        google.maps.event.trigger(map, 'resize');
+        if (window.qloRoomMapState.center) {
+            map.setCenter(window.qloRoomMapState.center);
+        }
+    }
+
+    // Initialize immediately only if the map pane is already visible/active.
+    if ($('#room_type_map_tab').hasClass('active') || $('#room_type_map_tab').is(':visible')) {
+        ensureRoomMap();
+        setTimeout(refreshRoomMapSize, 50);
+    }
+
+    // Lazily initialize when the user opens the map tab.
+    $(document)
+        .off('shown.bs.tab.qloRoomMap', 'a[href="#room_type_map_tab"][data-toggle="tab"]')
+        .on('shown.bs.tab.qloRoomMap', 'a[href="#room_type_map_tab"][data-toggle="tab"]', function() {
+            ensureRoomMap();
+            setTimeout(refreshRoomMapSize, 200);
+        });
 }
 
 var BookingForm = {

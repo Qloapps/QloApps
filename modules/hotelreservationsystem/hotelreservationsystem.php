@@ -123,9 +123,7 @@ class HotelReservationSystem extends Module
 
         return $this->display(__FILE__, 'hotelInfoBlock.tpl');
     }
-
-
-
+    
     public function hookDisplayNav()
     {
         $this->smarty->assign(array(

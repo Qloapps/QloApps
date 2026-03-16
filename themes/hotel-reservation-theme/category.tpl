@@ -101,7 +101,7 @@
     <div class="cat_cont container p-0">
         <div class="col-12">
             <div class="category_info_block row">
-                <div class="col-12 col-md-6 pr-md-3">
+                <div class="col-12 col-md-12 pr-md-3">
                     <div class="category_heading">
                         <span class="block_title">
                             {$objHotel->hotel_name}
@@ -143,20 +143,9 @@
                         </div>
                     </div>
                 </div>
-                {block name='category_google_map'}
-                    <div class="col-12 col-md-6 pl-md-3 mt-3 mt-md-0">
-                        {if isset($hotel) && $hotel}
-                            <div class="row m-0 layered_filter_cont" id="search-results-wrap">
-                                <div class="col-sm-12 lf_sub_cont p-0">
-                                    {if ($hotel->latitude|floatval != 0 && $hotel->longitude|floatval != 0)}
-                                        <div class="map-wrap qlo-border-class"></div>
-                                    {/if}
-                                </div>
-                            </div>
-                        {/if}
-                    </div>
+                {block name='category_hotel_info_google_map'}
+                    {* Map is rendered inside the Location section/tab when enabled *}
                 {/block}
-                {* todo: google maps and cheapest room info block *}
             </div>
             {block name='category_tabs'}
                 <div class="tab_container">
@@ -164,7 +153,9 @@
                         <li class="nav-item"><a href="#category_info_tab" data-toggle="tab" class="idTabHrefShort nav-pill active">{l s='Overview'}</a></li>
                         {* <li class="nav-item"><a href="#hotel_amenities" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Room Types'}</a></li> *}
                         <li class="nav-item"><a href="#room_types_list_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Room Types'}</a></li>
-                        <li class="nav-item"><a href="#location_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Location'}</a></li>
+                        {if isset($display_hotel_location) && $display_hotel_location}
+                            <li class="nav-item"><a href="#location_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Location'}</a></li>
+                        {/if}
                         <li class="nav-item"><a href="#about_us_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='About us'}</a></li>
                         <li class="nav-item"><a href="#policies_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Policies'}</a></li>
                         {* <li class="nav-item"><a href="#review_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Review'}</a></li> *}
@@ -212,6 +203,19 @@
                         </div>
                     {/block}
                     <hr class="block_seperator"/>
+                    {block name='location_tab'}
+                        {if isset($display_hotel_location) && $display_hotel_location}
+                            <div id="location_tab">
+                                <div class="block_heading">
+                                    <span>{l s='Location'}</span>
+                                </div>
+                                <div class="qlo-border-class w-auto p-0">
+                                    <div class="map-wrap"></div>
+                                </div>
+                            </div>
+                            <hr class="block_seperator"/>
+                        {/if}
+                    {/block}
                 </div>
             {/block}
         </div>
