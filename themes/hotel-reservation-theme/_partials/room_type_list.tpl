@@ -42,7 +42,7 @@
 						<div class="col-sm-8 room_info_cont">
 							{block name='room_type_list_room_quantity'}
 								<div class="row">
-									<p class="rm_heading col-sm-12 col-md-7">{$room_v['name']|escape:'htmlall':'UTF-8'}</p>
+									<a href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}"><p class="rm_heading col-sm-12 col-md-7">{$room_v['name']|escape:'htmlall':'UTF-8'}</p></a>
 									{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 										<p class="rm_left col-sm-12 col-md-5" {if !empty($display_all_room_types) || $room_v['room_left'] > $warning_num} style="display:none"{/if}>
 											{l s='Hurry!'} <span class="remain_rm_qty">{$room_v['room_left']|escape:'htmlall':'UTF-8'}</span> {l s='rooms left'}

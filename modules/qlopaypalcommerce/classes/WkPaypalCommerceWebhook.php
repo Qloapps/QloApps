@@ -52,7 +52,7 @@ class WkPaypalCommerceWebhook
         if (isset($eventData['resource']['note_to_payer'])) {
             $refundObj->refund_reason = $eventData['resource']['note_to_payer'];
         }
-        $refundObj->response = Tools::jsonEncode($eventData);
+        $refundObj->response = json_encode($eventData);
         $refundObj->refund_status = $eventData['resource']['status'];
         $refundObj->save();
     }
@@ -188,7 +188,7 @@ class WkPaypalCommerceWebhook
         return Db::getInstance()->execute(
             'UPDATE `'._DB_PREFIX_.'wk_paypal_commerce_order`
             SET `pp_payment_status` = "'.pSQL($payment_status).'",
-            `response` = "'.pSQL(Tools::jsonEncode($orderData)).'"
+            `response` = "'.pSQL(json_encode($orderData)).'"
             WHERE `pp_transaction_id` = "'.pSQL($transaction_id).'"
             '
         );

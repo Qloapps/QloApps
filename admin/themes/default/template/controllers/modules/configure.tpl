@@ -60,7 +60,7 @@
 			<li>
 				<a id="desc-module-back" class="toolbar_btn" href="javascript: window.history.back();" title="{l s='Back'}">
 					<i class="process-icon-back"></i>
-					<div>{l s='Back'}</div>
+					<span>{l s='Back'}</span>
 				</a>
 			</li>
 			<!-- <li>
@@ -85,7 +85,7 @@
 			<li>
 				<a id="desc-module-translate" data-toggle="modal" data-target="#moduleTradLangSelect" class="toolbar_btn" href="#" title="{l s='Translate'}">
 					<i class="process-icon-flag"></i>
-					<div>{l s='Translate'}</div>
+					<span>{l s='Translate'}</span>
 				</a>
 			</li>
 			{/if}
@@ -100,7 +100,7 @@
 			<li>
 				<a id="desc-module-hook" class="toolbar_btn" href="{$module_hook_link}" title="{l s='Manage hooks'}">
 					<i class="process-icon-anchor"></i>
-					<div>{l s='Manage hooks'}</div>
+					<span>{l s='Manage hooks'}</span>
 				</a>
 			</li>
 		</ul>

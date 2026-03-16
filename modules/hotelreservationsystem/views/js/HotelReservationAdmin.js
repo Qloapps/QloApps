@@ -293,32 +293,6 @@ $(document).ready(function() {
         }
     });
 
-    // delete hotel image
-	$('.deleteHtlImage').on('click', function(){
-		var imgId = $(this).attr('id_htl_img');
-		var $this = $(this);
-		$.ajax({
-			url: statebycountryurl,
-			data: {
-				id_htl_img: imgId,
-				ajax: true,
-				action: 'deleteHotelImage',
-			},
-			method: 'POST',
-			success: function(data) {
-				if (data == 1) {
-					$this.closest('.img-container-div').remove();
-					showSuccessMessage(htlImgDeleteSuccessMsg);
-				} else {
-					showErrorMessage(htlImgDeleteErrMsg);
-				}
-			},
-			error: function(XMLHttpRequest, textStatus, errorThrown) {
-				alert(textStatus);
-			}
-		});
-	});
-
     $('#hotel_country').on('change', function() {
         $('#hotel_state').empty();
         $.ajax({

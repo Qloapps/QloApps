@@ -69,7 +69,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
             switch ($action) {
                 case 1:
                     $json = Tools::file_get_contents('php://input');
-                    $orderDetails = Tools::jsonDecode($json, true);
+                    $orderDetails = json_decode($json, true);
 
                     $cart = $this->context->cart;
 
@@ -86,23 +86,23 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
 
                     // create order
                     $orderDetails['original'] = $this->getOrderDetails();
-                    WkPaypalCommerceHelper::logMsg('payment', Tools::jsonEncode($orderDetails));
+                    WkPaypalCommerceHelper::logMsg('payment', json_encode($orderDetails));
 
                     $ppOrderData = $ppCommerce->orders->create($orderDetails);
 
                     WkPaypalCommerceHelper::logMsg('payment', 'Payment response data: ', true);
-                    WkPaypalCommerceHelper::logMsg('payment', Tools::jsonEncode($ppOrderData));
+                    WkPaypalCommerceHelper::logMsg('payment', json_encode($ppOrderData));
 
-                    die(Tools::jsonEncode($ppOrderData));
+                    die(json_encode($ppOrderData));
                 case 2:
                     $json = Tools::file_get_contents('php://input');
-                    $orderData = Tools::jsonDecode($json, true);
+                    $orderData = json_decode($json, true);
 
                     if ($orderData['orderID'] && $orderData['getOrderData']) {
                         $ppCommerce = new PayPalCommerce();
                         $returnData = $ppCommerce->orders->capture($orderData['orderID']);
                         header('Content-Type: application/json');
-                        echo Tools::jsonEncode($returnData['data']);
+                        echo json_encode($returnData['data']);
                         die;
                     } elseif (Tools::getIsset('order_id')) {
                         $orderID = Tools::getValue('order_id');
@@ -116,14 +116,14 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                         WkPaypalCommerceHelper::logMsg('payment', 'Customer ID: '. $cart->id_customer);
                         WkPaypalCommerceHelper::logMsg('payment', 'Currency ID: '. $cart->id_currency);
                         WkPaypalCommerceHelper::logMsg('payment', 'Cart Total: '. $cart->getOrderTotal(true, Cart::BOTH));
-                        WkPaypalCommerceHelper::logMsg('payment', Tools::jsonEncode($returnData));
+                        WkPaypalCommerceHelper::logMsg('payment', json_encode($returnData));
 
                         if (isset($returnData['data']['id']) && !empty($returnData['data']['id'])) {
                             // Payment success
                             $paypalOrderID = $returnData['data']['id'];
 
                             // Save order data
-                            $this->saveOrderData($returnData);
+                            $transaction_id = $this->saveOrderData($returnData);
                             if ($paypalOrderID) {
                                 $currency = $this->context->currency;
                                 $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
@@ -144,6 +144,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                     $orderStatus = Configuration::get('PS_OS_AWAITING_PAYMENT');
                                 }
 
+                                $extraVars['transaction_id'] = $transaction_id;
                                 // create order for the payment
                                 $this->module->validateOrder(
                                     $cart->id,
@@ -151,7 +152,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                     $total,
                                     $this->module->l('PayPal Checkout', 'payment'),
                                     null,
-                                    null,
+                                    $extraVars,
                                     (int)$currency->id,
                                     false,
                                     $customer->secure_key
@@ -210,7 +211,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                     break;
                 case 3:
                     WkPaypalCommerceHelper::logMsg('payment', 'Payment cancelled by customer...', true);
-                    WkPaypalCommerceHelper::logMsg('payment', Tools::jsonEncode(Tools::getAllValues()));
+                    WkPaypalCommerceHelper::logMsg('payment', json_encode(Tools::getAllValues()));
                     WkPaypalCommerceHelper::logMsg('payment', '--------------', true);
 
                     Tools::redirect($this->context->link->getPageLink('order-opc', true, null).'?pp_cancel=1');
@@ -226,6 +227,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
     // Save order data
     private function saveOrderData($orderData)
     {
+        $transaction_id = '';
         if ($orderData) {
             $purchaseUnits = $orderData['data']['purchase_units'];
             foreach ($purchaseUnits as $purchase) {
@@ -260,15 +262,13 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                 $orderObj->pp_order_id = $orderData['data']['id'];
                 $orderObj->pp_transaction_id = $transaction_id;
                 $orderObj->pp_payment_status = $payment_status;
-                $orderObj->response = Tools::jsonEncode($orderData);
+                $orderObj->response = json_encode($orderData);
                 $orderObj->order_date = date('Y-m-d H:i:s');
                 $orderObj->save();
             }
-
-            return true;
         }
 
-        return false;
+        return $transaction_id;
     }
 
     // Create order data to send to PayPal

@@ -30,7 +30,8 @@ function classAutoLoader($class)
         return;
     }
 
-    $className = end(explode('\\', $class));
+    $parts = explode('\\', $class);
+    $className = end($parts);
     if(class_exists($className)) {
         return;
     }
