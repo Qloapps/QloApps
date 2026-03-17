@@ -1,243 +1,251 @@
-# AGENTS.md - QloApps v1.6.1 Development Guide
+# AGENTS.md
 
-## Project Overview
+## Overview
 
-QloApps is an open-source hotel reservation system and booking engine built on PHP. It enables users to launch hotel booking websites and manage online reservations.
+This document defines development guidelines for AI agents contributing to the QloApps codebase. QloApps is a hotel booking and property management platform built on PHP with an MVC architecture. These guidelines ensure code quality, security, and architectural consistency.
 
-## Skills
-A skill is a set of local instructions to follow stored in a `SKILL.md` file. Add skills here to make them available in this session.
+## Platform Architecture
 
-All skill paths in this file are defined relative to the current project root unless stated otherwise. Resolve them against the active workspace absolute path before loading a skill.
+QloApps follows a modular MVC architecture with the following core principles:
 
-Supporting skills may exist anywhere inside the current project. When a supporting skill is referenced by name, scan the current project for its `SKILL.md` file before loading it.
+### MVC Pattern
+- **Models**: Extend `ObjectModel` for database-backed entities
+- **Views**: Use Smarty templates; avoid inline HTML in controllers
+- **Controllers**: Extend `FrontController`, `AdminController`, or module variants
+- Separate business logic from presentation logic
 
-### Available skills
-- e2e-tests: Autonomous Playwright QA workflow with strict `playwright-cli` usage. (file: {project_root}/skills/e2e-tests/SKILL.md)
-- qloapps-module-development: QloApps module development workflow. (file: {project_root}/skills/qloapps-module-development/SKILL.md)
+### Core Technologies
+- **PHP**: 8.1 - 8.4
+- **Database**: MySQL 5.7 - 8.4, MariaDB 10.x
+- **Template Engine**: Smarty 3.x
+- **Caching**: File-based and Redis-compatible
+- **Web Server**: Apache 2.4+, Nginx 1.18+
 
-### Supporting Installed Skills
-- playwright-cli: Supporting browser interaction and selector discovery skill. Discover it by scanning the current project for `**/playwright-cli/SKILL.md`.
+### Database Layer
+- Use `Db::getInstance()` for all database operations
+- Always use table prefix `_DB_PREFIX_`
+- Escape values with `pSQL()` for strings and `(int)` for IDs
+- Respect multi-shop context with `Shop::addSqlRestriction()`
+- Use `bqSQL()` for table and column names
 
-### Skill Loading Rules
+## Module Development Guidelines
 
-On every request, first check whether the task matches one of the available local skills before proceeding without a skill.
-
-Use these rules:
-
-1. Determine `{project_root}` from the active workspace folder and resolve every skill file to that absolute path before loading it.
-2. For any e2e testing request, load `{project_root}/skills/e2e-tests/SKILL.md` first.
-3. Treat these requests as e2e testing by default: Playwright tests, browser automation, UI testing, login flow tests, checkout flow tests, reservation flow tests, regression tests, selector discovery, flaky UI test fixes, screenshot-based validation, and end-to-end test debugging.
-4. If the e2e task requires opening pages, discovering selectors, filling forms, taking snapshots, or any direct browser interaction, scan the current project for `**/playwright-cli/SKILL.md` and load the discovered `playwright-cli` skill.
-5. If multiple `playwright-cli` skill files are found, prefer the match closest to the project root.
-6. For QloApps module creation, module structure changes, hook registration, module controllers, module templates, or module packaging, load `{project_root}/skills/qloapps-module-development/SKILL.md`.
-7. If multiple skills apply, load the domain skill first, then the supporting skill. For e2e browser work, that means `e2e-tests` first and the discovered `playwright-cli` skill second.
-8. Do not guess selectors or browser steps for e2e work. When an e2e skill is loaded, follow its workflow exactly.
-9. If a request does not match any listed skill, continue with normal repository instructions.
-
-### E2E Priority Rule
-
-When a request mentions e2e, Playwright, browser tests, UI automation, test creation, or test debugging, automatically prefer the `e2e-tests` skill over general instructions.
-
-If the task involves interacting with the application in a browser, a discovered `playwright-cli` skill is mandatory support context for that task when present in the project scan.
-
-## Technology Stack
-
-- **Language**: PHP 5.6+ to PHP 7.4
-- **Database**: MySQL 5.1+ to 5.7
-- **Template Engine**: Smarty
-- **Architecture**: MVC (Model-View-Controller) based on PrestaShop framework
-- **License**: OSL-3.0 (Core), AFL-3.0 (Modules)
-
-## Directory Structure
-
-```
-QloApps161/
-├── adminhtl/           # Admin panel files
-│   ├── tabs/           # Admin controller tabs
-│   └── themes/         # Admin themes
-├── cache/              # Cache storage
-├── classes/            # Core PHP classes (Models)
-│   ├── ObjectModel.php # Base model class
-│   ├── Context.php     # Application context
-│   ├── Tools.php       # Utility functions
-│   └── ...
-├── config/             # Configuration files
-│   ├── config.inc.php  # Main configuration
-│   ├── defines.inc.php # Constants definitions
-│   └── smarty.*.inc.php # Smarty configurations
-├── controllers/        # Controllers
-│   ├── admin/          # Admin controllers
-│   └── front/          # Frontend controllers
-├── css/                # Stylesheets
-├── docs/               # Documentation
-├── img/                # Images
-├── installdev/         # Installation files
-├── js/                 # JavaScript files
-├── localization/       # Localization files
-├── log/                # Log files
-├── mails/              # Email templates
-├── modules/            # Modules/Addons
-├── override/           # Class overrides
-├── pdf/                # PDF templates
-├── tests/              # Unit tests
-├── themes/             # Frontend themes
-│   └── hotel-reservation-theme/
-├── tools/              # Utility libraries
-│   ├── smarty/         # Smarty template engine
-│   └── tcpdf/          # PDF library
-├── translations/       # Translation files
-├── upload/             # Uploaded files
-├── webservice/         # API/WebService
-├── index.php           # Application entry point
-├── init.php            # Initialization
-├── header.php          # Header include
-└── footer.php          # Footer include
-```
-
-## Key Classes
-
-- **ObjectModel**: Base class for all models (`classes/ObjectModel.php`)
-- **Context**: Application context singleton (`classes/Context.php`)
-- **Tools**: Utility helper class (`classes/Tools.php`)
-- **Dispatcher**: URL routing (`classes/Dispatcher.php`)
-- **Controller**: Base controller class
-- **Module**: Base module class for addons
-
-## Coding Standards
-
-### PHP Code Style
-
-- Follow PSR-2 coding standards
-- Use 4 spaces for indentation (no tabs)
-- Opening PHP tag: `<?php`
-- Class names: PascalCase (e.g., `CustomerModel`)
-- Method names: camelCase (e.g., `getCustomerById()`)
-- Constants: UPPER_SNAKE_CASE (e.g., `TYPE_INT`)
-- Add license header at the top of PHP files
-
-### File Naming
-
-- Class files: Match class name (e.g., `Customer.php` for `Customer` class)
-- Controllers: `{Name}Controller.php`
-- Module files: `{modulename}.php`
-
-### Database
-
-- Table prefix: Configurable (default `ps_`)
-- Use ObjectModel classes for database operations
-- Use `Db::getInstance()` for direct queries when needed
-
-## Module Development
-
-Modules are located in `/modules/`. Each module follows this structure:
+### Module Structure
+All extensions must be module-based and follow this structure:
 
 ```
 modules/{modulename}/
-├── {modulename}.php    # Main module class
-├── views/
-│   ├── templates/      # Smarty templates
-│   ├── css/            # Module CSS
-│   └── js/             # Module JavaScript
-├── classes/            # Module-specific classes
-├── translations/       # Module translations
-└── logo.png            # Module icon
+  ├── {modulename}.php        # Main module class
+  ├── config.xml              # Module metadata
+  ├── classes/                # Module-specific models
+  ├── controllers/
+  │   ├── admin/
+  │   └── front/
+  ├── views/
+  │   ├── templates/
+  │   ├── js/
+  │   └── css/
+  ├── translations/
+  └── upgrade/
 ```
 
-### Creating a Module
+### Module Lifecycle
+- Implement `install()` for setup and hook registration
+- Implement `uninstall()` for complete cleanup
+- Create `upgrade_module_{version}()` for version upgrades
+- Handle database schema changes with migration scripts
+- Support multi-shop and multi-language configurations
 
-1. Create directory in `/modules/`
-2. Create main PHP file extending `Module` class
-3. Implement required methods: `install()`, `uninstall()`
-4. Register hooks for integration
-5. Create templates in `views/templates/`
+### Module Configuration
+- Use the `Configuration` class for settings
+- Prefix all configuration keys with module name
+- Validate all configuration inputs
+- Provide admin configuration pages
 
-## Hooks System
+## Override & Extension Rules
 
-QloApps uses a hook system for extensibility:
+### Override System
+- Place overrides in `override/{classes|controllers|modules}/`
+- Override classes extend core class with "Core" suffix
+- Delete `cache/class_index.php` after adding overrides
+- Document override purpose and impact
+
+**Example:**
+```php
+class Cart extends CartCore {
+    // Override methods here
+}
+```
+
+### Core Modification Rules
+- Never modify core files directly
+- Use the override system for extending core classes
+- Use hooks for injecting custom functionality
+- Maintain backward compatibility
+
+## Hook Usage Guidelines
+
+### Hook Registration
+- Register hooks in module `install()` method
+- Unregister in `uninstall()` method
+- Document expected parameters for custom hooks
+
+### Hook Implementation
+- Keep hook handlers lightweight (< 50ms execution)
+- Avoid database writes in display hooks
+- Use action hooks for data modifications
+- Cache hook output when appropriate
+
+### Hook Naming
+- Display hooks: `display{Location}` (e.g., `displayHeader`)
+- Action hooks: `action{Event}` (e.g., `actionOrderStatusUpdate`)
+- Use camelCase for hook names
+
+## Code Standards
+
+### Coding Style
+- Follow PSR-12 coding standards
+- Use meaningful variable and function names
+- One class per file; filename matches class name
+- Maximum function length: 50 lines
+- Maximum file length: 1000 lines
+
+### Documentation
+- Add PHPDoc blocks to all classes, methods, and properties
+- Document parameters, return types, and exceptions
+- Include `@since` tags for new features
+- Maintain changelog for all modifications
+
+### Code Quality
+- No debug statements (`var_dump()`, `print_r()`, `die()`)
+- No dead code or commented-out blocks
+- Replace magic numbers with named constants
+- Handle all error conditions appropriately
+
+## Security Guidelines
+
+### Input Validation
+- Validate all user input at controller level
+- Use `Validate::is*()` methods for type checking
+- Sanitize input before database operations
+- Implement CSRF protection for state-changing operations
+
+### SQL Injection Prevention
+- Use `pSQL()` for string values in SQL queries
+- Cast all IDs to integer: `(int)$id`
+- Prefer `ObjectModel` methods over raw queries
+- Never concatenate user input into SQL
+
+### XSS Prevention
+- Escape output with `Tools::safeOutput()` or `htmlspecialchars()`
+- Use Smarty's `|escape:'html'` modifier in templates
+- Validate and sanitize rich text content
+
+### Authentication & Authorization
+- Check `$this->tabAccess` in admin controllers
+- Verify permissions before sensitive operations
+- Implement rate limiting for authentication
+- Use secure session management
+
+### Sensitive Data
+- Never log passwords, tokens, or PII
+- Use environment variables for secrets
+- Comply with PCI DSS for payment data
+- Encrypt sensitive data at rest
+
+## Logging & Error Handling
+
+### Logging
+Use the platform logging system for all events:
 
 ```php
-// Register a hook
-$this->registerHook('displayHeader');
-
-// Implement hook method
-public function hookDisplayHeader($params)
-{
-    // Your code
-}
-
-// Call hooks in templates
-{hook h='displayHeader'}
+PrestaShopLogger::addLog(
+    'Operation completed: #'.$id,
+    1, // severity: 1=info, 2=warning, 3=error
+    null,
+    'EntityType',
+    $entityId
+);
 ```
 
-## Template Development
+### Logging Levels
+- **ERROR**: System errors requiring immediate attention
+- **WARNING**: Unexpected conditions
+- **INFO**: Significant business events
+- **DEBUG**: Detailed diagnostic information
 
-- Smarty templates use `.tpl` extension
-- Main theme: `themes/hotel-reservation-theme/`
-- Compile/cache directories: `cache/smarty/`
+### Audit Logging
+- Log all financial transactions
+- Log booking state changes
+- Log administrative actions
+- Include user attribution
 
-### Smarty Syntax
+### Error Handling
+- Handle exceptions appropriately
+- Provide meaningful error messages
+- Never expose sensitive information in errors
+- Log errors with sufficient context
 
-```smarty
-{$variable}                    <!-- Variable output -->
-{l s='String to translate'}    <!-- Translatable string -->
-{if condition}...{/if}         <!-- Conditionals -->
-{foreach $items as $item}...{/foreach} <!-- Loops -->
-{include file='path/to/file.tpl'}     <!-- Include -->
-{hook h='hookName'}            <!-- Hook call -->
-```
+## Performance Guidelines
 
-## Running Tests
+### Query Optimization
+- Avoid N+1 queries
+- Use `JOIN` instead of multiple queries in loops
+- Add indexes for frequently queried columns
+- Use `LIMIT` clause for result sets
+- Analyze queries with `EXPLAIN`
 
-```bash
-cd tests
-composer install
-../vendor/bin/phpunit
-```
+### Caching
+- Cache expensive computations and queries
+- Invalidate cache on data modification
+- Support multiple cache backends (file, Redis)
+- Respect cache TTL configurations
 
-## Debugging
+### Resource Management
+- Limit memory consumption per request
+- Implement pagination for large datasets
+- Use generators for large result sets
+- Avoid loading entire collections into memory
 
-- Enable debug mode in `config/config.inc.php`: `_PS_MODE_DEV_ = true`
-- Check logs in `/log/` directory
-- Use `Tools::d()` and `Tools::p()` for debugging
+### Database Design
+- Normalize schema to 3NF minimum
+- Use appropriate data types
+- Define foreign key constraints
+- Create indexes on foreign keys and search columns
 
-## Configuration
+## Things to Avoid
 
-Key configuration files:
+### Never Modify
+- Core system files without override mechanism
+- Historical financial records
+- Completed transaction totals
+- Audit trail entries
 
-- `config/config.inc.php`: Main configuration
-- `config/defines.inc.php`: Path and constant definitions
-- `config/settings.inc.php`: Database credentials (auto-generated)
+### Never Introduce
+- Hardcoded credentials or secrets
+- Direct database access bypassing abstraction layer
+- Unbounded loops or recursion
+- Breaking changes to public APIs
 
-## Common Commands
+### Never Bypass
+- Input validation
+- Authentication and authorization checks
+- CSRF protection
+- SQL injection prevention
+- XSS prevention mechanisms
 
-### Clear Cache
+### Never Use
+- `eval()` or dynamic code execution
+- `mysql_*` functions (use PDO/mysqli)
+- Direct `$_GET`, `$_POST`, `$_COOKIE` access (use `Tools::getValue()`)
+- Deprecated PHP features
+- Unescaped output to browser
 
-```bash
-rm -rf cache/smarty/compile/*
-rm -rf cache/smarty/cache/*
-```
-
-### Install Dependencies
-
-```bash
-composer install
-```
-
-## Development Workflow
-
-1. Create feature branch from main
-2. Make changes following coding standards
-3. Test changes thoroughly
-4. Run tests if applicable
-5. Submit pull request with clear description
-
-## Version Information
-
-- Current Version: 1.6.1
-- Repository: https://github.com/webkul/hotelcommerce
-
-## Support
-
-- Documentation: https://qloapps.com/qlo-reservation-system
-- Forum: https://forums.qloapps.com/
-- Email: support@qloapps.com
+### Critical Operations
+- Never modify booking totals without recalculation
+- Never alter pricing or tax logic without validation
+- Never oversell room inventory
+- Never modify payment processing without approval
+- Always use row-level locking for inventory updates
+- Always validate availability before booking confirmation
+- Always maintain backward compatibility

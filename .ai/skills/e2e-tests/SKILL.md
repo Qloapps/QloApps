@@ -21,9 +21,9 @@ Before any browser interaction, scan the project for `**/playwright-cli/SKILL.md
 1. Open the page with `playwright-cli open <url>`
 2. Inspect with `playwright-cli snapshot`, explore with `click`/`fill`/`hover`
 3. Pick the best locator using the priority table
-4. Read `tests/e2e/.env` for available environment variables
-5. Generate the Playwright spec in `tests/e2e/specs/`
-6. Run with `npx playwright test --config=tests/e2e/playwright.config.ts`
+4. Read `tests/e2e/playwright/.env` for available environment variables
+5. Generate the Playwright spec in `tests/e2e/playwright/specs/`
+6. Run with `npx playwright test --config=tests/e2e/playwright/playwright.config.ts`
 7. If failures, re-inspect with `playwright-cli snapshot`, fix, and re-run until all pass
 
 ## Exploring the Page
@@ -53,7 +53,7 @@ Do NOT use `npx playwright codegen` or static HTML assumptions.
 
 ## Environment Variables
 
-All dynamic values come from `tests/e2e/.env`. Never hardcode credentials or URLs. Read the file to discover available variables before writing tests.
+All dynamic values come from `tests/e2e/playwright/.env`. Never hardcode credentials or URLs. Read the file to discover available variables before writing tests.
 
 ```ts
 await page.goto(process.env.BASE_URL! + process.env.AUTH_PATH!);
@@ -61,7 +61,7 @@ await page.goto(process.env.BASE_URL! + process.env.AUTH_PATH!);
 
 ## Test Spec Template
 
-Place specs in `tests/e2e/specs/`. Replace `<discovered-*>` with values from `playwright-cli snapshot`:
+Place specs in `tests/e2e/playwright/specs/`. Replace `<discovered-*>` with values from `playwright-cli snapshot`:
 
 ```ts
 import { test, expect } from '@playwright/test';
@@ -82,8 +82,8 @@ test.describe('<Feature>', () => {
 ## Running Tests
 
 ```bash
-npx playwright test --config=tests/e2e/playwright.config.ts
-npx playwright test --config=tests/e2e/playwright.config.ts --repeat-each=3  # flaky detection
+npx playwright test --config=tests/e2e/playwright/playwright.config.ts
+npx playwright test --config=tests/e2e/playwright/playwright.config.ts --repeat-each=3  # flaky detection
 ```
 
 ## Failure Repair
