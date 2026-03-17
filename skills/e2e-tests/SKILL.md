@@ -1,198 +1,52 @@
-# Autonomous Playwright Test Engineer Skill
+---
+name: e2e-tests
+description: >-
+  Autonomous Playwright QA workflow for QloApps. Generates reliable E2E test
+  specs by exploring the live application with playwright-cli, discovering
+  selectors from real DOM snapshots, and iterating until tests pass. Use for
+  Playwright tests, browser automation, UI testing, login/checkout/reservation
+  flows, regression tests, selector discovery, and flaky test repair.
+compatibility: Requires Node.js, Playwright, and the playwright-cli supporting skill.
+metadata:
+  version: "2.0"
+---
 
-## (Strict Playwright-CLI Interaction Mode)
+# E2E Test Engineer — QloApps
 
-## Role
-
-You are an **Autonomous Playwright QA Engineer** that generates reliable Playwright test specifications by **interacting with the application through `playwright-cli` commands**.
-
-You must **never guess selectors** or generate tests without first interacting with the application.
-
-All browser interactions must be performed through **`playwright-cli` commands**.
+Never guess selectors. Always explore the live UI with `playwright-cli` first.
 
 ## Supporting Skill Dependency
 
-This skill may require a separately installed supporting skill named `playwright-cli` for browser interaction workflows.
+Before any browser interaction, scan the project for `**/playwright-cli/SKILL.md` and load the match closest to the project root. That skill defines all valid `playwright-cli` commands.
 
-Before performing any browser interaction, scan the current project for `**/playwright-cli/SKILL.md` and load the discovered `playwright-cli` skill.
+## Workflow
 
-If multiple matches are found, prefer the match closest to the project root.
+Follow this sequence for every test task:
 
-If the task requires opening pages, clicking, filling, snapshots, or selector discovery, the discovered `playwright-cli` skill must be loaded first as supporting context.
+- [ ] Step 1: Open the page with `playwright-cli open <url>`
+- [ ] Step 2: Explore and inspect with `playwright-cli snapshot` (primary) and `click`/`fill`/`hover`
+- [ ] Step 3: Pick the best locator using the priority table below
+- [ ] Step 4: Generate the Playwright spec
+- [ ] Step 5: Run tests and verify
+- [ ] Step 6: If failures, repair locators/timing via `playwright-cli snapshot`, then re-run
+- [ ] Step 7: Repeat until all tests pass
 
----
+## Step 1 — Open & Explore
 
-# Critical Rules
-
-### Strict Tool Usage
-
-When browser interaction is required, use the browser interaction workflow defined by the installed `playwright-cli` supporting skill.
-
-Browser interactions must **only use**:
-
-```
-playwright-cli
-```
-
-Do NOT use:
-
-```
-npx playwright codegen
-manual guessing of selectors
-static HTML assumptions
+```bash
+playwright-cli open <BASE_URL from .env>
+playwright-cli snapshot          # primary DOM inspection tool
+playwright-cli click <ref>
+playwright-cli fill <ref> "value"
+playwright-cli hover <ref>
+playwright-cli screenshot        # visual confirmation when needed
 ```
 
-Always explore the UI first.
+`playwright-cli snapshot` returns the accessible tree with element refs. Use it to discover roles, labels, placeholders, text, and IDs — then pick a locator.
 
----
+Do NOT use `npx playwright codegen`, manual selector guessing, or static HTML assumptions.
 
-# Environment Variables
-
-All dynamic values must come from:
-
-```
-tests/e2e/playwright/.env
-```
-
-Examples may include:
-
-```
-BASE_URL
-AUTH_PATH
-CUSTOMER_EMAIL
-CUSTOMER_PASSWORD
-INVALID_EMAIL
-INVALID_PASSWORD
-```
-
-Rules:
-
-* Do **not hardcode credentials or dynamic values**
-* Always read variables from `.env`
-* The `.env` file is the **single source of truth for test data**
-
-Example usage:
-
-```ts
-process.env.BASE_URL
-process.env.AUTH_PATH
-process.env.CUSTOMER_EMAIL
-process.env.CUSTOMER_PASSWORD
-```
-
-Example test usage:
-
-```ts
-const baseUrl = process.env.BASE_URL!
-const authPath = process.env.AUTH_PATH || 'index.php?controller=authentication'
-await page.goto(baseUrl + authPath)
-
-await page.getByLabel('Email').fill(process.env.CUSTOMER_EMAIL!)
-await page.getByLabel('Password').fill(process.env.CUSTOMER_PASSWORD!)
-```
-
----
-
-# QloApps CI Guardrails (Mandatory)
-
-For this repository, follow these rules to avoid local-vs-CI mismatches:
-
-* Do not depend on pretty URLs like `/login` in tests or health checks.
-* Use the canonical authentication route: `index.php?controller=authentication`.
-* Prefer stable form scoping (`#login_form`) over positional selectors like `form.nth(1)`.
-* Keep Playwright retries disabled in CI (`retries: 0`) so failures are deterministic.
-* CI readiness checks must tolerate transient curl connection errors (`curl ... || true`) and retry.
-* CI must verify installation actually completed (`config/settings.inc.php` exists) before running tests.
-* When writing `tests/e2e/playwright/.env` in CI, use variable expansion (unquoted heredoc) so values are real, not literal `${VAR}` strings.
-
----
-
-# Required Workflow
-
-The AI must follow this process strictly.
-
-```
-Open application
-↓
-Explore UI using playwright-cli
-↓
-Inspect DOM elements
-↓
-Select best locator
-↓
-Generate Playwright spec
-↓
-Run tests
-↓
-Fix failures
-↓
-Repeat until stable
-```
-
----
-
-# Step 1 — Open Application
-
-Use `playwright-cli` to open the target URL.
-
-Example:
-
-```
-playwright-cli open https://example.com
-```
-
-The URL should come from:
-
-```
-process.env.BASE_URL
-```
-
----
-
-# Step 2 — Explore the Page
-
-Use CLI interactions to explore the UI.
-
-Examples:
-
-```
-playwright-cli click
-playwright-cli fill
-playwright-cli hover
-playwright-cli screenshot
-playwright-cli get-dom
-```
-
-The AI must understand:
-
-* forms
-* buttons
-* inputs
-* navigation
-* modals
-* tables
-
----
-
-# Step 3 — DOM Inspection
-
-Extract element attributes:
-
-* role
-* aria-label
-* label
-* placeholder
-* visible text
-* data-testid
-* id
-
-Generate locator candidates.
-
----
-
-# Step 4 — Locator Scoring Algorithm
-
-Select locators using this priority.
+## Step 2 — Locator Priority
 
 | Locator          | Priority |
 | ---------------- | -------- |
@@ -201,266 +55,79 @@ Select locators using this priority.
 | getByPlaceholder | High     |
 | getByText        | Medium   |
 | getByTestId      | Medium   |
-| CSS              | Low      |
+| CSS (#id)        | Low      |
 | XPath            | Avoid    |
 
-Example good locator:
+Good: `page.getByRole('button', { name: 'Sign in' })`
+Bad: `page.locator('div:nth-child(4) button')`
+
+## Step 3 — Environment Variables
+
+All dynamic values come from `tests/e2e/.env` (loaded automatically by `playwright.config.ts` via `dotenv`). Never hardcode credentials or URLs. Read `tests/e2e/.env` to discover available variables before writing tests.
+
+Usage pattern:
 
 ```ts
-page.getByRole('button', { name: 'Login' })
+await page.goto(process.env.BASE_URL! + process.env.AUTH_PATH!);
 ```
 
-Example bad locator:
+The `playwright.config.ts` also sets `baseURL`, so `page.goto('/')` resolves to `BASE_URL`. Use relative paths for simple navigation and explicit concatenation when building non-root paths.
+
+## Step 4 — Generate Test Spec
+
+Place specs in `tests/e2e/specs/`. Discover all selectors, labels, and button names from `playwright-cli snapshot` before writing assertions.
+
+Template structure (replace `<discovered-*>` placeholders with real values from snapshot):
 
 ```ts
-page.locator('div:nth-child(4) button')
+import { test, expect } from '@playwright/test';
+
+test.describe('<Feature>', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(process.env.BASE_URL! + (process.env.AUTH_PATH || '<discovered-path>'));
+  });
+
+  test('<test name>', async ({ page }) => {
+    // Use locators discovered via playwright-cli snapshot
+    await page.locator('<discovered-form-scope>').getByLabel('<discovered-label>').fill(process.env.<ENV_VAR>!);
+    await page.locator('<discovered-form-scope>').getByRole('button', { name: '<discovered-name>' }).click();
+
+    // Assert using visible elements found in post-action snapshot
+    await expect(page.getByRole('<discovered-role>', { name: /<discovered-pattern>/i })).toBeVisible();
+  });
+});
 ```
 
----
+Every test must include at least one assertion (element visibility, URL change, text content, or error message). Never copy locators from this template literally — always discover them from the live UI.
 
-# Step 5 — Generate Test Spec
+## Step 5 — Run Tests
 
-Tests must follow Playwright best practices.
-
-Example:
-
-```ts
-import { test, expect } from '@playwright/test'
-
-test('user login', async ({ page }) => {
-
-  const authPath = process.env.AUTH_PATH || 'index.php?controller=authentication'
-  await page.goto(process.env.BASE_URL + authPath)
-
-  await page.locator('#login_form').getByLabel('Email address').fill(process.env.CUSTOMER_EMAIL!)
-  await page.locator('#login_form').getByLabel('Password').fill(process.env.CUSTOMER_PASSWORD!)
-
-  await page.locator('#login_form').getByRole('button', { name: 'Sign in' }).click()
-
-  await expect(page.getByRole('button', { name: /John/i })).toBeVisible()
-
-})
+```bash
+npx playwright test --config=tests/e2e/playwright.config.ts
 ```
 
----
+For flaky test detection:
 
-# Step 6 — Add Assertions
-
-Each test must validate something.
-
-Examples:
-
-```
-URL change
-element visibility
-text content
-success message
+```bash
+npx playwright test --config=tests/e2e/playwright.config.ts --repeat-each=3
 ```
 
-Example:
+## Step 6 — Failure Repair
 
-```ts
-await expect(page.getByText('Welcome')).toBeVisible()
-```
+When tests fail, re-inspect with `playwright-cli snapshot` and fix:
 
----
+- **Locator broken?** Re-discover from snapshot, replace with higher-priority locator.
+- **Timeout?** Replace `waitForTimeout` with `expect(locator).toBeVisible()` or `expect.poll()`.
+- **Navigation failed?** Verify URL uses `index.php?controller=` format, not pretty URLs.
 
-# Step 7 — Run Tests
+Re-run after each fix. Repeat until all tests pass.
 
-Run tests using Playwright.
+## Gotchas
 
-```
-npx playwright test
-```
-
-Collect results:
-
-* passed
-* failed
-* flaky
-
----
-
-# Step 8 — Failure Analysis
-
-If tests fail:
-
-Analyze errors like:
-
-```
-locator not found
-element not visible
-navigation failure
-timeout
-```
-
-Example error:
-
-```
-locator.click: element not visible
-```
-
----
-
-# Step 9 — Automatic Repair
-
-Fix tests automatically.
-
-Possible fixes:
-
-### Locator Repair
-
-Reinspect DOM using `playwright-cli`.
-
-Replace weak selectors.
-
-Bad
-
-```ts
-page.locator('.btn-primary')
-```
-
-Better
-
-```ts
-page.getByRole('button', { name: 'Submit' })
-```
-
----
-
-### Timing Repair
-
-Replace weak waits.
-
-Bad
-
-```
-waitForTimeout
-```
-
-Good
-
-```
-expect(locator).toBeVisible()
-```
-
----
-
-# Step 10 — Retry Loop
-
-Repeat until tests pass.
-
-```
-Run tests
-↓
-Fail?
-↓
-Fix test
-↓
-Run again
-```
-
-Stop when:
-
-```
-All tests pass
-```
-
----
-
-# Playwright Test Architecture
-
-Tests must follow this structure.
-
-```
-tests/
-   auth/
-      login.spec.ts
-   booking/
-      booking.spec.ts
-```
-
-Optional:
-
-```
-pages/
-fixtures/
-helpers/
-data/
-```
-
----
-
-# Flaky Test Detection
-
-Run tests multiple times.
-
-```
-npx playwright test --repeat-each=3
-```
-
-If results differ:
-
-```
-mark as flaky
-repair locator or timing
-```
-
----
-
-# Output Requirements
-
-Generated tests must:
-
-* use Playwright recommended locators
-* avoid fragile selectors
-* include assertions
-* use environment variables from `.env`
-* be readable and maintainable
-* pass successfully
-
----
-
-# Autonomous Agent Architecture
-
-```
-AI Agent
-   │
-   ├─ playwright-cli browser controller
-   │
-   ├─ DOM analyzer
-   │
-   ├─ locator scorer
-   │
-   ├─ test generator
-   │
-   ├─ test runner
-   │
-   └─ failure repair engine
-```
-
----
-
-# Example Final Test
-
-```ts
-import { test, expect } from '@playwright/test'
-
-test.describe('Login', () => {
-
-  test('user can login', async ({ page }) => {
-
-    const authPath = process.env.AUTH_PATH || 'index.php?controller=authentication'
-    await page.goto(process.env.BASE_URL + authPath)
-
-    await page.locator('#login_form').getByLabel('Email address').fill(process.env.CUSTOMER_EMAIL!)
-    await page.locator('#login_form').getByLabel('Password').fill(process.env.CUSTOMER_PASSWORD!)
-
-    await page.locator('#login_form').getByRole('button', { name: 'Sign in' }).click()
-
-    await expect(page.getByRole('button', { name: /John/i })).toBeVisible()
-
-  })
-
-})
-```
+- Never use pretty URLs (`/login`). Always use `index.php?controller=` routes.
+- Scope form locators to stable containers (e.g. a form ID) instead of positional selectors like `form.nth(1)`.
+- QloApps post-login UI varies — check for account button OR sign-out link, not just one.
+- `retries: 0` in config — tests must be deterministic; do not rely on retries.
+- CI writes `.env` via unquoted heredoc for variable expansion. Literal `${VAR}` strings break tests.
+- CI must confirm `config/settings.inc.php` exists before running tests.
+- `dotenv` loading is handled in `playwright.config.ts` — do not add separate dotenv calls in specs.
