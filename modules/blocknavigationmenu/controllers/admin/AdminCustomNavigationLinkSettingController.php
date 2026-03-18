@@ -53,7 +53,17 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
                         'cast' => 'intval',
                         'type' => 'bool',
                     ),
+                    'WK_TOP_NAVBAR_ELEMENTS_COUNT' => array(
+                        'title' => $this->l('Top Navbar Element Limit'),
+                        'hint' => $this->l('Number of elements visible at the top navbar on home screen.'),
+                        'validation' => 'isUnsignedInt',
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'class' => 'fixed-width-sm',
+                        'required' => true,
+                    ),
                 ),
+
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
@@ -447,5 +457,30 @@ class AdminCustomNavigationLinkSettingController extends ModuleAdminController
         if ($this->display == 'edit' || $this->display == 'add') {
             $this->addJS($this->module->getPathUri().'views/js/admin/wk_navigation_link.js');
         }
+    }
+
+    public function processUpdateOptions()
+    {
+        $navbarElementsCount = (int) Tools::getValue('WK_TOP_NAVBAR_ELEMENTS_COUNT');
+
+        // Validate WK_TOP_NAVBAR_ELEMENTS_COUNT            
+        if ($navbarElementsCount <= 0) {
+            $this->errors[] = $this->l('Top Navbar Element Limit must be greater than 0.');
+        } else {
+            $objCustomNavigationLink = new WkCustomNavigationLink();
+
+            $navigationLinks = $objCustomNavigationLink->getCustomNavigationLinks(1, false, 1);
+            $maxAllowedCount = is_array($navigationLinks) ? count($navigationLinks) : 0;
+                
+            if ($navbarElementsCount > $maxAllowedCount) {
+                $this->errors[] = sprintf($this->l('Top Navbar Element Limit cannot exceed %d.'),$maxAllowedCount);
+            }
+        }
+        
+        if (!count($this->errors)) {
+            return parent::processUpdateOptions();
+        }
+        
+        return false;
     }
 }

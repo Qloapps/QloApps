@@ -38,7 +38,7 @@
 			{assign var='productPrice' value=$product->getPrice(false, $smarty.const.NULL, 6)}
 			{assign var='productPriceWithoutReduction' value=$product->getPriceWithoutReduct(true, $smarty.const.NULL)}
 		{/if}
-	<div class="product_wrapper mt-3 container-lg pb-4" itemscope itemtype="http://schema.org/Product">
+	<div id="product" class="product_wrapper mt-3 container-lg pb-4" itemscope itemtype="http://schema.org/Product">
 		<div class="product_breadcrumb">
 			<ol class="breadcrumb help_block bg-white mb-3 p-0">
 				<li class="breadcrumb-item">{l s='Home'}</li>
@@ -81,8 +81,8 @@
 							<div class="qlo-room-header">
 							<div class="room_type_name_block mb-4 {if isset($language_is_rtl) && $language_is_rtl}rtl{/if}">
 								{block name='product_name'}
-									<div class="hotel_name_block">
-										<div class="d-inline-block">
+									<div class="hotel_name_block d-flex flex-column flex-lg-row justify-content-between align-items-stretch align-items-lg-center">
+										<div class="flex-grow-1">
 											<div class="block_title"><span class="hotel_name">{$product->name}
 												{if isset($id_hotel) && $id_hotel}&nbsp;-&nbsp;{$hotel_name}{/if}</span>
 											</div>
@@ -103,9 +103,11 @@
 												</div>
 											{/if}
 										</div>
-										{block name='displayRoomTypeDetailRoomTypeNameBlock'}
-											{hook h='displayRoomTypeDetailRoomTypeNameBlock' id_product=$product->id}
-										{/block}
+										<div class="mt-3 mt-lg-0 flex-shrink-0">
+											{block name='displayRoomTypeDetailRoomTypeNameBlock'}
+												{hook h='displayRoomTypeDetailRoomTypeNameBlock' id_product=$product->id}
+											{/block}
+										</div>
 									</div>
 									{block name='displayRoomTypeDetailRoomTypeNameAfter'}
 										{hook h='displayRoomTypeDetailRoomTypeNameAfter' product=$product id_product=$product->id}
@@ -118,10 +120,14 @@
 							{/block}
 							<!-- product img-->
 							{block name='product_images'}
-								<div class="row qlo-room-gallery" data-room-gallery-urls="{if isset($images)}{foreach from=$images item=image name=gallery}{assign var=imageIds value="`$product->id`-`$image.id_image`"}{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}{if !$smarty.foreach.gallery.last}|{/if}{/foreach}{/if}">
+								{assign var=room_gallery_count value=0}
+								{if isset($images)}{assign var=room_gallery_count value=$images|@count}{/if}
+								{assign var=gallery_total value=$room_gallery_count}
+								<div class="d-none d-lg-block">
+									<div class="qlo-category-gallery qlo-room-gallery m-0 {if $room_gallery_count <= 1}gallery--single{elseif $room_gallery_count == 2}gallery--two{/if}" data-room-gallery-urls="{if isset($images)}{foreach from=$images item=image name=gallery}{assign var=imageIds value="`$product->id`-`$image.id_image`"}{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}{if !$smarty.foreach.gallery.last}|{/if}{/foreach}{/if}">
 
 									{block name='product_cover_image'}
-										<div id="image-block-cont" class="col-12 col-lg-7 pr-lg-2 qlo-room-gallery__cover">
+										<div id="image-block-cont" class="qlo-category-gallery__cover qlo-room-gallery__cover">
 											<div id="image-block" class="clearfix">
 												<!-- {if $product->new}
 													<span class="new-box">
@@ -138,11 +144,11 @@
 												{if $have_image}
 													<span id="view_full_size">
 														{if $jqZoomEnabled && $have_image && !$content_only}
-															<a class="jqzoom" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" rel="gal1" href="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'thickbox_default')|escape:'html':'UTF-8'}">
-																<img itemprop="image" src="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'large_default')|escape:'html':'UTF-8'}" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" alt="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}"/>
+															<a class="jqzoom d-block w-100 h-100" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" rel="gal1" href="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'thickbox_default')|escape:'html':'UTF-8'}">
+																<img class="d-block w-100 h-100" itemprop="image" src="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'large_default')|escape:'html':'UTF-8'}" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" alt="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}"/>
 															</a>
 														{else}
-															<img id="bigpic" itemprop="image" src="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'large_default')|escape:'html':'UTF-8'}" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" alt="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" width="{$largeSize.width}" height="{$largeSize.height}"/>
+															<img class="d-block w-100 h-100" id="bigpic" itemprop="image" src="{$link->getImageLink($product->link_rewrite, $cover.id_image, 'large_default')|escape:'html':'UTF-8'}" title="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" alt="{if !empty($cover.legend)}{$cover.legend|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}" width="{$largeSize.width}" height="{$largeSize.height}"/>
 															<!-- {if !$content_only}
 																<span class="span_link no-print">{l s='View larger'}</span>
 															{/if} -->
@@ -164,75 +170,86 @@
 											</div> <!-- end image-block -->
 										</div>
 									{/block}
-									{block name='product_thumbnails'}
-										<div class="col-12 col-lg-5 pl-lg-2 mt-3 mt-lg-0 qlo-room-gallery__thumbs">
-											{if isset($images) && count($images) > 0}
-												<!-- thumbnails -->
-													<div id="views_block" class="clearfix qlo-room-gallery__views {if isset($images) && count($images) < 2}hidden{/if}">
-														{if isset($images) && count($images) > 2}
-															{* <span class="view_scroll_spacer"> *}
-																<a id="view_scroll_left" class="" title="{l s='Other views'}" href="javascript:{ldelim}{rdelim}">
-																	{l s='Previous'}
-																</a>
-															{* </span> *}
-														{/if}
-														<div id="thumbs_list">
-															<ul id="thumbs_list_frame" class="qlo-room-gallery__thumb-grid">
-															{if isset($images)}
-																{assign var='visible_thumb_count' value=0}
-																{foreach from=$images item=image name=thumbnails}
-																	{assign var=imageIds value="`$product->id`-`$image.id_image`"}
-																	{if !empty($image.legend)}
-																		{assign var=imageTitle value=$image.legend|escape:'html':'UTF-8'}
-																	{else}
-																		{assign var=imageTitle value=$product->name|escape:'html':'UTF-8'}
-																	{/if}
-																	{assign var='thumb_is_cover' value=($image.id_image == $cover.id_image)}
-																	{assign var='thumb_is_visible' value=false}
-																	{if !$thumb_is_cover && $visible_thumb_count < 4}
-																		{assign var='thumb_is_visible' value=true}
-																		{assign var='visible_thumb_count' value=$visible_thumb_count+1}
-																	{/if}
-																	<li id="thumbnail_{$image.id_image}" class="qlo-room-gallery__thumb{if !$thumb_is_visible} d-none{/if}{if $smarty.foreach.thumbnails.last} last{/if}">
-																		<a {if $jqZoomEnabled && $have_image && !$content_only} href="javascript:void(0);" rel="{ldelim}gallery: 'gal1', smallimage: '{$link->getImageLink($product->link_rewrite, $imageIds, 'large_default')|escape:'html':'UTF-8'}',largeimage: '{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}'{rdelim}"{else} href="{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}"	data-fancybox-group="other-views" class="fancybox{if $image.id_image == $cover.id_image} shown{/if}"{/if} title="{$imageTitle}">
-																			<img class="img-responsive" id="thumb_{$image.id_image}" src="{$link->getImageLink($product->link_rewrite, $imageIds, 'cart_default')|escape:'html':'UTF-8'}" alt="{$imageTitle}" title="{$imageTitle}"{if isset($cartSize)} height="{$cartSize.height}" width="{$cartSize.width}"{/if} itemprop="image" />
-																		</a>
-																		{if $thumb_is_visible && $visible_thumb_count == 4}
-																			<a href="#" class="qlo-room-gallery__full js-room-full-gallery-trigger">
-																				<span>{l s='See Full Gallery'}</span> <i class="icon-long-arrow-right"></i>
-																			</a>
-																		{/if}
-																	</li>
-																{/foreach}
-															{/if}
-															{block name='displayRoomTypeThumbnailsBottom'}
-																{hook h='displayRoomTypeThumbnailsBottom'}
-															{/block}
-															</ul>
-														</div> <!-- end thumbs_list -->
-														{if isset($images) && count($images) > 2}
-															<a id="view_scroll_right" title="{l s='Other views'}" href="javascript:{ldelim}{rdelim}">
-																{l s='Next'}
-															</a>
-														{/if}
-														{block name='displayRoomTypeThumbnailsAfter'}
-															{hook h="displayRoomTypeThumbnailsAfter"}
-														{/block}
-													</div> <!-- end views-block -->
-												<!-- end thumbnails -->
+{block name='product_thumbnails'}
+								{if isset($images) && count($images) > 0}
+									<ul id="thumbs_list" class="qlo-category-gallery__grid">
+										{assign var='visible_thumb_count' value=0}
+										{foreach from=$images item=image name=thumbnails}
+											{assign var=imageIds value="`$product->id`-`$image.id_image`"}
+											{if !empty($image.legend)}
+												{assign var=imageTitle value=$image.legend|escape:'html':'UTF-8'}
+											{else}
+												{assign var=imageTitle value=$product->name|escape:'html':'UTF-8'}
 											{/if}
-										</div>
+											{assign var='visible_thumb_count' value=$visible_thumb_count+1}
+											<li id="thumbnail_{$image.id_image}" class="qlo-category-gallery__thumb{if $smarty.foreach.thumbnails.last} last{/if}{if $smarty.foreach.thumbnails.first} first{/if}{if $visible_thumb_count > 2} unvisible{/if}">
+												<a href="{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}" class="js-room-image" title="{$imageTitle}">
+													<img src="{$link->getImageLink($product->link_rewrite, $imageIds, 'cart_default')|escape:'html':'UTF-8'}" alt="{$imageTitle}" title="{$imageTitle}" loading="lazy"/>
+												</a>
+												{if $visible_thumb_count == 2 && $images|count > 2}
+													<a href="javascript:void(0);" class="qlo-category-gallery__full-gallery js-room-full-gallery-trigger">
+														<span>{l s='See Full Gallery'}</span> <i class="icon-long-arrow-right"></i>
+													</a>
+												{/if}
+											</li>
+										{/foreach}
+									</ul>
+									{block name='displayRoomTypeThumbnailsAfter'}
+										{hook h="displayRoomTypeThumbnailsAfter"}
 									{/block}
-								</div>
-								{if isset($images) && count($images) > 1}
-									<p class="resetimg clear no-print">
-										<span id="wrapResetImages" style="display: none;">
-											<a href="{$link->getProductLink($product)|escape:'html':'UTF-8'}" data-id="resetImages">
-												<i class="icon-repeat"></i>
-												{l s='Display all pictures'}
-											</a>
-										</span>
-									</p>
+								{/if}
+							{/block}
+								{if isset($images) && count($images) > 0}
+									<div class="mobile-hotel-gallery d-block d-lg-none position-relative">
+										<div class="owl-carousel owl-theme">
+											{foreach from=$images item=image}
+												{assign var=imageIds value="`$product->id`-`$image.id_image`"}
+												<div class="item">
+													<a href="{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|escape:'html':'UTF-8'}" class="js-room-image">
+														<img src="{$link->getImageLink($product->link_rewrite, $imageIds, 'large_default')|escape:'html':'UTF-8'}" alt="{$product->name|escape:'html':'UTF-8'}" loading="lazy"/>
+													</a>
+												</div>
+											{/foreach}
+										</div>
+										<div class="gallery-counter">
+											<span class="current">01</span>/<span class="total">{$gallery_total|string_format:"%02d"}</span>
+										</div>
+										<a href="#" class="qlo-category-gallery__full-gallery js-room-full-gallery-trigger">
+											<span>{l s='See Full Gallery'}</span> <i class="icon-long-arrow-right"></i>
+										</a>
+									</div>
+								{/if}
+								{if isset($images) && count($images) > 0}
+									<div class="qlo-full-gallery-modal" id="full-gallery-modal" style="display: none;">
+										<div class="qlo-full-gallery__overlay"></div>
+										<div class="qlo-full-gallery__container">
+											<button class="qlo-full-gallery__close" type="button"><i class="icon-times"></i></button>
+
+											<div class="qlo-full-gallery__header">
+												<h2 class="qlo-full-gallery__hotel-name">{$product->name|escape:'html':'UTF-8'}</h2>
+											</div>
+
+											<div class="qlo-full-gallery__tabs">
+												<div class="qlo-full-gallery__tabs-wrapper">
+													<button class="qlo-gallery-tab active" data-category="all">{l s='All photos'}</button>
+												</div>
+											</div>
+
+											<div class="qlo-full-gallery__main qlo-full-gallery__main--desktop">
+												<button class="qlo-full-gallery__nav qlo-full-gallery__nav--prev" type="button"><i class="icon-chevron-left"></i></button>
+												<div class="qlo-full-gallery__image-container"><img src="" alt="" class="qlo-full-gallery__main-image" id="main-image-modal"></div>
+												<button class="qlo-full-gallery__nav qlo-full-gallery__nav--next" type="button"><i class="icon-chevron-right"></i></button>
+											</div>
+
+											<div class="qlo-full-gallery__main qlo-full-gallery__main--mobile">
+												<div class="owl-carousel owl-theme" id="gallery-mobile-carousel"></div>
+											</div>
+
+											<div class="qlo-full-gallery__thumbnails qlo-full-gallery__thumbnails--desktop">
+												<div class="qlo-gallery-thumbnails__scroll" id="gallery-thumbnail"></div>
+											</div>
+										</div>
+									</div>
 								{/if}
 							{/block}
 						</div>
@@ -243,8 +260,8 @@
 								<section class="page-product-box">
 									{block name='product_tabs'}
 										<div class="tab_container">
-											<ul class="nav nav-pills tab_list_headings">
-												<li class="nav-item"><a href="#product_info_tab" data-toggle="tab" class="idTabHrefShort nav-pill active">{l s='Overview'}</a></li>
+												<ul class="nav nav-pills tab_list_headings flex-nowrap flex-lg-wrap overflow-auto">
+													<li class="nav-item"><a href="#product_info_tab" data-toggle="tab" class="idTabHrefShort nav-pill active">{l s='Overview'}</a></li>
 												{* Block for booking products *}
 												{if isset($features) && $features}
 													<li class="nav-item "><a href="#room_features_tab" data-toggle="tab" class="idTabHrefShort nav-pill">{l s='Amenities'}</a></li>
@@ -775,6 +792,31 @@
 			{addJsDef img_prod_dir=$img_prod_dir}
 			{addJsDef id_product=$product->id|intval}
 			{addJsDef jqZoomEnabled=$jqZoomEnabled|boolval}
+			{if isset($images) && count($images) > 0}
+				{assign var='room_gallery_item_delim' value=''}
+				{capture name='room_gallery_images_json'}
+					{* Cover image first *}
+					{foreach from=$images item=image}
+						{if isset($cover.id_image) && $image.id_image == $cover.id_image}
+							{assign var=imageIds value="`$product->id`-`$image.id_image`"}
+							{$room_gallery_item_delim}{ldelim}"id":{$image.id_image|intval},"large_link":{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|@json_encode},"small_link":{$link->getImageLink($product->link_rewrite, $imageIds, 'cart_default')|@json_encode}{rdelim}
+							{assign var='room_gallery_item_delim' value=','}
+						{/if}
+					{/foreach}
+					{* Remaining images *}
+					{foreach from=$images item=image}
+						{if !isset($cover.id_image) || $image.id_image != $cover.id_image}
+							{assign var=imageIds value="`$product->id`-`$image.id_image`"}
+							{$room_gallery_item_delim}{ldelim}"id":{$image.id_image|intval},"large_link":{$link->getImageLink($product->link_rewrite, $imageIds, 'thickbox_default')|@json_encode},"small_link":{$link->getImageLink($product->link_rewrite, $imageIds, 'cart_default')|@json_encode}{rdelim}
+							{assign var='room_gallery_item_delim' value=','}
+						{/if}
+					{/foreach}
+				{/capture}
+				{capture name='room_gallery_by_category_json'}
+					{ldelim}"all":{ldelim}"name":{$product->name|@json_encode},"images":[{$smarty.capture.room_gallery_images_json}]{rdelim}{rdelim}
+				{/capture}
+				{addJsDef roomGalleryByCategory=$smarty.capture.room_gallery_by_category_json}
+			{/if}
 			{addJsDef maxQuantityToAllowDisplayOfLastQuantityMessage=$last_qties|intval}
 			{addJsDef minimalQuantity=$product->minimal_quantity|intval}
 			{addJsDef noTaxForThisProduct=$no_tax|boolval}

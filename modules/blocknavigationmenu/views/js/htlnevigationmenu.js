@@ -29,7 +29,7 @@ $(document).ready(function() {
 			return;
 		}
 
-		var maxItems = 7;
+		var maxItems = topNavCount;
 		var items = nav.children('li').not('.nav-more');
 		items.removeClass('d-none nav-hidden');
 		moreItem.addClass('d-none');

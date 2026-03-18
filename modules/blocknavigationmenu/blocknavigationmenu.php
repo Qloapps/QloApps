@@ -50,7 +50,10 @@ class blocknavigationmenu extends Module
 
     public function hookTop($params)
     {
-        Media::addJsDef(array('currentPage' => $this->context->controller->php_self));
+        Media::addJsDef(array(
+            'currentPage' => $this->context->controller->php_self,
+            'topNavCount' => (int) Configuration::get('WK_TOP_NAVBAR_ELEMENTS_COUNT', 5)
+        ));
         $this->context->controller->addJS($this->_path.'/views/js/htlnevigationmenu.js');
 
         $objCustomNavigationLink = new WkCustomNavigationLink();

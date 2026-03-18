@@ -26,54 +26,112 @@
 {block name='cms'}
 	{if isset($cms) && !isset($cms_category)}
 		{if !$cms->active}
-			<br />
-			<div id="admin-action-cms">
-				<p>
-					<span>{l s='This CMS page is not visible to your customers.'}</span>
+			<div class="container my-4">
+				<div id="admin-action-cms" class="alert alert-warning">
+					<p class="mb-2">
+						<strong><i class="icon-warning"></i> {l s='This CMS page is not visible to your customers.'}</strong>
+					</p>
 					<input type="hidden" id="admin-action-cms-id" value="{$cms->id}" />
-					<input type="submit" value="{l s='Publish'}" name="publish_button" class="button btn btn-default"/>
-					<input type="submit" value="{l s='Back'}" name="lnk_view" class="button btn btn-default"/>
-				</p>
-				<div class="clear" ></div>
-				<p id="admin-action-result"></p>
+					<div class="d-flex gap-2">
+						<input type="submit" value="{l s='Publish'}" name="publish_button" class="btn btn-primary btn-sm"/>
+						<input type="submit" value="{l s='Back'}" name="lnk_view" class="btn btn-secondary btn-sm"/>
+					</div>
+					<p id="admin-action-result" class="mt-2 mb-0"></p>
+				</div>
 			</div>
 		{/if}
-		<div class="rte{if $content_only} content_only{/if} container">
-			{$cms->content}
+		
+		<div class="container-md my-4 my-lg-5">
+			<div class="row justify-content-center">
+				<div class="col-12 col-lg-10">
+					<article class="cms-page-content card qlo-account-card p-4 p-lg-5">
+						<div class="rte{if $content_only} content_only{/if}">
+							{$cms->content}
+						</div>
+					</article>
+				</div>
+			</div>
 		</div>
 	{elseif isset($cms_category)}
-		<div class="block-cms">
-			<h1><a href="{if $cms_category->id eq 1}{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}{else}{$link->getCMSCategoryLink($cms_category->id, $cms_category->link_rewrite)}{/if}">{$cms_category->name|escape:'html':'UTF-8'}</a></h1>
-			{if $cms_category->description}
-				<p>{$cms_category->description|escape:'html':'UTF-8'}</p>
-			{/if}
-			{if isset($sub_category) && !empty($sub_category)}
-				<p class="title_block">{l s='List of sub categories in %s:' sprintf=$cms_category->name}</p>
-				<ul class="bullet list-group">
-					{foreach from=$sub_category item=subcategory}
-						<li>
-							<a class="list-group-item" href="{$link->getCMSCategoryLink($subcategory.id_cms_category, $subcategory.link_rewrite)|escape:'html':'UTF-8'}">{$subcategory.name|escape:'html':'UTF-8'}</a>
-						</li>
-					{/foreach}
-				</ul>
-			{/if}
-			{if isset($cms_pages) && !empty($cms_pages)}
-			<p class="title_block">{l s='List of pages in %s:' sprintf=$cms_category->name}</p>
-				<ul class="bullet list-group">
-					{foreach from=$cms_pages item=cmspages}
-						<li>
-							<a class="list-group-item" href="{$link->getCMSLink($cmspages.id_cms, $cmspages.link_rewrite)|escape:'html':'UTF-8'}">{$cmspages.meta_title|escape:'html':'UTF-8'}</a>
-						</li>
-					{/foreach}
-				</ul>
-			{/if}
+		<div class="container-md my-4 my-lg-5">
+			{* Category Header *}
+			<div class="row mb-4 mb-lg-5">
+				<div class="col-12">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="{$link->getPageLink('cms', true)|escape:'html':'UTF-8'}">{l s='Information'}</a></li>
+							<li class="breadcrumb-item active" aria-current="page">{$cms_category->name|escape:'html':'UTF-8'}</li>
+						</ol>
+					</nav>
+					<h1 class="heading h2 mb-3">{$cms_category->name|escape:'html':'UTF-8'}</h1>
+					{if $cms_category->description}
+						<p class="text-muted lead">{$cms_category->description|escape:'html':'UTF-8'}</p>
+					{/if}
+				</div>
+			</div>
+			
+			<div class="row g-4">
+				{* Sub Categories *}
+				{if isset($sub_category) && !empty($sub_category)}
+					<div class="col-12">
+						<div class="card qlo-account-card p-4">
+							<h2 class="heading h4 mb-4">{l s='Sub Categories'}</h2>
+							<div class="row g-3">
+								{foreach from=$sub_category item=subcategory}
+									<div class="col-12 col-sm-6 col-md-4 col-lg-3">
+										<a href="{$link->getCMSCategoryLink($subcategory.id_cms_category, $subcategory.link_rewrite)|escape:'html':'UTF-8'}" class="btn btn-outline-primary w-100">
+											<i class="icon-folder me-2"></i>{$subcategory.name|escape:'html':'UTF-8'}
+										</a>
+									</div>
+								{/foreach}
+							</div>
+						</div>
+					</div>
+				{/if}
+				
+				{* CMS Pages *}
+				{if isset($cms_pages) && !empty($cms_pages)}
+					<div class="col-12">
+						<div class="card qlo-account-card p-4">
+							<h2 class="heading h4 mb-4">{l s='Pages'}</h2>
+							<div class="row g-3">
+								{foreach from=$cms_pages item=cmspages}
+									<div class="col-12 col-sm-6 col-md-6 col-lg-4">
+										<a href="{$link->getCMSLink($cmspages.id_cms, $cmspages.link_rewrite)|escape:'html':'UTF-8'}" class="cms-page-link card h-100 border-0 shadow-sm text-decoration-none">
+											<div class="card-body">
+												<h3 class="h5 mb-2">{$cmspages.meta_title|escape:'html':'UTF-8'}</h3>
+												{if $cmspages.meta_description}
+													<p class="text-muted small mb-0">{$cmspages.meta_description|escape:'html':'UTF-8'}</p>
+												{/if}
+											</div>
+											<div class="card-footer bg-transparent border-0">
+												<span class="text-primary small">{l s='Read more'} <i class="icon-long-arrow-right"></i></span>
+											</div>
+										</a>
+									</div>
+								{/foreach}
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
 		</div>
 	{else}
-		<div class="alert alert-danger">
-			{l s='This page does not exist.'}
+		<div class="container-md my-4 my-lg-5">
+			<div class="row justify-content-center">
+				<div class="col-12 col-md-8 col-lg-6">
+					<div class="alert alert-danger text-center" role="alert">
+						<i class="icon-exclamation-triangle icon-2x mb-3 d-block"></i>
+						<h4 class="alert-heading">{l s='Page Not Found'}</h4>
+						<p class="mb-0">{l s='This page does not exist.'}</p>
+						<hr>
+						<a href="{$link->getPageLink('index', true)|escape:'html':'UTF-8'}" class="btn btn-primary">{l s='Go to Home'}</a>
+					</div>
+				</div>
+			</div>
 		</div>
 	{/if}
-	<br />
+	
 	{block name='cms_js_vars'}
 		{strip}
 			{if isset($smarty.get.ad) && $smarty.get.ad}

@@ -23,6 +23,23 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 $(document).ready(function () {
+    $(document).on('click', '.nav-pills a[data-toggle="tab"]', function(e) {
+        e.preventDefault();
+        var targetId = $(this).attr('href');
+        var $target = $(targetId);
+        if ($target.length) {
+            $(this).tab('show');
+            
+            setTimeout(function() {
+                var offset = 100;
+                var targetPosition = $target.offset().top - offset;
+                $('html, body').animate({
+                    scrollTop: targetPosition
+                }, 500);
+            }, 100);
+        }
+    });
+
     $('.mobile-hotel-gallery .owl-carousel').owlCarousel({
         items: 1,
         loop: true,
@@ -328,52 +345,98 @@ $(document).ready(function () {
 });
 
 function initMap() {
-    var mapContainer = $('#location_tab .map-wrap').get(0) || $('#search-results-wrap .map-wrap').get(0);
-    if (!mapContainer) {
-        return;
-    }
-
     const hotelLocation = {
         lat: Number(hotel_location.latitude),
         lng: Number(hotel_location.longitude),
     };
 
-    const map = new google.maps.Map(mapContainer, {
-        zoom: 10,
-        center: hotelLocation,
-        mapId: PS_MAP_ID,
-        zoomControl: true,
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false,
-    });
+    const mainMapElement = document.getElementById('category-hotel-map');
+    if (mainMapElement) {
+        const mainMap = new google.maps.Map(mainMapElement, {
+            zoom: 10,
+            center: hotelLocation,
+            disableDefaultUI: true,
+            fullscreenControl: true,
+            mapId: PS_MAP_ID
+        });
 
-    let icon = document.createElement('img');
-    icon.src = PS_STORES_ICON;
-    icon.style.width = '24px';
-    icon.style.height = '24px';
+        let icon = document.createElement('img');
+        icon.src = PS_STORES_ICON;
+        icon.style.width = '24px';
+        icon.style.height = '24px';
 
-    const marker = new google.maps.marker.AdvancedMarkerElement({
-        map: map,
-        position: hotelLocation,
-        title: hotel_name,
-        content: icon,
-    });
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+            map: mainMap,
+            position: hotelLocation,
+            title: hotel_name,
+            content: icon,
+        });
 
-    marker.query = location.query || null;
-    marker.latitude = hotelLocation.lat;
-    marker.longitude = hotelLocation.lng;
+        marker.query = location.query || null;
+        marker.latitude = hotelLocation.lat;
+        marker.longitude = hotelLocation.lng;
 
-    marker.addListener('click', function() {
-        let query = '';
-        if (this.query) {
-            query = this.query;
-        } else if (this.latitude && this.longitude) {
-            query = `${this.latitude},${this.longitude}`;
+        marker.addListener('click', function() {
+            let query = '';
+            if (this.query) {
+                query = this.query;
+            } else if (this.latitude && this.longitude) {
+                query = `${this.latitude},${this.longitude}`;
+            }
+
+            if (query) {
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
+            }
+        });
+    }
+
+    // Initialize location tab map
+    const locationTabMapElement = document.getElementById('location-tab-map');
+    if (locationTabMapElement) {
+        const locationTabMap = new google.maps.Map(locationTabMapElement, {
+            zoom: 10,
+            center: hotelLocation,
+            disableDefaultUI: true,
+            fullscreenControl: true,
+            mapId: PS_MAP_ID
+        });
+
+        let icon = document.createElement('img');
+        icon.src = PS_STORES_ICON;
+        icon.style.width = '24px';
+        icon.style.height = '24px';
+
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+            map: locationTabMap,
+            position: hotelLocation,
+            title: hotel_name,
+            content: icon,
+        });
+
+        marker.query = location.query || null;
+        marker.latitude = hotelLocation.lat;
+        marker.longitude = hotelLocation.lng;
+
+        marker.addListener('click', function() {
+            let query = '';
+            if (this.query) {
+                query = this.query;
+            } else if (this.latitude && this.longitude) {
+                query = `${this.latitude},${this.longitude}`;
+            }
+
+            if (query) {
+                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
+            }
+        });
+
+        // Handle map resize when location tab is shown
+        const locationTabLink = document.querySelector('a[href="#location_tab"]');
+        if (locationTabLink) {
+            locationTabLink.addEventListener('shown.bs.tab', function() {
+                google.maps.event.trigger(locationTabMap, 'resize');
+                locationTabMap.setCenter(hotelLocation);
+            });
         }
-
-        if (query) {
-            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
-        }
-    });
+    }
 }

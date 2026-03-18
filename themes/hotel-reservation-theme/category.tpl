@@ -101,7 +101,7 @@
     <div class="cat_cont container p-0">
         <div class="col-12">
             <div class="category_info_block row">
-                <div class="col-12 col-md-12 pr-md-3">
+                <div class="col-12 col-md-6 pr-md-3">
                     <div class="category_heading">
                         <span class="block_title">
                             {$objHotel->hotel_name}
@@ -144,7 +144,17 @@
                     </div>
                 </div>
                 {block name='category_hotel_info_google_map'}
-                    {* Map is rendered inside the Location section/tab when enabled *}
+                    <div class="col-12 col-md-6 pl-md-3 mt-3 mt-md-0">
+                        {if isset($hotel) && $hotel}
+                            <div class="row m-0 layered_filter_cont" id="search-results-wrap">
+                                <div class="col-sm-12 lf_sub_cont p-0">
+                                    {if ($hotel->latitude|floatval != 0 && $hotel->longitude|floatval != 0)}
+                                        <div class="map-wrap qlo-border-class" id="category-hotel-map"></div>
+                                    {/if}
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
                 {/block}
             </div>
             {block name='category_tabs'}
@@ -210,7 +220,7 @@
                                     <span>{l s='Location'}</span>
                                 </div>
                                 <div class="qlo-border-class w-auto p-0">
-                                    <div class="map-wrap"></div>
+                                    <div class="map-wrap" id="location-tab-map"></div>
                                 </div>
                             </div>
                             <hr class="block_seperator"/>
