@@ -2,7 +2,7 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
 
 test.describe('Customer Login', () => {
 
-  const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1/QloApps-develop/';
+  const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1/';
   const AUTH_URL = BASE_URL + 'index.php?controller=authentication';
   const CUSTOMER_EMAIL = process.env.CUSTOMER_EMAIL || 'pub@qloapps.com';
   const CUSTOMER_PASSWORD = process.env.CUSTOMER_PASSWORD || '123456789';
@@ -110,9 +110,9 @@ test.describe('Customer Login', () => {
     await page.locator('#login_form').getByRole('button', { name: 'Sign in' }).click();
 
     await expectLoggedInUi(page);
-    
+
     await page.reload();
-    
+
     await expectLoggedInUi(page);
   });
 
