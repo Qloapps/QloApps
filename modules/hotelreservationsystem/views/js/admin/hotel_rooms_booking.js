@@ -296,15 +296,23 @@ $(document).ready(function() {
 
     function getBookingOccupancyDetails(bookingform)
     {
-        let occupancy;
-        if (occupancy_required_for_booking) {
+        if (!bookingform || !bookingform.length) {
+            return 1;
+        }
+
+        var isOccupancy = $(bookingform).data('occupancy-required');
+        if (typeof isOccupancy === 'undefined') {
+            isOccupancy = (typeof occupancy_required_for_booking !== 'undefined') ? occupancy_required_for_booking : false;
+        }
+        var occupancy;
+        if (isOccupancy) {
             $('.booking_occupancy_wrapper').parent().removeClass('open');
-            let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
+            var selected_occupancy = $(bookingform).find(".occupancy_info_block.selected");
             if (selected_occupancy.length) {
                 occupancy = [];
                 $(selected_occupancy).each(function(ind, element) {
                     if (parseInt($(element).find('.num_adults').val())) {
-                        let child_ages = [];
+                        var child_ages = [];
                         $(element).find('.guest_child_age').each(function(index) {
                             if ($(this).val() > -1) {
                                 child_ages.push($(this).val());
@@ -796,7 +804,8 @@ $(document).ready(function() {
         var adults = 0;
         var children = 0;
         var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
-
+        var roomLabel = $(booking_occupancy_wrapper).data('attribute_type') || room_txt;
+        var roomsLabel = $(booking_occupancy_wrapper).data('attribute_types') || rooms_txt;
         $(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
             adults += parseInt($(this).val());
         });
@@ -818,9 +827,9 @@ $(document).ready(function() {
             }
         }
         if (parseInt(rooms) > 1) {
-            guestButtonVal += ', ' + parseInt(rooms) + ' ' + rooms_txt;
+            guestButtonVal += ', ' + parseInt(rooms) + ' ' + roomsLabel;
         } else {
-            guestButtonVal += ', ' + parseInt(rooms) + ' ' + room_txt;
+            guestButtonVal += ', ' + parseInt(rooms) + ' ' + roomLabel;
         }
         $(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
     }

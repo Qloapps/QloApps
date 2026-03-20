@@ -555,6 +555,7 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminAddHotel', 'Manage Hotel', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelRoomsBooking', 'Book Now', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelFeatures', 'Manage Hotel Features', 'AdminHotelReservationSystemManagement');
+        $this->installTab('AdminHotelRoomTypeSellingTypes', 'Property & Room Types', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRules', 'Manage Order Refund Rules', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRequests', 'Manage Order Refund Requests', 'AdminHotelReservationSystemManagement');
 
@@ -610,6 +611,7 @@ class HotelReservationSystem extends Module
             || !$objHtlHelper->insertDefaultHotelEntries()
             || !$objHtlHelper->createHotelRoomDefaultFeatures()
             || !$objHtlHelper->createHotelDefaultBedTypes()
+            || !$objHtlHelper->createHotelDefaultRoomTypeSellingTypes()
             || !$objHtlHelper->insertHotelCommonFeatures()
         ) {
             return false;

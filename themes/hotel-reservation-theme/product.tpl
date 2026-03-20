@@ -205,14 +205,18 @@
 								{/block}
 							{/if}
 						</div>
-
+						{if isset($room_type_info['room_type_selling_type_name']) && $room_type_info['room_type_selling_type_name']}
+							{assign var=attribute_type value=$room_type_info['room_type_selling_type_name']}
+						{else}
+							{assign var=attribute_type value={l s='Room'}}
+						{/if}
 						<div class="product_info_containter">
 							<!-- tab hook is added here -->
 							<!--HOOK_PRODUCT_TAB -->
 							<section class="page-product-box">
 								{block name='product_tabs'}
 									<ul class="nav nav-tabs product_description_tabs">
-									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='Room Information'}{else}{l s='Product Information'}{/if}</a></li>
+									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='%s Information' sprintf=$attribute_type}{else}{l s='Product Information'}{/if}</a></li>
 										{* Block for booking products *}
 										{if isset($id_hotel) && $id_hotel}
 											<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
@@ -282,7 +286,7 @@
 														{if isset($features) && $features}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
-																	<span>{l s='Room Features'}</span>
+																	<span>{l s='%s Features' sprintf=$attribute_type}</span>
 																</div>
 																<div class="room_info_content row">
 																	{foreach from=$features key=ftr_k item=ftr_v}
@@ -302,7 +306,7 @@
 															{if isset($hotel_features) && $hotel_features}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Features'}</span>
+																		<span>{l s='%s Features' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$hotel_features key=ftr_k item=ftr_v}
@@ -316,7 +320,7 @@
 															{if isset($hotel_description) && $hotel_description}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Description'}</span>
+																		<span>{l s='%s Description' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content">
 																		{$hotel_description}
@@ -365,7 +369,7 @@
 														{if isset($hotel_policies) && $hotel_policies}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
-																	<span>{l s='Hotel Policies'}</span>
+																	<span>{l s='%s Policies' sprintf=$property_type}</span>
 																</div>
 																<div class="room_info_content">
 																	<p class="">{$hotel_policies}</p>

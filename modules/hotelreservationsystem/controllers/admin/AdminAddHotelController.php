@@ -222,6 +222,13 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['PS_MAX_CHECKOUT_OFFSET'] = (int) Configuration::get('PS_MAX_CHECKOUT_OFFSET');
         $smartyVars['PS_MIN_BOOKING_OFFSET'] = (int) Configuration::get('PS_MIN_BOOKING_OFFSET');
         $smartyVars['WK_ORDER_REFUND_ALLOWED'] = Configuration::get('WK_ORDER_REFUND_ALLOWED');
+        $hotelPropertyTypes = HotelRoomTypeSellingType::getHotelPropertyTypes($this->context->language->id);
+        $smartyVars['hotel_property_types_info'] = $hotelPropertyTypes;
+        $selectedHotelPropertyType = Tools::getValue('id_property_type');
+        if (!$selectedHotelPropertyType && isset($hotelBranchInfo)) {
+            $selectedHotelPropertyType = $hotelBranchInfo->id_property_type;
+        }
+        $smartyVars['selected_hotel_property_type'] = (int) $selectedHotelPropertyType;
 
         $this->context->smarty->assign($smartyVars);
 
@@ -259,6 +266,7 @@ class AdminAddHotelController extends ModuleAdminController
         $active = Tools::getValue('ENABLE_HOTEL');
         $fax = Tools::getValue('fax');
         $activeRefund = Tools::getValue('active_refund');
+        $idHotelPropertyType = Tools::getValue('id_property_type');
         $enableUseGlobalMaxCheckoutOffset = Tools::getValue('enable_use_global_max_checkout_offset');
         $maxCheckoutOffset = trim(Tools::getValue('max_checkout_offset'));
         $enableUseGlobalMinBookingOffset = Tools::getValue('enable_use_global_min_booking_offset');
@@ -286,6 +294,10 @@ class AdminAddHotelController extends ModuleAdminController
                     }
                 }
             }
+        }
+
+        if ($idHotelPropertyType == '' && $idHotelPropertyType == null && !Validate::isUnsignedId($idHotelPropertyType)) {
+            $this->errors[] = $this->l('Invalid property type.');
         }
 
         foreach ($languages as $lang) {
@@ -503,6 +515,7 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelBranch->active = $active;
             $objHotelBranch->active_refund = $activeRefund;
             $objHotelBranch->fax = $fax;
+            $objHotelBranch->id_property_type = $idHotelPropertyType;
 
             // lang fields
             $hotelCatName = array();

@@ -125,16 +125,16 @@
 	<div class="form-group" id="hotel_selection">
 		{if isset($htl_room_type)}
 			<label class="control-label col-sm-3 required">
-				{l s='Hotel'}
+				{l s='Property'}
 			</label>
 			<div class="col-sm-5">
 				<input type="text" class="form-control" value="{$htl_full_info['hotel_name']}" readonly>
 				<input type="hidden" name="id_hotel" value="{$htl_room_type['id_hotel']}">
-				<p class="help-block">{l s='Hotel once assigned cannot be reassigned'}</p>
+				<p class="help-block">{l s='Property once assigned cannot be reassigned'}</p>
 			</div>
 		{else}
 			<label class="control-label col-sm-3 required" for="hotel_place">
-				{l s='Select Hotel'}
+				{l s='Select Property'}
 			</label>
 			<div class="col-sm-5">
 			{if isset($htl_info) && $htl_info}
@@ -143,9 +143,9 @@
 						<option value="{$htl_dtl['id_hotel']}" >{$htl_dtl['hotel_name']}</option>
 					{/foreach}
 				</select>
-				<p class="help-block">{l s='Hotel once assigned cannot be reassigned'}</p>
+				<p class="help-block">{l s='Property once assigned cannot be reassigned'}</p>
 			{else}
-				<div class="control-label col-sm-3 text-danger">{l s='No hotel are available'}</div>
+				<div class="control-label col-sm-3 text-danger">{l s='No property are available'}</div>
 			{/if}
 			</div>
 		{/if}
@@ -465,6 +465,35 @@
 		</div>
 	{/if}
 
+	<div class="form-group" id="room_type_selection">
+		<label class="control-label col-sm-3">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select the room selling type for this room type.'}">
+				{l s='Room Type Selling Object Types'}
+			</span>
+		</label>
+		<div class="col-sm-5">
+			<select name="id_room_type_selling_object_type" id="id_room_type_selling_object_type" class="form-control chosen" >
+				{foreach from=$room_type_selling_object_types_info item=room_type_selling_object_type_info}
+					<option value="{$room_type_selling_object_type_info['id_room_type_selling_object_type']}" {if isset($selected_room_type_object_selling_types) && $room_type_selling_object_type_info['id_room_type_selling_object_type'] == $selected_room_type_object_selling_types}selected{/if}>{$room_type_selling_object_type_info['name']}</option>
+				{/foreach}
+			</select>
+		</div>
+	</div>
+
+	<div class="form-group" id="booking_types_selection">
+		<label class="control-label col-sm-3">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select all booking methods available for this room type.'}">
+				{l s='Booking Method'}
+			</span>
+		</label>
+		<div class="col-sm-5">
+			<select name="booking_method" id="booking_method" class="form-control">
+				{foreach from=$booking_methods_info item=booking_method_info}
+					<option value="{$booking_method_info['id']}" {if isset($selected_booking_method) && $booking_method_info['id'] == $selected_booking_method}selected{/if}>{$booking_method_info['name']}</option>
+				{/foreach}
+			</select>
+		</div>
+	</div>
 	<div class="form-group" id="bed_types_selection">
 		<label class="control-label col-sm-3">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select all bed types available for this room type.'}">

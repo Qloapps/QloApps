@@ -678,16 +678,11 @@ class AdminCartsControllerCore extends AdminController
                     $cart_detail_data[$key]['room_type_info'] = $objRoomType->getRoomTypeInfoByIdProduct($cart_data['id_product']);
                 }
             }
-            $occupancyRequiredForBooking = false;
-            if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
-                $occupancyRequiredForBooking = true;
-            }
 
             $this->context->smarty->assign(array(
                 'cart_detail_data' => $cart_detail_data,
                 'cart' => $objCart,
                 'currency' => new Currency((int)$this->context->cart->id_currency),
-                'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 'ajax' => true
             ));
 

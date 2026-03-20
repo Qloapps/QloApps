@@ -37,9 +37,7 @@
 							<th><span class="title_box">{l s='Room Image'}</th>
 							<th><span class="title_box">{l s='Room Type'}</span></th>
 							<th><span class="title_box">{l s='Duration'}</span></th>
-							{if $occupancy_required_for_booking}
-							<th><span class="fixed-width-lg title_box">{l s='Occupancy'}</span></th>
-						{/if}
+						<th><span class="fixed-width-lg title_box">{l s='Occupancy / Quantity'}</span></th>
 						<th><span class="title_box">{l s='Unit Price (tax excl)'}</span></th>
 							<th><span class="title_box">{l s='Extra Services / Fees (tax excl)'}</span></th>
 							{* <th><span class="title_box">{l s='Total Rooms Price (tax excl)'}</span></th> *}
@@ -58,7 +56,11 @@
 								</td>
 								{assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
 								<td>{dateFormat date=$data.date_from full=$is_full_date} - {dateFormat date=$data.date_to full=$is_full_date}</td>
-								{if $occupancy_required_for_booking}
+								{assign var=room_occ_required value=false}
+								{if isset($data.occupancy_required_for_booking)}
+									{assign var=room_occ_required value=$data.occupancy_required_for_booking}
+								{/if}
+								{if $room_occ_required}
 									<td>
 										<div class="dropdown">
 											<button class="booking_guest_occupancy btn btn-default btn-left btn-block input-occupancy" type="button">
@@ -115,6 +117,10 @@
 												</div>
 											</div>
 										</div>
+									</td>
+								{else}
+									<td>
+										<span class="text-muted">1</span>
 									</td>
 								{/if}
 								<td id="cart_detail_data_unit_price_{$data.id|escape:'html':'UTF-8'}">

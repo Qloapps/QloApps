@@ -1551,7 +1551,8 @@ function getBookingOccupancy()
 {
     let bookingform = $("#booking-form");
     let occupancy;
-    if (occupancy_required_for_booking) {
+    var isOccupancyBooking = getOccupancyRequiredForBooking(bookingform);
+    if (isOccupancyBooking) {
         let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
         if (selected_occupancy.length) {
             occupancy = [];
@@ -1590,4 +1591,16 @@ function getBookingOccupancy()
     }
 
     return occupancy;
+}
+
+function getOccupancyRequiredForBooking(bookingform)
+{
+    var value = occupancy_required_for_booking;
+    if (bookingform && $(bookingform).length) {
+        var dataVal = $(bookingform).closest('.booking_room_fields').data('occupancy-required');
+        if (typeof dataVal !== 'undefined') {
+            value = parseInt(dataVal, 10) === 1;
+        }
+    }
+    return value;
 }

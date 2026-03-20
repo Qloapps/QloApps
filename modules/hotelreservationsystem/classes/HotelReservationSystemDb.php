@@ -59,6 +59,7 @@ class HotelReservationSystemDb
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_category` int(10) unsigned NOT NULL,
                 `email` varchar(128) NOT NULL,
+                `id_property_type` int(10) unsigned NOT NULL DEFAULT '0',
                 `check_in` varchar(255) DEFAULT NULL,
                 `check_out` varchar(255) DEFAULT NULL,
                 `rating` int(2) unsigned NOT NULL,
@@ -115,6 +116,22 @@ class HotelReservationSystemDb
                 `id_lang` int(10) unsigned NOT NULL,
                 `name` varchar(255) NOT NULL,
                 PRIMARY KEY (`id`, `id_lang`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_selling_type` (
+                `id_htl_room_type_selling_type` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `type` tinyint(2) unsigned NOT NULL,
+                `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_htl_room_type_selling_type`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_selling_type_lang` (
+                `id_htl_room_type_selling_type` int(10) unsigned NOT NULL,
+                `id_lang` int(10) unsigned NOT NULL,
+                `name` varchar(255) NOT NULL,
+                PRIMARY KEY (`id_htl_room_type_selling_type`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_cart_booking_data` (
@@ -613,6 +630,8 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_bed_type`,
             `'._DB_PREFIX_.'htl_bed_type_lang`,
             `'._DB_PREFIX_.'htl_room_type_bed_type`,
+            `'._DB_PREFIX_.'htl_room_type_selling_type`,
+            `'._DB_PREFIX_.'htl_room_type_selling_type_lang`,
             `'._DB_PREFIX_.'htl_access`,
             `'._DB_PREFIX_.'htl_settings_link`,
             `'._DB_PREFIX_.'htl_settings_link_lang`'

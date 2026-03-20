@@ -21,9 +21,16 @@
 *}
 
 {if isset($product->id)}
+    {if isset($htl_room_type['room_type_selling_type_name']) && $htl_room_type['room_type_selling_type_name']}
+        {assign var=attribute_type value=$htl_room_type['room_type_selling_type_name']}
+        {assign var=attribute_types value=$htl_room_type['room_type_selling_type_name']|cat:'s'}
+    {else}
+        {assign var=attribute_type value={l s='Room'}}
+        {assign var=attribute_types value={l s='Rooms'}}
+    {/if}
 	<div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="Configuration" />
-		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {l s='Rooms'}</h3>
+		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {$attribute_types}</h3>
 
 		<input type="hidden" id="checkConfSubmit" value="0" name="checkConfSubmit">
 
@@ -35,7 +42,7 @@
 						<th class="col-sm-2 center">
 							<label class="control-label required">
 								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter room number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}'}">
-									{l s='Room No.'}
+									{l s='%s No.' sprintf=$attribute_type}
 								</span>
 							</label>
 						</th>
@@ -55,14 +62,14 @@
 						</th>
 						<th class="col-sm-3 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter extra information about this room. Leave empty if not required.'}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter extra information about this %s. Leave empty if not required.' sprintf=$attribute_types}">
 									{l s='Extra Information'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set date ranges when room is set to Temporarily Inactive.'}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set date ranges when %s is set to Temporarily Inactive.' sprintf=$attribute_types}">
 									{l s='Disable Dates'}
 								</span>
 							</label>
@@ -201,14 +208,14 @@
                             <li class="divider"></li>
                             <li>
                                 <a id="bulk-create-rooms-button" class="bulkCreateRoomModal" data-toggle="modal" data-target="#bulkCreateRoomModal" type="button" data-size="s" data-style="expand-right">
-                                    <i class="icon-plus"></i>&nbsp;{l s='Create Rooms'}
+                                    <i class="icon-plus"></i>&nbsp;{l s='Create %s' sprintf=$attribute_types}
                                 </a>
                             </li>
                         </ul>
                     </div>
 					<button id="add-more-rooms-button" class="btn btn-default" type="button" data-size="s" data-style="expand-right">
 						<i class="icon icon-plus"></i>
-						{l s='Add More Rooms'}
+						{l s='Add More %s'  sprintf=$attribute_types}
 					</button>
 				</div>
 			</div>
@@ -253,7 +260,7 @@
                     <div class="alert alert-warning">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <ul class="list-unstyled">
-                            <li>{l s='Please save this room first to add dates.'}</li>
+                            <li>{l s='Please save this %s first to add dates.' sprintf=$attribute_types}</li>
                         </ul>
                     </div>
                 </div>
@@ -325,7 +332,7 @@
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Update Rooms'}</h4>
+				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Update %s'  sprintf=$attribute_types}</h4>
 			</div>
 			<div class="modal-body padding-top-20">
 				<div class="text-left errors-wrap" style="display: none;"></div>
@@ -400,13 +407,13 @@
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Create Rooms'}</h4>
+				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Create %s' sprintf=$attribute_types}</h4>
 			</div>
 			<div class="modal-body padding-top-20">
 				<div class="text-left errors-wrap" style="display: none;"></div>
                 <div class="form-group">
                     <label class="control-label col-lg-3">
-                        <span>{l s='Room prefix'}</span>
+                        <span>{l s='%s prefix'  sprintf=$attribute_type}</span>
                     </label>
                     <div class="col-lg-6">
                         <input type="text" name="bulk_create_room_prefix"/>
@@ -414,7 +421,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-3">
-                        <span>{l s='Starting Room No.'}</span>
+                        <span>{l s='Starting %s No.'  sprintf=$attribute_type}</span>
                     </label>
                     <div class="col-lg-6">
                         <input type="text" name="bulk_create_room_num"/>
@@ -422,7 +429,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label required col-lg-3">
-                        <span>{l s='Number of Rooms'}</span>
+                        <span>{l s='Number of %s'  sprintf=$attribute_types}</span>
                     </label>
                     <div class="col-lg-6">
                         <input type="text" name="bulk_create_room_qty"/>
@@ -558,13 +565,13 @@
                     <li class="enable_selected_dates btn btn-default">
                         <span class="enable_selected_dates">
                             <i class="icon-check"></i>
-                            {l s='Make Room Available'}
+                            {l s='Make %s Available'  sprintf=$attribute_type}
                         </span>
                     </li>
                     <li class="disabled_selected_dates btn btn-default">
                         <span class="disabled_selected_dates">
                             <i class="icon-ban"></i>
-                            {l s='Disable Room'}
+                            {l s='Disable %s'  sprintf=$attribute_type}
                         </span>
                     </li>
                 </ul>
@@ -1524,7 +1531,7 @@
                 $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
                 $('#deactiveDatesModal').attr('data-id-room', idRoom);
                 if ($.trim(roomNum) != '') {
-                    roomNum = '( '+'{l s='Room No'}'+' '+roomNum+')';
+                    roomNum = '( '+'{l s='%s No' sprintf=$attribute_types}'+' '+roomNum+')';
                 }
 
                 $('#deactiveDatesModal .disable_dates_room_num').html(roomNum);

@@ -290,7 +290,7 @@ class AdminProductsControllerCore extends AdminController
             }
 
             $this->fields_list['hotel_name'] = array(
-                'title' => $this->l('Hotel'),
+                'title' => $this->l('Property'),
                 'type' => 'select',
                 'multiple' => true,
                 'operator' => 'or',
@@ -4537,10 +4537,21 @@ class AdminProductsControllerCore extends AdminController
         $objHotelBedType = new HotelBedType();
         $bedTypes = $objHotelBedType->getAllBedTypes($this->context->language->id);
         $data->assign('bed_types_info', $bedTypes);
+        $bookingMethods = $this->getRoomTypeBookingMethods();
+        $data->assign('booking_methods_info', $bookingMethods);
         $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
         if ($selectedBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($product->id)) {
             $selectedBedTypes = array_column($selectedBedTypes, 'id_bed_type');
             $data->assign('selected_bed_types', $selectedBedTypes);
+        }
+
+        $roomTypeObjectSellingTypes = HotelRoomTypeSellingType::getRoomTypeSellingObjectTypes($this->context->language->id);
+        $data->assign('room_type_selling_object_types_info', $roomTypeObjectSellingTypes);
+        if (!empty($product->id_room_type_selling_object_type)) {
+            $data->assign('selected_room_type_object_selling_types', $product->id_room_type_selling_object_type);
+        }
+        if (!empty($product->booking_method)) {
+            $data->assign('selected_booking_method', $product->booking_method);
         }
 
         $this->tpl_form_vars['product'] = $product;
@@ -5502,6 +5513,7 @@ class AdminProductsControllerCore extends AdminController
             ) {
                 $objRoomType = new HotelRoomType();
                 $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($objProduct->id);
+                $attribute_types = $roomTypeInfo['room_type_selling_type_name'] ? $roomTypeInfo['room_type_selling_type_name'] : $this->l('Rooms');
                 $idHotel = $roomTypeInfo['id_hotel'];
                 $rowsToHighlight = array();
                 $roomsInfo = array();
@@ -5521,13 +5533,13 @@ class AdminProductsControllerCore extends AdminController
                 if (!empty($roomNumber = trim(Tools::getValue('num')))
                     && !Validate::isUnsignedInt($roomNumber)
                 ) {
-                    $this->errors[] = Tools::displayError('Invalid Starting Room No.');
+                    $this->errors[] = sprintf(Tools::displayError('Invalid Starting %s No.') , $attribute_types);
                 }
 
                 if (!($roomQuantity = Tools::getValue('qty'))) {
-                    $this->errors[] = Tools::displayError('Number of rooms is required.');
+                    $this->errors[] = sprintf(Tools::displayError('Number of %s is required.') ,$attribute_types);
                 } else if (!Validate::isUnsignedInt($roomQuantity) || $roomQuantity < 1) {
-                    $this->errors[] = Tools::displayError('Invalid value for number of rooms.');
+                    $this->errors[] = sprintf(Tools::displayError('Invalid value for number of %s.') ,$attribute_types);
                 }
 
                 if (trim($comment = Tools::getValue('room_comment'))) {
@@ -5540,7 +5552,7 @@ class AdminProductsControllerCore extends AdminController
                     $disableDates = Tools::getValue('disable_dates');
                     $roomsInfo['disable_dates_json'] = json_encode($disableDates);
                     if (!$disableDates) {
-                        $this->errors[] = Tools::displayError('Please add at least one date range for updating the rooms status to temporary inactive.');
+                        $this->errors[] = sprintf(Tools::displayError('Please add at least one date range for updating the %s status to temporary inactive.') , $attribute_types);
                     } else {
                         $hasMissingRowError = false;
                         foreach ($disableDates as $key => $dateRange) {
@@ -5645,5 +5657,14 @@ class AdminProductsControllerCore extends AdminController
         ));
 
         return $tpl->fetch();
+    }
+
+    public function getRoomTypeBookingMethods()
+    {
+        return array(
+            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_DEFAULT, 'name' => $this->l('Default')),
+            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
+            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+        );
     }
 }

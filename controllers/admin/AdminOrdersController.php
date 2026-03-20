@@ -156,7 +156,7 @@ class AdminOrdersControllerCore extends AdminController
                 'visible_default' => true
             ),
             'hotel_name' => array(
-                'title' => $this->l('Hotel'),
+                'title' => $this->l('Property Name'),
                 'type' => 'select',
                 'filter_key' => 'hbd!id_hotel',
                 'list' => $this->hotelsArray,
@@ -425,11 +425,6 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
 
-                $occupancyRequiredForBooking = false;
-                if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
-                    $occupancyRequiredForBooking = true;
-                }
-
                 $objHotelAdvancedPayment = new HotelAdvancedPayment();
                 $this->context->smarty->assign(array(
                     'order_total' => $cart->getOrderTotal(true),
@@ -445,7 +440,6 @@ class AdminOrdersControllerCore extends AdminController
                     'currency' => new Currency((int)$cart->id_currency),
                     'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-                    'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 ));
 
             } else {
@@ -483,7 +477,7 @@ class AdminOrdersControllerCore extends AdminController
                 if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
                     $this->toolbar_btn['hotel'] = array(
                         'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
-                        'desc' => $this->l('View Hotel'),
+                        'desc' => $this->l('View Property'),
                         'class' => 'icon-building',
                         'target' => true,
                     );

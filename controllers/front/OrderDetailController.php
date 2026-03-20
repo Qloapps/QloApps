@@ -131,6 +131,9 @@ class OrderDetailControllerCore extends FrontController
                             }
                             $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                             $cartHotelData[$type_key]['cover_img'] = $type_value['cover_img'];
+                            if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($type_value['product_id'])) {
+                                $cartHotelData[$type_key]['room_type_selling_type_name'] = $roomTypeInfo['room_type_selling_type_name'];
+                            }
 
 
                             $objBookingDemand = new HotelBookingDemands();
@@ -447,10 +450,12 @@ class OrderDetailControllerCore extends FrontController
                 if ($idHotel = $addressTax->id_hotel) {
                     $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                     $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
+                    $propertyName = $objHotelBranchInformation->getHotelPropertyTypeName();
                     $objHotelBranchRefundRules = new HotelBranchRefundRules();
                     $hotelRefundRules = $objHotelBranchRefundRules->getHotelRefundRules($idHotel, 0, 1);
                     $this->context->smarty->assign(array(
                         'obj_hotel_branch_information' => $objHotelBranchInformation,
+                        'property_name' => $propertyName,
                         'hotel_address_info' => $hotelAddressInfo,
                         'hotel_refund_rules' => $hotelRefundRules,
                     ));

@@ -196,7 +196,7 @@
 							<span class="cross" title="{l s='Close window' mod='blockcart'}"></span>
 							{block name='blockcart_layer_cart_left_heading'}
 								<h2 class="layer_cart_room_txt">
-									<i class="icon-check"></i>{l s='Room successfully added to your cart' mod='blockcart'}
+									<i class="icon-check"></i><span class="layer_cart_room_success_msg" data-room-msg-template="{l s='%s successfully added to your cart' mod='blockcart' sprintf=['__ROOM__']}">{l s='Room successfully added to your cart' mod='blockcart'}</span>
 								</h2>
 								<h2 class="layer_cart_product_txt">
 									<i class="icon-check"></i>{l s='Product successfully added to your cart' mod='blockcart'}
@@ -223,12 +223,14 @@
 										<span id="layer_cart_product_unit_price"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_room_txt">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_room_txt" data-label-occupancy="{l s='%s occupancy' mod='blockcart' sprintf=['__ROOM__']}" data-label-quantity="{l s='%s quantity added' mod='blockcart' sprintf=['__ROOMS__']}">
+											<span class="layer_cart_attribute_type" data-room-msg-template="{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='%s occupancy' mod='blockcart' sprintf=['__ROOM__']}{else}{l s='%s quantity added' mod='blockcart' sprintf=['__ROOMS__']}{/if}">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if}</span> &nbsp;-&nbsp;
+										</strong>
 										<strong class="dark layer_cart_product_txt">{l s='Quantity' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_quantity"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_room_txt">{l s='Room type cost' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_room_txt"><span class="layer_cart_room_type_cost_label">{l s='Room type cost' mod='blockcart'}</span> &nbsp;-&nbsp;</strong>
 										<strong class="dark layer_cart_product_txt">{l s='Total' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_price"></span>
 									</div>
@@ -255,7 +257,7 @@
 							{block name='blockcart_layer_cart_room_total_price'}
 								<div class="layer_cart_row">
 									<strong class="dark">
-										{l s='Total Rooms Cost in cart' mod='blockcart'}
+										{l s='Total Stay Cost in cart' mod='blockcart'}
 										{if $display_tax_label}
 											{if $priceDisplay == 1}
 												{l s='(tax excl.)' mod='blockcart'}

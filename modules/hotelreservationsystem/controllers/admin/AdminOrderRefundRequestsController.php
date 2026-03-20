@@ -241,7 +241,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     'callback' => 'getUniqueRoomTypeNames'
                 ),
                 'hotel_name' => array(
-                    'title' => $this->l('Hotel')
+                    'title' => $this->l('Property Name')
                 ),
                 'date_from' => array(
                     'title' => $this->l('Date From')

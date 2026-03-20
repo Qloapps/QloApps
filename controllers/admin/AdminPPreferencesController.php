@@ -437,14 +437,6 @@ class AdminPPreferencesControllerCore extends AdminController
             Db::getInstance()->execute($sql);
         }
 
-        if (Tools::getValue('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $_POST['PS_FRONT_ROOM_UNIT_SELECTION_TYPE'] = HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
-        }
-
-        if (Tools::getValue('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $_POST['PS_BACKOFFICE_ROOM_BOOKING_TYPE'] = HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
-        }
-
         if (Tools::getIsset('PS_CATALOG_MODE')) {
             Tools::clearSmartyCache();
             Media::clearCache();

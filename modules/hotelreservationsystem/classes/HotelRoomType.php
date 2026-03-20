@@ -234,10 +234,15 @@ class HotelRoomType extends ObjectModel
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
-        $sql = 'SELECT hrt.*, hbl.`hotel_name`
+        $sql = 'SELECT hrt.*, hbl.`hotel_name`, hrtstl.`name` AS `room_type_selling_type_name`
                 FROM `'._DB_PREFIX_.'htl_room_type` AS hrt
                 INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbl
                 ON (hbl.`id` = hrt.`id_hotel` AND hbl.`id_lang` = '.(int)$idLang.')
+                LEFT JOIN `'._DB_PREFIX_.'product` AS p
+                ON (p.`id_product` = hrt.`id_product`)
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_selling_type_lang` AS hrtstl
+                ON (hrtstl.`id_htl_room_type_selling_type` = p.`id_room_type_selling_object_type`
+                    AND hrtstl.`id_lang` = '.(int)$idLang.')
                 WHERE hrt.`id_product` = '.(int)$id_product;
 
         return Db::getInstance()->getRow($sql);
@@ -298,12 +303,16 @@ class HotelRoomType extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
-        $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`
+        $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`, hrtstl.`name` AS `room_type_selling_type_name`
         '.($position ? ', cp.`position`' : '').'
         '.($fullDetail ? ', pl.`link_rewrite`, pl.`description_short`' : '').'
         FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
         INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)';
         $sql .= ' INNER JOIN `'._DB_PREFIX_.'product_lang` pl ON (hrt.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int)$idLang.')';
+        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'product` AS p ON (p.`id_product` = hrt.`id_product`)
+        LEFT JOIN `'._DB_PREFIX_.'htl_room_type_selling_type_lang` AS hrtstl
+            ON (hrtstl.`id_htl_room_type_selling_type` = p.`id_room_type_selling_object_type`
+                AND hrtstl.`id_lang` = '.(int)$idLang.')';
 
         if ($position) {
             $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hrt.`id_hotel`)

@@ -1368,6 +1368,45 @@ class HotelHelper
         return true;
     }
 
+    public function createHotelDefaultRoomTypeSellingTypes()
+    {
+        $propertyTypes = array(
+            'Hotel',
+            'Motel',
+        );
+
+        $sellingTypes = array(
+            'Room',
+            'Apartment',
+            'Villa',
+            'Cottage',
+            'Bungalow',
+        );
+
+        $languages = Language::getLanguages(true);
+        foreach ($propertyTypes as $typeName) {
+            $objType = new HotelRoomTypeSellingType();
+            $objType->type = HotelRoomTypeSellingType::HOTEL_PROPERTY_TYPE;
+            $objType->active = 1;
+            foreach ($languages as $lang) {
+                $objType->name[$lang['id_lang']] = $typeName;
+            }
+            $objType->save();
+        }
+
+        foreach ($sellingTypes as $typeName) {
+            $objType = new HotelRoomTypeSellingType();
+            $objType->type = HotelRoomTypeSellingType::ROOM_TYPE_OBJECT_SELLING_TYPE;
+            $objType->active = 1;
+            foreach ($languages as $lang) {
+                $objType->name[$lang['id_lang']] = $typeName;
+            }
+            $objType->save();
+        }
+
+        return true;
+    }
+
     public static function getPsProducts($id_lang, $start = 0, $limit = 0, $booking_product = null)
     {
         $sql = 'SELECT p.`id_product`, pl.`name`, p.`booking_product`
@@ -1386,6 +1425,7 @@ class HotelHelper
     {
         $obj_hotel_info = new HotelBranchInformation();
         $obj_hotel_info->active = 1;
+        $obj_hotel_info->id_property_type = 1;
         $obj_hotel_info->email = 'hotelprime@htl.com';
         $obj_hotel_info->check_in = '12:00';
         $obj_hotel_info->check_out = '11:00';
@@ -1989,6 +2029,7 @@ class HotelHelper
             $product->show_at_front = 1;
             $product->is_virtual = 1;
             $product->indexed = 1;
+            $product->id_room_type_selling_object_type = 3; // assign default selling type as 'Per Room'
             $product->save();
             $product_id = $product->id;
 

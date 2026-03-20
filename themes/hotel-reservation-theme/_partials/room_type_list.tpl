@@ -101,8 +101,12 @@
 										{block name='room_type_list_room_booking_fields'}
 											{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 												{if (!isset($display_all_room_types) || !$display_all_room_types)}
-													<div class="booking_room_fields">
-														{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
+													{assign var=room_occ_required value=false}
+													{if isset($room_v['occupancy_required_for_booking'])}
+														{assign var=room_occ_required value=$room_v['occupancy_required_for_booking']}
+													{/if}
+													<div class="booking_room_fields" data-occupancy-required="{$room_occ_required|intval}">
+														{if $room_occ_required}
 															<div class="booking_guest_occupancy_conatiner">
 																{block name='occupancy_field'}
 																	{include file="./occupancy_field.tpl" room_type_info=$room_v total_available_rooms=$room_v['room_left']}

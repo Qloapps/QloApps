@@ -26,6 +26,7 @@ class HotelBranchInformation extends ObjectModel
     public $id_category;
     public $hotel_name;
     public $email;
+    public $id_property_type;
     public $check_in;
     public $check_out;
     public $description;
@@ -51,6 +52,7 @@ class HotelBranchInformation extends ObjectModel
         'fields' => array(
             'id_category' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'email' => array('type' => self::TYPE_STRING,'validate' => 'isEmail', 'size' => 255, 'required' => true),
+            'id_property_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'check_in' => array('type' => self::TYPE_STRING, 'required' => true),
             'check_out' => array('type' => self::TYPE_STRING, 'required' => true),
@@ -575,6 +577,36 @@ class HotelBranchInformation extends ObjectModel
             WHERE hbi.`id_category` = '.(int)$cat_id.' AND `active` = 1';
 
         return Db::getInstance()->getRow($sql);
+    }
+
+    public function getHotelPropertyTypeName($id_hotel = null, $idLang = null)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        if (!$id_hotel) {
+            $id_hotel = (int) $this->id;
+        }
+
+        if (!$id_hotel) {
+            return false;
+        }
+
+        $cache_key = 'HotelBranchInformation::getHotelPropertyTypeName'.(int)$id_hotel;
+        if(!Cache::isStored($cache_key)){
+            $sql = 'SELECT hrtstl.`name`
+                FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_selling_type_lang` hrtstl
+                    ON (hbi.`id_property_type` = hrtstl.`id_htl_room_type_selling_type`
+                        AND hrtstl.`id_lang` = '.(int) $idLang.')
+                WHERE hbi.`id` = '.(int) $id_hotel;
+
+            $res = Db::getInstance()->getValue($sql);
+        }else{
+            $res = Cache::retrieve($cache_key);
+        }
+        return $res;
     }
 
     /**

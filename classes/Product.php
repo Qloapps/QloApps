@@ -247,6 +247,8 @@ class ProductCore extends ObjectModel
     public $is_virtual;
     public $booking_product;
     public $id_pack_product_attribute;
+    public $id_room_type_selling_object_type;
+    public $booking_method;
     public $cache_default_attribute;
 
     /**
@@ -341,6 +343,8 @@ class ProductCore extends ObjectModel
             'show_price' =>                array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'indexed' =>                    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'visibility' =>                array('type' => self::TYPE_STRING, 'shop' => true, 'validate' => 'isProductVisibility', 'values' => array('both', 'catalog', 'search', 'none'), 'default' => 'both'),
+            'id_room_type_selling_object_type' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => false),
+            'booking_method' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => false),
             'cache_default_attribute' =>    array('type' => self::TYPE_INT, 'shop' => true),
             'advanced_stock_management' =>    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'date_add' =>                    array('type' => self::TYPE_DATE, 'shop' => true, 'validate' => 'isDate'),
@@ -6872,5 +6876,27 @@ class ProductCore extends ObjectModel
         }
 
         return $price * (int)$quantity;
+    }
+
+    public static function getRoomTypeBookingMethod($idProduct, $fallbackType = null)
+    {
+        $objProduct = new self($idProduct);
+        $bookingType = null;
+        if(Validate::isLoadedObject($objProduct)) {
+            $bookingType = $objProduct->booking_method;
+            if ($bookingType !== null && $bookingType != HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_DEFAULT) {
+                return $bookingType;
+            }
+        }
+        if ($fallbackType === null) {
+            $context = Context::getContext();
+            if (isset($context->employee->id) && (int)$context->employee->id) {
+                $fallbackType = (int) Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE');
+            } else {
+                $fallbackType = (int) Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE');
+            }
+        }
+
+        return (int) $fallbackType;
     }
 }

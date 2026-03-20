@@ -265,6 +265,7 @@ class Blockcart extends Module
         }
 
         $objCartBookingData = new HotelCartBookingData();
+        $objRoomType = new HotelRoomType();
         $totalDemandsPrice = $objCartBookingData->getCartExtraDemands(
             $this->context->cart->id,
             0,
@@ -304,6 +305,11 @@ class Blockcart extends Module
                 'cart_default'
             );
             $addedProduct['booking_product'] = $objProduct->booking_product;
+            $roomLabel =  $objRoomType->getRoomTypeInfoByIdProduct($objProduct->id, $this->context->language->id);
+            if ($roomLabel) {
+                $addedProduct['attribute_type'] = $roomLabel['room_type_selling_type_name'];
+                $addedProduct['attribute_types'] = $roomLabel['room_type_selling_type_name'].'s';
+            }
             if ($objProduct->booking_product) {
                 $price = $addedProduct['price'] = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                     $objProduct->id,

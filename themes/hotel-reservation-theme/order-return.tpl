@@ -61,7 +61,7 @@
 						<tr>
 							<th>{l s='Rooms'}</th>
 							<th>{l s='Room type'}</th>
-							<th>{l s='Hotel'}</th>
+							<th>{l s='Property Name'}</th>
 							<th>{l s='Duration'}</th>
 							<th>{l s='Total rooms price (tax incl.)'}</th>
 							<th>{l s='Extra services price (tax incl.)'}</th>

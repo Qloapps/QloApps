@@ -100,6 +100,13 @@
 
 																<div class="row">
 																	{assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
+																	{if isset($data_v['room_type_selling_type_name']) && $data_v['room_type_selling_type_name']}
+																		{assign var=attribute_type value=$data_v['room_type_selling_type_name']}
+																		{assign var=attribute_types value=$data_v['room_type_selling_type_name']|cat:'s'}
+																	{else}
+																		{assign var=attribute_type value={l s='Room'}}
+																		{assign var=attribute_types value={l s='Rooms'}}
+																	{/if}
 																	<div class="col-xs-12 col-md-6">
 																		<div class="row">
 																			<dt class="col-xs-5">{l s='Check-in'}</dt>
@@ -117,7 +124,7 @@
 																<div class="row">
 																	<div class="col-xs-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{l s='Rooms'}</dt>
+																			<dt class="col-xs-5">{if $rm_v.num_rm > 1}{$attribute_types|escape:'html':'UTF-8'}{else}{$attribute_type|escape:'html':'UTF-8'}{/if}</dt>
 																			<dd class="col-xs-7">{$rm_v.num_rm|string_format:'%02d'}</dd>
 																		</div>
 																	</div>
@@ -424,7 +431,7 @@
 														{if isset($cart_htl_data)}
 															<tr class="item">
 																<td>
-																	<strong>{l s='Total Rooms Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</strong>
+																	<strong>{l s='Total Stay Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</strong>
 																</td>
 																<td class="text-right">
 																	{if $priceDisplay && $use_tax}

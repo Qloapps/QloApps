@@ -19,9 +19,15 @@
 * @copyright Since 2010 Webkul
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
-
+{if isset($room_type_info['room_type_selling_type_name']) && $room_type_info['room_type_selling_type_name']}
+    {assign var=attribute_types value=$room_type_info['room_type_selling_type_name']|cat:'s'}
+    {assign var=attribute_type value=$room_type_info['room_type_selling_type_name']}
+{else}
+    {assign var=attribute_types value={l s='Rooms'}}
+    {assign var=attribute_type value={l s='Room'}}
+{/if}
 <div class="booking-form card">
-    <div class="booking_room_fields">
+    <div class="booking_room_fields" data-occupancy-required="{$occupancy_required_for_booking|intval}">
         {block name='booking_form_content'}
             <form id="booking-form" action="" method="post">
                 {block name='product_hidden_fields'}
@@ -36,7 +42,7 @@
                 {block name='booking_form_hotel_location'}
                     {if isset($id_hotel) && $id_hotel}
                         <div class="form-group htl_location_block">
-                            <label for="" class="control-label">{l s='Hotel Location'}</label>
+                            <label for="" class="control-label">{l s='Property Location'}</label>
                             <p>{$hotel_location|escape:'html':'UTF-8'}</p>
                         </div>
                     {/if}
@@ -66,7 +72,7 @@
                                                     {include file="./occupancy_field.tpl"}
                                                 {/block}
                                             {else}
-                                                <label class="control-label">{l s='No. of Rooms'}</label>
+                                                <label class="control-label">{l s='No. of %s' sprintf=$attribute_types}</label>
                                                 {block name='quantity_field'}
                                                     {include file="./quantity_field.tpl"}
                                                 {/block}
@@ -79,7 +85,7 @@
                                         <hr class="separator-hr-mg-10">
                                         <div class="row price_desc_block">
                                             <div class="col-sm-6">
-                                                <label class="control-label">{l s='Room Price'}</label>
+                                                <label class="control-label">{l s='%s Price' sprintf=$attribute_type}</label>
                                                     <p>
                                                         <span class="total_price_block">{convertPrice price=$rooms_price|floatval}</span>
                                                         <span class="pull-right plus-sign">+</span>
@@ -100,7 +106,7 @@
                                                         <div class="services-info-tooltip-cont">
                                                             {if isset($selected_service_product) && $selected_service_product}
                                                                 <div class="extra-service-panel">
-                                                                    <p class="panel_title">{l s='Selected services'} <span>{l s='(Per room)'}</span></p>
+                                                                    <p class="panel_title">{l s='Selected services'} <span>{l s='(Per %s)' sprintf=$attribute_type}</span></p>
                                                                     <div class="services-list">
                                                                         {foreach $selected_service_product as $product}
                                                                             <div class="services-list-row">
@@ -143,7 +149,7 @@
                                                             <hr>
                                                             <div class="extra-service-panel">
                                                                 <div class="summary-row">
-                                                                    <div>{l s='Total price per room'}</div>
+                                                                    <div>{l s='Total price per %s' sprintf=$attribute_type}</div>
                                                                     <div><p class="service_price">{displayPrice price=$demands_price_per_room}</p></div>
                                                                 </div>
                                                                 <div class="summary-row">
@@ -181,7 +187,7 @@
                                                         <span class="num_searched_avail_rooms">
                                                             {$total_available_rooms|escape:'html':'UTF-8'}
                                                         </span>
-                                                        {if $total_available_rooms > 1} {l s='rooms left!'} {else} {l s='room left!'} {/if}
+                                                        {if $total_available_rooms > 1} {l s='%s left!' sprintf=$attribute_types} {else} {l s='%s left!' sprintf=$attribute_type} {/if}
                                                     </div>
                                                 {/if}
                                             {/block}
@@ -212,7 +218,7 @@
                                 {/block}
                             {else}
                                 <div class="sold_out_alert">
-                                    <span>{l s='All rooms sold out!'}</span>
+                                    <span>{l s='All %s sold out!' sprintf=$attribute_types}</span>
                                 </div>
                             {/if}
                         {/if}
@@ -220,7 +226,7 @@
                         {block name='booking_form_associated_hotels'}
                             {if isset($associated_hotels) && $associated_hotels}
                                 <div class="form-group">
-                                    <label class="control-label">{l s='Select Hotel'}</label>
+                                    <label class="control-label">{l s='Select Property'}</label>
                                     <select class="chosen input-hotel" name="service_id_hotel" id="service_id_hotel">
                                         {foreach $associated_hotels as $hotel}
                                             <option value="{$hotel.id_hotel}" {if isset($service_id_hotel) && $service_id_hotel == $hotel['id_hotel']}selected{elseif $hotel@first}selected{/if}>{$hotel.name}</option>

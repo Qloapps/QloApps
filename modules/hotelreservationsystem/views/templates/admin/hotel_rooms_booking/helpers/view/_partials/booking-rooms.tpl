@@ -16,10 +16,10 @@
                         </div>
                     </div>
                     <ul class="nav nav-tabs">
-                        <li class="active"><a href="#avail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Available Rooms' mod='hotelreservationsystem'}</a></li>
+                        <li class="active"><a href="#avail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Available %s' sprintf=$book_v['room_type_selling_type_name']|cat:'s' mod='hotelreservationsystem'}</a></li>
                         <li><a href="#part_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Partially Available' mod='hotelreservationsystem'}</a></li>
-                        <li><a href="#book_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Booked Rooms' mod='hotelreservationsystem'}</a></li>
-                        <li><a href="#unavail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Unavailable Rooms' mod='hotelreservationsystem'}</a></li>
+                        <li><a href="#book_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Booked %s' sprintf=$book_v['room_type_selling_type_name']|cat:'s' mod='hotelreservationsystem'}</a></li>
+                        <li><a href="#unavail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Unavailable %s' sprintf=$book_v['room_type_selling_type_name']|cat:'s' mod='hotelreservationsystem'}</a></li>
                     </ul>
                     <div class="tab-content panel">
                         <div id="avail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" class="tab-pane active">
@@ -27,11 +27,11 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
+                                            <th><span class="title_box">{l s='%s No.' sprintf=$book_v['room_type_selling_type_name'] mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
-                                            {if $occupancy_required_for_booking}
+                                            {if $book_v.occupancy_required_for_booking}
                                                 <th class="fixed-width-xxl"><span class="title_box">{l s='Guests' mod='hotelreservationsystem'}</span></th>
                                             {/if}
                                             <th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
@@ -53,19 +53,19 @@
                                                     {/foreach}
                                                     <input type="text" id="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" name="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
                                                 </td>
-                                                {if $occupancy_required_for_booking}
-                                                    <td class="booking_occupancy">
+                                                {if $book_v.occupancy_required_for_booking}
+                                                    <td class="booking_occupancy" data-occupancy-required="{$book_v.occupancy_required_for_booking|intval}">
                                                         <div class="dropdown">
                                                             <button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
                                                                 <span>{l s='Select occupancy' mod='hotelreservationsystem'}</span>
                                                             </button>
-                                                            <div class="dropdown-menu booking_occupancy_wrapper well well-sm">
+                                                            <div class="dropdown-menu booking_occupancy_wrapper well well-sm" data-attribute_types="{$book_v['room_type_selling_type_name']|cat:'s'}" data-attribute_type="{$book_v['room_type_selling_type_name']}">
                                                                 <input type="hidden" class="max_adults" value="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                 <input type="hidden" class="max_children" value="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{/if}">
                                                                 <input type="hidden" class="max_guests" value="{if isset($book_v)}{$book_v['max_guests']|escape:'html':'UTF-8'}{/if}">
                                                                 <div class="booking_occupancy_inner row">
                                                                     <div class="occupancy_info_block col-sm-12" occ_block_index="0">
-                                                                        <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
+                                                                        <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='%s - 1' sprintf=$book_v['room_type_selling_type_name'] mod='hotelreservationsystem'}</label></div>
                                                                         <div class="col-sm-12">
                                                                             <div class="row">
                                                                                 <div class="form-group col-xs-6 occupancy_count_block">
@@ -100,7 +100,7 @@
                                                     </td>
                                                 {/if}
                                                 <td>
-                                                    <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+                                                    <button data-occupancy-required="{$book_v.occupancy_required_for_booking}"  type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
                                                 </td>
                                             </tr>
                                         {/foreach}
@@ -114,9 +114,9 @@
                                     <thead>
                                         <tr>
                                             <th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
-                                            <th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
+                                            <th><span class="title_box">{l s='%s No.' sprintf=$book_v['room_type_selling_type_name'] mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
-                                            {if $occupancy_required_for_booking}
+                                            {if $book_v.occupancy_required_for_booking}
                                                 <th class="fixed-width-xxl"><span class="title_box">{l s='Guests' mod='hotelreservationsystem'}</span></th>
                                             {/if}
                                             <th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
@@ -142,13 +142,13 @@
                                                         {/foreach}
                                                         <input type="text" id="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" name="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
                                                     </td>
-                                                    {if $occupancy_required_for_booking}
-                                                        <td class="booking_occupancy">
+                                                    {if $book_v.occupancy_required_for_booking}
+                                                        <td class="booking_occupancy" data-occupancy-required="{$book_v.occupancy_required_for_booking|intval}">
                                                             <div class="dropdown">
                                                                 <button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
                                                                     <span>{l s='Select occupancy' mod='hotelreservationsystem'}</span>
                                                                 </button>
-                                                                <div class="dropdown-menu booking_occupancy_wrapper well well-sm">
+                                                                <div class="dropdown-menu booking_occupancy_wrapper well well-sm" data-attribute_types="{$book_v['room_type_selling_type_name']|cat:'s'}" data-attribute_type="{$book_v['room_type_selling_type_name']}">
                                                                     <input type="hidden" class="max_adults" value="{if isset($book_v)}{$book_v['max_adults']|escape:'html':'UTF-8'}{/if}">
                                                                     <input type="hidden" class="max_children" value="{if isset($book_v)}{$book_v['max_children']|escape:'html':'UTF-8'}{/if}">
                                                                     <input type="hidden" class="max_guests" value="{if isset($book_v)}{$book_v['max_guests']|escape:'html':'UTF-8'}{/if}">
@@ -189,7 +189,7 @@
                                                         </td>
                                                     {/if}
                                                     <td>
-                                                        <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$sub_part_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$sub_part_v['id_hotel']|escape:'htmlall':'UTF-8'}" data-date-from="{$part_v['date_from']|escape:'htmlall':'UTF-8'}" data-date-to ="{$part_v['date_to']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+                                                        <button data-occupancy-required="{$book_v.occupancy_required_for_booking}" type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$sub_part_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$sub_part_v['id_hotel']|escape:'htmlall':'UTF-8'}" data-date-from="{$part_v['date_from']|escape:'htmlall':'UTF-8'}" data-date-to ="{$part_v['date_to']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
                                                     </td>
                                                 </tr>
                                             {/foreach}
@@ -203,7 +203,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
+                                            <th><span class="title_box">{l s='%s No.' sprintf=$book_v['room_type_selling_type_name'] mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Order' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
@@ -246,7 +246,7 @@
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th><span class="title_box">{l s='Room No.' mod='hotelreservationsystem'}</span></th>
+                                            <th><span class="title_box">{l s='%s No.' sprintf=$book_v['room_type_selling_type_name'] mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Status' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>

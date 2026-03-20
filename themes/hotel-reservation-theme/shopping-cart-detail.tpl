@@ -91,6 +91,13 @@
                         {/block}
                         {block name='shopping_cart_room_type_booking_information'}
                             {assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
+                            {if isset($data_v['room_type_selling_type_name']) && $data_v['room_type_selling_type_name']}
+                                {assign var=attribute_type value=$data_v['room_type_selling_type_name']}
+                                {assign var=attribute_types value=$data_v['room_type_selling_type_name']|cat:'s'}
+                            {else}
+                                {assign var=attribute_type value={l s='Room'}}
+                                {assign var=attribute_types value={l s='Rooms'}}
+                            {/if}
                             <div class="room_duration_block">
                                 <div class="col-sm-3 col-xs-6">
                                     <p class="room_duration_block_head">{l s='CHECK IN'}</p>
@@ -103,7 +110,7 @@
                                 <div class="col-sm-6 col-xs-6">
                                     <p class="room_duration_block_head">{l s='OCCUPANCY'}</p>
                                     <p class="room_duration_block_value">
-                                        {if {$rm_v['adults']} <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {l s='Rooms'}{else} {l s='Room'}{/if}
+                                        {if {$rm_v['adults']} <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {$attribute_types|escape:'html':'UTF-8'}{else} {$attribute_type|escape:'html':'UTF-8'}{/if}
                                     </p>
                                 </div>
                             </div>
@@ -137,7 +144,7 @@
                                                         {/if}
                                                     </p>
                                                     <p class="total_price_detial">
-                                                        {l s='Total rooms price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                                        {l s='Total %s price' sprintf=$attribute_types|escape:'html':'UTF-8'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                                     </p>
                                                 </div>
                                             </div>
