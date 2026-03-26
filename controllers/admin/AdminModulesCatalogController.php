@@ -51,25 +51,25 @@ class AdminModulesCatalogControllerCore extends AdminController
         parent::initContent();
 
         $suggestedModules = Module::getSuggestedModules();
-
-        $modulesToAdd = array();
-        $dirModules = ModuleCore::getModulesOnDisk();
-        $modules_name = array_column($suggestedModules, 'name');
-        foreach ($dirModules as $mod) {
-            if (($id = array_search($mod->name, $modules_name)) !== false) {
-                if ($mod->installed) {
-                    unset($suggestedModules[$id]);
-                } else {
-                    $suggestedModules[$id]->not_on_disk = false;
-                }
-            } else {
-                if (!$mod->installed) {
-                    $modulesToAdd[] = $mod;
-                }
-            }
+        $localModuleNames = array();
+        $modulesDirOnDisk = Module::getModulesDirOnDisk();
+        foreach ($modulesDirOnDisk as $moduleName) {
+            $localModuleNames[Tools::strtolower($moduleName)] = true;
         }
 
-        $modules = array_merge($suggestedModules, $modulesToAdd);
+        $modules = array();
+        foreach ($suggestedModules as $suggestedModule) {
+            $moduleName = Tools::strtolower($suggestedModule->name);
+            if (isset($localModuleNames[$moduleName])) {
+                continue;
+            }
+
+            if (!$this->isCompatibleWithCurrentQloVersion($suggestedModule)) {
+                continue;
+            }
+
+            $modules[] = $suggestedModule;
+        }
 
         $link_admin_modules = $this->context->link->getAdminLink('AdminModules', true);
         foreach ($modules as $key => $module) {
@@ -104,6 +104,26 @@ class AdminModulesCatalogControllerCore extends AdminController
             'element_type_theme' => self::ELEMENT_TYPE_THEME,
 
         ));
+    }
+
+    protected function isCompatibleWithCurrentQloVersion($module)
+    {
+        if (!isset($module->compatibility)) {
+            return true;
+        }
+
+        $from = !empty($module->compatibility['from']) ? trim((string)$module->compatibility['from']) : '';
+        $to = !empty($module->compatibility['to']) ? trim((string)$module->compatibility['to']) : '';
+
+        if ($from && version_compare(_QLOAPPS_VERSION_, $from, '<')) {
+            return false;
+        }
+
+        if ($to && version_compare(_QLOAPPS_VERSION_, $to, '>')) {
+            return false;
+        }
+
+        return true;
     }
 
     public function initModal()
