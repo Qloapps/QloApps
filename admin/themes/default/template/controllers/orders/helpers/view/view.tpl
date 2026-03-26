@@ -145,6 +145,10 @@
                                                                 <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span> <i class="icon-file-text"></i>
                                                             </a>
 
+                                                            <a title="{l s='Download Registration Form'}" class="btn btn-default" href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateRegistrationFormPDF&amp;id_order={$data['id_order']}&amp;id_hotel_booking_detail={$data['id']}" target="_blank">
+                                                                <i class="icon-download"></i> {l s='Registration'}
+                                                            </a>
+
                                                             {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                                                                 <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
                                                             {elseif $can_edit}

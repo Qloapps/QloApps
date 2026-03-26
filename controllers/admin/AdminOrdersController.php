@@ -498,7 +498,7 @@ class AdminOrdersControllerCore extends AdminController
                         'target' => true,
                     );
                 }
-
+                     
                 $this->toolbar_btn['print'] = array(
                     'short' => $this->l('Print'),
                     'href' => 'javascript:window.print()',

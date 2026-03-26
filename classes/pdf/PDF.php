@@ -37,6 +37,7 @@ class PDFCore
     protected $smarty;
 
     const TEMPLATE_INVOICE = 'Invoice';
+    const TEMPLATE_REGISTRATION_FORM = 'RegistrationForm';
     const TEMPLATE_ORDER_RETURN = 'OrderReturn';
     const TEMPLATE_ORDER_SLIP = 'OrderSlip';
     const TEMPLATE_DELIVERY_SLIP = 'DeliverySlip';
@@ -87,6 +88,9 @@ class PDFCore
                 if (count($this->objects) > 1) {
                     $this->filename = $template->getBulkFilename();
                 }
+            }
+            if (method_exists($template, 'requestMinimalMargins') && $template->requestMinimalMargins()) {
+                $this->pdf_renderer->setMinimalMargins(true);
             }
 
             $template->assignHookData($object);

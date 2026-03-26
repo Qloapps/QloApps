@@ -38,6 +38,7 @@ class PDFGeneratorCore extends TCPDF
     public $pagination;
     public $content;
     public $font;
+    protected $force_minimal_margins = false;
 
     public $font_by_lang = array(
         'ja' => 'cid0jp',
@@ -207,6 +208,11 @@ class PDFGeneratorCore extends TCPDF
         return $this->output($filename, $output);
     }
 
+    public function setMinimalMargins($minimal = true)
+    {
+        $this->force_minimal_margins = $minimal;
+    }
+    
     /**
      * Write a PDF page
      */
@@ -214,7 +220,14 @@ class PDFGeneratorCore extends TCPDF
     {
         $this->SetHeaderMargin(5);
         $this->SetFooterMargin(21);
-        $this->setMargins(10, 40, 10);
+        if ($this->force_minimal_margins) {
+            $this->SetAutoPageBreak(true, 25);
+            $this->setPrintHeader(false);
+            $this->setMargins(10, 10, 10);  // Reclaim the 40mm space
+        } else {
+            $this->setPrintHeader(true);
+            $this->setMargins(10, 40, 10);
+        }
         $this->AddPage();
         $this->writeHTML($this->content, true, false, true, false, '');
     }
