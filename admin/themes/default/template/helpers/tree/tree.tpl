@@ -123,7 +123,7 @@
 
 		function startTree(idElem) {
 			if (typeof $.fn.tree === 'undefined') {
-				setTimeout(startTree, 100);
+				setTimeout(function() { startTree(idElem); }, 100);
 				return;
 			}
 
