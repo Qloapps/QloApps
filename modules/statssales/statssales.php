@@ -310,10 +310,14 @@ class StatsSales extends ModuleGraph
     {
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($this->query.$this->getDate().$this->query_group_by.$this->query_having_filter);
         foreach ($result as $row) {
+            $days = (int)substr($row['invoice_date'], 8, 2);
+            if (!isset($this->_values[$days])) {
+                $this->_values[$days] = 0;
+            }
             if ($this->option == 1) {
-                $this->_values[(int)substr($row['invoice_date'], 8, 2)] += 1;
+                $this->_values[$days] += 1;
             } else {
-                $this->_values[(int)substr($row['invoice_date'], 8, 2)] += $row['total_revenue'];
+                $this->_values[$days] += $row['total_revenue'];
             }
         }
     }

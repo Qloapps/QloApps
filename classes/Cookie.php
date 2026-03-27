@@ -332,6 +332,14 @@ class CookieCore
                 $this->logout();
             }
 
+            if (isset($this->_content['id_customer']) && isset($this->_content['passwd']) && (int)$this->_content['id_customer']) {
+                if (Validate::isLoadedObject($objCustomer = new Customer((int)$this->_content['id_customer']))) {
+                    if ($objCustomer->passwd != $this->_content['passwd']) {
+                        $this->logout();
+                    }
+                }
+            }
+
             if (!isset($this->_content['date_add'])) {
                 $this->_content['date_add'] = date('Y-m-d H:i:s');
             }
