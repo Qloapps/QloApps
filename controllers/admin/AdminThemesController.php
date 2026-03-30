@@ -714,8 +714,11 @@ class AdminThemesControllerCore extends AdminController
                 }
 
                 $ids_themes = Tools::unSerialize(Configuration::get('PS_ADDONS_THEMES_IDS'));
-                if (array_key_exists($obj->directory, $ids_themes)) {
-                    unset($ids_themes[$obj->directory]);
+
+                if(is_array($ids_themes)) {
+                    if (array_key_exists($obj->directory, $ids_themes)) {
+                        unset($ids_themes[$obj->directory]);
+                    }
                 }
 
                 $obj->removeMetas();
@@ -1358,8 +1361,8 @@ class AdminThemesControllerCore extends AdminController
         $fields_value['theme_name'] = $theme->name;
         $fields_value['theme_directory'] = $theme->directory;
         $fields_value['theme_version'] = '1.0';
-        $fields_value['compa_from'] = _PS_VERSION_;
-        $fields_value['compa_to'] = _PS_VERSION_;
+        $fields_value['compa_from'] = _QLOAPPS_VERSION_;
+        $fields_value['compa_to'] = _QLOAPPS_VERSION_;
         $fields_value['id_theme_export'] = Tools::getValue('id_theme_export');
         $fields_value['documentationName'] = $this->l('documentation');
 

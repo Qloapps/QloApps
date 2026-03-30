@@ -875,9 +875,13 @@ class AdminControllerCore extends Controller
         $prefix = $this->getCookieFilterPrefix();
         $filters = array();
         if (isset($this->list_id)) {
+            $postPrefixPattern = '#^('.
+                $this->list_id.'Filter_|'.
+                'submitFilter'.
+            ')#i';
             foreach ($_POST as $key => $value) {
                 // only process the filter fields.
-                if (stripos($key, $this->list_id.'Filter_') !== 0) {
+                if (!preg_match($postPrefixPattern, $key)) {
                     continue;
                 }
 
@@ -898,9 +902,15 @@ class AdminControllerCore extends Controller
                 }
             }
 
+            $getPrefixPattern = '#^(' .
+                'submitFilter|'.
+                $this->list_id.'Filter_|'.
+                $this->list_id.'Orderby|'.
+                $this->list_id.'Orderway'.
+            ')#i';
             foreach ($_GET as $key => $value) {
-                // only process the filter fields.
-                if (stripos($key, $this->list_id.'Filter_') !== 0) {
+                // only process the filter and order by, order way fields.
+                if (!preg_match($getPrefixPattern, $key)) {
                     continue;
                 }
 
@@ -2387,7 +2397,7 @@ class AdminControllerCore extends Controller
             $must_have_module_list = file_get_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST);
             if (!empty($must_have_module_list) && $must_have_module_list_xml = @simplexml_load_string($must_have_module_list)) {
                 $must_have_module_list_array = array();
-                if (is_object($country_module_list_xml->module)) {
+                if (is_object($must_have_module_list_xml->module)) {
                     foreach ($must_have_module_list_xml->module as $l => $mo) {
                         $all_module_list[] = (string)$mo->name;
                     }

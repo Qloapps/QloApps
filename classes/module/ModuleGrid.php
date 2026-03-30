@@ -159,12 +159,13 @@ abstract class ModuleGridCore extends Module
         $this->setLang($context->language->id);
         $this->setEmployee($context->employee->id);
 
+        $layers = isset($datas['layers']) ?  $datas['layers'] : 1;
+
         if (isset($datas['option'])) {
             $this->setOption($datas['option'], $layers);
         }
         $this->getData();
 
-        $layers = isset($datas['layers']) ?  $datas['layers'] : 1;
 
         if (count($datas['columns'])) {
             foreach ($datas['columns'] as $column) {

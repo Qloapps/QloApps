@@ -41,7 +41,7 @@
 					{if $action.type == 'link'}
 						<a href="{$action.href}" class="btn {$action.class}">{$action.label}</a>
 					{elseif $action.type == 'button'}
-						<button type="button" value="{$action.value}" class="btn {$action.class}">
+						<button type="button" value="{$action.value|default:''}" class="btn {$action.class}">
 							{$action.label}
 						</button>
 					{/if}

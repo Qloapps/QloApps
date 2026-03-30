@@ -3019,7 +3019,7 @@ abstract class ModuleCore
                     ),
                     array(
                         ' ',
-                        'class '.$overrideClassName.'OverrideOriginal'.$uniq
+                        'class '.$overrideClassName.'OverrideOriginal'.$uniq.' extends \stdClass'
                     ),
                     implode('', $overrideClassFileArray)
                 )
@@ -3037,7 +3037,7 @@ abstract class ModuleCore
                     ),
                     array(
                         ' ',
-                        'class '.$overrideClassName.'Override'.$uniq
+                        'class '.$overrideClassName.'Override'.$uniq.' extends \stdClass'
                     ),
                     implode('', $moduleClassFileArray)
                 )
@@ -3084,7 +3084,7 @@ abstract class ModuleCore
                     ),
                     array(
                         ' ',
-                        'class '.$overrideClassName.'Override'.$uniq
+                        'class '.$overrideClassName.'Override'.$uniq.' extends \stdClass'
                     ),
                     implode('', $moduleClassFileArray)
                 )
@@ -3213,7 +3213,7 @@ abstract class ModuleCore
                 ),
                 array(
                     ' ',
-                    'class '.$overrideClassName.'Original_remove'.$uniq
+                    'class '.$overrideClassName.'Original_remove'.$uniq.' extends \stdClass'
                 ),
                 implode('', $overrideClassFileArray)
             )
@@ -3230,7 +3230,7 @@ abstract class ModuleCore
                 ),
                 array(
                     ' ',
-                    'class '.$overrideClassName.'Override_remove'.$uniq
+                    'class '.$overrideClassName.'Override_remove'.$uniq.' extends \stdClass'
                 ),
                 implode('', $moduleClassFileArray)
             )

@@ -7,7 +7,6 @@
             <tr>
                 <th>{l s="Room Image"}</th>
                 <th>{l s="Room Description"}</th>
-                <th>{l s="Hotel"}</th>
                 <th>{l s="Room Capcity"}</th>
                 <th>{l s="Unit Price"}</th>
                 <th>{l s="Rooms Qty"}</th>
@@ -24,9 +23,6 @@
                     </td>
                     <td >
                         {$data_v['name']}
-                    </td>
-                    <td >
-                        {$data_v['hotel_name']}
                     </td>
                     <td >
                         {$rm_v['adults']} {l s='Adults'}, {$rm_v['children']} {l s='Children'}

@@ -104,7 +104,7 @@
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="name" type="default" multilang="true"}</span></div>
 		<label class="control-label col-lg-2 required" id="name" for="name_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Write the name of the Room Type for ex. Delux, Executive etc.'} {l s='Invalid characters:'} &lt;&gt;;=#{}">
-				{l s='Room Type'}
+				{l s='Name'}
 			</span>
 		</label>
 		<div class="col-lg-5">
@@ -137,12 +137,16 @@
 				{l s='Select Hotel'}
 			</label>
 			<div class="col-sm-5">
+			{if isset($htl_info) && $htl_info}
 				<select name="id_hotel" id="hotel_place" class="form-control chosen">
 					{foreach from=$htl_info item=htl_dtl}
-						<option value="{$htl_dtl['id']}" >{$htl_dtl['hotel_name']}</option>
+						<option value="{$htl_dtl['id_hotel']}" >{$htl_dtl['hotel_name']}</option>
 					{/foreach}
 				</select>
 				<p class="help-block">{l s='Hotel once assigned cannot be reassigned'}</p>
+			{else}
+				<div class="control-label col-sm-3 text-danger">{l s='No hotel are available'}</div>
+			{/if}
 			</div>
 		{/if}
 	</div>
