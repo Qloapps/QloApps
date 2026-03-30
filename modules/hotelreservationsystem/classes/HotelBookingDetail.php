@@ -2584,7 +2584,7 @@ class HotelBookingDetail extends ObjectModel
         AND `date_from` < \''.pSQL($new_date_to).'\' AND `date_from` != \''.pSQL($old_date_from).'\'
         AND IF(`id_status` !='.HotelBookingDetail::STATUS_CHECKED_OUT.',
             `date_to` != \''.pSQL($old_date_to).'\' AND `date_to` > \''.pSQL($new_date_from).'\',
-            `check_out` != \''.pSQL($old_date_to).'\' AND date(`check_out`) > \''.pSQL($new_date_from).'\'
+            `check_out` != \''.pSQL($old_date_to).'\' AND DATE(`check_out`) > DATE(\''.pSQL($new_date_from).'\')
         )
         AND `is_refunded`=0 AND `is_back_order`=0';
 
