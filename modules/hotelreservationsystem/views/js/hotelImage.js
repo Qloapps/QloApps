@@ -109,6 +109,7 @@ $(document).ready(function () {
             $.ajax({
                 type:'POST',
                 url: adminHotelCtrlUrl,
+                dataType: 'json',
                 data: {
                     ajax: true,
                     action: 'changeCoverImage',
@@ -116,7 +117,7 @@ $(document).ready(function () {
                     id_image: idImage,
                 },
                 success: function(result) {
-                    if (result) {
+                    if (result.status) {
                         // remover cover image identifier from old cover image
                         var oldCoverImageTr = $("#hotel-image-table tbody tr.cover-image-tr");
                         oldCoverImageTr.removeClass("cover-image-tr").find("td.cover-image-td").removeClass("cover-image-td").find("a.changer-cover-image").removeClass("text-success").addClass("text-danger").attr("data-is-cover", "0").find("i.icon-check").removeClass("icon-check").addClass("icon-times");
@@ -149,6 +150,7 @@ $(document).ready(function () {
             $.ajax({
                 type:'POST',
                 url: adminHotelCtrlUrl,
+                dataType: 'json',
                 data: {
                     ajax: true,
                     action: 'deleteHotelImage',
@@ -156,7 +158,7 @@ $(document).ready(function () {
                     id_image: idImage,
                 },
                 success: function(result) {
-                    if (result) {
+                    if (result.status) {
                         if (parseInt(isCover)) {
                             location.reload();
                         } else {

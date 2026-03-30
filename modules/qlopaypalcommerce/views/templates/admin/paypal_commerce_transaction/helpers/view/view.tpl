@@ -107,7 +107,7 @@
 {if $transaction_data and $transaction_data.pp_payment_status == 'COMPLETED'}
     {* show refund form only if there is any remaing amount for refund *}
     {if $remaining_refund > 0}
-        <form action="" method="post" class="form-horizontal" id="refund_form">
+        <form action="{$transaction_url|escape:'html':'UTF-8'}" method="post" class="form-horizontal" id="refund_form">
             <div class="panel col-lg-12">
                 <div class="panel-heading">
                     <i class="icon-reply"></i>
@@ -176,6 +176,7 @@
                         <th style="text-align: center">{l s='Amount' mod='qlopaypalcommerce'}</th>
                         <th style="text-align: center">{l s='Type' mod='qlopaypalcommerce'}</th>
                         <th style="text-align: center">{l s='Status' mod='qlopaypalcommerce'}</th>
+                        <th style="text-align: center">{l s='Remark' mod='qlopaypalcommerce'}</th>
                         <th style="text-align: center">{l s='Date' mod='qlopaypalcommerce'}</th>
                     </tr>
                     {if $refund_data}
@@ -197,6 +198,7 @@
                                         <label class="label label-danger">{$refund.refund_status|escape:'html':'UTF-8'}</label>
                                     {/if}
                                 </td>
+                                <td style="text-align: center">{$refund.refund_reason|escape:'html':'UTF-8'}</td>
                                 <td style="text-align: center">{$refund.date_add|escape:'html':'UTF-8'}</td>
                             </tr>
                         {/foreach}

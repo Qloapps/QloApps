@@ -730,50 +730,56 @@ class HotelBranchInformation extends ObjectModel
             $catName,
             $parent_category
         )) {
-            if (is_array($link_rewrite)) {
-                $objCategory = new Category($categoryExists['id_category']);
-
-                foreach (Language::getLanguages() as $lang) {
-                    $objCategory->link_rewrite[$lang['id_lang']] = $link_rewrite[$lang['id_lang']];
-                }
-
-                $objCategory->save();
-            }
-            return $categoryExists['id_category'];
-        } else {
-            $category = new Category();
-            foreach (Language::getLanguages(true) as $lang) {
-                if (is_array($name) && isset($name[$lang['id_lang']])) {
-                    $catName = $name[$lang['id_lang']];
-                } else {
-                    $catName = $name;
-                }
-                $category->name[$lang['id_lang']] = $catName;
-                $category->description[$lang['id_lang']] = $this->moduleInstance->l('Hotel Branch Category', 'HotelBranchInformation');
-
+            $idHotel = isset($params['id_hotel']) ? $params['id_hotel'] : false;
+            $isHotel = isset($params['is_hotel']) ? $params['is_hotel'] : false;
+            $existsCatId = $categoryExists['id_category'];
+            $belongsToSameHotel = ($idHotel == HotelBranchInformation::getHotelIdByIdCategory($existsCatId));
+            if (!$isHotel || $belongsToSameHotel) {
                 if (is_array($link_rewrite)) {
-                    $category->link_rewrite[$lang['id_lang']] = $link_rewrite[$lang['id_lang']];
-                } else {
-                    $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
+                    $objCategory = new Category($existsCatId);
+
+                    foreach (Language::getLanguages() as $lang) {
+                        $objCategory->link_rewrite[$lang['id_lang']] = $link_rewrite[$lang['id_lang']];
+                    }
+
+                    $objCategory->save();
                 }
+                return $existsCatId;
             }
-
-            if ($meta_title) {
-                $category->meta_title = $meta_title;
-            }
-            if ($meta_description) {
-                $category->meta_description = $meta_description;
-            }
-            if ($meta_keywords) {
-                $category->meta_keywords = $meta_keywords;
-            }
-
-            $category->id_parent = $parent_category;
-            $category->groupBox = $group_ids;
-            $category->add();
-
-            return $category->id;
         }
+
+        $category = new Category();
+        foreach (Language::getLanguages(true) as $lang) {
+            if (is_array($name) && isset($name[$lang['id_lang']])) {
+                $catName = $name[$lang['id_lang']];
+            } else {
+                $catName = $name;
+            }
+            $category->name[$lang['id_lang']] = $catName;
+            $category->description[$lang['id_lang']] = $this->moduleInstance->l('Hotel Branch Category', 'HotelBranchInformation');
+
+            if (is_array($link_rewrite)) {
+                $category->link_rewrite[$lang['id_lang']] = $link_rewrite[$lang['id_lang']];
+            } else {
+                $category->link_rewrite[$lang['id_lang']] = Tools::link_rewrite($catName);
+            }
+        }
+
+        if ($meta_title) {
+            $category->meta_title = $meta_title;
+        }
+        if ($meta_description) {
+            $category->meta_description = $meta_description;
+        }
+        if ($meta_keywords) {
+            $category->meta_keywords = $meta_keywords;
+        }
+
+        $category->id_parent = $parent_category;
+        $category->groupBox = $group_ids;
+        $category->add();
+
+        return $category->id;
     }
 
     //Overrided ObjectModet::delete() to delete all the dependencies of the hotel

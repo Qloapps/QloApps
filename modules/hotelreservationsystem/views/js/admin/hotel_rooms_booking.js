@@ -386,6 +386,7 @@ $(document).ready(function() {
                         if (result.success) {
                             $(".cart_booking_btn").removeAttr('disabled');
                             $current_btn.removeAttr('disabled');
+                            showSuccessMessage(added_room_success_txt);
                         }
 
                         btn.removeClass('btn-primary').removeClass('avai_add_cart').addClass('btn-danger').addClass('avai_delete_cart_data').html(remove);
@@ -512,6 +513,7 @@ $(document).ready(function() {
                 if (!result.success) {
                     $(".cart_booking_btn").attr('disabled', 'true');
                 } else {
+                    showSuccessMessage(removed_room_success_txt);
                     $("#htl_rooms_list").empty().append(result.data.room_tpl);
                     refreshCartData();
                     refreshStatsData();
@@ -571,7 +573,7 @@ $(document).ready(function() {
                     if (!(result.success)) {
                         $(".cart_booking_btn").attr('disabled', 'true');
                     }
-
+                    showSuccessMessage(removed_room_success_txt);
                     $(".cart_tbody tr td button[data-id-cart-book-data='" + id_cart_book_data + "']").parent().parent().remove();
                     refreshCartData();
                     refreshStatsData();
