@@ -3591,10 +3591,11 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
 
-            $messages = array_merge($customerMessages, $messages);
-            usort($messages, function ($a, $b) {
-                return strtotime($a['date_add']) < strtotime($b['date_add']);
-            });
+            if($messages = array_merge($customerMessages, $messages)){
+                usort($messages, function ($a, $b) {
+                    return (strtotime($a['date_add']) < strtotime($b['date_add'])) ? 1 : -1;
+                });
+            }
         }
 
         // send hotel standalone and standalone products
@@ -7487,7 +7488,7 @@ class AdminOrdersControllerCore extends AdminController
                                 $response['hasError'] = true;
                                 $response['errors'][] = Tools::displayError('Invalid quantity provided for service').': '.$objServiceProductOrderDetail->name;
                             }
-                        } elseif ($serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
+                        } elseif (is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail]) && $serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Can not order multiple quanitity for service').': '.$objServiceProductOrderDetail->name;
                         }
@@ -7508,7 +7509,11 @@ class AdminOrdersControllerCore extends AdminController
                     $result = true;
                     foreach ($selectedServicesOrderDetails as $idRoomTypeServiceProductOrderDetail) {
                         $objServiceProductOrderDetail = new ServiceProductOrderDetail($idRoomTypeServiceProductOrderDetail);
-                        $quantity = $serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        if(is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail])) {
+                            $quantity = (int)$serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        } else {
+                            $quantity = 1;
+                        }
                         $unitPrice = $serviceUnitPrices[$idRoomTypeServiceProductOrderDetail];
 
                         $objHotelBookingDetail = new HotelBookingDetail($objServiceProductOrderDetail->id_htl_booking_detail);

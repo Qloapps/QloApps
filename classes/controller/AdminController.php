@@ -886,7 +886,7 @@ class AdminControllerCore extends Controller
                 }
 
                 if (is_array($value)) {
-                    if ($value[0] === '' && $value[1] === '') {
+                    if (isset($value[0], $value[1]) && $value[0] === '' && $value[1] === '') {
                         $value = '';
                     } else {
                         $value = json_encode($value);
@@ -915,7 +915,7 @@ class AdminControllerCore extends Controller
                 }
 
                 if (is_array($value)) {
-                    if ($value[0] === '' && $value[1] === '') {
+                    if (isset($value[0], $value[1]) && $value[0] === '' && $value[1] === '') {
                         $value = '';
                     } else {
                         $value = json_encode($value);
