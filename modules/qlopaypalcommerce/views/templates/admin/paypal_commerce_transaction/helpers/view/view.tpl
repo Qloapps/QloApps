@@ -176,6 +176,7 @@
                         <th style="text-align: center">{l s='Amount' mod='qlopaypalcommerce'}</th>
                         <th style="text-align: center">{l s='Type' mod='qlopaypalcommerce'}</th>
                         <th style="text-align: center">{l s='Status' mod='qlopaypalcommerce'}</th>
+                        <th style="text-align: center">{l s='Remark' mod='qlopaypalcommerce'}</th>
                         <th style="text-align: center">{l s='Date' mod='qlopaypalcommerce'}</th>
                     </tr>
                     {if $refund_data}
@@ -197,6 +198,7 @@
                                         <label class="label label-danger">{$refund.refund_status|escape:'html':'UTF-8'}</label>
                                     {/if}
                                 </td>
+                                <td style="text-align: center">{$refund.refund_reason|escape:'html':'UTF-8'}</td>
                                 <td style="text-align: center">{$refund.date_add|escape:'html':'UTF-8'}</td>
                             </tr>
                         {/foreach}

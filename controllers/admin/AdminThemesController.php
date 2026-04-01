@@ -714,8 +714,11 @@ class AdminThemesControllerCore extends AdminController
                 }
 
                 $ids_themes = Tools::unSerialize(Configuration::get('PS_ADDONS_THEMES_IDS'));
-                if (array_key_exists($obj->directory, $ids_themes)) {
-                    unset($ids_themes[$obj->directory]);
+
+                if(is_array($ids_themes)) {
+                    if (array_key_exists($obj->directory, $ids_themes)) {
+                        unset($ids_themes[$obj->directory]);
+                    }
                 }
 
                 $obj->removeMetas();

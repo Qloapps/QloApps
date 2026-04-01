@@ -2317,6 +2317,23 @@ class HotelBookingDetail extends ObjectModel
                     OrderReturnDetail::deleteReturnDetailByIdBookingDetail($objOldHotelBooking->id_order, $idHotelBooking);
                 }
 
+                $totalPaid  = (float)$objOrder->getTotalPaid();
+                $orderTotal = (float)$objOrder->getOrderTotal();
+                $currentState = $objOrder->getCurrentOrderState();
+                if (Validate::isLoadedObject($currentState)) {
+                    $idEmployee = (int) $context->employee->id;
+                    if ($totalPaid < $orderTotal && $currentState->id == Configuration::get('PS_OS_PAYMENT_ACCEPTED')) {
+                        $objOrder->setCurrentState(
+                            Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED'),
+                            $idEmployee
+                        );
+                    } elseif ($totalPaid >= $orderTotal && $currentState->id == Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED')) {
+                        $objOrder->setCurrentState(
+                            Configuration::get('PS_OS_PAYMENT_ACCEPTED'),
+                            $idEmployee
+                        );
+                    }
+                }
                 // ===============================================================
                 // END Delete Process of the old booking
                 // ===============================================================
