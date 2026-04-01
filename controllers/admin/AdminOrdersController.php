@@ -368,6 +368,54 @@ class AdminOrdersControllerCore extends AdminController
                 'icon' => 'process-icon-new'
             );
         }
+        if ($this->display == 'view') {
+            /** @var Order $order */
+            if (Validate::isLoadedObject($order = $this->loadObject())) {
+                // hotel link in header
+                if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
+                    $this->page_header_toolbar_btn['hotel'] = array(
+                        'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
+                        'desc' => $this->l('View Hotel'),
+                        'class' => 'icon-building',
+                        'target' => true,
+                    );
+                }
+
+                if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
+                    $this->page_header_toolbar_btn['file'] = array(
+                        'short' => $this->l('Invoice'),
+                        'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.$order->id,
+                        'desc' => $this->l('View invoice'),
+                        'class' => 'icon-file-text',
+                        'target' => true,
+                    );
+                }
+
+                $this->page_header_toolbar_btn['print'] = array(
+                    'short' => $this->l('Print'),
+                    'href' => 'javascript:window.print()',
+                    'desc' => $this->l('Print order'),
+                    'class' => 'icon-print',
+                );
+
+                if ($this->tabAccess['edit'] === 1) {
+                    if (((int) $order->isReturnable())
+                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG, 0, 0)
+                    ) {
+                        $orderTotalPaid = $order->getTotalPaid();
+                        $orderDiscounts = $order->getCartRules();
+                        $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
+                        $this->page_header_toolbar_btn['cancel'] = array(
+                            'short' => ($hasOrderDiscountOrPayment) ? $this->l('Refund') : $this->l('Cancel'),
+                            'id' => 'desc-order-standard_refund',
+                            'desc' => ($hasOrderDiscountOrPayment) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
+                            'class' => 'icon-exchange',
+                            'target' => true,
+                        );
+                    }
+                }
+            }
+        }
 
         parent::initPageHeaderToolbar();
     }
@@ -476,55 +524,6 @@ class AdminOrdersControllerCore extends AdminController
 
     public function initToolbar()
     {
-        if ($this->display == 'view') {
-            /** @var Order $order */
-            if (Validate::isLoadedObject($order = $this->loadObject())) {
-                // hotel link in header
-                if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
-                    $this->toolbar_btn['hotel'] = array(
-                        'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
-                        'desc' => $this->l('View Hotel'),
-                        'class' => 'icon-building',
-                        'target' => true,
-                    );
-                }
-
-                if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
-                    $this->toolbar_btn['file'] = array(
-                        'short' => $this->l('Invoice'),
-                        'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.$order->id,
-                        'desc' => $this->l('View invoice'),
-                        'class' => 'icon-file-text',
-                        'target' => true,
-                    );
-                }
-
-                $this->toolbar_btn['print'] = array(
-                    'short' => $this->l('Print'),
-                    'href' => 'javascript:window.print()',
-                    'desc' => $this->l('Print order'),
-                    'class' => 'icon-print',
-                );
-
-                if ($this->tabAccess['edit'] === 1) {
-                    if (((int) $order->isReturnable())
-                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG, 0, 0)
-                    ) {
-                        $orderTotalPaid = $order->getTotalPaid();
-                        $orderDiscounts = $order->getCartRules();
-                        $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
-                        $this->toolbar_btn['cancel'] = array(
-                            'short' => ($hasOrderDiscountOrPayment) ? $this->l('Refund') : $this->l('Cancel'),
-                            'id' => 'desc-order-standard_refund',
-                            'desc' => ($hasOrderDiscountOrPayment) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
-                            'class' => 'icon-exchange',
-                            'target' => true,
-                        );
-                    }
-                }
-            }
-        }
-
         $res = parent::initToolbar();
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && isset($this->toolbar_btn['new']) && Shop::isFeatureActive()) {
             unset($this->toolbar_btn['new']);
@@ -3592,10 +3591,11 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
 
-            $messages = array_merge($customerMessages, $messages);
-            usort($messages, function ($a, $b) {
-                return strtotime($a['date_add']) < strtotime($b['date_add']);
-            });
+            if($messages = array_merge($customerMessages, $messages)){
+                usort($messages, function ($a, $b) {
+                    return (strtotime($a['date_add']) < strtotime($b['date_add'])) ? 1 : -1;
+                });
+            }
         }
 
         // send hotel standalone and standalone products
@@ -3710,6 +3710,7 @@ class AdminOrdersControllerCore extends AdminController
             'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
             'order_convenience_fee_services' => $orderConvenienceFeeServices,
+            'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
         );
 
         return parent::renderView();
@@ -7487,7 +7488,7 @@ class AdminOrdersControllerCore extends AdminController
                                 $response['hasError'] = true;
                                 $response['errors'][] = Tools::displayError('Invalid quantity provided for service').': '.$objServiceProductOrderDetail->name;
                             }
-                        } elseif ($serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
+                        } elseif (is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail]) && $serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Can not order multiple quanitity for service').': '.$objServiceProductOrderDetail->name;
                         }
@@ -7508,7 +7509,11 @@ class AdminOrdersControllerCore extends AdminController
                     $result = true;
                     foreach ($selectedServicesOrderDetails as $idRoomTypeServiceProductOrderDetail) {
                         $objServiceProductOrderDetail = new ServiceProductOrderDetail($idRoomTypeServiceProductOrderDetail);
-                        $quantity = $serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        if(is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail])) {
+                            $quantity = (int)$serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        } else {
+                            $quantity = 1;
+                        }
                         $unitPrice = $serviceUnitPrices[$idRoomTypeServiceProductOrderDetail];
 
                         $objHotelBookingDetail = new HotelBookingDetail($objServiceProductOrderDetail->id_htl_booking_detail);
