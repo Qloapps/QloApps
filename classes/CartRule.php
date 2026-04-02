@@ -973,8 +973,8 @@ class CartRuleCore extends ObjectModel
 
         $all_cart_rules_ids = $context->cart->getOrderedCartRulesIds();
 
-        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
-        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
+        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
 
         // Free shipping on selected carriers
         if ($this->free_shipping && in_array($filter, array(CartRule::FILTER_ACTION_ALL, CartRule::FILTER_ACTION_ALL_NOCAP, CartRule::FILTER_ACTION_SHIPPING))) {
@@ -1000,14 +1000,13 @@ class CartRuleCore extends ObjectModel
             // Discount (%) on the whole order
             if ($this->reduction_percent && $this->reduction_product == 0) {
                 // Do not give a reduction on free products!
-                $order_total = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS, $package_products);
+                $order_total = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE, $package_products);
                 foreach ($context->cart->getCartRules(CartRule::FILTER_ACTION_GIFT) as $cart_rule) {
                     $order_total -= Tools::ps_round($cart_rule['obj']->getContextualValue($use_tax, $context, CartRule::FILTER_ACTION_GIFT, $package), _PS_PRICE_COMPUTE_PRECISION_);
                 }
 
                 $reduction_value += $order_total * $this->reduction_percent / 100;
             }
-
             // Discount (%) on a specific product
             if ($this->reduction_percent && $this->reduction_product > 0) {
                 foreach ($package_products as $product) {
@@ -1073,9 +1072,9 @@ class CartRuleCore extends ObjectModel
             if ((float)$this->reduction_amount > 0) {
                 $prorata = 1;
                 if (!is_null($package) && count($all_products)) {
-                    $total_products = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+                    $total_products = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
                     if ($total_products) {
-                        $prorata = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS, $package['products']) / $total_products;
+                        $prorata = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE, $package['products']) / $total_products;
                     }
                 }
 
@@ -1124,7 +1123,7 @@ class CartRuleCore extends ObjectModel
                 if ($this->reduction_tax == $use_tax) {
                     // The reduction cannot exceed the products total, except when we do not want it to be limited (for the partial use calculation)
                     if ($filter != CartRule::FILTER_ACTION_ALL_NOCAP) {
-                        $cart_amount = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+                        $cart_amount = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
                         $reduction_amount = min($reduction_amount, $cart_amount);
                     }
                     $reduction_value += $prorata * $reduction_amount;
@@ -1379,7 +1378,7 @@ class CartRuleCore extends ObjectModel
             return array();
         }
 
-        $order_total = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS, null, null, false);
+        $order_total = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE, null, null, false);
         static $errors = array();
         foreach ($context->cart->getCartRules() as $cart_rule) {
             if ($error = $cart_rule['obj']->checkValidity($context, true)) {

@@ -173,19 +173,6 @@ $(function() {
 		</div>
 	{/if}
 
-	{if isset($num_global_demands) && $num_global_demands}
-		<div class="panel">
-			<h3>
-				{if $num_global_demands == 1}
-					{l s='1 global demand'}
-				{else}
-					{l s='%d global demands' sprintf=$num_global_demands}
-				{/if}
-			</h3>
-			{$global_demands}
-		</div>
-	{/if}
-
 	{if isset($num_refund_rules) && $num_refund_rules}
 		<div class="panel">
 			<h3>

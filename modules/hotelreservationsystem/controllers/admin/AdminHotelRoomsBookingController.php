@@ -753,7 +753,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $date_from,
                 $date_to,
                 array(),
-                array(),
                 $id_cart,
                 $id_guest,
                 $booking_type,

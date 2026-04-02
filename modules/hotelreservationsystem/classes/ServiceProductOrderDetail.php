@@ -497,9 +497,7 @@ class ServiceProductOrderDetail extends ObjectModel
 
             // things to do if order is not paid
             if (!$hasOrderDiscountOrPayment) {
-                $objHotelBookingDemands = new HotelBookingDemands();
                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-
                 $reduction_amount['total_price_tax_excl'] = (float) $this->total_price_tax_excl;
                 $reduction_amount['total_products_tax_excl'] = (float) $this->total_price_tax_excl;
                 $reduction_amount['total_price_tax_incl'] = (float) $this->total_price_tax_incl;

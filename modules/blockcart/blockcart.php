@@ -265,15 +265,7 @@ class Blockcart extends Module
         }
 
         $objCartBookingData = new HotelCartBookingData();
-        $totalDemandsPrice = $objCartBookingData->getCartExtraDemands(
-            $this->context->cart->id,
-            0,
-            0,
-            0,
-            0,
-            1
-        );
-
+       
         $addedProduct = false;
         // get currently added product if exists
         if (!empty($params['cookie']->currentAddedProduct)) {
@@ -383,8 +375,8 @@ class Blockcart extends Module
             'tax_cost' => $tax_cost,
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
             'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
-            'room_total' => ($totalRoomsPrice + $totalDemandsPrice + $totalAdditionalServicesWithAutoAddPrice),
-            'room_total_format' => Tools::displayPrice($totalRoomsPrice + $totalDemandsPrice + $totalAdditionalServicesWithAutoAddPrice - $totalConvenienceFee),
+            'room_total' => ($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice),
+            'room_total_format' => Tools::displayPrice($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice - $totalConvenienceFee),
             'totalToPay' => $totalToPay,
             'total_convenience_fee' => $totalConvenienceFee,
             'total_convenience_fee_format' => Tools::displayPrice(($totalConvenienceFee), $currency),

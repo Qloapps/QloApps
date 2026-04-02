@@ -125,7 +125,7 @@ var // currently active contextMenu trigger
                 offset = {top: y, left: x};
             }
             
-            // correct offset if viewport demands it
+            // correct offset if viewport it
             var bottom = $win.scrollTop() + $win.height(),
                 right = $win.scrollLeft() + $win.width(),
                 height = opt.$menu.height(),

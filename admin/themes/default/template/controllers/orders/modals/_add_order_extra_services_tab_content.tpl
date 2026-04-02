@@ -20,7 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div id="room_type_service_product_desc" class="tab-pane{if !isset($selectedRoomDemands) || !$selectedRoomDemands} active{/if}">
+<div id="room_type_service_product_desc" class="tab-pane{if isset($serviceProducts) || $serviceProducts} active{/if}">
     {if $customServiceAllowed}
         <div class="row">
             <button id="btn_new_room_service" class="btn btn-success pull-right"><i class="icon-plus-circle"></i> {l s='Add a new service'}</button>
@@ -31,8 +31,8 @@
     {if isset($serviceProducts) && $serviceProducts}
         <div id="room_type_services_desc">
             {assign var=roomCount value=1}
-            <div class="row room_demands_container">
-                <div class="col-sm-12 room_demand_detail">
+            <div class="row room_service_container">
+                <div class="col-sm-12 room_service_detail">
                     {if isset($serviceProducts) && $serviceProducts}
                         <form id="update_selected_room_services_form">
                             <table class="table table-striped">
@@ -54,7 +54,7 @@
                                         {else}
                                             {assign var='serviceSelected' value=false}
                                         {/if}
-                                        <tr class="room_demand_block">
+                                        <tr class="room_service_block">
                                             <td>
                                                 <input data-id_cart_booking="{$selectedRoomServiceProduct['id']}" value="{$product['id_product']|escape:'html':'UTF-8'}" type="checkbox" class="change_room_type_service_product" {if $serviceSelected}checked{/if}/>
 

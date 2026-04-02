@@ -354,14 +354,14 @@ $(document).on('click', '.btn-view-extra-services', function(e) {
             date_to: dateTo,
             id_product: idProduct,
             id_order: idOrder,
-            action: 'getRoomTypeBookingDemands',
+            action: 'getRoomTypeBookingServices',
             ajax: true,
             token: static_token,
         },
         success: function(result) {
-            if (result.extra_demands) {
+            if (result.extra_services) {
                 $('#popup-view-extra-services').html('');
-                $('#popup-view-extra-services').append(result.extra_demands);
+                $('#popup-view-extra-services').append(result.extra_services);
 
                 $.fancybox.open({
                     href: '#popup-view-extra-services',

@@ -75,7 +75,7 @@
                                     </div>
                                 {/block}
                                 {block name='booking_form_price_information'}
-                                    {if (isset($has_room_type_demands) && $has_room_type_demands) || (isset($service_products_exists) && $service_products_exists)}
+                                    {if isset($service_products_exists) && $service_products_exists}
                                         <hr class="separator-hr-mg-10">
                                         <div class="row price_desc_block">
                                             <div class="col-sm-6">
@@ -87,15 +87,15 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <label class="control-label">{l s='Extra Services'}</label>
-                                                <p class="extra_demands_price_block">
-                                                    {if isset($demands_price)}{convertPrice price=$demands_price}{else}{convertPrice price=0}{/if}
-                                                    {if (isset($selected_demands) && $selected_demands) || (isset($selected_service_product) && $selected_service_product)}
+                                                <p class="extra_services_price_block">
+                                                    {if isset($service_product_price)}{convertPrice price=$service_product_price}{else}{convertPrice price=0}{/if}
+                                                    {if isset($selected_service_product) && $selected_service_product}
                                                         <span class="services-info">
                                                             <img src="{$img_dir}icon/icon-info.svg" />
                                                         </span>
                                                     {/if}
                                                 </p>
-                                                {if (isset($selected_demands) && $selected_demands) || (isset($selected_service_product) && $selected_service_product)}
+                                                {if isset($selected_service_product) && $selected_service_product}
                                                     <div class="services-info-container" style="display: none;">
                                                         <div class="services-info-tooltip-cont">
                                                             {if isset($selected_service_product) && $selected_service_product}
@@ -119,36 +119,15 @@
                                                                     </div>
                                                                 </div>
                                                             {/if}
-                                                            {if isset($selected_demands) && $selected_demands}
-                                                                <div class="extra-service-panel">
-                                                                    <p class="panel_title">{l s='Selected facilities'} <span>{l s='(Per room)'}</span></p>
-                                                                    <div class="services-list">
-                                                                        {foreach $selected_demands as $product}
-                                                                            <div class="services-list-row">
-                                                                                <div>
-                                                                                    {$product['name']}
-                                                                                    {if isset($product['advance_option']) && $product['advance_option']}
-                                                                                        <p>{l s='Option:'} {$product['advance_option']['name']}</p>
-                                                                                    {/if}
-                                                                                </div>
-                                                                                <div class="text-right">
-                                                                                    <p>{displayPrice price=$product['price']}</p>
-                                                                                    <a class="btn btn-sm btn-default remove_roomtype_demand" data-id_global_demand="{$product['id_global_demand']}"><i class="icon-trash"></i></a>
-                                                                                </div>
-                                                                            </div>
-                                                                        {/foreach}
-                                                                    </div>
-                                                                </div>
-                                                            {/if}
                                                             <hr>
                                                             <div class="extra-service-panel">
                                                                 <div class="summary-row">
                                                                     <div>{l s='Total price per room'}</div>
-                                                                    <div><p class="service_price">{displayPrice price=$demands_price_per_room}</p></div>
+                                                                    <div><p class="service_price">{displayPrice price=$service_product_price_per_room}</p></div>
                                                                 </div>
                                                                 <div class="summary-row">
                                                                     <div>{l s='Total price:'}</div>
-                                                                    <div><p class="service_price">{displayPrice price=$demands_price}</p></div>
+                                                                    <div><p class="service_price">{displayPrice price=$service_product_price}</p></div>
                                                                 </div>
                                                             </div>
                                                         </div>

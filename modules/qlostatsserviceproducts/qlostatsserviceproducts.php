@@ -171,9 +171,6 @@ class QloStatsServiceProducts extends ModuleGrid
             case 'services' :
                 $this->setQueryForServices($dateBetween);
                 break;
-            case 'facilities' :
-                $this->setQueryForFacilities($dateBetween);
-                break;
         }
     }
 
@@ -262,79 +259,6 @@ class QloStatsServiceProducts extends ModuleGrid
         $this->option = 'services';
     }
 
-    public function setQueryForFacilities($dateBetween)
-    {
-        $this->query = '(SELECT bd.`name` as `display_name`,
-            ROUND(IFNULL(SUM(bd.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / SUM(
-                IF(bd.`price_calc_method` = '.(int)HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY.',
-                    DATEDIFF(hbd.`date_to`, hbd.`date_from`) * 1,
-                    1
-                )
-            ) as avgPriceSold,
-            IFNULL(SUM(
-                IF(bd.`price_calc_method` = '.(int)HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY.',
-                    DATEDIFF(hbd.`date_to`, hbd.`date_from`) * 1,
-                    1
-                )
-            ), 0) AS totalQuantitySold,
-            ROUND(IFNULL(SUM(bd.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) AS totalPriceSold
-            FROM '._DB_PREFIX_.'htl_booking_demands bd
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (bd.`id_htl_booking` = hbd.`id`)
-            INNER JOIN '._DB_PREFIX_.'orders o ON (hbd.id_order = o.id_order)
-            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
-            AND (
-                EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false).'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false, 'spod').'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
-                )
-            )
-            GROUP BY bd.`name`)
-            UNION
-            (SELECT IFNULL(gdaol.`name`, gdl.`name`) as `display_name`,
-            0 as avgPriceSold,
-            0 AS totalQuantitySold,
-            0 AS totalPriceSold
-            FROM '._DB_PREFIX_.'htl_room_type_global_demand gd
-            LEFT JOIN '._DB_PREFIX_.'htl_room_type_global_demand_lang gdl
-            ON (gd.id_global_demand = gdl.id_global_demand AND gdl.id_lang = '.(int)$this->getLang().')
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option` gdao
-            ON (gd.id_global_demand = gdao.id_global_demand)
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option_lang` gdaol
-            ON (gdao.id_option = gdaol.id_option AND gdaol.id_lang = '.(int)$this->getLang().')
-            WHERE 1
-            GROUP BY gdaol.`name`, gdl.`name`
-            HAVING `display_name` NOT IN (SELECT bd.`name`  FROM '._DB_PREFIX_.'htl_booking_demands bd
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (bd.`id_htl_booking` = hbd.`id`)
-            INNER JOIN '._DB_PREFIX_.'orders o ON (hbd.id_order = o.id_order)
-            WHERE o.valid = 1 AND o.invoice_date BETWEEN '.$dateBetween.'
-            AND (
-                EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                    WHERE hbd.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false).'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order`' . HotelBranchInformation::addHotelRestriction(false, 'spod').'
-                ) OR EXISTS (
-                    SELECT 1
-                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
-                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
-                )
-            )
-            ))';
-
-        $this->option = 'facilities';
-    }
 
     public function getData()
     {
