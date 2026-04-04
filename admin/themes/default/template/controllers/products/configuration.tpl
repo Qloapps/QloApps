@@ -119,9 +119,9 @@
                                 <td class="col-sm-1 center">
                                     {if isset($room_info['id'])}
                                         <a href="#" class="btn btn-default connectedRoomModal" data-toggle="modal"
-                                            data-target="#connectedRoomModal" data-id-room="{$room_info['id']}"
-                                            data-id-hotel="{$room_info['id_hotel']}" data-room-num="{$room_info['room_num']}"
-                                            data-room-type="{$room_info['id_product']}">
+                                            data-target="#connectedRoomModal" data-id-room="{$room_info['id']|intval}"
+                                            data-id-hotel="{$room_info['id_hotel']|intval}" data-room-num="{$room_info['room_num']|escape:'html':'UTF-8'}"
+                                            data-room-type="{$room_info['id_product']|intval}">
                                             <i class="icon-random"></i>
                                         </a>
                                     {/if}
@@ -603,6 +603,7 @@
     var rm_status = {$rm_status|@json_encode};
     var confirmText = "{l s='Are you sure?' js=1}";
     var removeDisableDateText = "{l s='Are you sure you want to remove the selected date range?' js=1}";
+    var selectRoomText = "{l s='Please select a room' js=1}";
     var currentRoomRow = 0;
     $(document).ready(function() {
         var tooltipCounter = 0;
@@ -1972,7 +1973,7 @@
             var hotelId = $('#hotel_id').val();
             let currentRoomType = $('[name="id_product"]').val();
             if (!connectedRoomId) {
-                alert('Please select a room');
+                alert(selectRoomText);
                 return;
             }
             $.ajax({

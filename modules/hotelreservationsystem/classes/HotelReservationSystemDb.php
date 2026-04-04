@@ -558,7 +558,10 @@ class HotelReservationSystemDb
                 `id_room` int(11) NOT NULL,
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id_connected_room`)
+                PRIMARY KEY (`id_connected_room`),
+                UNIQUE KEY `uniq_room_connection` (`id_room_information`, `id_room`),
+                KEY `idx_id_room_information` (`id_room_information`),
+                KEY `idx_id_room` (`id_room`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
         );
     }
@@ -623,7 +626,7 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_room_type_bed_type`,
             `'._DB_PREFIX_.'htl_access`,
             `'._DB_PREFIX_.'htl_settings_link`,
-            `'._DB_PREFIX_.'htl_settings_link_lang`
+            `'._DB_PREFIX_.'htl_settings_link_lang`,
             `'._DB_PREFIX_.'htl_connected_room`'
         );
     }

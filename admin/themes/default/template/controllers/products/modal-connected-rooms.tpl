@@ -33,7 +33,7 @@
             </div>
             <form id="connected_rooms_form">
                 <div class="modal-body">
-                    <input type="hidden" id="connected_room_main_id" name="main_room_id" value="{$main_room_id}">
+                    <input type="hidden" id="connected_room_main_id" name="main_room_id" value="{$main_room_id|intval}">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="icon-plus-circle"></i>
@@ -51,9 +51,9 @@
                                         {foreach from=$htl_not_connected_rooms item=room}
                                             {if !in_array($room.id_product, $types)}
                                                 {append var=types value=$room.id_product}
-                                                <option value="{$room.id_product}"
+                                                <option value="{$room.id_product|intval}"
                                                     {if $room.id_product == $current_roomtype}selected{/if}>
-                                                    {$room.room_type}
+                                                    {$room.room_type|escape:'html':'UTF-8'}
                                                 </option>
                                             {/if}
                                         {/foreach}
@@ -66,8 +66,8 @@
                                     </label>
                                     <select class="form-control" id="connect_room" name="connect_room">
                                         {foreach from=$htl_not_connected_rooms item=room}
-                                                <option value="{$room.id}" class="room-option" data-type="{$room.id_product}">
-                                                    {$room.room_num}
+                                                <option value="{$room.id|intval}" class="room-option" data-type="{$room.id_product|intval}">
+                                                    {$room.room_num|escape:'html':'UTF-8'}
                                                 </option>
                                         {/foreach}
                                     </select>
@@ -105,14 +105,14 @@
                                                 {foreach from=$hotelRooms key=roomType item=rooms}
                                                     {foreach from=$rooms item=row}
                                                         <tr>
-                                                            <td>{$row.connected_room_num}</td>
-                                                            <td>{$row.connected_room_type}</td>
+                                                            <td>{$row.connected_room_num|escape:'html':'UTF-8'}</td>
+                                                            <td>{$row.connected_room_type|escape:'html':'UTF-8'}</td>
                                                             <td class="text-center">
                                                                 <a href="javascript:void(0);" class="delete-connected-room text-danger"
-                                                                    data-connected-id="{$row.id_connected_room}"
-                                                                    data-room-id="{$row.id_room_information}"
-                                                                    data-connected-room-id="{$row.id_room}"
-                                                                    data-hotel-id="{$row.id_hotel}" title="{l s='Remove'}">
+                                                                    data-connected-id="{$row.id_connected_room|intval}"
+                                                                    data-room-id="{$row.id_room_information|intval}"
+                                                                    data-connected-room-id="{$row.id_room|intval}"
+                                                                    data-hotel-id="{$row.id_hotel|intval}" title="{l s='Remove'}">
                                                                     <i class="icon-trash"></i>
                                                                 </a>
                                                             </td>
@@ -144,5 +144,5 @@
             </form>
         </div>
     </div>
-    <input type="hidden" id="hotel_id" value="{$hotel_id}">
+    <input type="hidden" id="hotel_id" value="{$hotel_id|intval}">
 </div>
