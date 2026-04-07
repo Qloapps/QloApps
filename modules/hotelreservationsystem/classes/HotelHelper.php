@@ -1139,101 +1139,57 @@ class HotelHelper
         return true;
     }
 
-    public function createHotelRoomDefaultFeatures()
+    /**
+     * Seed default core room features and values used by room types.
+     *
+     * @return bool
+     */
+    public function seedDefaultDynamicRoomFeatures()
     {
-        $htl_room_ftrs = array(
-            'Wi-Fi' => array(
-                'en' => 'Wi-Fi',
-                'nl' => 'Wi-Fi',
-                'fr' => 'Wi-Fi',
-                'de' => 'Wi-Fi',
-                'ru' => 'Wi-Fi',
-                'es' => 'Wi-Fi'
-            ),
-            'News Paper' => array(
-                'en' => 'News Paper',
-                'nl' => 'Krant',
-                'fr' => 'Journal',
-                'de' => 'Zeitung',
-                'ru' => 'Газета',
-                'es' => 'Periódico'
-            ),
-            'Power BackUp' => array(
-                'en' => 'Power BackUp',
-                'nl' => 'Stroomvoorziening',
-                'fr' => 'Alimentation de secours',
-                'de' => 'Notstromversorgung',
-                'ru' => 'Резервное электропитание',
-                'es' => 'Energía de respaldo'
-            ),
-            'Refrigerator' => array(
-                'en' => 'Refrigerator',
-                'nl' => 'Koelkast',
-                'fr' => 'Réfrigérateur',
-                'de' => 'Kühlschrank',
-                'ru' => 'Холодильник',
-                'es' => 'Refrigerador'
-            ),
-            'Restaurant' => array(
-                'en' => 'Restaurant',
-                'nl' => 'Restaurant',
-                'fr' => 'Restaurant',
-                'de' => 'Restaurant',
-                'ru' => 'Ресторан',
-                'es' => 'Restaurante'
-            ),
-            'Room Service' => array(
-                'en' => 'Room Service',
-                'nl' => 'Roomservice',
-                'fr' => 'Service de chambre',
-                'de' => 'Zimmerservice',
-                'ru' => 'Обслуживание номеров',
-                'es' => 'Servicio de habitaciones'
-            ),
-            'Gym' => array(
-                'en' => 'Gym',
-                'nl' => 'Fitnessruimte',
-                'fr' => 'Salle de sport',
-                'de' => 'Fitnessraum',
-                'ru' => 'Фитнес',
-                'es' => 'Gimnasio'
-            )
-        );
+        $idLang = (int) Configuration::get('PS_LANG_DEFAULT');
+        $position = 0;
 
-        // image value in rf/ folder
-        $pos = 1;
-        $languages = Language::getLanguages(true);
-        foreach ($htl_room_ftrs as $room_ftr_k => $room_ftr_v) {
-            $obj_feature = new Feature();
-            foreach ($languages as $lang) {
-                if (isset($room_ftr_v[$lang['iso_code']])) {
-                    $obj_feature->name[$lang['id_lang']] = $room_ftr_v[$lang['iso_code']];
-                } else {
-                    $obj_feature->name[$lang['id_lang']] = $room_ftr_v['en'];
-                }
+        foreach ($this->getDefaultDynamicRoomFeatures() as $featureName => $featureValues) {
+            $idFeature = (int) Feature::addFeatureImport($featureName, $position);
+            if (!$idFeature) {
+                return false;
             }
-            $obj_feature->position = $pos-1;
-            $obj_feature->save();
-            if ($obj_feature->id) {
-                $obj_feature_value = new FeatureValue();
-                $obj_feature_value->id_feature = $obj_feature->id;
 
-                foreach ($languages as $lang) {
-                    $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.jpg';
-                }
-
-                $obj_feature_value->save();
-                if ($obj_feature_value->id) {
-                    if (file_exists(_PS_IMG_DIR_.'rf/'.$pos.'.jpg')) {
-                        rename(_PS_IMG_DIR_.'rf/'.$pos.'.jpg', _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.jpg');
-                    }
+            foreach ($featureValues as $featureValue) {
+                $idFeatureValue = (int) FeatureValue::addFeatureValueImport($idFeature, $featureValue, null, $idLang, false);
+                if (!$idFeatureValue) {
+                    return false;
                 }
             }
 
-            $pos++;
+            ++$position;
         }
 
         return true;
+    }
+
+    /**
+     * Return the default room feature/value seed set.
+     *
+     * @return array
+     */
+    protected function getDefaultDynamicRoomFeatures()
+    {
+        return array(
+            'Bed Type' => array('Single', 'Double', 'Queen', 'King', 'Super King', 'Twin', 'Bunk Bed', 'Sofa Bed', 'Futon', 'Murphy Bed', 'Water Bed'),
+            'Extra Bed Available' => array('Yes', 'No', 'On Request', 'Chargeable'),
+            'Crib/Cot Available' => array('Yes', 'No', 'On Request'),
+            'Room Size' => array('150 sq ft', '200 sq ft', '300 sq ft', '400 sq ft', '500 sq ft', '600 sq ft', '800 sq ft', '1000+ sq ft'),
+            'View' => array('Sea/Ocean View', 'Garden View', 'City View', 'Pool View', 'Mountain View', 'Lake View', 'River View', 'Park View', 'Courtyard View', 'Desert View', 'No View/Interior'),
+            'Balcony Type' => array('Private Balcony', 'Shared Terrace', 'Juliet Balcony', 'Rooftop Access', 'Patio', 'Veranda', 'None'),
+            'Bathroom Type' => array('Private/Ensuite', 'Shared', 'Jack and Jill (shared between 2 rooms)', 'Half Bath'),
+            'AC Type' => array('Split AC', 'Central AC', 'Window AC', 'No AC', 'Fan Only'),
+            'Heating Type' => array('Central Heating', 'Room Heater', 'Underfloor Heating', 'Fireplace', 'No Heating'),
+            'TV Type' => array('No TV', 'LED TV', 'Smart TV', 'OLED TV'),
+            'Wi-Fi Speed' => array('No Wi-Fi', 'Basic', 'High Speed', 'Premium/Fiber'),
+            'Smoke Detection' => array('Smoke Detector', 'Sprinkler', 'None'),
+            'Smoking Policy' => array('Smoking Not Allowed', 'Smoking Allowed'),
+        );
     }
 
     public function createHotelDefaultBedTypes()

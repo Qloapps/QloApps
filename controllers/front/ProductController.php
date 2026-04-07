@@ -409,19 +409,8 @@ class ProductControllerCore extends FrontController
                         }
                     }
 
-                    $objHotelBedType = new HotelBedType();
-                    if ($bedTypes = $objHotelBedType->getAllBedTypes($this->context->language->id)) {
-                        foreach ($bedTypes as $bedTypeKey => $bedType) {
-                            $bedTypes[$bedTypeKey]['area'] = Tools::ps_round($bedType['width'], 2).' * '.Tools::ps_round($bedType['length'], 2);
-                        }
-
-                        $bedTypes = array_column($bedTypes, null, 'id_bed_type');
-                    }
-
-                    $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-                    if ($selectedBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($this->product->id)) {
-                        $selectedBedTypes = array_column($selectedBedTypes, 'id_bed_type');
-                    }
+                    $roomDynamicFeatures = $this->getRoomDynamicFeatures($this->product->id);
+                    $roomDynamicAmenities = $this->getRoomDynamicAmenities($this->product->id);
 
                     $this->context->smarty->assign(
                         array(
@@ -449,14 +438,12 @@ class ProductControllerCore extends FrontController
                             'hotel_description' => $hotel_info_by_id['description'],
                             'hotel_policies' => $hotel_policies,
                             'hotel_features' => $htl_features,
+                            'room_dynamic_features' => $roomDynamicFeatures,
+                            'room_dynamic_amenities' => $roomDynamicAmenities,
                             'hotel_image_link' => $hotelImageLink,
                             'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
-                            'ftr_img_src' => _PS_IMG_.'rf/',
                             'order_date_restrict' => $order_date_restrict,
                             'PS_SERVICE_PRODUCT_CATEGORY_FILTER' => Configuration::get('PS_SERVICE_PRODUCT_CATEGORY_FILTER'),
-                            'bed_types_info' => $bedTypes,
-                            'selected_bed_types' => $selectedBedTypes,
-                            'dimension_unit' => Configuration::get('WK_DIMENSION_UNIT', $this->context->language->id),
                         )
                     );
 
@@ -578,6 +565,68 @@ class ProductControllerCore extends FrontController
             );
         }
         $this->setTemplate(_PS_THEME_DIR_.'product.tpl');
+    }
+
+    /**
+     * Get assigned dynamic room features for the room detail page.
+     *
+     * @param int $idProduct
+     *
+     * @return array
+     */
+    protected function getRoomDynamicFeatures($idProduct)
+    {
+        $features = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+            SELECT fl.`name` AS `feature_name`, fvl.`value` AS `feature_value`, f.`position`
+            FROM `'._DB_PREFIX_.'feature_product` fp
+            INNER JOIN `'._DB_PREFIX_.'feature` f ON (f.`id_feature` = fp.`id_feature`)
+            INNER JOIN `'._DB_PREFIX_.'feature_lang` fl
+                ON (fl.`id_feature` = fp.`id_feature` AND fl.`id_lang` = '.(int) $this->context->language->id.')
+            INNER JOIN `'._DB_PREFIX_.'feature_value_lang` fvl
+                ON (fvl.`id_feature_value` = fp.`id_feature_value` AND fvl.`id_lang` = '.(int) $this->context->language->id.')
+            WHERE fp.`id_product` = '.(int) $idProduct.'
+            ORDER BY f.`position` ASC, fl.`name` ASC'
+        );
+
+        if (!$features) {
+            return array();
+        }
+
+        $result = array();
+        foreach ($features as $feature) {
+            $result[] = array(
+                'name' => $feature['feature_name'],
+                'value' => $feature['feature_value'],
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get assigned dynamic room amenities for the room detail page.
+     *
+     * @param int $idProduct
+     *
+     * @return array
+     */
+    protected function getRoomDynamicAmenities($idProduct)
+    {
+        $amenities = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+            SELECT hfl.`name`
+            FROM `'._DB_PREFIX_.'htl_room_type_features` hrtf
+            INNER JOIN `'._DB_PREFIX_.'htl_features_lang` hfl
+                ON (hfl.`id` = hrtf.`feature_id` AND hfl.`id_lang` = '.(int) $this->context->language->id.')
+            INNER JOIN `'._DB_PREFIX_.'htl_features` hf ON (hf.`id` = hrtf.`feature_id`)
+            WHERE hrtf.`id_product` = '.(int) $idProduct.'
+            ORDER BY hf.`position` ASC, hfl.`name` ASC'
+        );
+
+        if (!$amenities) {
+            return array();
+        }
+
+        return $amenities;
     }
 
     public function assignRoomServiceProductVars()

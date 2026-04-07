@@ -944,12 +944,6 @@ class AdminProductsControllerCore extends AdminController
                         $id_hotel_new = $room_type_info['id_hotel'];
                     }
 
-                    $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-                    if ($roomTypeBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($id_product_old)) {
-                        $roomTypeBedTypes = array_column($roomTypeBedTypes, 'id_bed_type');
-                        $objHotelRoomTypeBedType->updateRoomTypeBedTypes($roomTypeBedTypes, $product->id);
-                    }
-
                     if ($product->hasAttributes()) {
                         Product::updateDefaultAttribute($product->id);
                     } else {
@@ -1143,32 +1137,160 @@ class AdminProductsControllerCore extends AdminController
         }
 
         if (Validate::isLoadedObject($product = new Product((int)Tools::getValue('id_product')))) {
-            // delete all objects
-            $product->deleteFeatures();
-
-            // add new objects
-            $languages = Language::getLanguages(false);
-            foreach ($_POST as $key => $val) {
-                if (preg_match('/^feature_([0-9]+)_check/i', $key, $match)) {
-                    if ($val) {
-                        $product->addFeaturesToDB($match[1], $val);
-                    } else {
-                        if ($default_value = $this->checkFeatures($languages, $match[1])) {
-                            $id_value = $product->addFeaturesToDB($match[1], 0, 1);
-                            foreach ($languages as $language) {
-                                if ($cust = Tools::getValue('custom_'.$match[1].'_'.(int)$language['id_lang'])) {
-                                    $product->addFeaturesCustomToDB($id_value, (int)$language['id_lang'], $cust);
-                                } else {
-                                    $product->addFeaturesCustomToDB($id_value, (int)$language['id_lang'], $default_value);
-                                }
-                            }
-                        }
-                    }
-                }
+            if (!$this->saveRoomTypeFeatureAssignments($product)) {
+                $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
             }
         } else {
             $this->errors[] = Tools::displayError('A room type must be created before adding features.');
         }
+    }
+
+    /**
+     * Save assigned core feature values for a room type.
+     *
+     * @param Product $product
+     *
+     * @return bool
+     */
+    protected function saveRoomTypeFeatureAssignments(Product $product)
+    {
+        $product->deleteFeatures();
+
+        $languages = Language::getLanguages(false);
+        foreach ($_POST as $key => $val) {
+            if (preg_match('/^feature_([0-9]+)_check/i', $key, $match)) {
+                if ($val) {
+                    $product->addFeaturesToDB($match[1], $val);
+                } elseif ($default_value = $this->checkFeatures($languages, $match[1])) {
+                    $id_value = $product->addFeaturesToDB($match[1], 0, 1);
+                    foreach ($languages as $language) {
+                        if ($cust = Tools::getValue('custom_'.$match[1].'_'.(int)$language['id_lang'])) {
+                            $product->addFeaturesCustomToDB($id_value, (int)$language['id_lang'], $cust);
+                        } else {
+                            $product->addFeaturesCustomToDB($id_value, (int)$language['id_lang'], $default_value);
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Save selected room type amenities.
+     *
+     * @param int $idProduct
+     *
+     * @return bool
+     */
+    protected function saveRoomTypeAmenities($idProduct)
+    {
+        $idProduct = (int) $idProduct;
+        $selectedAmenities = Tools::getValue('room_type_amenities', array());
+        if (!is_array($selectedAmenities)) {
+            $selectedAmenities = array($selectedAmenities);
+        }
+
+        $selectedAmenities = array_map('intval', $selectedAmenities);
+        $selectedAmenities = array_values(array_unique(array_filter($selectedAmenities)));
+
+        if (!Db::getInstance()->delete('htl_room_type_features', '`id_product` = '.$idProduct)) {
+            return false;
+        }
+
+        foreach ($selectedAmenities as $idAmenity) {
+            if (!Db::getInstance()->insert('htl_room_type_features', array(
+                'id_product' => $idProduct,
+                'feature_id' => (int) $idAmenity,
+                'date_add' => date('Y-m-d H:i:s'),
+                'date_upd' => date('Y-m-d H:i:s'),
+            ))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Get selected room type amenity ids.
+     *
+     * @param int $idProduct
+     *
+     * @return array
+     */
+    protected function getSelectedRoomTypeAmenityIds($idProduct)
+    {
+        $selectedAmenities = Db::getInstance()->executeS(
+            'SELECT `feature_id`
+            FROM `'._DB_PREFIX_.'htl_room_type_features`
+            WHERE `id_product` = '.(int) $idProduct
+        );
+
+        if (!$selectedAmenities) {
+            return array();
+        }
+
+        return array_map('intval', array_column($selectedAmenities, 'feature_id'));
+    }
+
+    /**
+     * Prepare amenities tree data for room type form.
+     *
+     * @param int $idProduct
+     *
+     * @return array
+     */
+    protected function getRoomTypeAmenitiesTree($idProduct)
+    {
+        $selectedAmenityRows = array();
+        foreach ($this->getSelectedRoomTypeAmenityIds($idProduct) as $selectedAmenityId) {
+            $selectedAmenityRows[] = array('feature_id' => $selectedAmenityId);
+        }
+
+        $objHotelFeatures = new HotelFeatures();
+        $roomTypeAmenities = $objHotelFeatures->HotelBranchSelectedFeaturesArray(
+            $selectedAmenityRows,
+            $this->context->language->id
+        );
+
+        return $roomTypeAmenities ? $roomTypeAmenities : array();
+    }
+
+    /**
+     * Prepare grouped core features and values for the room type feature tree.
+     *
+     * @param Product $product
+     *
+     * @return array
+     */
+    protected function getRoomTypeFeatureTree(Product $product)
+    {
+        $features = Feature::getFeatures(
+            $this->context->language->id,
+            (Shop::isFeatureActive() && Shop::getContext() == Shop::CONTEXT_SHOP)
+        );
+        $selectedFeatureValues = array();
+        foreach ($product->getFeatures() as $productFeature) {
+            $selectedFeatureValues[(int) $productFeature['id_feature']] = (int) $productFeature['id_feature_value'];
+        }
+
+        foreach ($features as &$feature) {
+            $feature['current_item'] = isset($selectedFeatureValues[(int) $feature['id_feature']])
+                ? $selectedFeatureValues[(int) $feature['id_feature']]
+                : 0;
+            $feature['featureValues'] = FeatureValue::getFeatureValuesWithLang(
+                $this->context->language->id,
+                (int) $feature['id_feature']
+            );
+
+            foreach ($feature['featureValues'] as &$featureValue) {
+                $featureValue['selected'] = ((int) $feature['current_item'] === (int) $featureValue['id_feature_value']);
+            }
+        }
+
+        return $features;
     }
 
     /**
@@ -1924,14 +2046,20 @@ class AdminProductsControllerCore extends AdminController
         $this->copyFromPost($this->object, $this->table);
         $this->object->booking_product = true;
         if ($this->object->add()) {
-            $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-            $objHotelRoomTypeBedType->updateRoomTypeBedTypes(Tools::getValue('id_bed_types'), $this->object->id);
             // associateroom type to hotel
             // if ($this->object->is_virtual) {
 
             // }
 
             $this->assignRoomType($this->object);
+            if ($this->isTabSubmitted('Informations') && !$this->saveRoomTypeAmenities($this->object->id)) {
+                $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
+                return false;
+            }
+            if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatureAssignments($this->object)) {
+                $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
+                return false;
+            }
 
             PrestaShopLogger::addLog(sprintf($this->l('%s addition', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$this->object->id, true, (int)$this->context->employee->id);
 
@@ -2109,8 +2237,14 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if ($object->update()) {
-                    $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-                    $objHotelRoomTypeBedType->updateRoomTypeBedTypes(Tools::getValue('id_bed_types'), $object->id);
+                    if ($this->isTabSubmitted('Informations') && !$this->saveRoomTypeAmenities($object->id)) {
+                        $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
+                        return false;
+                    }
+                    if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatureAssignments($object)) {
+                        $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
+                        return false;
+                    }
 
                     // update position in category
                     $object->setPositionInCategory(Tools::getValue('category_position'));
@@ -2133,9 +2267,6 @@ class AdminProductsControllerCore extends AdminController
                         }
                         if ($this->isTabSubmitted('Suppliers')) {
                             // $this->processSuppliers();
-                        }
-                        if ($this->isTabSubmitted('Features')) {
-                            $this->processFeatures();
                         }
                         if ($this->isTabSubmitted('Combinations')) {
                             $this->processProductAttribute();
@@ -4534,14 +4665,14 @@ class AdminProductsControllerCore extends AdminController
             $data->assign('htl_full_info', $hotelFullInfo);
         }
 
-        $objHotelBedType = new HotelBedType();
-        $bedTypes = $objHotelBedType->getAllBedTypes($this->context->language->id);
-        $data->assign('bed_types_info', $bedTypes);
-        $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-        if ($selectedBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($product->id)) {
-            $selectedBedTypes = array_column($selectedBedTypes, 'id_bed_type');
-            $data->assign('selected_bed_types', $selectedBedTypes);
+        $roomTypeAmenities = $this->getRoomTypeAmenitiesTree((int) $product->id);
+        if (!is_array($roomTypeAmenities) || empty($roomTypeAmenities)) {
+            $roomTypeAmenities = array();
         }
+
+        $data->assign('bed_types_info', array());
+        $data->assign('selected_bed_types', array());
+        $data->assign('room_type_amenities', $roomTypeAmenities);
 
         $this->tpl_form_vars['product'] = $product;
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -4784,36 +4915,7 @@ class AdminProductsControllerCore extends AdminController
         } else {
             if ($obj->id) {
                 if ($this->product_exists_in_shop) {
-                    $features = Feature::getFeatures($this->context->language->id, (Shop::isFeatureActive() && Shop::getContext() == Shop::CONTEXT_SHOP));
-
-                    foreach ($features as $k => $tab_features) {
-                        $features[$k]['current_item'] = false;
-                        $features[$k]['val'] = array();
-
-                        $custom = true;
-                        foreach ($obj->getFeatures() as $tab_products) {
-                            if ($tab_products['id_feature'] == $tab_features['id_feature']) {
-                                $features[$k]['current_item'] = $tab_products['id_feature_value'];
-                            }
-                        }
-
-                        $features[$k]['featureValues'] = FeatureValue::getFeatureValuesWithLang($this->context->language->id, (int)$tab_features['id_feature']);
-                        if (count($features[$k]['featureValues'])) {
-                            foreach ($features[$k]['featureValues'] as $value) {
-                                if ($features[$k]['current_item'] == $value['id_feature_value']) {
-                                    $custom = false;
-                                }
-                            }
-                        }
-
-                        if ($custom) {
-                            $feature_values_lang = FeatureValue::getFeatureValueLang($features[$k]['current_item']);
-                            foreach ($feature_values_lang as $feature_value) {
-                                $features[$k]['val'][$feature_value['id_lang']] = $feature_value;
-                            }
-                        }
-                    }
-
+                    $features = $this->getRoomTypeFeatureTree($obj);
                     $data->assign('available_features', $features);
                     $data->assign('product', $obj);
                     $data->assign('link', $this->context->link);

@@ -41,6 +41,10 @@ class HotelBedType extends ObjectModel
 
     public function getAllBedTypes($idLang)
     {
+        if (!$this->hasLegacyBedTypeTables()) {
+            return array();
+        }
+
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
@@ -54,9 +58,25 @@ class HotelBedType extends ObjectModel
 
     public function delete()
     {
+        if (!$this->hasLegacyBedTypeTables()) {
+            return true;
+        }
+
         $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
         $objHotelRoomTypeBedType->deleteRoomTypeBedTypes($this->id);
 
         return parent::delete();
+    }
+
+    /**
+     * Checks whether the deprecated bed type schema still exists.
+     *
+     * @return bool
+     */
+    protected function hasLegacyBedTypeTables()
+    {
+        return (bool) Db::getInstance()->getValue(
+            'SHOW TABLES LIKE \'' . pSQL(_DB_PREFIX_.$this->table) . '\''
+        );
     }
 }

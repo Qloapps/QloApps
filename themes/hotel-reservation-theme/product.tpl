@@ -262,34 +262,16 @@
 															</div>
 														{/if}
 													{/block}
-													{block name='product_info_tab_room_bed_type'}
-														{if isset($selected_bed_types) && $selected_bed_types && isset($bed_types_info) && $bed_types_info}
-															<div class="info_margin_div">
-																<div class="room_info_heading">
-																	<span>{l s='Bed Types'}</span>
-																</div>
-																<div class="room_info_content">
-																	{foreach $selected_bed_types as $selected_bed_type}
-																		{if isset($bed_types_info[$selected_bed_type])}
-																			<p>{$bed_types_info[$selected_bed_type]['name']}: {$bed_types_info[$selected_bed_type]['area']} {l s='sq.'}{$dimension_unit}</p>
-																		{/if}
-																	{/foreach}
-																</div>
-															</div>
-														{/if}
-													{/block}
 													{block name='product_info_tab_room_features'}
-														{if isset($features) && $features}
+														{if isset($room_dynamic_features) && $room_dynamic_features}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
 																	<span>{l s='Room Features'}</span>
 																</div>
 																<div class="room_info_content row">
-																	{foreach from=$features key=ftr_k item=ftr_v}
-																		<div class="col-md-3 col-sm-4 col-xs-6">
-																			<div class="rm_ftr_wrapper" title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" >
-																				<img src="{$link->getMediaLink("`$ftr_img_src|escape:'html':'UTF-8'`{$ftr_v.value|escape:'html':'UTF-8'}")}">  {$ftr_v.name|escape:'html':'UTF-8'}
-																			</div>
+																	{foreach from=$room_dynamic_features item=feature}
+																		<div class="col-sm-6 col-xs-12">
+																			<p><strong>{$feature.name|escape:'html':'UTF-8'}:</strong> {$feature.value|escape:'html':'UTF-8'}</p>
 																		</div>
 																	{/foreach}
 																</div>
@@ -299,14 +281,14 @@
 													{* Block for booking products *}
 													{if isset($id_hotel) && $id_hotel}
 														{block name='product_info_tab_hotel_features'}
-															{if isset($hotel_features) && $hotel_features}
+															{if isset($room_dynamic_amenities) && $room_dynamic_amenities}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Features'}</span>
+																		<span>{l s='Amenities'}</span>
 																	</div>
 																	<div class="room_info_content row">
-																		{foreach from=$hotel_features key=ftr_k item=ftr_v}
-																			<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$ftr_v|escape:'html':'UTF-8'}</div>
+																		{foreach from=$room_dynamic_amenities item=amenity}
+																			<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$amenity.name|escape:'html':'UTF-8'}</div>
 																		{/foreach}
 																	</div>
 																</div>

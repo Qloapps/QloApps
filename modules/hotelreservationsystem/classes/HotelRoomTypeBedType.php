@@ -37,6 +37,10 @@ class HotelRoomTypeBedType extends ObjectModel
 
     public function getRoomTypeBedTypes($idProduct)
     {
+        if (!$this->hasLegacyBedTypeTable()) {
+            return array();
+        }
+
         $sql = 'SELECT * FROM `'._DB_PREFIX_.$this->table.'`
             WHERE `id_product` ='.(int) $idProduct;
 
@@ -45,6 +49,10 @@ class HotelRoomTypeBedType extends ObjectModel
 
     public function updateRoomTypeBedTypes($idBedTypes, $idProduct)
     {
+        if (!$this->hasLegacyBedTypeTable()) {
+            return true;
+        }
+
         $res = true;
         if ($roomTypeBedTypes = $this->getRoomTypeBedTypes($idProduct)) {
             $roomTypeBedTypes = array_column($roomTypeBedTypes, 'id_room_type_bed_type', 'id_bed_type');
@@ -74,6 +82,10 @@ class HotelRoomTypeBedType extends ObjectModel
 
     public function deleteRoomTypeBedTypesById($idRoomTypeBedTypes)
     {
+        if (!$this->hasLegacyBedTypeTable()) {
+            return true;
+        }
+
         $res = true;
         if ($idRoomTypeBedTypes) {
             foreach ($idRoomTypeBedTypes as $idRoomTypeBedType) {
@@ -87,9 +99,25 @@ class HotelRoomTypeBedType extends ObjectModel
 
     public function deleteRoomTypeBedTypes($idBedType = false, $idProduct = false)
     {
+        if (!$this->hasLegacyBedTypeTable()) {
+            return true;
+        }
+
         return Db::getInstance()->delete(
             $this->table,
             ' 1 '.($idBedType ? ' AND `id_bed_type`='.(int) $idBedType : '').($idProduct ? ' AND `id_product`='.(int) $idProduct : '')
+        );
+    }
+
+    /**
+     * Checks whether the deprecated room-type bed mapping table still exists.
+     *
+     * @return bool
+     */
+    protected function hasLegacyBedTypeTable()
+    {
+        return (bool) Db::getInstance()->getValue(
+            'SHOW TABLES LIKE \'' . pSQL(_DB_PREFIX_.$this->table) . '\''
         );
     }
 
