@@ -1776,7 +1776,6 @@ class HotelHelper
         $roomTypeDemoDataLang = array(
             array(
                 'price' => 1000,
-                'id_bed_types' => array(4),
                 'en' => array(
                     'name' => 'General Rooms',
                     'description_short' => 'Our General Rooms offer space and comfort with multiple bedrooms and a cozy living area. Enjoy flat-screen TVs, complimentary Wi-Fi, and a kitchenette for a perfect family getaway.',
@@ -1810,7 +1809,6 @@ class HotelHelper
             ),
             array(
                 'price' => 1500,
-                'id_bed_types' => array(4, 5),
                 'en' => array(
                     'name' => 'Delux Rooms',
                     'description_short' => 'Enjoy lake views from our Deluxe Rooms with a king-sized bed, elegant furnishings, and a spacious sitting area. Perfect for guests seeking comfort, luxury, and modern amenities.',
@@ -1844,7 +1842,6 @@ class HotelHelper
             ),
             array(
                 'price' => 2000,
-                'id_bed_types' => array(5, 6),
                 'en' => array(
                     'name' => 'Executive Rooms',
                     'description_short' => 'Indulge in our Executive Rooms, featuring separate living and sleeping areas, a luxurious bathroom, and exclusive lounge access. Ideal for business travelers seeking privacy',
@@ -1878,7 +1875,6 @@ class HotelHelper
             ),
             array(
                 'price' => 2500,
-                'id_bed_types' => array(6, 8),
                 'en' => array(
                     'name' => 'Luxury Rooms',
                     'description_short' => 'Retreat to tranquility in our Luxury Rooms with expansive views. Featuring a queen-sized bed, workspace, and serene decor, perfect for business and leisure travelers alike.',
@@ -1912,7 +1908,6 @@ class HotelHelper
             ),
         );
 
-        $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
         $languages = Language::getLanguages(true);
         foreach ($roomTypeDemoDataLang as $key => $roomTypeData) {
             // Add Product
@@ -2033,16 +2028,8 @@ class HotelHelper
 
             $htl_rm_type->save();
 
-            // Add features to the product
-            $ftr_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
-            $ftr_val_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
-            foreach ($ftr_arr as $key_htl_ftr => $val_htl_ftr) {
-                $product->addFeaturesToDB($val_htl_ftr, $ftr_val_arr[$key_htl_ftr]);
-            }
-
             // save advance payment information
             $this->saveAdvancedPaymentInfo($product_id);
-            $objHotelRoomTypeBedType->updateRoomTypeBedTypes($roomTypeData['id_bed_types'], $product_id);
         }
     }
 

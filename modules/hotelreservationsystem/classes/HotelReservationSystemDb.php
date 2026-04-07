@@ -561,41 +561,6 @@ class HotelReservationSystemDb
         return true;
     }
 
-    /**
-     * Applies the schema changes required for the dynamic room feature migration.
-     *
-     * @return bool
-     */
-    public function migrateToDynamicRoomFeatureSchema()
-    {
-        $sql = array(
-            'UPDATE `'._DB_PREFIX_.'htl_branch_features` SET `feature_id` = NULL WHERE `feature_id` = ""',
-            'ALTER TABLE `'._DB_PREFIX_.'htl_branch_features`
-                MODIFY `feature_id` int(10) unsigned DEFAULT NULL',
-            'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'htl_room_type_features` (
-                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                `id_product` int(10) unsigned NOT NULL,
-                `feature_id` int(10) unsigned NOT NULL,
-                `date_add` datetime NOT NULL,
-                `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id`),
-                KEY `id_product` (`id_product`),
-                KEY `feature_id` (`feature_id`)
-            ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 AUTO_INCREMENT=1',
-            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'htl_room_type_bed_type`',
-            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'htl_bed_type_lang`',
-            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'htl_bed_type`',
-        );
-
-        foreach ($sql as $query) {
-            if (!Db::getInstance()->execute($query)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public function dropTables()
     {
         return Db::getInstance()->execute(

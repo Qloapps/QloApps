@@ -603,7 +603,6 @@ class HotelReservationSystem extends Module
         $objHtlHelper = new HotelHelper();
         if (!parent::install()
             || !$objModuleDb->createTables()
-            || !$objModuleDb->migrateToDynamicRoomFeatureSchema()
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
             || !$objHtlHelper->insertDefaultHotelEntries()
