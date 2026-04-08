@@ -107,6 +107,7 @@ class AdminProductsControllerCore extends AdminController
             'Images' => $this->l('Images'),
             'ServiceProduct' => $this->l('Service Products'),
             // 'Associations' => $this->l('Associations'),
+            'Amenities' => $this->l('Amenities'),
             'Features' => $this->l('Features'),
             'Configuration' => $this->l('Rooms'),
             'Occupancy' => $this->l('Occupancy'),
@@ -121,9 +122,10 @@ class AdminProductsControllerCore extends AdminController
                 'Seo' => 2,
                 // 'Associations' => 3,
                 'Images' => 4,
-                'Features' => 5,
-                'Configuration' => 6,
-                'Occupancy' => 7,
+                'Amenities' => 5,
+                'Features' => 6,
+                'Configuration' => 7,
+                'Occupancy' => 8,
                 'ServiceProduct' => 9,
                 'LengthOfStay' => 10,
                 'AdditionalFacilities' => 11,
@@ -1156,20 +1158,29 @@ class AdminProductsControllerCore extends AdminController
     {
         $product->deleteFeatures();
 
-        $languages = Language::getLanguages(false);
-        foreach ($_POST as $key => $val) {
-            if (preg_match('/^feature_([0-9]+)_check/i', $key, $match)) {
-                if ($val) {
-                    $product->addFeaturesToDB($match[1], $val);
-                } elseif ($default_value = $this->checkFeatures($languages, $match[1])) {
-                    $id_value = $product->addFeaturesToDB($match[1], 0, 1);
-                    foreach ($languages as $language) {
-                        if ($cust = Tools::getValue('custom_'.$match[1].'_'.(int)$language['id_lang'])) {
-                            $product->addFeaturesCustomToDB($id_value, (int)$language['id_lang'], $cust);
-                        } else {
-                            $product->addFeaturesCustomToDB($id_value, (int)$language['id_lang'], $default_value);
-                        }
-                    }
+        $featureValues = Tools::getValue('feature_values', array());
+        if (!is_array($featureValues) || empty($featureValues)) {
+            return true;
+        }
+
+        foreach ($featureValues as $idFeature => $selectedValues) {
+            $idFeature = (int) $idFeature;
+            if (!$idFeature) {
+                continue;
+            }
+
+            if (!is_array($selectedValues)) {
+                $selectedValues = array($selectedValues);
+            }
+
+            $selectedValues = array_values(array_unique(array_map('intval', $selectedValues)));
+            foreach ($selectedValues as $idFeatureValue) {
+                if ($idFeatureValue) {
+                    Db::getInstance()->insert('feature_product', array(
+                        'id_feature' => (int) $idFeature,
+                        'id_product' => (int) $product->id,
+                        'id_feature_value' => (int) $idFeatureValue
+                    ));
                 }
             }
         }
@@ -1255,7 +1266,31 @@ class AdminProductsControllerCore extends AdminController
             $this->context->language->id
         );
 
-        return $roomTypeAmenities ? $roomTypeAmenities : array();
+        if (!$roomTypeAmenities) {
+            return array();
+        }
+
+        foreach ($roomTypeAmenities as $idAmenityGroup => &$amenityGroup) {
+            $amenityGroup['value'] = (int) $idAmenityGroup;
+            $amenityGroup['input_name'] = 'room_type_amenity_parents';
+
+            $selectedAmenities = 0;
+            if (!empty($amenityGroup['children'])) {
+                foreach ($amenityGroup['children'] as &$amenity) {
+                    $amenity['value'] = (int) $amenity['id'];
+                    $amenity['input_name'] = 'room_type_amenities';
+                    if (!empty($amenity['selected'])) {
+                        ++$selectedAmenities;
+                    }
+                }
+
+                if ($selectedAmenities === count($amenityGroup['children'])) {
+                    $amenityGroup['selected'] = true;
+                }
+            }
+        }
+
+        return $roomTypeAmenities;
     }
 
     /**
@@ -1273,20 +1308,31 @@ class AdminProductsControllerCore extends AdminController
         );
         $selectedFeatureValues = array();
         foreach ($product->getFeatures() as $productFeature) {
-            $selectedFeatureValues[(int) $productFeature['id_feature']] = (int) $productFeature['id_feature_value'];
+            $selectedFeatureValues[(int) $productFeature['id_feature']][] = (int) $productFeature['id_feature_value'];
         }
 
         foreach ($features as &$feature) {
-            $feature['current_item'] = isset($selectedFeatureValues[(int) $feature['id_feature']])
-                ? $selectedFeatureValues[(int) $feature['id_feature']]
-                : 0;
-            $feature['featureValues'] = FeatureValue::getFeatureValuesWithLang(
+            $featureValues = FeatureValue::getFeatureValuesWithLang(
                 $this->context->language->id,
                 (int) $feature['id_feature']
             );
+            $feature['value'] = (int) $feature['id_feature'];
+            $feature['input_name'] = 'feature_value_parents';
+            $feature['children'] = array();
+            $selectedValues = isset($selectedFeatureValues[(int) $feature['id_feature']])
+                ? $selectedFeatureValues[(int) $feature['id_feature']]
+                : array();
 
-            foreach ($feature['featureValues'] as &$featureValue) {
-                $featureValue['selected'] = ((int) $feature['current_item'] === (int) $featureValue['id_feature_value']);
+            foreach ($featureValues as $featureValue) {
+                $featureValue['name'] = $featureValue['value'];
+                $featureValue['value'] = (int) $featureValue['id_feature_value'];
+                $featureValue['input_name'] = 'feature_values['.(int) $feature['id_feature'].']';
+                $featureValue['selected'] = in_array((int) $featureValue['id_feature_value'], $selectedValues);
+                $feature['children'][] = $featureValue;
+            }
+
+            if ($feature['children'] && count($selectedValues) === count($feature['children'])) {
+                $feature['selected'] = true;
             }
         }
 
@@ -2052,7 +2098,7 @@ class AdminProductsControllerCore extends AdminController
             // }
 
             $this->assignRoomType($this->object);
-            if ($this->isTabSubmitted('Informations') && !$this->saveRoomTypeAmenities($this->object->id)) {
+            if ($this->isTabSubmitted('Amenities') && !$this->saveRoomTypeAmenities($this->object->id)) {
                 $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
                 return false;
             }
@@ -2237,7 +2283,7 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if ($object->update()) {
-                    if ($this->isTabSubmitted('Informations') && !$this->saveRoomTypeAmenities($object->id)) {
+                    if ($this->isTabSubmitted('Amenities') && !$this->saveRoomTypeAmenities($object->id)) {
                         $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
                         return false;
                     }
@@ -4665,15 +4711,6 @@ class AdminProductsControllerCore extends AdminController
             $data->assign('htl_full_info', $hotelFullInfo);
         }
 
-        $roomTypeAmenities = $this->getRoomTypeAmenitiesTree((int) $product->id);
-        if (!is_array($roomTypeAmenities) || empty($roomTypeAmenities)) {
-            $roomTypeAmenities = array();
-        }
-
-        $data->assign('bed_types_info', array());
-        $data->assign('selected_bed_types', array());
-        $data->assign('room_type_amenities', $roomTypeAmenities);
-
         $this->tpl_form_vars['product'] = $product;
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
@@ -4916,7 +4953,15 @@ class AdminProductsControllerCore extends AdminController
             if ($obj->id) {
                 if ($this->product_exists_in_shop) {
                     $features = $this->getRoomTypeFeatureTree($obj);
-                    $data->assign('available_features', $features);
+                    if ($features) {
+                        $tree = new HelperTree('room-type-features-tree', $features);
+                        $tree->setShowCollapseExpandButton(true)
+                            ->setUseCheckBox(true)
+                            ->setAutoSelectChildren(true)
+                            ->setUseBulkActions(true)
+                            ->setHeaderTemplate('tree_header_room.tpl');
+                        $data->assign('room_type_features_tree', $tree->render());
+                    }
                     $data->assign('product', $obj);
                     $data->assign('link', $this->context->link);
                     $data->assign('default_form_language', $this->default_form_language);
@@ -4927,6 +4972,48 @@ class AdminProductsControllerCore extends AdminController
                 $this->displayWarning($this->l('You must save this room type before adding features.'));
             }
         }
+        $this->tpl_form_vars['custom_form'] = $data->fetch();
+    }
+
+    /**
+     * Prepare the amenities form tab for a room type.
+     *
+     * @param Product $obj
+     *
+     * @throws Exception
+     * @throws SmartyException
+     */
+    public function initFormAmenities($obj)
+    {
+        if (!$this->default_form_language) {
+            $this->getLanguages();
+        }
+
+        $data = $this->createTemplate($this->tpl_form);
+        $data->assign('default_form_language', $this->default_form_language);
+        $data->assign('languages', $this->_languages);
+        $data->assign('link', $this->context->link);
+        $data->assign('product', $obj);
+
+        if ($obj->id) {
+            if ($this->product_exists_in_shop) {
+                $roomTypeAmenities = $this->getRoomTypeAmenitiesTree((int) $obj->id);
+                if ($roomTypeAmenities) {
+                    $tree = new HelperTree('room-type-amenities-tree', $roomTypeAmenities);
+                    $tree->setShowCollapseExpandButton(true)
+                        ->setUseCheckBox(true)
+                        ->setAutoSelectChildren(true)
+                        ->setUseBulkActions(true)
+                        ->setHeaderTemplate('tree_header_room.tpl');
+                    $data->assign('room_type_amenities_tree', $tree->render());
+                }
+            } else {
+                $this->displayWarning($this->l('You must save the room type in this shop before adding amenities.'));
+            }
+        } else {
+            $this->displayWarning($this->l('You must save this room type before adding amenities.'));
+        }
+
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
 

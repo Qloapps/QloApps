@@ -465,47 +465,6 @@
 		</div>
 	{/if}
 
-	<div class="form-group" id="room_type_amenities_selection">
-		<label class="control-label col-sm-3">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select the amenities available for this room type.'}">
-				{l s='Amenities'}
-			</span>
-		</label>
-		<div class="col-sm-9">
-			{if isset($room_type_amenities) && $room_type_amenities}
-				<div class="panel panel-default">
-					<div class="panel-body">
-						{foreach from=$room_type_amenities item=amenity_group}
-							<div class="room-type-amenity-group" style="margin-bottom:15px;">
-								<div class="room-type-amenity-parent" style="font-weight:600; margin-bottom:8px;">
-									{$amenity_group.name|escape:'html':'UTF-8'}
-								</div>
-								{if isset($amenity_group.children) && $amenity_group.children}
-									<div class="row">
-										{foreach from=$amenity_group.children item=amenity}
-											<div class="col-lg-4 col-md-6">
-												<div class="checkbox">
-													<label>
-														<input type="checkbox" name="room_type_amenities[]" value="{$amenity.id|intval}" {if isset($amenity.selected) && $amenity.selected}checked="checked"{/if} />
-														{$amenity.name|escape:'html':'UTF-8'}
-													</label>
-												</div>
-											</div>
-										{/foreach}
-									</div>
-								{/if}
-							</div>
-						{/foreach}
-					</div>
-				</div>
-			{else}
-				<div class="alert alert-info">
-					{l s='No amenities have been defined yet.'}
-				</div>
-			{/if}
-		</div>
-	</div>
-
 	{* <div class="form-group">
 		<label class="control-label col-lg-3" for="tags_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip"

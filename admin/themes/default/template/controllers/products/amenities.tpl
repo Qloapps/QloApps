@@ -24,34 +24,34 @@
 *}
 
 {if isset($product->id)}
-<div id="product-features" class="panel product-tab">
-	<input type="hidden" name="submitted_tabs[]" value="Features" />
-	<h3>{l s='Assign features to this room type'}</h3>
+<div id="product-amenities" class="panel product-tab">
+	<input type="hidden" name="submitted_tabs[]" value="Amenities" />
+	<h3>{l s='Amenities'}</h3>
 
 	<div class="alert alert-info">
-		{l s='Select one or more values for each room feature using the tree below.'}
+		{l s='Select the amenities available for this room type using the tree below.'}
+		<a href="{$link->getAdminLink('AdminHotelFeatures')|escape:'html':'UTF-8'}" class="btn btn-link confirm_leave button" target="_blank">
+			<i class="icon-plus-sign"></i> {l s='Manage amenities'} <i class="icon-external-link-sign"></i>
+		</a>
 	</div>
 
-	{if isset($room_type_features_tree) && $room_type_features_tree}
+	{if isset($room_type_amenities_tree) && $room_type_amenities_tree}
 		<div class="form-group">
-			<label for="room-type-features-tree" class="control-label col-sm-3">
-				<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select the feature values available for this room type.'}">
-					{l s='Select feature values'}
+			<label for="room-type-amenities-tree" class="control-label col-sm-3">
+				<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select the amenities available for this room type.'}">
+					{l s='Select amenities'}
 				</span>
 			</label>
 			<div class="col-sm-7 room_features_tree">
-				{$room_type_features_tree}
+				{$room_type_amenities_tree}
 			</div>
 		</div>
 	{else}
 		<div class="alert alert-warning">
-			<i class="icon-warning-sign"></i> {l s='No features have been defined'}
+			<i class="icon-warning-sign"></i> {l s='No amenities have been defined yet.'}
 		</div>
 	{/if}
 
-	<a href="{$link->getAdminLink('AdminFeatures')|escape:'html':'UTF-8'}&amp;addfeature" class="btn btn-link confirm_leave button">
-		<i class="icon-plus-sign"></i> {l s='Add a new feature'} <i class="icon-external-link-sign"></i>
-	</a>
 	<div class="panel-footer">
 		<a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}{if isset($smarty.request.page) && $smarty.request.page > 1}&amp;submitFilterproduct={$smarty.request.page|intval}{/if}" class="btn btn-default"><i class="process-icon-cancel"></i> {l s='Cancel'}</a>
 		<button type="submit" name="submitAddproduct" class="btn btn-default pull-right" disabled="disabled"><i class="process-icon-loading"></i> {l s='Save'}</button>

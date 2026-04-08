@@ -558,6 +558,20 @@ class HotelReservationSystemDb
                 }
             }
         }
+
+        // Drop the restrictive primary key and add a multi-select capable primary key.
+        try {
+            Db::getInstance()->execute('ALTER TABLE `'._DB_PREFIX_.'feature_product` DROP PRIMARY KEY');
+        } catch (Exception $e) {
+        }
+
+        try {
+            Db::getInstance()->execute(
+                'ALTER TABLE `'._DB_PREFIX_.'feature_product` ADD PRIMARY KEY (`id_feature`, `id_product`, `id_feature_value`)'
+            );
+        } catch (Exception $e) {
+        }
+
         return true;
     }
 
