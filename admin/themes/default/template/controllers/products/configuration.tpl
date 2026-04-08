@@ -2109,13 +2109,17 @@
                 success: function(response) {
                     if (response.success) {
                         showSuccessMessage(response.message);
-                        $row.remove();
-                        var $modal = $('#connectedRoomModal');
-                        var $tbody = $modal.find('#connected_rooms_tbody');
-                        var hasConnectedRows = $tbody.find('.connected-room-row').length > 0;
-                        if (!hasConnectedRows) {
-                            $modal.find('#connected_rooms_table_wrapper').addClass('hide');
-                            $modal.find('#connected_rooms_empty_state').removeClass('hide').show();
+                        if (response.html) {
+                            $('#connectedRoomModal .modal-content').replaceWith($(response.html).find('.modal-content'));
+                        } else {
+                            $row.remove();
+                            var $modal = $('#connectedRoomModal');
+                            var $tbody = $modal.find('#connected_rooms_tbody');
+                            var hasConnectedRows = $tbody.find('.connected-room-row').length > 0;
+                            if (!hasConnectedRows) {
+                                $modal.find('#connected_rooms_table_wrapper').addClass('hide');
+                                $modal.find('#connected_rooms_empty_state').removeClass('hide').show();
+                            }
                         }
                         // update connected rooms count badge in list
                         var $icon = $('.connectedRoomModal[data-id-room="' + roomId + '"]').find('.connected-room-count');
