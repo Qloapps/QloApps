@@ -122,7 +122,12 @@
                                             data-target="#connectedRoomModal" data-id-room="{$room_info['id']|intval}"
                                             data-id-hotel="{$room_info['id_hotel']|intval}" data-room-num="{$room_info['room_num']|escape:'html':'UTF-8'}"
                                             data-room-type="{$room_info['id_product']|intval}">
-                                            <i class="icon-random"></i>
+                                            <span class="connected-room-icon-wrapper">
+                                                <i class="icon-random"></i>
+                                                <span class="connected-room-count">
+                                                    {if isset($room_info['connected_rooms_count'])}{$room_info['connected_rooms_count']|intval}{else}0{/if}
+                                                </span>
+                                            </span>
                                         </a>
                                     {/if}
                                 </td>
@@ -596,6 +601,26 @@
 		border: 1px solid #f2f2f2;
 		margin-top: 10px;
 	}
+    .connected-room-icon-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        justify-content: center;
+    }
+    .connected-room-count {
+        min-width: 14px;
+        height: 14px;
+        padding: 0 3px;
+        border-radius: 9px;
+        background: #f5f5f5;
+        color: #666;
+        border: 1px solid #d5d5d5;
+        font-size: 9px;
+        line-height: 12px;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: none;
+    }
 </style>
 
 <script>
@@ -604,6 +629,7 @@
     var confirmText = "{l s='Are you sure?' js=1}";
     var removeDisableDateText = "{l s='Are you sure you want to remove the selected date range?' js=1}";
     var selectRoomText = "{l s='Please select a room' js=1}";
+    var roomNoText = "{l s='Room No' js=1}";
     var currentRoomRow = 0;
     $(document).ready(function() {
         var tooltipCounter = 0;
@@ -1910,6 +1936,7 @@
 
             let roomId = $(this).data('id-room');
             let hotelId = $(this).data('id-hotel');
+            let roomNum = $(this).data('room-num');
             let currentRoomType = $('[name="id_product"]').val();
             $.ajax({
                 type: 'POST',
@@ -1937,6 +1964,12 @@
                             backdrop: 'static',
                             keyboard: true
                         });
+                        if (roomNum) {
+                            roomNum = '( ' + roomNoText + ' ' + roomNum + ')';
+                            $('#connected_room_title').html(roomNum);
+                        } else {
+                            $('#connected_room_title').html('');
+                        }
                     } else {
                         alert(response.message);
                     }
@@ -1945,31 +1978,68 @@
 
             });
         });
-        function filterRoomsByType() {
-            var selectedType = $('#connect_room_type').val();
+        function filterRoomsByType($row) {
+            var selectedType = $row.find('.connect-room-type').val();
+            var $roomSelect = $row.find('.connect-room');
             var firstVisible = null;
-            $('#connect_room option').each(function() {
+            $roomSelect.find('option').each(function() {
                 if ($(this).data('type') == selectedType) {
                     $(this).show();
-                    if (!firstVisible) firstVisible = $(this);
+                    if (!firstVisible) {
+                        firstVisible = $(this);
+                    }
                 } else {
                     $(this).hide();
                 }
             });
             if (firstVisible) {
                 firstVisible.prop('selected', true);
+            } else {
+                $roomSelect.val('');
             }
         }
-        $(document).on('change', '#connect_room_type', function() {
-            filterRoomsByType();
+        function addConnectedRoomRow() {
+            var $template = $('#connected_room_add_template');
+            if (!$template.length) {
+                return;
+            }
+            var $tbody = $('#connected_rooms_tbody');
+            if ($tbody.find('.connected-room-add-row').not('#connected_room_add_template').length) {
+                return;
+            }
+            var $newRow = $template.clone().removeAttr('id').removeClass('hide');
+            var $tableWrapper = $('#connected_rooms_table_wrapper');
+            var $emptyState = $('#connected_rooms_empty_state');
+            var $addButton = $('#add_connected_room_row');
+            if ($tableWrapper.length) {
+                $tableWrapper.removeClass('hide');
+            }
+            if ($emptyState.length) {
+                $emptyState.hide();
+            }
+            $tbody.append($newRow);
+            filterRoomsByType($newRow);
+            if ($addButton.length) {
+                $addButton.prop('disabled', true).hide();
+            }
+        }
+        $(document).on('click', '#add_connected_room_row', function() {
+            addConnectedRoomRow();
+        });
+        $(document).on('change', '.connect-room-type', function() {
+            filterRoomsByType($(this).closest('tr'));
         });
         $(document).on('shown.bs.modal', '#connectedRoomModal', function() {
-            filterRoomsByType();
+            var $row = $(this).find('.connected-room-add-row').not('#connected_room_add_template').first();
+            if ($row.length) {
+                filterRoomsByType($row);
+            }
         });
         //add connected room
-        $(document).on('click', '#save_connected_room', function() {
+        $(document).on('click', '.save-connected-room', function() {
+            var $row = $(this).closest('tr');
             var mainRoomId = $('#connected_room_main_id').val();
-            var connectedRoomId = $('#connect_room').val();
+            var connectedRoomId = $row.find('.connect-room').val();
             var hotelId = $('#hotel_id').val();
             let currentRoomType = $('[name="id_product"]').val();
             if (!connectedRoomId) {
@@ -1990,24 +2060,33 @@
                     current_roomtype: currentRoomType,
                 },
                 beforeSend: function() {
-                    $('#save_connected_room').prop('disabled', true);
+                    $row.find('.save-connected-room').prop('disabled', true);
                 },
                 success: function(response) {
                     if (response.success) {
                         showSuccessMessage(response.message);
                         $('#connectedRoomModal .modal-content').replaceWith($(response.html).find('.modal-content'));
-                        filterRoomsByType();
+                        // update connected rooms count badge in list
+                        var $icon = $('.connectedRoomModal[data-id-room="' + mainRoomId + '"]').find('.connected-room-count');
+                        if ($icon.length) {
+                            var currentCount = parseInt($.trim($icon.text()), 10);
+                            if (isNaN(currentCount)) {
+                                currentCount = 0;
+                            }
+                            $icon.text(currentCount + 1);
+                        }
                     } else {
                         alert(response.message);
                     }
                 },
                 complete: function() {
-                    $('#save_connected_room').prop('disabled', false);
+                    $row.find('.save-connected-room').prop('disabled', false);
                 }
             });
         });
         //remove connected room
         $(document).on('click', '.delete-connected-room', function() {
+            var $row = $(this).closest('tr');
             var roomId = $(this).data('room-id');
             var connectedRoomId = $(this).data('connected-room-id');
             var connectedId = $(this).data('connected-id');
@@ -2030,9 +2109,23 @@
                 success: function(response) {
                     if (response.success) {
                         showSuccessMessage(response.message);
-                        $('#connectedRoomModal .modal-content').replaceWith($(response.html).find(
-                            '.modal-content'));
-                        filterRoomsByType();
+                        $row.remove();
+                        var $modal = $('#connectedRoomModal');
+                        var $tbody = $modal.find('#connected_rooms_tbody');
+                        var hasConnectedRows = $tbody.find('.connected-room-row').length > 0;
+                        if (!hasConnectedRows) {
+                            $modal.find('#connected_rooms_table_wrapper').addClass('hide');
+                            $modal.find('#connected_rooms_empty_state').removeClass('hide').show();
+                        }
+                        // update connected rooms count badge in list
+                        var $icon = $('.connectedRoomModal[data-id-room="' + roomId + '"]').find('.connected-room-count');
+                        if ($icon.length) {
+                            var currentCount = parseInt($.trim($icon.text()), 10);
+                            if (isNaN(currentCount)) {
+                                currentCount = 0;
+                            }
+                            $icon.text(Math.max(0, currentCount - 1));
+                        }
                     } else {
                         alert(response.message);
                     }

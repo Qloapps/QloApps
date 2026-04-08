@@ -1,0 +1,100 @@
+.qlo-tooltip
+    display: none
+    position: absolute
+    top: 130%
+    left: 50%
+    transform: translateX(-50%)
+    z-index: 99999
+    font-size: 11px !important
+    line-height: 1.35 !important
+    font-family: "Open Sans", Arial, sans-serif !important
+    text-align: left
+    color: #666 !important
+    background: #ffffff !important
+    border: 1px solid #e5e5e5 !important
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12) !important
+    padding: 10px 12px !important
+    border-radius: 4px !important
+    width: fit-content
+    min-width: 0
+    max-width: none
+
+.qlo-tooltip-wrapper
+    position: relative
+    display: inline-block
+    cursor: pointer
+    color: #333
+
+.qlo-tooltip-wrapper:hover .qlo-tooltip
+    display: block
+
+.qlo-tooltip.align-right
+    left: auto
+    right: 0
+    transform: none
+
+.qlo-tooltip.align-left
+    left: 0
+    transform: none
+
+.qlo-tooltip .qlo_tooltip_content,
+.qlo-tooltip .qlo_tooltip_cont
+    width: 100%
+
+.qlo-tooltip .qlo_header
+    margin-bottom: 6px
+
+.qlo-tooltip .qlo_date
+    font-weight: 700
+    font-size: 12px
+    color: #333
+    white-space: nowrap
+
+.qlo-tooltip .qlo_body.grid
+    display: grid
+    grid-template-columns: repeat(2, minmax(0, max-content))
+    gap: 10px 18px
+    justify-content: start
+    justify-items: start
+    width: max-content
+
+.qlo-tooltip .qlo_body.grid.single-col
+    grid-template-columns: 1fr
+
+.qlo-tooltip .qlo_body.grid.single-col .qlo_element
+    display: block
+    width: auto
+
+.qlo-tooltip.single-col
+    min-width: 0
+    max-width: 240px
+    width: fit-content
+
+.qlo-tooltip .qlo_element_value
+    color: #666
+    font-weight: 600
+
+.qlo_tooltip_list
+    list-style: none !important
+    padding: 0 !important
+    margin: 0 !important
+
+.qlo_tooltip_list li
+    margin: 0 !important
+    padding: 0 !important
+    font-weight: 600 !important
+    color: #666 !important
+
+@media (max-width: 768px)
+    .qlo-tooltip
+        left: 0
+        right: auto
+        transform: none
+        min-width: 0
+        max-width: calc(100vw - 24px)
+
+.qlo-tooltip .qlo_element_heading
+    font-weight: 700
+    color: #333
+    margin-bottom: 2px
+    font-size: 11px

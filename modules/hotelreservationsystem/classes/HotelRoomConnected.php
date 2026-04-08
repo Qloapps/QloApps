@@ -61,6 +61,53 @@ class HotelRoomConnected extends ObjectModel
     }
 
     /**
+     * Get the hotel id for a room.
+     *
+     * @param int $roomId
+     *
+     * @return int
+     */
+    public static function getRoomHotelId($roomId)
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT `id_hotel` FROM `' . _DB_PREFIX_ . 'htl_room_information` WHERE `id` = ' . (int) $roomId
+        );
+    }
+
+    /**
+     * Get existing connected room id for a room pair.
+     *
+     * @param int $roomId
+     * @param int $connectedRoomId
+     *
+     * @return int
+     */
+    public static function getExistingConnectedRoomId($roomId, $connectedRoomId)
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT `id_connected_room` FROM `' . _DB_PREFIX_ . 'htl_connected_room` WHERE `id_room_information` = ' . (int) $roomId . ' AND `id_room` = ' . (int) $connectedRoomId
+        );
+    }
+
+    /**
+     * Check if a connected room record matches provided ids.
+     *
+     * @param int $connectedId
+     * @param int $roomId
+     * @param int $connectedRoomId
+     *
+     * @return bool
+     */
+    public static function isConnectionMatch($connectedId, $roomId, $connectedRoomId)
+    {
+        $matchId = (int) Db::getInstance()->getValue(
+            'SELECT `id_connected_room` FROM `' . _DB_PREFIX_ . 'htl_connected_room` WHERE `id_connected_room` = ' . (int) $connectedId . ' AND `id_room_information` = ' . (int) $roomId . ' AND `id_room` = ' . (int) $connectedRoomId
+        );
+
+        return ($matchId > 0);
+    }
+
+    /**
      * Fetch connected/not-connected rooms for a hotel.
      *
      * @param int      $idHotel

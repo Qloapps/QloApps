@@ -5647,15 +5647,6 @@ class AdminProductsControllerCore extends AdminController
         return $tpl->fetch();
     }
 
-    /**
-     * Render connected rooms modal HTML for a given room/hotel.
-     *
-     * @param int $hotelId
-     * @param int $roomId
-     * @param int $currentRoomType
-     *
-     * @return string
-     */
     protected function getConnectedRoomsModalHtml($hotelId, $roomId, $currentRoomType)
     {
         $connectedRooms = HotelRoomConnected::getConnectedRoomsByHotel($hotelId, $this->context->language->id, $roomId, true);
@@ -5696,9 +5687,7 @@ class AdminProductsControllerCore extends AdminController
             ]));
         }
 
-        $mainRoomHotelId = (int) Db::getInstance()->getValue(
-            'SELECT `id_hotel` FROM `' . _DB_PREFIX_ . 'htl_room_information` WHERE `id` = ' . (int) $roomId
-        );
+        $mainRoomHotelId = HotelRoomConnected::getRoomHotelId($roomId);
         if ($mainRoomHotelId !== (int) $hotelId) {
             die(json_encode([
                 'success' => false,
@@ -5748,12 +5737,8 @@ class AdminProductsControllerCore extends AdminController
             ]));
         }
 
-        $mainRoomHotelId = (int) Db::getInstance()->getValue(
-            'SELECT `id_hotel` FROM `' . _DB_PREFIX_ . 'htl_room_information` WHERE `id` = ' . (int) $roomId
-        );
-        $connectedRoomHotelId = (int) Db::getInstance()->getValue(
-            'SELECT `id_hotel` FROM `' . _DB_PREFIX_ . 'htl_room_information` WHERE `id` = ' . (int) $connectedRoomId
-        );
+        $mainRoomHotelId = HotelRoomConnected::getRoomHotelId($roomId);
+        $connectedRoomHotelId = HotelRoomConnected::getRoomHotelId($connectedRoomId);
         if (!$hotelId || $mainRoomHotelId !== $hotelId || $connectedRoomHotelId !== $hotelId) {
             die(json_encode([
                 'success' => false,
@@ -5764,9 +5749,7 @@ class AdminProductsControllerCore extends AdminController
         $currentRoomType = (int) Tools::getValue('current_roomtype');
 
         if ($mode === 'add') {
-            $existingConnectedId = (int) Db::getInstance()->getValue(
-                'SELECT `id_connected_room` FROM `' . _DB_PREFIX_ . 'htl_connected_room` WHERE `id_room_information` = ' . (int) $roomId . ' AND `id_room` = ' . (int) $connectedRoomId
-            );
+            $existingConnectedId = HotelRoomConnected::getExistingConnectedRoomId($roomId, $connectedRoomId);
             if ($existingConnectedId) {
                 $modalContent = $this->getConnectedRoomsModalHtml($hotelId, $roomId, $currentRoomType);
                 die(json_encode([
@@ -5802,10 +5785,7 @@ class AdminProductsControllerCore extends AdminController
                 ]));
             }
 
-            $matchesConnection = (int) Db::getInstance()->getValue(
-                'SELECT `id_connected_room` FROM `' . _DB_PREFIX_ . 'htl_connected_room` WHERE `id_connected_room` = ' . (int) $connectedId . ' AND `id_room_information` = ' . (int) $roomId . ' AND `id_room` = ' . (int) $connectedRoomId
-            );
-            if (!$matchesConnection) {
+            if (!HotelRoomConnected::isConnectionMatch($connectedId, $roomId, $connectedRoomId)) {
                 die(json_encode([
                     'success' => false,
                     'message' => $this->l('Invalid data.')

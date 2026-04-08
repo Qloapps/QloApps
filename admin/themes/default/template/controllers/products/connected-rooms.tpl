@@ -20,68 +20,59 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 {if isset($htl_connected_rooms) && $htl_connected_rooms|@count > 0}
-    <span class="connected-room-popup-wrapper">
+    {assign var=connectedRoomsCount value=0}
+    {foreach from=$htl_connected_rooms item=rooms_by_type}
+        {assign var=connectedRoomsCount value=$connectedRoomsCount+$rooms_by_type|@count}
+    {/foreach}
+    <span class="qlo-tooltip-wrapper connected-room-popup-wrapper">
         <i class="icon-random connected-room-icon"></i>
-        <div class="connected-room-popup">
-            <div class="popup-title">{l s='Connected Rooms'}</div>
-            <div class="popup-content">
-                {foreach from=$htl_connected_rooms key=conn_type item=rooms_by_type}
-                    <div class="connected-room-type"> {$conn_type|escape:'html':'UTF-8'}</div>
-                    <ul class="connected-room-list">
-                        {foreach from=$rooms_by_type item=room}
-                            <li>
-                                {$room.connected_room_num|escape:'html':'UTF-8'}
-                            </li>
+        <div class="qlo-tooltip connected-room-popup{if $htl_connected_rooms|@count == 1} single-col{/if}">
+            <div class="qlo_tooltip_content">
+                <div class="qlo_tooltip_cont">
+                    <div class="qlo_header">
+                        <div class="qlo_date">{l s='Connected Rooms'}</div>
+                    </div>
+                    <div class="qlo_body grid{if $htl_connected_rooms|@count == 1} single-col{/if}">
+                        {foreach from=$htl_connected_rooms key=conn_type item=rooms_by_type}
+                            <div class="qlo_element">
+                                <div class="qlo_element_heading">{$conn_type|escape:'html':'UTF-8'}</div>
+                                <div class="qlo_element_value">
+                                    <ul class="connected-room-list qlo_tooltip_list">
+                                        {foreach from=$rooms_by_type item=room}
+                                            <li>{$room.connected_room_num|escape:'html':'UTF-8'}</li>
+                                        {/foreach}
+                                    </ul>
+                                </div>
+                            </div>
                         {/foreach}
-                    </ul>
-                {/foreach}
+                    </div>
+                </div>
             </div>
         </div>
-    </span>
+</span>
 {/if}
 <style>
-    .connected-room-popup-wrapper {
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
-        color: #333;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
     .connected-room-icon {
         color: #008abd;
     }
-    .connected-room-popup {
-        display: none;
-        position: absolute;
-        top: 130%;
-        left: 50%;
-        background: #ffffff;
-        padding: 12px 16px;
-        border-radius: 6px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        font-size: 14px;
-        min-width: 200px;
-        z-index: 1000;
-    }
-    .connected-room-popup-wrapper:hover .connected-room-popup {
-        display: block;
-    }
-    .popup-title {
-        font-weight: 600;
-        font-size: 16px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.15);
-        padding-bottom: 4px;
-        margin-bottom: 4px;
-    }
-    .connected-room-type {
-        font-weight: bold;
-        margin-bottom: 2px;
-    }
-    .connected-room-list {
-        padding-left: 15px;
-    }
-    .connected-room-list li {
-        list-style: none;
-        margin: 0px;
-    }
 </style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var wrappers = document.querySelectorAll('.qlo-tooltip-wrapper');
+        wrappers.forEach(function(wrapper) {
+            wrapper.addEventListener('mouseenter', function() {
+                var popup = wrapper.querySelector('.connected-room-popup');
+                if (!popup) {
+                    return;
+                }
+                popup.classList.remove('align-right', 'align-left');
+                var rect = popup.getBoundingClientRect();
+                if (rect.right > window.innerWidth) {
+                    popup.classList.add('align-right');
+                } else if (rect.left < 0) {
+                    popup.classList.add('align-left');
+                }
+            });
+        });
+    });
+</script>
