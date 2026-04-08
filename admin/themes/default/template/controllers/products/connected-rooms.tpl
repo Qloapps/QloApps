@@ -30,7 +30,7 @@
             <div class="qlo_tooltip_content">
                 <div class="qlo_tooltip_cont">
                     <div class="qlo_header">
-                        <div class="qlo_date">{l s='Connected Rooms'}</div>
+                        <div class="qlo_heading">{l s='Connected Rooms'}</div>
                     </div>
                     <div class="qlo_body grid{if $htl_connected_rooms|@count == 1} single-col{/if}">
                         {foreach from=$htl_connected_rooms key=conn_type item=rooms_by_type}
