@@ -596,13 +596,15 @@ class AdminFeaturesControllerCore extends AdminController
     {
         $object = parent::processAdd();
 
-        if (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && !count($this->errors)) {
-            if ($this->table == 'feature_value' && ($this->display == 'edit' || $this->display == 'add')) {
+        if ('feature_value' === $this->table && !count($this->errors)) {
+            if (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && ($this->display == 'edit' || $this->display == 'add')) {
                 $this->redirect_after = self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token;
             } else {
-                $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'='.(int) $object->id.'&conf=3&update'.$this->table.'&token='.$this->token;
+                $this->redirect_after = self::$currentIndex.'&id_feature='.(int)Tools::getValue('id_feature').'&viewfeature&conf=3&token='.$this->token;
             }
-        } elseif (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && count($this->errors) && $this->table == 'feature_value') { // enter only if feature is submitted
+        } elseif (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && !count($this->errors)) {
+            $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'='.(int) $object->id.'&conf=3&update'.$this->table.'&token='.$this->token;
+        } elseif (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && count($this->errors) && 'feature_value' === $this->table) { // enter only if feature is submitted
             $this->display = 'editFeatureValue';
         }
 
@@ -617,8 +619,14 @@ class AdminFeaturesControllerCore extends AdminController
     {
         $object = parent::processUpdate();
 
-        if (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && !count($this->errors)) {
-            $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'='.(int) Tools::getValue('id_feature').'&conf=4&update'.$this->table.'&token='.$this->token;
+        if ('feature_value' === $this->table && !count($this->errors)) {
+            if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
+                $this->redirect_after = self::$currentIndex.'&updatefeature_value&id_feature_value='.(int)$object->id.'&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token;
+            } else {
+                $this->redirect_after = self::$currentIndex.'&id_feature='.(int)Tools::getValue('id_feature').'&viewfeature&conf=4&token='.$this->token;
+            }
+        } elseif (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && !count($this->errors)) {
+            $this->redirect_after = self::$currentIndex.'&'.$this->identifier.'='.(int)$object->id.'&conf=4&update'.$this->table.'&token='.$this->token;
         }
 
         return $object;
@@ -631,6 +639,10 @@ class AdminFeaturesControllerCore extends AdminController
      */
     public function processSave()
     {
+        if ('feature_value' === $this->table) {
+            return parent::processSave();
+        }
+
         if ($this->table == 'feature') {
             $idFeature = (int)Tools::getValue('id_feature');
             // Adding last position to the feature if not exist
@@ -675,24 +687,12 @@ class AdminFeaturesControllerCore extends AdminController
                         $this->errors[] = $this->l('Some error occurred while uploding room feature logo. Please try again.');
                     }
                 }
-
-                if ($featureValues = FeatureValue::getFeatureValuesWithLang(
-                    $this->context->language->id,
-                    $objFeature->id
-                )) {
-                    $objFeatureValue = new FeatureValue($featureValues[0]['id_feature_value']);
-                } else {
-                    $objFeatureValue = new FeatureValue();
-                }
-
-                $objFeatureValue->id_feature = $objFeature->id;
-                foreach (Language::getLanguages(true) as $lang) {
-                    $objFeatureValue->value[$lang['id_lang']] = $objFeature->id.'.jpg';
-                }
-                $objFeatureValue->save();
-                return $objFeature;
             }
+
+            return $objFeature;
         }
+
+        return parent::processSave();
     }
 
     /**
