@@ -95,7 +95,7 @@
 				<li>
 					<a href="#hotel-features" data-toggle="tab">
 						<i class="icon-list-alt"></i>
-						{l s='Features' mod='hotelreservationsystem'}
+						{l s='Amenities' mod='hotelreservationsystem'}
 					</a>
 				</li>
 				{hook h='displayAdminAddHotelFormTab' id_hotel=$hook_arg_id_hotel}
@@ -583,7 +583,7 @@
 					{if isset($hotel_feature_tree)}
 						<div class="form-group">
 							<label for="hotel_feature" class="control-label col-sm-3">
-								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select features for this hotel.' mod='hotelreservationsystem'}'>{l s='Select feature' mod='hotelreservationsystem'}</span>
+								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select amenities for this hotel.' mod='hotelreservationsystem'}'>{l s='Select amenities' mod='hotelreservationsystem'}</span>
 							</label>
 							<div class="col-xs-7 hotel_features_tree">
 								{$hotel_feature_tree}
