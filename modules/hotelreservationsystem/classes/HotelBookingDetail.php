@@ -2595,17 +2595,76 @@ class HotelBookingDetail extends ObjectModel
         $old_date_from,
         $old_date_to,
         $new_date_from,
-        $new_date_to
+        $new_date_to,
+        $idHotelBooking = 0
     ) {
-        $sql = 'SELECT * FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room`='.(int)$id_room.'
-        AND `date_from` < \''.pSQL($new_date_to).'\' AND `date_from` != \''.pSQL($old_date_from).'\'
-        AND IF(`id_status` !='.HotelBookingDetail::STATUS_CHECKED_OUT.',
-            `date_to` != \''.pSQL($old_date_to).'\' AND `date_to` > \''.pSQL($new_date_from).'\',
-            `check_out` != \''.pSQL($old_date_to).'\' AND DATE(`check_out`) > DATE(\''.pSQL($new_date_from).'\')
-        )
-        AND `is_refunded`=0 AND `is_back_order`=0';
+        $objRoomInformation = new HotelRoomInformation((int) $id_room);
+        if (!Validate::isLoadedObject($objRoomInformation)) {
+            return array();
+        }
 
-        return Db::getInstance()->executeS($sql);
+        $isHourlyBooking = date('H:i:s', strtotime($new_date_from)) !== '00:00:00'
+            || date('H:i:s', strtotime($new_date_to)) !== '00:00:00'
+            || date('H:i:s', strtotime($old_date_from)) !== '00:00:00'
+            || date('H:i:s', strtotime($old_date_to)) !== '00:00:00';
+
+        $bookingParams = array(
+            'date_from' => $new_date_from,
+            'date_to' => $new_date_to,
+            'hotel_id' => (int) $objRoomInformation->id_hotel,
+            'id_room_type' => (int) $objRoomInformation->id_product,
+            'search_available' => 0,
+            'search_partial' => 0,
+            'search_booked' => 1,
+            'search_unavai' => 0,
+            'search_cart_rms' => 0,
+            'only_active_roomtype' => 0,
+            'only_active_hotel' => 0
+        );
+
+        $bookingData = $this->getBookingData($bookingParams);
+        if (!isset($bookingData['rm_data'][$objRoomInformation->id_product]['data']['booked'][$id_room]['detail'])) {
+            return array();
+        }
+
+        if (!$isHourlyBooking) {
+            $objHotelBranchInfo = new HotelBranchInformation((int) $objRoomInformation->id_hotel);
+            if (Validate::isLoadedObject($objHotelBranchInfo) && $objHotelBranchInfo->check_out) {
+                $new_date_from = date(
+                    'Y-m-d H:i:s',
+                    strtotime(date('Y-m-d', strtotime($new_date_from)).' '.$objHotelBranchInfo->check_out)
+                );
+            }
+        }
+
+        $roomBookings = array();
+        foreach ($bookingData['rm_data'][$objRoomInformation->id_product]['data']['booked'][$id_room]['detail'] as $bookingDetail) {
+            $bookingStatus = isset($bookingDetail['booking_status']) ? (int) $bookingDetail['booking_status'] : 0;
+            $bookingDateFrom = isset($bookingDetail['date_from']) ? $bookingDetail['date_from'] : '';
+            $bookingDateTo = isset($bookingDetail['date_to']) ? $bookingDetail['date_to'] : '';
+
+            if ($idHotelBooking && ((int) $bookingDetail['id_htl_booking'] === (int) $idHotelBooking)) {
+                continue;
+            }
+
+            if ($bookingDateFrom === $old_date_from) {
+                continue;
+            }
+
+            if ($bookingStatus != self::STATUS_CHECKED_OUT) {
+                if ($bookingDateTo === $old_date_to || strtotime($bookingDateTo) <= strtotime($new_date_from)) {
+                    continue;
+                }
+            } else {
+                if ($bookingDateTo === $old_date_to || strtotime($bookingDateTo) <= strtotime($new_date_from)) {
+                    continue;
+                }
+            }
+
+            $roomBookings[] = $bookingDetail;
+        }
+
+        return $roomBookings;
     }
 
     public function updateHotelCartHotelOrderOnOrderEdit(

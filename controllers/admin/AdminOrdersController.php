@@ -6986,7 +6986,8 @@ class AdminOrdersControllerCore extends AdminController
             $old_date_from,
             $old_date_to,
             $new_date_from,
-            $new_date_to
+            $new_date_to,
+            $id_hotel_booking
         )) {
             die(json_encode(array(
                 'result' => false,
