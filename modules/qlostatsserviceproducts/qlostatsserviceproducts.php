@@ -57,22 +57,17 @@ class QloStatsServiceProducts extends ModuleGrid
     public function hookAdminStatsModules($params)
     {
         $engineParamsServices = $this->getServicesParams();
-        $engineParamsFacilities = $this->getFacilitiesParams();
 
         if (Tools::getValue('export')) {
             if (Tools::getValue('option') == 'services') {
                 $this->csvExport($engineParamsServices);
-            } else if (Tools::getValue('option') == 'facilities') {
-                $this->csvExport($engineParamsFacilities);
             }
         }
 
         $this->context->smarty->assign(array(
             'module_name' => $this->displayName,
             'grid_table_services' => $this->engine($engineParamsServices),
-            'grid_table_facilities' => $this->engine($engineParamsFacilities),
             'export_link_services' => Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&option=services',
-            'export_link_facilities' => Tools::safeOutput($_SERVER['REQUEST_URI']).'&export=1&option=facilities',
         ));
 
         return $this->display(__FILE__, 'services_content_block.tpl');
@@ -127,42 +122,6 @@ class QloStatsServiceProducts extends ModuleGrid
         );
     }
 
-    public function getFacilitiesParams()
-    {
-        return array(
-            'title' => $this->l('Facilities'),
-            'columns' => array(
-                array(
-                    'id' => 'display_name',
-                    'header' => $this->l('Name'),
-                    'dataIndex' => 'display_name',
-                    'align' => 'left'
-                ),
-                array(
-                    'id' => 'totalQuantitySold',
-                    'header' => $this->l('Quantity sold'),
-                    'dataIndex' => 'totalQuantitySold',
-                    'align' => 'left'
-                ),
-                array(
-                    'id' => 'avgPriceSold',
-                    'header' => $this->l('Average Price'),
-                    'dataIndex' => 'avgPriceSold',
-                    'align' => 'left'
-                ),
-                array(
-                    'id' => 'totalPriceSold',
-                    'header' => $this->l('Sales'),
-                    'dataIndex' => 'totalPriceSold',
-                    'align' => 'left'
-                ),
-            ),
-            'defaultSortColumn' => 'totalPriceSold',
-            'defaultSortDirection' => 'DESC',
-            'pagingMessage' => $this->paging_message,
-            'option' => 'facilities'
-        );
-    }
 
     public function setOption($option)
     {
