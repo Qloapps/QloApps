@@ -24,17 +24,22 @@
         #connectedRoomModal .connected-rooms-table {
             table-layout: fixed;
             width: 100%;
+            border-radius: 3px;
         }
+
         #connectedRoomModal .modal-title .disable_dates_title {
             display: inline-block;
             font-weight: 600;
         }
+
         #connectedRoomModal .modal-title .connected_room_num {
             color: grey;
         }
+
         #connectedRoomModal .modal-title {
             line-height: 2;
         }
+
         #connectedRoomModal .modal-title .close {
             line-height: 2;
         }
@@ -46,7 +51,8 @@
                 <div class="modal-title">
                     <div class="row">
                         <div class="disable_dates_title">
-                            <i class="icon-random"></i>&nbsp; {l s='Connected Rooms'} <span id="connected_room_title" class="connected_room_num"></span>
+                            <i class="icon-random"></i>&nbsp; {l s='Connected Rooms'} <span id="connected_room_title"
+                                class="connected_room_num"></span>
                         </div>
                         <div class="pull-right">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -61,64 +67,67 @@
                     <input type="hidden" id="connected_room_main_id" name="main_room_id" value="{$main_room_id|intval}">
                     <!-- connectedrooms list -->
                     <div class="">
-                        <div class="panel">
+                        <div class="">
                             <div id="connected_rooms_list">
-                            <div id="connected_rooms_table_wrapper" class="{if !isset($htl_connected_rooms) || $htl_connected_rooms|count == 0}hide{/if}">
+                                <div id="connected_rooms_table_wrapper"
+                                    class="{if !isset($htl_connected_rooms) || $htl_connected_rooms|count == 0}hide{/if}">
                                     <table class="table table-bordered table-striped connected-rooms-table">
-                                    <colgroup>
-                                        <col style="width: 45%;">
-                                        <col style="width: 35%;">
-                                        <col style="width: 120px;">
-                                    </colgroup>
-                                    <thead>
-                                        <tr>
-                                        <th>{l s='Room Type'}</th>
-                                        <th>{l s='Room'}</th>
-                                        <th width="120" class="text-center">
-                                            {l s='Action'}
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="connected_rooms_tbody">
-                                    {if isset($htl_connected_rooms) && $htl_connected_rooms|count > 0}
-                                        {foreach from=$htl_connected_rooms item=hotelRooms}
-                                                {foreach from=$hotelRooms key=roomType item=rooms}
-                                                    {foreach from=$rooms item=row}
-                                                        <tr class="connected-room-row">
-                                                            <td>{$row.connected_room_type|escape:'html':'UTF-8'}</td>
-                                                            <td>{$row.connected_room_num|escape:'html':'UTF-8'}</td>
-                                                            <td class="text-center">
-                                                                <a href="javascript:void(0);" class="delete-connected-room btn btn-default"
-                                                                    data-connected-id="{$row.id_connected_room|intval}"
-                                                                    data-room-id="{$row.id_room_information|intval}"
-                                                                    data-connected-room-id="{$row.id_room|intval}"
-                                                                    data-hotel-id="{$row.id_hotel|intval}" title="{l s='Remove'}">
-                                                                    <i class="icon-trash"></i>
-                                                                </a>
-                                                            </td>
-                                                        </tr>
+                                        <colgroup>
+                                            <col style="width: 45%;">
+                                            <col style="width: 35%;">
+                                            <col style="width: 120px;">
+                                        </colgroup>
+                                        <thead>
+                                            <tr>
+                                                <th>{l s='Room Type'}</th>
+                                                <th>{l s='Room'}</th>
+                                                <th width="120" class="text-center">
+                                                    {l s='Action'}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="connected_rooms_tbody">
+                                            {if isset($htl_connected_rooms) && $htl_connected_rooms|count > 0}
+                                                {foreach from=$htl_connected_rooms item=hotelRooms}
+                                                    {foreach from=$hotelRooms key=roomType item=rooms}
+                                                        {foreach from=$rooms item=row}
+                                                            <tr class="connected-room-row">
+                                                                <td>{$row.connected_room_type|escape:'html':'UTF-8'}</td>
+                                                                <td>{$row.connected_room_num|escape:'html':'UTF-8'}</td>
+                                                                <td class="text-center">
+                                                                    <a href="javascript:void(0);"
+                                                                        class="delete-connected-room btn btn-default"
+                                                                        data-connected-id="{$row.id_connected_room|intval}"
+                                                                        data-room-id="{$row.id_room_information|intval}"
+                                                                        data-connected-room-id="{$row.id_room|intval}"
+                                                                        data-hotel-id="{$row.id_hotel|intval}" title="{l s='Remove'}">
+                                                                        <i class="icon-trash"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        {/foreach}
                                                     {/foreach}
                                                 {/foreach}
-                                            {/foreach}
-                                        {/if}
-                                    </tbody>
+                                            {/if}
+                                        </tbody>
                                     </table>
                                 </div>
-                            <div class="list-empty {if isset($htl_connected_rooms) && $htl_connected_rooms|count > 0}hide{/if}" id="connected_rooms_empty_state">
-                                <div class="list-empty-msg">
-                                    <i class="icon-warning-sign list-empty-icon"></i>
-                                    {l s='No connected rooms.'}
-                                </div>
-                            </div>
-                        </div>
-                            {if isset($htl_not_connected_rooms) && $htl_not_connected_rooms|count > 0}
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <button type="button" id="add_connected_room_row" class="btn btn-default">
-                                            <i class="icon-plus"></i> {l s='Add Room'}
-                                        </button>
+                                <div class="list-empty {if isset($htl_connected_rooms) && $htl_connected_rooms|count > 0}hide{/if}"
+                                    id="connected_rooms_empty_state">
+                                    <div class="list-empty-msg">
+                                        <i class="icon-warning-sign list-empty-icon"></i>
+                                        {l s='No connected rooms.'}
                                     </div>
                                 </div>
+                            </div>
+                            {if isset($htl_not_connected_rooms) && $htl_not_connected_rooms|count > 0}
+
+
+                                <button type="button" id="add_connected_room_row" class="btn btn-default">
+                                    <i class="icon-plus"></i> {l s='Add Connected Room'}
+                                </button>
+
+
                             {/if}
                         </div>
                     </div>
@@ -143,15 +152,20 @@
                                     <td>
                                         <select class="form-control connect-room" name="connect_room">
                                             {foreach from=$htl_not_connected_rooms item=room}
-                                                <option value="{$room.id|intval}" class="room-option" data-type="{$room.id_product|intval}">
+                                                <option value="{$room.id|intval}" class="room-option"
+                                                    data-type="{$room.id_product|intval}">
                                                     {$room.room_num|escape:'html':'UTF-8'}
                                                 </option>
                                             {/foreach}
                                         </select>
                                     </td>
                                     <td class="text-center">
+                                        <button type="button" class="btn btn-default remove-connected-room-row"
+                                            title="{l s='Remove'}">
+                                            <i class="icon-trash"></i>
+                                        </button>
                                         <button type="button" class="btn btn-primary save-connected-room">
-                                            <i class="icon-plus"></i> {l s='Add'}
+                                            {l s='Add'}
                                         </button>
                                     </td>
                                 </tr>

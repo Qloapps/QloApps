@@ -3090,6 +3090,7 @@ class AdminProductsControllerCore extends AdminController
                                     $disableDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
                                     $room['disable_dates_json'] = json_encode($disableDates);
                                 }
+                                $room['connected_rooms_count'] = HotelConnectedRoom::getConnectedRooms($this->context->language->id, $room['id'], true,true);
                             }
 
                             $data->assign('htl_room_info', $hotelRoomInfo);
@@ -5647,15 +5648,14 @@ class AdminProductsControllerCore extends AdminController
         return $tpl->fetch();
     }
 
-    protected function getConnectedRoomsModalHtml($hotelId, $roomId, $currentRoomType)
+    protected function getConnectedRoomsModalHtml($roomId, $currentRoomType)
     {
-        $connectedRooms = HotelRoomConnected::getConnectedRoomsByHotel($hotelId, $this->context->language->id, $roomId, true);
-        $notConnectedRooms = HotelRoomConnected::getConnectedRoomsByHotel($hotelId, $this->context->language->id, $roomId, false);
+        $connectedRooms = HotelConnectedRoom::getConnectedRooms($this->context->language->id, $roomId, true);
+        $notConnectedRooms = HotelConnectedRoom::getConnectedRooms($this->context->language->id, $roomId, false);
         $this->context->smarty->assign(array(
             'htl_connected_rooms' => $connectedRooms,
             'htl_not_connected_rooms' => $notConnectedRooms,
             'main_room_id' => (int) $roomId,
-            'hotel_id' => (int) $hotelId,
             'current_roomtype' => (int) $currentRoomType,
         ));
 
@@ -5664,38 +5664,8 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessGetModalConnectedRooms()
     {
-        if ($this->tabAccess['edit'] !== 1) {
-            die(json_encode([
-                'success' => false,
-                'message' => $this->l('Permission denied.')
-            ]));
-        }
-
         $roomId = (int) Tools::getValue('room_id');
-        $hotelId = (int) Tools::getValue('hotel_id');
-        if (!$roomId || !$hotelId) {
-            die(json_encode([
-                'success' => false,
-                'message' => $this->l('Invalid data.')
-            ]));
-        }
-
-        if (!class_exists('HotelRoomConnected') || !HotelRoomConnected::isConnectedRoomTableAvailable()) {
-            die(json_encode([
-                'success' => false,
-                'message' => $this->l('Connected rooms feature is not available. Please upgrade the Hotel Reservation System module.')
-            ]));
-        }
-
-        $mainRoomHotelId = HotelRoomConnected::getRoomHotelId($roomId);
-        if ($mainRoomHotelId !== (int) $hotelId) {
-            die(json_encode([
-                'success' => false,
-                'message' => $this->l('Invalid room data.')
-            ]));
-        }
-
-        $modalContent = $this->getConnectedRoomsModalHtml($hotelId, $roomId, (int) Tools::getValue('current_roomtype'));
+        $modalContent = $this->getConnectedRoomsModalHtml($roomId, (int) Tools::getValue('current_roomtype'));
         die(json_encode([
             'success' => true,
             'html' => $modalContent
@@ -5704,66 +5674,18 @@ class AdminProductsControllerCore extends AdminController
 
     public function ajaxProcessManageConnectedRoom()
     {
-        if ($this->tabAccess['edit'] !== 1) {
-            die(json_encode([
-                'success' => false,
-                'message' => $this->l('Permission denied.')
-            ]));
-        }
-
         $mode = Tools::getValue('mode');
         $roomId = (int) Tools::getValue('room_id');
         $connectedRoomId = (int) Tools::getValue('connected_room_id');
         $connectedId = (int) Tools::getValue('connected_id');
-        $hotelId = (int) Tools::getValue('hotel_id');
-        if (!$roomId || !$connectedRoomId) {
-            die(json_encode([
-                'success' => false,
-                'message' => $this->l('Invalid room data.')
-            ]));
-        }
-
-        if (!class_exists('HotelRoomConnected') || !HotelRoomConnected::isConnectedRoomTableAvailable()) {
-            die(json_encode([
-                'success' => false,
-                'message' => $this->l('Connected rooms feature is not available. Please upgrade the Hotel Reservation System module.')
-            ]));
-        }
-
-        if ($roomId == $connectedRoomId) {
-            die(json_encode([
-                'success' => false,
-                'message' => $this->l('You cannot connect a room to itself.')
-            ]));
-        }
-
-        $mainRoomHotelId = HotelRoomConnected::getRoomHotelId($roomId);
-        $connectedRoomHotelId = HotelRoomConnected::getRoomHotelId($connectedRoomId);
-        if (!$hotelId || $mainRoomHotelId !== $hotelId || $connectedRoomHotelId !== $hotelId) {
-            die(json_encode([
-                'success' => false,
-                'message' => $this->l('Invalid room data.')
-            ]));
-        }
-
         $currentRoomType = (int) Tools::getValue('current_roomtype');
 
         if ($mode === 'add') {
-            $existingConnectedId = HotelRoomConnected::getExistingConnectedRoomId($roomId, $connectedRoomId);
-            if ($existingConnectedId) {
-                $modalContent = $this->getConnectedRoomsModalHtml($hotelId, $roomId, $currentRoomType);
-                die(json_encode([
-                    'html' => $modalContent,
-                    'success' => true,
-                    'message' => $this->l('Room is already connected.')
-                ]));
-            }
-
-            $connection = new HotelRoomConnected();
-            $connection->id_room_information = $roomId;
-            $connection->id_room = $connectedRoomId;
+            $connection = new HotelConnectedRoom();
+            $connection->id_room = $roomId;
+            $connection->id_room_connected = $connectedRoomId;
             if ($connection->add()) {
-                $modalContent = $this->getConnectedRoomsModalHtml($hotelId, $roomId, $currentRoomType);
+                $modalContent = $this->getConnectedRoomsModalHtml($roomId, $currentRoomType);
                 die(json_encode([
                     'html' => $modalContent,
                     'success' => true,
@@ -5785,16 +5707,9 @@ class AdminProductsControllerCore extends AdminController
                 ]));
             }
 
-            if (!HotelRoomConnected::isConnectionMatch($connectedId, $roomId, $connectedRoomId)) {
-                die(json_encode([
-                    'success' => false,
-                    'message' => $this->l('Invalid data.')
-                ]));
-            }
-
-            $objHotelRoomConnected = new HotelRoomConnected($connectedId);
+            $objHotelRoomConnected = new HotelConnectedRoom($connectedId);
             if ($objHotelRoomConnected->delete()) {
-                $modalContent = $this->getConnectedRoomsModalHtml($hotelId, $roomId, $currentRoomType);
+                $modalContent = $this->getConnectedRoomsModalHtml($roomId, $currentRoomType);
                 die(json_encode([
                     'success' => true,
                     'html' => $modalContent,

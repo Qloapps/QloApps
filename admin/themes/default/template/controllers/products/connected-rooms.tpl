@@ -20,59 +20,84 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 {if isset($htl_connected_rooms) && $htl_connected_rooms|@count > 0}
-    {assign var=connectedRoomsCount value=0}
-    {foreach from=$htl_connected_rooms item=rooms_by_type}
-        {assign var=connectedRoomsCount value=$connectedRoomsCount+$rooms_by_type|@count}
-    {/foreach}
-    <span class="qlo-tooltip-wrapper connected-room-popup-wrapper">
+    <span class="connected-room-tooltip-trigger"
+        data-connected-details='{json_encode($htl_connected_rooms)|escape:'html':'UTF-8'}'>
         <i class="icon-random connected-room-icon"></i>
-        <div class="qlo-tooltip connected-room-popup{if $htl_connected_rooms|@count == 1} single-col{/if}">
-            <div class="qlo_tooltip_content">
-                <div class="qlo_tooltip_cont">
-                    <div class="qlo_header">
-                        <div class="qlo_heading">{l s='Connected Rooms'}</div>
-                    </div>
-                    <div class="qlo_body grid{if $htl_connected_rooms|@count == 1} single-col{/if}">
-                        {foreach from=$htl_connected_rooms key=conn_type item=rooms_by_type}
-                            <div class="qlo_element">
-                                <div class="qlo_element_heading">{$conn_type|escape:'html':'UTF-8'}</div>
-                                <div class="qlo_element_value">
-                                    <ul class="connected-room-list qlo_tooltip_list">
-                                        {foreach from=$rooms_by_type item=room}
-                                            <li>{$room.connected_room_num|escape:'html':'UTF-8'}</li>
-                                        {/foreach}
-                                    </ul>
-                                </div>
-                            </div>
-                        {/foreach}
-                    </div>
-                </div>
-            </div>
-        </div>
-</span>
+    </span>
 {/if}
 <style>
     .connected-room-icon {
         color: #008abd;
+        cursor: pointer;
+    }
+
+    /* page tooltip */
+    .tooltip_cont {
+        min-width: 280px;
+        width: 100%;
+        font-size: 14px;
+        font-weight: 600;
+        /* display: grid; */
+    }
+
+    .tooltip_cont .tip_header {
+        margin-bottom: 10px;
+    }
+
+    .tooltip_cont .tip-body>div {
+        margin-bottom: 6px;
+    }
+
+    .tip_element_head {
+        font-size: 12px;
+    }
+
+    .tip_element_value {
+        font-size: 16px;
+        opacity: 0.6;
+    }
+
+    .tip-body {
+        display: grid;
+        grid-template-columns: auto auto;
     }
 </style>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var wrappers = document.querySelectorAll('.qlo-tooltip-wrapper');
-        wrappers.forEach(function(wrapper) {
-            wrapper.addEventListener('mouseenter', function() {
-                var popup = wrapper.querySelector('.connected-room-popup');
-                if (!popup) {
-                    return;
-                }
-                popup.classList.remove('align-right', 'align-left');
-                var rect = popup.getBoundingClientRect();
-                if (rect.right > window.innerWidth) {
-                    popup.classList.add('align-right');
-                } else if (rect.left < 0) {
-                    popup.classList.add('align-left');
-                }
-            });
-        });
+    $(document).ready(function() {
+        {literal}
+            if (typeof $.fn.tooltip !== 'undefined' && typeof $.ui !== 'undefined' && typeof $.ui.tooltip !==
+                'undefined') {
+                $('.connected-room-tooltip-trigger').tooltip({
+                    items: '.connected-room-tooltip-trigger',
+                    content: function() {
+                        var details = $(this).data('connected-details');
+                        if (!details || Object.keys(details).length === 0) {
+                            return "{/literal}{l s='No rooms connected' js=1}{literal}";
+                        }
+                        var html = '<div class="tooltip_cont">';
+                        html += '<div class="tip_header"><div class="tip_date">{/literal}{l s="Connected Rooms" js=1}{literal}</div></div>';
+                        html += '<div class="tip-body">';
+                        for (var type in details) {
+                            html += '<div>';
+                            html += '<div class="tip_element_head">' + type + '</div>';
+                            html += '<div class="tip_element_value">';
+                            var rooms = details[type];
+                            for (var i = 0; i < rooms.length; i++) {
+                                html += rooms[i].connected_room_num + (i < rooms.length - 1 ? ', ' :
+                                    '');
+                            }
+                            html += '</div></div>';
+                        }
+                        html += '</div></div>';
+                        return html;
+                    },
+                    position: {
+                        my: "center bottom-10",
+                        at: "center top",
+                        collision: "flipfit"
+                    }
+                });
+            }
+        {/literal}
     });
 </script>

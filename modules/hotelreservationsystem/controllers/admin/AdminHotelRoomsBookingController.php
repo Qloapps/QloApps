@@ -387,7 +387,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'link' => $this->context->link,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
-            'htl_connected_rooms' => HotelRoomConnected::getConnectedRoomsByHotel($this->id_hotel, $this->context->language->id, 0, true),
+            'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($this->context->language->id, true, true),
         ));
 
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
