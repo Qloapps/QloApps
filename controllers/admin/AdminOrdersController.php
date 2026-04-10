@@ -1281,6 +1281,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->addJqueryUI('ui.datepicker');
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
+        $this->addJqueryUI('ui.tooltip', 'base', true);
 
         if ($this->display == 'view') {
             if ($this->loadObject()) {
