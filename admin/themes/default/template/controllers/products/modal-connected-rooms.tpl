@@ -100,7 +100,7 @@
                                                                         data-connected-id="{$row.id_connected_room|intval}"
                                                                         data-room-id="{$row.id_room_information|intval}"
                                                                         data-connected-room-id="{$row.id_room|intval}"
-                                                                        data-hotel-id="{$row.id_hotel|intval}" title="{l s='Remove'}">
+                                                                        title="{l s='Remove'}">
                                                                         <i class="icon-trash"></i>
                                                                     </a>
                                                                 </td>
@@ -183,5 +183,4 @@
             </form>
         </div>
     </div>
-    <input type="hidden" id="hotel_id" value="{$hotel_id|intval}">
 </div>

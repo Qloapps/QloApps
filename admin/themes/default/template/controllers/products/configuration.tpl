@@ -120,7 +120,7 @@
                                     {if isset($room_info['id'])}
                                         <a href="#" class="btn btn-default connectedRoomModal" data-toggle="modal"
                                             data-target="#connectedRoomModal" data-id-room="{$room_info['id']|intval}"
-                                            data-id-hotel="{$room_info['id_hotel']|intval}" data-room-num="{$room_info['room_num']|escape:'html':'UTF-8'}"
+                                            data-room-num="{$room_info['room_num']|escape:'html':'UTF-8'}"
                                             data-room-type="{$room_info['id_product']|intval}">
                                             <span class="connected-room-icon-wrapper">
                                                 <i class="icon-random"></i>
@@ -661,44 +661,55 @@
         {/literal}
 
         // Add new room detail
-        $('#add-more-rooms-button').on('click',function() {
-            var lengthRooms = parseInt($('.room_data_values').length);
+            $('#add-more-rooms-button').on('click', function() {
+                var lengthRooms = parseInt($('.room_data_values').length);
 
-            var prefix = 'rooms_info['+lengthRooms+']';
-            html = '<tr class="room_data_values" data-row-index="'+lengthRooms+'">';
+                var prefix = 'rooms_info[' + lengthRooms + ']';
+                html = '<tr class="room_data_values" data-row-index="' + lengthRooms + '">';
                 html += '<td class="center">';
-                    html += '<input type="checkbox" disabled name="selected_room_ids[]">';
+                html += '<input type="checkbox" disabled name="selected_room_ids[]">';
                 html += '</td>';
                 html += '<td class="col-sm-1 center">';
-                    html += '<input class="form-control" type="text" name="'+prefix+'[room_num]">';
+                html += '<input class="form-control" type="text" name="' + prefix + '[room_num]">';
                 html += '</td>';
                 html += '<td class="col-sm-2 center">';
-                    html += '<input class="form-control" type="text" name="'+prefix+'[floor]">';
+                html += '<input class="form-control" type="text" name="' + prefix + '[floor]">';
                 html += '</td>';
                 html += '<td class="col-sm-2 center">';
-                    html += '<select class="form-control room_status" name="'+prefix+'[id_status]">';
-                        $.each(rm_status, function(key, value) {
-                            html += '<option value="'+value.id+'">'+value.status+'</option>';
-                        });
-                    html += '</select>';
+                html += '<select class="form-control room_status" name="' + prefix + '[id_status]">';
+                $.each(rm_status, function(key, value) {
+                    html += '<option value="' + value.id + '">' + value.status + '</option>';
+                });
+                html += '</select>';
                 html += '</td>';
                 html += '<td class="col-sm-3 center">';
-                    html += '<input class="form-control" type="text" name="'+prefix+'[comment]">';
+                html += '<input class="form-control" type="text" name="' + prefix + '[comment]">';
                 html += '</td>';
                 html += '<td class="center col-sm-2">';
-                    html += '<a class="btn btn-default deactiveDatesModal disabled" data-toggle="modal" data-target="#deactiveDatesModal">';
-                        html += "{l s='Add Dates'}";
-                    html += '</a>';
-                    html += '<input type="hidden" class="form-control disable_dates_json" name="'+prefix+'[disable_dates_json]">';
+                html +=
+                    '<a class="btn btn-default deactiveDatesModal disabled" data-toggle="modal" data-target="#deactiveDatesModal">';
+                html += "{l s='Add Dates'}";
+                html += '</a>';
+                html += '<input type="hidden" class="form-control disable_dates_json" name="' + prefix +
+                    '[disable_dates_json]">';
+                html += '</td>';
+                html += '<td class="col-sm-1 center">';
+                html += '<a href="#" class="btn btn-default disabled">';
+                html += '<span class="connected-room-icon-wrapper">';
+                html += '<i class="icon-random"></i>';
+                html += '<span class="connected-room-count">0</span>';
+                html += '</span>';
+                html += '</a>';
                 html += '</td>';
                 html += '{hook h='displayHotelRoomListTableRowColumn'}';
                 html += '<td class="center col-sm-1">';
-                    html += '<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>';
+                html +=
+                    '<a href="#" class="remove-rooms-button btn btn-default"><i class="icon-trash"></i></a>';
                 html += '</td>';
-            html += '</tr>';
+                html += '</tr>';
 
-            $('table.hotel-room tbody').append(html);
-        });
+                $('table.hotel-room tbody').append(html);
+            });
 
         // delete room
         $('.rm_htl_room').on('click',function(e) {
@@ -714,13 +725,26 @@
                     action:'deleteHotelRoom',
                     id: id_htl_info,
                 },
-                success: function (response) {
+                success: function(response) {
                     if (response.success) {
                         showSuccessMessage("{l s='Removed successfully'}");
                         $current.closest(".room_data_values").remove();
+                        if (response.affected_rooms && response.affected_rooms.length) {
+                            $.each(response.affected_rooms, function(i, roomId) {
+                                var $badge = $(
+                                    '.connectedRoomModal[data-id-room="' +
+                                    roomId + '"] .connected-room-count');
+                                if ($badge.length) {
+                                    var count = parseInt($badge.text().trim());
+                                    if (count > 0) {
+                                        $badge.text(count - 1);
+                                    }
+                                }
+                            });
+                        }
                     } else {
                         if (response.errors)
-                        showErrorMessage(response.errors);
+                            showErrorMessage(response.errors);
                     }
                 },
                 error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -1935,7 +1959,6 @@
             e.preventDefault();
 
             let roomId = $(this).data('id-room');
-            let hotelId = $(this).data('id-hotel');
             let roomNum = $(this).data('room-num');
             let currentRoomType = $('[name="id_product"]').val();
             $.ajax({
@@ -1946,7 +1969,6 @@
                     ajax: true,
                     action: 'getModalConnectedRooms',
                     room_id: roomId,
-                    hotel_id: hotelId,
                     current_roomtype: currentRoomType,
                 },
                 success: function(response) {
@@ -2051,7 +2073,6 @@
             var $row = $(this).closest('tr');
             var mainRoomId = $('#connected_room_main_id').val();
             var connectedRoomId = $row.find('.connect-room').val();
-            var hotelId = $('#hotel_id').val();
             let currentRoomType = $('[name="id_product"]').val();
             if (!connectedRoomId) {
                 alert(selectRoomText);
@@ -2065,7 +2086,6 @@
                     ajax: true,
                     action: 'ManageConnectedRoom',
                     mode: 'add',
-                    hotel_id: hotelId,
                     room_id: mainRoomId,
                     connected_room_id: connectedRoomId,
                     current_roomtype: currentRoomType,
@@ -2109,7 +2129,6 @@
             var mainRoomId = $('#connected_room_main_id').val();
             var connectedRoomId = $(this).data('connected-room-id');
             var connectedId = $(this).data('connected-id');
-            var hotelId = $(this).data('hotel-id');
             let currentRoomType = $('[name="id_product"]').val();
             $.ajax({
                 url: prod_link,
@@ -2122,7 +2141,6 @@
                     room_id: mainRoomId,
                     connected_room_id: connectedRoomId,
                     connected_id: connectedId,
-                    hotel_id: hotelId,
                     current_roomtype: currentRoomType,
                 },
                 success: function(response) {

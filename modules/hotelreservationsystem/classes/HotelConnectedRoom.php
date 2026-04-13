@@ -97,4 +97,25 @@ class HotelConnectedRoom extends ObjectModel
             return ($results === false) ? array() : $results;
         }
     }
+
+    public static function getRoomConnectedWith($roomId)
+    {
+        $objHotelRoomInformation = new HotelRoomInformation($roomId);
+        $idProduct = $objHotelRoomInformation->id_product;
+        if (!$idProduct) {
+            return array();
+        }
+        $sql = 'SELECT DISTINCT case 
+                    WHEN hcr.id_room = ' . (int) $roomId . ' THEN hcr.id_room_connected 
+                    ELSE hcr.id_room 
+                END AS affected_room_id
+                FROM `' . _DB_PREFIX_ . 'htl_connected_room` hcr
+                INNER JOIN `' . _DB_PREFIX_ . 'htl_room_information` hri 
+                    ON (hri.id = hcr.id_room OR hri.id = hcr.id_room_connected)
+                WHERE (hcr.id_room = ' . (int) $roomId . ' OR hcr.id_room_connected = ' . (int) $roomId . ')
+                AND hri.id != ' . (int) $roomId . '
+                AND hri.id_product = ' . (int) $idProduct;
+        $results = Db::getInstance()->executeS($sql);
+        return $results ? array_column($results, 'affected_room_id') : array();
+    }
 }

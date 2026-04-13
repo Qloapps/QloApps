@@ -3726,6 +3726,7 @@ class AdminProductsControllerCore extends AdminController
                 $this->errors[] = $this->l('This room cannot be deleted as this room contains future booking.');
             }
             if (empty($this->errors)) {
+                $response['affected_rooms'] = HotelConnectedRoom::getRoomConnectedWith($idRoom);
                 if ($objRoomInfo->delete()) {
                     $response['success'] = true;
                 } else {
@@ -5707,8 +5708,8 @@ class AdminProductsControllerCore extends AdminController
                 ]));
             }
 
-            $objHotelRoomConnected = new HotelConnectedRoom($connectedId);
-            if ($objHotelRoomConnected->delete()) {
+            $objHotelConnectedRoom = new HotelConnectedRoom($connectedId);
+            if ($objHotelConnectedRoom->delete()) {
                 $modalContent = $this->getConnectedRoomsModalHtml($roomId, $currentRoomType);
                 die(json_encode([
                     'success' => true,
