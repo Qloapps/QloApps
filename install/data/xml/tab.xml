@@ -117,6 +117,9 @@
     <tab id="Order_Messages" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminOrderMessage</class_name>
     </tab>
+    <tab id="Guest_Registration" id_parent="Orders" active="1" hide_host_mode="0">
+      <class_name>AdminGuestRegistration</class_name>
+    </tab>
     <tab id="Customers_1" id_parent="Customers" active="1" hide_host_mode="0">
       <class_name>AdminCustomers</class_name>
     </tab>

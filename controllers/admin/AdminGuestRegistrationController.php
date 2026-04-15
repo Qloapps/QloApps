@@ -37,7 +37,6 @@ class AdminGuestRegistrationControllerCore extends AdminController
         $this->className = 'GuestRegPurpose';
         $this->identifier = 'id_guest_reg_purpose';
         $this->lang = true;
-        $this->override_folder = 'guest_registration'.DIRECTORY_SEPARATOR;
 
         parent::__construct();
 

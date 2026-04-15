@@ -42,9 +42,10 @@
                                 <td class="dynamic-name-cell">
                                     {foreach from=$languages item=language}
                                         <div class="translatable-field row lang-{$language.id_lang}" {if $language.id_lang != $default_form_language}style="display:none;"{/if}>
-                                            <div class="col-lg-9">
+                                            <div class="col-lg-{if $languages|count > 1}9{else}12{/if}">
                                                 <input type="text" class="form-control" name="{$entity_name}[{$row.id|intval}][name][{$language.id_lang|intval}]" value="{$row.name[$language.id_lang]|default:''|escape:'html':'UTF-8'}" />
                                             </div>
+                                            {if $languages|count > 1}
                                             <div class="col-lg-2">
                                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                                     <span class="js-locale-btn">{$language.iso_code|escape:'html':'UTF-8'}</span> <span class="caret"></span>
@@ -55,6 +56,7 @@
                                                     {/foreach}
                                                 </ul>
                                             </div>
+                                            {/if}
                                         </div>
                                     {/foreach}
                                 </td>
@@ -74,9 +76,10 @@
                             <td class="dynamic-name-cell">
                                 {foreach from=$languages item=language}
                                     <div class="translatable-field row lang-{$language.id_lang}" {if $language.id_lang != $default_form_language}style="display:none;"{/if}>
-                                        <div class="col-lg-9">
+                                        <div class="col-lg-{if $languages|count > 1}9{else}12{/if}">
                                             <input type="text" class="form-control" data-name="__ENTITY__[__INDEX__][name][{$language.id_lang|intval}]" value="" />
                                         </div>
+                                        {if $languages|count > 1}
                                         <div class="col-lg-2">
                                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                                 <span class="js-locale-btn">{$language.iso_code|escape:'html':'UTF-8'}</span> <span class="caret"></span>
@@ -87,6 +90,7 @@
                                                 {/foreach}
                                             </ul>
                                         </div>
+                                        {/if}
                                     </div>
                                 {/foreach}
                             </td>
@@ -129,9 +133,10 @@
                                 <td class="dynamic-name-cell">
                                     {foreach from=$languages item=language}
                                         <div class="translatable-field row lang-{$language.id_lang}" {if $language.id_lang != $default_form_language}style="display:none;"{/if}>
-                                            <div class="col-lg-9">
+                                            <div class="col-lg-{if $languages|count > 1}9{else}12{/if}">
                                                 <input type="text" class="form-control" name="{$entity_name}[{$row.id|intval}][name][{$language.id_lang|intval}]" value="{$row.name[$language.id_lang]|default:''|escape:'html':'UTF-8'}" />
                                             </div>
+                                            {if $languages|count > 1}
                                             <div class="col-lg-2">
                                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                                     <span class="js-locale-btn">{$language.iso_code|escape:'html':'UTF-8'}</span> <span class="caret"></span>
@@ -142,6 +147,7 @@
                                                     {/foreach}
                                                 </ul>
                                             </div>
+                                            {/if}
                                         </div>
                                     {/foreach}
                                 </td>
@@ -161,9 +167,10 @@
                             <td class="dynamic-name-cell">
                                 {foreach from=$languages item=language}
                                     <div class="translatable-field row lang-{$language.id_lang}" {if $language.id_lang != $default_form_language}style="display:none;"{/if}>
-                                        <div class="col-lg-9">
+                                        <div class="col-lg-{if $languages|count > 1}9{else}12{/if}">
                                             <input type="text" class="form-control" data-name="__ENTITY__[__INDEX__][name][{$language.id_lang|intval}]" value="" />
                                         </div>
+                                        {if $languages|count > 1}
                                         <div class="col-lg-2">
                                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                                 <span class="js-locale-btn">{$language.iso_code|escape:'html':'UTF-8'}</span> <span class="caret"></span>
@@ -174,6 +181,7 @@
                                                 {/foreach}
                                             </ul>
                                         </div>
+                                        {/if}
                                     </div>
                                 {/foreach}
                             </td>
@@ -216,9 +224,10 @@
                                 <td class="dynamic-name-cell">
                                     {foreach from=$languages item=language}
                                         <div class="translatable-field row lang-{$language.id_lang}" {if $language.id_lang != $default_form_language}style="display:none;"{/if}>
-                                            <div class="col-lg-9">
+                                            <div class="col-lg-{if $languages|count > 1}9{else}12{/if}">
                                                 <input type="text" class="form-control" name="{$entity_name}[{$row.id|intval}][name][{$language.id_lang|intval}]" value="{$row.name[$language.id_lang]|default:''|escape:'html':'UTF-8'}" />
                                             </div>
+                                            {if $languages|count > 1}
                                             <div class="col-lg-2">
                                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                                     <span class="js-locale-btn">{$language.iso_code|escape:'html':'UTF-8'}</span> <span class="caret"></span>
@@ -229,6 +238,7 @@
                                                     {/foreach}
                                                 </ul>
                                             </div>
+                                            {/if}
                                         </div>
                                     {/foreach}
                                 </td>
@@ -248,9 +258,10 @@
                             <td class="dynamic-name-cell">
                                 {foreach from=$languages item=language}
                                     <div class="translatable-field row lang-{$language.id_lang}" {if $language.id_lang != $default_form_language}style="display:none;"{/if}>
-                                        <div class="col-lg-9">
+                                        <div class="col-lg-{if $languages|count > 1}9{else}12{/if}">
                                             <input type="text" class="form-control" data-name="__ENTITY__[__INDEX__][name][{$language.id_lang|intval}]" value="" />
                                         </div>
+                                        {if $languages|count > 1}
                                         <div class="col-lg-2">
                                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                                 <span class="js-locale-btn">{$language.iso_code|escape:'html':'UTF-8'}</span> <span class="caret"></span>
@@ -261,6 +272,7 @@
                                                 {/foreach}
                                             </ul>
                                         </div>
+                                        {/if}
                                     </div>
                                 {/foreach}
                             </td>

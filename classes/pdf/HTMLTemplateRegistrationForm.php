@@ -133,6 +133,7 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
      */
     protected function getGuestData(Customer $objCustomer)
     {
+        $idGender = (int)$objCustomer->id_gender;
         $guestFullName = trim($objCustomer->firstname.' '.$objCustomer->lastname);
         $guestEmail = $objCustomer->email;
         $guestPhone = '';
@@ -180,6 +181,7 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
         }
 
         return array(
+            'id_gender' => $idGender,
             'full_name' => $guestFullName,
             'email' => $guestEmail,
             'mobile' => $guestPhone,
