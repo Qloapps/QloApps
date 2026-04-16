@@ -1572,6 +1572,7 @@
 					id_room: idRoom,
 					id_cart: idCart,
 					id_product: idProduct,
+					id_customer: id_customer,
 					id_hotel_cart_booking: idHotelCartBooking,
 					action: 'getRoomTypeCartDemands',
 					ajax: true
@@ -1877,7 +1878,7 @@
             <i class="icon-user"></i>
             {l s='Customer'}
         </div>
-        <div id="search-customer-form-group" class="form-group">
+        <div id="search-customer-form-group" {if isset($cart->id_customer) && $cart->id_customer &&  isset($customer) && $customer }style="display:none;"{/if} class="form-group">
             <label class="control-label col-lg-3">
                 <span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing customer by typing the first letters of his/her name.'}">
                     {l s='Search for a customer'}
@@ -1904,7 +1905,26 @@
             </div>
         </div>
         <div class="row">
-            <div id="customers"></div>
+            <div id="customers">
+			 	{if isset($cart->id_customer) && $cart->id_customer && isset($customer) && $customer }
+					<div class="customerCard col-lg-4 selected-customer">
+						<div class="panel">
+							<div class="panel-heading">
+							<i class="icon-ok text-success"></i>{$customer->firstname} {$customer->lastname} <span class="pull-right">#{$customer->id}</span>
+							</div>
+							<span>{$customer->email}</span><br>
+							<span class="text-muted"></span><br>
+							<div class="panel-footer">
+							<a href="{$link->getAdminLink('AdminCustomers')}&id_customer={$customer->id}&viewcustomer&liteDisplaying=1" class="btn btn-default fancybox">
+								<i class="icon-search"></i> Details </a>
+								<button type="button" data-id_cart="6" data-customer="2" class="btn btn-default pull-right change-customer">
+									<i class="icon-refresh"></i>&nbsp;Change 
+								</button>
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
         </div>
         {*<div id="carts">
             <button type="button" id="show_old_carts" class="btn btn-default pull-right" data-toggle="collapse" data-target="#old_carts_orders">
@@ -1962,7 +1982,7 @@
     </div>
 	{include file='controllers/orders/_current_cart_details_data.tpl'}
 
-    <form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;addorder=1&amp;cart_id={$cart->id}" method="post" style="display:none" id="cart_detail_form">
+    <form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;addorder=1&amp;cart_id={$cart->id}" method="post" {if !isset($customer) && !$customer }style="display:none;"{/if} id="cart_detail_form">
         <div class="panel" id="products_part" style="display:none;">
             <div class="panel-heading">
                 <i class="icon-shopping-cart"></i>

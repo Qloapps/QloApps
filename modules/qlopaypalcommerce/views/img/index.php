@@ -1,3 +1,4 @@
+<?php
 /**
 * NOTICE OF LICENSE
 *
@@ -20,40 +21,12 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-#wk-overlay {
-    background: #ffffff;
-    color: #666666;
-    position: fixed;
-    height: 100%;
-    width: 100%;
-    z-index: 5000;
-    top: 0;
-    left: 0;
-    float: left;
-    text-align: center;
-    padding-top: 25%;
-    opacity: .80;}
-.wk-spinner {
-      margin: 0 auto;
-      height: 64px;
-      width: 64px;
-      animation: rotate 0.8s infinite linear;
-      border: 5px solid #777;
-      border-right-color: transparent;
-      border-radius: 50%;}
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 
-@keyframes rotate {
-    0% {transform: rotate(0deg);}
-    100% {transform: rotate(360deg);}}
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
 
-p.payment_module a#qlo_paypal_btn {
-    background: url(../../img/paypal-payment-icon.png) 15px 8px no-repeat #fbfbfb;
-}
-
-.qlo_paypal_methods_wrapper {
-    text-align: center;
-    padding: 20px 15px;
-    background: #fbfbfb;
-    border-radius: 3px;
-    border: 1px solid #d6d4d4;
-}
+header('Location: ../../../');
+exit;

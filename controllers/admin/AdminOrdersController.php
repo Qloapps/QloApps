@@ -485,6 +485,7 @@ class AdminOrdersControllerCore extends AdminController
                     'advance_payment_amount_without_tax' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
                     'advance_payment_amount_with_tax' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
                     'cart' => $cart,
+                    'customer' => $cart->id_customer ? new Customer($cart->id_customer): null ,
                     'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
                     'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
                     'payment_modules' => $payment_modules,
