@@ -46,9 +46,13 @@ class HotelConnectedRoom extends ObjectModel
     public static function getConnectedRooms($idLang, $roomId = null, $isConnected = true ,$count = false)
     {
         $idLang = (int) $idLang;
-        $roomId = (int) $roomId;
-        $objHotelRoomInformation = new HotelRoomInformation($roomId);
-        $hotelId = $objHotelRoomInformation->id_hotel;
+        $roomId = (!is_bool($roomId) && Validate::isUnsignedId($roomId)) ? (int) $roomId : 0;
+        $hotelId = 0;
+
+        if ($roomId > 0) {
+            $objHotelRoomInformation = new HotelRoomInformation($roomId);
+            $hotelId = (int) $objHotelRoomInformation->id_hotel;
+        }
 
         if ($isConnected) {
             $sql = 'SELECT 
@@ -59,8 +63,11 @@ class HotelConnectedRoom extends ObjectModel
             INNER JOIN `' . _DB_PREFIX_ . 'htl_room_information` connected_room ON connected_room.id = hcr.id_room_connected
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` main_pl ON (main_pl.id_product = main_room.id_product AND main_pl.id_lang = ' . (int) $idLang . ')
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` conn_pl ON (conn_pl.id_product = connected_room.id_product AND conn_pl.id_lang = ' . (int) $idLang . ')
-            WHERE main_room.id_hotel = ' . (int) $hotelId . '
-            AND connected_room.id_hotel = ' . (int) $hotelId;
+            WHERE 1';
+            if ($hotelId > 0) {
+                $sql .= ' AND main_room.id_hotel = ' . (int) $hotelId . '
+                AND connected_room.id_hotel = ' . (int) $hotelId;
+            }
             if ($roomId > 0) {
                 $sql .= ' AND main_room.id = ' . (int) $roomId;
             }
@@ -89,8 +96,11 @@ class HotelConnectedRoom extends ObjectModel
             $sql = 'SELECT hri.*, pl.name AS room_type
             FROM `' . _DB_PREFIX_ . 'htl_room_information` hri
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl ON (pl.id_product = hri.id_product AND pl.id_lang = ' . (int) $idLang . ')
-            WHERE hri.id_hotel = ' . (int) $hotelId . '
-            AND hri.id != ' . (int) $roomId . '
+            WHERE 1';
+            if ($hotelId > 0) {
+                $sql .= ' AND hri.id_hotel = ' . (int) $hotelId;
+            }
+            $sql .= ' AND hri.id != ' . (int) $roomId . '
             AND NOT EXISTS (SELECT 1 FROM `' . _DB_PREFIX_ . 'htl_connected_room` cr WHERE cr.id_room = ' . (int) $roomId . ' AND cr.id_room_connected = hri.id)
             ORDER BY hri.room_num ASC';
             $results = Db::getInstance()->executeS($sql);
