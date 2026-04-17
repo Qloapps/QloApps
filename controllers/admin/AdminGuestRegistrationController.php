@@ -97,6 +97,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
 
     public function postProcess()
     {
+        // ddd(Tools::getAllValues());
         if (Tools::isSubmit('submitBulkGuestRegistrationValues')) {
             $this->processBulkDynamicFieldSave();
 
@@ -162,9 +163,9 @@ class AdminGuestRegistrationControllerCore extends AdminController
             'languages' => $languages,
             'default_form_language' => $defaultFormLanguage,
             'dynamic_form_action' => self::$currentIndex.'&token='.$this->token,
-            'guest_reg_purpose_rows' => $this->getEntityRows('purpose'),
-            'guest_reg_id_proof_rows' => $this->getEntityRows('id_proof'),
-            'guest_reg_payment_method_rows' => $this->getEntityRows('payment_method'),
+            'guest_reg_purpose_rows' => $this->getEntityRowsForDisplay('purpose', $languages),
+            'guest_reg_id_proof_rows' => $this->getEntityRowsForDisplay('id_proof', $languages),
+            'guest_reg_payment_method_rows' => $this->getEntityRowsForDisplay('payment_method', $languages),
         ));
 
         return $this->createTemplate('dynamic_tables.tpl')->fetch();
@@ -286,6 +287,77 @@ class AdminGuestRegistrationControllerCore extends AdminController
         return true;
     }
 
+    /**
+     * @param string $entityKey
+     * @param array $languages
+     *
+     * @return array
+     */
+    protected function getEntityRowsForDisplay($entityKey, $languages)
+    {
+        if (Tools::isSubmit('submitBulkGuestRegistrationValues') && count($this->errors)) {
+            return $this->getPostedEntityRowsForDisplay($entityKey, $languages);
+        }
+
+        return $this->getEntityRows($entityKey);
+    }
+
+    /**
+     * @param string $entityKey
+     * @param array $languages
+     *
+     * @return array
+     */
+    protected function getPostedEntityRowsForDisplay($entityKey, $languages)
+    {
+        $entity = $this->getManagedEntity($entityKey);
+        $postedRows = Tools::getValue($entity['table'], array());
+        $rows = array();
+
+        if (!is_array($postedRows)) {
+            return $rows;
+        }
+
+        foreach ($postedRows as $rowKey => $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+
+            $displayRow = array(
+                'id' => !empty($row['id']) ? (int)$row['id'] : 0,
+                'form_key' => $this->sanitizeDynamicRowKey($rowKey),
+                'active' => !empty($row['active']) ? 1 : 0,
+                'date_add' => '',
+                'name' => array(),
+            );
+
+            foreach ($languages as $language) {
+                $idLang = (int)$language['id_lang'];
+                $displayRow['name'][$idLang] = isset($row['name'][$idLang]) ? (string)$row['name'][$idLang] : '';
+            }
+
+            $rows[] = $displayRow;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param string|int $rowKey
+     *
+     * @return string
+     */
+    protected function sanitizeDynamicRowKey($rowKey)
+    {
+        $rowKey = (string)$rowKey;
+
+        if (preg_match('/^[a-zA-Z0-9_-]+$/', $rowKey)) {
+            return $rowKey;
+        }
+
+        return 'new_'.time();
+    }
+
     protected function getEntityRows($entityKey)
     {
         $entity = $this->getManagedEntity($entityKey);
@@ -306,6 +378,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
                 if (!isset($rows[$idEntity])) {
                     $rows[$idEntity] = array(
                         'id' => $idEntity,
+                        'form_key' => $idEntity,
                         'active' => (int)$row['active'],
                         'date_add' => $row['date_add'],
                         'name' => array(),
@@ -364,7 +437,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
             3 => $this->l('Payment & Deposit'),
             4 => $this->l('Property Regulations'),
             5 => $this->l('For Office Use Only'),
-            6 => $this->l('Footer'),
+            6 => $this->l('Property Logo'),
         );
     }
 

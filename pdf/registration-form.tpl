@@ -28,15 +28,17 @@
 						{l s='GUEST REGISTRATION CARD' pdf='true'}
 					</td>
 				</tr>
-				<tr>
-					<td width="100%" class="center">
-						{if $registration_form.property.logo_path}
-							<img src="{$registration_form.property.logo_path}" style="height:60px;" />
-						{else}
-							<strong>[PROPERTY LOGO]</strong>
-						{/if}
-					</td>
-				</tr>
+				{if $registration_form.config.show_property_logo}
+					<tr>
+						<td width="100%" class="center">
+							{if $registration_form.property.logo_path}
+								<img src="{$registration_form.property.logo_path}" style="height:60px;" />
+							{else}
+								<strong>[PROPERTY LOGO]</strong>
+							{/if}
+						</td>
+					</tr>
+				{/if}
 				<tr>
 					<td width="100%" class="center" style="font-size: 12pt; font-weight: bold;">
 						{$registration_form.hotel.name|escape:'html':'UTF-8'}
@@ -62,58 +64,44 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-                        <td class="white">
-                            <strong>{l s='TITLE:' pdf='true'}</strong>
-                            <span style="font-family: freeserif;">{if $registration_form.guest.id_gender == 1}&#9745;{else}&#9633;{/if}</span> {l s='Mr.' pdf='true'} &nbsp; 
-                            <span style="font-family: freeserif;">{if $registration_form.guest.id_gender == 2}&#9745;{else}&#9633;{/if}</span> {l s='Ms.' pdf='true'} &nbsp;
-                        </td>
-                    </tr>
-					<tr>
-						<td class="white">
-							<table width="100%" cellpadding="4" cellspacing="0">
-								<tr>
-									<td width="25%" class="bold">{l s='Full Name (As per ID):' pdf='true'}</td>
-									<td width="75%" class="white">{$registration_form.guest.full_name|escape:'html':'UTF-8'}</td>
-								</tr>
-								<tr>
-									<td width="25%" class="bold">{l s='Phone / Mobile:' pdf='true'}</td>
-									<td width="25%" class="white">{$registration_form.guest.mobile|escape:'html':'UTF-8'}</td>
-									<td width="15%" class="bold">{l s='Email:' pdf='true'}</td>
-									<td width="35%" class="white">{$registration_form.guest.email|escape:'html':'UTF-8'}</td>
-								</tr>
-								<tr>
-									<td width="25%" class="bold">{l s='Date of Birth:' pdf='true'}</td>
-									<td width="25%" class="white">____ / ____ / ________</td>
-									<td width="15%" class="bold">{l s='Nationality:' pdf='true'}</td>
-									<td width="35%" class="white">________________________</td>
-								</tr>
-								<tr>
-									<td width="25%" class="bold">{l s='City / Country:' pdf='true'}</td>
-									<td width="25%" class="white">
-										{if $registration_form.guest.city_country}
-											{$registration_form.guest.city_country|escape:'html':'UTF-8'}
-										{else}
-											________________________
-										{/if}
-									</td>
-									<td width="15%" class="bold">{l s='Postal Code:' pdf='true'}</td>
-									<td width="35%" class="white">
-										{if $registration_form.guest.postcode}
-											{$registration_form.guest.postcode|escape:'html':'UTF-8'}
-										{else}
-											__________
-										{/if}
-									</td>
-								</tr>
-								<tr>
-									<td width="25%" class="bold">{l s='Address:' pdf='true'}</td>
-									<td width="75%" class="white">{$registration_form.guest.address}</td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</tbody>
+    <tr>
+        <td class="white">
+            <table width="100%" cellpadding="4" cellspacing="0">
+                <tr>
+                    <td width="25%" class="bold">{l s='TITLE:' pdf='true'}</td>
+                    <td width="25%" class="white">
+                        <span style="font-family: freeserif;">&#9633;</span> {l s='Mr.' pdf='true'} &nbsp; 
+                        <span style="font-family: freeserif;">&#9633;</span> {l s='Ms.' pdf='true'} &nbsp;
+                    </td>
+                    <td width="25%" class="bold">{l s='Full Name (As per ID):' pdf='true'}</td>
+                    <td width="25%" class="white">________________________</td>
+                </tr>
+                <tr>
+                    <td width="25%" class="bold">{l s='Phone / Mobile:' pdf='true'}</td>
+                    <td width="25%" class="white">________________________</td>
+                    <td width="25%" class="bold">{l s='Email:' pdf='true'}</td>
+                    <td width="25%" class="white">________________________</td>
+                </tr>
+                <tr>
+                    <td width="25%" class="bold">{l s='Date of Birth:' pdf='true'}</td>
+                    <td width="25%" class="white">____ / ____ / ________</td>
+                    <td width="25%" class="bold">{l s='Nationality:' pdf='true'}</td>
+                    <td width="25%" class="white">________________________</td>
+                </tr>
+                <tr>
+                    <td width="25%" class="bold">{l s='City / Country:' pdf='true'}</td>
+                    <td width="25%" class="white">________________________</td>
+                    <td width="25%" class="bold">{l s='Postal Code:' pdf='true'}</td>
+                    <td width="25%" class="white">________________________</td>
+                </tr>
+                <tr>
+                    <td width="25%" class="bold">{l s='Address:' pdf='true'}</td>
+                    <td width="75%" colspan="3" class="white">__________________________________________________________________________________</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
 			</table>
 		</td>
 	</tr>
@@ -134,25 +122,20 @@
 							<table width="100%" cellpadding="4" cellspacing="0">
 								<tr>
 									<td width="25%" class="bold">{l s='Arrived From:' pdf='true'}</td>
-									<td width="30%" class="white">________________________</td>
+									<td width="25%" class="white">________________________</td>
 									<td width="25%" class="bold">{l s='Next Destination:' pdf='true'}</td>
-									<td width="20%" class="white">___________________</td>
+									<td width="25%" class="white">___________________</td>
 								</tr>
 								<tr>
-                                    <td width="25%" class="bold">{l s='Purpose of Visit:' pdf='true'}</td>
-                                    <td width="75%" colspan="3" class="white">
-                                        {if $registration_form.dynamic_fields.purpose_of_visit|@count}
-                                            {foreach from=$registration_form.dynamic_fields.purpose_of_visit item=item}
-                                                <span style="font-family: freeserif;">&#9633;</span> {$item.name|escape:'html':'UTF-8'} &nbsp;&nbsp;
-                                            {/foreach}
-                                        {else}________________________
-                                        {/if}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="25%" class="bold">{l s='Flight / Train Number:' pdf='true'}</td>
-                                    <td width="75%" colspan="3" class="white">___________________</td>
-                                </tr>
+									<td width="25%" class="bold">{l s='Flight / Train Number:' pdf='true'}</td>
+									<td width="25%" class="white">________________________</td>
+									<td width="25%" class="bold">{l s='Vehicle Reg. No.:' pdf='true'}</td>
+									<td width="25%" class="white">___________________</td>
+								</tr>
+								<tr>
+									<td width="25%" class="bold">{l s='Purpose of Visit:' pdf='true'}</td>
+										<td width="75%" colspan="3" class="white">{if $registration_form.dynamic_fields.purpose_of_visit|@count}{foreach from=$registration_form.dynamic_fields.purpose_of_visit item=item name=purposeOfVisit}{if !$smarty.foreach.purposeOfVisit.first} {/if}<span style="font-family: freeserif; white-space: nowrap;">&#9633;&nbsp;{$item.name|escape:'html':'UTF-8'|replace:' ':'&nbsp;'}</span>{/foreach}{else}________________________{/if}</td>
+								</tr>
 							</table>
 						</td>
 					</tr>
@@ -176,22 +159,28 @@
 						<td class="white">
 							<table width="100%" cellpadding="4" cellspacing="0">
 								<tr>
-									<td width="28%" class="bold">{l s='Booking Reference No.:' pdf='true'}</td>
-									<td width="22%" class="white">{$registration_form.stay.booking_reference|escape:'html':'UTF-8'}</td>
-									<td width="28%" class="bold">{l s='Vehicle Reg. No.:' pdf='true'}</td>
-									<td width="22%" class="white">________________</td>
+									<td width="25%" class="bold">{l s='Booking Reference No.:' pdf='true'}</td>
+									<td width="25%" class="white">{$registration_form.stay.booking_reference|escape:'html':'UTF-8'}</td>
+									<td width="25%" class="bold">{l s='Rate per Night:' pdf='true'}</td>
+									<td width="25%" class="white">
+										{if $registration_form.stay.rate_per_night}
+											{$registration_form.stay.rate_per_night|escape:'html':'UTF-8'}
+										{else}
+											__________
+										{/if}
+									</td>
 								</tr>
 								<tr>
-									<td width="28%" class="bold">{l s='Arrival Date & Time:' pdf='true'}</td>
-									<td width="22%" class="white">
+									<td width="25%" class="bold">{l s='Arrival Date & Time:' pdf='true'}</td>
+									<td width="25%" class="white">
 										{if $registration_form.stay.arrival_date_time}
 											{$registration_form.stay.arrival_date_time|escape:'html':'UTF-8'}
 										{else}
 											____ / ____ / ____  ______
 										{/if}
 									</td>
-									<td width="28%" class="bold">{l s='Departure Date & Time:' pdf='true'}</td>
-									<td width="22%" class="white">
+									<td width="25%" class="bold">{l s='Departure Date & Time:' pdf='true'}</td>
+									<td width="25%" class="white">
 										{if $registration_form.stay.departure_date_time}
 											{$registration_form.stay.departure_date_time|escape:'html':'UTF-8'}
 										{else}
@@ -200,24 +189,16 @@
 									</td>
 								</tr>
 								<tr>
-									<td width="28%" class="bold">{l s='Room Type:' pdf='true'}</td>
-									<td width="22%" class="white">{$registration_form.stay.room_type|escape:'html':'UTF-8'}</td>
-									<td width="28%" class="bold">{l s='Room Number:' pdf='true'}</td>
-									<td width="22%" class="white">{$registration_form.stay.room_number|escape:'html':'UTF-8'}</td>
+									<td width="25%" class="bold">{l s='Room Type:' pdf='true'}</td>
+									<td width="25%" class="white">{$registration_form.stay.room_type|escape:'html':'UTF-8'}</td>
+									<td width="25%" class="bold">{l s='Room Number:' pdf='true'}</td>
+									<td width="25%" class="white">{$registration_form.stay.room_number|escape:'html':'UTF-8'}</td>
 								</tr>
 								<tr>
-									<td width="28%" class="bold">{l s='Number of Guests:' pdf='true'}</td>
-									<td width="22%" class="white">
+									<td width="25%" class="bold">{l s='Number of Guests:' pdf='true'}</td>
+									<td width="25%" class="white">
 										{l s='Adults:' pdf='true'} {$registration_form.stay.adults|escape:'html':'UTF-8'} &nbsp;
 										{l s='Children:' pdf='true'} {$registration_form.stay.children|escape:'html':'UTF-8'}
-									</td>
-									<td width="28%" class="bold">{l s='Rate per Night:' pdf='true'}</td>
-									<td width="22%" class="white">
-										{if $registration_form.stay.rate_per_night}
-											{$registration_form.stay.rate_per_night|escape:'html':'UTF-8'}
-										{else}
-											__________
-										{/if}
 									</td>
 								</tr>
 							</table>
@@ -241,19 +222,15 @@
 				<tbody>
 					<tr>
                         <td class="white">
-                            <strong><span style="font-family: freeserif; font-size: 14pt;">&#9633;</span> {l s='LOCAL GUEST' pdf='true'}</strong><br />
+                            <strong><span style="font-family: freeserif; font-size: 14pt;">&#9633;</span> {l s='LOCAL GUEST' pdf='true'}</strong><br /><br />
                             <table width="100%" cellpadding="4" cellspacing="0">
                                 <tr>	
                                     <td width="25%" class="bold">{l s='Identity Proof:' pdf='true'}</td>
-                                    <td width="75%" class="white">
-                                        {if $registration_form.dynamic_fields.identity_proof|@count}
-                                            {foreach from=$registration_form.dynamic_fields.identity_proof item=item}
-                                                <span style="font-family: freeserif;">&#9633;</span> {$item.name|escape:'html':'UTF-8'} &nbsp;&nbsp;
-                                            {/foreach}
-                                        {else}
-                                            ________________________________
-                                        {/if}
-                                    </td>
+									{if $registration_form.dynamic_fields.identity_proof|@count}
+											<td width="75%" class="white">{foreach from=$registration_form.dynamic_fields.identity_proof item=item name=identityProof}{if !$smarty.foreach.identityProof.first} {/if}<span style="font-family: freeserif; white-space: nowrap;">&#9633;&nbsp;{$item.name|escape:'html':'UTF-8'|replace:' ':'&nbsp;'}</span>{/foreach}</td>
+									{else}
+										<td width="75%" class="white">________________________________</td>
+									{/if}
                                 </tr>
                                 <tr>
                                     <td width="25%" class="bold">{l s='ID Number:' pdf='true'}</td>
@@ -264,7 +241,7 @@
                     </tr>
                     <tr>
                         <td class="white">
-                            <strong><span style="font-family: freeserif; font-size: 14pt;">&#9633;</span> {l s='INTERNATIONAL GUEST' pdf='true'}</strong><br />
+                            <strong><span style="font-family: freeserif; font-size: 14pt;">&#9633;</span> {l s='INTERNATIONAL GUEST' pdf='true'}</strong><br /><br />
                             <table width="100%" cellpadding="4" cellspacing="0">
                                 <tr>
                                     <td width="25%" class="bold">{l s='Passport No.:' pdf='true'}</td>
@@ -285,8 +262,8 @@
                                     <td width="25%" class="white">____ / ____ / ____</td>
                                 </tr>
                                 <tr>
-                                    <td width="35%" class="bold">{l s='Arrival Date in Country:' pdf='true'}</td>
-                                    <td width="65%" class="white">____ / ____ / ____</td>
+                                    <td width="25%" class="bold">{l s='Arrival Date in Country:' pdf='true'}</td>
+                                    <td width="75%" class="white">____ / ____ / ____</td>
                                 </tr>
                             </table>
                         </td>
@@ -394,21 +371,13 @@
 								<table width="100%" cellpadding="4" cellspacing="0">
 									<tr>
 										<td width="25%" class="bold">{l s='Payment Method:' pdf='true'}</td>
-										<td width="40%" class="white">
-										{if $registration_form.dynamic_fields.payment_method|@count}
-											{foreach from=$registration_form.dynamic_fields.payment_method item=item}
-												<span style="font-family: freeserif;">&#9633;</span> {$item.name|escape:'html':'UTF-8'} &nbsp;&nbsp;
-											{/foreach}
-										{else}
-											________________________
-										{/if}
-										</td>
+										<td width="75%" class="white">{if $registration_form.dynamic_fields.payment_method|@count}{foreach from=$registration_form.dynamic_fields.payment_method item=item name=paymentMethod}{if !$smarty.foreach.paymentMethod.first} {/if}<span style="font-family: freeserif; white-space: nowrap;">&#9633;&nbsp;{$item.name|escape:'html':'UTF-8'|replace:' ':'&nbsp;'}</span>{/foreach}{else}________________________________{/if}</td>
 									</tr>
 									<tr>
 										<td width="25%" class="bold">{l s='Credit Card Number:' pdf='true'}</td>
-										<td width="40%" class="white">________________________________</td>
+										<td width="35%" class="white">________________________________</td>
 										<td width="20%" class="bold">{l s='Security Deposit:' pdf='true'}</td>
-										<td width="15%" class="white">__________</td>
+										<td width="20%" class="white">__________________</td>
 									</tr>
 								</table>
 							</td>
@@ -427,11 +396,11 @@
 				<table class="bordered-table" width="100%" cellpadding="5" cellspacing="0" nobr="true">
 					<thead>
 						<tr>
-							{* <th class="header-left">{l s='8. PROPERTY REGULATIONS' pdf='true'}</th> *}
+							<th class="header-left">{l s='PROPERTY REGULATIONS' pdf='true'}</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
+						{* <tr>
 							<td class="white">
 								<table width="100%" cellpadding="4" cellspacing="0">
 									<tr>
@@ -442,7 +411,7 @@
 									</tr>
 								</table>
 							</td>
-						</tr>
+						</tr> *}
 						<tr>
 							<td class="white">
 								<strong> {l s='Check-in Time:' pdf='true'}</strong>
@@ -505,7 +474,7 @@
 		</tr>
 	{/if}
 
-	{if $registration_form.config.show_footer}
+	{* {if $registration_form.config.show_footer}
 		<tr><td colspan="12" height="10">&nbsp;</td></tr>
 
 		<tr>
@@ -525,7 +494,32 @@
 				</table>
 			</td>
 		</tr>
-	{/if}
+	{/if} *}
+	<tr>
+		<td colspan="12" height="10">&nbsp;</td>
+	</tr>
+    
+	<tr>
+		<td colspan="12">
+			<table class="bordered-table" width="100%" cellpadding="5" cellspacing="0" nobr="true">
+				<tbody>
+					<tr>
+						<td class="white">
+							<table width="100%" cellpadding="4" cellspacing="0">
+								<tr>
+									<td width="20%" class="bold">{l s='Guest Signature:' pdf='true'}</td>
+									<td width="50%" class="white">______________________________________</td>
+									<td width="10%" class="bold">{l s='Date:' pdf='true'}</td>
+									<td width="20%" class="white">____ / ____ / ________</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</td>
+	</tr>
+
 
 	{if isset($HOOK_DISPLAY_PDF)}
 	<tr>

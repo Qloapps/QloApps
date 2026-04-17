@@ -457,7 +457,7 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
             'show_payment_deposit' => in_array(3, $selectedSections),
             'show_property_regulations' => in_array(4, $selectedSections),
             'show_office_use_only' => in_array(5, $selectedSections),
-            'show_footer' => in_array(6, $selectedSections),
+            'show_property_logo' => in_array(6, $selectedSections),
         );
     }
 
