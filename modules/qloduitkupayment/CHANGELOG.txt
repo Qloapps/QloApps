@@ -1,0 +1,10 @@
+
+# V4.0.0 | COMPATIBLE:: QLOAPPS V1.7.x
+---------------------------------------------------------------
++ [CO] : Fixed compatibility issues with the QloApps 1.7.x
++ [CO] : Renamed class RoomTypeServiceProductCartDetail to ServiceProductCartDetail.
+
+---------------------------------------------------------------
+# V1.0.0 | COMPATIBLE:: QLOAPPS V1.6.x
+---------------------------------------------------------------
+- first release

@@ -261,7 +261,7 @@
                                                     {/if}
                                                     <td>{HotelRoomInformation::getRoomStatusTitle($unavail_dtl_v['id_status'])|escape:'htmlall':'UTF-8'}</td>
                                                     <td>
-                                                        {if $unavail_dtl_v['date_from'] && $unavail_dtl_v['date_to']}
+                                                        {if isset($unavail_dtl_v['date_from']) && isset($unavail_dtl_v['date_to'])}
                                                             {dateFormat date=$unavail_dtl_v['date_from']} - {dateFormat date=$unavail_dtl_v['date_to']}
                                                         {else}
                                                             --

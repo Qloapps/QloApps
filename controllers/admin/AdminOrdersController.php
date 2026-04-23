@@ -489,6 +489,7 @@ class AdminOrdersControllerCore extends AdminController
                     'advance_payment_amount_without_tax' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
                     'advance_payment_amount_with_tax' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
                     'cart' => $cart,
+                    'customer' => $cart->id_customer ? new Customer($cart->id_customer): null ,
                     'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
                     'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
                     'payment_modules' => $payment_modules,
@@ -3596,10 +3597,11 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
 
-            $messages = array_merge($customerMessages, $messages);
-            usort($messages, function ($a, $b) {
-                return strtotime($a['date_add']) < strtotime($b['date_add']);
-            });
+            if($messages = array_merge($customerMessages, $messages)){
+                usort($messages, function ($a, $b) {
+                    return (strtotime($a['date_add']) < strtotime($b['date_add'])) ? 1 : -1;
+                });
+            }
         }
 
         // send hotel standalone and standalone products
@@ -7492,7 +7494,7 @@ class AdminOrdersControllerCore extends AdminController
                                 $response['hasError'] = true;
                                 $response['errors'][] = Tools::displayError('Invalid quantity provided for service').': '.$objServiceProductOrderDetail->name;
                             }
-                        } elseif ($serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
+                        } elseif (is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail]) && $serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Can not order multiple quanitity for service').': '.$objServiceProductOrderDetail->name;
                         }
@@ -7513,7 +7515,11 @@ class AdminOrdersControllerCore extends AdminController
                     $result = true;
                     foreach ($selectedServicesOrderDetails as $idRoomTypeServiceProductOrderDetail) {
                         $objServiceProductOrderDetail = new ServiceProductOrderDetail($idRoomTypeServiceProductOrderDetail);
-                        $quantity = $serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        if(is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail])) {
+                            $quantity = (int)$serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        } else {
+                            $quantity = 1;
+                        }
                         $unitPrice = $serviceUnitPrices[$idRoomTypeServiceProductOrderDetail];
 
                         $objHotelBookingDetail = new HotelBookingDetail($objServiceProductOrderDetail->id_htl_booking_detail);
