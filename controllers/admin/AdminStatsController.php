@@ -1280,7 +1280,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
             'SELECT COUNT(hbd.`id_room`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
-            AND hbd.`date_from` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"'.
+            AND hbd.`date_from` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"
+            AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_NO_SHOW.
             HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
         );
 
@@ -1709,8 +1710,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
         LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0 AND hbd.`date_from` = "'.pSQL($date).' 00:00:00"
-        AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
-        AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.
+        AND hbd.`id_status` NOT IN ('.(int) HotelBookingDetail::STATUS_CHECKED_IN.',
+            '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.',
+            '.(int) HotelBookingDetail::STATUS_NO_SHOW.')'.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
         $result = Db::getInstance()->executeS($sql);
 
@@ -1811,6 +1813,31 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
         return $result ? $result : 0;
 
+    }
+
+    public static function getNoShowsCount($idHotel = false)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+            AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_NO_SHOW.
+            HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+    }
+
+    public static function getNoShowsInfo($idHotel = null)
+    {
+        $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+        DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+        LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+        WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
+        AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_NO_SHOW.
+        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
+
+        return Db::getInstance()->executeS($sql);
     }
 
     public static function getTotalBookedRooms($dateFrom, $dateTo, $idHotel = null)

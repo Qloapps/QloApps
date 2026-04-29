@@ -787,6 +787,7 @@ class AdminOrdersControllerCore extends AdminController
                     'current_index' => self::$currentIndex,
                     'hotel_order_status' => $htlOrderStatus,
                     'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
+                    'ROOM_STATUS_NO_SHOW' => HotelBookingDetail::STATUS_NO_SHOW,
                     'current_room_status' => Tools::getValue('current_room_status')
                 )
             );
@@ -811,6 +812,7 @@ class AdminOrdersControllerCore extends AdminController
             $response['STATUS_ALLOTED'] = HotelBookingDetail::STATUS_ALLOTED;
             $response['STATUS_CHECKED_IN'] = HotelBookingDetail::STATUS_CHECKED_IN;
             $response['STATUS_CHECKED_OUT'] = HotelBookingDetail::STATUS_CHECKED_OUT;
+            $response['STATUS_NO_SHOW'] = HotelBookingDetail::STATUS_NO_SHOW;
             $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
         }
 
@@ -3475,7 +3477,9 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 $order_detail_data[$key]['avail_room_types_to_realloc'] = $objBookingDetail->getAvailableRoomsForReallocation($value['date_from'], $value['date_to'], 0, $value['id_hotel'], 1);
-                $order_detail_data[$key]['avail_rooms_to_swap'] = $objBookingDetail->getAvailableRoomsForSwapping($value['date_from'], $value['date_to'], $value['id_product'], $value['id_hotel'], $value['id_room']);
+                $order_detail_data[$key]['avail_rooms_to_swap'] = ($value['id_status'] != HotelBookingDetail::STATUS_NO_SHOW)
+                    ? $objBookingDetail->getAvailableRoomsForSwapping($value['date_from'], $value['date_to'], $value['id_product'], $value['id_hotel'], $value['id_room'])
+                    : false;
 
                 /*Product price when order was created*/
                 $totalRoomsCostTE += $value['total_price_tax_excl'];
@@ -3711,6 +3715,7 @@ class AdminOrdersControllerCore extends AdminController
             'orderDocuments' => $order->getDocuments(),
             'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
             'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
+            'ROOM_STATUS_NO_SHOW' => HotelBookingDetail::STATUS_NO_SHOW,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
             'order_convenience_fee_services' => $orderConvenienceFeeServices,
             'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
@@ -8699,6 +8704,15 @@ class AdminOrdersControllerCore extends AdminController
                 ) {
                     $this->errors[] = Tools::displayError('Date should be between booking from date and to date.');
                 }
+            }
+
+            if ($objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_NO_SHOW
+                && $objHotelBookingDetail->chechRoomBooked($objHotelBookingDetail->id_room, $objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to
+                )
+            ) {
+                $this->errors[] = Tools::displayError(
+                    'Cannot update this booking status. The room has been booked by another guest while it was No Show. Please reallocate the booking to a different room first.'
+                );
             }
 
             if ($objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_CHECKED_OUT

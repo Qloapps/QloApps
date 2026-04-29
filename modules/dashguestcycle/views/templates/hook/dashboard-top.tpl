@@ -56,6 +56,21 @@
 					</div>
 				</div>
 				<div class="badge-wrapper">
+					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of bookings currently marked as No Show.' mod='dashguestcycle'}">
+						<div class="badge-strip" style="background-color: #AF8A42;"></div>
+						<div class="badge-content-wrapper">
+							<div class="title-wrapper">
+								<p class="text-center">{l s="No Shows" mod='dashguestcycle'}</p>
+							</div>
+							<div class="value-wrapper">
+								<p class="text-center">
+									<span id="dgc_no_shows"></span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="badge-wrapper">
 					<div class="badge-item label-tooltip" data-toggle="tooltip" data-original-title="{l s='The number of new bookings created today so far.' mod='dashguestcycle'}">
 						<div class="badge-strip" style="background-color: #56CE56;"></div>
 						<div class="badge-content-wrapper">

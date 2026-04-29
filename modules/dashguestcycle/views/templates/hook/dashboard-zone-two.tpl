@@ -65,6 +65,12 @@
                         <span class="label label-info" id="dgc_count_cancellations">0</span>
                     </a>
                 </li>
+                <li>
+                    <a href="#dgc_current_no_shows" data-toggle="tab">
+                        <span>{l s='No Shows' mod='dashguestcycle'}</span>
+                        <span class="label label-info" id="dgc_count_no_shows">0</span>
+                    </a>
+                </li>
                 {hook h='displayDashGuestCycleTab'}
             </ul>
 
@@ -95,6 +101,12 @@
                 </div>
                 <div class="tab-pane" id="dgc_current_cancellations">
                     <table class="table table-striped" id="dgc_table_cancellations">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="dgc_current_no_shows">
+                    <table class="table table-striped" id="dgc_table_no_shows">
                         <thead></thead>
                         <tbody></tbody>
                     </table>

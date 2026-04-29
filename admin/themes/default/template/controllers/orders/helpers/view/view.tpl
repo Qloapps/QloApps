@@ -122,6 +122,8 @@
                                                         <td>
                                                             {if ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']) || ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status'])}
                                                                 <span class="text-danger room_status">{l s='Checked in on'}<br>{dateFormat date=$data['check_in'] full=1}</span>
+                                                            {elseif isset($hotel_order_status['STATUS_NO_SHOW']) && $data['id_status'] == $hotel_order_status['STATUS_NO_SHOW']['id_status']}
+                                                                <span class="badge" style="background-color:#AF8A42;">{l s='No Show'}</span>
                                                             {else}
                                                                 --
                                                             {/if}
@@ -129,6 +131,8 @@
                                                         <td>
                                                             {if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
                                                                 <span class="text-success room_status">{l s='Checked out on'}<br>{dateFormat date=$data['check_out'] full=1}</span>
+                                                            {elseif isset($hotel_order_status['STATUS_NO_SHOW']) && $data['id_status'] == $hotel_order_status['STATUS_NO_SHOW']['id_status']}
+                                                                <span class="text-muted">{l s='N/A (No Show)'}</span>
                                                             {else}
                                                                 --
                                                             {/if}
@@ -1338,6 +1342,7 @@
         {addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_IN=$ROOM_STATUS_CHECKED_IN|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_OUT=$ROOM_STATUS_CHECKED_OUT|escape:'quotes':'UTF-8'}
+        {addJsDef ROOM_STATUS_NO_SHOW=$ROOM_STATUS_NO_SHOW|escape:'quotes':'UTF-8'}
         {addJsDef ALLOTMENT_MANUAL=$ALLOTMENT_MANUAL|escape:'quotes':'UTF-8'}
         {addJsDef PS_OS_CANCELED=Configuration::get('PS_OS_CANCELED')|escape:'quotes':'UTF-8'}
         {addJsDef PS_OS_REFUND=Configuration::get('PS_OS_REFUND')|escape:'quotes':'UTF-8'}
