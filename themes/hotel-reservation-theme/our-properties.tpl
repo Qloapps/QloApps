@@ -74,7 +74,7 @@
 										<span class="htl-address-icon htl-email-icon"></span>{$hotel['email']}
 									</p>
 									<div class="hotel-branch-info-actions">
-										<a href="{$hotel['view_rooms_link']}" target="_blank" class="btn btn-primary view_rooms_btn col-sm-6 col-xs-12">{l s='View Rooms'}</a>
+										<a href="{$hotel['view_rooms_link']}" target="_blank" class="btn btn-primary view_rooms_btn col-sm-6 col-xs-12">{l s='View Property'}</a>
 										{if ($hotel['latitude'] != 0 || $hotel['longitude'] != 0) && $viewOnMap}
 											<a class="btn htl-map-direction-btn col-sm-6 col-xs-12" href="http://maps.google.com/maps?daddr=({$hotel['latitude']},{$hotel['longitude']})" target="_blank">{l s='View on map'}</a>
 										{/if}
