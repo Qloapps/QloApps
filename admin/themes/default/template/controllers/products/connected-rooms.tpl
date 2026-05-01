@@ -56,7 +56,7 @@
                         html += '</div></div>';
                         return html;
                     },
-                    position: { my: "center top+10", at: "center bottom", collision: "flipfit" }
+                    position: { my: "left top+10", at: "left bottom", collision: "flipfit", within: "#content" }
                 });
             }
         {/literal}
