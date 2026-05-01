@@ -95,6 +95,7 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
             }
         }
 
+
         if (!count($errors['by_key']) && !count($errors['general'])) {
             $customerReview = QhrHotelReview::getByCustomer(
                 $objOrder->id_customer,
