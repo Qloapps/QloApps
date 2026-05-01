@@ -25,77 +25,38 @@
         <i class="icon-random connected-room-icon"></i>
     </span>
 {/if}
-<style>
-    .connected-room-icon {
-        color: #008abd;
-        cursor: pointer;
-    }
-
-    /* page tooltip */
-    .tooltip_cont {
-        min-width: 280px;
-        width: 100%;
-        font-size: 14px;
-        font-weight: 600;
-        /* display: grid; */
-    }
-
-    .tooltip_cont .tip_header {
-        margin-bottom: 10px;
-    }
-
-    .tooltip_cont .tip-body>div {
-        margin-bottom: 6px;
-    }
-
-    .tip_element_head {
-        font-size: 12px;
-    }
-
-    .tip_element_value {
-        font-size: 16px;
-        opacity: 0.6;
-    }
-
-    .tip-body {
-        display: grid;
-        grid-template-columns: auto auto;
-    }
-</style>
 <script>
     $(document).ready(function() {
         {literal}
-            if (typeof $.fn.tooltip !== 'undefined' && typeof $.ui !== 'undefined' && typeof $.ui.tooltip !==
-                'undefined') {
+            if (!window._connectedRoomTooltipBound &&
+                typeof $.fn.tooltip !== 'undefined' && typeof $.ui !== 'undefined' && typeof $.ui.tooltip !== 'undefined') {
+                window._connectedRoomTooltipBound = true;
                 $('.connected-room-tooltip-trigger').tooltip({
                     items: '.connected-room-tooltip-trigger',
                     content: function() {
                         var details = $(this).data('connected-details');
-                        if (!details || Object.keys(details).length === 0) {
+                        if (!details || details.length === 0) {
                             return "{/literal}{l s='No rooms connected' js=1}{literal}";
                         }
                         var html = '<div class="tooltip_cont">';
                         html += '<div class="tip_header"><div class="tip_date">{/literal}{l s="Connected Rooms" js=1}{literal}</div></div>';
-                        html += '<div class="tip-body">';
-                        for (var type in details) {
+                        html += '<div class="tip-body connected-tip-body">';
+                        var grouped = {};
+                        for (var i = 0; i < details.length; i++) {
+                            var type = details[i].room_type_name;
+                            if (!grouped[type]) { grouped[type] = []; }
+                            grouped[type].push(details[i].connected_room_name);
+                        }
+                        for (var type in grouped) {
                             html += '<div>';
                             html += '<div class="tip_element_head">' + type + '</div>';
-                            html += '<div class="tip_element_value">';
-                            var rooms = details[type];
-                            for (var i = 0; i < rooms.length; i++) {
-                                html += rooms[i].connected_room_num + (i < rooms.length - 1 ? ', ' :
-                                    '');
-                            }
-                            html += '</div></div>';
+                            html += '<div class="tip_element_value">' + grouped[type].join(', ') + '</div>';
+                            html += '</div>';
                         }
                         html += '</div></div>';
                         return html;
                     },
-                    position: {
-                        my: "center bottom-10",
-                        at: "center top",
-                        collision: "flipfit"
-                    }
+                    position: { my: "center top+10", at: "center bottom", collision: "flipfit" }
                 });
             }
         {/literal}

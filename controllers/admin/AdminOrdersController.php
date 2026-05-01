@@ -1283,6 +1283,9 @@ class AdminOrdersControllerCore extends AdminController
         parent::setMedia();
 
         $this->addJqueryUI('ui.datepicker');
+        $this->addJqueryUI('ui.tooltip', 'base', true);
+        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
+
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
         $this->addJqueryUI('ui.tooltip', 'base', true);
 
@@ -3488,7 +3491,7 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
                 $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
-                $order_detail_data[$key]['connected_rooms'] = HotelConnectedRoom::getConnectedRooms((int) Context::getContext()->language->id, (int) $value['id_room'], true);
+                $order_detail_data[$key]['connected_rooms'] = HotelConnectedRoom::getConnectedRooms((int) $value['id_room'], (int) Context::getContext()->language->id);
 
                 if (isset($value['refund_info'])
                     && $value['refund_info']['refunded']

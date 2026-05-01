@@ -577,7 +577,7 @@ p.room_cat_data
         .fc-today-button:disabled {
             display: none;
         }
-/* book now page tooltip */
+/*tooltip */
 .tooltip_cont {
     min-width: 280px;
     width: 100%;
@@ -607,6 +607,19 @@ body.adminhotelroomsbooking .ui-tooltip {
     padding: 10px;
     box-shadow: 0px 0px 15px 0px #00000026;
 }
+.ui-tooltip {
+    border: unset;
+    padding: 10px;
+    box-shadow: 0px 0px 15px 0px #00000026;
+}
+.tooltip_cont { min-width: 280px; width: 100%; font-size: 14px; font-weight: 600; }
+.tooltip_cont .tip_header { margin-bottom: 10px; }
+.tooltip_cont .tip-body > div { margin-bottom: 6px; }
+.tip_element_head { font-size: 12px; }
+.tip_element_value { font-size: 16px; opacity: 0.6; }
+.tip-body { display: grid; grid-template-columns: auto auto; }
+.tip-body.connected-tip-body { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+.connected-room-icon { color: #008abd; cursor: pointer; }
 
 #room-reallocation-modal .modal-footer {
 	padding: 15px 0px 0px 0px

@@ -1954,235 +1954,184 @@
                 return false;
             }
         }
-        //connected modal
-        $(document).on('click', '.connectedRoomModal', function(e) {
-            e.preventDefault();
+        const initConnectedRoomModal = {
+            show: function(e) {
+                e.preventDefault();
+                var roomId = $(this).data('id-room');
+                var roomNum = $(this).data('room-num');
 
-            let roomId = $(this).data('id-room');
-            let roomNum = $(this).data('room-num');
-            let currentRoomType = $('[name="id_product"]').val();
-            $.ajax({
-                type: 'POST',
-                url: prod_link,
-                dataType: 'json',
-                data: {
-                    ajax: true,
-                    action: 'getModalConnectedRooms',
-                    room_id: roomId,
-                    current_roomtype: currentRoomType,
-                },
-                success: function(response) {
-                    $('#modalLoader').remove();
-                    if (response.success) {
-                        if ($('#connectedRoomModal').length) {
-                            $('#connectedRoomModal').modal('hide');
-                            $('#connectedRoomModal').data('bs.modal', null);
-                            $('#connectedRoomModal').remove();
-                        }
-                        $('.modal-backdrop').remove();
-                        $('body').removeClass('modal-open');
-                        $("#footer").next(".bootstrap").append(response.html);
-                        $('#connectedRoomModal').modal({
-                            backdrop: 'static',
-                            keyboard: true
-                        });
-                        if (roomNum) {
-                            roomNum = '( ' + roomNoText + ' ' + roomNum + ')';
-                            $('#connectedRoomModal').attr('data-room-num-title', roomNum);
-                            $('#connected_room_title').html(roomNum);
+                $.ajax({
+                    type: 'POST',
+                    url: prod_link,
+                    dataType: 'json',
+                    data: {
+                        ajax: true,
+                        action: 'initConnectedRoomModal',
+                        room_id: roomId,
+                    },
+                    success: function(response) {
+                        if (!response.hasError) {
+                            if ($('#connectedRoomModal').length) {
+                                $('#connectedRoomModal').modal('hide');
+                                $('#connectedRoomModal').data('bs.modal', null);
+                                $('#connectedRoomModal').remove();
+                            }
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open');
+                            $("#footer").next(".bootstrap").append(response.modalHtml);
+                            $('#connectedRoomModal').modal({
+                                backdrop: 'static',
+                                keyboard: true
+                            });
+                            if (roomNum) {
+                                roomNum = '( ' + roomNoText + ' ' + roomNum + ')';
+                                $('#connectedRoomModal').attr('data-room-num-title', roomNum);
+                                $('#connected_room_title').html(roomNum);
+                            } else {
+                                $('#connectedRoomModal').attr('data-room-num-title', '');
+                                $('#connected_room_title').html('');
+                            }
                         } else {
-                            $('#connectedRoomModal').attr('data-room-num-title', '');
-                            $('#connected_room_title').html('');
+                            alert(response.message);
                         }
-                    } else {
-                        alert(response.message);
                     }
+                });
+            },
+            add: function() {
+                var $row = $(this).closest('tr');
+                var mainRoomId = $('#connected_room_main_id').val();
+                var connectedRoomId = $row.find('.connect-room').val();
+
+                if (!connectedRoomId) {
+                    alert(selectRoomText);
+                    return;
                 }
-
-
-            });
-        });
-
-        function filterRoomsByType($row) {
-            var selectedType = $row.find('.connect-room-type').val();
-            var $roomSelect = $row.find('.connect-room');
-            var firstVisible = null;
-            $roomSelect.find('option').each(function() {
-                if ($(this).data('type') == selectedType) {
-                    $(this).show();
-                    if (!firstVisible) {
-                        firstVisible = $(this);
-                    }
-                } else {
-                    $(this).hide();
-                }
-            });
-            if (firstVisible) {
-                firstVisible.prop('selected', true);
-            } else {
-                $roomSelect.val('');
-            }
-        }
-
-        function addConnectedRoomRow() {
-            var $template = $('#connected_room_add_template');
-            if (!$template.length) {
-                return;
-            }
-            var $tbody = $('#connected_rooms_tbody');
-            if ($tbody.find('.connected-room-add-row').not('#connected_room_add_template').length) {
-                return;
-            }
-            var $newRow = $template.clone().removeAttr('id').removeClass('hide');
-            var $tableWrapper = $('#connected_rooms_table_wrapper');
-            var $emptyState = $('#connected_rooms_empty_state');
-            var $addButton = $('#add_connected_room_row');
-            if ($tableWrapper.length) {
-                $tableWrapper.removeClass('hide');
-            }
-            if ($emptyState.length) {
-                $emptyState.hide();
-            }
-            $tbody.append($newRow);
-            filterRoomsByType($newRow);
-            if ($addButton.length) {
-                $addButton.prop('disabled', true);
-            }
-        }
-        $(document).on('click', '#add_connected_room_row', function() {
-            addConnectedRoomRow();
-        }); $(document).on('click', '.remove-connected-room-row', function() {
-            var $row = $(this).closest('tr');
-            $('#add_connected_room_row').prop('disabled', false);
-            $row.remove();
-            if (!$('#connected_rooms_tbody').find('.connected-room-row').length && !$('#connected_rooms_tbody')
-                .find('.connected-room-add-row').not('#connected_room_add_template').length) {
-                $('#connected_rooms_table_wrapper').addClass('hide');
-                $('#connected_rooms_empty_state').removeClass('hide').show();
-            }
-        }); $(document).on('change', '.connect-room-type', function() {
-            filterRoomsByType($(this).closest('tr'));
-        }); $(document).on('shown.bs.modal', '#connectedRoomModal', function() {
-            var $row = $(this).find('.connected-room-add-row').not('#connected_room_add_template').first();
-            if ($row.length) {
-                filterRoomsByType($row);
-            }
-        });
-        //add connected room
-        $(document).on('click', '.save-connected-room', function() {
-            var $row = $(this).closest('tr');
-            var mainRoomId = $('#connected_room_main_id').val();
-            var connectedRoomId = $row.find('.connect-room').val();
-            let currentRoomType = $('[name="id_product"]').val();
-            if (!connectedRoomId) {
-                alert(selectRoomText);
-                return;
-            }
-            $.ajax({
-                url: prod_link,
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    ajax: true,
-                    action: 'ManageConnectedRoom',
-                    mode: 'add',
-                    room_id: mainRoomId,
-                    connected_room_id: connectedRoomId,
-                    current_roomtype: currentRoomType,
-                },
-                beforeSend: function() {
-                    $row.find('.save-connected-room').prop('disabled', true);
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showSuccessMessage(response.message);
-                        $('#connectedRoomModal .modal-content').replaceWith($(response.html).find(
-                            '.modal-content'));
-                        $('#connected_room_title').html($('#connectedRoomModal').attr(
-                            'data-room-num-title'));
-                        // update connected rooms count badge in list
-                        var $icon = $('.connectedRoomModal[data-id-room="' + mainRoomId + '"]')
-                            .find('.connected-room-count');
-                        if ($icon.length) {
-                            var currentCount = parseInt($.trim($icon.text()), 10);
-                            if (isNaN(currentCount)) {
-                                currentCount = 0;
+                $.ajax({
+                    url: prod_link,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        ajax: true,
+                        action: 'ManageConnectedRoom',
+                        mode: 'add',
+                        room_id: mainRoomId,
+                        connected_room_id: connectedRoomId,
+                    },
+                    beforeSend: function() {
+                        $row.find('.save-connected-room').prop('disabled', true);
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showSuccessMessage(response.message);
+                            $('#connectedRoomModal .modal-body').replaceWith($(response.html).filter('.modal-body'));
+                            $('#connected_room_title').html($('#connectedRoomModal').attr('data-room-num-title'));
+                            var $icon = $('.connectedRoomModal[data-id-room="' + mainRoomId + '"]').find('.connected-room-count');
+                            if ($icon.length && typeof response.connected_count !== 'undefined') {
+                                $icon.text(response.connected_count);
                             }
-                            $icon.text(currentCount + 1);
-                        }
-                        if (response.details) {
-                            $('.connectedRoomModal[data-id-room="' + mainRoomId + '"]').data(
-                                'connected-details', response.details);
-                        }
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                complete: function() {
-                    $row.find('.save-connected-room').prop('disabled', false);
-                }
-            });
-        });
-        //remove connected room
-        $(document).on('click', '.delete-connected-room', function() {
-            var $row = $(this).closest('tr');
-            var mainRoomId = $('#connected_room_main_id').val();
-            var connectedRoomId = $(this).data('connected-room-id');
-            var connectedId = $(this).data('connected-id');
-            let currentRoomType = $('[name="id_product"]').val();
-            $.ajax({
-                url: prod_link,
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    ajax: true,
-                    action: 'ManageConnectedRoom',
-                    mode: 'delete',
-                    room_id: mainRoomId,
-                    connected_room_id: connectedRoomId,
-                    connected_id: connectedId,
-                    current_roomtype: currentRoomType,
-                },
-                success: function(response) {
-                    if (response.success) {
-                        showSuccessMessage(response.message);
-                        if (response.html) {
-                            $('#connectedRoomModal .modal-content').replaceWith($(response.html)
-                                .find('.modal-content'));
-                            $('#connected_room_title').html($('#connectedRoomModal').attr(
-                                'data-room-num-title'));
                         } else {
-                            $row.remove();
-                            var $modal = $('#connectedRoomModal');
-                            var $tbody = $modal.find('#connected_rooms_tbody');
-                            var hasConnectedRows = $tbody.find('.connected-room-row').length > 0;
-                            if (!hasConnectedRows) {
-                                $modal.find('#connected_rooms_table_wrapper').addClass('hide');
-                                $modal.find('#connected_rooms_empty_state').removeClass('hide')
-                                    .show();
-                            }
+                            alert(response.message);
                         }
-                        // update connected rooms count badge in list
-                        var $icon = $('.connectedRoomModal[data-id-room="' + mainRoomId + '"]')
-                            .find(
-                                '.connected-room-count');
-                        if ($icon.length) {
-                            var currentCount = parseInt($.trim($icon.text()), 10);
-                            if (isNaN(currentCount)) {
-                                currentCount = 0;
-                            }
-                            $icon.text(Math.max(0, currentCount - 1));
-                        }
-                        if (response.details) {
-                            $('.connectedRoomModal[data-id-room="' + mainRoomId + '"]').data(
-                                'connected-details', response.details);
-                        }
-                    } else {
-                        alert(response.message);
+                    },
+                    complete: function() {
+                        $row.find('.save-connected-room').prop('disabled', false);
                     }
+                });
+            },
+            showNotConnectedRooms: function() {
+                var $typeSelect = $(this);
+                var $row = $typeSelect.closest('tr');
+                var roomTypeId = $typeSelect.val();
+                var roomId = $('#connected_room_main_id').val();
+                var $roomSelect = $row.find('.connect-room');
+                $roomSelect.empty();
+                if (!roomTypeId) {
+                    return;
                 }
-            });
-        });
+                $.ajax({
+                    url: prod_link,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        ajax: true,
+                        action: 'getNotConnectedRooms',
+                        room_id: roomId,
+                        room_type_id: roomTypeId,
+                    },
+                    success: function(response) {
+                        if (response.success && response.rooms && response.rooms.length) {
+                            $.each(response.rooms, function(i, room) {
+                                $roomSelect.append(
+                                    $('<option>').val(room.id_room).text(room.name)
+                                );
+                            });
+                        }
+                    }
+                });
+            },
+            addRow: function() {
+                var $template = $('#connected_room_add_template');
+                if (!$template.length) {
+                    return;
+                }
+                var $tbody = $('#connected_rooms_tbody');
+                if ($tbody.find('.connected-room-add-row').not('#connected_room_add_template').length) {
+                    return;
+                }
+                var $newRow = $template.clone().removeAttr('id').removeClass('hide');
+                $('#connected_rooms_table_wrapper').removeClass('hide');
+                $('#connected_rooms_empty_state').hide();
+                $tbody.append($newRow);
+                initConnectedRoomModal.showNotConnectedRooms.call($newRow.find('.connect-room-type')[0]);
+                $('#add_connected_room_row').prop('disabled', true);
+            },
+            removeRow: function() {
+                var $row = $(this).closest('tr');
+                $row.remove();
+                $('#add_connected_room_row').prop('disabled', false);
+                if (!$('#connected_rooms_tbody').find('.connected-room-row').length) {
+                    $('#connected_rooms_table_wrapper').addClass('hide');
+                    $('#connected_rooms_empty_state').removeClass('hide').show();
+                }
+            },
+            delete: function() {
+                var mainRoomId = $('#connected_room_main_id').val();
+                var connectedId = $(this).data('connected-id');
+
+                $.ajax({
+                    url: prod_link,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        ajax: true,
+                        action: 'ManageConnectedRoom',
+                        mode: 'delete',
+                        room_id: mainRoomId,
+                        connected_id: connectedId,
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showSuccessMessage(response.message);
+                            $('#connectedRoomModal .modal-body').replaceWith($(response.html).filter('.modal-body'));
+                            $('#connected_room_title').html($('#connectedRoomModal').attr('data-room-num-title'));
+                            var $icon = $('.connectedRoomModal[data-id-room="' + mainRoomId + '"]').find('.connected-room-count');
+                            if ($icon.length && typeof response.connected_count !== 'undefined') {
+                                $icon.text(response.connected_count);
+                            }
+                        } else {
+                            alert(response.message);
+                        }
+                    }
+                });
+            }
+        };
+
+        $(document).on('click', '.connectedRoomModal', initConnectedRoomModal.show);
+        $(document).on('click', '.save-connected-room', initConnectedRoomModal.add);
+        $(document).on('click', '.delete-connected-room', initConnectedRoomModal.delete);
+        $(document).on('click', '#add_connected_room_row', initConnectedRoomModal.addRow);
+        $(document).on('click', '.remove-connected-room-row', initConnectedRoomModal.removeRow);
+        $(document).on('change', '.connect-room-type', initConnectedRoomModal.showNotConnectedRooms);
     });
 
 </script>

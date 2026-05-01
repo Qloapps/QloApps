@@ -387,7 +387,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'link' => $this->context->link,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
-            'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($this->context->language->id, true, true),
+            'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms(null, $this->context->language->id),
         ));
 
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
@@ -1038,6 +1038,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         // add fullcalender plugin
         $this->addJqueryUI('ui.tooltip', 'base', true);
         $this->removeJS(Media::getJqueryUIPath('effects.core', 'base', false), false);
+        $this->addCSS(array(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css'));
 
         $this->addCSS(_PS_JS_DIR_.'fullcalendar/main.css');
         $this->addJs(_PS_JS_DIR_.'fullcalendar/main.js');
