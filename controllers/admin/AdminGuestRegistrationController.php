@@ -1,28 +1,26 @@
 <?php
-/*
-* 2007-2017 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Open Software License (OSL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/osl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2017 PrestaShop SA
-*  @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*/
+
+/**
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.md
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/license/osl-3.0-php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@qloapps.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to a newer
+ * versions in the future. If you wish to customize this module for your needs
+ * please refer to https://store.webkul.com/customisation-guidelines for more information.
+ *
+ * @author Webkul IN
+ * @copyright Since 2010 Webkul
+ * @license https://opensource.org/license/osl-3.0-php Open Software License version 3.0
+ */
 
 class AdminGuestRegistrationControllerCore extends AdminController
 {
@@ -97,7 +95,6 @@ class AdminGuestRegistrationControllerCore extends AdminController
 
     public function postProcess()
     {
-        // ddd(Tools::getAllValues());
         if (Tools::isSubmit('submitBulkGuestRegistrationValues')) {
             $this->processBulkDynamicFieldSave();
 
@@ -116,21 +113,16 @@ class AdminGuestRegistrationControllerCore extends AdminController
         $this->fields_options['general']['fields'][self::CONF_OPTIONAL_SECTIONS]['value'] = '';
 
         $html = parent::renderOptions();
-        $selectedSections = Tools::jsonEncode($this->getSelectedOptionalSections());
 
-        $html .= '
-        <script type="text/javascript">
-            $(document).ready(function() {
-                var selectedSections = '.$selectedSections.';
-                $("input[name=\"'.self::CONF_OPTIONAL_SECTIONS.'\"]").each(function() {
-                    var checkboxValue = parseInt($(this).val(), 10);
-                    $(this).attr("name", "'.self::CONF_OPTIONAL_SECTIONS.'[]");
-                    if ($.inArray(checkboxValue, selectedSections) !== -1) {
-                        $(this).prop("checked", true);
-                    }
-                });
-            });
-        </script>';
+        $this->context->smarty->assign(array(
+            'guest_reg_preview_img_url'       => $this->context->link->getBaseLink().'img/admin/guest_registration_preview.jpg',
+            'guest_reg_selected_sections'     => $this->getSelectedOptionalSections(),
+            'guest_reg_conf_key'              => self::CONF_OPTIONAL_SECTIONS,
+            'guest_reg_preview_title'         => $this->l('Guest Registration Card Preview'),
+            'guest_reg_preview_btn_title'     => $this->l('Preview'),
+        ));
+
+        $html .= $this->createTemplate('preview_modal.tpl')->fetch();
 
         return $html;
     }
@@ -432,12 +424,12 @@ class AdminGuestRegistrationControllerCore extends AdminController
     protected function getOptionalSectionChoices()
     {
         return array(
-            1 => $this->l('Additional Guests'),
-            2 => $this->l('Billing & Corporate Details'),
-            3 => $this->l('Payment & Deposit'),
-            4 => $this->l('Property Regulations'),
-            5 => $this->l('For Office Use Only'),
-            6 => $this->l('Property Logo'),
+            1 => $this->l('Property Logo'),
+            2 => $this->l('Additional Guests'),
+            3 => $this->l('Billing & Corporate Details'),
+            4 => $this->l('Payment & Deposit'),
+            5 => $this->l('Property Regulations'),
+            6 => $this->l('For Office Use Only'),
         );
     }
 
