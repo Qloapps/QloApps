@@ -1449,8 +1449,8 @@ class AdminModulesControllerCore extends AdminController
             $modules_preferences[$v['module']] = $v;
         }
 
-        // Retrieve Modules List
-        $modules = Module::getInstalledModulesOnDisk(true, $this->logged_on_addons, $this->id_employee);
+        // Retrieve Modules List (installed + disabled + uninstalled)
+        $modules = Module::getModulesOnDisk(true, $this->logged_on_addons, $this->id_employee);
         $this->initModulesList($modules);
         $this->nb_modules_total = count($modules);
         $module_errors = array();

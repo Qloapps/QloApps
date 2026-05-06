@@ -238,13 +238,13 @@
 														</div>
 													{/block}
 													{block name='product_info_tab_room_guests'}
-														{if isset($room_type_info['adults']) && isset($room_type_info['children']) }
+														{if isset($room_type_info['max_adults']) && isset($room_type_info['max_children']) }
 															<div class="info_margin_div">
 																<div class="room_info_heading">
 																	<span>{l s='Max Capacity'}</span>
 																</div>
 																<div class="room_info_content">
-																	<p>{$room_type_info['adults']} {l s='Adults'}, {$room_type_info['children']} {if $room_type_info['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if} ({l s='Max guests'}: {$room_type_info['max_guests']|escape:'htmlall':'UTF-8'})</p>
+																	<p>{$room_type_info['max_adults']} {l s='Adults'}, {$room_type_info['max_children']} {if $room_type_info['max_children'] > 1}{l s='Children'}{else}{l s='Child'}{/if} ({l s='Max guests'}: {$room_type_info['max_guests']|escape:'htmlall':'UTF-8'})</p>
 																</div>
 															</div>
 														{/if}
