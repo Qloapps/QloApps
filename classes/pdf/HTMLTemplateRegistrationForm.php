@@ -232,9 +232,9 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
             // Additional guests table
             'additional_guests_rows'         => $additionalGuestsRows,
             // Dynamic field options
-            'purpose_of_visit_options'       => GuestRegPurpose::getActiveOptions($idLang),
-            'identity_proof_options'         => GuestRegIdProof::getActiveOptions($idLang),
-            'payment_method_options'         => GuestRegPaymentMethod::getActiveOptions($idLang),
+            'purpose_of_visit_options'       => GuestVisitPurpose::getGuestVisitPurposes(1, $idLang),
+            'identity_proof_options'         => GuestRegistrationIdProof::getRegistrationIdProofs(1, $idLang),
+            'payment_method_options'         => GuestRegistrationPaymentMethod::getRegistrationPaymentMethods(1, $idLang),
             // Optional section visibility flags
             'show_property_logo'             => in_array(1, $selectedSections),
             'show_additional_guests'         => in_array(2, $selectedSections),

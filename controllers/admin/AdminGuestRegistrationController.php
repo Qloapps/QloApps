@@ -32,7 +32,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
         $this->bootstrap = true;
         $this->context = Context::getContext();
         $this->table = 'guest_reg_purpose';
-        $this->className = 'GuestRegPurpose';
+        $this->className = 'GuestVisitPurpose';
         $this->identifier = 'id_guest_reg_purpose';
         $this->lang = true;
 
@@ -401,19 +401,19 @@ class AdminGuestRegistrationControllerCore extends AdminController
     {
         return array(
             'purpose' => array(
-                'class' => 'GuestRegPurpose',
+                'class' => 'GuestVisitPurpose',
                 'table' => 'guest_reg_purpose',
                 'identifier' => 'id_guest_reg_purpose',
                 'title' => $this->l('Purpose of visit'),
             ),
             'id_proof' => array(
-                'class' => 'GuestRegIdProof',
+                'class' => 'GuestRegistrationIdProof',
                 'table' => 'guest_reg_id_proof',
                 'identifier' => 'id_guest_reg_id_proof',
                 'title' => $this->l('Identity proof'),
             ),
             'payment_method' => array(
-                'class' => 'GuestRegPaymentMethod',
+                'class' => 'GuestRegistrationPaymentMethod',
                 'table' => 'guest_reg_payment_method',
                 'identifier' => 'id_guest_reg_payment_method',
                 'title' => $this->l('Payment method'),
