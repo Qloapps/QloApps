@@ -1700,11 +1700,26 @@ class HotelBookingDetail extends ObjectModel
         if (!$only_search_data) {
             if (!empty($bookingData)) {
                 foreach ($bookingData['rm_data'] as $key => $value) {
-                    $product_feature = Product::getFrontFeaturesStatic($context->language->id, $value['id_product']);
+                    // featured amenities for display in room type list
+                    $product_feature = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+                        SELECT ha.`id`, ha.`logo_type`, ha.`logo`, hal.`name`
+                        FROM `'._DB_PREFIX_.'htl_room_type_amenities` hrta
+                        INNER JOIN `'._DB_PREFIX_.'htl_amenities` ha ON ha.`id` = hrta.`amenity_id`
+                        INNER JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
+                            ON hal.`id` = hrta.`amenity_id` AND hal.`id_lang` = '.(int)$context->language->id.'
+                        WHERE hrta.`id_product` = '.(int)$value['id_product'].'
+                            AND ha.`is_featured` = 1 AND ha.`active` = 1
+                        ORDER BY ha.`position` ASC
+                    ');
+                    if (!$product_feature) {
+                        $product_feature = array();
+                    }
+                    // PS core features used by the amenities filter block
                     $prod_amen = array();
                     if (!empty($amenities) && $amenities) {
                         $prod_amen = $amenities;
-                        foreach ($product_feature as $a_key => $a_val) {
+                        $psFeatures = Product::getFrontFeaturesStatic($context->language->id, $value['id_product']);
+                        foreach ($psFeatures as $a_val) {
                             if (($pa_key = array_search($a_val['id_feature'], $prod_amen)) !== false) {
                                 unset($prod_amen[$pa_key]);
                                 if (empty($prod_amen)) {

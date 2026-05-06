@@ -350,8 +350,8 @@ class ProductControllerCore extends FrontController
 
                     if (isset($obj_hotel_feaures_ids) && $obj_hotel_feaures_ids) {
                         foreach ($obj_hotel_feaures_ids as $key => $value) {
-                            $obj_htl_ftr = new HotelFeatures();
-                            $htl_info = $obj_htl_ftr->getFeatureInfoById($value['feature_id']);
+                            $obj_htl_ftr = new HotelAmenities();
+                            $htl_info = $obj_htl_ftr->getFeatureInfoById($value['amenity_id']);
                             $htl_features[] = $htl_info['name'];
                         }
                     }
@@ -411,6 +411,7 @@ class ProductControllerCore extends FrontController
 
                     $roomDynamicFeatures = $this->getRoomDynamicFeatures($this->product->id);
                     $roomDynamicAmenities = $this->getRoomDynamicAmenities($this->product->id);
+                    $hotelDynamicAmenities = $this->getHotelDynamicAmenities($hotel_id);
 
                     $this->context->smarty->assign(
                         array(
@@ -440,6 +441,8 @@ class ProductControllerCore extends FrontController
                             'hotel_features' => $htl_features,
                             'room_dynamic_features' => $roomDynamicFeatures,
                             'room_dynamic_amenities' => $roomDynamicAmenities,
+                            'hotel_dynamic_amenities' => $hotelDynamicAmenities,
+                            'amenity_img_dir' => _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_amenities/',
                             'hotel_image_link' => $hotelImageLink,
                             'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
                             'order_date_restrict' => $order_date_restrict,
@@ -595,7 +598,7 @@ class ProductControllerCore extends FrontController
         $result = array();
         foreach ($features as $feature) {
             $result[] = array(
-                'name' => $feature['feature_name'],
+                'name'  => $feature['feature_name'],
                 'value' => $feature['feature_value'],
             );
         }
@@ -603,30 +606,34 @@ class ProductControllerCore extends FrontController
         return $result;
     }
 
-    /**
-     * Get assigned dynamic room amenities for the room detail page.
-     *
-     * @param int $idProduct
-     *
-     * @return array
-     */
     protected function getRoomDynamicAmenities($idProduct)
     {
         $amenities = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-            SELECT hfl.`name`
-            FROM `'._DB_PREFIX_.'htl_room_type_features` hrtf
-            INNER JOIN `'._DB_PREFIX_.'htl_features_lang` hfl
-                ON (hfl.`id` = hrtf.`feature_id` AND hfl.`id_lang` = '.(int) $this->context->language->id.')
-            INNER JOIN `'._DB_PREFIX_.'htl_features` hf ON (hf.`id` = hrtf.`feature_id`)
-            WHERE hrtf.`id_product` = '.(int) $idProduct.'
-            ORDER BY hf.`position` ASC, hfl.`name` ASC'
+            SELECT ha.`id`, ha.`logo_type`, ha.`logo`, hal.`name`
+            FROM `'._DB_PREFIX_.'htl_room_type_amenities` hrta
+            INNER JOIN `'._DB_PREFIX_.'htl_amenities` ha ON (ha.`id` = hrta.`amenity_id`)
+            INNER JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
+                ON (hal.`id` = hrta.`amenity_id` AND hal.`id_lang` = '.(int) $this->context->language->id.')
+            WHERE hrta.`id_product` = '.(int) $idProduct.' AND ha.`active` = 1
+            ORDER BY ha.`position` ASC, hal.`name` ASC'
         );
 
-        if (!$amenities) {
-            return array();
-        }
+        return $amenities ?: array();
+    }
 
-        return $amenities;
+    protected function getHotelDynamicAmenities($idHotel)
+    {
+        $amenities = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+            SELECT ha.`id`, ha.`logo_type`, ha.`logo`, hal.`name`
+            FROM `'._DB_PREFIX_.'htl_branch_amenities` hba
+            INNER JOIN `'._DB_PREFIX_.'htl_amenities` ha ON (ha.`id` = hba.`amenity_id`)
+            INNER JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
+                ON (hal.`id` = hba.`amenity_id` AND hal.`id_lang` = '.(int) $this->context->language->id.')
+            WHERE hba.`id_hotel` = '.(int) $idHotel.' AND ha.`active` = 1
+            ORDER BY ha.`position` ASC, hal.`name` ASC'
+        );
+
+        return $amenities ?: array();
     }
 
     public function assignRoomServiceProductVars()

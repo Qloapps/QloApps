@@ -506,7 +506,7 @@ class HotelBranchInformation extends ObjectModel
         $sql = 'SELECT hbi.`id`, hbl.`hotel_name` FROM `'._DB_PREFIX_.'htl_branch_info` hbi
             LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
             ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')
-            WHERE hbi.`id` NOT IN (SELECT DISTINCT id_hotel FROM `'._DB_PREFIX_.'htl_branch_features`)';
+            WHERE hbi.`id` NOT IN (SELECT DISTINCT id_hotel FROM `'._DB_PREFIX_.'htl_branch_amenities`)';
 
         return Db::getInstance()->executeS($sql);
     }
@@ -521,7 +521,7 @@ class HotelBranchInformation extends ObjectModel
     public function getFeaturesOfHotelByHotelId($id_hotel)
     {
         return Db::getInstance()->executeS(
-            'SELECT feature_id FROM `'._DB_PREFIX_.'htl_branch_features` WHERE id_hotel='.(int)$id_hotel
+            'SELECT amenity_id FROM `'._DB_PREFIX_.'htl_branch_amenities` WHERE id_hotel='.(int)$id_hotel
         );
     }
 
@@ -802,7 +802,7 @@ class HotelBranchInformation extends ObjectModel
                     }
                 }
             }
-            $objHotelfeatures = new HotelBranchFeatures();
+            $objHotelfeatures = new HotelBranchAmenities();
             $objHotelImage = new HotelImage();
             if (!$objHotelfeatures->deleteBranchFeaturesByHotelId($idHotel)) {
                 $contextController->errors[] = $this->moduleInstance->l(
@@ -1007,8 +1007,8 @@ class HotelBranchInformation extends ObjectModel
     public function getWsHotelFeatures()
     {
         return Db::getInstance()->executeS(
-            'SELECT `feature_id` as `id` FROM `'._DB_PREFIX_.'htl_branch_features` WHERE `id_hotel` = '.(int)$this->id.
-            ' ORDER BY `feature_id` ASC'
+            'SELECT `amenity_id` as `id` FROM `'._DB_PREFIX_.'htl_branch_amenities` WHERE `id_hotel` = '.(int)$this->id.
+            ' ORDER BY `amenity_id` ASC'
         );
     }
 
@@ -1016,12 +1016,12 @@ class HotelBranchInformation extends ObjectModel
     public function setWsHotelFeatures($branchFeatures)
     {
         Db::getInstance()->execute('
-			DELETE FROM `'._DB_PREFIX_.'htl_branch_features`
+			DELETE FROM `'._DB_PREFIX_.'htl_branch_amenities`
 			WHERE `id_hotel` = '.(int)$this->id
         );
 
         foreach ($branchFeatures as $feature) {
-            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_features` (`id_hotel`, `feature_id`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$feature['id'].', NOW(), NOW())');
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_amenities` (`id_hotel`, `amenity_id`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$feature['id'].', NOW(), NOW())');
         }
 
         return true;

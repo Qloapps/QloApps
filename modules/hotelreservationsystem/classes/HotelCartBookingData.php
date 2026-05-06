@@ -1534,7 +1534,7 @@ class HotelCartBookingData extends ObjectModel
             $objCartBooking = new self();
             $objRoomType = new HotelRoomType();
             $objHotelBranch = new HotelBranchInformation();
-            $objHtlFeatures = new HotelFeatures();
+            $objHtlFeatures = new HotelAmenities();
             $objCartBookingData = new HotelCartBookingData();
             $objRoomDemands = new HotelRoomTypeDemand();
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
@@ -1612,7 +1612,7 @@ class HotelCartBookingData extends ObjectModel
                                 if ($hotelFeaureIds = $objHotelBranch->getFeaturesOfHotelByHotelId($roomDetail['id_hotel'])) {
                                     $hotelFeatures = array();
                                     foreach ($hotelFeaureIds as $value) {
-                                        $htlFeatureInfo = $objHtlFeatures->getFeatureInfoById($value['feature_id']);
+                                        $htlFeatureInfo = $objHtlFeatures->getFeatureInfoById($value['amenity_id']);
                                         if ($htlFeatureInfo = $objHtlFeatures->getFeatureInfoById($value['feature_id'])) {
                                             $hotelFeatures[] = $htlFeatureInfo['name'];
                                         }

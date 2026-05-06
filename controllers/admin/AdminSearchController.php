@@ -38,7 +38,7 @@ class AdminSearchControllerCore extends AdminController
             'AdminOrderRefundRules' => 1,
             'AdminRoomTypeGlobalDemand' => 1,
             'AdminGroups' => 1,
-            'AdminHotelFeatures' => 1,
+            'AdminHotelAmenities' => 1,
             'AdminCustomers' => 1,
             'AdminAddHotel' => 1,
             'AdminNormalProducts' => 1,
@@ -430,9 +430,9 @@ class AdminSearchControllerCore extends AdminController
 
     public function searchHotelFeatures()
     {
-        if (class_exists('HotelFeatures')) {
-            if (isset($this->controllerAccess['AdminHotelFeatures']) && $this->controllerAccess['AdminHotelFeatures']) {
-                $objHotelFeatures = new HotelFeatures();
+        if (class_exists('HotelAmenities')) {
+            if (isset($this->controllerAccess['AdminHotelAmenities']) && $this->controllerAccess['AdminHotelAmenities']) {
+                $objHotelFeatures = new HotelAmenities();
                 if ($hotelFeatures = $objHotelFeatures->searchByName($this->query, $this->context->language->id)) {
                     $features = array();
                     foreach ($hotelFeatures as $key => $hotelFeature) {
@@ -939,9 +939,9 @@ class AdminSearchControllerCore extends AdminController
                 $helper->identifier = 'id';
                 $helper->actions = array('edit', 'view');
                 $helper->show_toolbar = false;
-                $helper->table = 'htl_features';
-                $helper->currentIndex = $this->context->link->getAdminLink('AdminHotelFeatures', false);
-                $helper->token = Tools::getAdminTokenLite('AdminHotelFeatures');
+                $helper->table = 'htl_amenities';
+                $helper->currentIndex = $this->context->link->getAdminLink('AdminHotelAmenities', false);
+                $helper->token = Tools::getAdminTokenLite('AdminHotelAmenities');
 
                 if ($this->_list['hotel_features']) {
                     $view = $helper->generateList($this->_list['hotel_features'], $this->fields_list['hotel_features']);

@@ -1206,16 +1206,16 @@ class AdminProductsControllerCore extends AdminController
         $selectedAmenities = array_map('intval', $selectedAmenities);
         $selectedAmenities = array_values(array_unique(array_filter($selectedAmenities)));
 
-        if (!Db::getInstance()->delete('htl_room_type_features', '`id_product` = '.$idProduct)) {
+        if (!Db::getInstance()->delete('htl_room_type_amenities', '`id_product` = '.$idProduct)) {
             return false;
         }
 
         foreach ($selectedAmenities as $idAmenity) {
-            if (!Db::getInstance()->insert('htl_room_type_features', array(
+            if (!Db::getInstance()->insert('htl_room_type_amenities', array(
                 'id_product' => $idProduct,
-                'feature_id' => (int) $idAmenity,
-                'date_add' => date('Y-m-d H:i:s'),
-                'date_upd' => date('Y-m-d H:i:s'),
+                'amenity_id' => (int) $idAmenity,
+                'date_add'   => date('Y-m-d H:i:s'),
+                'date_upd'   => date('Y-m-d H:i:s'),
             ))) {
                 return false;
             }
@@ -1234,8 +1234,8 @@ class AdminProductsControllerCore extends AdminController
     protected function getSelectedRoomTypeAmenityIds($idProduct)
     {
         $selectedAmenities = Db::getInstance()->executeS(
-            'SELECT `feature_id`
-            FROM `'._DB_PREFIX_.'htl_room_type_features`
+            'SELECT `amenity_id`
+            FROM `'._DB_PREFIX_.'htl_room_type_amenities`
             WHERE `id_product` = '.(int) $idProduct
         );
 
@@ -1243,7 +1243,7 @@ class AdminProductsControllerCore extends AdminController
             return array();
         }
 
-        return array_map('intval', array_column($selectedAmenities, 'feature_id'));
+        return array_map('intval', array_column($selectedAmenities, 'amenity_id'));
     }
 
     /**
@@ -1257,10 +1257,10 @@ class AdminProductsControllerCore extends AdminController
     {
         $selectedAmenityRows = array();
         foreach ($this->getSelectedRoomTypeAmenityIds($idProduct) as $selectedAmenityId) {
-            $selectedAmenityRows[] = array('feature_id' => $selectedAmenityId);
+            $selectedAmenityRows[] = array('amenity_id' => $selectedAmenityId);
         }
 
-        $objHotelFeatures = new HotelFeatures();
+        $objHotelFeatures = new HotelAmenities();
         $roomTypeAmenities = $objHotelFeatures->HotelBranchSelectedFeaturesArray(
             $selectedAmenityRows,
             $this->context->language->id

@@ -176,7 +176,7 @@ class AdminAddHotelController extends ModuleAdminController
             }
 
             $smartyVars['order_restrict_date_info'] = HotelOrderRestrictDate::getDataByHotelId($idHotel);
-            $objHotelFeatures = new HotelFeatures();
+            $objHotelFeatures = new HotelAmenities();
             $hotelFeatures = $this->object->getFeaturesOfHotelByHotelId($this->object->id);
             if ($features = $objHotelFeatures->HotelBranchSelectedFeaturesArray($hotelFeatures)) {
                 foreach ($features as $idFeature => $feature) {
@@ -802,7 +802,7 @@ class AdminAddHotelController extends ModuleAdminController
 
                 $objHotelOrderRestrictDate->save();
 
-                $objHotelFeatures = new HotelBranchFeatures();
+                $objHotelFeatures = new HotelBranchAmenities();
                 $objHotelFeatures->deleteBranchFeaturesByHotelId($idHotel);
                 if (!$objHotelFeatures->assignFeaturesToHotel($idHotel, $hotelFeatures)) {
                     $this->errors[] = $this->l('Some problem occurred while assigning features to the hotel.');

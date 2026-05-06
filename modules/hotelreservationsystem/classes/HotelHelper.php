@@ -977,9 +977,11 @@ class HotelHelper
         );
         // lang fields
         $languages = Language::getLanguages(false);
+        $imgDir = dirname(__FILE__).'/../views/img/hotel_amenities/';
         $i = 1;
+        $childCounter = 0;
         foreach ($parent_features_arr as $key => $value) {
-            $obj_feature = new HotelFeatures();
+            $obj_feature = new HotelAmenities();
             foreach ($languages as $lang) {
                 if (isset($value['name'][$lang['iso_code']])) {
                     $obj_feature->name[$lang['id_lang']] = $value['name'][$lang['iso_code']];
@@ -994,7 +996,8 @@ class HotelHelper
             $obj_feature->save();
             $parent_feature_id = $obj_feature->id;
             foreach ($value['features'] as $val) {
-                $obj_feature = new HotelFeatures();
+                ++$childCounter;
+                $obj_feature = new HotelAmenities();
                 foreach ($languages as $lang) {
                     if (isset($val[$lang['iso_code']])) {
                         $obj_feature->name[$lang['id_lang']] = $val[$lang['iso_code']];
@@ -1002,9 +1005,18 @@ class HotelHelper
                         $obj_feature->name[$lang['id_lang']] = $val['en'];
                     }
                 }
-                $obj_feature->active = 1;
+                $obj_feature->active            = 1;
                 $obj_feature->parent_feature_id = $parent_feature_id;
                 $obj_feature->save();
+
+                $srcImg = $imgDir.'_default/'.$childCounter.'.jpg';
+                if (file_exists($srcImg)) {
+                    if (ImageManager::resize($srcImg, $imgDir.$obj_feature->id.'.jpg')) {
+                        $obj_feature->logo_type = 'image';
+                        $obj_feature->logo      = $obj_feature->id.'.jpg';
+                        $obj_feature->save();
+                    }
+                }
             }
             ++$i;
         }
@@ -1190,138 +1202,6 @@ class HotelHelper
             'Smoke Detection' => array('Smoke Detector', 'Sprinkler', 'None'),
             'Smoking Policy' => array('Smoking Not Allowed', 'Smoking Allowed'),
         );
-    }
-
-    public function createHotelDefaultBedTypes()
-    {
-        $htlBedTypes = array(
-            array(
-                'length' => '6.25',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Twin Bed',
-                    'nl' => 'Eenpersoonsbed',
-                    'fr' => 'Lit simple',
-                    'de' => 'Einzelbett',
-                    'ru' => 'Односпальная кровать',
-                    'es' => 'Cama individual',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Twin XL Bed',
-                    'nl' => 'Eenpersoonsbed XL',
-                    'fr' => 'Lit simple XL',
-                    'de' => 'Einzelbett XL',
-                    'ru' => 'Односпальная кровать XL',
-                    'es' => 'Cama individual XL',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '4.5',
-                'name' => array(
-                    'en' => 'Full Bed',
-                    'nl' => 'Tweepersoonsbed',
-                    'fr' => 'Lit double',
-                    'de' => 'Doppelbett',
-                    'ru' => 'Двуспальная кровать',
-                    'es' => 'Cama doble',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '5',
-                'name' => array(
-                    'en' => 'Queen Bed',
-                    'nl' => 'Queen size bed',
-                    'fr' => 'Lit Queen',
-                    'de' => 'Queen-Size-Bett',
-                    'ru' => 'Кровать Queen Size',
-                    'es' => 'Cama Queen',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '6.33',
-                'name' => array(
-                    'en' => 'King Bed',
-                    'nl' => 'King size bed',
-                    'fr' => 'Lit King',
-                    'de' => 'King-Size-Bett',
-                    'ru' => 'Кровать King Size',
-                    'es' => 'Cama King',
-                ),
-            ),
-            array(
-                'length' => '7',
-                'width'  => '6',
-                'name' => array(
-                    'en' => 'California King Bed',
-                    'nl' => 'California King bed',
-                    'fr' => 'Lit California King',
-                    'de' => 'California King-Bett',
-                    'ru' => 'Калифорнийская кровать King Size',
-                    'es' => 'Cama California King',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Bunk Bed',
-                    'nl' => 'Stapelbed',
-                    'fr' => 'Lit superposé',
-                    'de' => 'Etagenbett',
-                    'ru' => 'Двухъярусная кровать',
-                    'es' => 'Litera',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '4.5',
-                'name' => array(
-                    'en' => 'Sofa Bed',
-                    'nl' => 'Slaapbank',
-                    'fr' => 'Canapé-lit',
-                    'de' => 'Schlafsofa',
-                    'ru' => 'Диван-кровать',
-                    'es' => 'Sofá cama',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '5',
-                'name' => array(
-                    'en' => 'Murphy Bed',
-                    'nl' => 'Inklapbed',
-                    'fr' => 'Lit escamotable',
-                    'de' => 'Klappbett',
-                    'ru' => 'Откидная кровать',
-                    'es' => 'Cama abatible',
-                ),
-            ),
-        );
-
-        $languages = Language::getLanguages(true);
-        foreach ($htlBedTypes as $htlBedType) {
-            $objBedType = new HotelBedType();
-            foreach ($languages as $lang) {
-                if (isset($htlBedType['name'][$lang['iso_code']])) {
-                    $objBedType->name[$lang['id_lang']] = $htlBedType['name'][$lang['iso_code']];
-                } else {
-                    $objBedType->name[$lang['id_lang']] = $htlBedType['name']['en'];
-                }
-
-                $objBedType->width = $htlBedType['width'];
-                $objBedType->length = $htlBedType['length'];
-                $objBedType->save();
-            }
-        }
-
-        return true;
     }
 
     public static function getPsProducts($id_lang, $start = 0, $limit = 0, $booking_product = null)
@@ -1764,9 +1644,9 @@ class HotelHelper
     {
         $branch_ftr_ids = array(1, 2, 4, 7, 8, 9, 11, 12, 14, 16, 17, 18, 21);
         foreach ($branch_ftr_ids as $value_ftr) {
-            $htl_ftr_obj = new HotelBranchFeatures();
-            $htl_ftr_obj->id_hotel = $id_hotel;
-            $htl_ftr_obj->feature_id = $value_ftr;
+            $htl_ftr_obj = new HotelBranchAmenities();
+            $htl_ftr_obj->id_hotel   = $id_hotel;
+            $htl_ftr_obj->amenity_id = $value_ftr;
             $htl_ftr_obj->save();
         }
     }

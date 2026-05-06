@@ -236,7 +236,6 @@ class CategoryControllerCore extends FrontController
                 }
             }
 
-            $feat_img_dir = _PS_IMG_.'rf/';
             $ratting_img = _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png';
             $this->context->smarty->assign(array(
                 'warning_num' => $warning_num,
@@ -249,7 +248,7 @@ class CategoryControllerCore extends FrontController
                 'display_all_room_types' => $displayAllRoomsTypes,
                 'id_hotel' => $id_hotel,
                 'currency' => $currency,
-                'feat_img_dir' => $feat_img_dir,
+                'amenity_img_dir' => _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_amenities/',
                 'ratting_img' => $ratting_img,
             ));
 

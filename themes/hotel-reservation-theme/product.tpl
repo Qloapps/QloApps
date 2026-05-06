@@ -280,15 +280,47 @@
 													{/block}
 													{* Block for booking products *}
 													{if isset($id_hotel) && $id_hotel}
-														{block name='product_info_tab_hotel_features'}
+														{block name='product_info_tab_room_amenities'}
 															{if isset($room_dynamic_amenities) && $room_dynamic_amenities}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Amenities'}</span>
+																		<span>{l s='Room Amenities'}</span>
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$room_dynamic_amenities item=amenity}
-																			<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$amenity.name|escape:'html':'UTF-8'}</div>
+																			<div class="col-sm-4 col-xs-12">
+																				{if $amenity.logo_type == 'icon' && $amenity.logo}
+																					<i class="{$amenity.logo|escape:'html':'UTF-8'}"></i>
+																				{elseif $amenity.logo_type == 'image' && $amenity.logo}
+																					<img src="{$amenity_img_dir|escape:'html':'UTF-8'}{$amenity.id|intval}.jpg"
+																						 alt="{$amenity.name|escape:'html':'UTF-8'}"
+																						 style="max-height:20px;max-width:20px;" />
+																				{/if}
+																				{$amenity.name|escape:'html':'UTF-8'}
+																			</div>
+																		{/foreach}
+																	</div>
+																</div>
+															{/if}
+														{/block}
+														{block name='product_info_tab_hotel_features'}
+															{if isset($hotel_dynamic_amenities) && $hotel_dynamic_amenities}
+																<div class="info_margin_div">
+																	<div class="room_info_heading">
+																		<span>{l s='Hotel Amenities'}</span>
+																	</div>
+																	<div class="room_info_content row">
+																		{foreach from=$hotel_dynamic_amenities item=amenity}
+																			<div class="col-sm-4 col-xs-12">
+																				{if $amenity.logo_type == 'icon' && $amenity.logo}
+																					<i class="{$amenity.logo|escape:'html':'UTF-8'}"></i>
+																				{elseif $amenity.logo_type == 'image' && $amenity.logo}
+																					<img src="{$amenity_img_dir|escape:'html':'UTF-8'}{$amenity.id|intval}.jpg"
+																						 alt="{$amenity.name|escape:'html':'UTF-8'}"
+																						 style="max-height:20px;max-width:20px;" />
+																				{/if}
+																				{$amenity.name|escape:'html':'UTF-8'}
+																			</div>
 																		{/foreach}
 																	</div>
 																</div>
