@@ -298,6 +298,18 @@
 				{/if}
 
 				<ul id="header_employee_box">
+					{if isset($debug_mode) && $debug_mode == true}
+						<li class="hidden-sm hidden-xs">
+							<a href="{$link->getAdminLink('AdminPerformance')|escape:'html':'UTF-8'}" data-html="true"
+							class="toolbar_btn label-tooltip" data-toggle="tooltip" data-placement="bottom"
+							title="<p class='text-left text-nowrap'><strong>{l s='Your site is in debug mode.'}</strong></p>
+									<p class='text-left'>{l s='All PHP errors and messages are displayed. Disable debug mode from Performance tab.'}</p>">
+								<i class="icon-bug"></i>
+								<span>{l s='Debug mode'}</span>
+							</a>
+						</li>
+					{/if}
+
 					{if isset($upgrade_info->update_available) && $upgrade_info->update_available > 0}
 						<li class="hidden-md hidden-sm hidden-xs"><a href="{$upgrade_info->upgrade_url}">{l s='QloApps Update Availabe:'} {$upgrade_info->latest_availabe}</a></li>
 					{/if}
