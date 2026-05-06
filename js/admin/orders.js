@@ -1535,23 +1535,34 @@ $(document).ready(function() {
     // toggle date input of check-in checkout dates as per status selected
     $(document).on('change', '.booking_order_status', function() {
         var status = $(this).val();
+        var $form = $(this).closest('.room_status_info_form');
         if (status == ROOM_STATUS_CHECKED_IN || status == ROOM_STATUS_CHECKED_OUT) {
-            $(this).closest('.room_status_info_form').find('.room_status_date').closest('.form-group').show();
+            $form.find('.room_status_date').closest('.form-group').show();
+            var currentStatus = $form.data('current_status');
+            var hasCheckedIn = currentStatus == ROOM_STATUS_CHECKED_IN || currentStatus == ROOM_STATUS_CHECKED_OUT;
+            var hasCheckedOut = currentStatus == ROOM_STATUS_CHECKED_OUT;
+            if (status == ROOM_STATUS_CHECKED_OUT) {
+                $form.find('.room_status_date').val(hasCheckedOut ? $form.data('check_out') : $form.find('[name="date_to"]').val() + ' ' + $form.data('check_out_time'));
+            } else {
+                $form.find('.room_status_date').val(hasCheckedIn ? $form.data('check_in') : $form.find('[name="date_from"]').val() + ' ' + $form.data('check_in_time'));
+            }
         } else {
-            $(this).closest('.room_status_info_form').find('.room_status_date').closest('.form-group').hide();
+            $form.find('.room_status_date').closest('.form-group').hide();
         }
     });
 
     // open date picker for the date input of check-in checkout dates
     $(document).on('focus', '.room_status_date', function() {
-        var dateFrom = $(this).closest('.room_status_info_form').find('[name="date_from"]').val();
+        var $input = $(this);
+        var dateFrom = $input.closest('.room_status_info_form').find('[name="date_from"]').val();
         minDate = new Date(dateFrom+'T00:00:00');
 
-        var dateTo = $(this).closest('.room_status_info_form').find('[name="date_to"]').val();
+        var dateTo = $input.closest('.room_status_info_form').find('[name="date_to"]').val();
         maxDate = new Date(dateTo+'T23:59:59');
 
-        $(this).datetimepicker({
-            dateFormat: 'dd-mm-yy',
+        $input.datetimepicker({
+            dateFormat: 'yy-mm-dd',
+            timeFormat: 'hh:mm',
             minDate: minDate,
             maxDate: maxDate,
             dayNamesMin: [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
@@ -2231,13 +2242,14 @@ const RoomStatusModal = {
             url: admin_order_tab_link,
             dataType: 'JSON',
             cache: false,
-            data: 'ajax=true&id_order='+id_order+'&action=InitRoomStatusModal',
+            data: 'ajax=true&id_order='+id_order+'&action=InitRoomStatusModal&current_room_status='+roomObj.data('id_status'),
             beforeSend: function() {
                 $("#page-loader").show();
             },
             success: function(result) {
                 if (result.hasError == 0 && result.modalHtml) {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
+                    var currentStatus = roomObj.data('id_status');
 
                     $('#room-status-modal #room_status_id_hotel_booking_detail').val(roomObj.data('id_hotel_booking_detail'));
                     $('#room-status-modal #room_status_date_from').val(roomObj.data('date_from'));
@@ -2245,15 +2257,16 @@ const RoomStatusModal = {
                     $('#room-status-modal #room_status_id_room').val(roomObj.data('id_room'));
                     $('#room-status-modal #room_status_id_order').val(roomObj.data('id_order'));
                     $('#room-status-modal .booking_order_status').val(roomObj.data('id_status'));
+                    var checkIn = roomObj.data('check_in') ? String(roomObj.data('check_in')).substring(0, 16) : '';
+                    var checkOut = roomObj.data('check_out') ? String(roomObj.data('check_out')).substring(0, 16) : '';
+                    $('#room-status-modal .room_status_info_form').data({check_in_time: roomObj.data('check_in_time'), check_out_time: roomObj.data('check_out_time'), check_in: checkIn, check_out: checkOut, current_status: currentStatus});
 
-                    if (roomObj.data('id_status') == result.STATUS_CHECKED_IN) {
-                        $('.room_status_info_form .room_status_date').val(roomObj.data('date_to') + ' ' + roomObj.data('check_out_time'));
+                    if (currentStatus == result.STATUS_CHECKED_OUT) {
+                        $('.room_status_info_form .room_status_date').val(checkOut || roomObj.data('date_to') + ' ' + roomObj.data('check_out_time'));
                     } else {
-                        $('.room_status_info_form .room_status_date').val(roomObj.data('date_from') + ' ' + roomObj.data('check_in_time'));
+                        $('.room_status_info_form .room_status_date').val(checkIn || roomObj.data('date_from') + ' ' + roomObj.data('check_in_time'));
                     }
-
-                    $('#room-status-modal .booking_order_status option:selected').attr('disabled', 'disabled');
-
+                    
                     $('#room-status-modal').modal('show');
                 } else if (result.errors) {
                     showErrorMessage();

@@ -1,0 +1,104 @@
+/**
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.md
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@qloapps.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this module to a newer
+ * versions in the future. If you wish to customize this module for your needs
+ * please refer to https://store.webkul.com/customisation-guidelines for more information.
+ *
+ * @author Webkul IN
+ * @copyright Since 2010 Webkul
+ * @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
+ */
+
+
+.modal-open .chosen-container {
+    width: 100%!important;}
+    .modal-open ul.chosen-choices {
+        border-radius: 3px;}
+.modal-open .form_fields_info .alert {
+    margin-bottom: 0px;}
+.modal-open #ics_export_form #ics_date_from, .modal-open #ics_export_form #ics_date_to {
+    background-color: #F5F8F9;
+    cursor: text;}
+    #ics_export_form .error-border {
+        border: 1px solid #dc3545;}
+    #ics_export_form .field-error {
+        display:none;
+        margin: 0px;
+        color: #dc3545;}
+
+/*datepicker on ics datepicker css*/
+.modal-open #ui-datepicker-div {
+    border: none;
+    background: #FFFFFF;
+    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.26);
+    padding: 12px;
+    width: auto;
+    z-index: 111111 !important;}
+.modal-open .ui-datepicker-header {
+    background: none;
+    border: none;}
+.modal-open .ui-datepicker-year, .ui-datepicker-month {
+    color: #333;
+    font-size: 16px;
+    font-weight: 400;}
+.modal-open .ui-datepicker-calendar thead th {
+    font-size: 12px;
+    font-weight: 600;
+    color: #777;
+    text-transform: uppercase;}
+.modal-open .ui-datepicker-unselectable {
+    color: #777 !important;
+    font-size: 14px;}
+.modal-open .ui-datepicker-calendar .ui-state-default {
+    text-align: center !important;
+    color: #333 !important;
+    font-size: 12px;
+    border: none !important;
+    background: none !important;}
+.modal-open .ui-datepicker .ui-datepicker-prev, .modal-open .ui-datepicker .ui-datepicker-next {
+    background-color: #F0F0F0;
+    border: none;
+    border-radius: 50%;}
+.modal-open .ui-datepicker .ui-datepicker-prev-hover, .modal-open .ui-datepicker .ui-datepicker-next-hover {
+    background: #DADADA;
+    cursor: pointer;
+    top: 2px;
+    border: none;}
+.modal-open .ui-datepicker .ui-datepicker-next-hover {
+    right: 2px;}
+.modal-open .ui-datepicker .ui-datepicker-prev-hover {
+    left: 2px;}
+.modal-open .ui-datepicker-header .ui-icon-circle-triangle-w {
+    border: none !important;
+    background-position: -97px 1px;}
+.modal-open .ui-datepicker-header .ui-icon-circle-triangle-e {
+    border: none !important;
+    background-position: -33px 1px;}
+.modal-open .ui-datepicker td span, .modal-open .ui-datepicker td a {
+    padding: 7px;}
+.modal-open .in-select-date-range {
+    background: #f2f2f2;}
+.modal-open .selectedCheckedDate {
+    opacity: 1!important;
+    background-color: #1292FF;
+    border-color: #285e8e;}
+.modal-open .selectedCheckedDate .ui-state-default {
+    color: #fff!important;}
+
+  /* set datepicker area doe small devices */
+  @media (max-width: 375px) {
+    .modal-open #ui-datepicker-div {
+      padding: 7px;}
+      .modal-open .ui-datepicker td span, .modal-open .ui-datepicker td a {
+      padding: 7px;}}

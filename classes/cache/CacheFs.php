@@ -37,7 +37,8 @@ class CacheFsCore extends Cache
 
         $keys_filename = $this->getFilename(self::KEYS_NAME);
         if (@filemtime($keys_filename)) {
-            $this->keys = unserialize(file_get_contents($keys_filename));
+            $keys = @unserialize(file_get_contents($keys_filename));
+            $this->keys = is_array($keys) ? $keys : array();
         }
     }
 

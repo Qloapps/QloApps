@@ -507,7 +507,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                 $formattedRooms[$key]['occupancy'] = $occupancy;
                 if (isset($room['id_tax_rules_group'])) {
                     $formattedRooms[$key]['id_tax_rules_group'] = $room['id_tax_rules_group'];
-                } else if ($room['total_tax']) {
+                } else if (isset($room['total_tax'])) {
                     $formattedRooms[$key]['total_tax'] = $room['total_tax'];
                 }
             }
