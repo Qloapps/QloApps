@@ -162,6 +162,8 @@ class HotelReservationSystemDb
                 `date_to` datetime NOT NULL,
                 `total_price_tax_excl` decimal(20,6) NOT NULL,
                 `total_price_tax_incl` decimal(20,6) NOT NULL,
+                `unit_price_tax_excl` decimal(20,6) NOT NULL DEFAULT '0.000000',
+                `unit_price_tax_incl` decimal(20,6) NOT NULL DEFAULT '0.000000',
                 `total_paid_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
                 `is_back_order` tinyint(4) NOT NULL,
                 `hotel_name` varchar(255) DEFAULT NULL,

@@ -853,6 +853,11 @@ abstract class PaymentModuleCore extends Module
                                 $objBookingDetail->date_to = $objCartBookingData->date_to;
                                 $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
                                 $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
+                                $numNights = max(1, (int) round(
+                                    (strtotime($objCartBookingData->date_to) - strtotime($objCartBookingData->date_from)) / 86400
+                                ));
+                                $objBookingDetail->unit_price_tax_excl = $total_price['total_price_tax_excl'] / $numNights;
+                                $objBookingDetail->unit_price_tax_incl = $total_price['total_price_tax_incl'] / $numNights;
                                 $objBookingDetail->adults = $objCartBookingData->adults;
                                 $objBookingDetail->children = $objCartBookingData->children;
                                 $objBookingDetail->child_ages = $objCartBookingData->child_ages;
