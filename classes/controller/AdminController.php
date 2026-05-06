@@ -554,8 +554,8 @@ class AdminControllerCore extends Controller
             }
             if ($this->access_query) {
                 if (Tools::getValue($this->identifier)) {
-                    $this->access_query .= ' AND a.'.$this->identifier.'='.(int) Tools::getValue($this->identifier);
-                    if (!Db::getInstance()->executeS($this->access_query)) {
+                    $access_query = $this->access_query.' AND a.'.$this->identifier.'='.(int) Tools::getValue($this->identifier);
+                    if (!Db::getInstance()->executeS($access_query)) {
                         $this->tabAccess['view'] = 0;
                         $this->tabAccess['add'] = 0;
                         $this->tabAccess['edit'] = 0;
@@ -886,7 +886,7 @@ class AdminControllerCore extends Controller
                 }
 
                 if (is_array($value)) {
-                    if ($value[0] === '' && $value[1] === '') {
+                    if (isset($value[0], $value[1]) && $value[0] === '' && $value[1] === '') {
                         $value = '';
                     } else {
                         $value = json_encode($value);
@@ -915,7 +915,7 @@ class AdminControllerCore extends Controller
                 }
 
                 if (is_array($value)) {
-                    if ($value[0] === '' && $value[1] === '') {
+                    if (isset($value[0], $value[1]) && $value[0] === '' && $value[1] === '') {
                         $value = '';
                     } else {
                         $value = json_encode($value);
@@ -3033,7 +3033,8 @@ class AdminControllerCore extends Controller
             $upgradeInfo = simplexml_load_string($content);
 
             $this->context->smarty->assign(array(
-                'upgrade_info' => $upgradeInfo
+                'upgrade_info' => $upgradeInfo,
+                'debug_mode' => (bool) _PS_MODE_DEV_,
             ));
         }
 
