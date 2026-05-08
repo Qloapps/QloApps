@@ -1608,17 +1608,16 @@ class HotelCartBookingData extends ObjectModel
                                 $addressInfo['country'].', '.$addressInfo['postcode'];
 
 
-                                // append hotel features
-                                if ($hotelFeaureIds = $objHotelBranch->getFeaturesOfHotelByHotelId($roomDetail['id_hotel'])) {
-                                    $hotelFeatures = array();
-                                    foreach ($hotelFeaureIds as $value) {
-                                        $htlFeatureInfo = $objHtlFeatures->getFeatureInfoById($value['amenity_id']);
-                                        if ($htlFeatureInfo = $objHtlFeatures->getFeatureInfoById($value['feature_id'])) {
-                                            $hotelFeatures[] = $htlFeatureInfo['name'];
+                                // append hotel amenities
+                                if ($hotelAmenityIds = $objHotelBranch->getAmenitiesOfHotelByHotelId($roomDetail['id_hotel'])) {
+                                    $hotelAmenities = array();
+                                    foreach ($hotelAmenityIds as $value) {
+                                        if ($htlAmenityInfo = $objHtlFeatures->getAmenityInfoById($value['amenity_id'])) {
+                                            $hotelAmenities[] = $htlAmenityInfo['name'];
                                         }
                                     }
-                                    if ($hotelFeatures) {
-                                        $hotelInfo['htl_features'] = $hotelFeatures;
+                                    if ($hotelAmenities) {
+                                        $hotelInfo['htl_features'] = $hotelAmenities;
                                     }
                                 }
                                 // append roomtype features

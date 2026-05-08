@@ -1164,86 +1164,21 @@ class AdminProductsControllerCore extends AdminController
         }
 
         foreach ($featureValues as $idFeature => $selectedValues) {
-            $idFeature = (int) $idFeature;
+            $idFeature = (int)$idFeature;
             if (!$idFeature) {
                 continue;
             }
-
             if (!is_array($selectedValues)) {
                 $selectedValues = array($selectedValues);
             }
-
-            $selectedValues = array_values(array_unique(array_map('intval', $selectedValues)));
-            foreach ($selectedValues as $idFeatureValue) {
+            foreach (array_unique(array_map('intval', $selectedValues)) as $idFeatureValue) {
                 if ($idFeatureValue) {
-                    Db::getInstance()->insert('feature_product', array(
-                        'id_feature' => (int) $idFeature,
-                        'id_product' => (int) $product->id,
-                        'id_feature_value' => (int) $idFeatureValue
-                    ));
+                    $product->addFeaturesToDB($idFeature, $idFeatureValue);
                 }
             }
         }
 
         return true;
-    }
-
-    /**
-     * Save selected room type amenities.
-     *
-     * @param int $idProduct
-     *
-     * @return bool
-     */
-    protected function saveRoomTypeAmenities($idProduct)
-    {
-        $idProduct = (int) $idProduct;
-        $selectedAmenities = Tools::getValue('room_type_amenities', array());
-        if (!is_array($selectedAmenities)) {
-            $selectedAmenities = array($selectedAmenities);
-        }
-
-        $selectedAmenities = array_map('intval', $selectedAmenities);
-        $selectedAmenities = array_values(array_unique(array_filter($selectedAmenities)));
-
-        if (!Db::getInstance()->delete('htl_room_type_amenities', '`id_product` = '.$idProduct)) {
-            return false;
-        }
-
-        foreach ($selectedAmenities as $idAmenity) {
-            if (!Db::getInstance()->insert('htl_room_type_amenities', array(
-                'id_product' => $idProduct,
-                'amenity_id' => (int) $idAmenity,
-                'date_add'   => date('Y-m-d H:i:s'),
-                'date_upd'   => date('Y-m-d H:i:s'),
-            ))) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Get selected room type amenity ids.
-     *
-     * @param int $idProduct
-     *
-     * @return array
-     */
-    protected function getSelectedRoomTypeAmenityIds($idProduct)
-    {
-        $selectedAmenities = Db::getInstance()->executeS(
-            'SELECT `amenity_id`
-            FROM `'._DB_PREFIX_.'htl_room_type_amenities`
-            WHERE `id_product` = '.(int) $idProduct
-        );
-
-        if (!$selectedAmenities) {
-            return array();
-        }
-
-        return array_map('intval', array_column($selectedAmenities, 'amenity_id'));
     }
 
     /**
@@ -1256,12 +1191,12 @@ class AdminProductsControllerCore extends AdminController
     protected function getRoomTypeAmenitiesTree($idProduct)
     {
         $selectedAmenityRows = array();
-        foreach ($this->getSelectedRoomTypeAmenityIds($idProduct) as $selectedAmenityId) {
+        foreach (HotelRoomTypeAmenities::getAmenityIdsByProduct($idProduct) as $selectedAmenityId) {
             $selectedAmenityRows[] = array('amenity_id' => $selectedAmenityId);
         }
 
-        $objHotelFeatures = new HotelAmenities();
-        $roomTypeAmenities = $objHotelFeatures->HotelBranchSelectedFeaturesArray(
+        $objHotelAmenities = new HotelAmenities();
+        $roomTypeAmenities = $objHotelAmenities->HotelBranchSelectedAmenitiesArray(
             $selectedAmenityRows,
             $this->context->language->id
         );
@@ -2098,9 +2033,15 @@ class AdminProductsControllerCore extends AdminController
             // }
 
             $this->assignRoomType($this->object);
-            if ($this->isTabSubmitted('Amenities') && !$this->saveRoomTypeAmenities($this->object->id)) {
-                $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
-                return false;
+            if ($this->isTabSubmitted('Amenities')) {
+                $selectedAmenities = Tools::getValue('room_type_amenities', array());
+                if (!is_array($selectedAmenities)) {
+                    $selectedAmenities = array($selectedAmenities);
+                }
+                if (!(new HotelRoomTypeAmenities())->assignAmenitiesToProduct((int)$this->object->id, $selectedAmenities)) {
+                    $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
+                    return false;
+                }
             }
             if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatureAssignments($this->object)) {
                 $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
@@ -2348,9 +2289,15 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if ($object->update()) {
-                    if ($this->isTabSubmitted('Amenities') && !$this->saveRoomTypeAmenities($object->id)) {
-                        $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
-                        return false;
+                    if ($this->isTabSubmitted('Amenities')) {
+                        $selectedAmenities = Tools::getValue('room_type_amenities', array());
+                        if (!is_array($selectedAmenities)) {
+                            $selectedAmenities = array($selectedAmenities);
+                        }
+                        if (!(new HotelRoomTypeAmenities())->assignAmenitiesToProduct((int)$object->id, $selectedAmenities)) {
+                            $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
+                            return false;
+                        }
                     }
                     if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatureAssignments($object)) {
                         $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
@@ -5063,7 +5010,7 @@ class AdminProductsControllerCore extends AdminController
         $data->assign('languages', $this->_languages);
         $data->assign('link', $this->context->link);
         $data->assign('product', $obj);
-
+        
         if ($obj->id) {
             if ($this->product_exists_in_shop) {
                 $roomTypeAmenities = $this->getRoomTypeAmenitiesTree((int) $obj->id);

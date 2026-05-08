@@ -635,3 +635,12 @@ body.adminhotelroomsbooking .ui-tooltip {
 .error-border {
     outline: rgb(210, 124, 130) solid 1px;
     border-radius: 2px;}
+
+.htl-amenity-category-heading {
+    display: flex;
+    align-items: center;
+    min-height: 46px;}
+.htl-amenity-category-heading .pull-right {
+    float: none !important;
+    margin-left: auto;
+    order: 2;}

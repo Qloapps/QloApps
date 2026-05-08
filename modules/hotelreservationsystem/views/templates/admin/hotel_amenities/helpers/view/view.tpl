@@ -29,14 +29,14 @@
 			{foreach from=$amenities_tree item=category}
 				<div class="col-sm-12 htl-amenity-category-block" id="amenity_category_{$category.id}">
 					<div class="panel">
-						<div class="panel-heading clearfix">
+						<div class="panel-heading htl-amenity-category-heading clearfix">
 							<div class="pull-right">
 								<a class="btn btn-primary"
 								   href="{$admin_link}&amp;addhtl_amenity_item&amp;id_category={$category.id}">
 									<i class="icon-plus"></i>&nbsp;&nbsp;{l s='Add new Amenity' mod='hotelreservationsystem'}
 								</a>
 								<a class="btn btn-primary"
-								   href="{$admin_link}&amp;updatehtl_amenities&amp;id={$category.id}">
+								   href="{$admin_link}&amp;updatehtl_amenity&amp;id={$category.id}">
 									<i class="icon-pencil"></i>&nbsp;&nbsp;{l s='Edit' mod='hotelreservationsystem'}
 								</a>
 								<a href="javascript:void(0)" class="btn btn-primary htl-delete-category"
@@ -48,18 +48,26 @@
 						</div>
 						<div class="panel-body">
 							{if isset($category.children) && $category.children}
-								<table class="table tableDnD">
+								<table class="table tableDnD htl-amenity-table">
+									<colgroup>
+										<col style="width:60px;">
+										<col style="width:400px;">
+										<col style="width:50px;">
+										<col style="width:100px;">
+										<col style="width:200px;">
+									</colgroup>
 									<thead>
 										<tr>
 											<th>{l s='Logo' mod='hotelreservationsystem'}</th>
 											<th>{l s='Name' mod='hotelreservationsystem'}</th>
 											<th class="text-center">{l s='Active' mod='hotelreservationsystem'}</th>
+											<th class="text-center">{l s='Featured' mod='hotelreservationsystem'}</th>
 											<th class="text-right">{l s='Actions' mod='hotelreservationsystem'}</th>
 										</tr>
 									</thead>
 									<tbody>
 										{foreach from=$category.children item=amenity}
-											<tr>
+											<tr id="amenity_row_{$amenity.id}">
 												<td class="fixed-width-xs">
 													{if $amenity.logo_type == 'icon' && $amenity.logo}
 														<i class="{$amenity.logo|escape:'htmlall':'UTF-8'}"></i>
@@ -74,10 +82,19 @@
 												<td>{$amenity.name|escape:'htmlall':'UTF-8'}</td>
 												<td class="text-center">
 													<a class="list-action-enable{if $amenity.active} action-enabled{else} action-disabled{/if}"
-													   href="{$admin_link}&amp;id={$amenity.id|intval}&amp;statushtl_amenities&amp;token={$token|escape:'htmlall':'UTF-8'}"
+													   href="{$admin_link}&amp;id_htl_amenity={$amenity.id|intval}&amp;statushtl_amenity&amp;token={$token|escape:'htmlall':'UTF-8'}"
 													   title="{if $amenity.active}{l s='Enabled' mod='hotelreservationsystem'}{else}{l s='Disabled' mod='hotelreservationsystem'}{/if}">
 														<i class="icon-check{if !$amenity.active} hidden{/if}"></i>
 														<i class="icon-remove{if $amenity.active} hidden{/if}"></i>
+													</a>
+												</td>
+												<td class="text-center">
+													<a href="javascript:void(0)"
+													   class="list-action-enable htl-toggle-featured{if $amenity.is_featured} action-enabled{else} action-disabled{/if}"
+													   data-amenity-id="{$amenity.id}"
+													   title="{if $amenity.is_featured}{l s='Featured' mod='hotelreservationsystem'}{else}{l s='Not Featured' mod='hotelreservationsystem'}{/if}">
+														<i class="icon-check{if !$amenity.is_featured} hidden{/if}"></i>
+														<i class="icon-remove{if $amenity.is_featured} hidden{/if}"></i>
 													</a>
 												</td>
 												<td class="text-right">
@@ -120,6 +137,7 @@
 	{addJsDef delete_url=$admin_link js=1 mod='hotelreservationsystem'}
 	{addJsDefL name=confirm_delete_msg}{l s='Are you sure you want to delete this? This action cannot be undone.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=error_delete_msg}{l s='An error occurred while deleting. Please try again.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+	{addJsDefL name=error_featured_msg}{l s='An error occurred while updating. Please try again.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 {/strip}
 
 <script type="text/javascript">
@@ -140,7 +158,7 @@
 			success: function (res) {
 				var r = $.parseJSON(res);
 				if (r.status) {
-					$('#amenity_category_' + $btn.data('category-id')).remove();
+					window.location = delete_url + '&conf=1';
 				} else {
 					alert(r.msg || error_delete_msg);
 				}
@@ -164,9 +182,35 @@
 			success: function (res) {
 				var r = $.parseJSON(res);
 				if (r.status) {
-					$btn.closest('tr').remove();
+					window.location = delete_url + '&conf=1';
 				} else {
 					alert(r.msg || error_delete_msg);
+				}
+			}
+		});
+	});
+
+	$(document).on('click', '.htl-toggle-featured', function (e) {
+		e.preventDefault();
+		var $btn = $(this);
+		$.ajax({
+			url: delete_url,
+			type: 'POST',
+			data: {
+				ajax: 1,
+				action: 'ToggleFeatured',
+				id_amenity: $btn.data('amenity-id'),
+				token: '{$token|escape:'javascript'}'
+			},
+			success: function (res) {
+				var r = $.parseJSON(res);
+				if (r.status) {
+					var featured = r.is_featured;
+					$btn.toggleClass('action-enabled', featured).toggleClass('action-disabled', !featured);
+					$btn.find('.icon-check').toggleClass('hidden', !featured);
+					$btn.find('.icon-remove').toggleClass('hidden', featured);
+				} else {
+					alert(r.msg || error_featured_msg);
 				}
 			}
 		});

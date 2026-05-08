@@ -24,15 +24,14 @@
 
 class HotelBranchAmenities extends ObjectModel
 {
-    public $id;
     public $id_hotel;
     public $amenity_id;
     public $date_add;
     public $date_upd;
 
     public static $definition = array(
-        'table'   => 'htl_branch_amenities',
-        'primary' => 'id',
+        'table'   => 'htl_branch_amenity',
+        'primary' => 'id_htl_branch_amenity',
         'fields'  => array(
             'id_hotel'   => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'amenity_id' => array('type' => self::TYPE_INT),
@@ -45,9 +44,9 @@ class HotelBranchAmenities extends ObjectModel
      * @param int $idHotel
      * @return bool
      */
-    public function deleteBranchFeaturesByHotelId($idHotel)
+    public function deleteBranchAmenitiesByHotelId($idHotel)
     {
-        return Db::getInstance()->delete('htl_branch_amenities', '`id_hotel` = '.(int)$idHotel);
+        return Db::getInstance()->delete('htl_branch_amenity', '`id_hotel` = '.(int)$idHotel);
     }
 
     /**
@@ -55,16 +54,39 @@ class HotelBranchAmenities extends ObjectModel
      * @param array $amenities array of amenity IDs
      * @return bool
      */
-    public function assignFeaturesToHotel($idHotel, $amenities)
+    public function assignAmenitiesToHotel($idHotel, $amenities)
     {
         if ($amenities) {
             foreach ($amenities as $amenityId) {
-                $obj = new HotelBranchAmenities();
-                $obj->id_hotel   = (int)$idHotel;
-                $obj->amenity_id = (int)$amenityId;
-                $obj->save();
+                $objHotelAmenities = new HotelBranchAmenities();
+                $objHotelAmenities->id_hotel   = (int)$idHotel;
+                $objHotelAmenities->amenity_id = (int)$amenityId;
+                $objHotelAmenities->save();
             }
         }
         return true;
+    }
+
+    /**
+     * Return active child amenities assigned to a hotel, formatted for front-end display.
+     *
+     * @param int $idHotel
+     * @param int $idLang
+     * @return array
+     */
+    public static function getFrontAmenities($idHotel, $idLang)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT ha.`id_htl_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
+            FROM `'._DB_PREFIX_.'htl_branch_amenity` hba
+            INNER JOIN `'._DB_PREFIX_.'htl_amenity` ha
+                ON (ha.`id_htl_amenity` = hba.`amenity_id`)
+            INNER JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
+                ON (hal.`id_htl_amenity` = hba.`amenity_id` AND hal.`id_lang` = '.(int)$idLang.')
+            WHERE hba.`id_hotel` = '.(int)$idHotel.'
+                AND ha.`active` = 1
+                AND ha.`parent_amenity_id` > 0
+            ORDER BY ha.`position` ASC, hal.`name` ASC'
+        ) ?: array();
     }
 }

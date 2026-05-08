@@ -346,12 +346,12 @@ class ProductControllerCore extends FrontController
                     $hotel_location = $addressInfo['city'].
                     ($addressInfo['id_state']?', '.$addressInfo['state']:'').', '.$addressInfo['country'];
 
-                    $obj_hotel_feaures_ids = $obj_hotel_branch->getFeaturesOfHotelByHotelId($hotel_id);
+                    $obj_hotel_amenities_ids = $obj_hotel_branch->getAmenitiesOfHotelByHotelId($hotel_id);
 
-                    if (isset($obj_hotel_feaures_ids) && $obj_hotel_feaures_ids) {
-                        foreach ($obj_hotel_feaures_ids as $key => $value) {
-                            $obj_htl_ftr = new HotelAmenities();
-                            $htl_info = $obj_htl_ftr->getFeatureInfoById($value['amenity_id']);
+                    if (isset($obj_hotel_amenities_ids) && $obj_hotel_amenities_ids) {
+                        foreach ($obj_hotel_amenities_ids as $key => $value) {
+                            $obj_htl_amenity = new HotelAmenities();
+                            $htl_info = $obj_htl_amenity->getAmenityInfoById($value['amenity_id']);
                             $htl_features[] = $htl_info['name'];
                         }
                     }
@@ -409,9 +409,9 @@ class ProductControllerCore extends FrontController
                         }
                     }
 
-                    $roomDynamicFeatures = $this->getRoomDynamicFeatures($this->product->id);
-                    $roomDynamicAmenities = $this->getRoomDynamicAmenities($this->product->id);
-                    $hotelDynamicAmenities = $this->getHotelDynamicAmenities($hotel_id);
+                    $roomFeatures = HotelRoomType::getFrontFeatures($this->product->id, $this->context->language->id);
+                    $roomAmenities = HotelRoomTypeAmenities::getFrontAmenities($this->product->id, $this->context->language->id);
+                    $hotelAmenities = HotelBranchAmenities::getFrontAmenities($hotel_id, $this->context->language->id);
 
                     $this->context->smarty->assign(
                         array(
@@ -439,9 +439,9 @@ class ProductControllerCore extends FrontController
                             'hotel_description' => $hotel_info_by_id['description'],
                             'hotel_policies' => $hotel_policies,
                             'hotel_features' => $htl_features,
-                            'room_dynamic_features' => $roomDynamicFeatures,
-                            'room_dynamic_amenities' => $roomDynamicAmenities,
-                            'hotel_dynamic_amenities' => $hotelDynamicAmenities,
+                            'room_dynamic_features' => $roomFeatures,
+                            'room_dynamic_amenities' => $roomAmenities,
+                            'hotel_dynamic_amenities' => $hotelAmenities,
                             'amenity_img_dir' => _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_amenities/',
                             'hotel_image_link' => $hotelImageLink,
                             'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
@@ -568,72 +568,6 @@ class ProductControllerCore extends FrontController
             );
         }
         $this->setTemplate(_PS_THEME_DIR_.'product.tpl');
-    }
-
-    /**
-     * Get assigned dynamic room features for the room detail page.
-     *
-     * @param int $idProduct
-     *
-     * @return array
-     */
-    protected function getRoomDynamicFeatures($idProduct)
-    {
-        $features = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-            SELECT fl.`name` AS `feature_name`, fvl.`value` AS `feature_value`, f.`position`
-            FROM `'._DB_PREFIX_.'feature_product` fp
-            INNER JOIN `'._DB_PREFIX_.'feature` f ON (f.`id_feature` = fp.`id_feature`)
-            INNER JOIN `'._DB_PREFIX_.'feature_lang` fl
-                ON (fl.`id_feature` = fp.`id_feature` AND fl.`id_lang` = '.(int) $this->context->language->id.')
-            INNER JOIN `'._DB_PREFIX_.'feature_value_lang` fvl
-                ON (fvl.`id_feature_value` = fp.`id_feature_value` AND fvl.`id_lang` = '.(int) $this->context->language->id.')
-            WHERE fp.`id_product` = '.(int) $idProduct.'
-            ORDER BY f.`position` ASC, fl.`name` ASC'
-        );
-
-        if (!$features) {
-            return array();
-        }
-
-        $result = array();
-        foreach ($features as $feature) {
-            $result[] = array(
-                'name'  => $feature['feature_name'],
-                'value' => $feature['feature_value'],
-            );
-        }
-
-        return $result;
-    }
-
-    protected function getRoomDynamicAmenities($idProduct)
-    {
-        $amenities = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-            SELECT ha.`id`, ha.`logo_type`, ha.`logo`, hal.`name`
-            FROM `'._DB_PREFIX_.'htl_room_type_amenities` hrta
-            INNER JOIN `'._DB_PREFIX_.'htl_amenities` ha ON (ha.`id` = hrta.`amenity_id`)
-            INNER JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
-                ON (hal.`id` = hrta.`amenity_id` AND hal.`id_lang` = '.(int) $this->context->language->id.')
-            WHERE hrta.`id_product` = '.(int) $idProduct.' AND ha.`active` = 1
-            ORDER BY ha.`position` ASC, hal.`name` ASC'
-        );
-
-        return $amenities ?: array();
-    }
-
-    protected function getHotelDynamicAmenities($idHotel)
-    {
-        $amenities = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-            SELECT ha.`id`, ha.`logo_type`, ha.`logo`, hal.`name`
-            FROM `'._DB_PREFIX_.'htl_branch_amenities` hba
-            INNER JOIN `'._DB_PREFIX_.'htl_amenities` ha ON (ha.`id` = hba.`amenity_id`)
-            INNER JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
-                ON (hal.`id` = hba.`amenity_id` AND hal.`id_lang` = '.(int) $this->context->language->id.')
-            WHERE hba.`id_hotel` = '.(int) $idHotel.' AND ha.`active` = 1
-            ORDER BY ha.`position` ASC, hal.`name` ASC'
-        );
-
-        return $amenities ?: array();
     }
 
     public function assignRoomServiceProductVars()

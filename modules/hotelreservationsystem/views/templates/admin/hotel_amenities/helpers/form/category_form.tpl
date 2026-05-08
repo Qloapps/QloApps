@@ -35,9 +35,9 @@
 
 			{if isset($category.id) && $category.id}
 				<input type="hidden" name="id" value="{$category.id|intval}" />
-				<input type="hidden" name="updatehtl_amenities" value="1" />
+				<input type="hidden" name="updatehtl_amenity" value="1" />
 			{else}
-				<input type="hidden" name="addhtl_amenities" value="1" />
+				<input type="hidden" name="addhtl_amenity" value="1" />
 			{/if}
 
 			<div class="form-group">

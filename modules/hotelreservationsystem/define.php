@@ -28,6 +28,7 @@ require_once 'classes/HotelBranchInformation.php';
 require_once 'classes/HotelImage.php';
 require_once 'classes/HotelAmenities.php';
 require_once 'classes/HotelBranchAmenities.php';
+require_once 'classes/HotelRoomTypeAmenities.php';
 require_once 'classes/HotelBookingDetail.php';
 require_once 'classes/HotelCartBookingData.php';
 require_once 'classes/HotelAdvancedPayment.php';

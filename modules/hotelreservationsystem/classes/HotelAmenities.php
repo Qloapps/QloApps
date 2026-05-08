@@ -25,7 +25,7 @@
 class HotelAmenities extends ObjectModel
 {
     public $name;
-    public $parent_feature_id;
+    public $parent_amenity_id;
     public $position;
     public $active;
     public $is_featured;
@@ -35,11 +35,11 @@ class HotelAmenities extends ObjectModel
     public $date_upd;
 
     public static $definition = array(
-        'table' => 'htl_amenities',
-        'primary' => 'id',
+        'table'     => 'htl_amenity',
+        'primary'   => 'id_htl_amenity',
         'multilang' => true,
-        'fields' => array(
-            'parent_feature_id' => array('type' => self::TYPE_INT, 'required' => true),
+        'fields'    => array(
+            'parent_amenity_id' => array('type' => self::TYPE_INT, 'required' => true),
             'position'          => array('type' => self::TYPE_INT),
             'active'            => array('type' => self::TYPE_INT, 'required' => true),
             'is_featured'       => array('type' => self::TYPE_INT),
@@ -61,8 +61,8 @@ class HotelAmenities extends ObjectModel
     public function delete()
     {
         if ($id = $this->id) {
-            Db::getInstance()->delete('htl_branch_amenities', '`amenity_id` = '.(int)$id);
-            Db::getInstance()->delete('htl_room_type_amenities', '`amenity_id` = '.(int)$id);
+            Db::getInstance()->delete('htl_branch_amenity', '`amenity_id` = '.(int)$id);
+            Db::getInstance()->delete('htl_room_type_amenity', '`amenity_id` = '.(int)$id);
             $imgFile = dirname(__FILE__).'/../views/img/hotel_amenities/'.(int)$id.'.jpg';
             if (file_exists($imgFile)) {
                 unlink($imgFile);
@@ -73,7 +73,7 @@ class HotelAmenities extends ObjectModel
     }
 
     /**
-     * Return all categories (parent_feature_id = 0) with their child amenities.
+     * Return all categories (parent_amenity_id = 0) with their child amenities.
      *
      * @param int $idLang
      * @return array|false
@@ -86,33 +86,37 @@ class HotelAmenities extends ObjectModel
 
         $result = array();
         $parents = Db::getInstance()->executeS(
-            'SELECT ha.`id`, ha.`position`, hal.`name`
-            FROM `'._DB_PREFIX_.'htl_amenities` ha
-            LEFT JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
-                ON (hal.`id` = ha.`id` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE ha.`parent_feature_id` = 0
+            'SELECT ha.`id_htl_amenity`, ha.`position`, hal.`name`
+            FROM `'._DB_PREFIX_.'htl_amenity` ha
+            LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
+                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+            WHERE ha.`parent_amenity_id` = 0
             ORDER BY ha.`position` ASC'
         );
 
         if ($parents) {
             foreach ($parents as $parent) {
-                $result[$parent['id']] = array(
-                    'id'       => $parent['id'],
+                $result[$parent['id_htl_amenity']] = array(
+                    'id'       => $parent['id_htl_amenity'],
                     'name'     => $parent['name'],
                     'position' => $parent['position'],
                     'children' => array(),
                 );
 
                 $children = Db::getInstance()->executeS(
-                    'SELECT ha.`id`, ha.`active`, ha.`logo_type`, ha.`logo`, hal.`name`
-                    FROM `'._DB_PREFIX_.'htl_amenities` ha
-                    LEFT JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
-                        ON (hal.`id` = ha.`id` AND hal.`id_lang` = '.(int)$idLang.')
-                    WHERE ha.`parent_feature_id` = '.(int)$parent['id']
+                    'SELECT ha.`id_htl_amenity`, ha.`active`, ha.`is_featured`, ha.`logo_type`, ha.`logo`, hal.`name`
+                    FROM `'._DB_PREFIX_.'htl_amenity` ha
+                    LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
+                        ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+                    WHERE ha.`parent_amenity_id` = '.(int)$parent['id_htl_amenity']
                 );
 
                 if ($children) {
-                    $result[$parent['id']]['children'] = $children;
+                    // normalize: rename id_htl_amenity → id for template compatibility
+                    foreach ($children as &$child) {
+                        $child['id'] = $child['id_htl_amenity'];
+                    }
+                    $result[$parent['id_htl_amenity']]['children'] = $children;
                 }
             }
         }
@@ -121,13 +125,13 @@ class HotelAmenities extends ObjectModel
     }
 
     /**
-     * Returns all amenity categories with children, marking which children are selected for a hotel.
+     * Returns all amenity categories with children, marking which are selected for a hotel/room type.
      *
-     * @param array $branchAmenities rows from htl_branch_amenities for a hotel
+     * @param array $branchAmenities rows from htl_branch_amenity for a hotel
      * @param int   $idLang
      * @return array|false
      */
-    public function HotelBranchSelectedFeaturesArray($branchAmenities, $idLang = 0)
+    public function HotelBranchSelectedAmenitiesArray($branchAmenities, $idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -135,22 +139,22 @@ class HotelAmenities extends ObjectModel
 
         $result = array();
         $parents = Db::getInstance()->executeS(
-            'SELECT ha.`id`, hal.`name`
-            FROM `'._DB_PREFIX_.'htl_amenities` ha
-            LEFT JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
-                ON (hal.`id` = ha.`id` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE ha.`parent_feature_id` = 0'
+            'SELECT ha.`id_htl_amenity`, hal.`name`
+            FROM `'._DB_PREFIX_.'htl_amenity` ha
+            LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
+                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+            WHERE ha.`parent_amenity_id` = 0'
         );
 
         if ($parents) {
             foreach ($parents as $parent) {
-                $result[$parent['id']]['name'] = $parent['name'];
+                $result[$parent['id_htl_amenity']]['name'] = $parent['name'];
                 $children = Db::getInstance()->executeS(
-                    'SELECT ha.`id`, hal.`name`
-                    FROM `'._DB_PREFIX_.'htl_amenities` ha
-                    LEFT JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
-                        ON (hal.`id` = ha.`id` AND hal.`id_lang` = '.(int)$idLang.')
-                    WHERE ha.`parent_feature_id` = '.(int)$parent['id']
+                    'SELECT ha.`id_htl_amenity`, hal.`name`
+                    FROM `'._DB_PREFIX_.'htl_amenity` ha
+                    LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
+                        ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+                    WHERE ha.`parent_amenity_id` = '.(int)$parent['id_htl_amenity']
                 );
 
                 if ($children) {
@@ -158,14 +162,15 @@ class HotelAmenities extends ObjectModel
                         $selected = 0;
                         if ($branchAmenities) {
                             foreach ($branchAmenities as $row) {
-                                if ($child['id'] == $row['amenity_id']) {
+                                if ($child['id_htl_amenity'] == $row['amenity_id']) {
                                     $selected = 1;
                                     break;
                                 }
                             }
                         }
+                        $child['id']       = $child['id_htl_amenity'];
                         $child['selected'] = $selected;
-                        $result[$parent['id']]['children'][] = $child;
+                        $result[$parent['id_htl_amenity']]['children'][] = $child;
                     }
                 }
             }
@@ -179,17 +184,17 @@ class HotelAmenities extends ObjectModel
      * @param int $idLang
      * @return array|false
      */
-    public function getFeatureInfoById($id, $idLang = 0)
+    public function getAmenityInfoById($id, $idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
         return Db::getInstance()->getRow(
-            'SELECT ha.`id`, hal.`name`
-            FROM `'._DB_PREFIX_.'htl_amenities` ha
-            LEFT JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
-                ON (hal.`id` = ha.`id` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE ha.`id` = '.(int)$id
+            'SELECT ha.`id_htl_amenity`, hal.`name`
+            FROM `'._DB_PREFIX_.'htl_amenity` ha
+            LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
+                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+            WHERE ha.`id_htl_amenity` = '.(int)$id
         );
     }
 
@@ -197,10 +202,10 @@ class HotelAmenities extends ObjectModel
      * @param int $parentId
      * @return array|false
      */
-    public function getChildFeaturesByParentFeatureId($parentId)
+    public function getChildAmenitiesByParentAmenityId($parentId)
     {
         return Db::getInstance()->executeS(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_amenities` WHERE `parent_feature_id` = '.(int)$parentId
+            'SELECT `id_htl_amenity` FROM `'._DB_PREFIX_.'htl_amenity` WHERE `parent_amenity_id` = '.(int)$parentId
         );
     }
 
@@ -210,16 +215,16 @@ class HotelAmenities extends ObjectModel
      * @param int $deleteId
      * @return bool
      */
-    public function deleteHotelFeatures($deleteId)
+    public function deleteHotelAmenities($deleteId)
     {
         $rows = Db::getInstance()->executeS(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_amenities`
-            WHERE `parent_feature_id` = '.(int)$deleteId.' OR `id` = '.(int)$deleteId
+            'SELECT `id_htl_amenity` FROM `'._DB_PREFIX_.'htl_amenity`
+            WHERE `parent_amenity_id` = '.(int)$deleteId.' OR `id_htl_amenity` = '.(int)$deleteId
         );
 
         if ($rows) {
             foreach ($rows as $row) {
-                $obj = new HotelAmenities((int)$row['id']);
+                $obj = new HotelAmenities((int)$row['id_htl_amenity']);
                 $obj->delete();
             }
         }
@@ -239,8 +244,8 @@ class HotelAmenities extends ObjectModel
         }
 
         return Db::getInstance()->executeS(
-            'SELECT ha.*, hal.* FROM `'._DB_PREFIX_.'htl_amenities` ha
-            LEFT JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal ON hal.`id` = ha.`id`
+            'SELECT ha.*, hal.* FROM `'._DB_PREFIX_.'htl_amenity` ha
+            LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal ON hal.`id_htl_amenity` = ha.`id_htl_amenity`
             WHERE hal.`name` LIKE \'%'.pSQL($query).'%\'
             AND hal.`id_lang` = '.(int)$idLang
         );

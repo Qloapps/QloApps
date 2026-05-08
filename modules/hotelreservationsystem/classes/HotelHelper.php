@@ -992,9 +992,9 @@ class HotelHelper
 
             $obj_feature->active = 1;
             $obj_feature->position = $i;
-            $obj_feature->parent_feature_id = 0;
+            $obj_feature->parent_amenity_id = 0;
             $obj_feature->save();
-            $parent_feature_id = $obj_feature->id;
+            $parent_amenity_id = $obj_feature->id;
             foreach ($value['features'] as $val) {
                 ++$childCounter;
                 $obj_feature = new HotelAmenities();
@@ -1006,7 +1006,7 @@ class HotelHelper
                     }
                 }
                 $obj_feature->active            = 1;
-                $obj_feature->parent_feature_id = $parent_feature_id;
+                $obj_feature->parent_amenity_id = $parent_amenity_id;
                 $obj_feature->save();
 
                 $srcImg = $imgDir.'_default/'.$childCounter.'.jpg';
@@ -1640,14 +1640,14 @@ class HotelHelper
         return $htl_id;
     }
 
-    public function saveDummyHotelFeatures($id_hotel)
+    public function saveDummyHotelAmenities($id_hotel)
     {
-        $branch_ftr_ids = array(1, 2, 4, 7, 8, 9, 11, 12, 14, 16, 17, 18, 21);
-        foreach ($branch_ftr_ids as $value_ftr) {
-            $htl_ftr_obj = new HotelBranchAmenities();
-            $htl_ftr_obj->id_hotel   = $id_hotel;
-            $htl_ftr_obj->amenity_id = $value_ftr;
-            $htl_ftr_obj->save();
+        $branch_amenity_ids = array(2, 4, 7, 8, 11, 12, 14, 16, 17, 18, 21);
+        foreach ($branch_amenity_ids as $amenityId) {
+            $objHotelAmenities = new HotelBranchAmenities();
+            $objHotelAmenities->id_hotel   = $id_hotel;
+            $objHotelAmenities->amenity_id = $amenityId;
+            $objHotelAmenities->save();
         }
     }
 
@@ -2297,7 +2297,7 @@ class HotelHelper
     {
         $htl_id = $this->saveDummyHotelBranchInfo();
         $this->saveDummyHotelImages($htl_id);
-        $this->saveDummyHotelFeatures($htl_id);
+        $this->saveDummyHotelAmenities($htl_id);
         $this->saveDummyProductsAndRelatedInfo($htl_id);
         $this->saveDummyServiceProductsAndRelatedInfo();
 

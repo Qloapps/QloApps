@@ -580,22 +580,22 @@
 				</div>
 				<div class="tab-pane" id="hotel-features">
 					{hook h='displayAdminAddHotelFormFeaturesTabBefore' id_hotel=$hook_arg_id_hotel}
-					{if isset($hotel_feature_tree)}
+					{if isset($hotel_amenity_tree)}
 						<div class="form-group">
-							<label for="hotel_feature" class="control-label col-sm-3">
+							<label for="hotel_amenity" class="control-label col-sm-3">
 								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select amenities for this hotel.' mod='hotelreservationsystem'}'>{l s='Select amenities' mod='hotelreservationsystem'}</span>
 							</label>
-							<div class="col-xs-7 hotel_features_tree">
-								{$hotel_feature_tree}
+							<div class="col-xs-7 hotel_amenities_tree">
+								{$hotel_amenity_tree}
 							</div>
 						</div>
 					{elseif isset($hotel_info.id) && $hotel_info.id}
 						<div class="alert alert-warning">
-							{l s='No features created yet.' mod='hotelreservationsystem'} {l s='You can create features by visiting ' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminHotelFeatures')}">{l s='manage hotel features.' mod='hotelreservationsystem'}</a>
+							{l s='No amenities created yet.' mod='hotelreservationsystem'} {l s='You can create amenities by visiting ' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminHotelAmenities')}">{l s='manage hotel amenities.' mod='hotelreservationsystem'}</a>
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save hotel information before assigning hotel features.' mod='hotelreservationsystem'}
+							{l s='Please save hotel information before assigning hotel amenities.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 

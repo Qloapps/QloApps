@@ -3325,7 +3325,7 @@ class AdminImportControllerCore extends AdminController
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_image`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_access`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_booking_detail`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_amenities`');
+                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_amenity`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_cart_booking_data`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_refund_rules`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_order_restrict_date`');

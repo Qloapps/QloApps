@@ -1701,19 +1701,10 @@ class HotelBookingDetail extends ObjectModel
             if (!empty($bookingData)) {
                 foreach ($bookingData['rm_data'] as $key => $value) {
                     // featured amenities for display in room type list
-                    $product_feature = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-                        SELECT ha.`id`, ha.`logo_type`, ha.`logo`, hal.`name`
-                        FROM `'._DB_PREFIX_.'htl_room_type_amenities` hrta
-                        INNER JOIN `'._DB_PREFIX_.'htl_amenities` ha ON ha.`id` = hrta.`amenity_id`
-                        INNER JOIN `'._DB_PREFIX_.'htl_amenities_lang` hal
-                            ON hal.`id` = hrta.`amenity_id` AND hal.`id_lang` = '.(int)$context->language->id.'
-                        WHERE hrta.`id_product` = '.(int)$value['id_product'].'
-                            AND ha.`is_featured` = 1 AND ha.`active` = 1
-                        ORDER BY ha.`position` ASC
-                    ');
-                    if (!$product_feature) {
-                        $product_feature = array();
-                    }
+                    $product_feature = HotelRoomTypeAmenities::getFeaturedAmenities(
+                        $value['id_product'],
+                        $context->language->id
+                    );
                     // PS core features used by the amenities filter block
                     $prod_amen = array();
                     if (!empty($amenities) && $amenities) {

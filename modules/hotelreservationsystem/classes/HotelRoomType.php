@@ -456,4 +456,41 @@ class HotelRoomType extends ObjectModel
         return parent::validateFields($die, $error_return);
     }
 
+    /**
+     * Return PS core features for a room type product, grouped by feature name for front-end display.
+     *
+     * @param int $idProduct
+     * @param int $idLang
+     * @return array  Each element: array('name' => string, 'values' => string[])
+     */
+    public static function getFrontFeatures($idProduct, $idLang)
+    {
+        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT fl.`name` AS `feature_name`, fvl.`value` AS `feature_value`, f.`position`
+            FROM `'._DB_PREFIX_.'feature_product` fp
+            INNER JOIN `'._DB_PREFIX_.'feature` f ON (f.`id_feature` = fp.`id_feature`)
+            INNER JOIN `'._DB_PREFIX_.'feature_lang` fl
+                ON (fl.`id_feature` = fp.`id_feature` AND fl.`id_lang` = '.(int)$idLang.')
+            INNER JOIN `'._DB_PREFIX_.'feature_value_lang` fvl
+                ON (fvl.`id_feature_value` = fp.`id_feature_value` AND fvl.`id_lang` = '.(int)$idLang.')
+            WHERE fp.`id_product` = '.(int)$idProduct.'
+            ORDER BY f.`position` ASC, fl.`name` ASC'
+        );
+
+        if (!$rows) {
+            return array();
+        }
+
+        $grouped = array();
+        foreach ($rows as $row) {
+            $name = $row['feature_name'];
+            if (!isset($grouped[$name])) {
+                $grouped[$name] = array('name' => $name, 'values' => array());
+            }
+            $grouped[$name]['values'][] = $row['feature_value'];
+        }
+
+        return array_values($grouped);
+    }
+
 }

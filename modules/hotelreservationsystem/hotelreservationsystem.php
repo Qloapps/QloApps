@@ -473,7 +473,7 @@ class HotelReservationSystem extends Module
             $langTables = array(
                 'htl_room_type_feature_pricing',
                 'htl_branch_info',
-                'htl_amenities',
+                'htl_amenity',
                 'htl_room_type_global_demand',
                 'htl_room_type_global_demand_advance_option',
                 'htl_order_refund_rules',

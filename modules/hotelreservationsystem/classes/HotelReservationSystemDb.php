@@ -91,29 +91,29 @@ class HotelReservationSystemDb
                 PRIMARY KEY  (`id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_branch_amenities` (
-                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_branch_amenity` (
+                `id_htl_branch_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_hotel` int(10) unsigned NOT NULL,
                 `amenity_id` int(10) unsigned NOT NULL,
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id`)
+                PRIMARY KEY (`id_htl_branch_amenity`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_amenities` (
-                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_amenity` (
+                `id_htl_room_type_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_product` int(10) unsigned NOT NULL,
                 `amenity_id` int(10) unsigned NOT NULL,
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id`),
+                PRIMARY KEY (`id_htl_room_type_amenity`),
                 KEY `id_product` (`id_product`),
                 KEY `amenity_id` (`amenity_id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_amenities` (
-                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                `parent_feature_id` int(10) unsigned NOT NULL,
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_amenity` (
+                `id_htl_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `parent_amenity_id` int(10) unsigned NOT NULL,
                 `position` int(10) unsigned NOT NULL,
                 `active` int(2) NOT NULL DEFAULT '0',
                 `is_featured` tinyint(1) NOT NULL DEFAULT '0',
@@ -121,14 +121,14 @@ class HotelReservationSystemDb
                 `logo` varchar(255) NOT NULL DEFAULT '',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id`)
+                PRIMARY KEY (`id_htl_amenity`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_amenities_lang` (
-                `id` int(10) unsigned NOT NULL,
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_amenity_lang` (
+                `id_htl_amenity` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
                 `name` varchar(255) NOT NULL,
-                PRIMARY KEY (`id`, `id_lang`)
+                PRIMARY KEY (`id_htl_amenity`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_cart_booking_data` (
@@ -561,20 +561,6 @@ class HotelReservationSystemDb
                 }
             }
         }
-
-        // Drop the restrictive primary key and add a multi-select capable primary key.
-        try {
-            Db::getInstance()->execute('ALTER TABLE `'._DB_PREFIX_.'feature_product` DROP PRIMARY KEY');
-        } catch (Exception $e) {
-        }
-
-        try {
-            Db::getInstance()->execute(
-                'ALTER TABLE `'._DB_PREFIX_.'feature_product` ADD PRIMARY KEY (`id_feature`, `id_product`, `id_feature_value`)'
-            );
-        } catch (Exception $e) {
-        }
-
         return true;
     }
 
@@ -587,10 +573,10 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_branch_info`,
             `'._DB_PREFIX_.'htl_branch_info_lang`,
             `'._DB_PREFIX_.'htl_image`,
-            `'._DB_PREFIX_.'htl_branch_amenities`,
-            `'._DB_PREFIX_.'htl_room_type_amenities`,
-            `'._DB_PREFIX_.'htl_amenities`,
-            `'._DB_PREFIX_.'htl_amenities_lang`,
+            `'._DB_PREFIX_.'htl_branch_amenity`,
+            `'._DB_PREFIX_.'htl_room_type_amenity`,
+            `'._DB_PREFIX_.'htl_amenity`,
+            `'._DB_PREFIX_.'htl_amenity_lang`,
             `'._DB_PREFIX_.'htl_cart_booking_data`,
             `'._DB_PREFIX_.'htl_booking_detail`,
             `'._DB_PREFIX_.'htl_booking_document`,
