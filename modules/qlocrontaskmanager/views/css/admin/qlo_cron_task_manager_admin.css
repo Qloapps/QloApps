@@ -31,3 +31,26 @@
 .label-default {
     background-color: #999;
 }
+
+
+.qctm-cron-fields-table thead th {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #ddd!important;
+    padding: 8px;
+}
+
+.qctm-cron-fields-table tbody td {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    border: 1px solid #e5e5e5;
+    padding: 6px;
+}
+.cron-expression-invalid{
+    color: #c33333!important;
+}
+.cron-expression-valid{
+    color: #409bbd !important
+}

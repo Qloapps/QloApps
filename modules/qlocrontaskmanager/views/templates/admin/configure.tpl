@@ -24,12 +24,12 @@
     <div class="panel-heading">
         <i class="icon-terminal"></i> {l s='Cron Command' mod='qlocrontaskmanager'}
     </div>
-    <div class="panel-body">
+    <div class="panel-body  form-horizontal ">
         <div class="alert alert-info">
             {l s='Add the following cron entry to your server. This single command will manage all module cron tasks automatically.' mod='qlocrontaskmanager'}
         </div>
         <div class="form-group">
-            <label class="control-label col-lg-3">{l s='Crontab Command' mod='qlocrontaskmanager'}</label>
+            <label class="control-label col-lg-3"></label>
             <div class="col-lg-8">
                 <div class="input-group">
                     <input type="text"

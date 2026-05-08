@@ -1,0 +1,34 @@
+{
+    "name": "lorisleiva/cron-translator",
+    "description": "Makes CRON expressions human-readable",
+    "keywords": [
+        "cron",
+        "expression",
+        "human"
+    ],
+    "homepage": "https://github.com/lorisleiva/cron-translator",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Loris LEIVA",
+            "email": "loris.leiva@gmail.com",
+            "homepage": "https://lorisleiva.com"
+        }
+    ],
+    "require": {
+        "php" : "^7.4 || ^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : "^8.5.21 || ^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lorisleiva\\CronTranslator\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lorisleiva\\CronTranslator\\Tests\\": "tests"
+        }
+    }
+}

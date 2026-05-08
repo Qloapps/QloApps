@@ -33,16 +33,17 @@ class QctmCronTaskManagerDb
         $sql = array(
             'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'qctm_cron_task` (
                 `id_cron_task` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `module_name` VARCHAR(64) NOT NULL,
+                `id_module` INT(11) UNSIGNED NOT NULL,
                 `task_name` VARCHAR(128) NOT NULL,
                 `description` VARCHAR(255) NOT NULL,
                 `cron_expression` VARCHAR(64) NOT NULL,
                 `callback` VARCHAR(128) NOT NULL,
                 `active` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
+                `is_system` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
                 `date_add` DATETIME NOT NULL,
                 `date_upd` DATETIME NOT NULL,
                 PRIMARY KEY (`id_cron_task`),
-                UNIQUE KEY `module_task` (`module_name`, `task_name`)
+                UNIQUE KEY `module_task` (`id_module`, `task_name`)
             ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;',
         
             'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'qctm_cron_task_log` (
@@ -87,7 +88,6 @@ class QctmCronTaskManagerDb
     {
         Configuration::updateValue('QCTM_CRON_TASK_MANAGER_TOKEN', Tools::passwdGen(32));
         Configuration::updateValue('QCTM_CRON_TASK_MANAGER_LOG_RETENTION_DAYS', 30);
-        Configuration::updateValue('QCTM_LOG_CLEANUP_LAST_RUN', 0);
 
         return true;
     }
@@ -96,7 +96,6 @@ class QctmCronTaskManagerDb
     {
         Configuration::deleteByName('QCTM_CRON_TASK_MANAGER_TOKEN');
         Configuration::deleteByName('QCTM_CRON_TASK_MANAGER_LOG_RETENTION_DAYS');
-        Configuration::deleteByName('QCTM_LOG_CLEANUP_LAST_RUN');
 
         return true;
     }

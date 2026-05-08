@@ -28,12 +28,13 @@ if (!defined('_PS_VERSION_')) {
 class QctmCronTask extends ObjectModel
 {
     public $id_cron_task;
-    public $module_name;
+    public $id_module;
     public $task_name;
     public $description;
     public $cron_expression;
     public $callback;
     public $active;
+    public $is_system;
     public $date_add;
     public $date_upd;
 
@@ -41,22 +42,22 @@ class QctmCronTask extends ObjectModel
         'table' => 'qctm_cron_task',
         'primary' => 'id_cron_task',
         'fields' => array(
-            'module_name' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName','size' => 64,'required' => true),
-            'task_name' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName','size' => 128,'required' => true),
+            'id_module' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'task_name' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 128, 'required' => true),
             'description' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 255, 'required' => true),
             'cron_expression' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 64, 'required' => true),
-            'callback' => array('type' => self::TYPE_STRING,'validate' => 'isGenericName','size' => 128, 'required' => true),
-            'active' => array('type' => self::TYPE_BOOL,'validate' => 'isBool'),
-            'date_add' => array('type' => self::TYPE_DATE,'validate' => 'isDate'),
+            'callback' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 128, 'required' => true),
+            'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'is_system' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
     );
 
-
     public static function getActiveTasks()
     {
         return Db::getInstance()->executeS(
-            'SELECT `id_cron_task`, `module_name`, `task_name`, `description`,
+            'SELECT `id_cron_task`, `id_module`, `task_name`, `description`,
                     `cron_expression`, `callback`, `active`
              FROM `' . _DB_PREFIX_ . 'qctm_cron_task`
              WHERE `active` = 1'
@@ -64,62 +65,32 @@ class QctmCronTask extends ObjectModel
     }
 
     /**
-     * Find a task by module name and task name
-     *
-     * @param string $moduleName
+     * @param int $idModule
      * @param string $taskName
      * @return int|false
      */
-    public static function getByModuleAndName($moduleName, $taskName)
+    public static function getByModuleAndName($idModule, $taskName)
     {
         return Db::getInstance()->getValue(
             'SELECT `id_cron_task`
              FROM `' . _DB_PREFIX_ . 'qctm_cron_task`
-             WHERE `module_name` = \'' . pSQL($moduleName) . '\'
+             WHERE `id_module` = ' . (int) $idModule . '
              AND `task_name` = \'' . pSQL($taskName) . '\''
         );
     }
 
     /**
-     * Delete all tasks belonging to a module
+     * Delete all tasks belonging to a module.
+     * Logs are intentionally preserved for history tracking.
      *
-     * @param string $moduleName
+     * @param int $idModule
      * @return bool
      */
-    public static function deleteByModule($moduleName)
+    public static function deleteByModule($idModule)
     {
-        $taskIds = Db::getInstance()->executeS(
-            'SELECT `id_cron_task`
-             FROM `' . _DB_PREFIX_ . 'qctm_cron_task`
-             WHERE `module_name` = \'' . pSQL($moduleName) . '\''
+        return Db::getInstance()->execute(
+            'DELETE FROM `' . _DB_PREFIX_ . 'qctm_cron_task`
+             WHERE `id_module` = ' . (int) $idModule
         );
-
-        $db = Db::getInstance();
-        $db->execute('START TRANSACTION');
-
-        try {
-            if ($taskIds) {
-                $ids = array_column($taskIds, 'id_cron_task');
-                $idsString = implode(',', array_map('intval', $ids));
-                $db->execute(
-                    'DELETE FROM `' . _DB_PREFIX_ . 'qctm_cron_task_log`
-                     WHERE `id_cron_task` IN (' . $idsString . ')'
-                );
-            }
-
-            $result = $db->execute(
-                'DELETE FROM `' . _DB_PREFIX_ . 'qctm_cron_task`
-                 WHERE `module_name` = \'' . pSQL($moduleName) . '\''
-            );
-
-            $db->execute('COMMIT');
-
-            return $result;
-        } catch (Exception $e) {
-            $db->execute('ROLLBACK');
-
-            return false;
-        }
     }
-
 }

@@ -20,4 +20,8 @@
 * @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
 *}
 
-<a href="{$logLink}" title="{l s='View logs' mod='qlocrontaskmanager'}"><i class="icon-list-alt"></i>{l s='Logs' mod='qlocrontaskmanager'}</a>
+<div class="btn-group pull-right">
+    <a href="{$logLink}" class="btn btn-default" title="View">
+        <i class="icon-search-plus"></i> View
+    </a>
+</div>

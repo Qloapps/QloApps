@@ -27,58 +27,22 @@ if (!defined('_PS_VERSION_')) {
 
 class AdminCronTaskManagerController extends ModuleAdminController
 {
-    protected $showLogs = false;
-
-    protected function useTaskContext()
-    {
-        $this->table = 'qctm_cron_task';
-        $this->className = 'QctmCronTask';
-        $this->identifier = 'id_cron_task';
-    }
-
     public function __construct()
     {
         $this->bootstrap = true;
-
-        parent::__construct();
-
-        if (Tools::getValue('id_cron_task')) {
-            $this->showLogs = true;
-            $this->initLogList();
-        } else {
-            $this->initTaskList();
-        }
-    }
-
-    public function init()
-    {
-        parent::init();
-        if (Tools::getValue('id_cron_task')) {
-            self::$currentIndex .= '&id_cron_task=' . (int) Tools::getValue('id_cron_task');
-            $this->toolbar_title = $this->l('Cron Task Logs');
-            $this->page_header_toolbar_btn['back-btn'] = array(
-                'href' => $this->getBackButtonLink(),
-                'icon' => 'process-icon-back',
-                'desc' => $this->l('Back To Tasks'),
-            );
-        }
-    }
-
-    protected function getBackButtonLink()
-    {
-        $backLink = preg_replace('/([&?])id_cron_task=\d+(&)?/', '$1', self::$currentIndex);
-        $backLink = rtrim($backLink, '&?');
-
-        return $backLink . '&token=' . $this->token;
-    }
-
-    protected function initTaskList()
-    {
-        $this->useTaskContext();
-        $this->lang = false;
-        $this->_orderBy = 'id_cron_task';
-        $this->_orderWay = 'ASC';
         $this->list_no_link = true;
+        $this->table = 'qctm_cron_task';
+        $this->className = 'QctmCronTask';
+        $this->identifier = 'id_cron_task';
+        $this->_orderBy = 'id_cron_task';
+
+        $this->lang = false;
+        $this->_orderWay = 'ASC';
+        
+        parent::__construct();
+        // Exclude hidden system tasks from the listing
+        $this->_where = ' AND a.`is_system` = 0';
+
         $this->_join = 'LEFT JOIN (
                 SELECT ctl.`id_cron_task`, ctl.`date_add` AS `last_run`, ctl.`status` AS `last_status`
                 FROM `' . _DB_PREFIX_ . 'qctm_cron_task_log` ctl
@@ -87,11 +51,14 @@ class AdminCronTaskManagerController extends ModuleAdminController
                     FROM `' . _DB_PREFIX_ . 'qctm_cron_task_log`
                     GROUP BY `id_cron_task`
                 ) latest ON ctl.`id_cron_task_log` = latest.`max_id`
-            ) AS llog ON (llog.`id_cron_task` = a.`id_cron_task`)';
+            ) AS llog ON (llog.`id_cron_task` = a.`id_cron_task`)
+            LEFT JOIN `' . _DB_PREFIX_ . 'module` m ON (m.`id_module` = a.`id_module`)';
 
-        $this->_select = 'llog.`last_run`, llog.`last_status`';
+        $this->_select = 'm.`name` as `module_name`, llog.`last_run`, llog.`last_status`, a.`cron_expression` AS `next_run_expression`';
 
-        $this->addRowAction('view');
+        $this->addRowAction('viewLogs');
+        $this->addRowAction('edit');
+        $this->addRowAction('resetModuleCrons');
 
         $this->bulk_actions = array(
             'enableSelection' => array(
@@ -111,18 +78,21 @@ class AdminCronTaskManagerController extends ModuleAdminController
                 'class' => 'fixed-width-xs',
             ),
             'module_name' => array(
-                'title' => $this->l('Module'),
-                'filter_key' => 'a!module_name',
+                'title' => $this->l('Module Name'),
+                'filter_key' => 'm!name',
+                'order_key' => 'm!name',
+                'callback' => 'displayModuleName',
             ),
-            'description' => array(
-                'title' => $this->l('Task'),
-                'filter_key' => 'a!description',
+            'task_name' => array(
+                'title' => $this->l('Task Name'),
+                'filter_key' => 'a!task_name',
             ),
             'cron_expression' => array(
                 'title' => $this->l('Cron Expression'),
                 'align' => 'center',
                 'class' => 'fixed-width-lg',
                 'search' => false,
+                'callback' => 'getCronWithReadable',
             ),
             'last_run' => array(
                 'title' => $this->l('Last Run'),
@@ -137,6 +107,19 @@ class AdminCronTaskManagerController extends ModuleAdminController
                 'search' => false,
                 'callback' => 'getLastStatus',
             ),
+            'next_run_expression' => array(
+                'title' => $this->l('Next Run'),
+                'align' => 'center',
+                'filter' => false,
+                'search' => false,
+                'callback' => 'getNextRun',
+            ),
+            'date_add' => array(
+                'title' => $this->l('Added Time'),
+                'align' => 'center',
+                'filter' => false,
+                'search' => false,
+            ),
             'active' => array(
                 'title' => $this->l('Active'),
                 'active' => 'status',
@@ -146,100 +129,304 @@ class AdminCronTaskManagerController extends ModuleAdminController
                 'filter_key' => 'a!active',
             ),
         );
+
     }
 
-    protected function initLogList()
+    public function init()
     {
-        $this->table = 'qctm_cron_task_log';
-        $this->className = 'QctmCronTaskLog';
-        $this->identifier = 'id_cron_task_log';
-        $this->lang = false;
-        $this->_orderBy = 'id_cron_task_log';
-        $this->_orderWay = 'DESC';
-        $this->list_no_link = true;
+        parent::init();
 
-        $idCronTask = (int) Tools::getValue('id_cron_task');
-        if ($idCronTask) {
-            $this->_where = ' AND a.`id_cron_task` = ' . $idCronTask;
+        if(!Validate::isUnsignedInt($idCronTask = Tools::getValue('id_cron_task')) && $this->display == 'edit') {
+            $this->errors = array($this->l('Invalid Cron Task ID'));
+            $this->display = 'list';
+        }else{
+            if (Validate::isUnsignedInt($idCronTask = Tools::getValue('id_cron_task')) && Validate::isLoadedObject($objCronTask = new QctmCronTask($idCronTask)) && $this->display == 'edit' ) {
+                $this->toolbar_title = $this->l('Edit Cron Task: ') . $objCronTask->task_name;
+            }
         }
 
-        $this->_select = 'ct.`module_name`, ct.`description` as task_description';
-        $this->_join = 'LEFT JOIN `' . _DB_PREFIX_ . 'qctm_cron_task` ct
-                          ON (a.`id_cron_task` = ct.`id_cron_task`)';
-
-        $cronTaskLogStatuses = QctmCronTaskLog::getStatuses();
-
-        $this->fields_list = array(
-            'id_cron_task_log' => array(
-                'title' => $this->l('ID'),
-                'align' => 'center',
-                'class' => 'fixed-width-xs',
-            ),
-            'module_name' => array(
-                'title' => $this->l('Module'),
-                'filter_key' => 'ct!module_name',
-            ),
-            'task_description' => array(
-                'title' => $this->l('Task'),
-                'filter' => false,
-                'search' => false,
-            ),
-            'status' => array(
-                'title' => $this->l('Status'),
-                'align' => 'center',
-                'type' => 'select',
-                'list' => $cronTaskLogStatuses,
-                'filter_key' => 'a!status',
-                'callback' => 'getStatusBadge',
-            ),
-            'error_message' => array(
-                'title' => $this->l('Error Message'),
-                'maxlength' => 80,
-            ),
-            'execution_time' => array(
-                'title' => $this->l('Execution Time'),
-                'align' => 'center',
-                'suffix' => ' s',
-                'class' => 'fixed-width-md',
-            ),
-            'date_add' => array(
-                'title' => $this->l('Date'),
-                'type' => 'datetime',
-                'align' => 'right',
-                'filter_key' => 'a!date_add',
-            ),
-        );
     }
 
     public function initToolbar()
     {
         parent::initToolbar();
-        unset($this->toolbar_btn['new']);
+
+        $this->page_header_toolbar_btn['view_all_logs'] = array(
+            'href' => $this->context->link->getAdminLink('AdminCronTaskLogs'),
+            'desc' => $this->l('View All Logs'),
+            'icon' => 'process-icon-list',
+        );
     }
 
+  
+
+    public function renderForm()
+    {
+        $cronExpression = '* * * * *';
+        if(Validate::isLoadedObject($this->object)){
+            $cronExpression = $this->object->cron_expression;
+        }
+
+        $isValidExpression = \Cron\CronExpression::isValidExpression($cronExpression);
+        if ($isValidExpression) {
+            try {
+                $readable = $this->l('Runs ') . \Lorisleiva\CronTranslator\CronTranslator::translate($cronExpression);
+            } catch (\Exception $e) {
+                $readable = '';
+            }
+        } else {
+            $readable = $this->l('Invalid cron expression.');
+        }
+
+        $moduleDisplayName = '';
+        if (Validate::isLoadedObject($this->object) && $this->object->id_module) {
+            $module = Module::getInstanceById($this->object->id_module);
+            $moduleDisplayName = ($module && $module->displayName) ? $module->displayName : '#' . (int) $this->object->id_module;
+        }
+        $this->fields_value['module_display_name'] = $moduleDisplayName;
+
+        $this->context->smarty->assign(array(
+            'qctmCronExpression' => $cronExpression,
+            'qctmCronReadable'   => $readable,
+            'qctmAjaxUrl'        => $this->context->link->getAdminLink($this->controller_name) . '&ajax=1',
+        ));
+
+        $this->fields_form = array(
+            'legend' => array(
+                'title' => $this->l('Cron Task'),
+                'icon' => 'icon-time',
+            ),
+            'input' => array(
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Module Name'),
+                    'name' => 'module_display_name',
+                    'readonly' => true,
+                    'col' => 5,
+                    'desc' => $this->l('The module that owns this task.'),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Task Name'),
+                    'name' => 'task_name',
+                    'readonly' => true,
+                    'required' => true,
+                    'col' => 5,
+                    'hint' => $this->l('e.g. send_daily_report'),
+                    'desc' => $this->l('A unique snake_case identifier for this task within the module. Used to detect duplicate registrations.'),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Callback Method'),
+                    'name' => 'callback',
+                    'required' => true,
+                    'readonly' => true,
+                    'col' => 5,
+                    'hint' => $this->l('e.g. runDailyReport'),
+                    'desc' => $this->l('The public method name on the module class that will be called when this task fires. Must exist on the module at runtime.'),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Description'),
+                    'name' => 'description',
+                    'required' => true,
+                    'col' => 7,
+                    'hint' => $this->l('e.g. Sends the daily booking summary report'),
+                    'desc' => $this->l('A short human-readable description of what this task does. Shown in the task list.'),
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Cron Expression'),
+                    'name' => 'cron_expression',
+                    'required' => true,
+                    'col' => 4,
+                    'class' => 'qctm-cron-expression',
+                    'hint' => $this->l('e.g. 0 0 * * *'),
+                    'desc' => $readable,
+                ),
+                array(
+                    'type' => 'html',
+                    'name' => 'qctm_cron_helper',
+                    'html_content' => $this->createTemplate('qctm_cron_expression_helper.tpl')->fetch(),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Active'),
+                    'name' => 'active',
+                    'required' => false,
+                    'desc' => $this->l('Disabled tasks are skipped by the cron dispatcher even if their schedule is due.'),
+                    'values' => array(
+                        array('id' => 'active_on', 'value' => 1, 'label' => $this->l('Enabled')),
+                        array('id' => 'active_off', 'value' => 0, 'label' => $this->l('Disabled')),
+                    ),
+                ),
+            ),
+            'submit' => array(
+                'title' => $this->l('Save'),
+            ),
+        );
+        return parent::renderForm();
+    }
+
+    public function ajaxProcessGetCronReadable()
+    {
+        $expression = Tools::getValue('cron_expression');
+        $result = array('readable' => $this->l('Invalid cron expression'), 'valid' => false);
+
+        if (\Cron\CronExpression::isValidExpression($expression)) {
+            $result['valid'] = true;
+            try {
+                $result['readable'] = $this->l('Runs ') . \Lorisleiva\CronTranslator\CronTranslator::translate($expression);
+            } catch (\Exception $e) {
+                $result['readable'] = $this->l('Invalid cron expression');
+            }
+        }        
+
+        die(Tools::jsonEncode($result));
+    }
+
+    public function processSave()
+    {
+        if (!$this->validateCronExpression()) {
+            $this->display = 'edit';
+            return false;
+        }
+
+        return parent::processSave();
+    }
+
+    protected function validateCronExpression()
+    {
+        $cronExpression = Tools::getValue('cron_expression');
+
+        if (!\Cron\CronExpression::isValidExpression($cronExpression)) {
+            $this->errors[] = $this->l('Invalid cron expression. Must have exactly 5 parts: minute hour day month weekday. Example: * * * * *');
+            return false;
+        }
+
+        return true;
+    }
 
     public function processStatus()
     {
-        $this->showLogs = false;
-        $this->useTaskContext();
-
         return parent::processStatus();
     }
 
     protected function processBulkEnableSelection()
     {
-        $this->showLogs = false;
-        $this->useTaskContext();
-
         return parent::processBulkEnableSelection();
     }
 
     protected function processBulkDisableSelection()
     {
-        $this->showLogs = false;
-        $this->useTaskContext();
-
         return parent::processBulkDisableSelection();
+    }
+
+    public function displayViewLogsLink($token = null, $id = null, $row = array())
+    {
+        $this->context->smarty->assign(
+            'viewLogsLink',
+            $this->context->link->getAdminLink('AdminCronTaskLogs') . '&id_cron_task=' . (int) $id
+        );
+        return $this->createTemplate('qctm_view_logs_link.tpl')->fetch();
+    }
+
+    public function displayResetModuleCronsLink($token = null, $id = null, $row = array())
+    {
+        $this->context->smarty->assign(
+            'resetLink',
+            $this->context->link->getAdminLink('AdminCronTaskManager')
+                . '&action=resetModuleCrons&' . $this->identifier . '=' . (int) $id
+        );
+        return $this->createTemplate('qctm_reset_module_crons_link.tpl')->fetch();
+    }
+
+    public function processResetModuleCrons()
+    {
+        $idCronTask = (int) Tools::getValue($this->identifier);
+        $cronTask = new QctmCronTask($idCronTask);
+
+        if (!Validate::isLoadedObject($cronTask)) {
+            $this->errors[] = $this->l('Cron task not found.');
+            return false;
+        }
+
+        $module = Module::getInstanceById($cronTask->id_module);
+
+        if (!$module) {
+            $this->errors[] = $this->l('Module not found.');
+            return false;
+        }
+
+        if (!method_exists($module, 'hookRegisterCronTasks')) {
+            $this->errors[] = $this->l('Module does not define any cron tasks.');
+            return false;
+        }
+
+        $tasks = $module->hookRegisterCronTasks();
+
+        if (empty($tasks) || !is_array($tasks)) {
+            $this->errors[] = $this->l('No tasks returned by module.');
+            return false;
+        }
+
+        foreach ($tasks as $task) {
+            if ($task['name'] === $cronTask->task_name) {
+                $cronTask->cron_expression = $task['cron'];
+                $cronTask->description = $task['description'];
+                $cronTask->callback = $task['callback'];
+
+                if (!$cronTask->save()) {
+                    $this->errors[] = $this->l('Failed to reset cron task.');
+                    return false;
+                }
+
+                $this->confirmations[] = $this->l('Cron task reset to module defaults successfully.');
+                return true;
+            }
+        }
+
+        $this->errors[] = $this->l('Task definition not found in module.');
+        return false;
+    }
+
+    public function getCronWithReadable($cronExpression, $row)
+    {
+        try {
+            $readable = \Lorisleiva\CronTranslator\CronTranslator::translate($cronExpression);
+        } catch (\Exception $e) {
+            $readable = $cronExpression;
+        }
+
+        return '<code>' . htmlspecialchars($cronExpression) . '</code>'
+            . '<br><small class="text-muted">' . htmlspecialchars($readable) . '</small>';
+    }
+
+    public function displayModuleName($moduleName, $row)
+    {
+        $cacheKey = 'displayModuleName_' . $moduleName;
+
+        if (!Cache::isStored($cacheKey)) {
+            $module = Module::getInstanceByName($moduleName);
+            $displayName = ($module && $module->displayName) ? $module->displayName : $moduleName;
+            Cache::store($cacheKey, $displayName);
+        }
+
+        return Cache::retrieve($cacheKey);
+    }
+
+    public function getNextRun($cronExpression, $row)
+    {
+        if (!$cronExpression || !\Cron\CronExpression::isValidExpression($cronExpression)) {
+            return '-';
+        }
+        
+        try {
+            $next = \Cron\CronExpression::factory($cronExpression)->getNextRunDate();
+            return $next->format('Y-m-d H:i:s');
+        } catch (\Exception $e) {
+            return '-';
+        }
     }
 
     public function getLastStatus($lastStatus, $row)
@@ -248,25 +435,16 @@ class AdminCronTaskManagerController extends ModuleAdminController
         return $this->createTemplate('qctm_badge_status.tpl')->fetch();
     }
 
-    public function getStatusBadge($status, $row)
-    {
-        $this->context->smarty->assign('status', $status);
-        return $this->createTemplate('qctm_badge_status.tpl')->fetch();
-    }
-
-    public function displayViewlogsLink($token, $id, $name = null)
-    {
-        $logLink = self::$currentIndex.'&id_cron_task=' . (int) $id. '&token=' . $this->token;
-
-        $this->context->smarty->assign('logLink', $logLink);
-
-        return $this->createTemplate('qctm_view_log.tpl')->fetch();
-    }
 
     public function setMedia()
     {
         parent::setMedia();
 
+        Media::addJsDef(
+            array(
+                'INVALID_CRON_EXPRESSION' => $this->l('Invalid cron expression.'),
+            )
+        );
         $this->addCSS($this->module->getPathUri() . 'views/css/admin/qlo_cron_task_manager_admin.css');
         $this->addJS($this->module->getPathUri() . 'views/js/admin/qlo_cron_task_manager_admin.js');
     }

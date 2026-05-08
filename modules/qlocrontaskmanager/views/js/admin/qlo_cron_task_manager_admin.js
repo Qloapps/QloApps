@@ -111,6 +111,59 @@ var QctmAdmin = {
     },
 };
 
+var QctmCronHelper = {
+    $input: null,
+    cronRegex: /^(\*|[\d\/*,\-]+)\s+(\*|[\d\/*,\-]+)\s+(\*|[\d\/*,\-]+)\s+(\*|[\d\/*,\-]+)\s+(\*|[\d\/*,\-]+)$/,
+
+    init: function () {
+        this.$input = $('.qctm-cron-expression');
+
+        if (!this.$input.length) {
+            return;
+        }
+        this.$input.on('input keyup', this.onInput.bind(this));
+    },
+
+    onInput: function (e) {
+        var $input = $(e.currentTarget);
+        var val = $input.val();
+        val = val.replace(/[^0-9*\/,\-\s]/g, '');
+        $input.val(val);
+        var $readable = $input.closest('.col-lg-4').find('.help-block');
+        if (this.cronRegex.test(val)) {
+            this.fetchReadable(val, $readable);
+        } else {
+            $readable.removeClass('cron-expression-valid').addClass('cron-expression-invalid').text(INVALID_CRON_EXPRESSION);
+        }
+    },
+
+    fetchReadable: function (val, $readable) {
+        var ajaxUrl = $('#qctm-ajax-url').val();
+
+        if (!ajaxUrl || !val) {
+            return;
+        }
+
+        $.ajax({
+            url: ajaxUrl,
+            type: 'GET',
+            data: {
+                action: 'getCronReadable',
+                cron_expression: val
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response && response.valid) {
+                    $readable.removeClass('cron-expression-invalid').addClass('cron-expression-valid').text(response.readable );
+                } else {
+                    $readable.removeClass('cron-expression-valid').addClass('cron-expression-invalid').text(response.readable);
+                }
+            }
+        });
+    }
+};
+
 $(document).ready(function () {
     QctmAdmin.init();
+    QctmCronHelper.init();
 });

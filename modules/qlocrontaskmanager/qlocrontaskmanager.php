@@ -25,7 +25,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-include_once 'define.php';
+require_once dirname(__FILE__).'/classes/QctmRequiredClasses.php';
 
 class QloCronTaskManager extends Module
 {
@@ -41,8 +41,8 @@ class QloCronTaskManager extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Cron Task Manager');
-        $this->description = $this->l('Centralized cron scheduling system. One server cron entry manages all module tasks.');
-        $this->confirmUninstall = $this->l('Are you sure you want to uninstall? All cron task data will be lost.');
+        $this->description = $this->l('A centralized cron scheduling system where a single server cron entry manages all module tasks.');
+        $this->confirmUninstall = $this->l('Are you sure you want to uninstall this module? All cron task data will be lost.');
     }
 
 
@@ -59,8 +59,10 @@ class QloCronTaskManager extends Module
             $output .= $this->displayConfirmation($this->l('Token has been regenerated. Update your server cron entry with the new URL.'));
         }
 
-        $this->context->controller->addCSS($this->_path . 'views/css/admin/qlo_cron_task_manager_admin.css');
-        $this->context->controller->addJS($this->_path . 'views/js/admin/qlo_cron_task_manager_admin.js');
+        if(Tools::getValue('module_name') === $this->name) {
+            $this->context->controller->addCSS($this->_path . 'views/css/admin/qlo_cron_task_manager_admin.css');
+            $this->context->controller->addJS($this->_path . 'views/js/admin/qlo_cron_task_manager_admin.js');
+        }
 
         $output .= $this->renderCronCommandPanel();
         $output .= $this->renderSettingsForm();
@@ -70,7 +72,11 @@ class QloCronTaskManager extends Module
 
     protected function processSaveSettings()
     {
-        $logRetention = (int) Tools::getValue('QCTM_CRON_TASK_MANAGER_LOG_RETENTION_DAYS');
+        $logRetention = Tools::getValue('QCTM_CRON_TASK_MANAGER_LOG_RETENTION_DAYS');
+
+        if(!Validate::isUnsignedInt($logRetention)) {
+            return $this->displayError($this->l('Log retention must be an integer value.'));
+        }
 
         if ($logRetention < 1 || $logRetention > 365) {
             return $this->displayError($this->l('Log retention must be between 1 and 365 days.'));
@@ -124,7 +130,7 @@ class QloCronTaskManager extends Module
                         'name' => 'QCTM_CRON_TASK_MANAGER_TOKEN',
                         'readonly' => true,
                         'col' => 6,
-                        'desc' => $this->l('This token secures the cron endpoint. Regenerating it will require updating your server cron entry.'),
+                        'desc' => $this->l('This token secures the cron endpoint. After regenerating it, you will need to update your server cron entry.'),
                     ),
                     array(
                         'type' => 'text',
@@ -132,6 +138,8 @@ class QloCronTaskManager extends Module
                         'name' => 'QCTM_CRON_TASK_MANAGER_LOG_RETENTION_DAYS',
                         'col' => 2,
                         'required' => true,
+                        'validation' => 'isUnsignedInt',
+                        'suffix' => $this->l('days'),
                         'desc' => $this->l('Number of days to keep execution logs.'),
                     ),
                 ),
@@ -166,18 +174,18 @@ class QloCronTaskManager extends Module
         if (method_exists($module, 'hookRegisterCronTasks')) {
             $tasks = $module->hookRegisterCronTasks();
             if (!empty($tasks) && is_array($tasks)) {
-                $this->registerTasksForModule($module->name, $tasks);
+                $this->registerTasksForModule($module->id, $tasks);
             }
         }
     }
 
     public function hookActionModuleUninstallBefore($params)
     {
-        if (!isset($params['object']) || !($params['object'] instanceof Module)) {
+        if (!isset($params['object']) || !($params['object'] instanceof Module) || $params['object']->id == $this->id) {
             return;
         }
 
-        QctmCronTask::deleteByModule($params['object']->name);
+        QctmCronTask::deleteByModule($params['object']->id);
     }
 
     protected function syncAllExistingModules()
@@ -187,7 +195,10 @@ class QloCronTaskManager extends Module
         if (!empty($allTasks) && is_array($allTasks)) {
             foreach ($allTasks as $moduleName => $tasks) {
                 if (!empty($tasks) && is_array($tasks)) {
-                    $this->registerTasksForModule($moduleName, $tasks);
+                    $module = Module::getInstanceByName($moduleName);
+                    if($module){
+                        $this->registerTasksForModule($module->id, $tasks);
+                    }
                 }
             }
         }
@@ -199,27 +210,34 @@ class QloCronTaskManager extends Module
      * @param string $moduleName
      * @param array $tasks
      */
-    protected function registerTasksForModule($moduleName, $tasks)
+    protected function registerTasksForModule($idModule, $tasks)
     {
+        $module = Module::getInstanceById($idModule);
+        if (!$module) {
+            return;
+        }
+
+
         foreach ($tasks as $task) {
-            if (!$this->validateTask($moduleName, $task)) {
+            if (!$this->validateTask($module, $task)) {
                 continue;
             }
 
-            if (QctmCronTask::getByModuleAndName($moduleName, $task['name'])) {
+            if (QctmCronTask::getByModuleAndName($idModule, $task['name'])) {
                 continue;
             }
 
             $cronTask = new QctmCronTask();
-            $cronTask->module_name = $moduleName;
+            $cronTask->id_module = $idModule;
             $cronTask->task_name = $task['name'];
             $cronTask->description = $task['description'];
             $cronTask->cron_expression = $task['cron'];
             $cronTask->callback = $task['callback'];
             $cronTask->active = 1;
+            $cronTask->is_system = 0;
             if (!$cronTask->save()) {
                 PrestaShopLogger::addLog(
-                    'QloCronTaskManager: failed to register task "' . $task['name'] . '" for module "' . $moduleName . '"',
+                    'QloCronTaskManager: failed to register task "' . $task['name'] . '" for module "' . $module->name . '"',
                     3
                 );
             }
@@ -233,10 +251,10 @@ class QloCronTaskManager extends Module
      * @param array $task
      * @return bool
      */
-    protected function validateTask($moduleName, $task)
+    protected function validateTask(Module $module, $task)
     {
-        if (empty($task['name']) || empty($task['description'])
-            || empty($task['cron']) || empty($task['callback'])) {
+        if (!Validate::isGenericName($task['name']) || !Validate::isGenericName($task['description'])
+            || !Validate::isString($task['cron']) || !Validate::isString($task['callback'])) {
             return false;
         }
 
@@ -244,8 +262,7 @@ class QloCronTaskManager extends Module
             return false;
         }
 
-        $module = Module::getInstanceByName($moduleName);
-        if (!$module || !method_exists($module, $task['callback'])) {
+        if (!method_exists($module, $task['callback'])) {
             return false;
         }
 
@@ -254,23 +271,45 @@ class QloCronTaskManager extends Module
 
     public function dispatch()
     {
-        $now = new DateTime();
-        $tasks = QctmCronTask::getActiveTasks();
+        if (!$this->active) {
+            return;
+        }
 
+        $tasks = QctmCronTask::getActiveTasks();
         if (empty($tasks)) {
             return;
         }
 
+        $now = new DateTime();
+
         foreach ($tasks as $task) {
+            if (!\Cron\CronExpression::isValidExpression($task['cron_expression'])) {
+                QctmCronTaskLog::addLog(
+                    $task['id_cron_task'],
+                    QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_ERROR,
+                    'Invalid cron expression "' . $task['cron_expression'] . '"'
+                );
+                continue;
+            }
+
             $cron = \Cron\CronExpression::factory($task['cron_expression']);
 
             if (!$cron->isDue($now)) {
                 continue;
             }
 
-            $module = Module::getInstanceByName($task['module_name']);
+            $module = Module::getInstanceById($task['id_module']);
 
-            if (!$module || !$module->active) {
+            if (!$module) {
+                QctmCronTaskLog::addLog(
+                    $task['id_cron_task'],
+                    QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_ERROR,
+                    'Module with ID "' . (int) $task['id_module'] . '" could not be loaded'
+                );
+                continue;
+            }
+
+            if (!$module->active) {
                 continue;
             }
 
@@ -280,7 +319,7 @@ class QloCronTaskManager extends Module
                 QctmCronTaskLog::addLog(
                     $task['id_cron_task'],
                     QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_ERROR,
-                    'Callback method "' . $callback . '" not found on module "' . $task['module_name'] . '"'
+                    'Callback method "' . $callback . '" not found on module "' . $module->name . '"'
                 );
                 continue;
             }
@@ -289,43 +328,34 @@ class QloCronTaskManager extends Module
 
             try {
                 $module->{$callback}();
-                $executionTime = round(microtime(true) - $startTime, 4);
 
                 QctmCronTaskLog::addLog(
                     $task['id_cron_task'],
                     QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_SUCCESS,
                     null,
-                    $executionTime
+                    round(microtime(true) - $startTime, 4)
                 );
             } catch (\Throwable $e) {
-                $executionTime = round(microtime(true) - $startTime, 4);
-
                 QctmCronTaskLog::addLog(
                     $task['id_cron_task'],
                     QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_ERROR,
                     $e->getMessage(),
-                    $executionTime
+                    round(microtime(true) - $startTime, 4)
                 );
             }
         }
-
-        $this->cleanOldLogs();
     }
 
-    public function cleanOldLogs()
+    /**
+     * Called by the system log-cleanup cron task (daily at midnight).
+     */
+    public function runLogCleanup()
     {
-        $lastRun = (int) Configuration::get('QCTM_LOG_CLEANUP_LAST_RUN');
-
-        if ($lastRun && (time() - $lastRun) < 86400) {
-            return;
-        }
-
         $days = (int) Configuration::get('QCTM_CRON_TASK_MANAGER_LOG_RETENTION_DAYS');
         if ($days > 0) {
             QctmCronTaskLog::deleteOlderThan($days);
         }
 
-        Configuration::updateValue('QCTM_LOG_CLEANUP_LAST_RUN', time());
     }
 
     public function install()
@@ -333,11 +363,11 @@ class QloCronTaskManager extends Module
         $db = new QctmCronTaskManagerDb();
 
         if (!parent::install()
-            || !$this->registerHook('actionModuleInstallAfter')
-            || !$this->registerHook('actionModuleUninstallBefore')
+            || !$this->registerHooks()
             || !$db->createTables()
             || !$db->installDefaultData()
             || !$this->installTabs()
+            || !$this->installDefaultTasks()
         ) {
             return false;
         }
@@ -345,6 +375,16 @@ class QloCronTaskManager extends Module
         $this->syncAllExistingModules();
 
         return true;
+    }
+
+    public function registerHooks()
+    {
+        return $this->registerHook(
+            array(
+                'actionModuleInstallAfter',
+                'actionModuleUninstallBefore',
+            )
+        );
     }
 
     public function uninstall()
@@ -362,28 +402,62 @@ class QloCronTaskManager extends Module
         return true;
     }
 
-    protected function installTabs()
+    protected function installDefaultTasks()
     {
-        $tab = new Tab();
-        $tab->class_name = 'AdminCronTaskManager';
-        $tab->id_parent = (int) Tab::getIdFromClassName('AdminTools');
-        $tab->module = $this->name;
-        $tab->position = Tab::getNewLastPosition($tab->id_parent);
-
-        foreach (Language::getLanguages(false) as $language) {
-            $tab->name[$language['id_lang']] = $this->l('Cron Task Manager');
+        if (QctmCronTask::getByModuleAndName($this->id, 'log_cleanup')) {
+            return true;
         }
 
-        return $tab->add();
+        $task = new QctmCronTask();
+        $task->id_module = (int) $this->id;
+        $task->task_name = 'log_cleanup';
+        $task->description = 'Automatic log cleanup';
+        $task->cron_expression = '0 0 * * *';
+        $task->callback = 'runLogCleanup';
+        $task->active = 1;
+        $task->is_system = 1;
+
+        return $task->save();
+    }
+
+    protected function installTabs()
+    {
+        $tabCronTasks = new Tab();
+        $tabCronTasks->class_name = 'AdminCronTaskManager';
+        $tabCronTasks->id_parent = (int) Tab::getIdFromClassName('AdminTools');
+        $tabCronTasks->module = $this->name;
+        $tabCronTasks->position = Tab::getNewLastPosition($tabCronTasks->id_parent);
+
+        foreach (Language::getLanguages(false) as $language) {
+            $tabCronTasks->name[$language['id_lang']] = $this->l('Cron Task Manager');
+        }
+
+        if (!$tabCronTasks->add()) {
+            return false;
+        }
+
+        // Hidden tab — accessible via URL but not shown in navigation menu
+        $tabLogs = new Tab();
+        $tabLogs->class_name = 'AdminCronTaskLogs';
+        $tabLogs->id_parent = -1;
+        $tabLogs->module = $this->name;
+
+        foreach (Language::getLanguages(false) as $language) {
+            $tabLogs->name[$language['id_lang']] = $this->l('Cron Task Logs');
+        }
+
+        return $tabLogs->add();
     }
 
     protected function uninstallTabs()
     {
-        $idTab = (int) Tab::getIdFromClassName('AdminCronTaskManager');
-        if ($idTab) {
-            $tab = new Tab($idTab);
-            if (!$tab->delete()) {
-                return false;
+        foreach (array('AdminCronTaskManager', 'AdminCronTaskLogs') as $className) {
+            $idTab = (int) Tab::getIdFromClassName($className);
+            if ($idTab) {
+                $tab = new Tab($idTab);
+                if (!$tab->delete()) {
+                    return false;
+                }
             }
         }
 
