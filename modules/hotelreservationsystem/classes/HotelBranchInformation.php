@@ -795,7 +795,7 @@ class HotelBranchInformation extends ObjectModel
             }
             $objHotelAmenities = new HotelBranchAmenities();
             $objHotelImage = new HotelImage();
-            if (!$objHotelAmenities->deleteBranchAmenitiesByHotelId($idHotel)) {
+            if (!$objHotelAmenities->saveBranchAmenities($idHotel, array())) {
                 $contextController->errors[] = $this->moduleInstance->l(
                     'Some error has occurred while deleting hotel amenity data.',
                     'HotelBranchInformation'

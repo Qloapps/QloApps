@@ -42,9 +42,9 @@ class HotelRoomTypeAmenities extends ObjectModel
 
     /**
      * @param int $idProduct
-     * @return int[]
+     * @return array
      */
-    public static function getAmenityIdsByProduct($idProduct)
+    public static function getAmenityIds($idProduct): array
     {
         $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
             'SELECT `amenity_id`
@@ -56,28 +56,43 @@ class HotelRoomTypeAmenities extends ObjectModel
     }
 
     /**
-     * Delete all amenity assignments for a room type product.
-     *
-     * @param int $idProduct
-     * @return bool
+     * @param int  $idProduct
+     * @param int  $idLang      defaults to current context language
+     * @param bool $featuredOnly  true = is_featured=1 only; false = all active child amenities
+     * @return array
      */
-    public function deleteByProductId($idProduct)
+    public static function getAmenities($idProduct, $idLang = 0, $featuredOnly = false): array
     {
-        return Db::getInstance()->delete('htl_room_type_amenity', '`id_product` = '.(int)$idProduct);
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $filter = $featuredOnly ? 'AND ha.`is_featured` = 1' : 'AND ha.`parent_amenity_id` > 0';
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT ha.`id_htl_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
+            FROM `'._DB_PREFIX_.'htl_room_type_amenity` hrta
+            INNER JOIN `'._DB_PREFIX_.'htl_amenity` ha
+                ON (ha.`id_htl_amenity` = hrta.`amenity_id`)
+            INNER JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
+                ON (hal.`id_htl_amenity` = hrta.`amenity_id` AND hal.`id_lang` = '.(int)$idLang.')
+            WHERE hrta.`id_product` = '.(int)$idProduct.'
+                AND ha.`active` = 1
+                '.$filter.'
+            ORDER BY ha.`position` ASC, hal.`name` ASC'
+        ) ?: array();
     }
 
     /**
-     * Replace all amenity assignments for a room type product.
+     * Delete existing assignments then save new ones for a room type.
      *
      * @param int   $idProduct
-     * @param int[] $amenityIds
+     * @param array $amenityIds
      * @return bool
      */
-    public function assignAmenitiesToProduct($idProduct, array $amenityIds)
+    public function saveRoomTypeAmenities($idProduct, array $amenityIds): bool
     {
-        if (!$this->deleteByProductId($idProduct)) {
-            return false;
-        }
+        Db::getInstance()->delete('htl_room_type_amenity', '`id_product` = '.(int)$idProduct);
 
         foreach (array_unique(array_filter(array_map('intval', $amenityIds))) as $amenityId) {
             $obj = new self();
@@ -89,51 +104,5 @@ class HotelRoomTypeAmenities extends ObjectModel
         }
 
         return true;
-    }
-
-    /**
-     * Return featured amenities assigned to a room type, for room type list display.
-     *
-     * @param int $idProduct
-     * @param int $idLang
-     * @return array
-     */
-    public static function getFeaturedAmenities($idProduct, $idLang)
-    {
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT ha.`id_htl_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
-            FROM `'._DB_PREFIX_.'htl_room_type_amenity` hrta
-            INNER JOIN `'._DB_PREFIX_.'htl_amenity` ha
-                ON (ha.`id_htl_amenity` = hrta.`amenity_id`)
-            INNER JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                ON (hal.`id_htl_amenity` = hrta.`amenity_id` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE hrta.`id_product` = '.(int)$idProduct.'
-                AND ha.`is_featured` = 1
-                AND ha.`active` = 1
-            ORDER BY ha.`position` ASC'
-        ) ?: array();
-    }
-
-    /**
-     * Return active child amenities assigned to a room type, formatted for front-end display.
-     *
-     * @param int $idProduct
-     * @param int $idLang
-     * @return array
-     */
-    public static function getFrontAmenities($idProduct, $idLang)
-    {
-        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT ha.`id_htl_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
-            FROM `'._DB_PREFIX_.'htl_room_type_amenity` hrta
-            INNER JOIN `'._DB_PREFIX_.'htl_amenity` ha
-                ON (ha.`id_htl_amenity` = hrta.`amenity_id`)
-            INNER JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                ON (hal.`id_htl_amenity` = hrta.`amenity_id` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE hrta.`id_product` = '.(int)$idProduct.'
-                AND ha.`active` = 1
-                AND ha.`parent_amenity_id` > 0
-            ORDER BY ha.`position` ASC, hal.`name` ASC'
-        ) ?: array();
     }
 }

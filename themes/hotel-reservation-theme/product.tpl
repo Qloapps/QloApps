@@ -265,21 +265,23 @@
 													{block name='product_info_tab_room_features'}
 														{if isset($room_dynamic_features) && $room_dynamic_features}
 															<div class="info_margin_div">
+																{assign var="current_feature_name" value=""}
 																{foreach from=$room_dynamic_features item=feature}
-																	<div class="room_feature_group">
-																		<div class="room_info_heading">
-																			<span>{$feature.name|escape:'html':'UTF-8'}</span>
-																		</div>
-																		<div class="room_info_content row">
-																			{foreach from=$feature.values item=val}
-																				<div class="col-sm-4 col-xs-12">
-																					<div class="rm_ftr_wrapper">
-																						{$val|escape:'html':'UTF-8'}
-																					</div>
-																				</div>
-																			{/foreach}
+																	{if $feature.name != $current_feature_name}
+																		{if $current_feature_name != ""}</div></div>{/if}
+																		{assign var="current_feature_name" value=$feature.name}
+																		<div class="room_feature_group">
+																			<div class="room_info_heading">
+																				<span>{$feature.name|escape:'html':'UTF-8'}</span>
+																			</div>
+																			<div class="room_info_content row">
+																	{/if}
+																	<div class="col-sm-4 col-xs-12">
+																		<div class="rm_ftr_wrapper">
+																			{$feature.value|escape:'html':'UTF-8'}
 																		</div>
 																	</div>
+																	{if $feature@last}</div></div>{/if}
 																{/foreach}
 															</div>
 														{/if}

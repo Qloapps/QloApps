@@ -1701,9 +1701,10 @@ class HotelBookingDetail extends ObjectModel
             if (!empty($bookingData)) {
                 foreach ($bookingData['rm_data'] as $key => $value) {
                     // featured amenities for display in room type list
-                    $product_feature = HotelRoomTypeAmenities::getFeaturedAmenities(
+                    $product_feature = HotelRoomTypeAmenities::getAmenities(
                         $value['id_product'],
-                        $context->language->id
+                        $context->language->id,
+                        true
                     );
                     // PS core features used by the amenities filter block
                     $prod_amen = array();

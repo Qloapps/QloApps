@@ -803,8 +803,7 @@ class AdminAddHotelController extends ModuleAdminController
                 $objHotelOrderRestrictDate->save();
 
                 $objHotelAmenities = new HotelBranchAmenities();
-                $objHotelAmenities->deleteBranchAmenitiesByHotelId($idHotel);
-                if (!$objHotelAmenities->assignAmenitiesToHotel($idHotel, $hotelAmenities)) {
+                if (!$objHotelAmenities->saveBranchAmenities($idHotel, $hotelAmenities)) {
                     $this->errors[] = $this->l('Some problem occurred while assigning amenities to the hotel.');
                 }
             }

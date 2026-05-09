@@ -45,7 +45,7 @@ class AdminHotelAmenitiesController extends ModuleAdminController
 
         if ($this->display == 'view') {
             $this->page_header_toolbar_btn['add_category'] = array(
-                'href'     => self::$currentIndex.'&addhtl_amenity&token='.$this->token,
+                'href'     => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
                 'desc'     => $this->l('Add new Amenity Category'),
                 'imgclass' => 'new',
             );
@@ -54,8 +54,8 @@ class AdminHotelAmenitiesController extends ModuleAdminController
 
     public function initContent()
     {
-        if (Tools::isSubmit('addhtl_amenity') || Tools::isSubmit('updatehtl_amenity')
-            || Tools::isSubmit('addhtl_amenity_item') || Tools::isSubmit('updatehtl_amenity_item')
+        if (Tools::isSubmit('add'.$this->table) || Tools::isSubmit('update'.$this->table)
+            || Tools::isSubmit('add'.$this->table.'_item') || Tools::isSubmit('update'.$this->table.'_item')
         ) {
             $this->display = 'edit';
         }
@@ -81,9 +81,9 @@ class AdminHotelAmenitiesController extends ModuleAdminController
 
     public function renderView()
     {
-        $obj = new HotelAmenities();
+        $objHotelAmenities = new HotelAmenities();
         $this->context->smarty->assign(array(
-            'amenities_tree' => $obj->getAllAmenitiesTree(),
+            'amenities_tree' => $objHotelAmenities->getAllAmenitiesTree(),
             'img_base_url'   => $this->module->getPathUri().self::IMG_DIR,
             'current_index'  => self::$currentIndex,
             'token'          => $this->token,
@@ -99,23 +99,23 @@ class AdminHotelAmenitiesController extends ModuleAdminController
         $defaultLang = (int)Configuration::get('PS_LANG_DEFAULT');
         $adminLink   = Context::getContext()->link->getAdminLink('AdminHotelAmenities');
 
-        if (Tools::isSubmit('addhtl_amenity_item') || Tools::isSubmit('updatehtl_amenity_item')) {
+        if (Tools::isSubmit('add'.$this->table.'_item') || Tools::isSubmit('update'.$this->table.'_item')) {
             $idAmenity  = (int)Tools::getValue('id');
             $idCategory = (int)Tools::getValue('id_category');
             $amenity    = array();
 
             if ($idAmenity) {
-                $obj = new HotelAmenities($idAmenity);
-                if (Validate::isLoadedObject($obj)) {
-                    $idCategory = (int)$obj->parent_amenity_id;
+                $objHotelAmenities = new HotelAmenities($idAmenity);
+                if (Validate::isLoadedObject($objHotelAmenities)) {
+                    $idCategory = (int)$objHotelAmenities->parent_amenity_id;
                     $amenity = array(
-                        'id'               => $obj->id,
+                        'id'               => $objHotelAmenities->id,
                         'parent_amenity_id' => $idCategory,
-                        'active'           => (int)$obj->active,
-                        'is_featured'      => (int)$obj->is_featured,
-                        'logo_type'        => $obj->logo_type,
-                        'logo'             => $obj->logo,
-                        'name'             => is_array($obj->name) ? $obj->name : array(),
+                        'active'           => (int)$objHotelAmenities->active,
+                        'is_featured'      => (int)$objHotelAmenities->is_featured,
+                        'logo_type'        => $objHotelAmenities->logo_type,
+                        'logo'             => $objHotelAmenities->logo,
+                        'name'             => is_array($objHotelAmenities->name) ? $objHotelAmenities->name : array(),
                     );
                 }
             }
@@ -146,12 +146,12 @@ class AdminHotelAmenitiesController extends ModuleAdminController
         $category   = array();
 
         if ($idCategory) {
-            $obj = new HotelAmenities($idCategory);
-            if (Validate::isLoadedObject($obj)) {
+            $objHotelAmenities = new HotelAmenities($idCategory);
+            if (Validate::isLoadedObject($objHotelAmenities)) {
                 $category = array(
-                    'id'       => $obj->id,
-                    'position' => $obj->position,
-                    'name'     => is_array($obj->name) ? $obj->name : array(),
+                    'id'       => $objHotelAmenities->id,
+                    'position' => $objHotelAmenities->position,
+                    'name'     => is_array($objHotelAmenities->name) ? $objHotelAmenities->name : array(),
                 );
             }
         }
@@ -194,16 +194,16 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 return;
             }
 
-            $obj = $idCategory ? new HotelAmenities($idCategory) : new HotelAmenities();
+            $objHotelAmenities = $idCategory ? new HotelAmenities($idCategory) : new HotelAmenities();
             foreach ($languages as $lang) {
                 $val = trim(Tools::getValue('cat_name_'.$lang['id_lang']));
-                $obj->name[$lang['id_lang']] = $val ?: $nameDefault;
+                $objHotelAmenities->name[$lang['id_lang']] = $val ?: $nameDefault;
             }
-            $obj->parent_amenity_id = 0;
-            $obj->position          = $pos;
-            $obj->active            = 1;
+            $objHotelAmenities->parent_amenity_id = 0;
+            $objHotelAmenities->position          = $pos;
+            $objHotelAmenities->active            = 1;
 
-            if (!$obj->save()) {
+            if (!$objHotelAmenities->save()) {
                 $this->errors[] = $this->l('Error saving category.');
                 $this->display  = 'edit';
                 return;
@@ -254,25 +254,25 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 return;
             }
 
-            $obj = $idAmenity ? new HotelAmenities($idAmenity) : new HotelAmenities();
+            $objHotelAmenities = $idAmenity ? new HotelAmenities($idAmenity) : new HotelAmenities();
             foreach ($languages as $lang) {
                 $val = trim(Tools::getValue('amenity_name_'.$lang['id_lang']));
-                $obj->name[$lang['id_lang']] = $val ?: $nameDefault;
+                $objHotelAmenities->name[$lang['id_lang']] = $val ?: $nameDefault;
             }
-            $obj->parent_amenity_id = $idCategory;
-            $obj->active            = $active;
-            $obj->is_featured       = $isFeatured;
-            $obj->logo_type         = ($logoType === 'icon') ? 'icon' : 'image';
-            $obj->logo              = ($logoType === 'icon') ? $logoValue : $obj->logo;
+            $objHotelAmenities->parent_amenity_id = $idCategory;
+            $objHotelAmenities->active            = $active;
+            $objHotelAmenities->is_featured       = $isFeatured;
+            $objHotelAmenities->logo_type         = ($logoType === 'icon') ? 'icon' : 'image';
+            $objHotelAmenities->logo              = ($logoType === 'icon') ? $logoValue : $objHotelAmenities->logo;
 
-            if (!$obj->save()) {
+            if (!$objHotelAmenities->save()) {
                 $this->errors[] = $this->l('Error saving amenity.');
                 $this->display  = 'edit';
                 return;
             }
 
             if ($logoType === 'icon') {
-                $imgFile = $this->module->getLocalPath().self::IMG_DIR.$obj->id.'.jpg';
+                $imgFile = $this->module->getLocalPath().self::IMG_DIR.$objHotelAmenities->id.'.jpg';
                 if (file_exists($imgFile)) {
                     unlink($imgFile);
                 }
@@ -287,9 +287,9 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                     if (!is_dir($imgDir)) {
                         mkdir($imgDir, 0755, true);
                     }
-                    if (ImageManager::resize($imgFile['tmp_name'], $imgDir.$obj->id.'.jpg')) {
-                        $obj->logo = $obj->id.'.jpg';
-                        $obj->save();
+                    if (ImageManager::resize($imgFile['tmp_name'], $imgDir.$objHotelAmenities->id.'.jpg')) {
+                        $objHotelAmenities->logo = $objHotelAmenities->id.'.jpg';
+                        $objHotelAmenities->save();
                     } else {
                         $this->errors[] = $this->l('Error uploading amenity image.');
                     }
@@ -315,8 +315,8 @@ class AdminHotelAmenitiesController extends ModuleAdminController
         $response = array('status' => false);
 
         if ($this->tabAccess['delete']) {
-            $obj = new HotelAmenities();
-            if ($obj->deleteHotelAmenities((int)Tools::getValue('id_category'))) {
+            $objHotelAmenities = new HotelAmenities();
+            if ($objHotelAmenities->deleteCategory((int)Tools::getValue('id_category'))) {
                 $response['status'] = true;
             } else {
                 $response['msg'] = $this->l('Error deleting category.');
@@ -333,8 +333,8 @@ class AdminHotelAmenitiesController extends ModuleAdminController
         $response = array('status' => false);
 
         if ($this->tabAccess['delete']) {
-            $obj = new HotelAmenities((int)Tools::getValue('id_amenity'));
-            if (Validate::isLoadedObject($obj) && $obj->delete()) {
+            $objHotelAmenities = new HotelAmenities((int)Tools::getValue('id_amenity'));
+            if (Validate::isLoadedObject($objHotelAmenities) && $objHotelAmenities->delete()) {
                 $response['status'] = true;
             } else {
                 $response['msg'] = $this->l('Error deleting amenity.');
@@ -351,12 +351,12 @@ class AdminHotelAmenitiesController extends ModuleAdminController
         $response = array('status' => false);
 
         if ($this->tabAccess['edit']) {
-            $obj = new HotelAmenities((int)Tools::getValue('id_amenity'));
-            if (Validate::isLoadedObject($obj)) {
-                $obj->is_featured = $obj->is_featured ? 0 : 1;
-                if ($obj->save()) {
+            $objHotelAmenities = new HotelAmenities((int)Tools::getValue('id_amenity'));
+            if (Validate::isLoadedObject($objHotelAmenities)) {
+                $objHotelAmenities->is_featured = $objHotelAmenities->is_featured ? 0 : 1;
+                if ($objHotelAmenities->save()) {
                     $response['status']      = true;
-                    $response['is_featured'] = (bool)$obj->is_featured;
+                    $response['is_featured'] = (bool)$objHotelAmenities->is_featured;
                 } else {
                     $response['msg'] = $this->l('Error updating amenity.');
                 }

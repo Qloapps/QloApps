@@ -409,9 +409,9 @@ class ProductControllerCore extends FrontController
                         }
                     }
 
-                    $roomFeatures = HotelRoomType::getFrontFeatures($this->product->id, $this->context->language->id);
-                    $roomAmenities = HotelRoomTypeAmenities::getFrontAmenities($this->product->id, $this->context->language->id);
-                    $hotelAmenities = HotelBranchAmenities::getFrontAmenities($hotel_id, $this->context->language->id);
+                    $roomFeatures = $this->product->getFrontFeatures($this->context->language->id);
+                    $roomAmenities = HotelRoomTypeAmenities::getAmenities($this->product->id, $this->context->language->id);
+                    $hotelAmenities = HotelBranchAmenities::getAmenities($hotel_id, $this->context->language->id);
 
                     $this->context->smarty->assign(
                         array(

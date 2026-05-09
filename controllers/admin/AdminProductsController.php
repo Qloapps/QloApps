@@ -1191,7 +1191,7 @@ class AdminProductsControllerCore extends AdminController
     protected function getRoomTypeAmenitiesTree($idProduct)
     {
         $selectedAmenityRows = array();
-        foreach (HotelRoomTypeAmenities::getAmenityIdsByProduct($idProduct) as $selectedAmenityId) {
+        foreach (HotelRoomTypeAmenities::getAmenityIds($idProduct) as $selectedAmenityId) {
             $selectedAmenityRows[] = array('amenity_id' => $selectedAmenityId);
         }
 
@@ -2038,7 +2038,7 @@ class AdminProductsControllerCore extends AdminController
                 if (!is_array($selectedAmenities)) {
                     $selectedAmenities = array($selectedAmenities);
                 }
-                if (!(new HotelRoomTypeAmenities())->assignAmenitiesToProduct((int)$this->object->id, $selectedAmenities)) {
+                if (!(new HotelRoomTypeAmenities())->saveRoomTypeAmenities((int)$this->object->id, $selectedAmenities)) {
                     $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
                     return false;
                 }
@@ -2294,7 +2294,7 @@ class AdminProductsControllerCore extends AdminController
                         if (!is_array($selectedAmenities)) {
                             $selectedAmenities = array($selectedAmenities);
                         }
-                        if (!(new HotelRoomTypeAmenities())->assignAmenitiesToProduct((int)$object->id, $selectedAmenities)) {
+                        if (!(new HotelRoomTypeAmenities())->saveRoomTypeAmenities((int)$object->id, $selectedAmenities)) {
                             $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
                             return false;
                         }

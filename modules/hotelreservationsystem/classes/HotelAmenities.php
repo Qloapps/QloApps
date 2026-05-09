@@ -61,8 +61,6 @@ class HotelAmenities extends ObjectModel
     public function delete()
     {
         if ($id = $this->id) {
-            Db::getInstance()->delete('htl_branch_amenity', '`amenity_id` = '.(int)$id);
-            Db::getInstance()->delete('htl_room_type_amenity', '`amenity_id` = '.(int)$id);
             $imgFile = dirname(__FILE__).'/../views/img/hotel_amenities/'.(int)$id.'.jpg';
             if (file_exists($imgFile)) {
                 unlink($imgFile);
@@ -215,17 +213,17 @@ class HotelAmenities extends ObjectModel
      * @param int $deleteId
      * @return bool
      */
-    public function deleteHotelAmenities($deleteId)
+    public function deleteCategory($idCategory)
     {
         $rows = Db::getInstance()->executeS(
             'SELECT `id_htl_amenity` FROM `'._DB_PREFIX_.'htl_amenity`
-            WHERE `parent_amenity_id` = '.(int)$deleteId.' OR `id_htl_amenity` = '.(int)$deleteId
+            WHERE `parent_amenity_id` = '.(int)$idCategory.' OR `id_htl_amenity` = '.(int)$idCategory
         );
 
         if ($rows) {
             foreach ($rows as $row) {
-                $obj = new HotelAmenities((int)$row['id_htl_amenity']);
-                $obj->delete();
+                $objHotelAmenities = new HotelAmenities((int)$row['id_htl_amenity']);
+                $objHotelAmenities->delete();
             }
         }
 
@@ -237,7 +235,7 @@ class HotelAmenities extends ObjectModel
      * @param int    $idLang
      * @return array|false
      */
-    public function searchByName($query, $idLang = false)
+    public function searchByName($query, $idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;

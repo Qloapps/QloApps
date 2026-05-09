@@ -42,40 +42,15 @@ class HotelBranchAmenities extends ObjectModel
 
     /**
      * @param int $idHotel
-     * @return bool
-     */
-    public function deleteBranchAmenitiesByHotelId($idHotel)
-    {
-        return Db::getInstance()->delete('htl_branch_amenity', '`id_hotel` = '.(int)$idHotel);
-    }
-
-    /**
-     * @param int   $idHotel
-     * @param array $amenities array of amenity IDs
-     * @return bool
-     */
-    public function assignAmenitiesToHotel($idHotel, $amenities)
-    {
-        if ($amenities) {
-            foreach ($amenities as $amenityId) {
-                $objHotelAmenities = new HotelBranchAmenities();
-                $objHotelAmenities->id_hotel   = (int)$idHotel;
-                $objHotelAmenities->amenity_id = (int)$amenityId;
-                $objHotelAmenities->save();
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Return active child amenities assigned to a hotel, formatted for front-end display.
-     *
-     * @param int $idHotel
-     * @param int $idLang
+     * @param int $idLang  defaults to current context language
      * @return array
      */
-    public static function getFrontAmenities($idHotel, $idLang)
+    public static function getAmenities($idHotel, $idLang = 0): array
     {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
             'SELECT ha.`id_htl_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
             FROM `'._DB_PREFIX_.'htl_branch_amenity` hba
@@ -88,5 +63,26 @@ class HotelBranchAmenities extends ObjectModel
                 AND ha.`parent_amenity_id` > 0
             ORDER BY ha.`position` ASC, hal.`name` ASC'
         ) ?: array();
+    }
+
+    /**
+     * Delete existing assignments then save new ones for a hotel.
+     *
+     * @param int   $idHotel
+     * @param array $amenityIds
+     * @return bool
+     */
+    public function saveBranchAmenities($idHotel, array $amenityIds): bool
+    {
+        Db::getInstance()->delete('htl_branch_amenity', '`id_hotel` = '.(int)$idHotel);
+
+        foreach ($amenityIds as $amenityId) {
+            $obj = new self();
+            $obj->id_hotel   = (int)$idHotel;
+            $obj->amenity_id = (int)$amenityId;
+            $obj->save();
+        }
+
+        return true;
     }
 }
