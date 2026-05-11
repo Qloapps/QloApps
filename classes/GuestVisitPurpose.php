@@ -70,4 +70,56 @@ class GuestVisitPurposeCore extends ObjectModel
             ORDER BY al.`name` ASC'
         );
     }
+
+    /**
+     * @return array  All rows with names for every installed language, for the admin management table.
+     */
+    public static function getGuestVisitPurposeRows(): array
+    {
+        $languages = Language::getLanguages(false);
+        $rows = array();
+
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT a.`id_guest_reg_purpose`, a.`active`, a.`date_add`, al.`id_lang`, al.`name`
+            FROM `'._DB_PREFIX_.'guest_reg_purpose` a
+            LEFT JOIN `'._DB_PREFIX_.'guest_reg_purpose_lang` al
+                ON (a.`id_guest_reg_purpose` = al.`id_guest_reg_purpose`)
+            ORDER BY a.`id_guest_reg_purpose` ASC'
+        );
+
+        if ($result) {
+            foreach ($result as $row) {
+                $id = (int)$row['id_guest_reg_purpose'];
+                if (!isset($rows[$id])) {
+                    $rows[$id] = array(
+                        'id'       => $id,
+                        'form_key' => $id,
+                        'active'   => (int)$row['active'],
+                        'date_add' => $row['date_add'],
+                        'name'     => array(),
+                    );
+                    foreach ($languages as $language) {
+                        $rows[$id]['name'][(int)$language['id_lang']] = '';
+                    }
+                }
+                if ((int)$row['id_lang']) {
+                    $rows[$id]['name'][(int)$row['id_lang']] = $row['name'];
+                }
+            }
+        }
+
+        return array_values($rows);
+    }
+
+    /**
+     * @return array  All persisted IDs.
+     */
+    public static function getGuestVisitPurposeIds(): array
+    {
+        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT `id_guest_reg_purpose` FROM `'._DB_PREFIX_.'guest_reg_purpose`'
+        );
+
+        return $result ? array_map('intval', array_column($result, 'id_guest_reg_purpose')) : array();
+    }
 }

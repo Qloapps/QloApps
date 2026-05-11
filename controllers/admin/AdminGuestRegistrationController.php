@@ -71,7 +71,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
         $this->initPageHeaderToolbar();
 
         $this->content = $this->renderOptions();
-        $this->content .= $this->renderDynamicFieldManagement();
+        $this->content .= $this->renderRegForm();
 
         $this->context->smarty->assign(array(
             'content' => $this->content,
@@ -96,7 +96,115 @@ class AdminGuestRegistrationControllerCore extends AdminController
     public function postProcess()
     {
         if (Tools::isSubmit('submitBulkGuestRegistrationValues')) {
-            $this->processBulkDynamicFieldSave();
+            $languages = Language::getLanguages(false);
+            $regFields = $this->getRegFieldTypes();
+            $idLangDefault = (int)Configuration::get('PS_LANG_DEFAULT');
+            $validatedRows = array();
+
+            // Validate all field types first, collect errors before saving anything
+            foreach ($regFields as $fieldKey => $fieldConfig) {
+                $postedRows = Tools::getValue($fieldConfig['table'], array());
+                if (!is_array($postedRows)) {
+                    $postedRows = array();
+                }
+
+                $rows = array();
+                foreach ($postedRows as $rowKey => $row) {
+                    if (!is_array($row)) {
+                        continue;
+                    }
+
+                    // Skip blank new rows (no ID and no name in any language)
+                    if (empty($row['id'])) {
+                        $hasName = false;
+                        if (isset($row['name']) && is_array($row['name'])) {
+                            foreach ($languages as $language) {
+                                if (!empty($row['name'][(int)$language['id_lang']])) {
+                                    $hasName = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!$hasName) {
+                            continue;
+                        }
+                    }
+
+                    $validRow = array(
+                        'id'     => !empty($row['id']) ? (int)$row['id'] : 0,
+                        'active' => !empty($row['active']) ? 1 : 0,
+                        'name'   => array(),
+                    );
+
+                    $defaultName = isset($row['name'][$idLangDefault]) ? trim($row['name'][$idLangDefault]) : '';
+
+                    foreach ($languages as $language) {
+                        $idLang = (int)$language['id_lang'];
+                        $name = isset($row['name'][$idLang]) ? trim($row['name'][$idLang]) : '';
+
+                        if ($name === '' && $defaultName !== '') {
+                            $name = $defaultName;
+                        }
+
+                        if ($name === '') {
+                            $this->errors[] = sprintf(
+                                $this->l('%s: name is required for %s (or for the default language).'),
+                                $fieldConfig['title'],
+                                $language['name']
+                            );
+                        } elseif (!Validate::isCatalogName($name)) {
+                            $this->errors[] = sprintf(
+                                $this->l('%s: name is invalid for %s.'),
+                                $fieldConfig['title'],
+                                $language['name']
+                            );
+                        }
+
+                        $validRow['name'][$idLang] = $name;
+                    }
+
+                    $rows[$rowKey] = $validRow;
+                }
+
+                $validatedRows[$fieldKey] = $rows;
+            }
+
+            // Save only when validation passes for all types
+            if (!count($this->errors)) {
+                foreach ($regFields as $fieldKey => $fieldConfig) {
+                    $className = $fieldConfig['class'];
+                    $idMethod = $fieldConfig['ids_fn'];
+                    $existingIds = $className::$idMethod();
+                    $savedIds = array();
+                    $saveFailed = false;
+
+                    foreach ($validatedRows[$fieldKey] as $row) {
+                        $object = $row['id'] ? new $className((int)$row['id']) : new $className();
+                        $object->active = (int)$row['active'];
+                        $object->name = $row['name'];
+
+                        if (!$object->save()) {
+                            $this->errors[] = sprintf(
+                                $this->l('An error occurred while saving %s.'),
+                                Tools::strtolower($fieldConfig['title'])
+                            );
+                            $saveFailed = true;
+                            continue;
+                        }
+
+                        $savedIds[] = (int)$object->id;
+                    }
+
+                    if (!$saveFailed) {
+                        foreach (array_diff($existingIds, $savedIds) as $idToDelete) {
+                            $object = new $className((int)$idToDelete);
+                            if (Validate::isLoadedObject($object)) {
+                                $object->delete();
+                            }
+                        }
+                    }
+                }
+            }
 
             if (!count($this->errors)) {
                 Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
@@ -114,12 +222,20 @@ class AdminGuestRegistrationControllerCore extends AdminController
 
         $html = parent::renderOptions();
 
+        $value = Configuration::get(self::CONF_OPTIONAL_SECTIONS);
+        if ($value === false || $value === '') {
+            $selectedSections = array(1, 2, 3, 4, 5, 6);
+        } else {
+            $decoded = Tools::jsonDecode($value, true);
+            $selectedSections = is_array($decoded) ? array_map('intval', $decoded) : array();
+        }
+
         $this->context->smarty->assign(array(
-            'guest_reg_preview_img_url'       => $this->context->link->getBaseLink().'img/admin/guest_registration_preview.jpg',
-            'guest_reg_selected_sections'     => $this->getSelectedOptionalSections(),
-            'guest_reg_conf_key'              => self::CONF_OPTIONAL_SECTIONS,
-            'guest_reg_preview_title'         => $this->l('Guest Registration Card Preview'),
-            'guest_reg_preview_btn_title'     => $this->l('Preview'),
+            'guest_reg_preview_img_url'   => $this->context->link->getBaseLink().'img/admin/guest_registration_preview.jpg',
+            'guest_reg_selected_sections' => $selectedSections,
+            'guest_reg_conf_key'          => self::CONF_OPTIONAL_SECTIONS,
+            'guest_reg_preview_title'     => $this->l('Guest Registration Card Preview'),
+            'guest_reg_preview_btn_title' => $this->l('Preview'),
         ));
 
         $html .= $this->createTemplate('preview_modal.tpl')->fetch();
@@ -127,6 +243,11 @@ class AdminGuestRegistrationControllerCore extends AdminController
         return $html;
     }
 
+    /**
+     * Called automatically by AdminController::processUpdateOptions() via
+     * 'updateOption' + Tools::toCamelCase('QLO_GUEST_REG_OPTIONAL_SECTIONS').
+     * Validates and stores the selected optional section IDs.
+     */
     protected function updateOptionQloGuestRegOptionalSections($value)
     {
         if (!is_array($value)) {
@@ -146,282 +267,108 @@ class AdminGuestRegistrationControllerCore extends AdminController
         Configuration::updateValue(self::CONF_OPTIONAL_SECTIONS, Tools::jsonEncode(array_values(array_unique($selected))));
     }
 
-    protected function renderDynamicFieldManagement()
+    protected function renderRegForm()
     {
         $languages = Language::getLanguages(false);
-        $defaultFormLanguage = (int)Configuration::get('PS_LANG_DEFAULT');
+        $regFields = $this->getRegFieldTypes();
 
         $this->context->smarty->assign(array(
-            'languages' => $languages,
-            'default_form_language' => $defaultFormLanguage,
-            'dynamic_form_action' => self::$currentIndex.'&token='.$this->token,
-            'guest_reg_purpose_rows' => $this->getEntityRowsForDisplay('purpose', $languages),
-            'guest_reg_id_proof_rows' => $this->getEntityRowsForDisplay('id_proof', $languages),
-            'guest_reg_payment_method_rows' => $this->getEntityRowsForDisplay('payment_method', $languages),
+            'languages'                     => $languages,
+            'default_form_language'         => (int)Configuration::get('PS_LANG_DEFAULT'),
+            'dynamic_form_action'           => self::$currentIndex.'&token='.$this->token,
+            'guest_reg_purpose_rows'        => $this->getRegFieldRows($regFields['purpose'], $languages),
+            'guest_reg_id_proof_rows'       => $this->getRegFieldRows($regFields['id_proof'], $languages),
+            'guest_reg_payment_method_rows' => $this->getRegFieldRows($regFields['payment_method'], $languages),
         ));
 
         return $this->createTemplate('dynamic_tables.tpl')->fetch();
     }
 
-    protected function processBulkDynamicFieldSave()
-    {
-        $languages = Language::getLanguages(false);
-        $savedRows = array();
-
-        foreach ($this->getManagedEntities() as $entityKey => $entity) {
-            $postedRows = Tools::getValue($entity['table'], array());
-            if (!is_array($postedRows)) {
-                $postedRows = array();
-            }
-
-            $savedRows[$entityKey] = $this->prepareEntityRowsForSave($entityKey, $postedRows, $languages);
-        }
-
-        if (count($this->errors)) {
-            return false;
-        }
-
-        foreach ($savedRows as $entityKey => $rows) {
-            $this->persistEntityRows($entityKey, $rows);
-        }
-
-        return true;
-    }
-
-    protected function prepareEntityRowsForSave($entityKey, $postedRows, $languages)
-    {
-        $entity = $this->getManagedEntity($entityKey);
-        $rows = array();
-        
-        // Get the system's default language ID
-        $idLangDefault = (int)Configuration::get('PS_LANG_DEFAULT');
-
-        foreach ($postedRows as $rowKey => $row) {
-            if (!is_array($row)) {
-                continue;
-            }
-
-            if ($this->isEmptyEntityRow($row, $languages)) {
-                continue;
-            }
-
-            $preparedRow = array(
-                'id' => !empty($row['id']) ? (int)$row['id'] : 0,
-                'active' => !empty($row['active']) ? 1 : 0,
-                'name' => array(),
-            );
-
-            // Capture the default language value first to use as a fallback
-            $defaultValue = '';
-            if (isset($row['name'][$idLangDefault])) {
-                $defaultValue = trim($row['name'][$idLangDefault]);
-            }
-
-            foreach ($languages as $language) {
-                $idLang = (int)$language['id_lang'];
-                $value = '';
-                
-                if (isset($row['name'][$idLang])) {
-                    $value = trim($row['name'][$idLang]);
-                }
-
-                // AUTOMATIC FALLBACK: If current language is blank, use the default language text
-                if ($value === '' && $defaultValue !== '') {
-                    $value = $defaultValue;
-                }
-
-                // Validation
-                if ($value === '') {
-                    $this->errors[] = sprintf($this->l('%s: name is required for %s (or for the default language).'), $entity['title'], $language['name']);
-                } elseif (!Validate::isCatalogName($value)) {
-                    $this->errors[] = sprintf($this->l('%s: name is invalid for %s.'), $entity['title'], $language['name']);
-                }
-
-                $preparedRow['name'][$idLang] = $value;
-            }
-
-            $rows[$rowKey] = $preparedRow;
-        }
-
-        return $rows;
-    }
-
-    protected function persistEntityRows($entityKey, $rows)
-    {
-        $entity = $this->getManagedEntity($entityKey);
-        $existingIds = $this->getEntityIds($entityKey);
-        $savedIds = array();
-
-        foreach ($rows as $row) {
-            $object = $row['id'] ? new $entity['class']((int)$row['id']) : new $entity['class']();
-            $object->active = (int)$row['active'];
-            $object->name = $row['name'];
-
-            if (!$object->save()) {
-                $this->errors[] = sprintf($this->l('An error occurred while saving %s.'), Tools::strtolower($entity['title']));
-                continue;
-            }
-
-            $savedIds[] = (int)$object->id;
-        }
-
-        if (count($this->errors)) {
-            return false;
-        }
-
-        foreach (array_diff($existingIds, $savedIds) as $idToDelete) {
-            $object = new $entity['class']((int)$idToDelete);
-            if (Validate::isLoadedObject($object)) {
-                $object->delete();
-            }
-        }
-
-        return true;
-    }
-
     /**
-     * @param string $entityKey
-     * @param array $languages
-     *
-     * @return array
+     * Returns display rows for one guest registration field type.
+     * On validation error repopulates from posted data; otherwise fetches from the database.
+     * Called 3× from renderRegForm(), one per field type.
      */
-    protected function getEntityRowsForDisplay($entityKey, $languages)
+    protected function getRegFieldRows(array $fieldConfig, array $languages): array
     {
         if (Tools::isSubmit('submitBulkGuestRegistrationValues') && count($this->errors)) {
-            return $this->getPostedEntityRowsForDisplay($entityKey, $languages);
-        }
+            $postedRows = Tools::getValue($fieldConfig['table'], array());
+            $rows = array();
 
-        return $this->getEntityRows($entityKey);
-    }
+            if (!is_array($postedRows)) {
+                return $rows;
+            }
 
-    /**
-     * @param string $entityKey
-     * @param array $languages
-     *
-     * @return array
-     */
-    protected function getPostedEntityRowsForDisplay($entityKey, $languages)
-    {
-        $entity = $this->getManagedEntity($entityKey);
-        $postedRows = Tools::getValue($entity['table'], array());
-        $rows = array();
+            foreach ($postedRows as $rowKey => $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
 
-        if (!is_array($postedRows)) {
+                $rowKey = (string)$rowKey;
+                $formKey = preg_match('/^[a-zA-Z0-9_-]+$/', $rowKey) ? $rowKey : 'new_'.time();
+
+                $displayRow = array(
+                    'id'       => !empty($row['id']) ? (int)$row['id'] : 0,
+                    'form_key' => $formKey,
+                    'active'   => !empty($row['active']) ? 1 : 0,
+                    'date_add' => '',
+                    'name'     => array(),
+                );
+
+                foreach ($languages as $language) {
+                    $idLang = (int)$language['id_lang'];
+                    $displayRow['name'][$idLang] = isset($row['name'][$idLang]) ? (string)$row['name'][$idLang] : '';
+                }
+
+                $rows[] = $displayRow;
+            }
+
             return $rows;
         }
 
-        foreach ($postedRows as $rowKey => $row) {
-            if (!is_array($row)) {
-                continue;
-            }
+        $className = $fieldConfig['class'];
+        $rowsMethod = $fieldConfig['rows_fn'];
 
-            $displayRow = array(
-                'id' => !empty($row['id']) ? (int)$row['id'] : 0,
-                'form_key' => $this->sanitizeDynamicRowKey($rowKey),
-                'active' => !empty($row['active']) ? 1 : 0,
-                'date_add' => '',
-                'name' => array(),
-            );
-
-            foreach ($languages as $language) {
-                $idLang = (int)$language['id_lang'];
-                $displayRow['name'][$idLang] = isset($row['name'][$idLang]) ? (string)$row['name'][$idLang] : '';
-            }
-
-            $rows[] = $displayRow;
-        }
-
-        return $rows;
+        return $className::$rowsMethod();
     }
 
     /**
-     * @param string|int $rowKey
-     *
-     * @return string
+     * @return array  Config for each guest registration field type managed on this page
      */
-    protected function sanitizeDynamicRowKey($rowKey)
-    {
-        $rowKey = (string)$rowKey;
-
-        if (preg_match('/^[a-zA-Z0-9_-]+$/', $rowKey)) {
-            return $rowKey;
-        }
-
-        return 'new_'.time();
-    }
-
-    protected function getEntityRows($entityKey)
-    {
-        $entity = $this->getManagedEntity($entityKey);
-        $languages = Language::getLanguages(false);
-        $rows = array();
-
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT a.`'.$entity['identifier'].'`, a.`active`, a.`date_add`, al.`id_lang`, al.`name`
-            FROM `'._DB_PREFIX_.$entity['table'].'` a
-            LEFT JOIN `'._DB_PREFIX_.$entity['table'].'_lang` al
-                ON (a.`'.$entity['identifier'].'` = al.`'.$entity['identifier'].'`)
-            ORDER BY a.`'.$entity['identifier'].'` ASC'
-        );
-
-        if ($result) {
-            foreach ($result as $row) {
-                $idEntity = (int)$row[$entity['identifier']];
-                if (!isset($rows[$idEntity])) {
-                    $rows[$idEntity] = array(
-                        'id' => $idEntity,
-                        'form_key' => $idEntity,
-                        'active' => (int)$row['active'],
-                        'date_add' => $row['date_add'],
-                        'name' => array(),
-                    );
-
-                    foreach ($languages as $language) {
-                        $rows[$idEntity]['name'][(int)$language['id_lang']] = '';
-                    }
-                }
-
-                if ((int)$row['id_lang']) {
-                    $rows[$idEntity]['name'][(int)$row['id_lang']] = $row['name'];
-                }
-            }
-        }
-
-        return array_values($rows);
-    }
-
-    protected function getManagedEntity($entityKey)
-    {
-        $entities = $this->getManagedEntities();
-
-        return $entities[$entityKey];
-    }
-
-    protected function getManagedEntities()
+    protected function getRegFieldTypes(): array
     {
         return array(
             'purpose' => array(
-                'class' => 'GuestVisitPurpose',
-                'table' => 'guest_reg_purpose',
+                'class'      => 'GuestVisitPurpose',
+                'table'      => 'guest_reg_purpose',
                 'identifier' => 'id_guest_reg_purpose',
-                'title' => $this->l('Purpose of visit'),
+                'title'      => $this->l('Purpose of visit'),
+                'rows_fn'    => 'getGuestVisitPurposeRows',
+                'ids_fn'     => 'getGuestVisitPurposeIds',
             ),
             'id_proof' => array(
-                'class' => 'GuestRegistrationIdProof',
-                'table' => 'guest_reg_id_proof',
+                'class'      => 'GuestRegistrationIdProof',
+                'table'      => 'guest_reg_id_proof',
                 'identifier' => 'id_guest_reg_id_proof',
-                'title' => $this->l('Identity proof'),
+                'title'      => $this->l('Identity proof'),
+                'rows_fn'    => 'getRegistrationIdProofRows',
+                'ids_fn'     => 'getRegistrationIdProofIds',
             ),
             'payment_method' => array(
-                'class' => 'GuestRegistrationPaymentMethod',
-                'table' => 'guest_reg_payment_method',
+                'class'      => 'GuestRegistrationPaymentMethod',
+                'table'      => 'guest_reg_payment_method',
                 'identifier' => 'id_guest_reg_payment_method',
-                'title' => $this->l('Payment method'),
+                'title'      => $this->l('Payment method'),
+                'rows_fn'    => 'getRegistrationPaymentMethodRows',
+                'ids_fn'     => 'getRegistrationPaymentMethodIds',
             ),
         );
     }
 
-    protected function getOptionalSectionChoices()
+    /**
+     * @return array  Section ID → label for the optional-sections checkbox group
+     */
+    protected function getOptionalSectionChoices(): array
     {
         return array(
             1 => $this->l('Property Logo'),
@@ -431,57 +378,5 @@ class AdminGuestRegistrationControllerCore extends AdminController
             5 => $this->l('Property Regulations'),
             6 => $this->l('For Office Use Only'),
         );
-    }
-
-    protected function getSelectedOptionalSections()
-    {
-        $value = Configuration::get(self::CONF_OPTIONAL_SECTIONS);
-
-        if ($value === false || $value === '') {
-            return array(1, 2, 3, 4, 5, 6);
-        }
-
-        $value = Tools::jsonDecode($value, true);
-
-        if (!is_array($value)) {
-            return array();
-        }
-
-        return array_map('intval', $value);
-    }
-
-    protected function getEntityIds($entityKey)
-    {
-        $entity = $this->getManagedEntity($entityKey);
-        $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT `'.$entity['identifier'].'`
-            FROM `'._DB_PREFIX_.$entity['table'].'`'
-        );
-
-        if (!$result) {
-            return array();
-        }
-
-        return array_map('intval', array_column($result, $entity['identifier']));
-    }
-
-    protected function isEmptyEntityRow($row, $languages)
-    {
-        if (!empty($row['id'])) {
-            return false;
-        }
-
-        if (!isset($row['name']) || !is_array($row['name'])) {
-            return true;
-        }
-
-        foreach ($languages as $language) {
-            $idLang = (int)$language['id_lang'];
-            if (!empty($row['name'][$idLang])) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
