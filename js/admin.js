@@ -1686,11 +1686,26 @@ function confirm_link(head_text, display_text, confirm_text, cancel_text, confir
 	});
 }
 function countDown($source, $target) {
-	var max = $source.attr("data-maxchar");
-	$target.html(max-$source.val().length);
+	var max = parseInt($source.attr("data-maxchar"), 10);
 
-	$source.keyup(function(){
-		$target.html(max-$source.val().length);
+	function update() {
+		var val = $source.val();
+		if (val.length > max) {
+			$source.val(val.substring(0, max));
+		}
+		var remaining = max - $source.val().length;
+		$target.html(remaining);
+		if (remaining <= 0) {
+			$target.addClass('text-danger');
+		} else {
+			$target.removeClass('text-danger');
+		}
+	}
+
+	update();
+
+	$source.on('keyup input', function() {
+		update();
 	});
 }
 

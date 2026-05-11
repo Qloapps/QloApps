@@ -218,6 +218,7 @@
 
 				$('.product-tab-content').on('displayed', function(e) {
 					$('#toolbar-footer').appendTo($(this).children('.product-tab'));
+					$(window).trigger('resize.autosize');
 				});
 
 			});

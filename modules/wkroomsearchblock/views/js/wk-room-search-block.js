@@ -696,37 +696,26 @@ $(document).ready(function() {
         if (childElement) {
             var totalChilds = $(this).closest('.occupancy_info_block').find('.guest_child_age').length;
 
-            if (max_child_in_room == 0 || totalChilds < max_child_in_room) {
-                element.val(elementVal);
-                $(this).closest('.occupancy_info_block').find('.children_age_info_block').show();
+            element.val(elementVal);
+            $(this).closest('.occupancy_info_block').find('.children_age_info_block').show();
 
-                var roomBlockIndex = parseInt($(this).closest('.occupancy_info_block').attr('occ_block_index'));
+            var roomBlockIndex = parseInt($(this).closest('.occupancy_info_block').attr('occ_block_index'));
 
-                var childAgeSelect = '<div>';
-                    childAgeSelect += '<select class="guest_child_age room_occupancies" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
-                        childAgeSelect += '<option value="-1">' + select_age_txt + '</option>';
-                        childAgeSelect += '<option value="0">' + under_1_age + '</option>';
-                        for (let age = 1; age < max_child_age; age++) {
-                            childAgeSelect += '<option value="'+age+'">'+age+'</option>';
-                        }
-                    childAgeSelect += '</select>';
-                childAgeSelect += '</div>';
-
-                $(this).closest('.occupancy_info_block').find('.children_ages').append(childAgeSelect);
-
-                // set input field value
-                $(this).closest('.occupancy_count_block').find('.occupancy_count > span').text(elementVal);
-            } else {
-                if (elementVal >= max_child_in_room) {
-                    if (elementVal == 0) {
-                        showOccupancyError(no_children_allowed_txt, $(this).closest(".occupancy_info_block"));
-                    } else {
-                        showOccupancyError(max_children_txt, $(this).closest(".occupancy_info_block"));
+            var childAgeSelect = '<div>';
+                childAgeSelect += '<select class="guest_child_age room_occupancies" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
+                    childAgeSelect += '<option value="-1">' + select_age_txt + '</option>';
+                    childAgeSelect += '<option value="0">' + under_1_age + '</option>';
+                    for (let age = 1; age < max_child_age; age++) {
+                        childAgeSelect += '<option value="'+age+'">'+age+'</option>';
                     }
-                } else {
-                    showOccupancyError(max_occupancy_reached_txt, $(this).closest(".occupancy_info_block"));
-                }
-            }
+                childAgeSelect += '</select>';
+            childAgeSelect += '</div>';
+
+            $(this).closest('.occupancy_info_block').find('.children_ages').append(childAgeSelect);
+
+            // set input field value
+            $(this).closest('.occupancy_count_block').find('.occupancy_count > span').text(elementVal);
+
         } else {
             element.val(elementVal);
 
@@ -934,7 +923,7 @@ $(document).ready(function() {
 
     // set positions of popups when required
     if (page_name == 'index') {
-        $('#hotel_location, #id_hotel_button, #guest_occupancy').focus(function () {
+        $('#hotel_location, #id_hotel_button_chosen, #guest_occupancy').focus(function () {
             setBookingSearchPositions();
         });
 
