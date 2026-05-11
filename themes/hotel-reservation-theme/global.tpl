@@ -62,7 +62,6 @@
 {addJsDef is_occupancy_wise_search=$is_occupancy_wise_search|boolval}
 {addJsDef occupancy_required_for_booking=$occupancy_required_for_booking|boolval}
 {addJsDef max_child_age=$max_child_age}
-{addJsDef max_child_in_room=$max_child_in_room}
 
 {addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum room occupancy reached' js=1}{/addJsDefL}
 {addJsDefL name='max_adults_txt'}{l s='Maximum adult occupancy reached' js=1}{/addJsDefL}

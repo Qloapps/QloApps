@@ -269,9 +269,14 @@
                                             <input type="hidden" name="id_order" value="{$order->id}" />
                                         </div>
                                         <div class="col-lg-3">
-                                            <button type="submit" name="submitState" class="btn btn-primary">
-                                                {l s='Update status'}
-                                            </button>
+                                            <div class="btn-group">
+                                                <button type="submit" name="submitState" class="btn btn-primary">
+                                                    {l s='Update status'}
+                                                </button>
+                                                <button type="button" id="order_status_disable_info" class="btn btn-default" data-toggle="modal" data-target="#order_status_disable_reason" title="{l s='Click here to see why certain statuses can’t be selected'}" aria-label="{l s='Why are some staClick here to see why certain statuses can’t be selected'}">
+                                                    <i class="icon-info-circle"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
@@ -1302,7 +1307,30 @@
             {/if}
         </div>
     </div>
-
+    {* Css for handling order disable status modal *}
+    <style type="text/css">
+        #order-status-disable-reason-body p { margin: 0 0 15px; }
+        #order-status-disable-reason-body p:last-child { margin-bottom: 0; }
+    </style>
+    <div class="modal fade" id="order_status_disable_reason" tabindex="-1" role="dialog" aria-labelledby="order_status_disable_reason_label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{l s='Close'}"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="order_status_disable_reason_label"><i class="icon icon-ban"></i> {l s='Order Status Disable Criteria'}</h4>
+                </div>
+                <div class="modal-body" id="order-status-disable-reason-body">
+                    <p><strong>{l s='Refunded:'}</strong> {l s='Disabled when total paid amount is 0 and no discount is applied.'}</p>
+                    <p><strong>{l s='Cancelled:'}</strong> {l s='Disabled when the paid amount is greater than 0 or when discounts are applied.'}</p>
+                    <p><strong>{l s='Overbooking:'}</strong> {l s='Disabled when the order has no overbooked rooms.'}</p>
+                    <p><strong>{l s='Current:'}</strong> {l s='The current order status cannot be selected again.'}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{l s='Close'}</button>
+                </div>
+            </div>
+        </div>
+    </div>
     {strip}
         {addJsDefL name=no_rm_avail_txt}{l s='No room available.' js=1}{/addJsDefL}
         {addJsDefL name=no_realloc_rm_avail_txt}{l s='No room available for reallocation.' js=1}{/addJsDefL}
@@ -1335,7 +1363,6 @@
         {addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
         {addJsDefL name='select_room_txt'}{l s='Select room' js=1}{/addJsDefL}
         {addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
-        {addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_IN=$ROOM_STATUS_CHECKED_IN|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_OUT=$ROOM_STATUS_CHECKED_OUT|escape:'quotes':'UTF-8'}
         {addJsDef ALLOTMENT_MANUAL=$ALLOTMENT_MANUAL|escape:'quotes':'UTF-8'}
