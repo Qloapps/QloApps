@@ -178,7 +178,7 @@ class AdminAddHotelController extends ModuleAdminController
             $smartyVars['order_restrict_date_info'] = HotelOrderRestrictDate::getDataByHotelId($idHotel);
             $objHotelAmenities = new HotelAmenities();
             $hotelAmenities = $this->object->getAmenitiesOfHotelByHotelId($this->object->id);
-            if ($amenities = $objHotelAmenities->HotelBranchSelectedAmenitiesArray($hotelAmenities)) {
+            if ($amenities = $objHotelAmenities->hotelBranchSelectedAmenitiesArray($hotelAmenities)) {
                 foreach ($amenities as $idAmenity => $amenity) {
                     $amenities[$idAmenity]['value'] = $idAmenity;
                     $amenities[$idAmenity]['input_name'] = 'id_amenity_parents';

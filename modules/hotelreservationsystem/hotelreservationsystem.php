@@ -572,7 +572,7 @@ class HotelReservationSystem extends Module
             || !$this->registerModuleHooks()
             || !$this->callInstallTab()
             || !$objHtlHelper->insertDefaultHotelEntries()
-            || !$objHtlHelper->seedDefaultDynamicRoomFeatures()
+            || !$objHtlHelper->createHotelRoomDefaultFeatures()
             || !$objHtlHelper->insertHotelCommonFeatures()
         ) {
             return false;

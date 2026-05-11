@@ -1196,7 +1196,7 @@ class AdminProductsControllerCore extends AdminController
         }
 
         $objHotelAmenities = new HotelAmenities();
-        $roomTypeAmenities = $objHotelAmenities->HotelBranchSelectedAmenitiesArray(
+        $roomTypeAmenities = $objHotelAmenities->hotelBranchSelectedAmenitiesArray(
             $selectedAmenityRows,
             $this->context->language->id
         );

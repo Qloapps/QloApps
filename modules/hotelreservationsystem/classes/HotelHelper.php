@@ -1156,12 +1156,12 @@ class HotelHelper
      *
      * @return bool
      */
-    public function seedDefaultDynamicRoomFeatures()
+    public function createHotelRoomDefaultFeatures()
     {
         $idLang = (int) Configuration::get('PS_LANG_DEFAULT');
         $position = 0;
 
-        foreach ($this->getDefaultDynamicRoomFeatures() as $featureName => $featureValues) {
+        foreach ($this->getDefaultRoomFeatures() as $featureName => $featureValues) {
             $idFeature = (int) Feature::addFeatureImport($featureName, $position);
             if (!$idFeature) {
                 return false;
@@ -1185,7 +1185,7 @@ class HotelHelper
      *
      * @return array
      */
-    protected function getDefaultDynamicRoomFeatures()
+    protected function getDefaultRoomFeatures()
     {
         return array(
             'Bed Type' => array('Single', 'Double', 'Queen', 'King', 'Super King', 'Twin', 'Bunk Bed', 'Sofa Bed', 'Futon', 'Murphy Bed', 'Water Bed'),

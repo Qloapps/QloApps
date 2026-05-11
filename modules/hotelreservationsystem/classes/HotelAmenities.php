@@ -129,7 +129,7 @@ class HotelAmenities extends ObjectModel
      * @param int   $idLang
      * @return array|false
      */
-    public function HotelBranchSelectedAmenitiesArray($branchAmenities, $idLang = 0)
+    public function hotelBranchSelectedAmenitiesArray($branchAmenities, $idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
