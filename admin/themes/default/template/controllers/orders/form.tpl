@@ -2450,7 +2450,6 @@
     </form>
 {strip}
 	{addJsDef max_child_age=$max_child_age}
-	{addJsDef max_child_in_room=$max_child_in_room}
 	{addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
 	{addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
 	{addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
