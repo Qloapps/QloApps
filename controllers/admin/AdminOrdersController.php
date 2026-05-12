@@ -1518,6 +1518,19 @@ class AdminOrdersControllerCore extends AdminController
         );
     }
 
+    protected function addOrderLog($message, Order $order)
+    {
+        PrestaShopLogger::addLog(
+            $message,
+            1,
+            null,
+            'Order',
+            (int)$order->id,
+            true,
+            (int)$this->context->employee->id
+        );
+    }
+
     public function postProcess()
     {
         // Process reallocation of rooms
@@ -1559,6 +1572,17 @@ class AdminOrdersControllerCore extends AdminController
                 if (!count($this->errors)) {
                     // Finally, reallocate the room
                     if ($objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
+                        $order = new Order((int)$idOrder);
+                        $this->addOrderLog(
+                            sprintf(
+                                $this->l('[%s] Room %s reallocated to Room %s (%s)'),
+                                $order->reference,
+                                $objHotelBooking->room_num,
+                                $objRoomInfo->room_num,
+                                Product::getProductName($idNewRoomType, null, $this->context->language->id)
+                            ),
+                            $order
+                        );
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=52&token='.$this->token);
                     } else {
                         $this->errors[] = $this->l('Some error occured. Please try again.');
@@ -1601,6 +1625,16 @@ class AdminOrdersControllerCore extends AdminController
                 if (!count($this->errors)) {
                     $objBookingDetail = new HotelBookingDetail();
                     if ($objBookingDetail->swapBooking($idHtlBookingFrom, $idHtlBookingToSwap)) {
+                        $order = new Order((int)$idOrder);
+                        $this->addOrderLog(
+                            sprintf(
+                                $this->l('[%s] Room %s swapped with Room %s'),
+                                $order->reference,
+                                $objHotelBooking->room_num,
+                                $objHotelBookingTo->room_num
+                            ),
+                            $order
+                        );
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$idOrder.'&vieworder&conf=53&token='.$this->token);
                     } else {
                         $this->errors[] = $this->l('Some error occured. Please try again.');
@@ -1696,6 +1730,15 @@ class AdminOrdersControllerCore extends AdminController
             if ($this->tabAccess['edit'] === 1) {
                 $result = $order->changeOrderStatus();
                 if ($result['status']) {
+                    $newOrderState = new OrderState((int)Tools::getValue('id_order_state'));
+                    $this->addOrderLog(
+                        sprintf(
+                            $this->l('[%s] Order status updated to %s'),
+                            $order->reference,
+                            Validate::isLoadedObject($newOrderState) ? $newOrderState->name[(int)$order->id_lang] : Tools::getValue('id_order_state')
+                        ),
+                        $order
+                    );
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&conf=5&vieworder&token='.$this->token);
                 } else {
                     $this->errors = array_merge($this->errors, $result['errors']);
@@ -1944,6 +1987,15 @@ class AdminOrdersControllerCore extends AdminController
 
                 // Redirect if no errors
                 if (!count($this->errors)) {
+                    $this->addOrderLog(
+                        sprintf(
+                            $this->l('[%s] Refund/cancellation request #%s created (reason: %s)'),
+                            $order->reference,
+                            $objOrderReturn->id,
+                            $refundReason
+                        ),
+                        $order
+                    );
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=3&token='.$this->token);
                 }
             } else {
@@ -2010,6 +2062,16 @@ class AdminOrdersControllerCore extends AdminController
                             $this->errors[] = Tools::displayError('An error occurred during payment.');
                         }
                     } else {
+                        $this->addOrderLog(
+                            sprintf(
+                                $this->l('[%s] Payment of %s %s added via %s'),
+                                $order->reference,
+                                $amount,
+                                $currency->iso_code,
+                                Tools::getValue('payment_method')
+                            ),
+                            $order
+                        );
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                     }
                 }
@@ -2170,6 +2232,16 @@ class AdminOrdersControllerCore extends AdminController
                         }
 
                         if ($objPaymentModule->currentOrder) {
+                            $newOrder = new Order((int)$objPaymentModule->currentOrder);
+                            $this->addOrderLog(
+                                sprintf(
+                                    $this->l('[%s] Order created by admin (payment: %s, amount paid: %s)'),
+                                    $newOrder->reference,
+                                    $objPaymentModule->displayName,
+                                    $amountPaid
+                                ),
+                                $newOrder
+                            );
                             Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                         }
                     }
@@ -2524,6 +2596,15 @@ class AdminOrdersControllerCore extends AdminController
                             _PS_PRICE_COMPUTE_PRECISION_
                         );
                         $order->update();
+
+                        $this->addOrderLog(
+                            sprintf(
+                                $this->l('[%s] Voucher %s removed from order'),
+                                $order->reference,
+                                $order_cart_rule->name
+                            ),
+                            $order
+                        );
                     }
 
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
@@ -2699,6 +2780,14 @@ class AdminOrdersControllerCore extends AdminController
                         }
 
                         if ($res) {
+                            $this->addOrderLog(
+                                sprintf(
+                                    $this->l('[%s] Voucher %s added to order'),
+                                    $order->reference,
+                                    Tools::getValue('discount_name')
+                                ),
+                                $order
+                            );
                             Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                         } else {
                             $this->errors[] = Tools::displayError('An error occurred during the OrderCartRule creation');
@@ -5324,6 +5413,18 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if ($objBookingDetail->save()) {
+                    $this->addOrderLog(
+                        sprintf(
+                            $this->l('[%s] Room %s (%s) added to order (check-in: %s, check-out: %s)'),
+                            $order->reference,
+                            $objBookingDetail->room_num,
+                            $objBookingDetail->room_type_name,
+                            date('d M Y', strtotime($objBookingDetail->date_from)),
+                            date('d M Y', strtotime($objBookingDetail->date_to))
+                        ),
+                        $order
+                    );
+
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                     $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                     $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -5709,6 +5810,15 @@ class AdminOrdersControllerCore extends AdminController
                             $objServiceProductOrderDetail->save();
                         }
 
+                        $this->addOrderLog(
+                            sprintf(
+                                $this->l('[%s] Product %s (qty: %s) added to order'),
+                                $objOrder->reference,
+                                $objProduct->name,
+                                $productInformations['product_quantity']
+                            ),
+                            $objOrder
+                        );
                         $response['status'] = true;
                     } else {
                         $response['status'] = false;
@@ -6211,6 +6321,19 @@ class AdminOrdersControllerCore extends AdminController
             $view = $this->createTemplate('_product_line.tpl')->fetch();
         }
 
+        $this->addOrderLog(
+            sprintf(
+                $this->l('[%s] Room %s details edited: dates %s-%s → %s-%s'),
+                $order->reference,
+                $obj_booking_detail->room_num,
+                date('d M Y', strtotime($old_date_from)),
+                date('d M Y', strtotime($old_date_to)),
+                date('d M Y', strtotime($new_date_from)),
+                date('d M Y', strtotime($new_date_to))
+            ),
+            $order
+        );
+
         $this->sendChangedNotification($order);
         die(json_encode(array(
             'result' => $res,
@@ -6347,6 +6470,16 @@ class AdminOrdersControllerCore extends AdminController
                 $response['error'] = Tools::displayError('Some error has been occurred while updating the product. Please try again.');
             } else {
                 $this->sendChangedNotification($objOrder);
+                $this->addOrderLog(
+                    sprintf(
+                        $this->l('[%s] Product %s updated: qty set to %s, unit price (excl. tax) set to %s'),
+                        $objOrder->reference,
+                        $objServiceProductOrderDetail->name,
+                        $editProductInfo['product_quantity'],
+                        $editProductInfo['product_price_tax_excl']
+                    ),
+                    $objOrder
+                );
             }
         }
 
@@ -6682,6 +6815,18 @@ class AdminOrdersControllerCore extends AdminController
             'can_edit' => ($this->tabAccess['edit'] === 1),
         ));
 
+        $this->addOrderLog(
+            sprintf(
+                $this->l('[%s] Room %s (%s) removed from order (check-in: %s, check-out: %s)'),
+                $order->reference,
+                $objBookingDetail->room_num,
+                $order_detail->product_name,
+                date('d M Y', strtotime($objBookingDetail->date_from)),
+                date('d M Y', strtotime($objBookingDetail->date_to))
+            ),
+            $order
+        );
+
         $this->sendChangedNotification($order);
         die(json_encode(array(
             'result' => $res,
@@ -6770,6 +6915,14 @@ class AdminOrdersControllerCore extends AdminController
                 $response['error'] = Tools::displayError('Some error has been occurred while updating the product. Please try again.');
             } else {
                 $this->sendChangedNotification($objOrder);
+                $this->addOrderLog(
+                    sprintf(
+                        $this->l('[%s] Product %s removed from order'),
+                        $objOrder->reference,
+                        $objOrderDetail->product_name
+                    ),
+                    $objOrder
+                );
             }
         }
 
@@ -8755,6 +8908,22 @@ class AdminOrdersControllerCore extends AdminController
                                 'date_from' => $objHotelBookingDetail->date_from,
                                 'date_to' => $objHotelBookingDetail->date_to
                             )
+                        );
+
+                        $statusLabels = array(
+                            HotelBookingDetail::STATUS_ALLOTED => $this->l('Alloted'),
+                            HotelBookingDetail::STATUS_CHECKED_IN => $this->l('Checked In'),
+                            HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked Out'),
+                        );
+                        $statusLabel = isset($statusLabels[$newStatus]) ? $statusLabels[$newStatus] : $newStatus;
+                        $this->addOrderLog(
+                            sprintf(
+                                $this->l('[%s] Room %s status updated to %s'),
+                                $order->reference,
+                                $objHotelBookingDetail->room_num,
+                                $statusLabel
+                            ),
+                            $order
                         );
 
                         Tools::redirectAdmin(self::$currentIndex . '&id_order=' . (int) $objHotelBookingDetail->id_order . '&vieworder&token=' . $this->token . '&conf=4');
