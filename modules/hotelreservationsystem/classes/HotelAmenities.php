@@ -250,6 +250,28 @@ class HotelAmenities extends ObjectModel
     }
 
     /**
+     * Return all amenity categories (parent_amenity_id = 0), ordered by position.
+     *
+     * @param int $idLang
+     * @return array
+     */
+    public static function getCategories($idLang = 0): array
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT ha.`id_htl_amenity`, hal.`name`
+            FROM `'._DB_PREFIX_.'htl_amenity` ha
+            LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
+                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+            WHERE ha.`parent_amenity_id` = 0
+            ORDER BY ha.`position` ASC'
+        ) ?: array();
+    }
+
+    /**
      * Return image path for amenity logo stored in views/img/hotel_amenities/.
      *
      * @param int $id

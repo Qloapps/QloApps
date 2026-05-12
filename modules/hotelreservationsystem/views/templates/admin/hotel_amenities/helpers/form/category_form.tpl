@@ -53,10 +53,11 @@
 						<div class="translatable-field lang-{$language.id_lang}" {if $language.id_lang != $default_lang_id}style="display:none;"{/if}>
 							<div class="col-lg-9">
 						{/if}
-							<input type="text"
+							{assign var="cat_name_key" value="cat_name_`$language.id_lang`"}
+					<input type="text"
 								   id="cat_name_{$language.id_lang}"
 								   name="cat_name_{$language.id_lang}"
-								   value="{if isset($category.name[$language.id_lang])}{$category.name[$language.id_lang]|escape:'htmlall':'UTF-8'}{/if}"
+								   value="{if isset($smarty.post.$cat_name_key)}{$smarty.post.$cat_name_key|escape:'htmlall':'UTF-8'}{elseif isset($category.name[$language.id_lang])}{$category.name[$language.id_lang]|escape:'htmlall':'UTF-8'}{/if}"
 								   class="form-control"
 								   maxlength="128" />
 						{if $languages|count > 1}
@@ -87,7 +88,7 @@
 				</label>
 				<div class="col-lg-3">
 					<input type="number" min="1" name="position" class="form-control"
-						   value="{if isset($category.position)}{$category.position|intval}{else}1{/if}" />
+						   value="{if isset($smarty.post.position)}{$smarty.post.position|intval}{elseif isset($category.position)}{$category.position|intval}{else}1{/if}" />
 				</div>
 			</div>
 
@@ -97,6 +98,9 @@
 				</a>
 				<button type="submit" name="submitHtlCategory" class="btn btn-default pull-right">
 					<i class="process-icon-save"></i> {l s='Save' mod='hotelreservationsystem'}
+				</button>
+				<button type="submit" name="submitHtlCategoryAndStay" class="btn btn-default pull-right">
+					<i class="process-icon-save"></i> {l s='Save and Stay' mod='hotelreservationsystem'}
 				</button>
 			</div>
 		</form>

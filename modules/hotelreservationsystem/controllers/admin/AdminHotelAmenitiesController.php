@@ -172,7 +172,7 @@ class AdminHotelAmenitiesController extends ModuleAdminController
 
     public function postProcess()
     {
-        if (Tools::isSubmit('submitHtlCategory')) {
+        if (Tools::isSubmit('submitHtlCategory') || Tools::isSubmit('submitHtlCategoryAndStay')) {
             $idCategory  = (int)Tools::getValue('id');
             $pos         = (int)Tools::getValue('position');
             $languages   = Language::getLanguages(false);
@@ -209,11 +209,16 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 return;
             }
 
-            Tools::redirectAdmin(self::$currentIndex.'&conf='.($idCategory ? 4 : 3).'&token='.$this->token);
+            $conf = $idCategory ? 4 : 3;
+            if (Tools::isSubmit('submitHtlCategoryAndStay')) {
+                Tools::redirectAdmin(self::$currentIndex.'&id='.(int)$objHotelAmenities->id.'&update'.$this->table.'&conf='.$conf.'&token='.$this->token);
+            } else {
+                Tools::redirectAdmin(self::$currentIndex.'&conf='.$conf.'&token='.$this->token);
+            }
             return;
         }
 
-        if (Tools::isSubmit('submitHtlAmenityItem')) {
+        if (Tools::isSubmit('submitHtlAmenityItem') || Tools::isSubmit('submitHtlAmenityItemAndStay')) {
             $idAmenity   = (int)Tools::getValue('id');
             $idCategory  = (int)Tools::getValue('id_category');
             $active      = (int)Tools::getValue('active');
@@ -301,7 +306,12 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 return;
             }
 
-            Tools::redirectAdmin(self::$currentIndex.'&conf='.($idAmenity ? 4 : 3).'&token='.$this->token);
+            $conf = $idAmenity ? 4 : 3;
+            if (Tools::isSubmit('submitHtlAmenityItemAndStay')) {
+                Tools::redirectAdmin(self::$currentIndex.'&id='.(int)$objHotelAmenities->id.'&id_category='.(int)$idCategory.'&update'.$this->table.'_item&conf='.$conf.'&token='.$this->token);
+            } else {
+                Tools::redirectAdmin(self::$currentIndex.'&conf='.$conf.'&token='.$this->token);
+            }
             return;
         }
 

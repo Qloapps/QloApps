@@ -266,22 +266,26 @@
 														{if isset($room_dynamic_features) && $room_dynamic_features}
 															<div class="info_margin_div">
 																{assign var="current_feature_name" value=""}
+																{assign var="current_feature_values" value=""}
 																{foreach from=$room_dynamic_features item=feature}
 																	{if $feature.name != $current_feature_name}
-																		{if $current_feature_name != ""}</div></div>{/if}
-																		{assign var="current_feature_name" value=$feature.name}
-																		<div class="room_feature_group">
-																			<div class="room_info_heading">
-																				<span>{$feature.name|escape:'html':'UTF-8'}</span>
+																		{if $current_feature_name != ""}
+																			<div class="room_feature_group">
+																				<div class="room_info_heading"><span>{$current_feature_name|escape:'html':'UTF-8'}</span></div>
+																				<div class="room_info_content">{$current_feature_values|escape:'html':'UTF-8'}</div>
 																			</div>
-																			<div class="room_info_content row">
+																		{/if}
+																		{assign var="current_feature_name" value=$feature.name}
+																		{assign var="current_feature_values" value=$feature.value}
+																	{else}
+																		{assign var="current_feature_values" value="`$current_feature_values`, `$feature.value`"}
 																	{/if}
-																	<div class="col-sm-4 col-xs-12">
-																		<div class="rm_ftr_wrapper">
-																			{$feature.value|escape:'html':'UTF-8'}
+																	{if $feature@last}
+																		<div class="room_feature_group">
+																			<div class="room_info_heading"><span>{$current_feature_name|escape:'html':'UTF-8'}</span></div>
+																			<div class="room_info_content">{$current_feature_values|escape:'html':'UTF-8'}</div>
 																		</div>
-																	</div>
-																	{if $feature@last}</div></div>{/if}
+																	{/if}
 																{/foreach}
 															</div>
 														{/if}
@@ -305,7 +309,7 @@
 																						 title="{$amenity.name|escape:'html':'UTF-8'}"
 																						 style="max-height:20px;max-width:20px;" />
 																				{/if}
-																				{$amenity.name|escape:'html':'UTF-8'}
+																				<span class="amenity-name">{$amenity.name|escape:'html':'UTF-8'}</span>
 																			</div>
 																		{/foreach}
 																	</div>
@@ -329,7 +333,7 @@
 																						 title="{$amenity.name|escape:'html':'UTF-8'}"
 																						 style="max-height:20px;max-width:20px;" />
 																				{/if}
-																				{$amenity.name|escape:'html':'UTF-8'}
+																				<span class="amenity-name">{$amenity.name|escape:'html':'UTF-8'}</span>
 																			</div>
 																		{/foreach}
 																	</div>

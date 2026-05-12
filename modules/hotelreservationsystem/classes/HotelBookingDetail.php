@@ -1706,20 +1706,19 @@ class HotelBookingDetail extends ObjectModel
                         $context->language->id,
                         true
                     );
-                    // PS core features used by the amenities filter block
-                    $prod_amen = array();
+                    // amenity category filter
                     if (!empty($amenities) && $amenities) {
-                        $prod_amen = $amenities;
-                        $psFeatures = Product::getFrontFeaturesStatic($context->language->id, $value['id_product']);
-                        foreach ($psFeatures as $a_val) {
-                            if (($pa_key = array_search($a_val['id_feature'], $prod_amen)) !== false) {
-                                unset($prod_amen[$pa_key]);
-                                if (empty($prod_amen)) {
-                                    break;
-                                }
+                        $roomAmenityIds = HotelRoomTypeAmenities::getAmenityIds($value['id_product']);
+                        $allMatch = true;
+                        $objHotelAmenities = new HotelAmenities();
+                        foreach ($amenities as $categoryId) {
+                            $childIds = array_column($objHotelAmenities->getChildAmenitiesByParentAmenityId((int)$categoryId), 'id_htl_amenity');
+                            if (!array_intersect($roomAmenityIds, $childIds)) {
+                                $allMatch = false;
+                                break;
                             }
                         }
-                        if (!empty($prod_amen)) {
+                        if (!$allMatch) {
                             unset($bookingData['rm_data'][$key]);
                             continue;
                         }

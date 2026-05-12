@@ -1284,8 +1284,12 @@ Quick View Styles
   margin-bottom: 5px;}
 .room_info_content.row {
   line-height: 30px;}
-/* .room_info_content.row .col-sm-4, */
-.room_info_content.row .col-sm-4{
+.room_info_content.row .col-sm-4 {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 5px;}
+.room_info_content.row .col-sm-4 .amenity-name {
   white-space: nowrap;
   overflow: hidden;}
 .room_feature_group {

@@ -23,6 +23,7 @@
 <div class="panel">
 	<div class="panel-heading">
 		<i class="icon-list"></i> {l s='Manage Amenities' mod='hotelreservationsystem'}
+		<div id="htl_featured_loader" style="display:inline-block;margin-left:10px;vertical-align:middle;"></div>
 	</div>
 	<div class="row">
 		{if $amenities_tree}
@@ -138,6 +139,7 @@
 	{addJsDefL name=confirm_delete_msg}{l s='Are you sure you want to delete this? This action cannot be undone.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=error_delete_msg}{l s='An error occurred while deleting. Please try again.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=error_featured_msg}{l s='An error occurred while updating. Please try again.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+	{addJsDefL name=success_featured_msg}{l s='Amenity is featured successfully.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 {/strip}
 
 <script type="text/javascript">
@@ -190,8 +192,13 @@
 		});
 	});
 
+	var featuredAjaxPending = false;
 	$(document).on('click', '.htl-toggle-featured', function (e) {
 		e.preventDefault();
+		if (featuredAjaxPending) { return; }
+		featuredAjaxPending = true;
+		$('#htl_featured_loader').html('<img src="{$smarty.const._PS_ADMIN_IMG_}ajax-loader.gif" alt="" />');
+		$('.htl-toggle-featured').addClass('disabled').css('pointer-events', 'none');
 		var $btn = $(this);
 		$.ajax({
 			url: delete_url,
@@ -204,14 +211,24 @@
 			},
 			success: function (res) {
 				var r = $.parseJSON(res);
+				$('#htl_featured_loader').html('');
+				featuredAjaxPending = false;
+				$('.htl-toggle-featured').removeClass('disabled').css('pointer-events', '');
 				if (r.status) {
 					var featured = r.is_featured;
 					$btn.toggleClass('action-enabled', featured).toggleClass('action-disabled', !featured);
 					$btn.find('.icon-check').toggleClass('hidden', !featured);
 					$btn.find('.icon-remove').toggleClass('hidden', featured);
+					showSuccessMessage(success_featured_msg);
 				} else {
-					alert(r.msg || error_featured_msg);
+					showErrorMessage(r.msg || error_featured_msg);
 				}
+			},
+			error: function () {
+				$('#htl_featured_loader').html('');
+				featuredAjaxPending = false;
+				$('.htl-toggle-featured').removeClass('disabled').css('pointer-events', '');
+				showErrorMessage(error_featured_msg);
 			}
 		});
 	});
