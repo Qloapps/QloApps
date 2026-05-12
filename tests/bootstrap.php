@@ -21,7 +21,6 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-define('_PS_IN_TEST_', true);
 define('_PS_ROOT_DIR_', dirname(__DIR__));
 
 // Load all QloApps path constants (_PS_CLASS_DIR_, _PS_CONFIG_DIR_, etc.)
