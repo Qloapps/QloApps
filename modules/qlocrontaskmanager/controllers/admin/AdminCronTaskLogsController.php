@@ -59,7 +59,6 @@ class AdminCronTaskLogsController extends ModuleAdminController
                 $this->toolbar_title = $this->l('Cron Task Logs');
             }
         } else {
-            unset($this->context->cookie->{$cookieKey});
             $this->context->cookie->{'submitFilter' . $this->table} = 0;
             $this->toolbar_title = $this->l('All Cron Task Logs');
         }

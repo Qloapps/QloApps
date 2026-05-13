@@ -21,6 +21,6 @@
 *}
 
 <a href="{$resetLink|escape:'html'}" title="{l s='Reset Module Crons' mod='qlocrontaskmanager'}"
-    onclick="return confirm('{l s='Reset this task to the module default values?' mod='qlocrontaskmanager' js=1}');">
+    onclick="return confirm('{l s='Are you sure? This will revert the task settings to the module\'s original values.' mod='qlocrontaskmanager' js=1}');">
     <i class="icon-refresh"></i> {l s='Reset' mod='qlocrontaskmanager'}
 </a>

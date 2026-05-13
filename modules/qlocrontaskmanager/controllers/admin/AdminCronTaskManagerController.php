@@ -150,11 +150,11 @@ class AdminCronTaskManagerController extends ModuleAdminController
     public function initToolbar()
     {
         parent::initToolbar();
-
+        unset($this->toolbar_btn['new']);
         $this->page_header_toolbar_btn['view_all_logs'] = array(
             'href' => $this->context->link->getAdminLink('AdminCronTaskLogs'),
             'desc' => $this->l('View All Logs'),
-            'icon' => 'process-icon-list',
+            'icon' => 'icon-history',
         );
     }
 
@@ -201,7 +201,7 @@ class AdminCronTaskManagerController extends ModuleAdminController
                     'type' => 'text',
                     'label' => $this->l('Module Name'),
                     'name' => 'module_display_name',
-                    'readonly' => true,
+                    'disabled' => true,
                     'col' => 5,
                     'desc' => $this->l('The module that owns this task.'),
                 ),
@@ -209,21 +209,11 @@ class AdminCronTaskManagerController extends ModuleAdminController
                     'type' => 'text',
                     'label' => $this->l('Task Name'),
                     'name' => 'task_name',
-                    'readonly' => true,
+                    'disabled' => true,
                     'required' => true,
                     'col' => 5,
                     'hint' => $this->l('e.g. send_daily_report'),
-                    'desc' => $this->l('A unique snake_case identifier for this task within the module. Used to detect duplicate registrations.'),
-                ),
-                array(
-                    'type' => 'text',
-                    'label' => $this->l('Callback Method'),
-                    'name' => 'callback',
-                    'required' => true,
-                    'readonly' => true,
-                    'col' => 5,
-                    'hint' => $this->l('e.g. runDailyReport'),
-                    'desc' => $this->l('The public method name on the module class that will be called when this task fires. Must exist on the module at runtime.'),
+                    'desc' => $this->l('A unique identifier for this task within the module.'),
                 ),
                 array(
                     'type' => 'text',
@@ -232,7 +222,7 @@ class AdminCronTaskManagerController extends ModuleAdminController
                     'required' => true,
                     'col' => 7,
                     'hint' => $this->l('e.g. Sends the daily booking summary report'),
-                    'desc' => $this->l('A short human-readable description of what this task does. Shown in the task list.'),
+                    'desc' => $this->l('A short human-readable description of what this task does.'),
                 ),
                 array(
                     'type' => 'text',
@@ -254,7 +244,7 @@ class AdminCronTaskManagerController extends ModuleAdminController
                     'label' => $this->l('Active'),
                     'name' => 'active',
                     'required' => false,
-                    'desc' => $this->l('Disabled tasks are skipped by the cron dispatcher even if their schedule is due.'),
+                    'desc' => $this->l('Disabled tasks are skipped.'),
                     'values' => array(
                         array('id' => 'active_on', 'value' => 1, 'label' => $this->l('Enabled')),
                         array('id' => 'active_off', 'value' => 0, 'label' => $this->l('Disabled')),
