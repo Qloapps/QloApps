@@ -7755,6 +7755,18 @@ class AdminOrdersControllerCore extends AdminController
                             $objOrder->total_paid_tax_excl = Tools::ps_round($objOrder->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
                             $result &= $objOrder->update();
+                            if ($result) {
+                                $this->addOrderLog(
+                                    sprintf(
+                                        $this->l('[%s] Room service %s updated (qty: %s, unit price: %s)'),
+                                        $objOrder->reference,
+                                        $objServiceProductOrderDetail->name,
+                                        $objServiceProductOrderDetail->quantity,
+                                        $objServiceProductOrderDetail->unit_price_tax_excl
+                                    ),
+                                    $objOrder
+                                );
+                            }
                         }
                     }
 
@@ -7989,6 +8001,16 @@ class AdminOrdersControllerCore extends AdminController
                             $objServiceProductOrderDetail->name = $service['name'];
                             $objServiceProductOrderDetail->quantity = $objServiceProductCartDetail->quantity;
                             $objServiceProductOrderDetail->save();
+                                $this->addOrderLog(
+                                    sprintf(
+                                        $this->l('[%s] Service %s added to room %s'),
+                                        $order->reference,
+                                        $service['name'],
+                                        $objHotelBookingDetail->room_num
+                                    ),
+                                    $order
+                                );
+                            
 
                             // update totals amount of order
                             $order->total_products = Tools::ps_round((float)($order->total_products + $totalPriceChangeTaxExcl), _PS_PRICE_COMPUTE_PRECISION_);
@@ -8309,6 +8331,15 @@ class AdminOrdersControllerCore extends AdminController
                                                         $objHotelBookingDetail->id,
                                                         true
                                                     );
+                                                    $this->addOrderLog(
+                                                        sprintf(
+                                                            $this->l('[%s] New service %s added to room %s'),
+                                                            $objOrder->reference,
+                                                            $name,
+                                                            $objHotelBookingDetail->room_num
+                                                        ),
+                                                        $objOrder
+                                                    );
                                                 } else {
                                                     $response['hasError'] = true;
                                                     $response['errors'][] = Tools::displayError('Some error occurred while updating the order');
@@ -8455,6 +8486,15 @@ class AdminOrdersControllerCore extends AdminController
                     $res &= $order->update();
                 }
                 if ($res) {
+                    $this->addOrderLog(
+                        sprintf(
+                            $this->l('[%s] Service %s removed from room %s'),
+                            $order->reference,
+                            $objServiceProductOrderDetail->name,
+                            $objHotelBookingDetail->room_num
+                        ),
+                        $order
+                    );
                     $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
                         $objOrderDetail->id_order,
                         $objHotelBookingDetail->id_product,
