@@ -89,9 +89,6 @@ class PDFCore
                     $this->filename = $template->getBulkFilename();
                 }
             }
-            if (method_exists($template, 'requestMinimalMargins') && $template->requestMinimalMargins()) {
-                $this->pdf_renderer->setMinimalMargins(true);
-            }
 
             $template->assignHookData($object);
 

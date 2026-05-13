@@ -56,11 +56,6 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
         return '';
     }
 
-    public function requestMinimalMargins()
-    {
-        return !(bool)Configuration::get('QLO_GUEST_REG_ENABLE_HEADER');
-    }
-
     /**
      * Returns the template's HTML content
      *
@@ -69,58 +64,23 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
     public function getContent()
     {
         $idLang = (int)$this->order->id_lang;
-        $idHotel = (int)HotelBookingDetail::getIdHotelByIdOrder($this->order->id);
+        $hotelBookingDetail = new HotelBookingDetail((int)$this->id_hotel_booking_detail);
+        $idHotel = Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->id_hotel : 0;
 
-        $objHotelBookingDetail = new HotelBookingDetail();
-        $hotelBookingDetails = $objHotelBookingDetail->getBookingDataByOrderId($this->order->id);
-        if ($this->id_hotel_booking_detail) {
-            $hotelBookingDetails = array_filter($hotelBookingDetails, function ($detail) {
-                return $detail['id'] == $this->id_hotel_booking_detail;
-            });
-        }
-
-        // Hotel info from HotelBranchInformation (authoritative)
-        $hotelName = '';
-        $hotelCheckInTime = '';
-        $hotelCheckOutTime = '';
-        $hotelPolicies = '';
-        $hotelCity = '';
+        $objHotelBranchInformation = null;
         $hotelCountry = '';
 
         if ($idHotel) {
             $objHotelBranchInformation = new HotelBranchInformation($idHotel, $idLang);
             if (Validate::isLoadedObject($objHotelBranchInformation)) {
-                $hotelName = $objHotelBranchInformation->hotel_name;
-                $hotelCity = (string)$objHotelBranchInformation->city;
-                $policies = $objHotelBranchInformation->policies;
-                $hotelPolicies = is_array($policies) ? '' : (string)$policies;
-
-                $checkIn = $objHotelBranchInformation->check_in;
-                $hotelCheckInTime = ($checkIn && $checkIn != '00:00:00') ? date('h:i a', strtotime($checkIn)) : '';
-
-                $checkOut = $objHotelBranchInformation->check_out;
-                $hotelCheckOutTime = ($checkOut && $checkOut != '00:00:00') ? date('h:i a', strtotime($checkOut)) : '';
-
                 if ($objHotelBranchInformation->id_country) {
                     $objCountry = new Country((int)$objHotelBranchInformation->id_country, $idLang);
                     if (Validate::isLoadedObject($objCountry)) {
                         $hotelCountry = (string)$objCountry->name;
                     }
                 }
-            }
-        }
-
-        // Fallback to booking detail row for name/city/country if branch info unavailable
-        if ((!$hotelName || !$hotelCity || !$hotelCountry) && !empty($hotelBookingDetails)) {
-            $firstDetail = reset($hotelBookingDetails);
-            if (!$hotelName) {
-                $hotelName = $firstDetail['hotel_name'];
-            }
-            if (!$hotelCity) {
-                $hotelCity = $firstDetail['city'];
-            }
-            if (!$hotelCountry) {
-                $hotelCountry = $firstDetail['country'];
+            } else {
+                $objHotelBranchInformation = null;
             }
         }
 
@@ -136,68 +96,33 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
             $propertyLogoPath = (string)$this->getLogo();
         }
 
-        // Stay data: dates, rooms, guests, rate
-        $arrivalDate = '';
-        $departureDate = '';
-        $roomNumbers = array();
-        $roomTypes = array();
-        $adults = 0;
-        $children = 0;
         $ratePerNight = '';
         $arrivalDateTime = '';
         $departureDateTime = '';
 
-        if (!empty($hotelBookingDetails)) {
-            $currency = new Currency((int)$this->order->id_currency);
-            $totalRate = 0;
-            $totalRateCount = 0;
-            foreach ($hotelBookingDetails as $detail) {
-                if (!$arrivalDate || strtotime($detail['date_from']) < strtotime($arrivalDate)) {
-                    $arrivalDate = $detail['date_from'];
-                }
-                if (!$departureDate || strtotime($detail['date_to']) > strtotime($departureDate)) {
-                    $departureDate = $detail['date_to'];
-                }
-                if (!empty($detail['room_num'])) {
-                    $roomNumbers[] = $detail['room_num'];
-                }
-                if (!empty($detail['room_type_name'])) {
-                    $roomTypes[] = $detail['room_type_name'];
-                }
-                $adults += (int)$detail['adults'];
-                $children += (int)$detail['children'];
-                $nights = (int)HotelHelper::getNumberOfDays($detail['date_from'], $detail['date_to']);
-                if ($nights > 0) {
-                    $totalRate += ((float)$detail['total_price_tax_incl'] / $nights);
-                    ++$totalRateCount;
-                }
+        if (Validate::isLoadedObject($hotelBookingDetail)) {
+            $nights = (int)HotelHelper::getNumberOfDays($hotelBookingDetail->date_from, $hotelBookingDetail->date_to);
+            if ($nights > 0) {
+                $currency = new Currency((int)$this->order->id_currency);
+                $ratePerNight = Tools::displayPrice((float)$hotelBookingDetail->total_price_tax_incl / $nights, $currency, false);
             }
-
-            if ($totalRateCount) {
-                $ratePerNight = Tools::displayPrice($totalRate / $totalRateCount, $currency, false);
+            $arrivalDateTime = $hotelBookingDetail->date_from ? Tools::displayDate($hotelBookingDetail->date_from) : '';
+            $departureDateTime = $hotelBookingDetail->date_to ? Tools::displayDate($hotelBookingDetail->date_to) : '';
+            if ($arrivalDateTime && $objHotelBranchInformation && $objHotelBranchInformation->check_in && $objHotelBranchInformation->check_in != '00:00:00') {
+                $arrivalDateTime .= ' '.date('h:i a', strtotime($objHotelBranchInformation->check_in));
             }
-
-            $arrivalDateTime = $arrivalDate ? Tools::displayDate($arrivalDate) : '';
-            $departureDateTime = $departureDate ? Tools::displayDate($departureDate) : '';
-            if ($arrivalDateTime && $hotelCheckInTime) {
-                $arrivalDateTime .= ' '.$hotelCheckInTime;
-            }
-            if ($departureDateTime && $hotelCheckOutTime) {
-                $departureDateTime .= ' '.$hotelCheckOutTime;
+            if ($departureDateTime && $objHotelBranchInformation && $objHotelBranchInformation->check_out && $objHotelBranchInformation->check_out != '00:00:00') {
+                $departureDateTime .= ' '.date('h:i a', strtotime($objHotelBranchInformation->check_out));
             }
         }
 
         // Additional guests rows based on max_guests of the room type
         $additionalGuestsRows = 0;
-        if (!empty($hotelBookingDetails)) {
-            $idProducts = array_unique(array_filter(array_map('intval', array_column($hotelBookingDetails, 'id_product'))));
-            if (!empty($idProducts)) {
-                $objHotelRoomType = new HotelRoomType();
-                $roomTypeDetails = $objHotelRoomType->getRoomTypeDetailByRoomTypeIds(implode(',', $idProducts), false);
-                if (!empty($roomTypeDetails) && isset($roomTypeDetails[0]['max_guests'])) {
-                    $maxGuests = (int)$roomTypeDetails[0]['max_guests'];
-                    $additionalGuestsRows = ($maxGuests > 1) ? ($maxGuests - 1) : 0;
-                }
+        if (Validate::isLoadedObject($hotelBookingDetail) && $hotelBookingDetail->id_product) {
+            $roomTypeDetails = (new HotelRoomType())->getRoomTypeDetailByRoomTypeIds((string)(int)$hotelBookingDetail->id_product, false);
+            if (!empty($roomTypeDetails) && isset($roomTypeDetails[0]['max_guests'])) {
+                $maxGuests = (int)$roomTypeDetails[0]['max_guests'];
+                $additionalGuestsRows = ($maxGuests > 1) ? ($maxGuests - 1) : 0;
             }
         }
 
@@ -212,30 +137,21 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
 
         $this->smarty->assign(array(
             'style_tab'                      => $this->smarty->fetch($this->getTemplate('invoice.style-tab')),
-            // Hotel / property header
-            'hotel_name'                     => $hotelName,
+            'hotel'                          => $objHotelBranchInformation,
             'property_logo_path'             => $propertyLogoPath,
-            'property_city_country'          => implode(', ', array_filter(array($hotelCity, $hotelCountry))),
-            // Booking stay info
+            'property_city_country'          => implode(', ', array_filter(array($objHotelBranchInformation ? (string)$objHotelBranchInformation->city : '', $hotelCountry))),
             'booking_reference'              => $this->order->getUniqReference(),
             'arrival_date_time'              => $arrivalDateTime,
             'departure_date_time'            => $departureDateTime,
-            'room_type'                      => implode(', ', array_unique($roomTypes)),
-            'room_number'                    => implode(', ', array_unique($roomNumbers)),
-            'adults'                         => $adults,
-            'children'                       => $children,
+            'room_type'                      => Validate::isLoadedObject($hotelBookingDetail) ? $hotelBookingDetail->room_type_name : '',
+            'room_number'                    => Validate::isLoadedObject($hotelBookingDetail) ? $hotelBookingDetail->room_num : '',
+            'adults'                         => Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->adults : 0,
+            'children'                       => Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->children : 0,
             'rate_per_night'                 => $ratePerNight,
-            // Property regulations section
-            'hotel_check_in_time'            => $hotelCheckInTime,
-            'hotel_check_out_time'           => $hotelCheckOutTime,
-            'hotel_policies'                 => $hotelPolicies,
-            // Additional guests table
             'additional_guests_rows'         => $additionalGuestsRows,
-            // Dynamic field options
             'purpose_of_visit_options'       => GuestVisitPurpose::getGuestVisitPurposes(1, $idLang),
-            'identity_proof_options'         => GuestRegistrationIdProof::getRegistrationIdProofs(1, $idLang),
+            'identity_proof_options'         => IdProof::getRegistrationIdProofs(1, $idLang),
             'payment_method_options'         => GuestRegistrationPaymentMethod::getRegistrationPaymentMethods(1, $idLang),
-            // Optional section visibility flags
             'show_property_logo'             => in_array(1, $selectedSections),
             'show_additional_guests'         => in_array(2, $selectedSections),
             'show_billing_corporate_details' => in_array(3, $selectedSections),

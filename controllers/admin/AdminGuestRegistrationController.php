@@ -71,7 +71,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
         $this->initPageHeaderToolbar();
 
         $this->content = $this->renderOptions();
-        $this->content .= $this->renderRegForm();
+        $this->content .= $this->renderRegistrationForm();
 
         $this->context->smarty->assign(array(
             'content' => $this->content,
@@ -97,112 +97,74 @@ class AdminGuestRegistrationControllerCore extends AdminController
     {
         if (Tools::isSubmit('submitBulkGuestRegistrationValues')) {
             $languages = Language::getLanguages(false);
-            $regFields = $this->getRegFieldTypes();
             $idLangDefault = (int)Configuration::get('PS_LANG_DEFAULT');
-            $validatedRows = array();
 
-            // Validate all field types first, collect errors before saving anything
-            foreach ($regFields as $fieldKey => $fieldConfig) {
-                $postedRows = Tools::getValue($fieldConfig['table'], array());
-                if (!is_array($postedRows)) {
-                    $postedRows = array();
-                }
+            $guestRegPurposeData = $this->validateRegistrationFieldRows(
+                (array)Tools::getValue('guest_reg_purpose', array()),
+                $languages,
+                $idLangDefault,
+                $this->l('Purpose of visit')
+            );
+            $idProofData = $this->validateRegistrationFieldRows(
+                (array)Tools::getValue('guest_reg_id_proof', array()),
+                $languages,
+                $idLangDefault,
+                $this->l('Identity proof')
+            );
+            $guestRegPaymentMethodData = $this->validateRegistrationFieldRows(
+                (array)Tools::getValue('guest_reg_payment_method', array()),
+                $languages,
+                $idLangDefault,
+                $this->l('Payment method')
+            );
 
-                $rows = array();
-                foreach ($postedRows as $rowKey => $row) {
-                    if (!is_array($row)) {
-                        continue;
-                    }
-
-                    // Skip blank new rows (no ID and no name in any language)
-                    if (empty($row['id'])) {
-                        $hasName = false;
-                        if (isset($row['name']) && is_array($row['name'])) {
-                            foreach ($languages as $language) {
-                                if (!empty($row['name'][(int)$language['id_lang']])) {
-                                    $hasName = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (!$hasName) {
-                            continue;
-                        }
-                    }
-
-                    $validRow = array(
-                        'id'     => !empty($row['id']) ? (int)$row['id'] : 0,
-                        'active' => !empty($row['active']) ? 1 : 0,
-                        'name'   => array(),
-                    );
-
-                    $defaultName = isset($row['name'][$idLangDefault]) ? trim($row['name'][$idLangDefault]) : '';
-
-                    foreach ($languages as $language) {
-                        $idLang = (int)$language['id_lang'];
-                        $name = isset($row['name'][$idLang]) ? trim($row['name'][$idLang]) : '';
-
-                        if ($name === '' && $defaultName !== '') {
-                            $name = $defaultName;
-                        }
-
-                        if ($name === '') {
-                            $this->errors[] = sprintf(
-                                $this->l('%s: name is required for %s (or for the default language).'),
-                                $fieldConfig['title'],
-                                $language['name']
-                            );
-                        } elseif (!Validate::isCatalogName($name)) {
-                            $this->errors[] = sprintf(
-                                $this->l('%s: name is invalid for %s.'),
-                                $fieldConfig['title'],
-                                $language['name']
-                            );
-                        }
-
-                        $validRow['name'][$idLang] = $name;
-                    }
-
-                    $rows[$rowKey] = $validRow;
-                }
-
-                $validatedRows[$fieldKey] = $rows;
-            }
-
-            // Save only when validation passes for all types
             if (!count($this->errors)) {
-                foreach ($regFields as $fieldKey => $fieldConfig) {
-                    $className = $fieldConfig['class'];
-                    $idMethod = $fieldConfig['ids_fn'];
-                    $existingIds = $className::$idMethod();
-                    $savedIds = array();
-                    $saveFailed = false;
-
-                    foreach ($validatedRows[$fieldKey] as $row) {
-                        $object = $row['id'] ? new $className((int)$row['id']) : new $className();
-                        $object->active = (int)$row['active'];
-                        $object->name = $row['name'];
-
-                        if (!$object->save()) {
-                            $this->errors[] = sprintf(
-                                $this->l('An error occurred while saving %s.'),
-                                Tools::strtolower($fieldConfig['title'])
-                            );
-                            $saveFailed = true;
-                            continue;
-                        }
-
-                        $savedIds[] = (int)$object->id;
+                $savedPurposeIds = array();
+                foreach ($guestRegPurposeData as $row) {
+                    $objGuestVisitPurpose = $row['id'] ? new GuestVisitPurpose((int)$row['id']) : new GuestVisitPurpose();
+                    $objGuestVisitPurpose->active = $row['active'];
+                    $objGuestVisitPurpose->name = $row['name'];
+                    if ($objGuestVisitPurpose->save()) {
+                        $savedPurposeIds[] = (int)$objGuestVisitPurpose->id;
+                    } else {
+                        $this->errors[] = $this->l('An error occurred while saving purpose of visit.');
                     }
+                }
+                foreach (array_diff(GuestVisitPurpose::getGuestVisitPurposeIds(), $savedPurposeIds) as $id) {
+                    $objGuestVisitPurpose = new GuestVisitPurpose((int)$id);
+                    $objGuestVisitPurpose->delete();
+                }
 
-                    if (!$saveFailed) {
-                        foreach (array_diff($existingIds, $savedIds) as $idToDelete) {
-                            $object = new $className((int)$idToDelete);
-                            if (Validate::isLoadedObject($object)) {
-                                $object->delete();
-                            }
-                        }
+                $savedIdProofIds = array();
+                foreach ($idProofData as $row) {
+                    $objIdProof = $row['id'] ? new IdProof((int)$row['id']) : new IdProof();
+                    $objIdProof->active = $row['active'];
+                    $objIdProof->name = $row['name'];
+                    if ($objIdProof->save()) {
+                        $savedIdProofIds[] = (int)$objIdProof->id;
+                    } else {
+                        $this->errors[] = $this->l('An error occurred while saving identity proof.');
                     }
+                }
+                foreach (array_diff(IdProof::getRegistrationIdProofIds(), $savedIdProofIds) as $id) {
+                    $objIdProof = new IdProof((int)$id);
+                    $objIdProof->delete();
+                }
+
+                $savedPaymentMethodIds = array();
+                foreach ($guestRegPaymentMethodData as $row) {
+                    $objGuestRegistrationPaymentMethod = $row['id'] ? new GuestRegistrationPaymentMethod((int)$row['id']) : new GuestRegistrationPaymentMethod();
+                    $objGuestRegistrationPaymentMethod->active = $row['active'];
+                    $objGuestRegistrationPaymentMethod->name = $row['name'];
+                    if ($objGuestRegistrationPaymentMethod->save()) {
+                        $savedPaymentMethodIds[] = (int)$objGuestRegistrationPaymentMethod->id;
+                    } else {
+                        $this->errors[] = $this->l('An error occurred while saving payment method.');
+                    }
+                }
+                foreach (array_diff(GuestRegistrationPaymentMethod::getRegistrationPaymentMethodIds(), $savedPaymentMethodIds) as $id) {
+                    $objGuestRegistrationPaymentMethod = new GuestRegistrationPaymentMethod((int)$id);
+                    $objGuestRegistrationPaymentMethod->delete();
                 }
             }
 
@@ -243,11 +205,6 @@ class AdminGuestRegistrationControllerCore extends AdminController
         return $html;
     }
 
-    /**
-     * Called automatically by AdminController::processUpdateOptions() via
-     * 'updateOption' + Tools::toCamelCase('QLO_GUEST_REG_OPTIONAL_SECTIONS').
-     * Validates and stores the selected optional section IDs.
-     */
     protected function updateOptionQloGuestRegOptionalSections($value)
     {
         if (!is_array($value)) {
@@ -267,106 +224,98 @@ class AdminGuestRegistrationControllerCore extends AdminController
         Configuration::updateValue(self::CONF_OPTIONAL_SECTIONS, Tools::jsonEncode(array_values(array_unique($selected))));
     }
 
-    protected function renderRegForm()
+    protected function renderRegistrationForm(): string
     {
         $languages = Language::getLanguages(false);
-        $regFields = $this->getRegFieldTypes();
 
         $this->context->smarty->assign(array(
             'languages'                     => $languages,
             'default_form_language'         => (int)Configuration::get('PS_LANG_DEFAULT'),
             'dynamic_form_action'           => self::$currentIndex.'&token='.$this->token,
-            'guest_reg_purpose_rows'        => $this->getRegFieldRows($regFields['purpose'], $languages),
-            'guest_reg_id_proof_rows'       => $this->getRegFieldRows($regFields['id_proof'], $languages),
-            'guest_reg_payment_method_rows' => $this->getRegFieldRows($regFields['payment_method'], $languages),
+            'guest_reg_purpose_rows'        => GuestVisitPurpose::getGuestVisitPurposeRows(),
+            'guest_reg_id_proof_rows'       => IdProof::getRegistrationIdProofRows(),
+            'guest_reg_payment_method_rows' => GuestRegistrationPaymentMethod::getRegistrationPaymentMethodRows(),
         ));
 
         return $this->createTemplate('dynamic_tables.tpl')->fetch();
     }
 
     /**
-     * Returns display rows for one guest registration field type.
-     * On validation error repopulates from posted data; otherwise fetches from the database.
-     * Called 3× from renderRegForm(), one per field type.
+     * Validates posted rows for one guest registration field type.
+     * Populates $this->errors on failure. Returns array of validated rows.
+     *
+     * @param array  $postedRows
+     * @param array  $languages
+     * @param int    $idLangDefault
+     * @param string $title
+     * @return array
      */
-    protected function getRegFieldRows(array $fieldConfig, array $languages): array
+    protected function validateRegistrationFieldRows(array $postedRows, array $languages, int $idLangDefault, string $title): array
     {
-        if (Tools::isSubmit('submitBulkGuestRegistrationValues') && count($this->errors)) {
-            $postedRows = Tools::getValue($fieldConfig['table'], array());
-            $rows = array();
+        $rows = array();
 
-            if (!is_array($postedRows)) {
-                return $rows;
+        foreach ($postedRows as $row) {
+            if (!is_array($row)) {
+                continue;
             }
 
-            foreach ($postedRows as $rowKey => $row) {
-                if (!is_array($row)) {
+            // Skip blank new rows (no ID and no name in any language)
+            if (empty($row['id'])) {
+                $hasName = false;
+                if (isset($row['name']) && is_array($row['name'])) {
+                    foreach ($languages as $language) {
+                        if (!empty($row['name'][(int)$language['id_lang']])) {
+                            $hasName = true;
+                            break;
+                        }
+                    }
+                }
+                if (!$hasName) {
                     continue;
                 }
-
-                $rowKey = (string)$rowKey;
-                $formKey = preg_match('/^[a-zA-Z0-9_-]+$/', $rowKey) ? $rowKey : 'new_'.time();
-
-                $displayRow = array(
-                    'id'       => !empty($row['id']) ? (int)$row['id'] : 0,
-                    'form_key' => $formKey,
-                    'active'   => !empty($row['active']) ? 1 : 0,
-                    'date_add' => '',
-                    'name'     => array(),
-                );
-
-                foreach ($languages as $language) {
-                    $idLang = (int)$language['id_lang'];
-                    $displayRow['name'][$idLang] = isset($row['name'][$idLang]) ? (string)$row['name'][$idLang] : '';
-                }
-
-                $rows[] = $displayRow;
             }
 
-            return $rows;
+            $validRow = array(
+                'id'     => !empty($row['id']) ? (int)$row['id'] : 0,
+                'active' => !empty($row['active']) ? 1 : 0,
+                'name'   => array(),
+            );
+
+            $defaultName = isset($row['name'][$idLangDefault]) ? trim($row['name'][$idLangDefault]) : '';
+
+            foreach ($languages as $language) {
+                $idLang = (int)$language['id_lang'];
+                $name = isset($row['name'][$idLang]) ? trim($row['name'][$idLang]) : '';
+
+                if ($name === '' && $defaultName !== '') {
+                    $name = $defaultName;
+                }
+
+                if ($name === '') {
+                    $this->errors[] = sprintf(
+                        $this->l('%s: name is required for %s (or for the default language).'),
+                        $title,
+                        $language['name']
+                    );
+                } elseif (!Validate::isCatalogName($name)) {
+                    $this->errors[] = sprintf(
+                        $this->l('%s: name is invalid for %s.'),
+                        $title,
+                        $language['name']
+                    );
+                }
+
+                $validRow['name'][$idLang] = $name;
+            }
+
+            $rows[] = $validRow;
         }
 
-        $className = $fieldConfig['class'];
-        $rowsMethod = $fieldConfig['rows_fn'];
-
-        return $className::$rowsMethod();
+        return $rows;
     }
 
     /**
-     * @return array  Config for each guest registration field type managed on this page
-     */
-    protected function getRegFieldTypes(): array
-    {
-        return array(
-            'purpose' => array(
-                'class'      => 'GuestVisitPurpose',
-                'table'      => 'guest_reg_purpose',
-                'identifier' => 'id_guest_reg_purpose',
-                'title'      => $this->l('Purpose of visit'),
-                'rows_fn'    => 'getGuestVisitPurposeRows',
-                'ids_fn'     => 'getGuestVisitPurposeIds',
-            ),
-            'id_proof' => array(
-                'class'      => 'GuestRegistrationIdProof',
-                'table'      => 'guest_reg_id_proof',
-                'identifier' => 'id_guest_reg_id_proof',
-                'title'      => $this->l('Identity proof'),
-                'rows_fn'    => 'getRegistrationIdProofRows',
-                'ids_fn'     => 'getRegistrationIdProofIds',
-            ),
-            'payment_method' => array(
-                'class'      => 'GuestRegistrationPaymentMethod',
-                'table'      => 'guest_reg_payment_method',
-                'identifier' => 'id_guest_reg_payment_method',
-                'title'      => $this->l('Payment method'),
-                'rows_fn'    => 'getRegistrationPaymentMethodRows',
-                'ids_fn'     => 'getRegistrationPaymentMethodIds',
-            ),
-        );
-    }
-
-    /**
-     * @return array  Section ID → label for the optional-sections checkbox group
+     * @return array  Section ID => label for the optional-sections checkbox group
      */
     protected function getOptionalSectionChoices(): array
     {

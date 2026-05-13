@@ -41,7 +41,7 @@
 				{/if}
 				<tr>
 					<td width="100%" class="center" style="font-size: 12pt; font-weight: bold;">
-						{$hotel_name|escape:'html':'UTF-8'}
+						{if $hotel}{$hotel->hotel_name|escape:'html':'UTF-8'}{/if}
 					</td>
 				</tr>
 				<tr>
@@ -134,7 +134,7 @@
 								</tr>
 								<tr>
 									<td width="25%" class="bold">{l s='Purpose of Visit:' pdf='true'}</td>
-									<td width="75%" colspan="3" class="white">{if $purpose_of_visit_options|@count}{foreach from=$purpose_of_visit_options item=item name=purposeOfVisit}{if !$smarty.foreach.purposeOfVisit.first} {/if}<span style="font-family: freeserif; white-space: nowrap;">&#9633;&nbsp;{$item.name|escape:'html':'UTF-8'|replace:' ':'&nbsp;'}</span>{/foreach}{else}________________________{/if}</td>
+									<td width="75%" colspan="3" class="white">{if $purpose_of_visit_options|@count}{foreach from=$purpose_of_visit_options item=item name=purposeOfVisit}{if !$smarty.foreach.purposeOfVisit.first}&nbsp;&nbsp;&nbsp;{/if}<span style="font-family: freeserif; white-space: nowrap;">&#9633;&nbsp;{$item.name|escape:'html':'UTF-8'|replace:' ':'&nbsp;'}</span>{/foreach}{else}________________________{/if}</td>
 								</tr>
 							</table>
 						</td>
@@ -227,7 +227,7 @@
 								<tr>
 									<td width="25%" class="bold">{l s='Identity Proof:' pdf='true'}</td>
 									{if $identity_proof_options|@count}
-										<td width="75%" class="white">{foreach from=$identity_proof_options item=item name=identityProof}{if !$smarty.foreach.identityProof.first} {/if}<span style="font-family: freeserif; white-space: nowrap;">&#9633;&nbsp;{$item.name|escape:'html':'UTF-8'|replace:' ':'&nbsp;'}</span>{/foreach}</td>
+										<td width="75%" class="white">{foreach from=$identity_proof_options item=item name=identityProof}{if !$smarty.foreach.identityProof.first}&nbsp;&nbsp;&nbsp;{/if}<span style="font-family: freeserif; white-space: nowrap;">&#9633;&nbsp;{$item.name|escape:'html':'UTF-8'|replace:' ':'&nbsp;'}</span>{/foreach}</td>
 									{else}
 										<td width="75%" class="white">________________________________</td>
 									{/if}
@@ -371,7 +371,7 @@
 								<table width="100%" cellpadding="4" cellspacing="0">
 									<tr>
 										<td width="25%" class="bold">{l s='Payment Method:' pdf='true'}</td>
-										<td width="75%" class="white">{if $payment_method_options|@count}{foreach from=$payment_method_options item=item name=paymentMethod}{if !$smarty.foreach.paymentMethod.first} {/if}<span style="font-family: freeserif; white-space: nowrap;">&#9633;&nbsp;{$item.name|escape:'html':'UTF-8'|replace:' ':'&nbsp;'}</span>{/foreach}{else}________________________________{/if}</td>
+										<td width="75%" class="white">{if $payment_method_options|@count}{foreach from=$payment_method_options item=item name=paymentMethod}{if !$smarty.foreach.paymentMethod.first}&nbsp;&nbsp;&nbsp;{/if}<span style="font-family: freeserif; white-space: nowrap;">&#9633;&nbsp;{$item.name|escape:'html':'UTF-8'|replace:' ':'&nbsp;'}</span>{/foreach}{else}________________________________{/if}</td>
 									</tr>
 									<tr>
 										<td width="25%" class="bold">{l s='Credit Card Number:' pdf='true'}</td>
@@ -403,17 +403,17 @@
 						<tr>
 							<td class="white">
 								<strong> {l s='Check-in Time:' pdf='true'}</strong>
-								{if $hotel_check_in_time}{$hotel_check_in_time|escape:'html':'UTF-8'}{else}__________{/if}
+								{if $hotel && $hotel->check_in && $hotel->check_in != '00:00:00'}{$hotel->check_in|escape:'html':'UTF-8'}{else}__________{/if}
 								&nbsp;&nbsp;&nbsp;
 								<strong>{l s='Check-out Time:' pdf='true'}</strong>
-								{if $hotel_check_out_time}{$hotel_check_out_time|escape:'html':'UTF-8'}{else}__________{/if}
+								{if $hotel && $hotel->check_out && $hotel->check_out != '00:00:00'}{$hotel->check_out|escape:'html':'UTF-8'}{else}__________{/if}
 							</td>
 						</tr>
 						<tr>
 							<td class="white">
 								<strong> {l s='Hotel Policies:' pdf='true'}</strong>
-								{if $hotel_policies}
-									{$hotel_policies}
+								{if $hotel && $hotel->policies && !($hotel->policies|@is_array)}
+									{$hotel->policies}
 								{else}
 									______________________________<br />
 									______________________________<br />

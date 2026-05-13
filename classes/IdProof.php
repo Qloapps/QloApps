@@ -21,7 +21,7 @@
  * @license https://opensource.org/license/osl-3.0-php Open Software License version 3.0
  */
 
-class GuestRegistrationIdProofCore extends ObjectModel
+class IdProofCore extends ObjectModel
 {
     public $active = 1;
     public $name;
