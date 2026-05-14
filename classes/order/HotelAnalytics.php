@@ -144,14 +144,16 @@ class HotelAnalyticsCore extends ObjectModel
      */
     public static function getServiceRevenue(array $params)
     {
-        $dateFrom = pSQL($params['date_from']);
-        $dateTo   = isset($params['date_to']) ? pSQL($params['date_to']) : $dateFrom;
-        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : null;
-        $datewise = isset($params['datewise_breakdown']) ? (bool) $params['datewise_breakdown'] : false;
+        $dateFrom  = pSQL($params['date_from']);
+        $dateTo    = isset($params['date_to'])    ? pSQL($params['date_to'])       : $dateFrom;
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']            : null;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product']    : 0;
+        $datewise  = isset($params['datewise_breakdown']) ? (bool) $params['datewise_breakdown'] : false;
 
-        $hotelFilter = !is_null($idHotel)
+        $hotelFilter   = !is_null($idHotel)
             ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
             : '';
+        $productFilter = $idProduct ? ' AND hbd.`id_product` = '.$idProduct : '';
 
         if ($datewise) {
             $discreteDates = self::buildDiscreteDates($dateFrom, $dateTo);
@@ -176,7 +178,7 @@ class HotelAnalyticsCore extends ObjectModel
                     AND hbd.`is_refunded` = 0
                     AND hbd.`date_from` < "'.pSQL($d['date_to']).' 00:00:00"
                     AND hbd.`date_to`   > "'.pSQL($d['date_from']).' 00:00:00"'
-                    .$hotelFilter;
+                    .$productFilter.$hotelFilter;
                 if ($v = Db::getInstance()->getValue($sqlServices)) {
                     $total += (float) $v;
                 }
@@ -198,7 +200,7 @@ class HotelAnalyticsCore extends ObjectModel
                     AND hbd.`is_refunded` = 0
                     AND hbd.`date_from` < "'.pSQL($d['date_to']).' 00:00:00"
                     AND hbd.`date_to`   > "'.pSQL($d['date_from']).' 00:00:00"'
-                    .$hotelFilter;
+                    .$productFilter.$hotelFilter;
                 if ($v = Db::getInstance()->getValue($sqlDemands)) {
                     $total += (float) $v;
                 }
@@ -230,7 +232,7 @@ class HotelAnalyticsCore extends ObjectModel
             AND hbd.`is_refunded` = 0
             AND hbd.`date_from` < "'.pSQL($dateTo).' 23:59:59"
             AND hbd.`date_to`   > "'.pSQL($dateFrom).' 00:00:00"'
-            .$hotelFilter;
+            .$productFilter.$hotelFilter;
         if ($v = Db::getInstance()->getValue($sqlServices)) {
             $total += (float) $v;
         }
@@ -254,7 +256,7 @@ class HotelAnalyticsCore extends ObjectModel
             AND hbd.`is_refunded` = 0
             AND hbd.`date_from` < "'.pSQL($dateTo).' 23:59:59"
             AND hbd.`date_to`   > "'.pSQL($dateFrom).' 00:00:00"'
-            .$hotelFilter;
+            .$productFilter.$hotelFilter;
         if ($v = Db::getInstance()->getValue($sqlDemands)) {
             $total += (float) $v;
         }
@@ -585,12 +587,11 @@ class HotelAnalyticsCore extends ObjectModel
      */
     public static function getAverageDailyRate(array $params)
     {
-        $datewise = isset($params['datewise_breakdown']) && $params['datewise_breakdown'];
-
-        $occupiedRooms  = self::getOccupancyStats(array_merge($params, array('datewise_breakdown' => $datewise)));
-        $roomRevenue    = self::getRoomRevenue(array_merge($params, array('datewise_breakdown' => $datewise)));
+        $datewise    = isset($params['datewise_breakdown']) && $params['datewise_breakdown'];
+        $roomRevenue = self::getRoomRevenue(array_merge($params, array('datewise_breakdown' => $datewise)));
 
         if ($datewise) {
+            $occupiedRooms = self::getOccupancyStats(array_merge($params, array('datewise_breakdown' => true)));
             $result = array();
             foreach ($occupiedRooms as $ts => $rooms) {
                 $result[$ts] = $rooms ? $roomRevenue[$ts] / $rooms : 0.0;
@@ -598,7 +599,11 @@ class HotelAnalyticsCore extends ObjectModel
             return $result;
         }
 
-        return $occupiedRooms ? ($roomRevenue / $occupiedRooms) : 0.0;
+        // Denominator must be total room-nights (sum of daily occupied counts),
+        // not booking count. A 3-night booking contributes 3 room-nights to ADR.
+        $dailyOccupied  = self::getOccupancyStats(array_merge($params, array('datewise_breakdown' => true)));
+        $totalRoomNights = array_sum($dailyOccupied);
+        return $totalRoomNights ? ((float) $roomRevenue / $totalRoomNights) : 0.0;
     }
 
     /**
@@ -711,9 +716,7 @@ class HotelAnalyticsCore extends ObjectModel
         $dateTo   = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
         $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
 
-        $hotelFilter = $idHotel !== false
-            ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
-            : '';
+        $hotelFilter = HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
 
         $total = (int) Db::getInstance()->getValue(
             'SELECT COUNT(hbd.`id`)
@@ -750,9 +753,7 @@ class HotelAnalyticsCore extends ObjectModel
         $dateTo   = date('Y-m-d H:i:s', strtotime(isset($params['date_to']) ? $params['date_to'] : $params['date_from']));
         $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
 
-        $hotelFilter = $idHotel !== false
-            ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
-            : '';
+        $hotelFilter = HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
 
         $checkedOut = (int) HotelBookingDetail::STATUS_CHECKED_OUT;
 
@@ -788,13 +789,25 @@ class HotelAnalyticsCore extends ObjectModel
      */
     public static function getAverageLengthOfStay(array $params)
     {
-        $discreteParams = array_merge($params, array('datewise_breakdown' => true));
-        $nightsByDate   = self::getOccupancyStats($discreteParams);
-        $totalNights    = array_sum($nightsByDate);
+        $dateFrom  = pSQL($params['date_from']);
+        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']         : null;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
 
-        $totalBookings  = self::getOccupancyStats(array_merge($params, array('datewise_breakdown' => false)));
+        $hotelFilter   = !is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '';
+        $productFilter = $idProduct ? ' AND hbd.`id_product` = '.$idProduct : '';
 
-        return $totalBookings ? ($totalNights / $totalBookings) : 0.0;
+        // Replicates the legacy AdminStats ALOS formula exactly:
+        // "average stay length of bookings created (date_add) in the period"
+        $value = Db::getInstance()->getValue(
+            'SELECT IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) / COUNT(hbd.`id`), 0)
+             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+             WHERE hbd.`is_refunded` = 0
+             AND LEFT(hbd.`date_add`, 10) BETWEEN "'.pSQL($dateFrom).'" AND "'.pSQL($dateTo).'"'
+            .$productFilter.$hotelFilter
+        );
+
+        return (float) $value;
     }
 
     // =========================================================================
