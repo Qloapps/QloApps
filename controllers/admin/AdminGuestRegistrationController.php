@@ -31,9 +31,9 @@ class AdminGuestRegistrationControllerCore extends AdminController
     {
         $this->bootstrap = true;
         $this->context = Context::getContext();
-        $this->table = 'guest_reg_purpose';
+        $this->table = 'guest_visit_purpose';
         $this->className = 'GuestVisitPurpose';
-        $this->identifier = 'id_guest_reg_purpose';
+        $this->identifier = 'id_guest_visit_purpose';
         $this->lang = true;
 
         parent::__construct();
@@ -100,13 +100,13 @@ class AdminGuestRegistrationControllerCore extends AdminController
             $idLangDefault = (int)Configuration::get('PS_LANG_DEFAULT');
 
             $guestRegPurposeData = $this->validateRegistrationFieldRows(
-                (array)Tools::getValue('guest_reg_purpose', array()),
+                (array)Tools::getValue('guest_visit_purpose', array()),
                 $languages,
                 $idLangDefault,
                 $this->l('Purpose of visit')
             );
             $idProofData = $this->validateRegistrationFieldRows(
-                (array)Tools::getValue('guest_reg_id_proof', array()),
+                (array)Tools::getValue('reg_id_proof', array()),
                 $languages,
                 $idLangDefault,
                 $this->l('Identity proof')
@@ -232,8 +232,8 @@ class AdminGuestRegistrationControllerCore extends AdminController
             'languages'                     => $languages,
             'default_form_language'         => (int)Configuration::get('PS_LANG_DEFAULT'),
             'dynamic_form_action'           => self::$currentIndex.'&token='.$this->token,
-            'guest_reg_purpose_rows'        => GuestVisitPurpose::getGuestVisitPurposeRows(),
-            'guest_reg_id_proof_rows'       => IdProof::getRegistrationIdProofRows(),
+            'guest_visit_purpose_rows'        => GuestVisitPurpose::getGuestVisitPurposeRows(),
+            'reg_id_proof_rows'       => IdProof::getRegistrationIdProofRows(),
             'guest_reg_payment_method_rows' => GuestRegistrationPaymentMethod::getRegistrationPaymentMethodRows(),
         ));
 

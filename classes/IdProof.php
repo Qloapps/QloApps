@@ -29,8 +29,8 @@ class IdProofCore extends ObjectModel
     public $date_upd;
 
     public static $definition = array(
-        'table' => 'guest_reg_id_proof',
-        'primary' => 'id_guest_reg_id_proof',
+        'table' => 'reg_id_proof',
+        'primary' => 'id_reg_id_proof',
         'multilang' => true,
         'fields' => array(
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
@@ -61,10 +61,10 @@ class IdProofCore extends ObjectModel
         $activeCondition = ($active !== null) ? ' AND a.`active` = '.(int)$active : '';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT a.`id_guest_reg_id_proof`, al.`name`
-            FROM `'._DB_PREFIX_.'guest_reg_id_proof` a
-            INNER JOIN `'._DB_PREFIX_.'guest_reg_id_proof_lang` al
-                ON (a.`id_guest_reg_id_proof` = al.`id_guest_reg_id_proof`
+            'SELECT a.`id_reg_id_proof`, al.`name`
+            FROM `'._DB_PREFIX_.'reg_id_proof` a
+            INNER JOIN `'._DB_PREFIX_.'reg_id_proof_lang` al
+                ON (a.`id_reg_id_proof` = al.`id_reg_id_proof`
                 AND al.`id_lang` = '.(int)$idLang.')
             WHERE 1'.$activeCondition.'
             ORDER BY al.`name` ASC'
@@ -80,16 +80,16 @@ class IdProofCore extends ObjectModel
         $rows = array();
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT a.`id_guest_reg_id_proof`, a.`active`, a.`date_add`, al.`id_lang`, al.`name`
-            FROM `'._DB_PREFIX_.'guest_reg_id_proof` a
-            LEFT JOIN `'._DB_PREFIX_.'guest_reg_id_proof_lang` al
-                ON (a.`id_guest_reg_id_proof` = al.`id_guest_reg_id_proof`)
-            ORDER BY a.`id_guest_reg_id_proof` ASC'
+            'SELECT a.`id_reg_id_proof`, a.`active`, a.`date_add`, al.`id_lang`, al.`name`
+            FROM `'._DB_PREFIX_.'reg_id_proof` a
+            LEFT JOIN `'._DB_PREFIX_.'reg_id_proof_lang` al
+                ON (a.`id_reg_id_proof` = al.`id_reg_id_proof`)
+            ORDER BY a.`id_reg_id_proof` ASC'
         );
 
         if ($result) {
             foreach ($result as $row) {
-                $id = (int)$row['id_guest_reg_id_proof'];
+                $id = (int)$row['id_reg_id_proof'];
                 if (!isset($rows[$id])) {
                     $rows[$id] = array(
                         'id'       => $id,
@@ -117,9 +117,9 @@ class IdProofCore extends ObjectModel
     public static function getRegistrationIdProofIds(): array
     {
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT `id_guest_reg_id_proof` FROM `'._DB_PREFIX_.'guest_reg_id_proof`'
+            'SELECT `id_reg_id_proof` FROM `'._DB_PREFIX_.'reg_id_proof`'
         );
 
-        return $result ? array_map('intval', array_column($result, 'id_guest_reg_id_proof')) : array();
+        return $result ? array_map('intval', array_column($result, 'id_reg_id_proof')) : array();
     }
 }

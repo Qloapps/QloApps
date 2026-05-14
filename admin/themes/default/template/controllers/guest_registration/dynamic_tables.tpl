@@ -23,8 +23,8 @@
         </div>
         <div class="panel">
             <h3><i class="icon-plane"></i> {l s='Purpose of visit'}</h3>
-            {assign var=entity_name value='guest_reg_purpose'}
-            {assign var=entity_rows value=$guest_reg_purpose_rows}
+            {assign var=entity_name value='guest_visit_purpose'}
+            {assign var=entity_rows value=$guest_visit_purpose_rows}
             {if isset($smarty.post.$entity_name) && is_array($smarty.post.$entity_name)}
                 {assign var=entity_rows value=$smarty.post.$entity_name}
             {/if}
@@ -127,8 +127,8 @@
 
         <div class="panel">
             <h3><i class="icon-file-text"></i> {l s='Identity proof'}</h3>
-            {assign var=entity_name value='guest_reg_id_proof'}
-            {assign var=entity_rows value=$guest_reg_id_proof_rows}
+            {assign var=entity_name value='reg_id_proof'}
+            {assign var=entity_rows value=$reg_id_proof_rows}
             {if isset($smarty.post.$entity_name) && is_array($smarty.post.$entity_name)}
                 {assign var=entity_rows value=$smarty.post.$entity_name}
             {/if}

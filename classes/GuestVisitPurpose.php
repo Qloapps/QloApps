@@ -29,8 +29,8 @@ class GuestVisitPurposeCore extends ObjectModel
     public $date_upd;
 
     public static $definition = array(
-        'table' => 'guest_reg_purpose',
-        'primary' => 'id_guest_reg_purpose',
+        'table' => 'guest_visit_purpose',
+        'primary' => 'id_guest_visit_purpose',
         'multilang' => true,
         'fields' => array(
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
@@ -61,10 +61,10 @@ class GuestVisitPurposeCore extends ObjectModel
         $activeCondition = ($active !== null) ? ' AND a.`active` = '.(int)$active : '';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT a.`id_guest_reg_purpose`, al.`name`
-            FROM `'._DB_PREFIX_.'guest_reg_purpose` a
-            INNER JOIN `'._DB_PREFIX_.'guest_reg_purpose_lang` al
-                ON (a.`id_guest_reg_purpose` = al.`id_guest_reg_purpose`
+            'SELECT a.`id_guest_visit_purpose`, al.`name`
+            FROM `'._DB_PREFIX_.'guest_visit_purpose` a
+            INNER JOIN `'._DB_PREFIX_.'guest_visit_purpose_lang` al
+                ON (a.`id_guest_visit_purpose` = al.`id_guest_visit_purpose`
                 AND al.`id_lang` = '.(int)$idLang.')
             WHERE 1'.$activeCondition.'
             ORDER BY al.`name` ASC'
@@ -80,16 +80,16 @@ class GuestVisitPurposeCore extends ObjectModel
         $rows = array();
 
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT a.`id_guest_reg_purpose`, a.`active`, a.`date_add`, al.`id_lang`, al.`name`
-            FROM `'._DB_PREFIX_.'guest_reg_purpose` a
-            LEFT JOIN `'._DB_PREFIX_.'guest_reg_purpose_lang` al
-                ON (a.`id_guest_reg_purpose` = al.`id_guest_reg_purpose`)
-            ORDER BY a.`id_guest_reg_purpose` ASC'
+            'SELECT a.`id_guest_visit_purpose`, a.`active`, a.`date_add`, al.`id_lang`, al.`name`
+            FROM `'._DB_PREFIX_.'guest_visit_purpose` a
+            LEFT JOIN `'._DB_PREFIX_.'guest_visit_purpose_lang` al
+                ON (a.`id_guest_visit_purpose` = al.`id_guest_visit_purpose`)
+            ORDER BY a.`id_guest_visit_purpose` ASC'
         );
 
         if ($result) {
             foreach ($result as $row) {
-                $id = (int)$row['id_guest_reg_purpose'];
+                $id = (int)$row['id_guest_visit_purpose'];
                 if (!isset($rows[$id])) {
                     $rows[$id] = array(
                         'id'       => $id,
@@ -117,9 +117,9 @@ class GuestVisitPurposeCore extends ObjectModel
     public static function getGuestVisitPurposeIds(): array
     {
         $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT `id_guest_reg_purpose` FROM `'._DB_PREFIX_.'guest_reg_purpose`'
+            'SELECT `id_guest_visit_purpose` FROM `'._DB_PREFIX_.'guest_visit_purpose`'
         );
 
-        return $result ? array_map('intval', array_column($result, 'id_guest_reg_purpose')) : array();
+        return $result ? array_map('intval', array_column($result, 'id_guest_visit_purpose')) : array();
     }
 }

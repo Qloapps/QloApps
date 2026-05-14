@@ -2777,35 +2777,35 @@ CREATE TABLE IF NOT EXISTS `PREFIX_maintenance_access` (
   PRIMARY KEY (`id_maintenance_access`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `PREFIX_guest_reg_purpose` (
-  `id_guest_reg_purpose` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `PREFIX_guest_visit_purpose` (
+  `id_guest_visit_purpose` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `active` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
   `date_add` DATETIME NOT NULL,
   `date_upd` DATETIME NOT NULL,
-  PRIMARY KEY (`id_guest_reg_purpose`)
+  PRIMARY KEY (`id_guest_visit_purpose`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `PREFIX_guest_reg_purpose_lang` (
-  `id_guest_reg_purpose` INT(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `PREFIX_guest_visit_purpose_lang` (
+  `id_guest_visit_purpose` INT(10) UNSIGNED NOT NULL,
   `id_lang` INT(10) UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id_guest_reg_purpose`, `id_lang`),
+  PRIMARY KEY (`id_guest_visit_purpose`, `id_lang`),
   KEY `id_lang` (`id_lang`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `PREFIX_guest_reg_id_proof` (
-  `id_guest_reg_id_proof` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `PREFIX_reg_id_proof` (
+  `id_reg_id_proof` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `active` TINYINT(1) UNSIGNED NOT NULL DEFAULT 1,
   `date_add` DATETIME NOT NULL,
   `date_upd` DATETIME NOT NULL,
-  PRIMARY KEY (`id_guest_reg_id_proof`)
+  PRIMARY KEY (`id_reg_id_proof`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `PREFIX_guest_reg_id_proof_lang` (
-  `id_guest_reg_id_proof` INT(10) UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS `PREFIX_reg_id_proof_lang` (
+  `id_reg_id_proof` INT(10) UNSIGNED NOT NULL,
   `id_lang` INT(10) UNSIGNED NOT NULL,
   `name` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id_guest_reg_id_proof`, `id_lang`),
+  PRIMARY KEY (`id_reg_id_proof`, `id_lang`),
   KEY `id_lang` (`id_lang`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
