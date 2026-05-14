@@ -690,8 +690,8 @@ class QloCleaner extends Module
                 array('htl_room_type_global_demand_lang', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
                 array('htl_branch_info_lang', 'id_lang', 'lang', 'id_lang'),
                 array('htl_branch_info_lang', 'id', 'htl_branch_info', 'id'),
-                array('htl_amenities_lang', 'id_lang', 'lang', 'id_lang'),
-                array('htl_amenities_lang', 'id', 'htl_amenities', 'id'),
+                array('htl_amenity_lang', 'id_lang', 'lang', 'id_lang'),
+                array('htl_amenity_lang', 'id_htl_amenity', 'htl_amenity', 'id_htl_amenity'),
                 array('htl_room_type_demand', 'id_global_demand', 'htl_room_type_global_demand', 'id_global_demand'),
                 array('htl_room_type_demand', 'id_product', 'product', 'id_product'),
                 array('htl_room_type_demand_price', 'id_product', 'product', 'id_product'),
@@ -704,7 +704,7 @@ class QloCleaner extends Module
                 array('htl_booking_demands', 'id_htl_booking', 'htl_booking_detail', 'id_htl_booking'),
                 array('htl_cart_booking_data', 'id_order', 'orders', 'id_order'),
                 array('htl_cart_booking_data', 'id_customer', 'customer', 'id_customer'),
-                array('htl_branch_amenities', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_branch_amenity', 'id_hotel', 'htl_branch_info', 'id'),
                 array('htl_image', 'id_hotel', 'htl_branch_info', 'id'),
                 array('htl_branch_info', 'id_category', 'category', 'id_category'),
                 array('htl_room_information', 'id_product', 'product', 'id_product'),
@@ -727,8 +727,8 @@ class QloCleaner extends Module
                 array('htl_room_type_service_product', 'id_element', 'product', 'id_product'),
                 array('htl_room_type_service_product_price', 'id_product', 'product', 'id_product'),
                 array('htl_room_type_service_product_price', 'id_element', 'product', 'id_product'),
-                array('htl_room_type_amenities', 'id_product', 'product', 'id_product'),
-                array('htl_room_type_amenities', 'amenity_id', 'htl_amenities', 'id'),
+                array('htl_room_type_amenity', 'id_product', 'product', 'id_product'),
+                array('htl_room_type_amenity', 'amenity_id', 'htl_amenity', 'id_htl_amenity'),
 
             )
         );
@@ -812,7 +812,7 @@ class QloCleaner extends Module
                 'htl_branch_info',
                 'htl_branch_info_lang',
                 'htl_image',
-                'htl_branch_amenities',
+                'htl_branch_amenity',
                 'htl_advance_payment',
                 'htl_branch_refund_rules',
                 'htl_order_restrict_date',
@@ -830,7 +830,7 @@ class QloCleaner extends Module
                 'htl_room_type_global_demand',
                 'htl_room_type_service_product',
                 'htl_room_type_service_product_price',
-                'htl_room_type_amenities',
+                'htl_room_type_amenity',
             )
         );
     }
