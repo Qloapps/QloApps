@@ -1,22 +1,27 @@
 <?php
+
 /**
- * HotelAnalyticsCore — centralized analytics gateway for QloApps.
+ * NOTICE OF LICENSE
  *
- * Replaces the fragmented static methods in AdminStatsController with
- * consolidated, domain-specific functions. All functions accept a single
- * $params array so callers can be configured without changing function
- * signatures. The mathematical logic is a 1:1 replication of the canonical
- * AdminStatsController calculations.
+ * This source file is subject to the Open Software License version 3.0
+ * that is bundled with this package in the file LICENSE.md
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/license/osl-3.0-php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to support@qloapps.com so we can send you a copy immediately.
  *
- * Base tables:
- *   - Room metrics  → htl_booking_detail
- *   - Service/demand metrics → service_product_order_detail + htl_booking_demands
+ * DISCLAIMER
  *
- * JOINs are added only when a specific $params key strictly requires them
- * (e.g., p.active=1 check, conversion_rate from orders).
+ * Do not edit or add to this file if you wish to upgrade this module to a newer
+ * versions in the future. If you wish to customize this module for your needs
+ * please refer to https://store.webkul.com/customisation-guidelines for more information.
  *
- * @see controllers/admin/AdminStatsController.php (canonical source)
+ * @author Webkul IN
+ * @copyright Since 2010 Webkul
+ * @license https://opensource.org/license/osl-3.0-php Open Software License version 3.0
  */
+
 class HotelAnalyticsCore extends ObjectModel
 {
     public static $definition = array(
