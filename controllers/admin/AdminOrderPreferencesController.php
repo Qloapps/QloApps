@@ -96,7 +96,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                     'PS_MIN_BOOKING_OFFSET' => array(
                         'title' => $this->l('Minimum booking offset'),
-                        'hint' => $this->l('The minimum booking offset is the minimum number of days before the check-in date that a guest must book a room. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book rooms for dates from and after 3 days, i.e, 5th of March.'),
+                        'hint' => $this->l('The minimum booking offset is the minimum number of days before the check-in date that a guest must book a stay. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book stays for dates from and after 3 days, i.e, 5th of March.'),
                         'desc' => $this->l('Set to 0 to disable this feature.'),
                         'type' => 'text',
                         'class' => 'fixed-width-xl',
@@ -187,9 +187,9 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'cast' => 'intval'
                     ),
                     'PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN' => array(
-                        'title' => $this->l('Show room price breakdown'),
-                        'hint' => $this->l('Show price breakdown for rooms with auto added services on checkout page.'),
-                        'desc' => $this->l('Displays a price breakdown for rooms that have auto-added services during checkout.'),
+                        'title' => $this->l('Show stay price breakdown'),
+                        'hint' => $this->l('Show price breakdown for stays with auto added services on checkout page.'),
+                        'desc' => $this->l('Displays a price breakdown for stays that have auto-added services during checkout.'),
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
@@ -221,8 +221,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                     'PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING' => array(
                         'title' => $this->l('Allow to add all services in a booking'),
-                        'hint' => $this->l('Enable to allow all services created to be added in a booking while adding or editing a booking. Disable to allow only attached services with room type.'),
-                        'desc' => $this->l('If disabled, only attached services with room type will be available to be added to a booking.'),
+                        'hint' => $this->l('Enable to allow all services created to be added in a booking while adding or editing a booking. Disable to allow only attached services with stay type.'),
+                        'desc' => $this->l('If disabled, only attached services with stay type will be available to be added to a booking.'),
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
@@ -311,8 +311,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                     'PS_OVERBOOKING_AUTO_RESOLVE' => array(
                         'title' => $this->l('Resolve overbooking automatically'),
-                        'hint' => $this->l('Enable, if you want to resolve overbooking automatically when rooms are available to be replaced with overbooked rooms.'),
-                        'desc' => $this->l('If enabled, the overbookings in the order will be resolved automatically when rooms are available to be replaced with all overbooked rooms in the order.'),
+                        'hint' => $this->l('Enable, if you want to resolve overbooking automatically when stays are available to be replaced with overbooked stays.'),
+                        'desc' => $this->l('If enabled, the overbookings in the order will be resolved automatically when stays are available to be replaced with all overbooked stays in the order.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'

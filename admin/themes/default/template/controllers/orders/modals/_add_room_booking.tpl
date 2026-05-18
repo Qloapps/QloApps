@@ -24,9 +24,9 @@
     <div id="new_room">
         <input type="hidden" id="add_product_product_id" name="add_product[product_id]" value="0" />
         <div class="form-group">
-            <label class="control-label">{l s='Room Type:'}</label>
+            <label class="control-label">{l s='Stay Type:'}</label>
             <div class="input-group">
-                <input type="text" id="add_product_product_name" class="form-control" value="" placeholder="{l s='Enter the name of the room type'}" />
+                <input type="text" id="add_product_product_name" class="form-control" value="" placeholder="{l s='Enter the name of the stay type'}" />
                 <div class="input-group-addon">
                     <i class="icon-search"></i>
                 </div>
@@ -86,7 +86,7 @@
                                         <input type="hidden" class="max_children" value="">
                                         <input type="hidden" class="max_guests" value="">
                                         <div class="occupancy_info_block row" occ_block_index="0">
-                                            <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1'}</label></div>
+                                            <div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Stay - 1'}</label></div>
                                             <div class="col-sm-12">
                                                 <div class="row">
                                                     <div class="form-group col-xs-6 occupancy_count_block">
@@ -113,7 +113,7 @@
                                         </div>
                                     </div>
                                     <div class="add_occupancy_block">
-                                        <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room'}</span></a>
+                                        <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Stay'}</span></a>
                                     </div>
                                 </div>
                             </div>
@@ -122,7 +122,7 @@
                 {else}
                     <div class="form-group row">
                         <div class="col-sm-6">
-                            <label class="control-label">{l s='No. of rooms'}</label>
+                            <label class="control-label">{l s='No. of stays'}</label>
                             <input type="number" class="form-control" name="add_product[product_quantity]" id="add_product_product_quantity" value="1" disabled="disabled" min="1"/>
                         </div>
                     </div>

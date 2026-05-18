@@ -19,13 +19,6 @@
 * @copyright Since 2010 Webkul
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
-{if isset($data_v.room_type_selling_type_name) && $data_v.room_type_selling_type_name}
-    {assign var=attribute_type value=$data_v.room_type_selling_type_name}
-    {assign var=attribute_types value=$data_v.room_type_selling_type_name|cat:'s'}
-{else}
-    {assign var=attribute_type value={l s='Room'}}
-    {assign var=attribute_types value={l s='Rooms'}}
-{/if}
 <div class="product-detail" data-id-product="{$data_v.id_product}" data-date-diff="{$rm_k}">
     <div class="row">
         {block name='order_room_detail_room_image'}
@@ -48,18 +41,18 @@
                                 {if $rm_v['count_cancelled'] > 0}
                                     <span class="badge badge-danger">
                                         {if $rm_v['count_cancelled'] > 1}
-                                            {$rm_v['count_cancelled']} {l s='%s Cancelled' sprintf=$attribute_types|escape:'html':'UTF-8'}
+                                            {$rm_v['count_cancelled']} {l s='%s Cancelled' sprintf=$data_v.multiple_room_type_selling_object|escape:'html':'UTF-8'}
                                         {else}
-                                            {$rm_v['count_cancelled']} {l s='%s Cancelled' sprintf=$attribute_type|escape:'html':'UTF-8'}
+                                            {$rm_v['count_cancelled']} {l s='%s Cancelled' sprintf=$data_v.multiple_room_type_selling_object|escape:'html':'UTF-8'}
                                         {/if}
                                     </span>
                                 {/if}
                                 {if $rm_v['count_refunded'] > 0}
                                 <span class="badge badge-danger">
                                     {if $rm_v['count_refunded'] > 1}
-                                        {$rm_v['count_refunded']} {l s='%s Refunded' sprintf=$attribute_types|escape:'html':'UTF-8'}
+                                        {$rm_v['count_refunded']} {l s='%s Refunded' sprintf=$data_v.multiple_room_type_selling_object|escape:'html':'UTF-8'}
                                     {else}
-                                        {$rm_v['count_refunded']} {l s='%s Refunded' sprintf=$attribute_type|escape:'html':'UTF-8'}
+                                        {$rm_v['count_refunded']} {l s='%s Refunded' sprintf=$data_v.room_type_selling_object|escape:'html':'UTF-8'}
                                     {/if}
                                 </span>
                                 {/if}
@@ -88,7 +81,7 @@
                                 <div class="row">
                                     <div class="col-xs-12 col-md-6">
                                         <div class="row">
-                                            <dt class="col-xs-5">{if $rm_v.num_rm > 1}{$attribute_types|escape:'html':'UTF-8'}{else}{$attribute_type|escape:'html':'UTF-8'}{/if}</dt>
+                                            <dt class="col-xs-5">{if $rm_v.num_rm > 1}{$data_v.multiple_room_type_selling_object|escape:'html':'UTF-8'}{else}{$data_v.room_type_selling_object|escape:'html':'UTF-8'}{/if}</dt>
                                             <dd class="col-xs-7">{$rm_v.num_rm|string_format:'%02d'}</dd>
                                         </div>
                                     </div>
@@ -138,7 +131,7 @@
                                                         <div class="price-info-tooltip-cont">
                                                             <div class="list-row">
                                                                 <div>
-                                                                    <p>{l s='%s cost:' sprintf=$attribute_types|escape:'html':'UTF-8'}</p>
+                                                                    <p>{l s='%s cost:' sprintf=$data_v.multiple_room_type_selling_object|escape:'html':'UTF-8'}</p>
                                                                 </div>
                                                                 <div class="text-right">
                                                                     <p>

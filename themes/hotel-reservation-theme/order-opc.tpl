@@ -62,7 +62,7 @@
 															<div class="card-header" id="shopping-cart-summary-head">
 																{block name='order_opc_rooms_summary_heading'}
 																	<h5 class="accordion-header" data-toggle="collapse" data-target="#collapse-shopping-cart" aria-expanded="true" aria-controls="collapse-shopping-cart">
-																		<span>{l s='Rooms & Price Summary'}</span>
+																		<span>{l s='Stays & Price Summary'}</span>
 																		<i class="icon-angle-left pull-right accordion-left-arrow {if $step->step_is_current}hidden{/if}"></i>
 																	</h5>
 																{/block}
@@ -340,7 +340,7 @@
 								{include file="$tpl_dir./errors.tpl"}
 							{/block}
 
-							<p class="alert alert-warning">{l s='You have not added any rooms or products to your cart yet.'}</p>
+							<p class="alert alert-warning">{l s='You have not added any stays or products to your cart yet.'}</p>
 						{/if}
 						{block name='order_opc_js_vars'}
 							{strip}

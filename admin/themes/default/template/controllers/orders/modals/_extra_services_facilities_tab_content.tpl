@@ -72,7 +72,7 @@
 			</table>
 		</div>
 
-		{* Room demands available for the current editing room*}
+		{* Stay demands available for the current editing room*}
 		<div class="col-sm-12 room_demands_container">
 			<div class="room_demand_detail">
 				{if isset($roomTypeDemands) && $roomTypeDemands}
@@ -135,7 +135,7 @@
                         <button type="button" id="save_room_demands" class="btn btn-primary"><i class="icon icon-save"></i> &nbsp;{l s="Update Facilities"}</button>
                     </div>
 				{else}
-                    <i class="icon-warning"></i> {l s='No facilities available for this room.'}
+                    <i class="icon-warning"></i> {l s='No facilities available for this stay.'}
 				{/if}
 			</div>
 		</div>

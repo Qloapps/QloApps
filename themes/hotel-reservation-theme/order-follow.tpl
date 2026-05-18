@@ -48,7 +48,7 @@
 						<tr>
 							<th>{l s='Order'}</th>
 							{if isset($hasRoomRefunds) && $hasRoomRefunds}
-                                <th>{l s='Total rooms'}</th>
+                                <th>{l s='Total stays'}</th>
                             {/if}
                             {if isset($hasProductRefunds) && $hasProductRefunds}
                                 <th>{l s='Total products'}</th>

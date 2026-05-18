@@ -375,7 +375,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
 
             $booking_data['rm_data'][$roomKey]['occupancy_required_for_booking'] =
-               (int) (Product::getRoomTypeBookingMethod($roomData['id_product']) == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
+               (int) Product::isOccupancyBookingMethod($roomData['id_product']);
         }
         
         $this->context->smarty->assign(array(
@@ -576,13 +576,13 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         if ($bookingData = $objBookingDetail->getBookingData($bookingParams)) {
             if ($bookingData['stats']['num_avail']) {
                 $eventColor = '#7EC77B';
-                $title = sprintf($this->l('Available Rooms : %s'), $bookingData['stats']['num_avail']);
+                $title = sprintf($this->l('Available Stays : %s'), $bookingData['stats']['num_avail']);
             } elseif ($bookingData['stats']['num_part_avai']) {
                 $eventColor = '#FFC224';
-                $title = sprintf($this->l('Partially Available Rooms : %s'), $bookingData['stats']['num_part_avai']);
+                $title = sprintf($this->l('Partially Available Stays : %s'), $bookingData['stats']['num_part_avai']);
             } else {
                 $eventColor = '#FF3838';
-                $title = sprintf($this->l('Available Rooms : %s'), $bookingData['stats']['num_avail']);
+                $title = sprintf($this->l('Available Stays : %s'), $bookingData['stats']['num_avail']);
             }
             $bookingData['date_from_format'] = Tools::displayDate($searchDateFrom);
             $bookingData['date_to_format'] = Tools::displayDate($searchDateTo);
@@ -688,7 +688,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $date_from = Tools::getValue('date_from');
         $date_to = Tools::getValue('date_to');
         $occupancy = Tools::getValue('occupancy');
-        if (Product::getRoomTypeBookingMethod($id_product) == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+        if (Product::isOccupancyBookingMethod($id_product)) {
             if (!Validate::isOccupancy($occupancy)) {
                 $occupancy = array();
             }

@@ -132,7 +132,10 @@ class OrderDetailControllerCore extends FrontController
                             $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                             $cartHotelData[$type_key]['cover_img'] = $type_value['cover_img'];
                             if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($type_value['product_id'])) {
-                                $cartHotelData[$type_key]['room_type_selling_type_name'] = $roomTypeInfo['room_type_selling_type_name'];
+                                $cartHotelData[$type_key]['room_type_selling_object'] = $roomTypeInfo['room_type_selling_object'];
+                                $cartHotelData[$type_key]['multiple_room_type_selling_object'] = $roomTypeInfo['multiple_room_type_selling_object'];
+                                $cart_htl_data[$type_key]['isOccupancyType'] = Product::isOccupancyBookingMethod($type_value['product_id']);;
+
                             }
 
 
@@ -450,7 +453,7 @@ class OrderDetailControllerCore extends FrontController
                 if ($idHotel = $addressTax->id_hotel) {
                     $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                     $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
-                    $propertyName = $objHotelBranchInformation->getHotelPropertyTypeName();
+                    $propertyName = HotelPropertyType::getPropertyType($idHotel);
                     $objHotelBranchRefundRules = new HotelBranchRefundRules();
                     $hotelRefundRules = $objHotelBranchRefundRules->getHotelRefundRules($idHotel, 0, 1);
                     $this->context->smarty->assign(array(
@@ -533,6 +536,8 @@ class OrderDetailControllerCore extends FrontController
             && ($dateFrom = Tools::getValue('date_from'))
             && ($dateTo = Tools::getValue('date_to'))
         ) {
+            
+            $objRoomType = new HotelRoomType();
             $objHotelBookingDemands = new HotelBookingDemands();
             $useTax = 0;
             if (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC) {
@@ -572,8 +577,10 @@ class OrderDetailControllerCore extends FrontController
                 ));
             }
 
+            $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
             $this->context->smarty->assign(array(
                 'objOrder' => new Order($idOrder),
+                'room_type_info' => $roomTypeInfo,
             ));
 
             $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');

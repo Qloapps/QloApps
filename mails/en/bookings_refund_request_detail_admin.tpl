@@ -2,11 +2,11 @@
     <table class="table table-recap room-booking-table">
         <thead>
             <tr>
-                <th colspan="9" class="table-caption">{l s='Rooms Bookings Detail'}</th>
+                <th colspan="9" class="table-caption">{l s='Stays Bookings Detail'}</th>
             </tr>
             <tr>
-                <th>{l s="Room Num"}</th>
-                <th>{l s="Room Type"}</th>
+                <th>{l s="Stay Num"}</th>
+                <th>{l s="Stay Type"}</th>
                 <th>{l s="Hotel"}</th>
                 <th>{l s="Duration"}</th>
             </tr>

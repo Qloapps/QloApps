@@ -255,7 +255,7 @@
 			<p class="checkbox">
 				<label>
 					<input type="checkbox" id="product_restriction" name="product_restriction" value="1" {if $product_rule_groups|@count}checked="checked"{/if} />
-					{l s='Room Type selection'}
+					{l s='Stay Type selection'}
 				</label>
 			</p>
 			<div id="product_restriction_div">
@@ -266,7 +266,7 @@
 					{/foreach}
 				</table>
 				<a href="javascript:addProductRuleGroup();" class="btn btn-default ">
-					<i class="icon-plus-sign"></i> {l s='Room Type selection'}
+					<i class="icon-plus-sign"></i> {l s='Stay Type selection'}
 				</a>
 			</div>
 

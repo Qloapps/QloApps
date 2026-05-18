@@ -2,7 +2,7 @@
     {if isset($list['has_room_bookings']) && $list['has_room_bookings']}
         <tr>
             <td>
-                <strong>{l s="Total Rooms Cost"}</strong>
+                <strong>{l s="Total Stays Cost"}</strong>
             </td>
             <td>
                 {$list['room_price_tax_excl']}

@@ -78,7 +78,7 @@
                     {if isset($obj_hotel_branch_information) && $obj_hotel_branch_information}
                         <div class="card hotel-details">
                             <div class="card-header">
-                                {l s='%s Details' sprintf=$property_name}
+                                {l s='%s Details'  sprintf=[$property_name|default:'Hotel']}
                                 <div class="booking-actions-wrap">
                                     <div class="row">
                                         <div class="col-xs-12 clearfix">
@@ -102,7 +102,7 @@
                                     <div class="description-list">
                                         <dl class="">
                                             <div class="row">
-                                                <dt class="col-xs-6 col-sm-3">{l s='%s Name' sprintf=$property_name}</dt>
+                                                <dt class="col-xs-6 col-sm-3">{l s='%s Name' sprintf=[$property_name|default:'Hotel']}</dt>
                                                 <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
                                                 <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
                                                 <dd class="col-xs-6 col-sm-3">
@@ -176,7 +176,7 @@
                     {if isset($obj_hotel_branch_information)}
                         <div class="card hotel-location visible-xs visible-sm hidden-md hidden-lg">
                             <div class="card-header">
-                                {l s='%s Location' sprintf=$property_name}
+                                {l s='%s Location' sprintf=[$property_name|default:'Hotel']}
                             </div>
                             <div class="card-body">
                                 <p class="card-subtitle">
@@ -191,7 +191,7 @@
                                         {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
                                     </p>
                                 {else}
-                                    <div class="card-text">{l s='%s location not available.' sprintf=$property_name}</div>
+                                    <div class="card-text">{l s='%s location not available.' sprintf=[$property_name|default:'Hotel']}</div>
                                 {/if}
 
                                 {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
@@ -217,7 +217,7 @@
                 {block name='order_detail_refund_requests'}
                     {if (isset($refundReqBookings) && $refundReqBookings) || (isset($refundReqProducts) && $refundReqProducts)}
                         <div class="alert alert-info-light cancel_requests_link_wrapper">
-                            <i class="icon-info-circle"></i> <span>{l s='Your cancellation request for'} {if (isset($refundReqBookings) && $refundReqBookings) && (isset($refundReqProducts) && $refundReqProducts)}{l s='%d room(s) and %d product(s)' sprintf=[count($refundReqBookings), count($refundReqProducts)]}{elseif isset($refundReqBookings) && $refundReqBookings}{l s='%d room(s)' sprintf=[count($refundReqBookings)]}{elseif isset($refundReqProducts) && $refundReqProducts}{l s='%d product(s)' sprintf=[count($refundReqProducts)]}{/if} {l s='is being processed. To check request status' sprintf=[count($refundReqBookings)]} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
+                            <i class="icon-info-circle"></i> <span>{l s='Your cancellation request for'} {if (isset($refundReqBookings) && $refundReqBookings) && (isset($refundReqProducts) && $refundReqProducts)}{l s='%d stay(s) and %d product(s)' sprintf=[count($refundReqBookings), count($refundReqProducts)]}{elseif isset($refundReqBookings) && $refundReqBookings}{l s='%d stay(s)' sprintf=[count($refundReqBookings)]}{elseif isset($refundReqProducts) && $refundReqProducts}{l s='%d product(s)' sprintf=[count($refundReqProducts)]}{/if} {l s='is being processed. To check request status' sprintf=[count($refundReqBookings)]} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
                         </div>
                     {/if}
                 {/block}
@@ -230,7 +230,7 @@
                     {if isset($cart_htl_data) && $cart_htl_data}
                         <div class="card room-details">
                             <div class="card-header">
-                                {l s='Room Details'}
+                                {l s='Stay Details'}
                             </div>
                             <div class="card-body">
                                 {if isset($cart_htl_data) && $cart_htl_data}
@@ -248,7 +248,7 @@
                                         {/block}
                                     </div>
                                 {else}
-                                    <div class="no-rooms card-text">{l s='Room details not available.'}</div>
+                                    <div class="no-stays card-text">{l s='Stay details not available.'}</div>
                                 {/if}
                             </div>
                         </div>
@@ -494,7 +494,7 @@
                                     <ul class="nav nav-tabs">
                                         {if $has_general_hotel_policies}
                                             <li class="active">
-                                                <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='%s Policies' sprintf=$property_name}</a>
+                                                <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='%s Policies' sprintf=[$property_name|default:'Hotel']}</a>
                                             </li>
                                         {/if}
                                         {if $has_refund_hotel_policies}
@@ -577,12 +577,12 @@
                                 {block name='order_detail_add_order_messages_form'}
                                     <form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
                                         <div class="form-group select-room-type">
-                                            <label for="id_product">{l s='Room Type'}{if $service_products_formatted}/{l s='Product'}{/if}</label>
+                                            <label for="id_product">{l s='Stay Type'}{if $service_products_formatted}/{l s='Product'}{/if}</label>
                                             <p class="card-subheader text-muted">
                                                 {if $service_products_formatted}
-                                                    {l s='To add a comment about a room type/product, please select one first.'}
+                                                    {l s='To add a comment about a stay type/product, please select one first.'}
                                                 {else}
-                                                    {l s='To add a comment about a room type, please select one first.'}
+                                                    {l s='To add a comment about a stay type, please select one first.'}
                                                 {/if}
                                             </p>
                                             <select name="id_product" class="form-control">
@@ -675,7 +675,7 @@
                     {if isset($obj_hotel_branch_information)}
                         <div class="card hotel-location hidden-xs hidden-sm visible-md">
                             <div class="card-header">
-                                {l s='%s Location' sprintf=$property_name}
+                                {l s='%s Location' sprintf=[$property_name|default:'Hotel']}
                             </div>
                             <div class="card-body">
                                 <p class="card-subtitle">
@@ -691,7 +691,7 @@
                                         {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
                                     </p>
                                 {else}
-                                    <div class="card-text">{l s='%s location not available.' sprintf=$property_name }</div>
+                                    <div class="card-text">{l s='%s location not available.' sprintf=[$property_name|default:'Hotel'] }</div>
                                 {/if}
 
                                 {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
@@ -956,21 +956,14 @@
                                                     {foreach from=$cart_htl_data key=data_k item=data_v}
                                                         {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
                                                             <div id="room-info-tab-{$data_v.id_product}-{$rm_k}" class="tab-pane {if $flag_is_first_iteration}active{/if}">
-                                                                {if isset($data_v.room_type_selling_type_name) && $data_v.room_type_selling_type_name}
-                                                                    {assign var=attribute_type value=$data_v.room_type_selling_type_name}
-                                                                    {assign var=attribute_types value=$data_v.room_type_selling_type_name|cat:'s'}
-                                                                {else}
-                                                                    {assign var=attribute_type value={l s='Room'}}
-                                                                    {assign var=attribute_types value={l s='Rooms'}}
-                                                                {/if}
                                                                 <div class="refund_element_summary clearfix">
                                                                     <p class="refund_element_name">{$data_v.name}</p>
                                                                     <div class="col-xs-3">
-                                                                        <p>{l s='Total %s' sprintf=$attribute_types|escape:'html':'UTF-8'}</p>
+                                                                        <p>{l s='Total %s' sprintf=$data_v.multiple_room_type_selling_object|escape:'html':'UTF-8'}</p>
                                                                         <strong>{$rm_v.num_rm|string_format:'%02d'}</strong>
                                                                     </div>
                                                                     <div class="col-xs-3">
-                                                                        <p>{l s='Cancelled %s' sprintf=$attribute_types|escape:'html':'UTF-8'}</p>
+                                                                        <p>{l s='Cancelled %s' sprintf=$data_v.multiple_room_type_selling_object|escape:'html':'UTF-8'}</p>
                                                                         <strong>{($rm_v.count_cancelled + $rm_v.count_refunded)|string_format:'%02d'}</strong>
                                                                     </div>
                                                                 </div>
@@ -982,7 +975,7 @@
                                                                                 <div class="checkbox">
                                                                                     <label for="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}">
                                                                                         <input type="checkbox" class="bookings_to_refund" id="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}" name="bookings_to_refund[]" value="{$hotel_booking_detail.id_htl_booking|escape:'html':'UTF-8'}" {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}disabled{/if}/>
-                                                                                        {l s='%s - %s' sprintf=[$attribute_type|escape:'html':'UTF-8', $smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d']}
+                                                                                        {l s='%s - %s' sprintf=[$data_v.room_type_selling_object|escape:'html':'UTF-8', $smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d']}
                                                                                     </label>
 
                                                                                     <span>({$hotel_booking_detail.adults|string_format:'%02d'} {if $hotel_booking_detail.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $hotel_booking_detail.children > 0}{l s=', '}{$hotel_booking_detail.children|string_format:'%02d'} {if $hotel_booking_detail.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
@@ -1023,7 +1016,7 @@
                                                                                 </div>
                                                                             {else}
                                                                                 <div class="extra-services-wrap clearfix">
-                                                                                    <p class="text-muted">{l s='No extra services added for this %s.' sprintf=$attribute_type|escape:'html':'UTF-8'}</p>
+                                                                                    <p class="text-muted">{l s='No extra services added for this %s.' sprintf=$data_v.room_type_selling_object|escape:'html':'UTF-8'}</p>
                                                                                 </div>
                                                                             {/if}
                                                                         </div>
@@ -1064,7 +1057,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="selected-rooms-wrap">
-                                        {l s='Selected: '}<span class="num-selected-rooms">{l s='00'}</span>
+                                        {l s='Selected: '}<span class="num-selected-stays">{l s='00'}</span>
                                     </div>
                                     <div class="actions-wrap">
                                         <button class="btn btn-secondary btn-cancel">
@@ -1085,7 +1078,7 @@
                                     <div class="errors" style="display: none;"></div>
 
                                     <div class="well well-sm">
-                                        <p class="text">{l s='Total cancel request:'} <span class="count-total-rooms">{l s='00'}</span></p>
+                                        <p class="text">{l s='Total cancel request:'} <span class="count-total-stays">{l s='00'}</span></p>
                                     </div>
 
                                     <div class="form-group">
@@ -1140,7 +1133,7 @@
             {addJsDefL name=pending_state_msg}{l s='Pending...' js=1}{/addJsDefL}
             {addJsDefL name=mail_sending_err}{l s='Some error occurred while sending mail to the customer' js=1}{/addJsDefL}
             {addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for booking cancellation.' js=1}{/addJsDefL}
-            {addJsDefL name=no_bookings_selected}{l s='Please select at least one room to proceed for cancellation.' js=1}{/addJsDefL}
+            {addJsDefL name=no_bookings_selected}{l s='Please select at least one stay to proceed for cancellation.' js=1}{/addJsDefL}
             {addJsDefL name=refund_request_success_txt}{l s='Request for booking cancellation is successffully created.' js=1}{/addJsDefL}
             {addJsDefL name=order_message_choose_txt}{l s='-- Choose --' js=1}{/addJsDefL}
             {addJsDefL name=order_message_success_txt}{l s='Order message sent successfully.' js=1}{/addJsDefL}

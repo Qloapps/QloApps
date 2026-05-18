@@ -140,7 +140,7 @@ class AdminPPreferencesControllerCore extends AdminController
                             array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
                         ),
                         'identifier' => 'id',
-                        'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
+                        'desc' => $this->l('This option is only for fully available rooms. For partially available stays, always all possible stays will be displayed.'),
                     ),
                     'PS_FRONT_ROOM_UNIT_SELECTION_TYPE' => array(
                         'title' => $this->l('In front-end, add rooms to cart with'),
@@ -148,8 +148,8 @@ class AdminPPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(
-                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
-                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Stay Occupancy')),
+                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Stays Quantity (No. of stays)'))
                         ),
                         'identifier' => 'id',
                     ),
@@ -172,19 +172,19 @@ class AdminPPreferencesControllerCore extends AdminController
                         'type' => 'select',
                         'list' => array(
                             array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfying required occupancy')),
-                            array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
+                            array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available stay types'))
                         ),
                         'identifier' => 'id',
-                        'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
+                        'desc' => $this->l('This option is only for fully available stays. For partially available stay, always all possible rooms will be displayed.'),
                     ),
                     'PS_BACKOFFICE_ROOM_BOOKING_TYPE' => array(
-                        'title' => $this->l('In back-office, add rooms to cart with'),
-                        'hint' => $this->l('In Room occupancy, while adding rooms in cart customer has to select per room occupancy and in room quantity customer only has to select number of rooms.'),
+                        'title' => $this->l('In back-office, add stays to cart with'),
+                        'hint' => $this->l('In stay occupancy, while adding stay in cart customer has to select per stay occupancy and in room quantity customer only has to select number of rooms.'),
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(
-                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
-                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Stay Occupancy')),
+                            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Stays Quantity (No. of stays)'))
                         ),
                         'identifier' => 'id',
                     ),

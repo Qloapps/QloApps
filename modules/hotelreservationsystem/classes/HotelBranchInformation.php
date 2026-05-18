@@ -579,36 +579,6 @@ class HotelBranchInformation extends ObjectModel
         return Db::getInstance()->getRow($sql);
     }
 
-    public function getHotelPropertyTypeName($id_hotel = null, $idLang = null)
-    {
-        if (!$idLang) {
-            $idLang = Context::getContext()->language->id;
-        }
-
-        if (!$id_hotel) {
-            $id_hotel = (int) $this->id;
-        }
-
-        if (!$id_hotel) {
-            return false;
-        }
-
-        $cache_key = 'HotelBranchInformation::getHotelPropertyTypeName'.(int)$id_hotel;
-        if(!Cache::isStored($cache_key)){
-            $sql = 'SELECT hrtstl.`name`
-                FROM `'._DB_PREFIX_.'htl_branch_info` hbi
-                LEFT JOIN `'._DB_PREFIX_.'htl_room_type_selling_type_lang` hrtstl
-                    ON (hbi.`id_property_type` = hrtstl.`id_htl_room_type_selling_type`
-                        AND hrtstl.`id_lang` = '.(int) $idLang.')
-                WHERE hbi.`id` = '.(int) $id_hotel;
-
-            $res = Db::getInstance()->getValue($sql);
-        }else{
-            $res = Cache::retrieve($cache_key);
-        }
-        return $res;
-    }
-
     /**
      * [getHotelCategoryTree : Select category info by name of the category]
      * @param  [string] $searchData [description]

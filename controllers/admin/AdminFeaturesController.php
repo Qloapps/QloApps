@@ -176,10 +176,10 @@ class AdminFeaturesControllerCore extends AdminController
             $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$img_url."'>";
         }
 
-        $this->toolbar_title = $this->l('Add a new room feature');
+        $this->toolbar_title = $this->l('Add a new stay feature');
         $this->fields_form = array(
             'legend' => array(
-                'title' => $this->l('Room feature'),
+                'title' => $this->l('Stay feature'),
                 'icon' => 'icon-info-sign'
             ),
             'input' => array(
@@ -189,16 +189,16 @@ class AdminFeaturesControllerCore extends AdminController
                     'name' => 'name',
                     'lang' => true,
                     'size' => 33,
-                    'hint' => $this->l('Enter a name for the room feature. Invalid characters:').' <>;=#{}',
+                    'hint' => $this->l('Enter a name for the stay feature. Invalid characters:').' <>;=#{}',
                     'required' => true
                 ),
                 array(
                     'type' => 'file',
-                    'label' => $this->l('Room Feature Logo'),
+                    'label' => $this->l('Stay Feature Logo'),
                     'name' => 'logo',
                     'image' => $img_exist ? $image : false,
                     'display_image' => true,
-                    'hint' => $this->l('Upload a room feature logo.'),
+                    'hint' => $this->l('Upload a stay feature logo.'),
                     'required' => true
                 )
             )
@@ -234,13 +234,13 @@ class AdminFeaturesControllerCore extends AdminController
         if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_feature'] = array(
                 'href' => self::$currentIndex.'&addfeature&token='.$this->token,
-                'desc' => $this->l('Add new room feature', null, null, false),
+                'desc' => $this->l('Add new stay feature', null, null, false),
                 'icon' => 'process-icon-new'
             );
 
             // $this->page_header_toolbar_btn['new_feature_value'] = array(
             //     'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
-            //     'desc' => $this->l('Add new room feature value', null, null, false),
+            //     'desc' => $this->l('Add new stay feature value', null, null, false),
             //     'icon' => 'process-icon-new'
             // );
         }
@@ -248,7 +248,7 @@ class AdminFeaturesControllerCore extends AdminController
         if ($this->display == 'view') {
             $this->page_header_toolbar_btn['new_feature_value'] = array(
                 'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
-                'desc' => $this->l('Add new room feature value', null, null, false),
+                'desc' => $this->l('Add new stay feature value', null, null, false),
                 'icon' => 'process-icon-new'
             );
         }
@@ -294,7 +294,7 @@ class AdminFeaturesControllerCore extends AdminController
             case 'view':
                 $this->toolbar_btn['newAttributes'] = array(
                     'href' => self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token,
-                    'desc' => $this->l('Add new room feature values')
+                    'desc' => $this->l('Add new stay feature values')
                 );
                 $this->toolbar_btn['back'] = array(
                     'href' => self::$currentIndex.'&token='.$this->token,
@@ -312,12 +312,12 @@ class AdminFeaturesControllerCore extends AdminController
 
         switch ($this->display) {
             case 'edit':
-                $bread_extended[] = $this->l('Edit New Room Feature');
+                $bread_extended[] = $this->l('Edit New Stay Feature');
                 $this->addMetaTitle($bread_extended[count($bread_extended) - 1]);
                 break;
 
             case 'add':
-                $bread_extended[] = $this->l('Add New Room Feature');
+                $bread_extended[] = $this->l('Add New Stay Feature');
                 $this->addMetaTitle($bread_extended[count($bread_extended) - 1]);
                 break;
 
@@ -362,13 +362,13 @@ class AdminFeaturesControllerCore extends AdminController
 
         $this->fields_form[0]['form'] = array(
             'legend' => array(
-                'title' => $this->l('Room feature value'),
+                'title' => $this->l('Stay feature value'),
                 'icon' => 'icon-info-sign'
             ),
             'input' => array(
                 array(
                     'type' => 'select',
-                    'label' => $this->l('Room feature'),
+                    'label' => $this->l('Stay feature'),
                     'name' => 'id_feature',
                     'options' => array(
                         'query' => Feature::getFeatures($this->context->language->id),
@@ -436,7 +436,7 @@ class AdminFeaturesControllerCore extends AdminController
         $helper->allow_employee_form_lang = $this->allow_employee_form_lang;
         $helper->fields_value = $this->getFieldsValue($feature_value);
         $helper->toolbar_btn = $this->toolbar_btn;
-        $helper->title = $this->l('Add a new room feature value');
+        $helper->title = $this->l('Add a new stay feature value');
         $this->content .= $helper->generateForm($this->fields_form);
     }
 
@@ -474,7 +474,7 @@ class AdminFeaturesControllerCore extends AdminController
             }
         } else {
             $url = '<a href="index.php?tab=AdminPerformance&token='.Tools::getAdminTokenLite('AdminPerformance').'#featuresDetachables">'.$this->l('Performance').'</a>';
-            $this->displayWarning(sprintf($this->l('This room feature has been disabled. You can activate it here: %s.'), $url));
+            $this->displayWarning(sprintf($this->l('This stay feature has been disabled. You can activate it here: %s.'), $url));
         }
 
         $this->context->smarty->assign(
@@ -625,7 +625,7 @@ class AdminFeaturesControllerCore extends AdminController
                     // upload feature image
                     $imgPath = _PS_IMG_DIR_.'rf/'.$objFeature->id.'.jpg';
                     if (!ImageManager::resize($featureImage['tmp_name'], $imgPath)) {
-                        $this->errors[] = $this->l('Some error occurred while uploding room feature logo. Please try again.');
+                        $this->errors[] = $this->l('Some error occurred while uploding stay feature logo. Please try again.');
                     }
                 }
 

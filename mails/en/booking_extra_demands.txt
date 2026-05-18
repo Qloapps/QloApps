@@ -1,6 +1,6 @@
 {if isset($list)}
     {l s='Extra Demands Details'}
-    {l s='Room Type'}
+    {l s='Stay Type'}
     {l s='Extra demand name'}
     {l s='Total'} {l s='(Tax excl.)'}
 
@@ -16,7 +16,7 @@
                                         <font size="2" face="Open-sans, sans-serif" color="#555454">
                                             {$data_v['name']}<br>
                                             {$rm_v['data_form']|date_format:"%d-%m-%Y"} {l s='to'} {$rm_v['data_to']|date_format:"%d-%m-%Y"}<br>
-                                            <strong>{l s='Room'} - {$roomCount}</strong>
+                                            <strong>{l s='Stay'} - {$roomCount}</strong>
                                         </font>
                                     </td>
                                 {/if}

@@ -24,7 +24,7 @@
     <div id="edit_product">
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a href="#edit_room_tab" role="tab" data-toggle="tab">{l s='Rooms'}</a>
+                <a href="#edit_room_tab" role="tab" data-toggle="tab">{l s='Stays'}</a>
             </li>
             <li role="presentation">
                 <a href="#room_type_demands_desc" aria-controls="facilities" role="tab" data-toggle="tab">{l s='Facilities'}</a>

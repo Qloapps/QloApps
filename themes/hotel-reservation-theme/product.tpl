@@ -49,7 +49,7 @@
 				{/if} --><!-- by webkul -->
 				{if isset($adminActionDisplay) && $adminActionDisplay}
 					<div id="admin-action" class="container">
-						<p class="alert alert-info">{l s='This room type is not visible to your customers.'}
+						<p class="alert alert-info">{l s='This stay type is not visible to your customers.'}
 							<input type="hidden" id="admin-action-product-id" value="{$product->id}" />
 							<a id="publish_button" class="btn btn-default button button-small" href="#">
 								<span>{l s='Publish'}</span>
@@ -205,18 +205,13 @@
 								{/block}
 							{/if}
 						</div>
-						{if isset($room_type_info['room_type_selling_type_name']) && $room_type_info['room_type_selling_type_name']}
-							{assign var=attribute_type value=$room_type_info['room_type_selling_type_name']}
-						{else}
-							{assign var=attribute_type value={l s='Room'}}
-						{/if}
 						<div class="product_info_containter">
 							<!-- tab hook is added here -->
 							<!--HOOK_PRODUCT_TAB -->
 							<section class="page-product-box">
 								{block name='product_tabs'}
 									<ul class="nav nav-tabs product_description_tabs">
-									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='%s Information' sprintf=$attribute_type}{else}{l s='Product Information'}{/if}</a></li>
+									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='%s Information' sprintf=$room_type_info['room_type_selling_object']}{else}{l s='Product Information'}{/if}</a></li>
 										{* Block for booking products *}
 										{if isset($id_hotel) && $id_hotel}
 											<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
@@ -286,7 +281,7 @@
 														{if isset($features) && $features}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
-																	<span>{l s='%s Features' sprintf=$attribute_type}</span>
+																	<span>{l s='%s Features' sprintf=$room_type_info['room_type_selling_object']}</span>
 																</div>
 																<div class="room_info_content row">
 																	{foreach from=$features key=ftr_k item=ftr_v}
@@ -306,7 +301,7 @@
 															{if isset($hotel_features) && $hotel_features}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='%s Features' sprintf=$property_type}</span>
+																		<span>{l s='%s Features' sprintf=[$property_type|default:'Hotel']}</span>
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$hotel_features key=ftr_k item=ftr_v}
@@ -320,7 +315,7 @@
 															{if isset($hotel_description) && $hotel_description}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='%s Description' sprintf=$property_type}</span>
+																		<span>{l s='%s Description' sprintf=[$property_type|default:'Hotel']}</span>
 																	</div>
 																	<div class="room_info_content">
 																		{$hotel_description}
@@ -361,7 +356,7 @@
 													{/block}
 													<!-- <div class="info_margin_div">
 														<div class="room_info_heading">
-															<span>{l s='Rooms'}</span>
+															<span>{l s='Stays'}</span>
 														</div>
 														<div class="room_info_content row"></div>
 													</div> -->
@@ -369,7 +364,7 @@
 														{if isset($hotel_policies) && $hotel_policies}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
-																	<span>{l s='%s Policies' sprintf=$property_type}</span>
+																	<span>{l s='%s Policies' sprintf=[$property_type|default:'Hotel']}</span>
 																</div>
 																<div class="room_info_content">
 																	<p class="">{$hotel_policies}</p>
@@ -753,7 +748,7 @@
 		{else}
 			<div class="bootstrap">
 				<div class="alert alert-warning">
-					{l s='This room type has not enough information. Please save information of related hotel and other required room information for the booking of this room type.'}
+					{l s='This stay type has not enough information. Please save information of related hotel and other required stay information for the booking of this stay type.'}
 				</div>
 			</div>
 		{/if}
@@ -871,8 +866,8 @@
 			{addJsDef currency_blank = $currency->blank}
 			{addJsDefL name=correct_date_cond}{l s='Check Out Date should be greater than Check in date.' js=1}{/addJsDefL}
 			{addJsDefL name=some_error_cond}{l s='Some error occured .Please try again.' js=1}{/addJsDefL}
-			{addJsDefL name=unavail_qty_text}{l s='Required quantity of rooms are Not available.' js=1}{/addJsDefL}
-			{addJsDefL name=out_of_stock_cond}{l s='No room is available for this period.' js=1}{/addJsDefL}
+			{addJsDefL name=unavail_qty_text}{l s='Required quantity of stays are Not available.' js=1}{/addJsDefL}
+			{addJsDefL name=out_of_stock_cond}{l s='No stay is available for this period.' js=1}{/addJsDefL}
 			{addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
 			{addJsDefL name=select_txt}{l s='Select' js=1}{/addJsDefL}
 			{addJsDefL name=remove_txt}{l s='Remove' js=1}{/addJsDefL}

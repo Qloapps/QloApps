@@ -33,14 +33,14 @@
 				{if isset($cart_detail_data) && $cart_detail_data}
 					<thead>
 						<tr>
-							<th><span class="title_box">{l s='Room No.'}</span></th>
-							<th><span class="title_box">{l s='Room Image'}</th>
-							<th><span class="title_box">{l s='Room Type'}</span></th>
+							<th><span class="title_box">{l s='Stay No.'}</span></th>
+							<th><span class="title_box">{l s='Stay Image'}</th>
+							<th><span class="title_box">{l s='Stay Type'}</span></th>
 							<th><span class="title_box">{l s='Duration'}</span></th>
 						<th><span class="fixed-width-lg title_box">{l s='Occupancy / Quantity'}</span></th>
 						<th><span class="title_box">{l s='Unit Price (tax excl)'}</span></th>
 							<th><span class="title_box">{l s='Extra Services / Fees (tax excl)'}</span></th>
-							{* <th><span class="title_box">{l s='Total Rooms Price (tax excl)'}</span></th> *}
+							{* <th><span class="title_box">{l s='Total Stays Price (tax excl)'}</span></th> *}
 							<th><span class="title_box">{l s='Total Price (tax excl)'}</span></th>
 							<th></th>
 						</tr>
@@ -50,7 +50,7 @@
 						{foreach from=$cart_detail_data item=data}
 							<tr  data-id-booking-data="{$data.id}" data-id-product="{$data.id_product}" data-id-room="{$data.id_room}" data-date-from="{$data.date_from}" data-date-to="{$data.date_to}" >
 								<td>{$data.room_num|escape:'html':'UTF-8'} {hook h='displayRoomNumAfter' data=$data type='adminOrder'}</td>
-								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Room image" /></td>
+								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Stay image" /></td>
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
 								</td>
@@ -74,7 +74,7 @@
 													<input type="hidden" class="max_children" value="{if isset($data['room_type_info'])}{$data['room_type_info']['max_children']|escape:'html':'UTF-8'}{/if}">
 													<input type="hidden" class="max_guests" value="{if isset($data['room_type_info'])}{$data['room_type_info']['max_guests']|escape:'html':'UTF-8'}{/if}">
 													<div class="occupancy_info_block selected" occ_block_index="0">
-														<div class="occupancy_info_head col-sm-12"><span class="room_num_wrapper">{l s='Room - 1'}</span></div>
+														<div class="occupancy_info_head col-sm-12"><span class="room_num_wrapper">{l s='Stay - 1'}</span></div>
 														<div class="row">
 															<div class="col-xs-6 occupancy_count_block">
 																<div class="col-sm-12">
@@ -147,7 +147,7 @@
 										<i class="icon-trash"></i>&nbsp;{l s='Delete'}
 									</button>
                                     <br />
-                                    <a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
+                                    <a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this stay type.'}">
                                         <i class="icon-pencil"></i>&nbsp;{l s='Services'}
                                     </a>
 								</td>

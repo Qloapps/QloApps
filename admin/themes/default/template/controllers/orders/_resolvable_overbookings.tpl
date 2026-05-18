@@ -41,8 +41,8 @@
             <div class="table-responsive form-group">
                 <table class="table table-striped">
                     <tr>
-                        <th>{l s='Room No.'}</th>
-                        <th>{l s='Room type'}</th>
+                        <th>{l s='Stay No.'}</th>
+                        <th>{l s='Stay type'}</th>
                         <th>{l s='Hotel'}</th>
                         <th>{l s='Duration'}</th>
                         <th>{l s='Order'}</th>

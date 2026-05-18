@@ -9,7 +9,7 @@ been canceled.
 Here are your order details:
 Order reference: {order_name}
 Order total: {total_paid}
-Total Rooms: {num_rooms}
+Total Stays: {num_rooms}
 
 Hotel details:
 Hotel Name: {hotel_hotel_name}

@@ -30,8 +30,8 @@
 	<h3 class="tab"> <i class="icon-info"></i> {l s='Information'}</h3>
 	<script type="text/javascript">
 
-		var msg_select_one = "{l s='Please select at least one room type.' js=1}";
-		var msg_set_quantity = "{l s='Please set a quantity to add a room type.' js=1}";
+		var msg_select_one = "{l s='Please select at least one stay type.' js=1}";
+		var msg_set_quantity = "{l s='Please set a quantity to add a stay type.' js=1}";
 
 		{if isset($ps_force_friendly_product) && $ps_force_friendly_product}
 			var ps_force_friendly_product = 1;
@@ -232,15 +232,15 @@
     {* Code For Standard product working *}
 	{* <div class="form-group" id="global_product_type_container">
 		<label class="control-label col-lg-3" for="selling_preference_type">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether this product will be sold with room type or as an standalone product'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether this product will be sold with stay type or as an standalone product'}">
 				{l s='Product selling preference'}
 			<span>
 		</label>
 		<div class="col-lg-4">
 			<select name="selling_preference_type" id="selling_preference_type">
-                <option value="{Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with room types'}</option>
+                <option value="{Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with stay types'}</option>
                 <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE}selected="selected"{/if} >{l s='Sell with hotels'}</option>
-                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with hotels and room types'}</option>
+                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with hotels and stay types'}</option>
                 <option value="{Product::SELLING_PREFERENCE_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE}selected="selected"{/if} >{l s='Sell as standalone product'}</option>
 			</select>
 		</div>
@@ -261,8 +261,8 @@
 	<div class="form-group" id="associated_hotel_rooms_tree" {if ($product->selling_preference_type != Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE && $product->selling_preference_type != 0)}style="display:none;"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="category_box" type="category_box"}</span></div>
 		<label class="control-label col-lg-2" for="hotel_room_block">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select room type and hotels for which this service will be available.'}">
-				{l s='Associated Room Types'}
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select stay type and hotels for which this service will be available.'}">
+				{l s='Associated Stay Types'}
 			</span>
 		</label>
 		<div class="col-lg-9">
@@ -273,7 +273,7 @@
 	</div>
 	<div class="form-group" id="auto_add_to_cart_container" {if $product->selling_preference_type != Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product->selling_preference_type != 0}style="display:none;"{/if}>
 		<label class="control-label col-lg-3" for="">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='When enabled, this service will be added in cart for each associated Room type or Hotel when they are added in cart. Also auto added services will not be visible to customers.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='When enabled, this service will be added in cart for each associated Stay type or Hotel when they are added in cart. Also auto added services will not be visible to customers.'}">
 				{l s='Auto add to cart this product'}
 			</span>
 		</label>
@@ -295,13 +295,13 @@
 	<div id="price_addition_type_container" {if !$product->auto_add_to_cart || !$product->isAssociatedToShop()}style="display:none;"{/if}>
 		<div class="form-group">
 			<label class="control-label col-lg-3" for="selling_preference_type">
-				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether price will be added in the base room price or as Convenience Fee'}">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether price will be added in the base stay price or as Convenience Fee'}">
 					{l s='Price display preference'}
 				<span>
 			</label>
 			<div class="col-lg-4">
 				<select name="price_addition_type" id="price_addition_type">
-					<option value="{Product::PRICE_ADDITION_TYPE_WITH_ROOM}" {if $product->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}selected="selected"{/if} >{l s='Add price in room price'}</option>
+					<option value="{Product::PRICE_ADDITION_TYPE_WITH_ROOM}" {if $product->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}selected="selected"{/if} >{l s='Add price in stay price'}</option>
 					<option value="{Product::PRICE_ADDITION_TYPE_INDEPENDENT}" {if $product->price_addition_type == Product::PRICE_ADDITION_TYPE_INDEPENDENT}selected="selected"{/if} >{l s='Add price as convenience Fee'}</option>
 				</select>
 			</div>
@@ -312,7 +312,7 @@
 					{l s='Select how this service price will be added in booking.'}
 					<ul>
 						<li>
-							<b>{l s='Add price in room price'}</b> : {l s='Service price will be added in room base price.'}<br>{l s='(e.g., Room price : 500, service price: 50, final room price : 550)'}
+							<b>{l s='Add price in stay price'}</b> : {l s='Service price will be added in stay base price.'}<br>{l s='(e.g., Stay price : 500, service price: 50, final stay price : 550)'}
 						</li>
 						<li><b>{l s='Add price as convenience fee'}</b> : {l s='Service price will be dispalyed in order summary as "Convenience Fees"'}</li>
 					</ul>
@@ -399,7 +399,7 @@
 	<div id="allow_multiple_quantity_container" {if $product->auto_add_to_cart && $product->isAssociatedToShop()}style="display:none;"{/if}>
 		<div class="form-group">
 			<label class="control-label col-lg-3">
-				<span class="label-tooltip" data-toggle="tooltip" title="{l s='When enabled, customer can order multiple quantity of product otherwise only one quantity can be purchased by customer per room/hotel'}">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='When enabled, customer can order multiple quantity of product otherwise only one quantity can be purchased by customer per stay/hotel'}">
 					{l s='Allow ordering of multiple quantities'}
 				</span>
 			</label>
@@ -421,7 +421,7 @@
 			<div class="form-group">
 				<label class="control-label col-lg-3" for="max_quantity">
 					<span class="label-tooltip" data-toggle="tooltip"
-						title="{l s='Enter max allowed quantity per room, enter 0 for unlimited.'}">
+						title="{l s='Enter max allowed quantity per stay, enter 0 for unlimited.'}">
 						{l s='Max quantity allow'}
 					</span>
 				</label>
@@ -432,7 +432,7 @@
 			<div class="form-group">
 				<div class="col-lg-6 col-lg-offset-3">
 					<div class="alert alert-info">
-					{l s='By default all products have infinte quantity, Using this setting you can restrict customer to purchase only one product per room.'}
+					{l s='By default all products have infinte quantity, Using this setting you can restrict customer to purchase only one product per stay.'}
 					</div>
 				</div>
 			</div>
@@ -462,7 +462,7 @@
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="description" type="tinymce" multilang="true"}</span></div>
 		<label class="control-label col-lg-2" for="description_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Appears in the body of the room type.'}">
+				title="{l s='Appears in the body of the stay type.'}">
 				{l s='Description'}
 			</span>
 		</label>
@@ -543,7 +543,7 @@
 	{* <div class="form-group">
 		<label class="control-label col-lg-3" for="tags_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Will be displayed in the tags block when enabled. Tags help customers easily find your room types.'}">
+				title="{l s='Will be displayed in the tags block when enabled. Tags help customers easily find your stay types.'}">
 				{l s='Tags:'}
 			</span>
 		</label>

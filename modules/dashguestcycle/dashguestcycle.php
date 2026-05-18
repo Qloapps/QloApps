@@ -327,7 +327,7 @@ class DashGuestCycle extends Module
             'order_id' => array('title' => $this->l('Order ID'), 'class' => 'text-center'),
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
             'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
-            'total' => array('title' => $this->l('Total Rooms'), 'class' => 'text-center'),
+            'total' => array('title' => $this->l('Total Stays'), 'class' => 'text-center'),
             'guests' => array('title' => $this->l('Guests'), 'class' => 'text-center'),
             'order_total' => array('title' => $this->l('Order Total'), 'class' => 'text-right'),
             'order_status' => array('title' => $this->l('Order Status'), 'class' => 'text-left'),

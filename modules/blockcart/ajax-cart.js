@@ -136,6 +136,7 @@ var ajaxCart = {
 
             var dateFrom = $(this).attr('cat_rm_check_in');
             var dateTo = $(this).attr('cat_rm_check_out');
+            occupancy_required_for_booking = $(this).closest('.booking_room_fields').data('occupancy-required');
             var occupancy = getBookingOccupancyDetails($(this).closest('.booking_room_fields'), true);
             /* By Webkul
              * Note : In our case minimalQuantity is taken from Qty. field
@@ -378,9 +379,6 @@ var ajaxCart = {
         if ($('.cart_block_list').hasClass('collapsed'))
             this.expand();
 
-        var isOccupancyBooking = getOccupancyRequiredForBooking($(callerElement).closest('.booking_room_fields'));
-        ajaxCart.lastOccupancyRequiredForBooking = isOccupancyBooking;
-
         // create from data in order to manage adding different type of products
         var req = new FormData();
         req.append('controller', 'cart');
@@ -401,7 +399,7 @@ var ajaxCart = {
             if (typeof dateTo != 'undefined')
                 req.append('dateTo', dateTo);
 
-            if (isOccupancyBooking) {
+            if (occupancy_required_for_booking) {
                 req.append('occupancy', JSON.stringify(occupancy));
             } else {
                 req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
@@ -1206,28 +1204,22 @@ var ajaxCart = {
         $('#layer_cart_product_quantity').parent().show();
         var product_quantity_text = '';
         if(parseInt(product.booking_product)) {
-            var roomLabel = product.attribute_type || (typeof room_txt !== 'undefined' ? room_txt : 'Room');
-            var roomsLabel = product.attribute_types || (typeof rooms_txt !== 'undefined' ? rooms_txt : roomLabel);
-            applyRoomLabelsToLayer(roomLabel, roomsLabel);
             let rooms = 0;
             let adults = 0;
             let children = 0;
-            var isOccupancyBooking = (typeof ajaxCart.lastOccupancyRequiredForBooking !== 'undefined') ? ajaxCart.lastOccupancyRequiredForBooking : occupancy_required_for_booking;
-            var $roomLabel = $('#layer_cart .layer_cart_room_txt .layer_cart_attribute_type');
-            if ($roomLabel.length) {
-                var $labelContainer = $roomLabel.closest('.layer_cart_room_txt');
-                var label = isOccupancyBooking ? $labelContainer.data('label-occupancy') : $labelContainer.data('label-quantity');
-                if (label) {
-                    $roomLabel.text(label);
-                }
+            if (typeof product.layer_cart_attribute_label !== 'undefined') {
+                $('#layer_cart .layer_cart_attribute_type').text(product.layer_cart_attribute_label);
             }
-            if (isOccupancyBooking) {
+            if(typeof product.layer_cart_room_success_msg !== 'undefined'){
+                $('#layer_cart .layer_cart_room_success_msg').text(product.layer_cart_room_success_msg);
+            }
+            if (occupancy_required_for_booking) {
                 $.each(product.occupancy, function(index, val) {
                     rooms++;
                     adults += parseInt(val.adults);
                     children += parseInt(val.children);
                 });
-                product_quantity_text = getRoomTypeGuestOccupancyFormated(adults, children, rooms);
+                product_quantity_text = getRoomTypeGuestOccupancyFormated(adults, children, rooms,product.room_info.room_type_selling_object, product.room_info.multiple_room_type_selling_object);
             } else {
                 product_quantity_text = product.occupancy;
             }
@@ -1469,8 +1461,7 @@ function getBookingOccupancyDetails(bookingform, booking_product)
 {
     let occupancy;
     if (booking_product) {
-        var isOccupancyBooking = getOccupancyRequiredForBooking(bookingform);
-        if (isOccupancyBooking) {
+        if (occupancy_required_for_booking) {
             $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
             let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
             if (selected_occupancy.length) {
@@ -1513,29 +1504,3 @@ function getBookingOccupancyDetails(bookingform, booking_product)
     return occupancy;
 }
 
-function applyRoomLabelsToLayer(roomLabel, roomsLabel)
-{
-    var $layer = $('#layer_cart');
-    $layer.find('[data-room-msg-template]').each(function() {
-        var template = $(this).attr('data-room-msg-template');
-        if (!template) {
-            return;
-        }
-        var text = template.replace(/__ROOMS__/g, roomsLabel).replace(/__ROOM__/g, roomLabel);
-        $(this).text(text);
-    });
-}
-
-function getOccupancyRequiredForBooking(bookingform) {
-    var value = occupancy_required_for_booking;
-    var $form = bookingform ? $(bookingform) : $('#booking-form').closest('.booking_room_fields');
-
-    if ($form.length) {
-        var dataVal = $form.data('occupancy-required');
-        if (dataVal !== undefined) {
-            value = parseInt(dataVal) === 1;
-        }
-    }
-
-    return value;
-}

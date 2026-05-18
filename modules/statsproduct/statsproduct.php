@@ -308,7 +308,7 @@ class StatsProduct extends ModuleGraph
 							<span class="title_box active">'.$this->l('Room type name').'</span>
 						</th>
 						<th>
-							<span class="title_box text-center active">'.$this->l('Total rooms').'</span>
+							<span class="title_box text-center active">'.$this->l('Total stays').'</span>
 						</th>
 						<th>
 							<span class="title_box text-center active">'.$this->l('Action').'</span>
@@ -400,7 +400,7 @@ class StatsProduct extends ModuleGraph
             case 42:
                 $this->_titles['main'][0] = $this->l('ID');
                 $this->_titles['main'][1] = $this->l('Room type name');
-                $this->_titles['main'][2] = $this->l('Total Rooms');
+                $this->_titles['main'][2] = $this->l('Total Stays');
                 break;
         }
     }

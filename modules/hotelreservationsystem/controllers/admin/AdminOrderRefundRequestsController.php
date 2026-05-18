@@ -93,7 +93,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
             if ($refundReqBookings) {
                 $this->fields_list['num_rooms'] = array(
-                    'title' => $this->l('Total Rooms'),
+                    'title' => $this->l('Total Stays'),
                     'align' => 'center',
                     'havingFilter' => true,
                 );
@@ -304,7 +304,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         $objCustomer = new Customer($objOrderReturn->id_customer);
         $objOrder = new Order($objOrderReturn->id_order);
         $orderCurrency = new Currency($objOrder->id_currency);
-
+        $objRoomType = new HotelRoomType();
         $objRefundRules = new HotelOrderRefundRules();
         if ($refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrderReturn->id_order, $objOrderReturn->id)){
             foreach ($refundReqBookings as &$booking) {
@@ -313,6 +313,9 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     $objOrderReturn->id,
                     $booking['id']
                 );
+                
+                $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($booking['id_product']);
+                $booking['room_type_info'] = $roomTypeInfo;
                 $booking = array_merge($booking, array_shift($bookingCharges));
             }
         }

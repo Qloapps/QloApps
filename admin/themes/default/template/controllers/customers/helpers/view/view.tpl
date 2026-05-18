@@ -358,7 +358,7 @@
 			{if $products AND count($products)}
 				<div class="panel">
 					<div class="panel-heading">
-						<i class="icon-archive"></i> {l s='Room types and services'} <span class="badge">{count($products)}</span>
+						<i class="icon-archive"></i> {l s='Stay types and services'} <span class="badge">{count($products)}</span>
 					</div>
 					<div class="nav nav-tabs">
 						<ul class="nav nav-tabs">
@@ -367,7 +367,7 @@
 							{if $count_room_types}
 								<li class="active">
 									<a data-toggle="tab" href="#purchased_room_types">
-										{l s='Room Types'}
+										{l s='Stay Types'}
 										<span class="label label-success">{$count_room_types}</span>
 									</a>
 								</li>
@@ -449,7 +449,7 @@
 			{if count($interested)}
 			<div class="panel">
 				<div class="panel-heading">
-					<i class="icon-eye"></i> {l s='Viewed room types'} <span class="badge">{count($interested)}</span>
+					<i class="icon-eye"></i> {l s='Viewed stay types'} <span class="badge">{count($interested)}</span>
 				</div>
 				<table class="table">
 					<thead>

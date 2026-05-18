@@ -50,7 +50,7 @@ class AdminInvoicesControllerCore extends AdminController
                         'type' => 'bool'
                     ),
                     'PS_PDF_IMG_INVOICE' => array(
-                        'title' => $this->l('Enable room type image'),
+                        'title' => $this->l('Enable stay type image'),
                         'hint' => $this->l('Adds an image before product name on the invoice'),
                         'validation' => 'isBool',
                         'cast' => 'intval',

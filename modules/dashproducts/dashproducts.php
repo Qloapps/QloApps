@@ -144,7 +144,7 @@ class DashProducts extends Module
 	{
 		$header = array(
 			array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
-			array('title' => $this->l('Total Rooms'), 'class' => 'text-left'),
+			array('title' => $this->l('Total Stays'), 'class' => 'text-left'),
 			array('title' => $this->l('Order'), 'class' => 'text-left'),
 			array('title' => $this->l('Hotel'), 'class' => 'text-left'),
 			array('title' => $this->l('Total').' '.$this->l('Tax excl.'), 'class' => 'text-left'),

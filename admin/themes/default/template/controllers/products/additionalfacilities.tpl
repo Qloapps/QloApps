@@ -24,7 +24,7 @@
     <input type="hidden" name="submitted_tabs[]" value="AdditionalFacilities" />
     <div class="panel">
         <div class="panel-heading">
-            <i class="icon-user"></i> {l s='Room Type Additional Facilities'}
+            <i class="icon-user"></i> {l s='Stay Type Additional Facilities'}
         </div>
         <div class="alert alert-info">
             {l s='To create new additional facilities please visit'} <a target="_blank" href="{$link->getAdminLink('AdminRoomTypeGlobalDemand')}">{l s='Additional facilities'}</a> {l s='page.'}

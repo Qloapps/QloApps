@@ -223,9 +223,8 @@ class CategoryControllerCore extends FrontController
 
                 foreach ($booking_data['rm_data'] as $roomKey => $roomData) {
                     if (isset($roomData['id_product'])) {
-                        $bookingMethod = Product::getRoomTypeBookingMethod($roomData['id_product']);
-                        $booking_data['rm_data'][$roomKey]['occupancy_required_for_booking'] = 
-                            ($bookingMethod == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) ? 1 : 0;
+                        $booking_data['rm_data'][$roomKey]['occupancy_required_for_booking'] =
+                            (int) Product::isOccupancyBookingMethod($roomData['id_product']);
                     }
                 }
             }

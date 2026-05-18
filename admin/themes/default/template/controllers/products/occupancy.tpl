@@ -27,8 +27,8 @@
 		<h3 class="tab"> <i class="icon-users"></i> {l s='Occupancy'}</h3>
 
         <div class="alert alert-info">
-            {l s='Below, enter the base occupancy of this room type.'}
-            <p><b>{l s='Note'}</b>: {l s='Minimum 1 adult is madatory in the base occupancy of the room type'}</p>
+            {l s='Below, enter the base occupancy of this stay type.'}
+            <p><b>{l s='Note'}</b>: {l s='Minimum 1 adult is madatory in the base occupancy of the stay type'}</p>
         </div>
 
 		<div class="form-group">
@@ -58,15 +58,15 @@
         <hr>
 
         <div class="alert alert-info">
-            {l s='Below, enter the maximum number of adults and children which can be accommodated in a room of this room type.'}
+            {l s='Below, enter the maximum number of adults and children which can be accommodated in a stay of this stay type.'}
 			<br>
-            {l s='For maximum room occupancy, the total number of guests which can be accommodated in a room of this room type.'}
+            {l s='For maximum stay occupancy, the total number of guests which can be accommodated in a stay of this stay type.'}
         </div>
 
         <div class="form-group">
 			<label class="control-label col-sm-2" for="max_adults">
                 <span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Enter maximum number of adults can be accommodated in a room of this room type.'}">
+				title="{l s='Enter maximum number of adults can be accommodated in a stay of this stay type.'}">
                     {l s='Maximum adults'}
                 </span>
 			</label>
@@ -77,7 +77,7 @@
         <div class="form-group">
 			<label class="control-label col-sm-2" for="max_children">
                 <span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Enter maximum number of children can be accommodated in a room of this room type.'}">
+				title="{l s='Enter maximum number of children can be accommodated in a stay of this stay type.'}">
                     {l s='Maximum children'}
                 </span>
 			</label>
@@ -88,8 +88,8 @@
         <div class="form-group">
 			<label class="control-label col-sm-2" for="max_guests">
                 <span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Enter maximum number of guests can be accommodated in a room of this room type.'}">
-                    {l s='Maximum room occupancy'}
+				title="{l s='Enter maximum number of guests can be accommodated in a stay of this stay type.'}">
+                    {l s='Maximum stay occupancy'}
                 </span>
 			</label>
 			<div class="col-sm-3">

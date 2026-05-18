@@ -54,16 +54,16 @@
 		{block name='order_return_detail'}
 			{if $refundReqBookings}
                 {if isset($refundReqProducts) && $refundReqProducts}
-                    <h1 class="page-subheading">{l s='Rooms refund requests'}</h1>
+                    <h1 class="page-subheading">{l s='Stays refund requests'}</h1>
                 {/if}
 				<div class="table-responsive wk-datatable-wrapper">
 					<table class="table table-bordered">
 						<tr>
-							<th>{l s='Rooms'}</th>
-							<th>{l s='Room type'}</th>
+							<th>{l s='Stays'}</th>
+							<th>{l s='Stay type'}</th>
 							<th>{l s='Property Name'}</th>
 							<th>{l s='Duration'}</th>
-							<th>{l s='Total rooms price (tax incl.)'}</th>
+							<th>{l s='Total stays price (tax incl.)'}</th>
 							<th>{l s='Extra services price (tax incl.)'}</th>
 							{if $isRefundCompleted}
 								<th>{l s='Refund amount'}</th>
@@ -72,7 +72,7 @@
 						</tr>
 						{foreach from=$refundReqBookings item=$booking name=refundRequest}
 							<tr>
-								<td>{l s='Room'} - {$smarty.foreach.refundRequest.iteration|string_format:'%02d'}</td>
+								<td>{l s='Stay'} - {$smarty.foreach.refundRequest.iteration|string_format:'%02d'}</td>
 								<td>{$booking['room_type_name']|escape:'htmlall':'UTF-8'}</td>
 								<td>{$booking['hotel_name']|escape:'htmlall':'UTF-8'}</td>
 								{assign var="is_full_date" value=($show_full_date && ($booking['date_from']|date_format:'%D' == $booking['date_to']|date_format:'%D'))}

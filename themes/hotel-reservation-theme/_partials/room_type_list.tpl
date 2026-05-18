@@ -45,7 +45,7 @@
 									<a href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}"><p class="rm_heading col-sm-12 col-md-7">{$room_v['name']|escape:'htmlall':'UTF-8'}</p></a>
 									{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 										<p class="rm_left col-sm-12 col-md-5" {if !empty($display_all_room_types) || $room_v['room_left'] > $warning_num} style="display:none"{/if}>
-											{l s='Hurry!'} <span class="remain_rm_qty">{$room_v['room_left']|escape:'htmlall':'UTF-8'}</span> {l s='rooms left'}
+											{l s='Hurry!'} <span class="remain_rm_qty">{$room_v['room_left']|escape:'htmlall':'UTF-8'}</span> {l s='stays left'}
 										</p>
 									{/if}
 								</div>
@@ -101,12 +101,8 @@
 										{block name='room_type_list_room_booking_fields'}
 											{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE && !$order_date_restrict}
 												{if (!isset($display_all_room_types) || !$display_all_room_types)}
-													{assign var=room_occ_required value=false}
-													{if isset($room_v['occupancy_required_for_booking'])}
-														{assign var=room_occ_required value=$room_v['occupancy_required_for_booking']}
-													{/if}
-													<div class="booking_room_fields" data-occupancy-required="{$room_occ_required|intval}">
-														{if $room_occ_required}
+													<div class="booking_room_fields" data-occupancy-required="{$room_v['occupancy_required_for_booking']|intval}">
+														{if isset($room_v['occupancy_required_for_booking']) && $room_v['occupancy_required_for_booking']}
 															<div class="booking_guest_occupancy_conatiner">
 																{block name='occupancy_field'}
 																	{include file="./occupancy_field.tpl" room_type_info=$room_v total_available_rooms=$room_v['room_left']}
@@ -156,7 +152,7 @@
 	{/foreach}
 {else}
 	<div class="noRoomsAvailAlert">
-		<span>{l s='No room available for this hotel!'}</span>
+		<span>{l s='No stay available for this hotel!'}</span>
 	</div>
 {/if}
 

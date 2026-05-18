@@ -276,7 +276,7 @@
 			{/if}
 			{if !$product->active && $product->isAssociatedToShop()}
 			<div class="alert alert-info draft" >
-				{l s='Your room type will be saved as a draft.'}
+				{l s='Your stay type will be saved as a draft.'}
 				<a href="#" class="btn btn-default" onclick="submitAddProductAndPreview()" ><i class="icon-eye-open"></i>&nbsp;{l s='Save and preview'}</a>
 				<input type="hidden" name="fakeSubmitAddProductAndPreview" id="fakeSubmitAddProductAndPreview" />
 			</div>

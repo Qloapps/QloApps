@@ -950,6 +950,7 @@ class OrderOpcControllerCore extends ParentOrderController
                 && ($dateTo = Tools::getValue('date_to'))
             ) {
                 $objCartBookingData = new HotelCartBookingData();
+                $objRoomType = new HotelRoomType();
                 if ($selectedRoomDemands = $objCartBookingData->getCartExtraDemands(
                     $this->context->cart->id,
                     $idProduct,
@@ -1001,9 +1002,12 @@ class OrderOpcControllerCore extends ParentOrderController
                         1
                     );
                 }
+
+                $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
                 $this->context->smarty->assign(array(
                     'roomTypeServiceProducts' => $roomTypeServiceProducts,
-                    'cartRooms' => $cartBookings
+                    'cartRooms' => $cartBookings,
+                    'room_type_info' => $roomTypeInfo
                 ));
             }
         }

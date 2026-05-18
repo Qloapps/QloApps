@@ -29,8 +29,8 @@
             <div class="table-responsive form-group">
                 <table class="table table-striped">
                     <tr>
-                        <th>{l s='Room No.'}</th>
-                        <th>{l s='Room type.'}</th>
+                        <th>{l s='Stay No.'}</th>
+                        <th>{l s='Stay type.'}</th>
                         <th>{l s='Duration'}</th>
                         <th>{l s='Occupancy'}</th>
                         <th>{l s='Confirmed booking order'}</th>
@@ -77,7 +77,7 @@
                                     {/if}
                                 </td>
                                 <td>
-                                    <a href="#" class="btn btn-default reallocate_overbooking" id_htl_booking="{$data['id']}"><i class="icon-refresh"></i> {l s='Reallocate/Swap Room'}</a>
+                                    <a href="#" class="btn btn-default reallocate_overbooking" id_htl_booking="{$data['id']}"><i class="icon-refresh"></i> {l s='Reallocate/Swap Stay'}</a>
                                 </td>
                                 <td>
                                     {if isset($data['booked_room_info']) && $data['booked_room_info']}
@@ -93,8 +93,8 @@
             </div>
 
             <div class="help-block">
-                <p>- {l s='You can resolve room overbooking with \'Resolve\' column only when the overbooked room is now free for booked duration.'}</p>
-                <p>- {l s='You can also reallocate an overbooked room with an available room to resolve room\'s overbooking.'}</p>
+                <p>- {l s='You can resolve stay overbooking with \'Resolve\' column only when the overbooked stay is now free for booked duration.'}</p>
+                <p>- {l s='You can also reallocate an overbooked stay with an available stay to resolve stay\'s overbooking.'}</p>
             </div>
         </div>
     </div>

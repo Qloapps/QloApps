@@ -25,7 +25,7 @@
 		<div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
-                <h4 class="modal-title"><i class="icon icon-bed"></i> &nbsp;{l s='Room Services'}</h4>
+                <h4 class="modal-title"><i class="icon icon-bed"></i> &nbsp;{l s='Stay Services'}</h4>
             </div>
 			<div class="modal-body" id="rooms_extra_demands">
                 <ul class="nav nav-tabs" role="tablist">

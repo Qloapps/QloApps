@@ -108,7 +108,7 @@ class AdminProductsControllerCore extends AdminController
             'ServiceProduct' => $this->l('Service Products'),
             // 'Associations' => $this->l('Associations'),
             'Features' => $this->l('Features'),
-            'Configuration' => $this->l('Rooms'),
+            'Configuration' => $this->l('Stays'),
             'Occupancy' => $this->l('Occupancy'),
             'LengthOfStay' => $this->l('Length of Stay'),
             'AdditionalFacilities' => $this->l('Additional Facilities'),
@@ -322,7 +322,7 @@ class AdminProductsControllerCore extends AdminController
         );
         // use it for total rooms
         $this->fields_list['num_rooms'] = array(
-            'title' => $this->l('Total Rooms'),
+            'title' => $this->l('Total Stays'),
             'align' => 'center',
             'type' => 'range',
             'havingFilter' => true,
@@ -2282,6 +2282,7 @@ class AdminProductsControllerCore extends AdminController
             $saveShort = Tools::getValue('description_short');
             $_POST['description_short'] = strip_tags(Tools::getValue('description_short'));
         }
+        $_POST['booking_method'] = Tools::getValue('booking_method_switch') ? (int)Tools::getValue('booking_method') : 0;
 
         // Check description short size without html
         $limit = (int)Configuration::get('PS_SHORT_DESC_LIMIT');
@@ -2386,11 +2387,11 @@ class AdminProductsControllerCore extends AdminController
 
         // Categories
         if ($this->isProductFieldUpdated('id_category_default') && (!Tools::isSubmit('categoryBox') || !count(Tools::getValue('categoryBox')))) {
-            $this->errors[] = $this->l('This room type must be in at least one category.');
+            $this->errors[] = $this->l('This stay type must be in at least one category.');
         }
 
         if ($this->isProductFieldUpdated('id_category_default') && (!is_array(Tools::getValue('categoryBox')) || !in_array(Tools::getValue('id_category_default'), Tools::getValue('categoryBox')))) {
-            $this->errors[] = $this->l('This room type must be in the default category.');
+            $this->errors[] = $this->l('This stay type must be in the default category.');
         }
 
         // Tags
@@ -2531,7 +2532,7 @@ class AdminProductsControllerCore extends AdminController
             } else {
                 if (($object = $this->loadObject(true)) && $object->isAssociatedToShop()) {
                     if (!$object->booking_product) {
-                        $this->errors[] = $this->l('Room type not found.');
+                        $this->errors[] = $this->l('Stay type not found.');
                         return;
                     }
                 }
@@ -2581,70 +2582,70 @@ class AdminProductsControllerCore extends AdminController
         $helper->id = 'box-total-rooms';
         $helper->icon = 'icon-bed';
         $helper->color = 'color3';
-        $helper->title = $this->l('Total Rooms', null, null, false);
+        $helper->title = $this->l('Total Stays', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_rooms';
-        $helper->tooltip = $this->l('The total number of rooms in all hotels.', null, null, false);
+        $helper->tooltip = $this->l('The total number of stays in all hotels.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-occupied-rooms';
         $helper->icon = 'icon-user';
         $helper->color = 'color1';
-        $helper->title = $this->l('Occupied Rooms', null, null, false);
+        $helper->title = $this->l('Occupied Stays', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=occupied_rooms';
-        $helper->tooltip = $this->l('The count of rooms that are currently occupied by guests.', null, null, false);
+        $helper->tooltip = $this->l('The count of stays that are currently occupied by guests.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-vacant-rooms';
         $helper->icon = 'icon-check-empty';
         $helper->color = 'color3';
-        $helper->title = $this->l('Vacant Rooms', null, null, false);
+        $helper->title = $this->l('Vacant Stays', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=vacant_rooms';
-        $helper->tooltip = $this->l('The count of rooms that are either booked but currently unoccupied or available for booking', null, null, false);
+        $helper->tooltip = $this->l('The count of stays that are either booked but currently unoccupied or available for booking', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-reserved-rooms';
         $helper->icon = 'icon-calendar';
         $helper->color = 'color4';
-        $helper->title = $this->l('Booked Rooms', null, null, false);
+        $helper->title = $this->l('Booked Stays', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=booked_rooms';
-        $helper->tooltip = $this->l('The total number of rooms that are currently booked and awaiting guest check-in', null, null, false);
+        $helper->tooltip = $this->l('The total number of stays that are currently booked and awaiting guest check-in', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-disabled-rooms';
         $helper->icon = 'icon-ban';
         $helper->color = 'color2';
-        $helper->title = $this->l('Disabled Rooms', null, null, false);
+        $helper->title = $this->l('Disabled Stays', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_rooms';
-        $helper->tooltip = $this->l('The total number of rooms that are currently disabled.', null, null, false);
+        $helper->tooltip = $this->l('The total number of stays that are currently disabled.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-online-bookable-rooms';
         $helper->icon = 'icon-globe';
         $helper->color = 'color4';
-        $helper->title = $this->l('Online Bookable Rooms', null, null, false);
+        $helper->title = $this->l('Online Bookable Stays', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=online_bookable_rooms';
-        $helper->tooltip = $this->l('The total number of rooms that can be booked directly from the front office.', null, null, false);
+        $helper->tooltip = $this->l('The total number of stays that can be booked directly from the front office.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-offline-bookable-rooms';
         $helper->icon = 'icon-building';
         $helper->color = 'color1';
-        $helper->title = $this->l('Offline Bookable Rooms', null, null, false);
+        $helper->title = $this->l('Offline Bookable Stays', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=offline_bookable_rooms';
-        $helper->tooltip = $this->l('The total number of rooms available for booking through the back office.', null, null, false);
+        $helper->tooltip = $this->l('The total number of stays available for booking through the back office.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -2660,17 +2661,17 @@ class AdminProductsControllerCore extends AdminController
         }
 
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=best_selling_room_type';
-        $helper->tooltip = sprintf($this->l('Displays the best selling room type based on the sales in the last %s day(s).', null, null, false), $nbDaysBestSelling);
+        $helper->tooltip = sprintf($this->l('Displays the best selling stay type based on the sales in the last %s day(s).', null, null, false), $nbDaysBestSelling);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-disbled-room-types';
         $helper->icon = 'icon-ban';
         $helper->color = 'color2';
-        $helper->title = $this->l('Disabled Room Types', null, null, false);
+        $helper->title = $this->l('Disabled Stay Types', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_room_types';
         $helper->href = Context::getContext()->link->getAdminLink('AdminProducts').'&submitResetproduct&submitFilterproduct=1&productFilter_sa!active=0&submitFilterproduct=1';
-        $helper->tooltip = $this->l('The total number of room types that are currently disabled.', null, null, false);
+        $helper->tooltip = $this->l('The total number of stay types that are currently disabled.', null, null, false);
         $this->kpis[] = $helper;
 
         return parent::renderKpis();
@@ -2683,7 +2684,7 @@ class AdminProductsControllerCore extends AdminController
         $this->addRowAction('duplicate');
         $this->addRowAction('delete');
 
-        $this->tpl_list_vars['title'] = $this->l('Room Types');
+        $this->tpl_list_vars['title'] = $this->l('Stay Types');
 
         $this->_new_list_header_design = true;
 
@@ -2761,7 +2762,7 @@ class AdminProductsControllerCore extends AdminController
     protected function _displayDraftWarning($active)
     {
         $content = '<div class="warn draft" style="'.($active ? 'display:none' : '').'">
-				<span>'.$this->l('Your room type will be saved as a draft.').'</span>
+				<span>'.$this->l('Your stay type will be saved as a draft.').'</span>
 				<a href="#" class="btn btn-default pull-right" onclick="submitAddProductAndPreview()" ><i class="icon-external-link-sign"></i> '.$this->l('Save and preview').'</a>
 				<input type="hidden" name="fakeSubmitAddProductAndPreview" id="fakeSubmitAddProductAndPreview" />
 	 		</div>';
@@ -2773,8 +2774,8 @@ class AdminProductsControllerCore extends AdminController
         if (empty($this->display)) {
             $this->page_header_toolbar_btn['new_product'] = array(
                     'href' => self::$currentIndex.'&addproduct&token='.$this->token,
-                    // 'desc' => $this->l('Add new room type', null, null, false),
-                    'desc' => $this->l('Add new room type', null, null, false),
+                    // 'desc' => $this->l('Add new stay type', null, null, false),
+                    'desc' => $this->l('Add new stay type', null, null, false),
                     'icon' => 'process-icon-new'
                 );
         }
@@ -2807,7 +2808,7 @@ class AdminProductsControllerCore extends AdminController
                     $this->page_header_toolbar_btn['stats'] = array(
                     'short' => $this->l('Statistics', null, null, false),
                     'href' => $this->context->link->getAdminLink('AdminStats').'&module=statsproduct&id_product='.(int)$product->id,
-                    'desc' => $this->l('Room Type Sales', null, null, false),
+                    'desc' => $this->l('Stay Type Sales', null, null, false),
                 );
                 }
 
@@ -2816,9 +2817,9 @@ class AdminProductsControllerCore extends AdminController
                     $this->page_header_toolbar_btn['delete'] = array(
                         'short' => $this->l('Delete', null, null, false),
                         'href' => $this->context->link->getAdminLink('AdminProducts').'&id_product='.(int)$product->id.'&deleteproduct',
-                        'desc' => $this->l('Delete this room type', null, null, false),
+                        'desc' => $this->l('Delete this stay type', null, null, false),
                         'confirm' => 1,
-                        'js' => 'if (confirm(\''.$this->l('Delete room type?', null, true, false).'\')){return true;}else{event.preventDefault();}'
+                        'js' => 'if (confirm(\''.$this->l('Delete stay type?', null, true, false).'\')){return true;}else{event.preventDefault();}'
                     );
                 }
             }
@@ -2926,8 +2927,8 @@ class AdminProductsControllerCore extends AdminController
 
         // add text for normal product and booking product
         $this->tpl_form_vars['booking_product_text'] = array(
-            'name'=> $this->l('Room Type'),
-            'name_title'=> $this->l('Write the name of the Room Type for ex. Delux, Executive etc. Invalid characters <>;=#{}')
+            'name'=> $this->l('Stay Type'),
+            'name_title'=> $this->l('Write the name of the Stay Type for ex. Delux, Executive etc. Invalid characters <>;=#{}')
         );
         $this->tpl_form_vars['normal_product_text'] = array(
             'name'=> $this->l('Name'),
@@ -3105,13 +3106,13 @@ class AdminProductsControllerCore extends AdminController
                         )
                     );
                 } else {
-                    $this->displayWarning($this->l('Add Hotel Before configurate this room type.'));
+                    $this->displayWarning($this->l('Add Hotel Before configurate this stay type.'));
                 }
             } else {
-                $this->displayWarning($this->l('You must save the room type in this shop before managing hotel configuration.'));
+                $this->displayWarning($this->l('You must save the stay type in this shop before managing hotel configuration.'));
             }
         } else {
-            $this->displayWarning($this->l('You must save this room type before managing rooms.'));
+            $this->displayWarning($this->l('You must save this stay type before managing stays.'));
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -3244,7 +3245,7 @@ class AdminProductsControllerCore extends AdminController
                 ));
             }
         } else {
-            $this->displayWarning($this->l('You must save this room type before managing Service Products.'));
+            $this->displayWarning($this->l('You must save this stay type before managing Service Products.'));
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -3354,7 +3355,7 @@ class AdminProductsControllerCore extends AdminController
                 }
             }
         } else {
-            $this->errors[] = $this->l('Please save room type details before saving service products.');
+            $this->errors[] = $this->l('Please save stay type details before saving service products.');
         }
     }
 
@@ -3373,13 +3374,13 @@ class AdminProductsControllerCore extends AdminController
                         $smartyVars['roomTypeInfo'] = $roomTypeInfo;
                     }
                 } else {
-                    $this->displayWarning($this->l('Add Hotel Before configurate this room type.'));
+                    $this->displayWarning($this->l('Add Hotel Before configurate this stay type.'));
                 }
             } else {
-                $this->displayWarning($this->l('You must save the room type in this shop before managing occupancy.'));
+                $this->displayWarning($this->l('You must save the stay type in this shop before managing occupancy.'));
             }
         } else {
-            $this->displayWarning($this->l('You must save this room type before managing occupancy.'));
+            $this->displayWarning($this->l('You must save this stay type before managing occupancy.'));
         }
         $smartyVars['currency'] = $this->context->currency;
         $data->assign($smartyVars);
@@ -3470,16 +3471,16 @@ class AdminProductsControllerCore extends AdminController
                         $roomTypeInfo['restrictionDataRange'] = $objRoomTypeRestrictionDates->getRoomTypeLengthOfStayRestriction($product->id);
                         $smartyVars['roomTypeInfo'] = $roomTypeInfo;
                     } else {
-                        $this->displayWarning($this->l('No hotel is attached to this room type.'));
+                        $this->displayWarning($this->l('No hotel is attached to this stay type.'));
                     }
                 } else {
-                    $this->displayWarning($this->l('Room type information is missing.'));
+                    $this->displayWarning($this->l('Stay type information is missing.'));
                 }
             } else {
-                $this->displayWarning($this->l('You must save room type before managing length of stay.'));
+                $this->displayWarning($this->l('You must save stay type before managing length of stay.'));
             }
         } else {
-            $this->displayWarning($this->l('You must save room type before managing length of stay.'));
+            $this->displayWarning($this->l('You must save stay type before managing length of stay.'));
         }
 
         $smartyVars['product'] = $product;
@@ -3722,13 +3723,13 @@ class AdminProductsControllerCore extends AdminController
             $idRoom = Tools::getValue('id');
             $objRoomInfo = new HotelRoomInformation((int) $idRoom);
             if ($objRoomInfo->getFutureBookings($idRoom)) {
-                $this->errors[] = $this->l('This room cannot be deleted as this room contains future booking.');
+                $this->errors[] = $this->l('This stay cannot be deleted as this stay contains future booking.');
             }
             if (empty($this->errors)) {
                 if ($objRoomInfo->delete()) {
                     $response['success'] = true;
                 } else {
-                    $this->errors[] = $this->l('Unable to delete room. Please try again!.');
+                    $this->errors[] = $this->l('Unable to delete stay. Please try again!.');
                 }
             }
         }
@@ -3770,7 +3771,7 @@ class AdminProductsControllerCore extends AdminController
                 'idDefaultcurrency' => $objCurrency->id,
             ));
         } else {
-            $this->displayWarning($this->l('You must save this room type before managing additional facilities.'));
+            $this->displayWarning($this->l('You must save this stay type before managing additional facilities.'));
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -3946,7 +3947,7 @@ class AdminProductsControllerCore extends AdminController
                         'is_shop_context' => Shop::getContext() == Shop::CONTEXT_SHOP
             ));
         } else {
-            $this->displayWarning($this->l('You must save this room type before updating associations.'));
+            $this->displayWarning($this->l('You must save this stay type before updating associations.'));
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -4007,7 +4008,7 @@ class AdminProductsControllerCore extends AdminController
             // get hotel address for this room type
             $address_infos = Address::getCountryAndState(Cart::getIdAddressForTaxCalculation($obj->id));
         } else {
-            $this->displayWarning($this->l('You must save this room type before adding specific pricing'));
+            $this->displayWarning($this->l('You must save this stay type before adding specific pricing'));
             $product->id_tax_rules_group = (int)Product::getIdTaxRulesGroupMostUsed();
             $data->assign('ecotax_tax_excl', 0);
         }
@@ -4539,16 +4540,17 @@ class AdminProductsControllerCore extends AdminController
         $data->assign('bed_types_info', $bedTypes);
         $bookingMethods = $this->getRoomTypeBookingMethods();
         $data->assign('booking_methods_info', $bookingMethods);
+        $data->assign('global_booking_config_link', $this->context->link->getAdminLink('AdminPPreferences'));
         $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
         if ($selectedBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($product->id)) {
             $selectedBedTypes = array_column($selectedBedTypes, 'id_bed_type');
             $data->assign('selected_bed_types', $selectedBedTypes);
         }
 
-        $roomTypeObjectSellingTypes = HotelRoomTypeSellingType::getRoomTypeSellingObjectTypes($this->context->language->id);
-        $data->assign('room_type_selling_object_types_info', $roomTypeObjectSellingTypes);
-        if (!empty($product->id_room_type_selling_object_type)) {
-            $data->assign('selected_room_type_object_selling_types', $product->id_room_type_selling_object_type);
+        $roomTypeSellingObjects = RoomTypeSellingObject::getRoomTypeSellingObject($this->context->language->id);
+        $data->assign('room_type_selling_object_info', $roomTypeSellingObjects);
+        if (!empty($product->id_room_type_selling_object)) {
+            $data->assign('selected_room_type_selling_object', $product->id_room_type_selling_object);
         }
         if (!empty($product->booking_method)) {
             $data->assign('selected_booking_method', $product->booking_method);
@@ -4766,10 +4768,10 @@ class AdminProductsControllerCore extends AdminController
                     $data->assign('imageType', ImageType::getFormatedName('small'));
                 }
             } else {
-                $this->displayWarning($this->l('You must save the room type in this shop before adding images.'));
+                $this->displayWarning($this->l('You must save the stay type in this shop before adding images.'));
             }
         } else {
-            $this->displayWarning($this->l('You must save this room type before adding images.'));
+            $this->displayWarning($this->l('You must save this stay type before adding images.'));
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -4830,10 +4832,10 @@ class AdminProductsControllerCore extends AdminController
                     $data->assign('link', $this->context->link);
                     $data->assign('default_form_language', $this->default_form_language);
                 } else {
-                    $this->displayWarning($this->l('You must save the room type in this shop before adding features.'));
+                    $this->displayWarning($this->l('You must save the stay type in this shop before adding features.'));
                 }
             } else {
-                $this->displayWarning($this->l('You must save this room type before adding features.'));
+                $this->displayWarning($this->l('You must save this stay type before adding features.'));
             }
         }
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -4911,8 +4913,8 @@ class AdminProductsControllerCore extends AdminController
                     && ($product->pack_stock_type == 2 || $product->pack_stock_type == 1 ||
                         ($product->pack_stock_type == 3 && (Configuration::get('PS_PACK_STOCK_TYPE') == 1 || Configuration::get('PS_PACK_STOCK_TYPE') == 2))))) {
                     die(json_encode(array('error' => $this->l('You cannot use advanced stock management for this pack because').'<br />'.
-                        $this->l('- advanced stock management is not enabled for these room types').'<br />'.
-                        $this->l('- you have chosen to decrement room types quantities.'))));
+                        $this->l('- advanced stock management is not enabled for these stay types').'<br />'.
+                        $this->l('- you have chosen to decrement stay types quantities.'))));
                 }
 
                 StockAvailable::setProductDependsOnStock($product->id, (int)Tools::getValue('value'));
@@ -4930,7 +4932,7 @@ class AdminProductsControllerCore extends AdminController
                 if ($product->depends_on_stock && !Pack::allUsesAdvancedStockManagement($product->id) && ((int)$value == 1
                     || (int)$value == 2 || ((int)$value == 3 && (Configuration::get('PS_PACK_STOCK_TYPE') == 1 || Configuration::get('PS_PACK_STOCK_TYPE') == 2)))) {
                     die(json_encode(array('error' => $this->l('You cannot use this stock management option because:').'<br />'.
-                        $this->l('- advanced stock management is not enabled for these room types').'<br />'.
+                        $this->l('- advanced stock management is not enabled for these stay types').'<br />'.
                         $this->l('- advanced stock management is enabled for the pack'))));
                 }
 
@@ -4953,7 +4955,7 @@ class AdminProductsControllerCore extends AdminController
                     die(json_encode(array('error' =>  $this->l('Undefined value'))));
                 }
                 if (Tools::getValue('id_product_attribute') === false) {
-                    die(json_encode(array('error' =>  $this->l('Undefined id room type attribute'))));
+                    die(json_encode(array('error' =>  $this->l('Undefined id stay type attribute'))));
                 }
 
                 StockAvailable::setQuantity($product->id, (int)Tools::getValue('id_product_attribute'), (int)Tools::getValue('value'));
@@ -5029,7 +5031,7 @@ class AdminProductsControllerCore extends AdminController
             'Consider changing the default category.' => $this->l('Consider changing the default category.'),
             'ID' => $this->l('ID'),
             'Name' => $this->l('Name'),
-            'Mark all checkbox(es) of categories in which room type is to appear' => $this->l('Mark the checkbox of each categories in which this room type will appear.')
+            'Mark all checkbox(es) of categories in which stay type is to appear' => $this->l('Mark the checkbox of each categories in which this stay type will appear.')
         );
         return $trad[$key];
     }
@@ -5037,7 +5039,7 @@ class AdminProductsControllerCore extends AdminController
     protected function _displayUnavailableProductWarning()
     {
         $content = '<div class="alert">
-            <span>'.$this->l('Your room type will be saved as a draft.').'</span>
+            <span>'.$this->l('Your stay type will be saved as a draft.').'</span>
                 <a href="#" class="btn btn-default pull-right" onclick="submitAddProductAndPreview()" ><i class="icon-external-link-sign"></i> '.$this->l('Save and preview').'</a>
                 <input type="hidden" name="fakeSubmitAddProductAndPreview" id="fakeSubmitAddProductAndPreview" />
             </div>';
@@ -5164,7 +5166,7 @@ class AdminProductsControllerCore extends AdminController
         $idProduct = Tools::getValue('id_product');
         if ($this->tabAccess['edit'] === 1) {
             if (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo)) {
-                $this->errors[] = $this->l('Please select a valid date range to temporary disable this room');
+                $this->errors[] = $this->l('Please select a valid date range to temporary disable this stay');
             } else if ($idRoom && Validate::isLoadedObject($objHotelRoomInfo = new HotelRoomInformation((int) $idRoom))) {
                 $dateTo = date('Y-m-d', strtotime($dateTo));
                 $objHotelBookingDetail = new HotelBookingDetail();
@@ -5513,7 +5515,6 @@ class AdminProductsControllerCore extends AdminController
             ) {
                 $objRoomType = new HotelRoomType();
                 $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($objProduct->id);
-                $attribute_types = $roomTypeInfo['room_type_selling_type_name'] ? $roomTypeInfo['room_type_selling_type_name'] : $this->l('Rooms');
                 $idHotel = $roomTypeInfo['id_hotel'];
                 $rowsToHighlight = array();
                 $roomsInfo = array();
@@ -5533,13 +5534,13 @@ class AdminProductsControllerCore extends AdminController
                 if (!empty($roomNumber = trim(Tools::getValue('num')))
                     && !Validate::isUnsignedInt($roomNumber)
                 ) {
-                    $this->errors[] = sprintf(Tools::displayError('Invalid Starting %s No.') , $attribute_types);
+                    $this->errors[] = sprintf(Tools::displayError('Invalid Starting %s No.') , $roomTypeInfo['room_type_selling_object']);
                 }
 
                 if (!($roomQuantity = Tools::getValue('qty'))) {
-                    $this->errors[] = sprintf(Tools::displayError('Number of %s is required.') ,$attribute_types);
+                    $this->errors[] = sprintf(Tools::displayError('Number of %s is required.') ,$roomTypeInfo['room_type_selling_object']);
                 } else if (!Validate::isUnsignedInt($roomQuantity) || $roomQuantity < 1) {
-                    $this->errors[] = sprintf(Tools::displayError('Invalid value for number of %s.') ,$attribute_types);
+                    $this->errors[] = sprintf(Tools::displayError('Invalid value for number of %s.') ,$roomTypeInfo['room_type_selling_object']);
                 }
 
                 if (trim($comment = Tools::getValue('room_comment'))) {
@@ -5552,7 +5553,7 @@ class AdminProductsControllerCore extends AdminController
                     $disableDates = Tools::getValue('disable_dates');
                     $roomsInfo['disable_dates_json'] = json_encode($disableDates);
                     if (!$disableDates) {
-                        $this->errors[] = sprintf(Tools::displayError('Please add at least one date range for updating the %s status to temporary inactive.') , $attribute_types);
+                        $this->errors[] = sprintf(Tools::displayError('Please add at least one date range for updating the %s status to temporary inactive.') , $roomTypeInfo['room_type_selling_object']);
                     } else {
                         $hasMissingRowError = false;
                         foreach ($disableDates as $key => $dateRange) {
@@ -5662,9 +5663,8 @@ class AdminProductsControllerCore extends AdminController
     public function getRoomTypeBookingMethods()
     {
         return array(
-            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_DEFAULT, 'name' => $this->l('Default')),
-            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Room Occupancy')),
-            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Rooms Quantity (No. of rooms)'))
+            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Stay Occupancy')),
+            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Stays Quantity (No. of stays)')),
         );
     }
 }

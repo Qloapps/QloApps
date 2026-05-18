@@ -21,16 +21,9 @@
 *}
 
 {if isset($product->id)}
-    {if isset($htl_room_type['room_type_selling_type_name']) && $htl_room_type['room_type_selling_type_name']}
-        {assign var=attribute_type value=$htl_room_type['room_type_selling_type_name']}
-        {assign var=attribute_types value=$htl_room_type['room_type_selling_type_name']|cat:'s'}
-    {else}
-        {assign var=attribute_type value={l s='Room'}}
-        {assign var=attribute_types value={l s='Rooms'}}
-    {/if}
 	<div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="Configuration" />
-		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {$attribute_types}</h3>
+		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {$htl_room_type['multiple_room_type_selling_object']}</h3>
 
 		<input type="hidden" id="checkConfSubmit" value="0" name="checkConfSubmit">
 
@@ -41,35 +34,35 @@
                         <th class="center"></th>
 						<th class="col-sm-2 center">
 							<label class="control-label required">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter room number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}'}">
-									{l s='%s No.' sprintf=$attribute_type}
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter %s number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}' sprintf=$htl_room_type['room_type_selling_object']}">
+									{l s='%s No.' sprintf=$htl_room_type['room_type_selling_object']}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter floor of the room. For eg. First, Second etc. Invalid characters <>;=#{}'}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter floor of the %s. For eg. First, Second etc. Invalid characters <>;=#{}' sprintf=$htl_room_type['room_type_selling_object']}">
 									{l s='Floor'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select status of the room.'}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select status of the %s.' sprintf=$htl_room_type['room_type_selling_object']}">
 									{l s='Status'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-3 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter extra information about this %s. Leave empty if not required.' sprintf=$attribute_types}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter extra information about this %s. Leave empty if not required.' sprintf=$htl_room_type['multiple_room_type_selling_object']}">
 									{l s='Extra Information'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set date ranges when %s is set to Temporarily Inactive.' sprintf=$attribute_types}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set date ranges when %s is set to Temporarily Inactive.' sprintf=$htl_room_type['multiple_room_type_selling_object']}">
 									{l s='Disable Dates'}
 								</span>
 							</label>
@@ -110,7 +103,7 @@
 									<input type="text" class="form-control room_comment" value="{if isset($room_info['comment'])}{$room_info['comment']}{/if}" name="{$var_name_room_info|cat:'[comment]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<a class="btn btn-default deactiveDatesModal {if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }disabled{/if}" data-toggle="modal" data-target="#deactiveDatesModal" data-id-room="{if isset($room_info['id'])}{$room_info['id']}{/if}">{if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
+									<a class="btn btn-default deactiveDatesModal {if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }disabled{/if}" data-toggle="modal" data-target="#deactiveDatesModal" data-id-stay="{if isset($room_info['id'])}{$room_info['id']}{/if}">{if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
 									</a>
 									<input type="hidden" class="form-control disable_dates_json" name="{$var_name_room_info|cat:'[disable_dates_json]'}" {if $room_info['id_status'] == $rm_status['STATUS_TEMPORARY_INACTIVE']['id']}value="{$room_info['disable_dates_json']|escape:'html':'UTF-8'}"{/if}>
 								</td>
@@ -208,14 +201,14 @@
                             <li class="divider"></li>
                             <li>
                                 <a id="bulk-create-rooms-button" class="bulkCreateRoomModal" data-toggle="modal" data-target="#bulkCreateRoomModal" type="button" data-size="s" data-style="expand-right">
-                                    <i class="icon-plus"></i>&nbsp;{l s='Create %s' sprintf=$attribute_types}
+                                    <i class="icon-plus"></i>&nbsp;{l s='Create %s' sprintf=$htl_room_type['multiple_room_type_selling_object']}
                                 </a>
                             </li>
                         </ul>
                     </div>
 					<button id="add-more-rooms-button" class="btn btn-default" type="button" data-size="s" data-style="expand-right">
 						<i class="icon icon-plus"></i>
-						{l s='Add More %s'  sprintf=$attribute_types}
+						{l s='Add More %s'  sprintf=$htl_room_type['multiple_room_type_selling_object']}
 					</button>
 				</div>
 			</div>
@@ -260,7 +253,7 @@
                     <div class="alert alert-warning">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <ul class="list-unstyled">
-                            <li>{l s='Please save this %s first to add dates.' sprintf=$attribute_types}</li>
+                            <li>{l s='Please save this %s first to add dates.' sprintf=$htl_room_type['multiple_room_type_selling_object']}</li>
                         </ul>
                     </div>
                 </div>
@@ -332,7 +325,7 @@
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Update %s'  sprintf=$attribute_types}</h4>
+				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Update %s'  sprintf=$htl_room_type['multiple_room_type_selling_object']}</h4>
 			</div>
 			<div class="modal-body padding-top-20">
 				<div class="text-left errors-wrap" style="display: none;"></div>
@@ -365,7 +358,7 @@
                     </div>
                 </div>
 				<div class="from-group table-responsive-row clearfix" style="display:none;">
-                    <div class="rooms-disable-dates-title">{l s='Disable Dates'}</div>
+                    <div class="stays-disable-dates-title">{l s='Disable Dates'}</div>
                     <table class="table rooms-disable-dates">
                         <thead>
                             <tr class="nodrag nodrop">
@@ -407,13 +400,13 @@
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Create %s' sprintf=$attribute_types}</h4>
+				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Create %s' sprintf=$htl_room_type['multiple_room_type_selling_object']}</h4>
 			</div>
 			<div class="modal-body padding-top-20">
 				<div class="text-left errors-wrap" style="display: none;"></div>
                 <div class="form-group">
                     <label class="control-label col-lg-3">
-                        <span>{l s='%s prefix'  sprintf=$attribute_type}</span>
+                        <span>{l s='%s prefix'  sprintf=$htl_room_type['room_type_selling_object']}</span>
                     </label>
                     <div class="col-lg-6">
                         <input type="text" name="bulk_create_room_prefix"/>
@@ -421,7 +414,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-3">
-                        <span>{l s='Starting %s No.'  sprintf=$attribute_type}</span>
+                        <span>{l s='Starting %s No.'  sprintf=$htl_room_type['room_type_selling_object']}</span>
                     </label>
                     <div class="col-lg-6">
                         <input type="text" name="bulk_create_room_num"/>
@@ -429,7 +422,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label required col-lg-3">
-                        <span>{l s='Number of %s'  sprintf=$attribute_types}</span>
+                        <span>{l s='Number of %s'  sprintf=$htl_room_type['multiple_room_type_selling_object']}</span>
                     </label>
                     <div class="col-lg-6">
                         <input type="text" name="bulk_create_room_qty"/>
@@ -468,7 +461,7 @@
                     </div>
                 </div>
 				<div class="from-group table-responsive-row clearfix" style="display:none;">
-                    <div class="rooms-disable-dates-title">{l s='Disable Dates'}</div>
+                    <div class="stays-disable-dates-title">{l s='Disable Dates'}</div>
                     <table class="table rooms-disable-dates">
                         <thead>
                             <tr class="nodrag nodrop">
@@ -565,13 +558,13 @@
                     <li class="enable_selected_dates btn btn-default">
                         <span class="enable_selected_dates">
                             <i class="icon-check"></i>
-                            {l s='Make %s Available'  sprintf=$attribute_type}
+                            {l s='Make %s Available'  sprintf=$htl_room_type['room_type_selling_object']}
                         </span>
                     </li>
                     <li class="disabled_selected_dates btn btn-default">
                         <span class="disabled_selected_dates">
                             <i class="icon-ban"></i>
-                            {l s='Disable %s'  sprintf=$attribute_type}
+                            {l s='Disable %s'  sprintf=$htl_room_type['room_type_selling_object']}
                         </span>
                     </li>
                 </ul>
@@ -616,7 +609,7 @@
                 }
             } else {
                 $('#room-dates-modal .room-booked-dates-table tbody').append(`<tr>
-                    <td colspan="3" class="center">{/literal}{l s='No Booking for this room'}{literal}</td>
+                    <td colspan="3" class="center">{/literal}{l s='No Booking for this stay'}{literal}</td>
                 </tr>`);
             }
         });
@@ -1169,7 +1162,7 @@
                 });
             },
             submitBulkDelete: function() {
-                if (confirm("{l s='Delete selected rooms?'}")) {
+                if (confirm("{l s='Delete selected stays?'}")) {
                     $('#product_form').append('<input type="hidden" name="submitBulkDeleteRooms" value="1"/>');
                     $('form#product_form').submit();
                 }
@@ -1531,7 +1524,7 @@
                 $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
                 $('#deactiveDatesModal').attr('data-id-room', idRoom);
                 if ($.trim(roomNum) != '') {
-                    roomNum = '( '+'{l s='%s No' sprintf=$attribute_types}'+' '+roomNum+')';
+                    roomNum = '( '+'{l s='%s No' sprintf=$htl_room_type['multiple_room_type_selling_object']}'+' '+roomNum+')';
                 }
 
                 $('#deactiveDatesModal .disable_dates_room_num').html(roomNum);

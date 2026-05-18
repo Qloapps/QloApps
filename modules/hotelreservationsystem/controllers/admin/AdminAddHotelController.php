@@ -45,16 +45,24 @@ class AdminAddHotelController extends ModuleAdminController
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'state` s ON (s.`id_state` = aa.`id_state`)';
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
         ON (cl.`id_country` = aa.`id_country` AND cl.`id_lang` = '.(int) $this->context->language->id.')';
-
-        $this->_select = ' hbl.`hotel_name`, aa.`city`, s.`name` as `state_name`, cl.`name` as country_name';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_property_type_lang` hrtsl
+        ON (hrtsl.`id_htl_property_type` = a.`id_property_type` AND hrtsl.`id_lang` = '.(int) $this->context->language->id.')';
+        $this->_select = ' hrtsl.`name` as `property_type` , hbl.`hotel_name`, aa.`city`, s.`name` as `state_name`, cl.`name` as `country_name`';
 
         $this->fields_list = array(
             'id' => array(
                 'title' => $this->l('ID'),
                 'align' => 'center',
             ),
+            'property_type' => array(
+                'title' => $this->l('Property type'),
+                'align' => 'center',
+                'optional' => false,
+                'filter_key' => 'hrtsl!name',
+                'order_key' => 'hrtsl!name',
+            ),
             'hotel_name' => array(
-                'title' => $this->l('Hotel Name'),
+                'title' => $this->l('Name'),
                 'align' => 'center',
             ),
             'city' => array(
@@ -222,7 +230,7 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['PS_MAX_CHECKOUT_OFFSET'] = (int) Configuration::get('PS_MAX_CHECKOUT_OFFSET');
         $smartyVars['PS_MIN_BOOKING_OFFSET'] = (int) Configuration::get('PS_MIN_BOOKING_OFFSET');
         $smartyVars['WK_ORDER_REFUND_ALLOWED'] = Configuration::get('WK_ORDER_REFUND_ALLOWED');
-        $hotelPropertyTypes = HotelRoomTypeSellingType::getHotelPropertyTypes($this->context->language->id);
+        $hotelPropertyTypes = HotelPropertyType::getPropertyTypes($this->context->language->id);
         $smartyVars['hotel_property_types_info'] = $hotelPropertyTypes;
         $selectedHotelPropertyType = Tools::getValue('id_property_type');
         if (!$selectedHotelPropertyType && isset($hotelBranchInfo)) {
@@ -294,10 +302,6 @@ class AdminAddHotelController extends ModuleAdminController
                     }
                 }
             }
-        }
-
-        if ($idHotelPropertyType == '' && $idHotelPropertyType == null && !Validate::isUnsignedId($idHotelPropertyType)) {
-            $this->errors[] = $this->l('Invalid property type.');
         }
 
         foreach ($languages as $lang) {

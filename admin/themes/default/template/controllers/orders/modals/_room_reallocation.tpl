@@ -23,17 +23,17 @@
 <div class="modal-body">
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active">
-            <a  href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation'}</a>
+            <a  href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Stay Reallocation'}</a>
         </li>
         <li role="presentation">
-            <a  href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room'}</a>
+            <a  href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Stay'}</a>
         </li>
     </ul>
     <div class="tab-content active">
         <div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
             <div class="row">
                 <dl class="list-detail col-sm-6">
-                    <label class="label-title">{l s='Current Room Number'}</label>
+                    <label class="label-title">{l s='Current Stay Number'}</label>
                     <dd><i class="icon-bed"></i> &nbsp;<span class="modal_curr_room_num"></span></dd>
                 </dl>
                 <dl class="list-detail col-sm-6">
@@ -58,20 +58,20 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="form-group col-sm-6">
-                            <label for="realloc_avail_room_type" class="control-label model-label">{l s='Room Type To Reallocate:'}</label>
+                            <label for="realloc_avail_room_type" class="control-label model-label">{l s='Stay Type To Reallocate:'}</label>
                             <input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
                             <div class="realloc_avail_room_type_container">
                                 <select class="form-control" name="realloc_avail_room_type" id="realloc_avail_room_type">
-                                    <option value="0" selected="selected">{l s='Select Room Type'}</option>
+                                    <option value="0" selected="selected">{l s='Select Stay Type'}</option>
                                 </select>
                             </div>
                             <p class="error_text" id="realloc_sel_rm_type_err_p"></p>
                         </div>
                         <div class="form-group col-sm-6">
-                            <label for="realloc_avail_rooms" class="control-label model-label">{l s='Room To Reallocate:'}</label>
+                            <label for="realloc_avail_rooms" class="control-label model-label">{l s='Stay To Reallocate:'}</label>
                             <div class="realloc_avail_rooms_container">
                                 <select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
-                                    <option value="0" selected="selected">{l s='Select Rooms'}</option>
+                                    <option value="0" selected="selected">{l s='Select Stays'}</option>
                                 </select>
                             </div>
                             <p class="error_text" id="realloc_sel_rm_err_p"></p>
@@ -89,8 +89,8 @@
                     </div>
                     <div class="row">
                         <div class="alert alert-warning col-sm-12 realloc_roomtype_change_message" style="display:none">
-                            <p>{l s="If room type is changed while room reallocation then all additional facilities and services will be assigned to the selected room of new room type."}</p>
-                            <p>{l s="If you want to change additional facilities or services, you can update by editing the room after reallocation."}</p>
+                            <p>{l s="If stay type is changed while stay reallocation then all additional facilities and services will be assigned to the selected stay of new stay type."}</p>
+                            <p>{l s="If you want to change additional facilities or services, you can update by editing the stay after reallocation."}</p>
                         </div>
                     </div>
                     <p class="error_text" id="realloc_sel_rm_err_p"></p>
@@ -105,7 +105,7 @@
         <div role="tabpanel" class="tab-pane" id="swap_room_tab">
             <div class="row">
                 <dl class="list-detail col-sm-6">
-                    <label class="label-title">{l s='Current Room Number'}</label>
+                    <label class="label-title">{l s='Current Stay Number'}</label>
                     <dd><i class="icon-bed"></i> &nbsp;<span class="modal_curr_room_num"></span></dd>
                 </dl>
                 <dl class="list-detail col-sm-6">
@@ -131,7 +131,7 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-sm-6">
-                            <label for="swap_avail_rooms" class="control-label model-label">{l s='Available rooms to swap'}</label>
+                            <label for="swap_avail_rooms" class="control-label model-label">{l s='Available stays to swap'}</label>
                             <input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
                             <div class="swap_avail_rooms_container"></div>
 

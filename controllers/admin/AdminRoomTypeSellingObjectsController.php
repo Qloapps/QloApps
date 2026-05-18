@@ -21,28 +21,22 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-class AdminHotelRoomTypeSellingTypesController extends ModuleAdminController
+class AdminRoomTypeSellingObjectsController extends AdminController
 {
-
     public function __construct()
     {
         $this->bootstrap = true;
-        $this->table = 'htl_room_type_selling_type';
-        $this->className = 'HotelRoomTypeSellingType';
-        $this->identifier = 'id_htl_room_type_selling_type';
+        $this->table = 'room_type_selling_object';
+        $this->className = 'RoomTypeSellingObject';
+        $this->identifier = 'id_room_type_selling_object';
         $this->lang = true;
         $this->context = Context::getContext();
-        $this->toolbar_title = $this->l('Property & Room Types');
+        $this->toolbar_title = $this->l('Stay Type Selling Objects');
 
         parent::__construct();
 
-        $this->propertyTypes = array(
-            HotelRoomTypeSellingType::HOTEL_PROPERTY_TYPE => $this->l('Property type'),
-            HotelRoomTypeSellingType::ROOM_TYPE_OBJECT_SELLING_TYPE => $this->l('Room selling type'),
-        );
-
         $this->fields_list = array(
-            'id_htl_room_type_selling_type' => array(
+            'id_room_type_selling_object' => array(
                 'title' => $this->l('ID'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
@@ -50,14 +44,6 @@ class AdminHotelRoomTypeSellingTypesController extends ModuleAdminController
             'name' => array(
                 'title' => $this->l('Name'),
                 'align' => 'left',
-            ),
-            'type' => array(
-                'title' => $this->l('Type'),
-                'align' => 'center',
-                'type' => 'select',
-                'list' => $this->propertyTypes,
-                'filter_key' => 'a!type',
-                'callback' => 'getSellingTypeLabel',
             ),
             'active' => array(
                 'title' => $this->l('Status'),
@@ -74,27 +60,22 @@ class AdminHotelRoomTypeSellingTypesController extends ModuleAdminController
             'delete' => array(
                 'text' => $this->l('Delete selected'),
                 'confirm' => $this->l('Delete selected items?'),
-                'icon' => 'icon-trash'
-            )
+                'icon' => 'icon-trash',
+            ),
         );
     }
 
     public function initPageHeaderToolbar()
     {
         if (!$this->display || $this->display == 'list') {
-            $this->page_header_toolbar_btn['new_type'] = array(
+            $this->page_header_toolbar_btn['new_room_selling_type'] = array(
                 'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-                'desc' => $this->l('Add new', null, null, false),
-                'icon' => 'process-icon-new'
+                'desc' => $this->l('Add new Selling Object', null, null, false),
+                'icon' => 'process-icon-new',
             );
         }
 
         parent::initPageHeaderToolbar();
-    }
-
-    public function initToolbar()
-    {
-        $this->toolbar_btn = array();
     }
 
     public function renderForm()
@@ -103,14 +84,9 @@ class AdminHotelRoomTypeSellingTypesController extends ModuleAdminController
             return;
         }
 
-        $typeSelect = array();
-        foreach ($this->propertyTypes as $id => $name) {
-            $typeSelect[] = array('id' => $id, 'name' => $name);
-        }
-
         $this->fields_form = array(
             'legend' => array(
-                'title' => $this->l('Type'),
+                'title' => $this->l('Stay Type Selling Object'),
                 'icon' => 'icon-tags',
             ),
             'input' => array(
@@ -120,18 +96,7 @@ class AdminHotelRoomTypeSellingTypesController extends ModuleAdminController
                     'name' => 'name',
                     'lang' => true,
                     'required' => true,
-                    'hint' => $this->l('Displayed name for this type.'),
-                ),
-                array(
-                    'type' => 'select',
-                    'label' => $this->l('Type'),
-                    'name' => 'type',
-                    'required' => true,
-                    'options' => array(
-                        'query' => $typeSelect,
-                        'id' => 'id',
-                        'name' => 'name',
-                    ),
+                    'hint' => $this->l('Displayed name for this stay type selling object.'),
                 ),
                 array(
                     'type' => 'switch',
@@ -148,21 +113,15 @@ class AdminHotelRoomTypeSellingTypesController extends ModuleAdminController
                             'id' => 'active_off',
                             'value' => 0,
                             'label' => $this->l('Disabled'),
-                        )
+                        ),
                     ),
                 ),
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
-            )
+            ),
         );
 
         return parent::renderForm();
     }
-
-    public function getSellingTypeLabel($value, $row)
-    {
-        return isset($this->propertyTypes[$value]) ? $this->propertyTypes[$value] : $value;
-    }
-
 }

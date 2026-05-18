@@ -2,10 +2,10 @@
     <table class="table table-recap room-extra-demand-table">
         <thead>
             <tr>
-                <th colspan="3" class="table-caption">{l s='Room Extra Demands Detail'}</th>
+                <th colspan="3" class="table-caption">{l s='Stay Extra Demands Detail'}</th>
             </tr>
             <tr>
-                <th>{l s='Room Type'}</th>
+                <th>{l s='Stay Type'}</th>
                 <th>{l s='Name'}</th>
                 <th>{l s='Total'} <br /> {l s='(Tax excl.)'}</th>
             </tr>
@@ -26,7 +26,7 @@
                                             <font size="2" face="Open-sans, sans-serif" color="#555454">
                                                 {$data_v['name']}<br>
                                                 {$rm_v['data_form']|date_format:"%d-%m-%Y"} {l s='to'} {$rm_v['data_to']|date_format:"%d-%m-%Y"}<br>
-                                                <strong>{l s='Room'} - {$roomCount}</strong>
+                                                <strong>{l s='Stay'} - {$roomCount}</strong>
                                             </font>
                                         </td>
                                     {/if}
@@ -50,7 +50,7 @@
 
             {if !isset($room_demand_exists)}
                 <tr>
-                    <th colspan="3" class="table-caption">{l s='No room extra demands added.'}</th>
+                    <th colspan="3" class="table-caption">{l s='No stay extra demands added.'}</th>
                 </tr>
             {/if}
         </tbody>
@@ -59,10 +59,10 @@
     <table class="table table-recap room-extra-service-table">
         <thead>
             <tr>
-                <th colspan="4" class="table-caption">{l s='Rooms Services Detail'}</th>
+                <th colspan="4" class="table-caption">{l s='Stays Services Detail'}</th>
             </tr>
             <tr>
-                <th>{l s='Room Type'}</th>
+                <th>{l s='Stay Type'}</th>
                 <th>{l s='Name'}</th>
                 <th>{l s='Qty'}</th>
                 <th>{l s='Total'}</th>
@@ -84,7 +84,7 @@
                                             <font size="2" face="Open-sans, sans-serif" color="#555454">
                                                 {$data_v['name']}<br>
                                                 {$rm_v['data_form']|date_format:"%d-%m-%Y"} {l s='to'} {$rm_v['data_to']|date_format:"%d-%m-%Y"}<br>
-                                                <strong>{l s='Room'} - {$roomCount}</strong>
+                                                <strong>{l s='Stay'} - {$roomCount}</strong>
                                             </font>
                                         </td>
                                     {/if}
@@ -117,7 +117,7 @@
 
             {if !isset($room_additinal_services_exists)}
                 <tr>
-                    <th colspan="4" class="table-caption">{l s='No room services added.'}</th>
+                    <th colspan="4" class="table-caption">{l s='No stay services added.'}</th>
                 </tr>
             {/if}
         </tbody>

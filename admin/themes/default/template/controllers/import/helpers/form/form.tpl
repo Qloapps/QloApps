@@ -315,10 +315,10 @@
 					{l s='Sample Hotels file'}
 				</a>
 				<a class="list-group-item _blank" href="../docs/csv_import/room_types_import.csv">
-					{l s='Sample Room Types file'}
+					{l s='Sample Stay Types file'}
 				</a>
 				<a class="list-group-item _blank" href="../docs/csv_import/rooms_import.csv">
-					{l s='Sample Rooms file'}
+					{l s='Sample Stays file'}
 				</a>
 				<a class="list-group-item _blank" href="../docs/csv_import/service_products_import.csv">
 					{l s='Sample Service Products file'}

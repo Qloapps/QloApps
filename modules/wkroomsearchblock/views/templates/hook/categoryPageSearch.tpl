@@ -24,7 +24,7 @@
     {if isset($hotels_info) && count($hotels_info)}
         <div class="header-rmsearch-wrapper">
         <div class="filter_header clearfix">
-        <p>{l s='Search Rooms' mod='wkroomsearchblock'}</p>
+        <p>{l s='Search Stays' mod='wkroomsearchblock'}</p>
         <hr class="header-bottom-hr">
         </div>
         {block name='search_form'}

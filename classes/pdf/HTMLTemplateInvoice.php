@@ -315,12 +315,14 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         $room_extra_demands = array();
         $room_additinal_services = array();
         $formattedHotelAddress = '';
+        $propertyType = '';
         if (Module::isInstalled('hotelreservationsystem')) {
             $obj_htl_bk_dtl = new HotelBookingDetail();
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
             $invoiceAddressPatternRules['avoid'][] = 'lastname';
             if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order_obj->id)) {
                 $objHotelBranchInfo = new HotelBranchInformation((int) $idHotel, $context->language->id);
+                $propertyType = HotelPropertyType::getPropertyType($idHotel);
                 $invoiceAddressPatternRules['avoid'][] = 'lastname';
                 if ($idHotelAddress = $objHotelBranchInfo->getHotelIdAddress()) {
                     $objHotelAddress = new Address((int) $idHotelAddress);
@@ -681,6 +683,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'delivery_address' => $formatted_delivery_address,
             'invoice_address' => $formatted_invoice_address,
             'hotel_address' => $formattedHotelAddress,
+            'property_type' => $propertyType,
             'addresses' => array('invoice' => $invoice_address, 'delivery' => $delivery_address),
             'tax_excluded_display' => $tax_excluded_display,
             'display_product_images' => $display_product_images,

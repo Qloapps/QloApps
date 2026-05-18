@@ -12,9 +12,9 @@ Payment Mode: {payment_mode}
 Transaction Id: {id_transaction}
 Booking details
 
-Room Type
+Stay Type
 Hotel
-Num. Rooms
+Num. Stays
 Duration
 {refundBookingHtml}
 

@@ -39,7 +39,7 @@
 					</li>
 					<li class="divider"></li>
 					<li class="search-book search-option">
-						<a href="#" data-value="{$QLO_SEARCH_TYPE_CATELOG}" data-placeholder="{l s='Room Types, Service products...'}" data-icon="icon-book">
+						<a href="#" data-value="{$QLO_SEARCH_TYPE_CATELOG}" data-placeholder="{l s='Stay Types, Service products...'}" data-icon="icon-book">
 							<i class="icon-book"></i> {l s='Catalog'}
 						</a>
 					</li>

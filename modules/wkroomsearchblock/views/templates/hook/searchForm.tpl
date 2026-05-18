@@ -164,7 +164,7 @@
                                         {/foreach}
                                     {else}
                                         <div class="occupancy-room-block">
-                                            <div class="occupancy_info_head"><span class="room_num_wrapper">{l s='Room - 1' mod='wkroomsearchblock'}</span></div>
+                                            <div class="occupancy_info_head"><span class="room_num_wrapper">{l s='Stay - 1' mod='wkroomsearchblock'}</span></div>
                                             <div class="occupancy_info_block" occ_block_index="0">
                                                 <div class="row">
                                                     <div class="form-group occupancy_count_block col-sm-5 col-xs-6">
@@ -226,7 +226,7 @@
                                 </div>
                                 <div class="occupancy_block_actions">
                                     <span id="add_new_occupancy">
-                                        <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='wkroomsearchblock'}</span></a>
+                                        <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Stay' mod='wkroomsearchblock'}</span></a>
                                     </span>
                                     <span>
                                         <button class="submit_occupancy_btn btn btn-primary">{l s='Done' mod='wkroomsearchblock'}</button>
@@ -240,7 +240,7 @@
             {block name='search_form_submit'}
                 <div class="form-group grid-item search_room_submit_block area-4" style="grid-column: span 4;">
                     <button type="submit" class="btn btn btn-primary" name="search_room_submit" id="search_room_submit">
-                        <span>{l s='Search Rooms' mod='wkroomsearchblock'}</span>
+                        <span>{l s='Search Stays' mod='wkroomsearchblock'}</span>
                     </button>
                 </div>
             {/block}

@@ -33,8 +33,8 @@
 	<h3 class="tab"> <i class="icon-info"></i> {l s='Information'}</h3>
 	<script type="text/javascript">
 
-		var msg_select_one = "{l s='Please select at least one room type.' js=1}";
-		var msg_set_quantity = "{l s='Please set a quantity to add a room type.' js=1}";
+		var msg_select_one = "{l s='Please select at least one stay type.' js=1}";
+		var msg_set_quantity = "{l s='Please set a quantity to add a stay type.' js=1}";
 
 		{if isset($ps_force_friendly_product) && $ps_force_friendly_product}
 			var ps_force_friendly_product = 1;
@@ -95,7 +95,7 @@
 	</script>
 
 	{if isset($display_common_field) && $display_common_field}
-	<div class="alert alert-warning" style="display: block">{l s='Warning, if you change the value of fields with an orange bullet %s, the value will be changed for all other shops for this room type' sprintf=$bullet_common_field}</div>
+	<div class="alert alert-warning" style="display: block">{l s='Warning, if you change the value of fields with an orange bullet %s, the value will be changed for all other shops for this stay type' sprintf=$bullet_common_field}</div>
 	{/if}
 
 	{include file="controllers/products/multishop/check_fields.tpl" product_tab="Informations"}
@@ -103,7 +103,7 @@
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="name" type="default" multilang="true"}</span></div>
 		<label class="control-label col-lg-2 required" id="name" for="name_{$id_lang}">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Write the name of the Room Type for ex. Delux, Executive etc.'} {l s='Invalid characters:'} &lt;&gt;;=#{}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Write the name of the Stay Type for ex. Delux, Executive etc.'} {l s='Invalid characters:'} &lt;&gt;;=#{}">
 				{l s='Name'}
 			</span>
 		</label>
@@ -155,7 +155,7 @@
 	<div class="form-group hidden">
 		<label class="control-label col-lg-3" for="reference">
 			<span class="label-tooltip" data-toggle="tooltip"
-			title="{l s='Your internal reference code for this room type.'} {l s='Allowed special characters:'} .-_#\">
+			title="{l s='Your internal reference code for this stay type.'} {l s='Allowed special characters:'} .-_#\">
 				{$bullet_common_field} {l s='Reference code'}
 			</span>
 		</label>
@@ -167,7 +167,7 @@
 	<div class="form-group hidden">
 		<label class="control-label col-lg-3" for="ean13">
 			<span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='This type of room type code is specific to Europe and Japan, but is widely used internationally. It is a superset of the UPC code: all products marked with an EAN will be accepted in North America.'}">
+				title="{l s='This type of stay type code is specific to Europe and Japan, but is widely used internationally. It is a superset of the UPC code: all products marked with an EAN will be accepted in North America.'}">
 				{$bullet_common_field} {l s='EAN-13 or JAN barcode'}
 			</span>
 		</label>
@@ -179,7 +179,7 @@
 	<div class="form-group hidden">
 		<label class="control-label col-lg-3" for="upc">
 			<span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='This type of room type code is widely used in the United States, Canada, the United Kingdom, Australia, New Zealand and in other countries.'}">
+				title="{l s='This type of stay type code is widely used in the United States, Canada, the United Kingdom, Australia, New Zealand and in other countries.'}">
 				{$bullet_common_field} {l s='UPC barcode'}
 			</span>
 		</label>
@@ -228,8 +228,8 @@
 		<div class="col-lg-9 col-lg-offset-3">
 			<div class="alert alert-info">
 				{l s='404 Not Found = Do not redirect and display a 404 page.'}<br/>
-				{l s='301 Moved Permanently = Permanently display another room type instead.'}<br/>
-				{l s='302 Moved Temporarily = Temporarily display another room type instead.'}
+				{l s='301 Moved Permanently = Permanently display another stay type instead.'}<br/>
+				{l s='302 Moved Temporarily = Temporarily display another stay type instead.'}
 			</div>
 		</div>
 	</div>
@@ -237,7 +237,7 @@
 	<div class="form-group redirect_product_options redirect_product_options_product_choise" style="display:none">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="id_product_redirected" type="radio" onclick=""}</span></div>
 		<label class="control-label col-lg-2" for="related_product_autocomplete_input">
-			{l s='Related room type'}
+			{l s='Related stay type'}
 		</label>
 		<div class="col-lg-7">
 			<input type="hidden" value="" name="id_product_redirected" />
@@ -248,7 +248,7 @@
 			</div>
 
 			<div class="form-control-static">
-				<span id="related_product_name"><i class="icon-warning-sign"></i>&nbsp;{l s='No related room type.'}</span>
+				<span id="related_product_name"><i class="icon-warning-sign"></i>&nbsp;{l s='No related stay type.'}</span>
 				<span id="related_product_remove" style="display:none">
 					<a class="btn btn-default" href="#" onclick="removeRelatedProduct(); return false" id="related_product_remove_link">
 						<i class="icon-remove text-danger"></i>
@@ -258,7 +258,7 @@
 
 		</div>
 		<script>
-			var no_related_product = '{l s='No related room type.'}';
+			var no_related_product = '{l s='No related stay type.'}';
 			var id_product_redirected = {$product->id_product_redirected|intval};
 			var product_name_redirected = '{$product_name_redirected|escape:'html':'UTF-8'}';
 		</script>
@@ -280,7 +280,7 @@
 
 	<div class="form-group" id="show_at_front_container">
 		<label class="control-label col-lg-3">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Enable if you want this room type to be shown and to be available for booking from front office.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Enable if you want this stay type to be shown and to be available for booking from front office.'}">
 				{l s='Show at front office'}
 			</span>
 		</label>
@@ -352,7 +352,7 @@
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="description_short" type="tinymce" multilang="true"}</span></div>
 		<label class="control-label col-lg-2" for="description_short_{$id_lang}">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Appears in the room type list(s), and at the top of the room type page.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Appears in the stay type list(s), and at the top of the stay type page.'}">
 				{l s='Short description'}
 			</span>
 		</label>
@@ -369,7 +369,7 @@
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="description" type="tinymce" multilang="true"}</span></div>
 		<label class="control-label col-lg-2" for="description_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Appears in the body of the room type.'}">
+				title="{l s='Appears in the body of the stay type.'}">
 				{l s='Description'}
 			</span>
 		</label>
@@ -450,53 +450,88 @@
 	{if isset($product->id) && $product->id}
 		<div class="form-group">
 			<label class="control-label col-lg-3" id="category_position" for="category_position">
-				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Set display position of room type on the search results page.'}">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Set display position of stay type on the search results page.'}">
 					{l s='Position'}
 				</span>
 			</label>
 			<div class="col-lg-9">
 				<input type="text" id="category_position" class="form-control fixed-width-lg" name="category_position" value="{$category_position}" />
-				<p class="help-block">{l s='Please note that position numbering starts from 0. A position of 0 means room type will be displayed at the topmost position.'}</p>
+				<p class="help-block">{l s='Please note that position numbering starts from 0. A position of 0 means stay type will be displayed at the topmost position.'}</p>
 				<div class="alert alert-info">
-					{l s='You can manage positions of the room types of this hotel from'}
+					{l s='You can manage positions of the stay types of this hotel from'}
 					<a href="{$link->getAdminLink('AdminProducts')}&submitResetproduct&submitFilterproduct=1&productFilter_a!id_category_default={$htl_full_info['id_category']}">{l s='here.'}</a>
 				</div>
 			</div>
 		</div>
 	{/if}
 
-	<div class="form-group" id="room_type_selection">
-		<label class="control-label col-sm-3">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select the room selling type for this room type.'}">
-				{l s='Room Type Selling Object Types'}
+	{if isset($room_type_selling_object_info) && $room_type_selling_object_info}
+		<div class="form-group" id="room_type_selection">
+			<label class="control-label col-sm-3">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select the stay selling type for this stay type.'}">
+					{l s='Stay Type Selling'}
+				</span>
+			</label>
+			<div class="col-sm-5">
+				<select name="id_room_type_selling_object" id="id_room_type_selling_object" class="form-control chosen" >
+					{foreach from=$room_type_selling_object_info item=room_type_selling_object_type_info}
+						<option value="{$room_type_selling_object_type_info['id_room_type_selling_object']}" {if isset($selected_room_type_selling_object) && $room_type_selling_object_type_info['id_room_type_selling_object'] == $selected_room_type_selling_object}selected{/if}>{$room_type_selling_object_type_info['name']}</option>
+					{/foreach}
+				</select>
+			</div>
+		</div>
+	{else}
+			<input type="hidden" name="id_room_type_selling_object" value="0">
+	{/if}
+
+
+	{assign var="has_booking_method" value=(isset($selected_booking_method) && $selected_booking_method)}
+	<div class="form-group">
+		<div class="col-lg-1"></span></div>
+		<label class="control-label col-lg-2">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Override the global booking method setting for this stay type.'}">
+				{l s='Search Type'}
 			</span>
 		</label>
-		<div class="col-sm-5">
-			<select name="id_room_type_selling_object_type" id="id_room_type_selling_object_type" class="form-control chosen" >
-				{foreach from=$room_type_selling_object_types_info item=room_type_selling_object_type_info}
-					<option value="{$room_type_selling_object_type_info['id_room_type_selling_object_type']}" {if isset($selected_room_type_object_selling_types) && $room_type_selling_object_type_info['id_room_type_selling_object_type'] == $selected_room_type_object_selling_types}selected{/if}>{$room_type_selling_object_type_info['name']}</option>
-				{/foreach}
-			</select>
+		<div class="col-lg-9">
+			<span class="switch prestashop-switch fixed-width-lg">
+				<input onclick="showBookingMehtodOption(true);" type="radio" name="booking_method_switch" id="booking_method_on" value="1" {if $has_booking_method}checked="checked" {/if} />
+				<label for="booking_method_on" class="radioCheck">
+					{l s='Yes'}
+				</label>
+				<input onclick="showBookingMehtodOption(false);"  type="radio" name="booking_method_switch" id="booking_method_off" value="0" {if !$has_booking_method }checked="checked"{/if} />
+				<label for="booking_method_off" class="radioCheck">
+					{l s='No'}
+				</label>
+				<a class="slide-button btn"></a>
+			</span>
+			<p class="help-block">
+				{l s='Disabled state uses the,'} <a href="{$global_booking_config_link|escape:'html':'UTF-8'}" target="_blank">{l s='global booking search type '}</a> {l s='setting is used.'}
+			</p>
 		</div>
 	</div>
 
-	<div class="form-group" id="booking_types_selection">
+	<div class="form-group booking_method_product_options" {if !$has_booking_method}style="display:none;"{/if}>
 		<label class="control-label col-sm-3">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select all booking methods available for this room type.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Override the global booking method setting for this stay type.'}">
 				{l s='Booking Method'}
 			</span>
 		</label>
 		<div class="col-sm-5">
-			<select name="booking_method" id="booking_method" class="form-control">
-				{foreach from=$booking_methods_info item=booking_method_info}
-					<option value="{$booking_method_info['id']}" {if isset($selected_booking_method) && $booking_method_info['id'] == $selected_booking_method}selected{/if}>{$booking_method_info['name']}</option>
-				{/foreach}
-			</select>
+			<div id="booking_method_select" class="margin-top-5" {if !$has_booking_method}style="display:none;"{/if}>
+				<select name="booking_method" id="booking_method" class="form-control" {if !$has_booking_method}disabled="disabled"{/if}>
+					{foreach from=$booking_methods_info item=booking_method_info}
+						<option value="{$booking_method_info['id']}" {if $has_booking_method && $booking_method_info['id'] == $selected_booking_method}selected{/if}>
+							{$booking_method_info['name']}
+						</option>
+					{/foreach}
+				</select>
+			</div>
 		</div>
 	</div>
 	<div class="form-group" id="bed_types_selection">
 		<label class="control-label col-sm-3">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select all bed types available for this room type.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select all bed types available for this stay type.'}">
 				{l s='Bed Types'}
 			</span>
 		</label>
@@ -512,7 +547,7 @@
 	{* <div class="form-group">
 		<label class="control-label col-lg-3" for="tags_{$id_lang}">
 			<span class="label-tooltip" data-toggle="tooltip"
-				title="{l s='Will be displayed in the tags block when enabled. Tags help customers easily find your room types.'}">
+				title="{l s='Will be displayed in the tags block when enabled. Tags help customers easily find your stay types.'}">
 				{l s='Tags:'}
 			</span>
 		</label>
@@ -572,5 +607,5 @@
 </div>
 <script type="text/javascript">
 	hideOtherLanguage({$default_form_language});
-	var missing_product_name = '{l s='Please fill room type name input field' js=1}';
+	var missing_product_name = '{l s='Please fill stay type name input field' js=1}';
 </script>

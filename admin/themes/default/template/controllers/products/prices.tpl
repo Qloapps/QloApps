@@ -108,7 +108,7 @@ $(document).ready(function () {
 {capture assign=priceDisplayPrecisionFormat}{'%.'|cat:$smarty.const._PS_PRICE_DISPLAY_PRECISION_|cat:'f'}{/capture}
 <div id="product-prices" class="panel product-tab">
 	<input type="hidden" name="submitted_tabs[]" value="Prices" />
-	<h3>{l s='Room type price'}</h3>
+	<h3>{l s='Stay type price'}</h3>
 	<div class="alert alert-info" {if !$country_display_tax_label || $tax_exclude_taxe_option}style="display:none;"{/if}>
 		{l s='You must enter either the pre-tax retail price, or the retail price with tax. The input field will be automatically calculated.'}
 	</div>
@@ -116,20 +116,20 @@ $(document).ready(function () {
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="wholesale_price" type="default"}</span></div>
 		<label class="control-label col-lg-2" for="wholesale_price">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='The operating cost is the expense related to the operation of the room type. Do not include the tax.'}">{if !$country_display_tax_label || $tax_exclude_taxe_option}{l s='Operating cost'}{else}{l s='Pre-tax operating cost'}{/if}</span>
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='The operating cost is the expense related to the operation of the stay type. Do not include the tax.'}">{if !$country_display_tax_label || $tax_exclude_taxe_option}{l s='Operating cost'}{else}{l s='Pre-tax operating cost'}{/if}</span>
 		</label>
 		<div class="col-lg-2">
 			<div class="input-group">
 				<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
 				<input maxlength="27" name="wholesale_price" id="wholesale_price" type="text" value="{{toolsConvertPrice price=$product->wholesale_price}|string_format:$priceDisplayPrecisionFormat}" onchange="this.value = this.value.replace(/,/g, '.');" />
 			</div>
-			{if isset($pack) && $pack->isPack($product->id)}<p class="help-block">{l s='The sum of wholesale prices of the room types in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackWholesalePrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
+			{if isset($pack) && $pack->isPack($product->id)}<p class="help-block">{l s='The sum of wholesale prices of the stay types in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackWholesalePrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
 		</div>
 	</div>
 	<div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
 		<label class="control-label col-lg-2" for="priceTE">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='The pre-tax retail price is the price for which you intend sell this room type to your customers. It should be higher than the pre-tax operating cost: the difference between the two will be your margin.'}">{if !$country_display_tax_label || $tax_exclude_taxe_option}{l s='Retail price'}{else}{l s='Pre-tax retail price'}{/if}</span>
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='The pre-tax retail price is the price for which you intend sell this stay type to your customers. It should be higher than the pre-tax operating cost: the difference between the two will be your margin.'}">{if !$country_display_tax_label || $tax_exclude_taxe_option}{l s='Retail price'}{else}{l s='Pre-tax retail price'}{/if}</span>
 		</label>
 		<div class="col-lg-2">
 			<div class="input-group">
@@ -200,7 +200,7 @@ $(document).ready(function () {
 			<input id="priceType" name="priceType" type="hidden" value="TE" />
 			<input id="priceTI" name="priceTI" type="text" value="" onchange="noComma('priceTI');" maxlength="27" onkeyup="$('#priceType').val('TI');if (isArrowKey(event)) return;  calcPriceTE();" />
 		</div>
-		{if isset($pack) && $pack->isPack($product->id)}<p class="col-lg-9 col-lg-offset-3 help-block">{l s='The sum of prices of the room types in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackPrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
+		{if isset($pack) && $pack->isPack($product->id)}<p class="col-lg-9 col-lg-offset-3 help-block">{l s='The sum of prices of the stay types in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackPrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
 	</div>
 	{* As no use in QloApps currently so commented *}
 	{* <div class="form-group">
@@ -236,7 +236,7 @@ $(document).ready(function () {
 			<div class="checkbox">
 				<label class="control-label" for="on_sale" >
 					<input type="checkbox" name="on_sale" id="on_sale" {if $product->on_sale}checked="checked"{/if} value="1" />
-					{l s='Display the "on sale" icon on the room type page, and in the text found within the room type listing.'}
+					{l s='Display the "on sale" icon on the stay type page, and in the text found within the stay type listing.'}
 				</label>
 			</div>
 		</div>
@@ -270,7 +270,7 @@ $(document).ready(function () {
 			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
 			<label class="control-label col-sm-2">
 				<input type="hidden" name="id_adv_pmt" {if isset($adv_pay_dtl)}value="{$adv_pay_dtl['id']}"{/if}>
-				<span class="label-tooltip" data-toggle="tooltip" title="{l s='If Disabled, Advance payment will not apply on this room type.'}">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='If Disabled, Advance payment will not apply on this stay type.'}">
 					{l s='Allow Advance Payment'}
 				</span>
 			</label>
@@ -288,8 +288,8 @@ $(document).ready(function () {
 			<div class="form-group">
 				<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="price" type="price"}</span></div>
 				<label class="control-label col-sm-2">
-					<span class="label-tooltip" data-toggle="tooltip" title="{l s='If disabled, Advance Payment for the room type will be calculated By Global Advance payment settings.'}">
-						{l s='Apply Room Type Advance Payment Setting.'}
+					<span class="label-tooltip" data-toggle="tooltip" title="{l s='If disabled, Advance Payment for the stay type will be calculated By Global Advance payment settings.'}">
+						{l s='Apply Stay Type Advance Payment Setting.'}
 					</span>
 				</label>
 				<div class="col-lg-9">
@@ -347,7 +347,7 @@ $(document).ready(function () {
 									</div>
 								</div>
 								<div class="help-block">
-									{l s='If final price of the room type is less than advance payment amount for the customer then customer will pay the final(lesser) price of the room type.'}
+									{l s='If final price of the stay type is less than advance payment amount for the customer then customer will pay the final(lesser) price of the stay type.'}
 								</div>
 							</div>
 						</div>
@@ -582,7 +582,7 @@ $(document).ready(function () {
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="control-label col-lg-2" for="sp_price">{l s='Room type price'}
+				<label class="control-label col-lg-2" for="sp_price">{l s='Stay type price'}
 					{if $country_display_tax_label}
 						{l s='(tax excl.)'}
 					{/if}

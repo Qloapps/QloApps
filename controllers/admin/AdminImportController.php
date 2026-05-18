@@ -79,8 +79,8 @@ class AdminImportControllerCore extends AdminController
         $this->bootstrap = true;
         $this->entities = array(
             $this->l('Hotels'),
-            $this->l('Room Types'),
-            $this->l('Rooms'),
+            $this->l('Stay Types'),
+            $this->l('Stays'),
             $this->l('Categories'),
             $this->l('Service Products'),
             $this->l('Bookings'),
@@ -157,7 +157,7 @@ class AdminImportControllerCore extends AdminController
                     ),
                 );
             break;
-            case $this->entities[$this->l('Room Types')]:
+            case $this->entities[$this->l('Stay Types')]:
                 $this->required_fields = array('id_hotel', 'name');
 
                 self::$validators['image'] = array('AdminImportController', 'split');
@@ -175,7 +175,7 @@ class AdminImportControllerCore extends AdminController
                     'id_tax_rules_group' => array('label' => $this->l('Tax rule ID')),
                     'advance_payment' => array('label' => $this->l('Allow advance payment(0 = Yes, 1 = No)')),
                     'payment_type' => array(
-                        'label' => $this->l('Room type advance payment (0/1/2)'),
+                        'label' => $this->l('Stay type advance payment (0/1/2)'),
                         'help' => $this->l('0 = use global, 1 = Percentage, 2 = Fixed amount')
                     ),
                     'payment_value' => array(
@@ -192,7 +192,7 @@ class AdminImportControllerCore extends AdminController
                     'base_children' => array('label' => $this->l('Base children')),
                     'max_adults' => array('label' => $this->l('Maximum adults')),
                     'max_children' => array('label' => $this->l('Maximum children')),
-                    'max_room_occupancy' => array('label' => $this->l('Maximum room occupancy')),
+                    'max_room_occupancy' => array('label' => $this->l('Maximum stay occupancy')),
                     'show_at_front' => array('label' => $this->l('Show at front (0/1)')),
                     'id_additional_facilities' => array('label' => $this->l('Additional facilities IDs (x,y,z...)')),
                     'id_service_products' => array('label' => $this->l('Service products IDs (x, y, z...)')),
@@ -223,17 +223,17 @@ class AdminImportControllerCore extends AdminController
                     'date_upd' => date('Y-m-d H:i:s'),
                 );
             break;
-            case $this->entities[$this->l('Rooms')]:
+            case $this->entities[$this->l('Stays')]:
                 $this->required_fields = array('room_num', 'id_status', 'id_product');
 
                 self::$validators['dates'] = array('AdminImportController', 'split');
                 $this->available_fields = array(
                     'no' => array('label' => $this->l('Ignore this column')),
-                    'room_num' => array('label' => $this->l('Room No *'),),
+                    'room_num' => array('label' => $this->l('Stay No *'),),
                     'floor' => array('label' => $this->l('Floor')),
-                    'id_product' => array('label' => $this->l('Room Type ID *')),
+                    'id_product' => array('label' => $this->l('Stay Type ID *')),
                     'id_status' => array(
-                        'label' => $this->l('Room status (1/2/3)'),
+                        'label' => $this->l('Stay status (1/2/3)'),
                         'help' => $this->l('1 = Active, 2 = Inactive, 3 = Temporarily Inactive')),
                     'comment' => array('label' => $this->l('Extra Information')),
                     'dates' => array('label' => $this->l('Inactive date ranges and Reason(yyyy-mm-dd)'),
@@ -251,13 +251,13 @@ class AdminImportControllerCore extends AdminController
                     'active' => array('label' => $this->l('Active (0/1)')),
                     'name' => array('label' => $this->l('Name *')),
                     'category' => array('label' => $this->l('Categories (x,y,z...)')),
-                    'id_room_types' => array('label' => $this->l('Associated room types (x,y,z...) *')),
+                    'id_room_types' => array('label' => $this->l('Associated stay types (x,y,z...) *')),
                     'price' => array('label' => $this->l('Pre-tax retail price')),
                     'wholesale_price' => array('label' => $this->l('Pre-tax operating cost')),
                     'id_tax_rules_group' => array('label' => $this->l('Tax rule ID')),
                     'auto_add_to_cart' => array('label' => $this->l('Auto add to cart (0 = No, 1 = Yes)')),
                     'price_addition_type' => array('label' => $this->l('Price display preference'),
-                        'help' => $this->l('1 = With room price, 2 = As convenience fee')),
+                        'help' => $this->l('1 = With stay price, 2 = As convenience fee')),
                     'show_at_front' => array('label' => $this->l('Show at front office (0 = No, 1 = Yes)')),
                     'price_calculation_method' => array('label' => $this->l('Price calculation method'),
                         'help' => $this->l('1 = Once per booking, 2 = Each day')),
@@ -303,7 +303,7 @@ class AdminImportControllerCore extends AdminController
                         'label' => $this->l('Duration * (yyyy-mm-dd)'),
                         'help' => $this->l('Check_in, Check_out')
                     ),
-                    'num_rooms' => array('label' => $this->l('Number Of Rooms')),
+                    'num_rooms' => array('label' => $this->l('Number Of Stays')),
                     'amount' => array('label' => $this->l('Order Price')),
                     'due_amount' => array('label' => $this->l('Due Amount')),
                     'id_currency' => array('label' => $this->l('Currency ID')),
@@ -2492,7 +2492,7 @@ class AdminImportControllerCore extends AdminController
                             }
                         }
                     } else {
-                        $this->warnings[] = $this->l('Invalid room type Id: ').$info['id_product'];
+                        $this->warnings[] = $this->l('Invalid stay type Id: ').$info['id_product'];
                     }
                 }
             }
@@ -3317,7 +3317,7 @@ class AdminImportControllerCore extends AdminController
                 Tools::deleteDirectory($hotelImages, false);
                 $prodImages = $objHotelReservation->getLocalPath().'views/img/prod_imgs/';
                 Tools::deleteDirectory($prodImages, false);
-            case $this->entities[$this->l('Room Types')]:
+            case $this->entities[$this->l('Stay Types')]:
                 $images = Db::getInstance()->executeS('SELECT id_image FROM `'._DB_PREFIX_.'image` img
                     LEFT JOIN `'._DB_PREFIX_.'product` p ON p.id_product = img.id_product
                     WHERE p.booking_product=1');
@@ -3374,7 +3374,7 @@ class AdminImportControllerCore extends AdminController
                 if (!file_exists(_PS_PROD_IMG_DIR_)) {
                     mkdir(_PS_PROD_IMG_DIR_);
                 }
-            case $this->entities[$this->l('Rooms')]:
+            case $this->entities[$this->l('Stays')]:
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_information`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_disable_dates`');
             break;
@@ -3498,11 +3498,11 @@ class AdminImportControllerCore extends AdminController
                         $this->hotelImport();
                         $this->clearSmartyCache();
                         break;
-                    case $this->entities[$import_type = $this->l('Room Types')]:
+                    case $this->entities[$import_type = $this->l('Stay Types')]:
                         $this->roomTypeImport();
                         $this->clearSmartyCache();
                         break;
-                    case $this->entities[$import_type = $this->l('Rooms')]:
+                    case $this->entities[$import_type = $this->l('Stays')]:
                         $this->roomImport();
                         $this->clearSmartyCache();
                         break;

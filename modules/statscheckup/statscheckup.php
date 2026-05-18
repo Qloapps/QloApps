@@ -234,7 +234,7 @@ class StatsCheckUp extends Module
             'DESCRIPTIONS' => array('name' => $this->l('Descriptions'), 'text' => $this->l('chars (without HTML)')),
             'IMAGES' => array('name' => $this->l('Images'), 'text' => $this->l('images')),
             'ORDERS' => array('name' => $this->l('Orders'), 'text' => $this->l('orders / month')),
-            'TOTAL_ROOMS' => array('name' => $this->l('Total rooms'), 'text' => $this->l('rooms')),
+            'TOTAL_ROOMS' => array('name' => $this->l('Total stays'), 'text' => $this->l('rooms')),
         );
 
         $hotelsHtml = '
@@ -309,7 +309,7 @@ class StatsCheckUp extends Module
         $hotelsHtml .= '
                     <th class="center"><span class="title_box active">'.$this->l('Images').'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
-                    <th class="center"><span class="title_box active">'.$this->l('Total rooms').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Total stays').'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Overall status').'</span></th>
                     '.(!$this->id_hotel ? '<th class="center"><span class="title_box active">'.$this->l('Action').'</span></th>' : '').'
                 </tr>
@@ -415,7 +415,7 @@ class StatsCheckUp extends Module
         $hotelsHtml .= '
                     <th class="center"><span class="title_box active">'.$this->l('Images').'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
-                    <th class="center"><span class="title_box active">'.$this->l('Total rooms').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Total stays').'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Overall status').'</span></th>
                     '.(!$this->id_hotel ? '<th></th>' : '').'
                 </tr>

@@ -139,7 +139,7 @@
 					});
 				}
 
-				// manage Hotel and Room type filter inputs
+				// manage Hotel and Stay type filter inputs
 				$(document).on('change', '#filter_input_hotel_name', function () {
 					updateRoomTypeFilter();
 					updateHotelRoomsFilter(false);

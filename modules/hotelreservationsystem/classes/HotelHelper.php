@@ -1368,25 +1368,26 @@ class HotelHelper
         return true;
     }
 
-    public function createHotelDefaultRoomTypeSellingTypes()
+    public function createHotelDefaultPropertyTypes()
     {
         $propertyTypes = array(
             'Hotel',
             'Motel',
-        );
-
-        $sellingTypes = array(
-            'Room',
+            'Resort',
+            'Hostel',
+            'Guest House',
+            'Lodge',
             'Apartment',
-            'Villa',
-            'Cottage',
-            'Bungalow',
+            'Vacation Rental',
+            'Homestay',
+            'Co-Living',
+            'Camping',
+            'Bed & Breakfast',
         );
 
         $languages = Language::getLanguages(true);
         foreach ($propertyTypes as $typeName) {
-            $objType = new HotelRoomTypeSellingType();
-            $objType->type = HotelRoomTypeSellingType::HOTEL_PROPERTY_TYPE;
+            $objType = new HotelPropertyType();
             $objType->active = 1;
             foreach ($languages as $lang) {
                 $objType->name[$lang['id_lang']] = $typeName;
@@ -1394,9 +1395,31 @@ class HotelHelper
             $objType->save();
         }
 
-        foreach ($sellingTypes as $typeName) {
-            $objType = new HotelRoomTypeSellingType();
-            $objType->type = HotelRoomTypeSellingType::ROOM_TYPE_OBJECT_SELLING_TYPE;
+        return true;
+    }
+
+    public function createHotelDefaultRoomSellingTypes()
+    {
+        $sellingObjects = array(
+            'Room',
+            'Apartment',
+            'Villa',
+            'Cottage',
+            'Bungalow',
+            'House',
+            'Chalet',
+            'Cabin',
+            'Studio',
+            'Penthouse',
+            'Camping Pitch',
+            'Overwater Bungalow',
+            'Heritage Room',
+            'Houseboat',
+        );
+
+        $languages = Language::getLanguages(true);
+        foreach ($sellingObjects as $typeName) {
+            $objType = new RoomTypeSellingObject();
             $objType->active = 1;
             foreach ($languages as $lang) {
                 $objType->name[$lang['id_lang']] = $typeName;
@@ -2029,7 +2052,7 @@ class HotelHelper
             $product->show_at_front = 1;
             $product->is_virtual = 1;
             $product->indexed = 1;
-            $product->id_room_type_selling_object_type = 3; // assign default selling type as 'Per Room'
+            $product->id_room_type_selling_object= 1;
             $product->save();
             $product_id = $product->id;
 
@@ -2518,6 +2541,8 @@ class HotelHelper
         $this->saveDummyHotelFeatures($htl_id);
         $this->saveDummyProductsAndRelatedInfo($htl_id);
         $this->saveDummyServiceProductsAndRelatedInfo();
+        $this->createHotelDefaultPropertyTypes();
+        $this->createHotelDefaultRoomSellingTypes();
 
         return true;
     }

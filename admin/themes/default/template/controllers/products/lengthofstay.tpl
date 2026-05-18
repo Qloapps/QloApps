@@ -32,7 +32,7 @@
 					<li>{l s='Set 1 day for setting no limit on Minimum length of stay'}</li>
 					<li>{l s='Set 0 day for setting no limit on Maximum length of stay'}</li>
 					<li>{l s='Enable "Length of stay for date ranges" for setting values of \"Minimum length of stay\" and \"Maximum length of stay\" according to different date ranges'}</li>
-					<li>{l s='Length of stays (minimum|maximum) of all the dates which does not fall under the date ranges of \"Length of stay for date ranges\", will be taken from the global values of length of stays of this room type.'}</li>
+					<li>{l s='Length of stays (minimum|maximum) of all the dates which does not fall under the date ranges of \"Length of stay for date ranges\", will be taken from the global values of length of stays of this stay type.'}</li>
 					<li>{l s='\"Date to\" will not be included in the date range of \"Length of stay for date ranges\".'}</li>
 				</ul>
 			</div>

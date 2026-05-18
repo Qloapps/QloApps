@@ -27,11 +27,11 @@ $(document).ready(function(){
 
 		booking_occupancy_inner = $(this).closest('.booking_occupancy_inner');
         var booking_occupancy_wrapper = $(this).closest('.booking_occupancy_wrapper');
-        var roomLabels = getRoomLabels(booking_occupancy_wrapper);
+        var room_type_selling_keys = getRoomTypeSellingObject(booking_occupancy_wrapper);
         $(this).closest('.occupancy_info_block').hide('fast', function(){
             $(this).remove()
             $(booking_occupancy_inner).find('.room_num_wrapper').each(function(key, val) {
-                $(this).text(roomLabels.room + ' - '+ (key+1) );
+                $(this).text(room_type_selling_keys.selling_object + ' - '+ (key+1) );
             });
             var countRooms = parseInt($(booking_occupancy_wrapper).find('.occupancy_info_block').length);
             if (countRooms < $(booking_occupancy_wrapper).find('.max_avail_type_qty').val()) {
@@ -241,7 +241,7 @@ $(document).ready(function(){
         e.preventDefault();
 
         var booking_occupancy_wrapper = $(this).closest('.booking_occupancy_wrapper');
-        var roomLabels = getRoomLabels(booking_occupancy_wrapper);
+        var room_type_selling_keys = getRoomTypeSellingObject(booking_occupancy_wrapper);
         var occupancy_block = '';
         var roomBlockIndex = parseInt($(booking_occupancy_wrapper).find(".occupancy_info_block").last().attr('occ_block_index'));
         roomBlockIndex += 1;
@@ -254,7 +254,7 @@ $(document).ready(function(){
 			&& countRooms <= $(booking_occupancy_wrapper).find('.max_avail_type_qty').val()
 		) {
             occupancy_block += '<div class="occupancy_info_block" occ_block_index="'+roomBlockIndex+'" style="display:none;">';
-                occupancy_block += '<div class="occupancy_info_head"><span class="room_num_wrapper">'+ roomLabels.room + ' - ' + countRooms + '</span><a class="remove-room-link pull-right" href="#">' + remove_txt + '</a></div>';
+                occupancy_block += '<div class="occupancy_info_head"><span class="room_num_wrapper">'+ room_type_selling_keys.selling_object + ' - ' + countRooms + '</span><a class="remove-room-link pull-right" href="#">' + remove_txt + '</a></div>';
                 occupancy_block += '<div class="row">';
                     occupancy_block += '<div class="form-group col-sm-5 col-xs-6 occupancy_count_block">';
                         occupancy_block += '<div class="row">';
@@ -365,7 +365,7 @@ function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
     var adults = 0;
     var children = 0;
 	var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
-    var roomLabels = getRoomLabels(booking_occupancy_wrapper);
+    var room_type_selling_keys = getRoomTypeSellingObject(booking_occupancy_wrapper);
 
 	$(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
         adults += parseInt($(this).val());
@@ -373,18 +373,12 @@ function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
     $(booking_occupancy_wrapper).find(".num_children" ).each(function(key, val) {
         children += parseInt($(this).val());
     });
-	guestButtonVal = getRoomTypeGuestOccupancyFormated(adults, children, rooms, roomLabels.room, roomLabels.rooms);
+	guestButtonVal = getRoomTypeGuestOccupancyFormated(adults, children, rooms, room_type_selling_keys.selling_object, room_type_selling_keys.miltiple_selling_object);
 	$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
 }
 
-function getRoomTypeGuestOccupancyFormated(adults, children, rooms, roomLabel, roomsLabel)
+function getRoomTypeGuestOccupancyFormated(adults, children, rooms, selling_object, miltiple_selling_object)
 {
-    if (!roomLabel) {
-        roomLabel = (typeof room_txt !== 'undefined') ? room_txt : 'Room';
-    }
-    if (!roomsLabel) {
-        roomsLabel = (typeof rooms_txt !== 'undefined') ? rooms_txt : roomLabel;
-    }
 	var guestButtonVal = parseInt(adults) + ' ';
     if (parseInt(adults) > 1) {
         guestButtonVal += adults_txt;
@@ -399,30 +393,22 @@ function getRoomTypeGuestOccupancyFormated(adults, children, rooms, roomLabel, r
         }
     }
     if (parseInt(rooms) > 1) {
-        guestButtonVal += ', ' + parseInt(rooms) + ' ' + roomsLabel;
+        guestButtonVal += ', ' + parseInt(rooms) + ' ' + miltiple_selling_object;
     } else {
-        guestButtonVal += ', ' + parseInt(rooms) + ' ' + roomLabel;
+        guestButtonVal += ', ' + parseInt(rooms) + ' ' + selling_object;
     }
 
 	return guestButtonVal;
 }
 
-function getRoomLabels(booking_occupancy_wrapper)
+function getRoomTypeSellingObject(booking_occupancy_wrapper)
 {
     var $wrapper = $(booking_occupancy_wrapper);
-    var roomLabel = $wrapper.attr('data-room-label');
-    var roomsLabel = $wrapper.attr('data-rooms-label');
-
-    if (!roomLabel) {
-        roomLabel = (typeof room_txt !== 'undefined') ? room_txt : 'Room';
-    }
-    if (!roomsLabel) {
-        roomsLabel = (typeof rooms_txt !== 'undefined') ? rooms_txt : roomLabel;
-    }
-
+    var selling_object = $wrapper.attr('data-selling-object');
+    var miltiple_selling_object = $wrapper.attr('data-multiple-selling-object');
     return {
-        room: roomLabel,
-        rooms: roomsLabel
+        selling_object,
+        miltiple_selling_object
     };
 }
 

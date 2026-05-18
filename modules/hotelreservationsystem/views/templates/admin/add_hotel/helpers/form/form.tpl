@@ -123,23 +123,25 @@
 							</span>
 						</div>
 					</div>
-					<div class="form-group">
-						<label class="control-label col-sm-3 required" for="id_property_type">
-							<span>
-								{l s='Property Type :' mod='hotelreservationsystem'}
-							</span>
-						</label>
-						<div class="col-sm-6">
-							<select name="id_property_type" id="id_property_type" class="form-control chosen">
-								{foreach from=$hotel_property_types_info item=property_type}
-									<option value="{$property_type.id_property_type|escape:'htmlall':'UTF-8'}"
-										{if isset($selected_hotel_property_type) && $selected_hotel_property_type == $property_type.id_property_type}selected{/if}>
-										{$property_type.name|escape:'htmlall':'UTF-8'}
-									</option>
-								{/foreach}
-							</select>
+					{if isset($hotel_property_types_info) && $hotel_property_types_info}
+						<div class="form-group">
+							<label class="control-label col-sm-3 " for="id_property_type">
+								<span>
+									{l s='Property Type :' mod='hotelreservationsystem'}
+								</span>
+							</label>
+							<div class="col-sm-6">
+								<select name="id_property_type" id="id_property_type" class="form-control chosen">
+									{foreach from=$hotel_property_types_info item=property_type}
+										<option value="{$property_type.id_property_type|escape:'htmlall':'UTF-8'}"
+											{if isset($selected_hotel_property_type) && $selected_hotel_property_type == $property_type.id_property_type}selected{/if}>
+											{$property_type.name|escape:'htmlall':'UTF-8'}
+										</option>
+									{/foreach}
+								</select>
+							</div>
 						</div>
-					</div>
+					{/if}
 					<div class="form-group">
 						<label class="col-sm-3 control-label required" for="hotel_name" >
 							{l s='Name :' mod='hotelreservationsystem'}

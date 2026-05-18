@@ -341,7 +341,7 @@ class ProductControllerCore extends FrontController
                     $hotel_info_by_id = $obj_hotel_branch->hotelBranchesInfo(false, 2, 1, $hotel_id);
                     $hotel_policies = $hotel_info_by_id['policies'];
                     $hotel_name = $hotel_info_by_id['hotel_name'];
-                    $property_type = $obj_hotel_branch->getHotelPropertyTypeName($hotel_id);
+                    $propertyType = HotelPropertyType::getPropertyType($hotel_id);
                     $addressInfo = HotelBranchInformation::getAddress($room_info_by_product_id['id_hotel']);
                     $hotel_location = $addressInfo['city'].
                     ($addressInfo['id_state']?', '.$addressInfo['state']:'').', '.$addressInfo['country'];
@@ -448,7 +448,7 @@ class ProductControllerCore extends FrontController
                             'hotel_rating' => $hotel_info_by_id['rating'],
                             'hotel_description' => $hotel_info_by_id['description'],
                             'hotel_policies' => $hotel_policies,
-                            'property_type' => $property_type,
+                            'property_type' => $propertyType,
                             'hotel_features' => $htl_features,
                             'hotel_image_link' => $hotelImageLink,
                             'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
@@ -461,11 +461,10 @@ class ProductControllerCore extends FrontController
                         )
                     );
 
-                    $roomBookingSelectedType = Product::getRoomTypeBookingMethod($this->product->id);
-                    $isOccupancyType = ($roomBookingSelectedType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY);
-                    $this->context->smarty->assign('occupancy_required_for_booking',$isOccupancyType);
+                    $isOccupancyType = Product::isOccupancyBookingMethod($this->product->id);
+                    $this->context->smarty->assign('occupancy_required_for_booking', $isOccupancyType);
                     $occupancy_value = Tools::getValue('occupancy', array());
-                    if ($roomBookingSelectedType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY) {
+                    if (Product::isQuantityBookingMethod($this->product->id)) {
                         $occupancy_value = 1;
                     } else {
                         $useDefaultOccupancy = true;
@@ -659,7 +658,7 @@ class ProductControllerCore extends FrontController
         $hotel = $objHotel->hotelBranchesInfo(false, 2, 1, $idHotel);
         $hotelLocation = $hotel['city'].', '.(isset($hotel['state_name']) ? ' '.$hotel['state_name'].', ' : '').
         ' '.$hotel['country_name'];
-        $roomBookingSelectedType = Product::getRoomTypeBookingMethod($idProduct);
+        $isOccupancyBooking = Product::isOccupancyBookingMethod($idProduct);
 
         $orderDateRestrict = false;
         $maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($idHotel);
@@ -681,7 +680,7 @@ class ProductControllerCore extends FrontController
             'id_cart' => $idCart,
             'id_guest' => $idGuest,
         );
-        if ($roomBookingSelectedType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+        if ($isOccupancyBooking) {
             $bookingParams['occupancy'] = $occupancy;
             $quantity = count($occupancy);
         } else {
@@ -1421,8 +1420,7 @@ class ProductControllerCore extends FrontController
             $dateFrom = Tools::getValue('room_check_in');
             $dateTo = Tools::getValue('room_check_out');
             $occupancy = Tools::getValue('occupancy');
-            $roomBookingSelectedType = Product::getRoomTypeBookingMethod($idProduct);
-            $isOccupancyType = $roomBookingSelectedType == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
+            $isOccupancyType = Product::isOccupancyBookingMethod($idProduct);
             // $this->context->smarty->assign(
             //     'occupancy_required_for_booking',
             //     $isOccupancyType
