@@ -480,8 +480,6 @@
 				</select>
 			</div>
 		</div>
-	{else}
-			<input type="hidden" name="id_room_type_selling_object" value="0">
 	{/if}
 
 

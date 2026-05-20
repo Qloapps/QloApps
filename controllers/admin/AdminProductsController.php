@@ -2283,6 +2283,7 @@ class AdminProductsControllerCore extends AdminController
             $_POST['description_short'] = strip_tags(Tools::getValue('description_short'));
         }
         $_POST['booking_method'] = Tools::getValue('booking_method_switch') ? (int)Tools::getValue('booking_method') : 0;
+        $_POST['id_room_type_selling_object'] = Tools::getValue('id_room_type_selling_object') ?? 0;
 
         // Check description short size without html
         $limit = (int)Configuration::get('PS_SHORT_DESC_LIMIT');
