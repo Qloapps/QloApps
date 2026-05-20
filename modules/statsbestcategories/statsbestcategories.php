@@ -56,7 +56,7 @@ class StatsBestCategories extends ModuleGrid
         $this->columns = array(
             array(
                 'id' => 'name',
-                'header' => $this->l('Hotel name'),
+                'header' => $this->l('Property Name'),
                 'dataIndex' => 'hotel_name',
                 'align' => 'center'
             ),
@@ -65,14 +65,14 @@ class StatsBestCategories extends ModuleGrid
                 'header' => $this->l('Room nights booked'),
                 'dataIndex' => 'totalRoomsBooked',
                 'align' => 'center',
-                'tooltip' => $this->l('The room nights booked for the hotel.'),
+                'tooltip' => $this->l('The room nights booked for the property.'),
             ),
             array(
                 'id' => 'availableRooms',
                 'header' => $this->l('Available room nights'),
                 'dataIndex' => 'availableRooms',
                 'align' => 'center',
-                'tooltip' => $this->l('The total room nights available for booking for the hotel.'),
+                'tooltip' => $this->l('The total room nights available for booking for the property.'),
             ),
             array(
                 'id' => 'totalOrders',

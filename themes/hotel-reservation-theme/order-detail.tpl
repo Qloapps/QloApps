@@ -121,7 +121,7 @@
                                         </dl>
                                     </div>
                                 {else}
-                                    <div class="card-text">{l s='Hotel details not available.'}</div>
+                                    <div class="card-text">{l s='Property details not available.'}</div>
                                 {/if}
                             </div>
                         </div>

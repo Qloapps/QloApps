@@ -41,7 +41,7 @@ class wkhotelfilterblock extends Module
         parent::__construct();
 
         $this->displayName = $this->l('Layered filters and sorting block');
-        $this->description = $this->l('Hotel filter and sorting block');
+        $this->description = $this->l('Property filter and sorting block');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 

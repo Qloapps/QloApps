@@ -215,7 +215,7 @@
 										<span id="layer_cart_product_time_duration"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_product_txt">{l s='Hotel Name' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_product_txt">{l s='Property Name' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_hotel_name"></span>
 									</div>
 									<div>

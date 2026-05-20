@@ -22,7 +22,7 @@
 
 <div class="panel">
 	<div class="panel-heading">
-		{l s='Hotel Features' mod='hotelreservationsystem'}
+		{l s='Property Features' mod='hotelreservationsystem'}
 	</div>
 	<div class="row">
 		<form method="post" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" class="defaultForm form-horizontal features_list_form" enctype="multipart/form-data">

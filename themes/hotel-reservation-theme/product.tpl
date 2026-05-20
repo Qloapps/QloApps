@@ -329,7 +329,7 @@
 															<div class="room_info_hotel_images_wrap">
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Images'}</span>
+																		<span>{l s='Property Images'}</span>
 																	</div>
 																	<div class="room_info_content" id="room_info_hotel_images">
 																		<div class="row images-wrap"></div>

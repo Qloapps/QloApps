@@ -42,7 +42,7 @@
 							</div>
 							<div class="form-group col-sm-12">
 								<label for="id_hotel" class="control-label col-sm-4 required">
-									<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Hotel Name' mod='hotelreservationsystem'}</span>
+									<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Property Name' mod='hotelreservationsystem'}</span>
 								</label>
 								<div class="col-sm-8">
 									<select name="id_hotel" class="form-control" id="id_hotel">
@@ -51,7 +51,7 @@
 												<option value="{$name_val['id']|escape:'htmlall':'UTF-8'}" {if isset($id_hotel) && ($name_val['id'] == $id_hotel)}selected{/if}>{$name_val['hotel_name']|escape:'htmlall':'UTF-8'}</option>
 											{/foreach}
 										{else}
-											{l s='No hotels available' mod='hotelreservationsystem'}
+											{l s='No properties available' mod='hotelreservationsystem'}
 										{/if}
 									</select>
 									<input type="hidden" name="search_id_hotel" id="search_id_hotel" {if isset($id_hotel)}value="{$id_hotel|escape:'htmlall':'UTF-8'}"{/if}>
@@ -209,7 +209,7 @@
 	{else}
 		<div class="panel">
 			<div class="panel-heading">
-				<i class="icon-warning"></i> {l s='No Hotels' mod='hotelreservationsystem'}
+				<i class="icon-warning"></i> {l s='No Properties Available' mod='hotelreservationsystem'}
 			</div>
 
 			<div class="alert alert-warning">

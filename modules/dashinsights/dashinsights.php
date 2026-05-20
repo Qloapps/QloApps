@@ -58,7 +58,7 @@ class DashInsights extends Module
     {
         if (Tools::getValue('controller') == 'AdminDashboard') {
             Media::addJsDef(array(
-                'hotel_txt' => $this->l('Hotel'),
+                'hotel_txt' => $this->l('Property'),
                 'nights_booked_txt' => $this->l('Nights Booked'),
                 'room_booked_txt' => $this->l('Stays Booked'),
                 'length_of_stay_txt' => $this->l('Length Of Stay'),

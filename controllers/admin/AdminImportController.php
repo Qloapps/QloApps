@@ -78,7 +78,7 @@ class AdminImportControllerCore extends AdminController
     {
         $this->bootstrap = true;
         $this->entities = array(
-            $this->l('Hotels'),
+            $this->l('Properties'),
             $this->l('Room Types'),
             $this->l('Stays'),
             $this->l('Categories'),
@@ -108,7 +108,7 @@ class AdminImportControllerCore extends AdminController
                     'parent' => Configuration::get('PS_HOME_CATEGORY'),
                 );
             break;
-            case $this->entities[$this->l('Hotels')]:
+            case $this->entities[$this->l('Properties')]:
                 $this->required_fields = array(
                     'hotel_name',
                     'phone',
@@ -132,7 +132,7 @@ class AdminImportControllerCore extends AdminController
                     'no' => array('label' => $this->l('Ignore this column')),
                     'id' => array('label' => $this->l('ID')),
                     'active' => array('label' => $this->l('Active (0/1)')),
-                    'hotel_name' => array('label' => $this->l('Hotel Name *')),
+                    'hotel_name' => array('label' => $this->l('Property Name *')),
                     'short_description' => array('label' => $this->l('Short Description')),
                     'description' => array('label' => $this->l('Description')),
                     'phone' => array('label' => $this->l('Mobile phone *')),
@@ -146,7 +146,7 @@ class AdminImportControllerCore extends AdminController
                     'city' => array('label' => $this->l('City *')),
                     'postcode' => array('label' => $this->l('Zip Code *')),
                     'fax' => array('label' => $this->l('Fax')),
-                    'policies' => array('label' => $this->l('Hotel Policies')),
+                    'policies' => array('label' => $this->l('Property Policies')),
                     'active_refund' => array('label' => $this->l('Allow Refund (0 = No, 1 = Yes)')),
                     'refund_ids' => array('label' => $this->l('Refund IDs (x,y,z...)')),
                     'max_checkout_offset' => array('label' => $this->l('Maximum checkout offset')),
@@ -169,7 +169,7 @@ class AdminImportControllerCore extends AdminController
                     'id' => array('label' => $this->l('ID')),
                     'active' => array('label' => $this->l('Active (0/1)')),
                     'name' => array('label' => $this->l('Name *')),
-                    'id_hotel' => array('label' => $this->l('Hotel ID *')),
+                    'id_hotel' => array('label' => $this->l('Property ID *')),
                     'price' => array('label' => $this->l('Pre-tax retail price')),
                     'wholesale_price' => array('label' => $this->l('Pre-tax operating cost')),
                     'id_tax_rules_group' => array('label' => $this->l('Tax rule ID')),
@@ -1479,8 +1479,8 @@ class AdminImportControllerCore extends AdminController
                         }
                     }
                 } else {
-                    $this->warnings[] = $this->l('Hotel creation for the ').$objCountry->name.
-                    $this->l(' is currently unavailable. Kindly activate the country for hotel creation.');
+                    $this->warnings[] = $this->l('Property creation for the ').$objCountry->name.
+                    $this->l(' is currently unavailable. Kindly activate the country for property creation.');
                 }
             }
         }
@@ -3297,7 +3297,7 @@ class AdminImportControllerCore extends AdminController
                     }
                 }
                 break;
-            case $this->entities[$this->l('Hotels')]:
+            case $this->entities[$this->l('Properties')]:
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_info_lang`');
                 Db::getInstance()->execute('DELETE c, cl FROM `'._DB_PREFIX_.'category` c
                     LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON c.id_category = cl.id_category
@@ -3494,7 +3494,7 @@ class AdminImportControllerCore extends AdminController
                 $import_type = false;
                 Db::getInstance()->disableCache();
                 switch ((int)Tools::getValue('entity')) {
-                    case $this->entities[$import_type = $this->l('Hotels')]:
+                    case $this->entities[$import_type = $this->l('Properties')]:
                         $this->hotelImport();
                         $this->clearSmartyCache();
                         break;

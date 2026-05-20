@@ -146,7 +146,7 @@ class DashProducts extends Module
 			array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
 			array('title' => $this->l('Total Stays'), 'class' => 'text-left'),
 			array('title' => $this->l('Order'), 'class' => 'text-left'),
-			array('title' => $this->l('Hotel'), 'class' => 'text-left'),
+			array('title' => $this->l('Property'), 'class' => 'text-left'),
 			array('title' => $this->l('Total').' '.$this->l('Tax excl.'), 'class' => 'text-left'),
 			array('title' => $this->l('Date'), 'class' => 'text-left'),
 			array('title' => $this->l('Status'), 'class' => 'text-left'),
@@ -235,7 +235,7 @@ class DashProducts extends Module
 			),
 			array(
 				'id' => 'category',
-				'title' => $this->l('Hotel'),
+				'title' => $this->l('Property'),
 				'class' => 'text-center',
 			),
 			array(
@@ -339,7 +339,7 @@ class DashProducts extends Module
 			),
 			array(
 				'id' => 'hotel',
-				'title' => $this->l('Hotel'),
+				'title' => $this->l('Property'),
 				'class' => 'text-center',
 			),
 			array(
@@ -448,7 +448,7 @@ class DashProducts extends Module
             ),
 			array(
 				'id' => 'reference',
-				'title' => $this->l('Hotel'),
+				'title' => $this->l('Property'),
 				'class' => 'text-center'
 			),
 			array(

@@ -644,7 +644,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             if (validate::isLoadedObject($objHotelBranch = new HotelBranchInformation($id_hotel))) {
                 $hotelIdAddress = $objHotelBranch->getHotelIdAddress();
             } else {
-                $this->errrors[] = $this->l('Hotel not found');
+                $this->errrors[] = $this->l('Property not found');
             }
 
         }
@@ -985,11 +985,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'rooms_reallocation_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'rooms_booking_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'opt_select_all' => $this->l('All Types', null, true),
-            'slt_another_htl' => $this->l('Select Another Hotel', null, true),
+            'slt_another_htl' => $this->l('Select Another Property', null, true),
             'product_type_cond' => $this->l('Product type is required', null, true),
             'from_date_cond' => $this->l('From date is required', null, true),
             'to_date_cond' => $this->l('To date is required', null, true),
-            'hotel_name_cond' => $this->l('Hotel Name is required', null, true),
+            'hotel_name_cond' => $this->l('Property Name is required', null, true),
             'num_rooms_cond' => $this->l('Number of Rooms is required', null, true),
             'add_to_cart' => $this->l('Add To Cart', null, true),
             'remove' => $this->l('Remove', null, true),

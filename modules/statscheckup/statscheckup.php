@@ -167,7 +167,7 @@ class StatsCheckUp extends Module
             <ul class="nav nav-tabs">
                 <li '.($activeTab == 'hotels' ? 'class="active"' : '').'>
                     <a href="#statscheckup_hotels" data-toggle="tab">
-                        <span>'.$this->l('Hotels').'</span>
+                        <span>'.$this->l('Properties').'</span>
                     </a>
                 </li>
                 <li '.($activeTab == 'services' ? 'class="active"' : '').'>
@@ -301,7 +301,7 @@ class StatsCheckUp extends Module
             <thead>
                 <tr>
                     <th><span class="title_box active">'.$this->l('ID').'</span></th>
-                    <th><span class="title_box active">'.(!$this->id_hotel ? $this->l('Hotel') : $this->l('Room type')).'</span></th>
+                    <th><span class="title_box active">'.(!$this->id_hotel ? $this->l('Property') : $this->l('Room type')).'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Active').'</span></th>';
         foreach ($languages as $language) {
             $hotelsHtml .= '<th><span class="title_box active">'.$this->l('Desc.').' ('.Tools::strtoupper($language['iso_code']).')</span></th>';

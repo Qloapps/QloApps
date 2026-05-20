@@ -31,7 +31,7 @@
 			</tr>
 			<tr>
 				<th class="product header">{l s='Room Type / Reference' pdf='true'}</th>
-                <th class="product header">{l s='Hotel' pdf='true'}</th>
+                <th class="product header">{l s='Property Name' pdf='true'}</th>
 				<th class="product header">{l s='Duration' pdf='true'}</th>
 				<th class="product header">{l s='Num stays' pdf='true'}</th>
 				<th class="product header-right">{l s='Total Price' pdf='true'}<br />{if $tax_excluded_display}{l s='(Tax Excl.)' pdf='true'}{else}{l s='(Tax Incl.)' pdf='true'}{/if}</th>
