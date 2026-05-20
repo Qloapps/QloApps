@@ -183,7 +183,7 @@
             </div>
         {else}
             <div class="alert alert-info">
-                {l s='No services are attached with this stay type'}
+                {l s='No services are attached with this room type'}
             </div>
         {/if}
     </div>

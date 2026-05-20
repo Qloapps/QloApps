@@ -12,7 +12,7 @@ Payment Mode: {payment_mode}
 Transaction Id: {id_transaction}
 Booking details
 
-Stay Type
+Room Type
 Hotel
 Num. Stays
 Duration

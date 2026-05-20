@@ -12,7 +12,7 @@ Cancelation Reason: {cancelation_reason}
 Requested Booking Cancellations
 
 Stay Num
-Stay Type
+Room Type
 Hotel
 Duration
 

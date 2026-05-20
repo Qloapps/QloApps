@@ -85,26 +85,26 @@
 		<p class="radio">
 			<label for="apply_discount_to_product">
 				<input type="radio" name="apply_discount_to" id="apply_discount_to_product" value="specific"{if $currentTab->getFieldValue($currentObject, 'reduction_product')|intval > 0} checked="checked"{/if} />
-				{l s='Specific Stay type'}
+				{l s='Specific Room type'}
 			</label>
 		</p>
 		<p class="radio">
 			<label for="apply_discount_to_cheapest">
 				<input type="radio" name="apply_discount_to" id="apply_discount_to_cheapest" value="cheapest"{if $currentTab->getFieldValue($currentObject, 'reduction_product')|intval == -1} checked="checked"{/if} />
-				 {l s='Cheapest Stay type'}
+				 {l s='Cheapest Room type'}
 			</label>
 		</p>
 		<p class="radio">
 			<label for="apply_discount_to_selection">
 				<input type="radio" name="apply_discount_to" id="apply_discount_to_selection" value="selection"{if $currentTab->getFieldValue($currentObject, 'reduction_product')|intval == -2} checked="checked"{/if}{if $product_rule_groups|@count == 0}disabled="disabled"{/if} />
-				{l s='Selected Stay Type(s)'}{if $product_rule_groups|@count == 0}&nbsp;<span id="apply_discount_to_selection_warning" class="text-muted clearfix"><i class="icon-warning-sign"></i> <a href="#" id="apply_discount_to_selection_shortcut">{l s='You must select some stay types first'}</a></span>{/if}
+				{l s='Selected Room Type(s)'}{if $product_rule_groups|@count == 0}&nbsp;<span id="apply_discount_to_selection_warning" class="text-muted clearfix"><i class="icon-warning-sign"></i> <a href="#" id="apply_discount_to_selection_shortcut">{l s='You must select some room types first'}</a></span>{/if}
 			</label>
 		</p>
 	</div>
 </div>
 
 <div id="apply_discount_to_product_div" class="form-group">
-	<label class="control-label col-lg-3">{l s='Stay Type'}</label>
+	<label class="control-label col-lg-3">{l s='Room Type'}</label>
 	<div class="col-lg-9">
 		<div class="input-group col-lg-5">
 			<input type="text" id="reductionProductFilter" name="reductionProductFilter" value="{$reductionProductFilter|escape:'html':'UTF-8'}" />

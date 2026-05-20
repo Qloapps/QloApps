@@ -35,7 +35,7 @@
 			<label class="control-label col-lg-3 file_upload_label">
 				<span class="label-tooltip" data-toggle="tooltip"
 					title="{l s='Format:'} JPG, GIF, PNG. {l s='Filesize:'} {$max_image_size|string_format:"%.2f"} {l s='MB max.'}">
-					{if isset($id_image)}{l s='Edit this stay type\'s image:'}{else}{l s='Add a new image to this stay type'}{/if}
+					{if isset($id_image)}{l s='Edit this room type\'s image:'}{else}{l s='Add a new image to this room type'}{/if}
 				</span>
 			</label>
 			<div class="col-lg-9">

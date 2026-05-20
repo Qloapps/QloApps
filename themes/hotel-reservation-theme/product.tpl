@@ -49,7 +49,7 @@
 				{/if} --><!-- by webkul -->
 				{if isset($adminActionDisplay) && $adminActionDisplay}
 					<div id="admin-action" class="container">
-						<p class="alert alert-info">{l s='This stay type is not visible to your customers.'}
+						<p class="alert alert-info">{l s='This room type is not visible to your customers.'}
 							<input type="hidden" id="admin-action-product-id" value="{$product->id}" />
 							<a id="publish_button" class="btn btn-default button button-small" href="#">
 								<span>{l s='Publish'}</span>
@@ -748,7 +748,7 @@
 		{else}
 			<div class="bootstrap">
 				<div class="alert alert-warning">
-					{l s='This stay type has not enough information. Please save information of related hotel and other required stay information for the booking of this stay type.'}
+					{l s='This room type has not enough information. Please save information of related hotel and other required stay information for the booking of this room type.'}
 				</div>
 			</div>
 		{/if}

@@ -86,8 +86,6 @@ class HotelBookingDetail extends ObjectModel
     const SEARCH_TYPE_OWS = 1;
     const SEARCH_TYPE_NORMAL = 2;
 
-    //
-    const PS_ROOM_UNIT_SELECTION_TYPE_DEFAULT = 0;
     const PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY = 1;
     const PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY = 2;
 

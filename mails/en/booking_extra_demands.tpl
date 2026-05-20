@@ -5,7 +5,7 @@
                 <th colspan="3" class="table-caption">{l s='Stay Extra Demands Detail'}</th>
             </tr>
             <tr>
-                <th>{l s='Stay Type'}</th>
+                <th>{l s='Room Type'}</th>
                 <th>{l s='Name'}</th>
                 <th>{l s='Total'} <br /> {l s='(Tax excl.)'}</th>
             </tr>
@@ -62,7 +62,7 @@
                 <th colspan="4" class="table-caption">{l s='Stays Services Detail'}</th>
             </tr>
             <tr>
-                <th>{l s='Stay Type'}</th>
+                <th>{l s='Room Type'}</th>
                 <th>{l s='Name'}</th>
                 <th>{l s='Qty'}</th>
                 <th>{l s='Total'}</th>

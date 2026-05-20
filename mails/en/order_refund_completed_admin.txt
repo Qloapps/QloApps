@@ -13,7 +13,7 @@ Transaction Id: {id_transaction}
 Booking details
 
 Stay Num
-Stay Type
+Room Type
 Hotel
 Duration
 {refundBookingHtml}

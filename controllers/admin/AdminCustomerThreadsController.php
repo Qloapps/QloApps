@@ -1004,7 +1004,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
 
             if (Validate::isLoadedObject($product)) {
                 if ($product->booking_product) {
-                    $content .= $this->l('Stay type:');
+                    $content .= $this->l('Room type:');
                 } else {
                     $content .= $this->l('Product:');
                 }

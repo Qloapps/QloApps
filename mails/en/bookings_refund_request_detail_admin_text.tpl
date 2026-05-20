@@ -2,7 +2,7 @@
 
 {l s="Stay Num"}
 
-{l s="Stay Type"}
+{l s="Room Type"}
 
 {l s="Hotel"}
 

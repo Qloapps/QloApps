@@ -3,7 +3,7 @@
 {l s='Stays Bookings Detail'}
 
 
-{l s="Stay Type"}
+{l s="Room Type"}
 
 {l s="Hotel"}
 

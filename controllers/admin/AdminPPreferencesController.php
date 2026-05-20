@@ -172,7 +172,7 @@ class AdminPPreferencesControllerCore extends AdminController
                         'type' => 'select',
                         'list' => array(
                             array('id' => HotelBookingDetail::SEARCH_EXACT_ROOM_TYPE_ALGO, 'name' => $this->l('Show room types satisfying required occupancy')),
-                            array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available stay types'))
+                            array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
                         ),
                         'identifier' => 'id',
                         'desc' => $this->l('This option is only for fully available stays. For partially available stay, always all possible rooms will be displayed.'),

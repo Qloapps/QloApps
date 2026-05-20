@@ -234,7 +234,7 @@ class StatsCheckUp extends Module
             'DESCRIPTIONS' => array('name' => $this->l('Descriptions'), 'text' => $this->l('chars (without HTML)')),
             'IMAGES' => array('name' => $this->l('Images'), 'text' => $this->l('images')),
             'ORDERS' => array('name' => $this->l('Orders'), 'text' => $this->l('orders / month')),
-            'TOTAL_ROOMS' => array('name' => $this->l('Total stays'), 'text' => $this->l('rooms')),
+            'TOTAL_ROOMS' => array('name' => $this->l('Total stays'), 'text' => $this->l('stays')),
         );
 
         $hotelsHtml = '

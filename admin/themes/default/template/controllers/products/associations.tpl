@@ -47,7 +47,7 @@
 		<div class="form-group">
 			<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="id_category_default" type="default"}</span></div>
 			<label class="control-label col-lg-2" for="id_category_default">
-				<span class="label-tooltip" data-toggle="tooltip" title="{l s='The default category is the main category for your stay type, and is displayed by default.'}">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='The default category is the main category for your room type, and is displayed by default.'}">
 					{l s='Default category'}
 				</span>
 			</label>

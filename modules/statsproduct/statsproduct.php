@@ -356,9 +356,9 @@ class StatsProduct extends ModuleGraph
                 if (Tools::getValue('export')) {
                     $this->_titles['main'][] = $this->l('Date');
                 }
-                $this->_titles['main'][] = $this->l('Room nights');
+                $this->_titles['main'][] = $this->l('Stay nights');
                 $this->_titles['main'][] = $this->l('Views (x100)');
-                $this->_titles['y'] = $this->l('Room nights, Views (x100)');
+                $this->_titles['y'] = $this->l('Stay nights, Views (x100)');
                 $this->_formats['y'] = 'd';
 
                 $this->query[0] = 'SELECT o.`date_add`, SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total

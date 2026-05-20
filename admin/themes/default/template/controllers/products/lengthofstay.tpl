@@ -32,7 +32,7 @@
 					<li>{l s='Set 1 day for setting no limit on Minimum length of stay'}</li>
 					<li>{l s='Set 0 day for setting no limit on Maximum length of stay'}</li>
 					<li>{l s='Enable "Length of stay for date ranges" for setting values of \"Minimum length of stay\" and \"Maximum length of stay\" according to different date ranges'}</li>
-					<li>{l s='Length of stays (minimum|maximum) of all the dates which does not fall under the date ranges of \"Length of stay for date ranges\", will be taken from the global values of length of stays of this stay type.'}</li>
+					<li>{l s='Length of stays (minimum|maximum) of all the dates which does not fall under the date ranges of \"Length of stay for date ranges\", will be taken from the global values of length of stays of this room type.'}</li>
 					<li>{l s='\"Date to\" will not be included in the date range of \"Length of stay for date ranges\".'}</li>
 				</ul>
 			</div>
@@ -60,7 +60,7 @@
 
 			<div class="form-group">
 				<label class="control-label col-sm-3 required" for="max_los">
-					<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enter maximum length of stay for the hotel. set 0 day for setting no limit on maximum length of stay.'}">{l s='Maximum length of stay'}</span>
+					<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enter maximum length of stay for the property. set 0 day for setting no limit on maximum length of stay.'}">{l s='Maximum length of stay'}</span>
 				</label>
                 <div class="col-sm-9">
                     <div class="row">

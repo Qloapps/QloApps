@@ -35,7 +35,7 @@
 						<tr>
 							<th><span class="title_box">{l s='Stay No.'}</span></th>
 							<th><span class="title_box">{l s='Stay Image'}</th>
-							<th><span class="title_box">{l s='Stay Type'}</span></th>
+							<th><span class="title_box">{l s='Room Type'}</span></th>
 							<th><span class="title_box">{l s='Duration'}</span></th>
 						<th><span class="fixed-width-lg title_box">{l s='Occupancy / Quantity'}</span></th>
 						<th><span class="title_box">{l s='Unit Price (tax excl)'}</span></th>
@@ -147,7 +147,7 @@
 										<i class="icon-trash"></i>&nbsp;{l s='Delete'}
 									</button>
                                     <br />
-                                    <a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this stay type.'}">
+                                    <a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
                                         <i class="icon-pencil"></i>&nbsp;{l s='Services'}
                                     </a>
 								</td>

@@ -60,7 +60,7 @@
 					<table class="table table-bordered">
 						<tr>
 							<th>{l s='Stays'}</th>
-							<th>{l s='Stay type'}</th>
+							<th>{l s='Room type'}</th>
 							<th>{l s='Property Name'}</th>
 							<th>{l s='Duration'}</th>
 							<th>{l s='Total stays price (tax incl.)'}</th>

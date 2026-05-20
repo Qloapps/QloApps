@@ -30,7 +30,7 @@
 				<th colspan="4" class="header">{l s='Stay Additional Facilities Detail' pdf='true'}</th>
 			</tr>
 			<tr>
-				<th class="header-left small">{l s='Stay Type' pdf='true'}</th>
+				<th class="header-left small">{l s='Room Type' pdf='true'}</th>
 				<th class="header-left small">{l s='Name' pdf='true'}</th>
 				<th class="header-left small">{l s='Tax rate(s)' pdf='true'}</th>
 				<th class="header-left small">{l s='Total' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
@@ -75,7 +75,7 @@
 				<th colspan="5" class="header">{l s='Stay Extra Services Detail' pdf='true'}</th>
 			</tr>
 			<tr>
-				<th class="header-left small">{l s='Stay Type' pdf='true'}</th>
+				<th class="header-left small">{l s='Room Type' pdf='true'}</th>
 				<th class="header-left small">{l s='Name' pdf='true'}</th>
 				<th class="header small">{l s='Tax rate(s)' pdf='true'}</th>
 				<th class="header small">{l s='Qty' pdf='true'}</th>

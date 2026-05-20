@@ -41,8 +41,8 @@ class WkRoomSearchBlock extends Module
         $this->bootstrap = true;
         parent::__construct();
 
-        $this->displayName = $this->l('QloApps Room Search Panels');
-        $this->description = $this->l('Room search blocks on different pages to search rooms as per user travel parameters.');
+        $this->displayName = $this->l('QloApps Stay Search Panels');
+        $this->description = $this->l('Stay search blocks on different pages to search stays as per user travel parameters.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
@@ -80,8 +80,8 @@ class WkRoomSearchBlock extends Module
                         'select_htl_txt' => $this->l('Select Hotel', false, true),
                         'select_age_txt' => $this->l('Select age', false, true),
                         'under_1_age' => $this->l('Under 1', false, true),
-                        'room_txt' => $this->l('Room', false, true),
-                        'rooms_txt' => $this->l('Rooms', false, true),
+                        'room_txt' => $this->l('Stay', false, true),
+                        'rooms_txt' => $this->l('Stays', false, true),
                         'remove_txt' => $this->l('Remove', false, true),
                         'adult_txt' => $this->l('Adult', false, true),
                         'adults_txt' => $this->l('Adults', false, true),

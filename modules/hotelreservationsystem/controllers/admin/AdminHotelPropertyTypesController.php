@@ -100,9 +100,10 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
                 ),
                 array(
                     'type' => 'switch',
-                    'label' => $this->l('Status'),
+                    'label' => $this->l('Enabled'),
                     'name' => 'active',
                     'is_bool' => true,
+                    'default_value' => 1,
                     'values' => array(
                         array(
                             'id' => 'active_on',
@@ -123,5 +124,39 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
         );
 
         return parent::renderForm();
+    }
+
+    public function postProcess()
+    {
+        if (Tools::isSubmit('submitAdd'.$this->table)) {
+            $languages = Language::getLanguages(false);
+            $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
+            $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
+            $idPropertyType = Tools::getValue($this->identifier);
+
+            if (!trim(Tools::getValue('name_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Name is required at least in ').$objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('name_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('name_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid Name in ').$lang['name'];
+                        }
+                    }
+                }
+            }
+
+            if ($idPropertyType) {
+                $this->display = 'edit';
+            } else {
+                $this->display = 'add';
+            }
+
+            if (!$this->errors) {
+                parent::postProcess();
+            }
+        } else {
+            parent::postProcess();
+        }
     }
 }

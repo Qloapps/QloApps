@@ -237,7 +237,7 @@
                 {if $roomTypeTaxRuleGroupExist}
                     <div class="row form-group">
                         <div class="col-sm-12 help-block">
-                            {l s='Note: If auto added service is enabled, then tax of the booking\'s stay type will be applicable.'}
+                            {l s='Note: If auto added service is enabled, then tax of the booking\'s room type will be applicable.'}
                         </div>
                     </div>
                 {/if}

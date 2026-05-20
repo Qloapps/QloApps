@@ -44,7 +44,7 @@
                                 <tr>
                                     <th></th>
                                     <th>{l s='Stay No.'}</th>
-                                    <th>{l s='Stay Type'}</th>
+                                    <th>{l s='Room Type'}</th>
                                     <th>{l s='Hotel Name'}</th>
                                     <th>{l s='Duration'}</th>
                                     <th>{l s='Total Price (Tax incl.)'}</th>

@@ -24,9 +24,9 @@
     <div id="new_room">
         <input type="hidden" id="add_product_product_id" name="add_product[product_id]" value="0" />
         <div class="form-group">
-            <label class="control-label">{l s='Stay Type:'}</label>
+            <label class="control-label">{l s='Room Type:'}</label>
             <div class="input-group">
-                <input type="text" id="add_product_product_name" class="form-control" value="" placeholder="{l s='Enter the name of the stay type'}" />
+                <input type="text" id="add_product_product_name" class="form-control" value="" placeholder="{l s='Enter the name of the room type'}" />
                 <div class="input-group-addon">
                     <i class="icon-search"></i>
                 </div>

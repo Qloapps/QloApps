@@ -29,7 +29,7 @@
                     <div class="form-group">
                         <label class="control-label col-lg-3">
                             <span class="label-tooltip" data-toggle="tooltip" data-html="true"
-                                title="{l s="Select hotel to assign duplicated stay type to."}">
+                                title="{l s="Select hotel to assign duplicated room type to."}">
                                 {l s="Select hotel"}
                             </span>
                         </label>
@@ -47,7 +47,7 @@
                     <div class="form-group">
                         <label class="control-label col-lg-3">
                             <span class="label-tooltip" data-toggle="tooltip" data-html="true"
-                                title="{l s="Choose whether to copy images to duplicated stay type."}">
+                                title="{l s="Choose whether to copy images to duplicated room type."}">
                                 {l s="Duplicate images"}
                             </span>
                         </label>

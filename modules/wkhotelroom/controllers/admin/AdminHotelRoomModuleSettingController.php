@@ -223,7 +223,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
 
         $this->fields_form = array(
             'legend' => array(
-                'title' => $this->l('Rooms Configuration'),
+                'title' => $this->l('Stays Configuration'),
                 'icon' => 'icon-globe'
             ),
             'input' => array(

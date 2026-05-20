@@ -1,6 +1,6 @@
 {if isset($list)}
     {l s='Extra Demands Details'}
-    {l s='Stay Type'}
+    {l s='Room Type'}
     {l s='Extra demand name'}
     {l s='Total'} {l s='(Tax excl.)'}
 

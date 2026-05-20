@@ -1306,9 +1306,9 @@
     {strip}
         {addJsDefL name=no_rm_avail_txt}{l s='No stay available.' js=1}{/addJsDefL}
         {addJsDefL name=no_realloc_rm_avail_txt}{l s='No stay available for reallocation.' js=1}{/addJsDefL}
-        {addJsDefL name=no_realloc_rm_type_avail_txt}{l s='No stay type available for reallocation.' js=1}{/addJsDefL}
+        {addJsDefL name=no_realloc_rm_type_avail_txt}{l s='No room type available for reallocation.' js=1}{/addJsDefL}
         {addJsDefL name=no_swap_rm_avail_txt}{l s='No stay available for swap.' js=1}{/addJsDefL}
-        {addJsDefL name=slct_rm_type_err}{l s='Please select a stay type first.' js=1}{/addJsDefL}
+        {addJsDefL name=slct_rm_type_err}{l s='Please select a room type first.' js=1}{/addJsDefL}
         {addJsDefL name=slct_rm_err}{l s='Please select a stay first.' js=1}{/addJsDefL}
         {addJsDefL name=txtExtraDemandSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
         {addJsDefL name=atleastSelectTxt}{l s='Select at least one facility to update.' js=1}{/addJsDefL}

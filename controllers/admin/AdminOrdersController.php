@@ -165,7 +165,7 @@ class AdminOrdersControllerCore extends AdminController
                 'visible_default' => true
             ),
             'room_type_name' => array(
-                'title' => $this->l('Stay type'),
+                'title' => $this->l('Room type'),
                 'type' => 'select',
                 'filter_key' => 'hbd!id_product',
                 'list' => $this->roomTypesArray,
@@ -1442,7 +1442,7 @@ class AdminOrdersControllerCore extends AdminController
                     'title' => $this->l('Phone')
                 ),
                 'room_types' => array(
-                    'title' => $this->l('Stay Types')
+                    'title' => $this->l('Room Types')
                 ),
                 'rooms' => array(
                     'title' => $this->l('Stays')
@@ -1539,7 +1539,7 @@ class AdminOrdersControllerCore extends AdminController
                         } elseif (!in_array($idRoomToReallocate, array_column($availableRooms, 'id_room'))) {
                             $this->errors[] = $this->l('Selected stay is not available for reallocation.');
                         } elseif (!Validate::isFloat($priceDiff)) {
-                            $this->errors[] = $this->l('Invalid price difference of the stay types.');
+                            $this->errors[] = $this->l('Invalid price difference of the room types.');
                         }
                     } else {
                         $this->errors[] = $this->l('Selected stay is not available for reallocation.');
@@ -3231,7 +3231,7 @@ class AdminOrdersControllerCore extends AdminController
 
             // if the current stock requires a warning
             // if ($product['current_stock'] <= 0 && $display_out_of_stock_warning) {
-            //     $this->displayWarning($this->l('This booked stay type is not found: ').' '.$product['product_name']);
+            //     $this->displayWarning($this->l('This booked room type is not found: ').' '.$product['product_name']);
             // }
             if ($product['id_warehouse'] != 0) {
                 $warehouse = new Warehouse((int)$product['id_warehouse']);
@@ -8789,7 +8789,7 @@ class AdminOrdersControllerCore extends AdminController
                 $result['error'] = $this->l('Invalid booking information. Please try again.');
             }
         } else {
-            $result['error'] = $this->l('Selected stay type not found. Please try again.');
+            $result['error'] = $this->l('Selected room type not found. Please try again.');
         }
 
         $this->ajaxDie(json_encode($result));

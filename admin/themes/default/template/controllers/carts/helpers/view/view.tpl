@@ -81,7 +81,7 @@
 			<thead>
 				<tr>
 					<th class="fixed-width-xs"><span class="title_box">{l s='Image'}</span></th>
-					<th><span class="title_box">{l s='Stay Type'}</span></th>
+					<th><span class="title_box">{l s='Room Type'}</span></th>
 					<th><span class="title_box">{l s='Hotel'}</span></th>
 					<th><span class="title_box">{l s='Duration'}</span></th>
 					<th><span class="title_box">{l s='occupancy'}</span></th>

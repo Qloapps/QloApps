@@ -29,7 +29,7 @@
                         <tr>
                             <th><span class="title_box">{l s='Stay No.'}</span></th>
                             <th><span class="title_box">{l s='Image'}</th>
-                            <th><span class="title_box">{l s='Stay Type'}</span></th>
+                            <th><span class="title_box">{l s='Room Type'}</span></th>
                             <th><span class="title_box">{l s='Duration'}</span></th>
                             <th class="fixed-width-lg"><span class="title_box">{l s='Occupancy'}</span></th>
                             <th><span class="title_box">{l s='Stay Price (Tax excl.)'}</span></th>

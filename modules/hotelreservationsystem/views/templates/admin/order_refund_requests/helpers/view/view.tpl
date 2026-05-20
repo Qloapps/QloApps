@@ -143,7 +143,7 @@
 												<th></th>
 											{/if}
 											<th>{l s='Stay num' mod='hotelreservationsystem'}</th>
-											<th>{l s='Stay type' mod='hotelreservationsystem'}</th>
+											<th>{l s='Room type' mod='hotelreservationsystem'}</th>
 											<th>{l s='Property' mod='hotelreservationsystem'}</th>
 											<th>{l s='Duration' mod='hotelreservationsystem'}</th>
 											<th>{l s='Total cost (tax incl.)' mod='hotelreservationsystem'}</th>

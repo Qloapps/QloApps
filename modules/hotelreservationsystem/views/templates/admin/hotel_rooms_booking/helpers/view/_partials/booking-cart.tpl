@@ -14,7 +14,7 @@
 								<thead class="cart-table-thead">
 									<tr>
 										<th class="text-center">{l s='Stay No.' mod='hotelreservationsystem'}</th>
-										<th class="text-center">{l s='Stay Type' mod='hotelreservationsystem'}</th>
+										<th class="text-center">{l s='Room Type' mod='hotelreservationsystem'}</th>
 										<th class="text-center">{l s='Duration' mod='hotelreservationsystem'}</th>
 										<th class="text-center">{l s='Amount (Tax excl.)' mod='hotelreservationsystem'}</th>
 										<th></th>

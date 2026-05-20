@@ -30,7 +30,7 @@
                 <table class="table table-striped">
                     <tr>
                         <th>{l s='Stay No.'}</th>
-                        <th>{l s='Stay type.'}</th>
+                        <th>{l s='Room type.'}</th>
                         <th>{l s='Duration'}</th>
                         <th>{l s='Occupancy'}</th>
                         <th>{l s='Confirmed booking order'}</th>

@@ -6891,7 +6891,7 @@ class ProductCore extends ObjectModel
         $objProduct = new self($idProduct);
         if (Validate::isLoadedObject($objProduct)) {
             $bookingType = $objProduct->booking_method;
-            if ($bookingType !== null && $bookingType != HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_DEFAULT) {
+            if ($bookingType !== null && $bookingType != 0) {
                 $result = (int) $bookingType;
                 if ($fallbackType === null) {
                     Cache::store($cache_key, $result);

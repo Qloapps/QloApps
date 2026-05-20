@@ -6,7 +6,7 @@
             </tr>
             <tr>
                 <th>{l s="Stay Num"}</th>
-                <th>{l s="Stay Type"}</th>
+                <th>{l s="Room Type"}</th>
                 <th>{l s="Hotel"}</th>
                 <th>{l s="Duration"}</th>
             </tr>

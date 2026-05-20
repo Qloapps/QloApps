@@ -2,7 +2,7 @@
 
 {l s='Stay Extra Demands Detail'}
 
-{l s='Stay Type'}
+{l s='Room Type'}
 {l s='Name'}
 {l s='Total'} {l s='(Tax excl.)'}
 
@@ -45,7 +45,7 @@
 
 {l s='Stays Services Detail'}
 
-{l s='Stay Type'}
+{l s='Room Type'}
 {l s='Name'}
 {l s='Qty'}
 {l s='Total'}

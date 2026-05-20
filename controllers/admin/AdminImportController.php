@@ -79,7 +79,7 @@ class AdminImportControllerCore extends AdminController
         $this->bootstrap = true;
         $this->entities = array(
             $this->l('Hotels'),
-            $this->l('Stay Types'),
+            $this->l('Room Types'),
             $this->l('Stays'),
             $this->l('Categories'),
             $this->l('Service Products'),
@@ -157,7 +157,7 @@ class AdminImportControllerCore extends AdminController
                     ),
                 );
             break;
-            case $this->entities[$this->l('Stay Types')]:
+            case $this->entities[$this->l('Room Types')]:
                 $this->required_fields = array('id_hotel', 'name');
 
                 self::$validators['image'] = array('AdminImportController', 'split');
@@ -175,7 +175,7 @@ class AdminImportControllerCore extends AdminController
                     'id_tax_rules_group' => array('label' => $this->l('Tax rule ID')),
                     'advance_payment' => array('label' => $this->l('Allow advance payment(0 = Yes, 1 = No)')),
                     'payment_type' => array(
-                        'label' => $this->l('Stay type advance payment (0/1/2)'),
+                        'label' => $this->l('Room type advance payment (0/1/2)'),
                         'help' => $this->l('0 = use global, 1 = Percentage, 2 = Fixed amount')
                     ),
                     'payment_value' => array(
@@ -231,7 +231,7 @@ class AdminImportControllerCore extends AdminController
                     'no' => array('label' => $this->l('Ignore this column')),
                     'room_num' => array('label' => $this->l('Stay No *'),),
                     'floor' => array('label' => $this->l('Floor')),
-                    'id_product' => array('label' => $this->l('Stay Type ID *')),
+                    'id_product' => array('label' => $this->l('Room Type ID *')),
                     'id_status' => array(
                         'label' => $this->l('Stay status (1/2/3)'),
                         'help' => $this->l('1 = Active, 2 = Inactive, 3 = Temporarily Inactive')),
@@ -251,7 +251,7 @@ class AdminImportControllerCore extends AdminController
                     'active' => array('label' => $this->l('Active (0/1)')),
                     'name' => array('label' => $this->l('Name *')),
                     'category' => array('label' => $this->l('Categories (x,y,z...)')),
-                    'id_room_types' => array('label' => $this->l('Associated stay types (x,y,z...) *')),
+                    'id_room_types' => array('label' => $this->l('Associated room types (x,y,z...) *')),
                     'price' => array('label' => $this->l('Pre-tax retail price')),
                     'wholesale_price' => array('label' => $this->l('Pre-tax operating cost')),
                     'id_tax_rules_group' => array('label' => $this->l('Tax rule ID')),
@@ -2492,7 +2492,7 @@ class AdminImportControllerCore extends AdminController
                             }
                         }
                     } else {
-                        $this->warnings[] = $this->l('Invalid stay type Id: ').$info['id_product'];
+                        $this->warnings[] = $this->l('Invalid room type Id: ').$info['id_product'];
                     }
                 }
             }
@@ -3317,7 +3317,7 @@ class AdminImportControllerCore extends AdminController
                 Tools::deleteDirectory($hotelImages, false);
                 $prodImages = $objHotelReservation->getLocalPath().'views/img/prod_imgs/';
                 Tools::deleteDirectory($prodImages, false);
-            case $this->entities[$this->l('Stay Types')]:
+            case $this->entities[$this->l('Room Types')]:
                 $images = Db::getInstance()->executeS('SELECT id_image FROM `'._DB_PREFIX_.'image` img
                     LEFT JOIN `'._DB_PREFIX_.'product` p ON p.id_product = img.id_product
                     WHERE p.booking_product=1');
@@ -3498,7 +3498,7 @@ class AdminImportControllerCore extends AdminController
                         $this->hotelImport();
                         $this->clearSmartyCache();
                         break;
-                    case $this->entities[$import_type = $this->l('Stay Types')]:
+                    case $this->entities[$import_type = $this->l('Room Types')]:
                         $this->roomTypeImport();
                         $this->clearSmartyCache();
                         break;

@@ -187,7 +187,7 @@ class AdminPreferencesControllerCore extends AdminController
                 ),
                 'PS_SHORT_DESC_LIMIT' => array(
                     'title' => $this->l('Short description Max Size'),
-                    'hint' => $this->l('Set the maximum size of stay type, services and hotel short description (in characters).'),
+                    'hint' => $this->l('Set the maximum size of room type, services and hotel short description (in characters).'),
                     'validation' => 'isUnsignedInt',
                     'cast' => 'intval',
                     'type' => 'text',

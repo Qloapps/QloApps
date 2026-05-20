@@ -11,7 +11,7 @@ Refund Status: {status_name}
 
 Booking details
 
-Stay Type
+Room Type
 Hotel
 Num. Stays
 Duration

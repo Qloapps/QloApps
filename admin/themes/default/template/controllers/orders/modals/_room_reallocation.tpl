@@ -58,11 +58,11 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="form-group col-sm-6">
-                            <label for="realloc_avail_room_type" class="control-label model-label">{l s='Stay Type To Reallocate:'}</label>
+                            <label for="realloc_avail_room_type" class="control-label model-label">{l s='Room Type To Reallocate:'}</label>
                             <input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
                             <div class="realloc_avail_room_type_container">
                                 <select class="form-control" name="realloc_avail_room_type" id="realloc_avail_room_type">
-                                    <option value="0" selected="selected">{l s='Select Stay Type'}</option>
+                                    <option value="0" selected="selected">{l s='Select Room Type'}</option>
                                 </select>
                             </div>
                             <p class="error_text" id="realloc_sel_rm_type_err_p"></p>
@@ -89,7 +89,7 @@
                     </div>
                     <div class="row">
                         <div class="alert alert-warning col-sm-12 realloc_roomtype_change_message" style="display:none">
-                            <p>{l s="If stay type is changed while stay reallocation then all additional facilities and services will be assigned to the selected stay of new stay type."}</p>
+                            <p>{l s="If room type is changed while stay reallocation then all additional facilities and services will be assigned to the selected stay of new room type."}</p>
                             <p>{l s="If you want to change additional facilities or services, you can update by editing the stay after reallocation."}</p>
                         </div>
                     </div>

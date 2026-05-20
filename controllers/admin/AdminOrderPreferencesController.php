@@ -221,8 +221,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                     'PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING' => array(
                         'title' => $this->l('Allow to add all services in a booking'),
-                        'hint' => $this->l('Enable to allow all services created to be added in a booking while adding or editing a booking. Disable to allow only attached services with stay type.'),
-                        'desc' => $this->l('If disabled, only attached services with stay type will be available to be added to a booking.'),
+                        'hint' => $this->l('Enable to allow all services created to be added in a booking while adding or editing a booking. Disable to allow only attached services with room type.'),
+                        'desc' => $this->l('If disabled, only attached services with room type will be available to be added to a booking.'),
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),

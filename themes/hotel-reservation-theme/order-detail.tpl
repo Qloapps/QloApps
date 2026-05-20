@@ -577,12 +577,12 @@
                                 {block name='order_detail_add_order_messages_form'}
                                     <form action="{$link->getPageLink('order-detail', true)|escape:'html':'UTF-8'}" method="post" class="std" id="sendOrderMessage">
                                         <div class="form-group select-room-type">
-                                            <label for="id_product">{l s='Stay Type'}{if $service_products_formatted}/{l s='Product'}{/if}</label>
+                                            <label for="id_product">{l s='Room Type'}{if $service_products_formatted}/{l s='Product'}{/if}</label>
                                             <p class="card-subheader text-muted">
                                                 {if $service_products_formatted}
-                                                    {l s='To add a comment about a stay type/product, please select one first.'}
+                                                    {l s='To add a comment about a room type/product, please select one first.'}
                                                 {else}
-                                                    {l s='To add a comment about a stay type, please select one first.'}
+                                                    {l s='To add a comment about a room type, please select one first.'}
                                                 {/if}
                                             </p>
                                             <select name="id_product" class="form-control">

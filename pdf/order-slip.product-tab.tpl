@@ -30,7 +30,7 @@
 				<th colspan="5" class="header">{l s='Stay Bookings Detail' pdf='true'}</th>
 			</tr>
 			<tr>
-				<th class="product header">{l s='Stay Type / Reference' pdf='true'}</th>
+				<th class="product header">{l s='Room Type / Reference' pdf='true'}</th>
                 <th class="product header">{l s='Hotel' pdf='true'}</th>
 				<th class="product header">{l s='Duration' pdf='true'}</th>
 				<th class="product header">{l s='Num stays' pdf='true'}</th>

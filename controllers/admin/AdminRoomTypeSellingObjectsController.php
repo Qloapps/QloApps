@@ -31,7 +31,7 @@ class AdminRoomTypeSellingObjectsController extends AdminController
         $this->identifier = 'id_room_type_selling_object';
         $this->lang = true;
         $this->context = Context::getContext();
-        $this->toolbar_title = $this->l('Stay Type Selling Objects');
+        $this->toolbar_title = $this->l('Room Type Selling Objects');
 
         parent::__construct();
 
@@ -86,7 +86,7 @@ class AdminRoomTypeSellingObjectsController extends AdminController
 
         $this->fields_form = array(
             'legend' => array(
-                'title' => $this->l('Stay Type Selling Object'),
+                'title' => $this->l('Room Type Selling Object'),
                 'icon' => 'icon-tags',
             ),
             'input' => array(
@@ -96,13 +96,14 @@ class AdminRoomTypeSellingObjectsController extends AdminController
                     'name' => 'name',
                     'lang' => true,
                     'required' => true,
-                    'hint' => $this->l('Displayed name for this stay type selling object.'),
+                    'hint' => $this->l('Displayed name for this room type selling object.'),
                 ),
                 array(
                     'type' => 'switch',
-                    'label' => $this->l('Status'),
+                    'label' => $this->l('Enabled'),
                     'name' => 'active',
                     'is_bool' => true,
+                    'default_value' => 1,
                     'values' => array(
                         array(
                             'id' => 'active_on',
@@ -123,5 +124,39 @@ class AdminRoomTypeSellingObjectsController extends AdminController
         );
 
         return parent::renderForm();
+    }
+
+    public function postProcess()
+    {
+        if (Tools::isSubmit('submitAdd'.$this->table)) {
+            $languages = Language::getLanguages(false);
+            $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
+            $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
+            $idSellingObject = Tools::getValue($this->identifier);
+
+            if (!trim(Tools::getValue('name_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Name is required at least in ').$objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('name_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('name_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid Name in ').$lang['name'];
+                        }
+                    }
+                }
+            }
+
+            if ($idSellingObject) {
+                $this->display = 'edit';
+            } else {
+                $this->display = 'add';
+            }
+
+            if (!$this->errors) {
+                parent::postProcess();
+            }
+        } else {
+            parent::postProcess();
+        }
     }
 }

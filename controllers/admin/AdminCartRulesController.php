@@ -250,8 +250,8 @@ class AdminCartRulesControllerCore extends AdminController
         Media::addJsDef(
             array(
                 'admin_cart_rule_tab_link' => $this->context->link->getAdminLink('AdminCartRules'),
-                'room_access_err' => $this->l('You can only select stay types which hotel(s) access is provided to this employee.'),
-                'room_rmv_txt' => $this->l('Unselect below stay types'),
+                'room_access_err' => $this->l('You can only select room types which hotel(s) access is provided to this employee.'),
+                'room_rmv_txt' => $this->l('Unselect below room types'),
             )
         );
         $this->addJS(_PS_JS_DIR_.'admin/cart-rules.js');
