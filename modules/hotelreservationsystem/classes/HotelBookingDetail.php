@@ -3817,4 +3817,620 @@ class HotelBookingDetail extends ObjectModel
 
         return parent::add($auto_date, $null_values);
     }
+
+    // =========================================================================
+    // ANALYTICS METHODS
+    // Primary table: htl_booking_detail
+    // All methods accept a single $params array. Keys:
+    //   date_from   string  'Y-m-d'  (required for date-range methods)
+    //   date_to     string  'Y-m-d'  (required for date-range methods)
+    //   id_hotel    int|false  false = all hotels employee has access to
+    //   id_product  int  0 = all room types
+    //   id_room     int  0 = all rooms
+    //   id_order    int  0 = all orders
+    //   id_customer int  0 = all customers
+    // =========================================================================
+
+    // ── ROOM REVENUE ──────────────────────────────────────────────────────────
+
+    /**
+     * Total room revenue for a date range using occupancy-spread formula.
+     * Each booking's revenue is prorated to the nights that fall within [date_from, date_to].
+     * Replicates: AdminStatsController::getRoomsRevenueForDiscreteDates() (aggregate path)
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_order, id_customer
+     *
+     * @param array $params
+     * @return float
+     */
+    public static function getTotalRoomRevenue(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $value = Db::getInstance()->getValue(
+            'SELECT IFNULL(SUM(
+                (hbd.`total_price_tax_excl` / o.`conversion_rate`)
+                * DATEDIFF(
+                    LEAST(hbd.`date_to`,   DATE_ADD("'.$dateTo.'", INTERVAL 1 DAY)),
+                    GREATEST(hbd.`date_from`, "'.$dateFrom.'")
+                ) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)
+            ), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+            WHERE p.`active` = 1
+            AND o.`valid` = 1
+            AND hbd.`is_refunded` = 0
+            AND hbd.`date_from` < "'.$dateTo.' 23:59:59"
+            AND hbd.`date_to`   > "'.$dateFrom.' 00:00:00"'
+            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+            .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+            .($idOrder    ? ' AND hbd.`id_order` = '.$idOrder        : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+
+        return (float) $value;
+    }
+
+    /**
+     * Room revenue broken down per day across a date range.
+     * Returns array keyed by unix timestamp (midnight of each day).
+     * Replicates: AdminStatsController::getRoomsRevenueForDiscreteDates() (per-day loop)
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_order, id_customer
+     *
+     * @param array $params
+     * @return array  timestamp => float
+     */
+    public static function getDatewiseRoomRevenue(array $params)
+    {
+        $dateFrom   = $params['date_from'];
+        $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $result  = array();
+        $current = $dateFrom;
+
+        while ($current <= $dateTo) {
+            $next     = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+            $ts       = strtotime($current);
+            $cacheKey = 'HotelBookingDetail::getDatewiseRoomRevenue_'.$ts.'_'
+                .(is_array($idHotel) ? implode('_', $idHotel) : (int) $idHotel)
+                .'_'.$idProduct.'_'.$idRoom;
+
+            if (!Cache::isStored($cacheKey)) {
+                $value = Db::getInstance()->getValue(
+                    'SELECT IFNULL(SUM(
+                        (hbd.`total_price_tax_excl` / o.`conversion_rate`)
+                        / DATEDIFF(hbd.`date_to`, hbd.`date_from`)
+                    ), 0)
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
+                    LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+                    WHERE p.`active` = 1
+                    AND o.`valid` = 1
+                    AND hbd.`is_refunded` = 0
+                    AND hbd.`date_from` < "'.pSQL($next).' 00:00:00"
+                    AND hbd.`date_to`   > "'.pSQL($current).' 00:00:00"'
+                    .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+                    .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+                    .($idOrder    ? ' AND hbd.`id_order` = '.$idOrder        : '')
+                    .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+                    .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+                );
+                Cache::store($cacheKey, $value);
+            }
+
+            $result[$ts] = (float) Cache::retrieve($cacheKey);
+            $current     = $next;
+        }
+
+        return $result;
+    }
+
+    // ── ARRIVALS ──────────────────────────────────────────────────────────────
+
+    /**
+     * Arrivals for a single date or range.
+     * Returns array with 'arrived' (checked-in) and 'total_arrivals' (all booked).
+     * Replicates: AdminStatsController::getArrivalsByDate()
+     *
+     * $params: date_from, date_to (if omitted = date_from), id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return array  keys: arrived, total_arrivals
+     */
+    public static function getArrivals(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $totalArrivals = (int) Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_back_order` = 0
+            AND hbd.`date_from` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+            .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+
+        $arrived = (int) Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_back_order` = 0
+            AND hbd.`date_from` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
+            AND hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN
+            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+            .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+
+        return array('arrived' => $arrived, 'total_arrivals' => $totalArrivals);
+    }
+
+    /**
+     * Total arrival count (all booked, not just checked-in) for a date or range.
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return int
+     */
+    public static function getTotalArrivals(array $params)
+    {
+        $result = self::getArrivals($params);
+        return $result['total_arrivals'];
+    }
+
+    /**
+     * Arrival counts per day across a date range.
+     * Returns array keyed by unix timestamp.
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return array  timestamp => int
+     */
+    public static function getDatewiseArrivals(array $params)
+    {
+        $dateFrom   = $params['date_from'];
+        $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $result  = array();
+        $current = $dateFrom;
+
+        while ($current <= $dateTo) {
+            $result[strtotime($current)] = (int) Db::getInstance()->getValue(
+                'SELECT COUNT(hbd.`id_room`)
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`is_refunded` = 0
+                AND hbd.`is_back_order` = 0
+                AND hbd.`date_from` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
+                .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+                .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+                .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            );
+            $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+        }
+
+        return $result;
+    }
+
+    // ── DEPARTURES ────────────────────────────────────────────────────────────
+
+    /**
+     * Departures for a single date or range.
+     * Returns array with 'departed' (checked-out) and 'total_departures' (all due).
+     * Replicates: AdminStatsController::getDeparturesByDate()
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return array  keys: departed, total_departures
+     */
+    public static function getDepartures(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $totalDepartures = (int) Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0
+            AND hbd.`date_to` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
+            AND (hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN
+            .' OR (hbd.`check_in` != "0000-00-00 00:00:00" AND hbd.`check_out` != "0000-00-00 00:00:00"))'
+            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+            .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+
+        $departed = (int) Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0
+            AND hbd.`date_to` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
+            AND hbd.`id_status` = '.(int) self::STATUS_CHECKED_OUT.'
+            AND hbd.`check_in` != "0000-00-00 00:00:00"'
+            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+            .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+
+        return array('departed' => $departed, 'total_departures' => $totalDepartures);
+    }
+
+    /**
+     * Total departure count for a date or range.
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return int
+     */
+    public static function getTotalDepartures(array $params)
+    {
+        $result = self::getDepartures($params);
+        return $result['total_departures'];
+    }
+
+    /**
+     * Departure counts per day across a date range.
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return array  timestamp => int
+     */
+    public static function getDatewiseDepartures(array $params)
+    {
+        $dateFrom   = $params['date_from'];
+        $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $result  = array();
+        $current = $dateFrom;
+
+        while ($current <= $dateTo) {
+            $result[strtotime($current)] = (int) Db::getInstance()->getValue(
+                'SELECT COUNT(hbd.`id_room`)
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`is_refunded` = 0
+                AND hbd.`date_to` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"
+                AND (hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN
+                .' OR (hbd.`check_in` != "0000-00-00 00:00:00" AND hbd.`check_out` != "0000-00-00 00:00:00"))'
+                .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+                .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+                .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            );
+            $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+        }
+
+        return $result;
+    }
+
+    // ── STAY-OVERS ────────────────────────────────────────────────────────────
+
+    /**
+     * Rooms currently checked-in that span beyond date_from (stay-overs).
+     * Replicates: AdminStatsController::getStayOversByDate()
+     *
+     * $params: date_from, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return int
+     */
+    public static function getStayOvers(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        return (int) Db::getInstance()->getValue(
+            'SELECT COUNT(hbd.`id_room`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_back_order` = 0
+            AND hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN.'
+            AND hbd.`date_to` > "'.$dateFrom.' 00:00:00"'
+            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+            .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+    }
+
+    /**
+     * Stay-over counts per day across a date range.
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return array  timestamp => int
+     */
+    public static function getDatewiseStayOvers(array $params)
+    {
+        $dateFrom   = $params['date_from'];
+        $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $result  = array();
+        $current = $dateFrom;
+
+        while ($current <= $dateTo) {
+            $result[strtotime($current)] = (int) Db::getInstance()->getValue(
+                'SELECT COUNT(hbd.`id_room`)
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`is_refunded` = 0
+                AND hbd.`is_back_order` = 0
+                AND hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN.'
+                AND hbd.`date_to` > "'.pSQL($current).' 00:00:00"'
+                .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+                .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+                .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            );
+            $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+        }
+
+        return $result;
+    }
+
+    // ── CANCELLATIONS ─────────────────────────────────────────────────────────
+
+    /**
+     * Count of cancelled booking rows in a date range (by date_upd = cancellation date).
+     * Uses is_cancelled=1 on htl_booking_detail.
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return int
+     */
+    public static function getTotalCancellations(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        return (int) Db::getInstance()->getValue(
+            'SELECT COUNT(DISTINCT o.`id_order`)
+            FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
+            WHERE o.`date_upd` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
+            AND o.`current_state` IN ('.(int) Configuration::get('PS_OS_CANCELED').', '.(int) Configuration::get('PS_OS_REFUND').')'
+            .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+    }
+
+    /**
+     * Cancellation counts per day.
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return array  timestamp => int
+     */
+    public static function getDatewiseCancellations(array $params)
+    {
+        $dateFrom   = $params['date_from'];
+        $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $cancelledStates = (int) Configuration::get('PS_OS_CANCELED').', '.(int) Configuration::get('PS_OS_REFUND');
+
+        $result  = array();
+        $current = $dateFrom;
+
+        while ($current <= $dateTo) {
+            $result[strtotime($current)] = (int) Db::getInstance()->getValue(
+                'SELECT COUNT(DISTINCT o.`id_order`)
+                FROM `'._DB_PREFIX_.'orders` o
+                LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
+                WHERE o.`date_upd` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"
+                AND o.`current_state` IN ('.$cancelledStates.')'
+                .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
+                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            );
+            $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+        }
+
+        return $result;
+    }
+
+    // ── GUESTS ────────────────────────────────────────────────────────────────
+
+    /**
+     * Total adults and children arriving in a date range.
+     * Replicates: AdminStatsController::getGuestsByDate()
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return array  keys: adults, children
+     */
+    public static function getTotalGuests(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $row = Db::getInstance()->getRow(
+            'SELECT SUM(hbd.`adults`) AS adults, SUM(hbd.`children`) AS children
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_back_order` = 0
+            AND hbd.`date_from` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+            .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+
+        return array(
+            'adults'   => (int) ($row ? $row['adults']   : 0),
+            'children' => (int) ($row ? $row['children'] : 0),
+        );
+    }
+
+    /**
+     * Guests (adults + children) per day across a date range.
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_room, id_customer
+     *
+     * @param array $params
+     * @return array  timestamp => array(adults, children)
+     */
+    public static function getDatewiseGuests(array $params)
+    {
+        $dateFrom   = $params['date_from'];
+        $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $result  = array();
+        $current = $dateFrom;
+
+        while ($current <= $dateTo) {
+            $row = Db::getInstance()->getRow(
+                'SELECT SUM(hbd.`adults`) AS adults, SUM(hbd.`children`) AS children
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`is_refunded` = 0
+                AND hbd.`is_back_order` = 0
+                AND hbd.`date_from` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
+                .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+                .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+                .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            );
+            $result[strtotime($current)] = array(
+                'adults'   => (int) ($row ? $row['adults']   : 0),
+                'children' => (int) ($row ? $row['children'] : 0),
+            );
+            $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+        }
+
+        return $result;
+    }
+
+    // ── BOOKINGS ──────────────────────────────────────────────────────────────
+
+    /**
+     * Count of distinct orders (new bookings) created in a date range.
+     * Replicates: AdminStatsController::getBookingsByDate()
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_customer
+     *
+     * @param array $params
+     * @return int
+     */
+    public static function getTotalBookings(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        return (int) Db::getInstance()->getValue(
+            'SELECT COUNT(DISTINCT hbd.`id_order`)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+    }
+
+    /**
+     * New booking counts per day across a date range.
+     *
+     * $params: date_from, date_to, id_hotel, id_product, id_customer
+     *
+     * @param array $params
+     * @return array  timestamp => int
+     */
+    public static function getDatewiseBookings(array $params)
+    {
+        $dateFrom   = $params['date_from'];
+        $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $result  = array();
+        $current = $dateFrom;
+
+        while ($current <= $dateTo) {
+            $result[strtotime($current)] = (int) Db::getInstance()->getValue(
+                'SELECT COUNT(DISTINCT hbd.`id_order`)
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`date_add` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
+                .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+                .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            );
+            $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+        }
+
+        return $result;
+    }
+    /**
+     * Returns total revenue (room + service) for the given date range.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_product, id_room, id_order, id_customer
+     * @return float
+     */
+    public static function getTotalRevenue(array $params)
+    {
+        return self::getTotalRoomRevenue($params) + HotelBookingDemands::getTotalServiceRevenue($params);
+    }
 }

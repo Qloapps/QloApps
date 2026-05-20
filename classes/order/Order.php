@@ -3148,4 +3148,210 @@ class OrderCore extends ObjectModel
 
         return $totalOrder;
     }
+
+    // ── ANALYTICS ─────────────────────────────────────────────────────────────
+
+    /**
+     * Returns total purchase cost (supplier prices) for orders in the given date range.
+     *
+     * Replicates: AdminStatsController::getPurchases() aggregate.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_order, id_customer
+     * @return float
+     */
+    public static function getTotalPurchases(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        return (float) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT SUM(od.`product_quantity` * IF(
+                od.`purchase_supplier_price` > 0,
+                od.`purchase_supplier_price`,
+                (od.`original_product_price` / o.`conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
+            ))
+            FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order` = o.`id_order`)
+            LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = o.`current_state`)
+            WHERE o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
+            AND os.`logable` = 1'
+            .($idOrder    ? ' AND o.`id_order` = '.$idOrder       : '')
+            .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '').'
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'spod').'
+                )'.(!$idHotel ? ' OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                )' : '').'
+            )'
+        );
+    }
+
+    /**
+     * Returns total payment gateway expenses for orders in the given date range.
+     *
+     * Replicates: AdminStatsController::getExpenses() aggregate.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_order, id_customer
+     * @return float
+     */
+    public static function getExpenses(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $orders = Db::getInstance()->executeS(
+            'SELECT
+                o.`id_order`,
+                o.`id_currency`,
+                o.`module`,
+                o.`total_paid_tax_incl` / o.`conversion_rate` AS total_paid_tax_incl
+            FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = o.`current_state`)
+            WHERE o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
+            AND os.`logable` = 1'
+            .($idOrder    ? ' AND o.`id_order` = '.$idOrder       : '')
+            .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '').'
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'spod').'
+                )'.(!$idHotel ? ' OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                )' : '').'
+            )'
+        );
+
+        $total = 0;
+        $defaultCurrency = (int) Configuration::get('PS_CURRENCY_DEFAULT');
+
+        foreach ($orders as $order) {
+            $module = strtoupper($order['module']);
+            $sameCurrency = ((int) $order['id_currency'] === $defaultCurrency);
+
+            $flatFee = (float) Configuration::get('CONF_ORDER_FIXED')
+                + (float) Configuration::get('CONF_'.$module.($sameCurrency ? '_FIXED' : '_FIXED_FOREIGN'));
+            $varFee  = (float) $order['total_paid_tax_incl']
+                * (float) Configuration::get('CONF_'.$module.($sameCurrency ? '_VAR' : '_VAR_FOREIGN'))
+                / 100;
+
+            $total += $flatFee + $varFee;
+        }
+
+        return $total;
+    }
+
+    /**
+     * Returns total refunded amount for orders in the given date range.
+     *
+     * Replicates: AdminStatsController::getRefunds() aggregate.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_order, id_customer
+     * @return float
+     */
+    public static function getTotalRefund(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        return (float) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT IFNULL(SUM(orr.`refunded_amount`), 0)
+            FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON (orr.`id_order` = o.`id_order`)
+            LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = o.`current_state`)
+            WHERE orr.`payment_mode` != ""
+            AND orr.`id_transaction` != ""
+            AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idOrder    ? ' AND o.`id_order` = '.$idOrder       : '')
+            .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '').'
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'spod').'
+                )'.(!$idHotel ? ' OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                )' : '').'
+            )'
+        );
+    }
+
+    /**
+     * Returns total amount due (total_paid_tax_incl - total_paid_real) across orders.
+     * Used to compute outstanding balances.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_order, id_customer
+     * @return float
+     */
+    public static function getTotalDueAmount(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $objHotelBooking     = new HotelBookingDetail();
+        $invalidOrderStates  = $objHotelBooking->getOrderStatusToFreeBookedRoom();
+
+        return (float) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT IFNULL(SUM(
+                IF(
+                    (o.`total_paid_tax_incl` / o.`conversion_rate`) - (o.`total_paid_real` / o.`conversion_rate`) > 0,
+                    (o.`total_paid_tax_incl` / o.`conversion_rate`) - (o.`total_paid_real` / o.`conversion_rate`),
+                    0
+                )
+            ), 0)
+            FROM `'._DB_PREFIX_.'orders` o
+            WHERE o.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($invalidOrderStates ? ' AND o.`current_state` NOT IN ('.implode(',', array_map('intval', $invalidOrderStates)).')' : '')
+            .($idOrder    ? ' AND o.`id_order` = '.$idOrder       : '')
+            .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '').'
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'spod').'
+                )'.(!$idHotel ? ' OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                )' : '').'
+            )'
+        );
+    }
 }

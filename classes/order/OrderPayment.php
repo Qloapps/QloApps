@@ -159,4 +159,46 @@ class OrderPaymentCore extends ObjectModel
     {
         return Db::getInstance()->getValue('SELECT (SUM(`amount` * `conversion_rate`) / SUM(`amount`)) FROM `'._DB_PREFIX_.'order_payment` WHERE `order_reference` = \''.pSQL($order_reference).'\' AND `id_currency` = '.(int)$idCurrency);
     }
+
+    // ── ANALYTICS ─────────────────────────────────────────────────────────────
+
+    /**
+     * Returns total amount paid (sum of order_payment.amount) for the given date range.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_order, id_customer
+     * @return float
+     */
+    public static function getTotalPaidAmount(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        return (float) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+            'SELECT IFNULL(SUM(op.`amount` / op.`conversion_rate`), 0)
+            FROM `'._DB_PREFIX_.'order_payment` op
+            INNER JOIN `'._DB_PREFIX_.'orders` o
+                ON (o.`reference` = op.`order_reference`)
+            WHERE op.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idOrder    ? ' AND o.`id_order` = '.$idOrder       : '')
+            .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '').'
+            AND (
+                EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+                ) OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order`'.HotelBranchInformation::addHotelRestriction($idHotel, 'spod').'
+                )'.(!$idHotel ? ' OR EXISTS (
+                    SELECT 1
+                    FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                    WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
+                )' : '').'
+            )'
+        );
+    }
 }
