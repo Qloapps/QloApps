@@ -244,8 +244,11 @@ class HotelRoomType extends ObjectModel
                         AND hbl.`id_lang` = '.(int)$idLang.')
                 LEFT JOIN `'._DB_PREFIX_.'product` AS p
                     ON (p.`id_product` = hrt.`id_product`)
+                LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object` AS hrtso
+                    ON (hrtso.`id_room_type_selling_object` = p.`id_room_type_selling_object`
+                        AND hrtso.`active` = 1)
                 LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object_lang` AS hrtstl
-                    ON (hrtstl.`id_room_type_selling_object` = p.`id_room_type_selling_object`
+                    ON (hrtstl.`id_room_type_selling_object` = hrtso.`id_room_type_selling_object`
                         AND hrtstl.`id_lang` = '.(int)$idLang.')
                 WHERE hrt.`id_product` = '.(int)$id_product;
 
@@ -321,8 +324,11 @@ class HotelRoomType extends ObjectModel
         INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)';
         $sql .= ' INNER JOIN `'._DB_PREFIX_.'product_lang` pl ON (hrt.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int)$idLang.')';
         $sql .= ' LEFT JOIN `'._DB_PREFIX_.'product` AS p ON (p.`id_product` = hrt.`id_product`)
+        LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object` AS hrtso
+            ON (hrtso.`id_room_type_selling_object` = p.`id_room_type_selling_object`
+                AND hrtso.`active` = 1)
         LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object_lang` AS hrtstl
-            ON (hrtstl.`id_room_type_selling_object` = p.`id_room_type_selling_object`
+            ON (hrtstl.`id_room_type_selling_object` = hrtso.`id_room_type_selling_object`
                 AND hrtstl.`id_lang` = '.(int)$idLang.')';
 
         if ($position) {
