@@ -230,7 +230,7 @@ class QloCronTaskManager extends Module
             $cronTask = new QctmCronTask();
             $cronTask->id_module = $idModule;
             $cronTask->task_name = $task['name'];
-            $cronTask->description = $task['description'];
+            $cronTask->description = $this->l($task['description']);
             $cronTask->cron_expression = $task['cron'];
             $cronTask->callback = $task['callback'];
             $cronTask->active = 1;

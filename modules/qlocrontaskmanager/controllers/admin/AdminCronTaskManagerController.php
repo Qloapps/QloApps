@@ -220,6 +220,7 @@ class AdminCronTaskManagerController extends ModuleAdminController
                     'label' => $this->l('Description'),
                     'name' => 'description',
                     'required' => true,
+                    'disabled' => true,
                     'col' => 7,
                     'hint' => $this->l('e.g. Sends the daily booking summary report'),
                     'desc' => $this->l('A short human-readable description of what this task does.'),
