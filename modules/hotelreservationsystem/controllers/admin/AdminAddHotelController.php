@@ -214,10 +214,24 @@ class AdminAddHotelController extends ModuleAdminController
                 $treeContent = $tree->render();
                 $smartyVars['hotel_feature_tree'] = $treeContent;
             }
+
+            $smartyVars['rewrite_url'] = [];
+            $idHotelCategory = (int) $hotelBranchInfo->id_category;
+            if ($idHotelCategory > 0 && !empty($smartyVars['languages'])) {
+                foreach ($smartyVars['languages'] as $lang) {
+                    $idLang = (int) $lang['id_lang'];
+                    $category = new Category($idHotelCategory, $idLang);
+                    if (!Validate::isLoadedObject($category)) {
+                        continue;
+                    }
+
+                    $fullUrl = $this->context->link->getCategoryLink($category, '[REWRITE]', $idLang);
+                    $smartyVars['rewrite_url'][$idLang] = explode('[REWRITE]', $fullUrl);
+                }
+            }
         } else {
             $idCountry = Tools::getValue('hotel_country');
         }
-
         // manage state option
         $stateOptions = null;
         if ($idCountry) {
@@ -273,6 +287,7 @@ class AdminAddHotelController extends ModuleAdminController
         $address = Tools::getValue('address');
         $active = Tools::getValue('ENABLE_HOTEL');
         $fax = Tools::getValue('fax');
+        $vatNumber = trim(Tools::getValue('vat_number'));
         $activeRefund = Tools::getValue('active_refund');
         $idHotelPropertyType = Tools::getValue('id_property_type');
         $enableUseGlobalMaxCheckoutOffset = Tools::getValue('enable_use_global_max_checkout_offset');
@@ -402,6 +417,11 @@ class AdminAddHotelController extends ModuleAdminController
 
         if ($fax && !Validate::isGenericName($fax)) {
             $this->errors[] = $this->l('Field fax in invalid.');
+        }
+        if ($vatNumber && !Validate::isGenericName($vatNumber)) {
+            $this->errors[] = $this->l('Field VAT number is invalid.');
+        } else if (Tools::strlen($vatNumber) > 64) {
+            $this->errors[] = $this->l('Field VAT number cannot exceed 64 characters.');
         }
 
         if (!$country) {
@@ -659,6 +679,7 @@ class AdminAddHotelController extends ModuleAdminController
                 $objAddress->id_country = $country;
                 $objAddress->id_state = $state;
                 $objAddress->city = $city;
+                $objAddress->vat_number = $vatNumber;
                 $objAddress->postcode = $zipcode;
                 $hotelName = $objHotelBranch->hotel_name[$defaultLangId];
                 $hotelName = trim(preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName));

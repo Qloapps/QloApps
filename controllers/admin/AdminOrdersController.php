@@ -480,13 +480,13 @@ class AdminOrdersControllerCore extends AdminController
                     'advance_payment_amount_without_tax' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
                     'advance_payment_amount_with_tax' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
                     'cart' => $cart,
+                    'customer' => $cart->id_customer ? new Customer($cart->id_customer): null ,
                     'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
                     'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
                     'payment_modules' => $payment_modules,
                     'payment_types' => $paymentTypes,
                     'PAYMENT_TYPE_PAY_AT_HOTEL' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                     'currency' => new Currency((int)$cart->id_currency),
-                    'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
                 ));
 
@@ -779,6 +779,8 @@ class AdminOrdersControllerCore extends AdminController
                     'order' => $objOrder,
                     'current_index' => self::$currentIndex,
                     'hotel_order_status' => $htlOrderStatus,
+                    'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
+                    'current_room_status' => Tools::getValue('current_room_status')
                 )
             );
             $modal = array(
@@ -3105,9 +3107,6 @@ class AdminOrdersControllerCore extends AdminController
             $this->kpis[] = $helper;
         }
 
-        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-            'kpis' => &$kpis,
-        ));
 
         return parent::renderKpis();
     }
@@ -3585,10 +3584,11 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
 
-            $messages = array_merge($customerMessages, $messages);
-            usort($messages, function ($a, $b) {
-                return strtotime($a['date_add']) < strtotime($b['date_add']);
-            });
+            if($messages = array_merge($customerMessages, $messages)){
+                usort($messages, function ($a, $b) {
+                    return (strtotime($a['date_add']) < strtotime($b['date_add'])) ? 1 : -1;
+                });
+            }
         }
 
         // send hotel standalone and standalone products
@@ -3619,7 +3619,6 @@ class AdminOrdersControllerCore extends AdminController
             'htl_booking_order_data' => $bookingOrderInfo,
             'hotel_order_status' => $htlOrderStatus,
             'order_detail_data' => $order_detail_data,
-            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'hotel_service_products' => $orderHotelServiceProducts,
             'standalone_service_products' => $orderStandaloneServiceProducts,
@@ -7481,7 +7480,7 @@ class AdminOrdersControllerCore extends AdminController
                                 $response['hasError'] = true;
                                 $response['errors'][] = Tools::displayError('Invalid quantity provided for service').': '.$objServiceProductOrderDetail->name;
                             }
-                        } elseif ($serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
+                        } elseif (is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail]) && $serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Can not order multiple quanitity for service').': '.$objServiceProductOrderDetail->name;
                         }
@@ -7502,7 +7501,11 @@ class AdminOrdersControllerCore extends AdminController
                     $result = true;
                     foreach ($selectedServicesOrderDetails as $idRoomTypeServiceProductOrderDetail) {
                         $objServiceProductOrderDetail = new ServiceProductOrderDetail($idRoomTypeServiceProductOrderDetail);
-                        $quantity = $serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        if(is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail])) {
+                            $quantity = (int)$serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        } else {
+                            $quantity = 1;
+                        }
                         $unitPrice = $serviceUnitPrices[$idRoomTypeServiceProductOrderDetail];
 
                         $objHotelBookingDetail = new HotelBookingDetail($objServiceProductOrderDetail->id_htl_booking_detail);
@@ -8709,30 +8712,49 @@ class AdminOrdersControllerCore extends AdminController
             }
 
             if (empty($this->errors)) {
-                $objHotelBookingDetail->id_status = $newStatus;
-                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
-                    $objHotelBookingDetail->check_in = $statusDate;
-                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
-                    $objHotelBookingDetail->check_out = $statusDate;
-                } else {
-                    $objHotelBookingDetail->check_in = '';
-                    $objHotelBookingDetail->check_out = '';
-                }
-                if ($objHotelBookingDetail->save()) {
-                    Hook::exec(
-                        'actionRoomBookingStatusUpdateAfter',
-                        array(
-                            'id_hotel_booking_detail' => $objHotelBookingDetail->id,
-                            'id_order' => $objHotelBookingDetail->id_order,
-                            'id_room' => $objHotelBookingDetail->id_room,
-                            'date_from' => $objHotelBookingDetail->date_from,
-                            'date_to' => $objHotelBookingDetail->date_to
-                        )
-                    );
 
-                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $objHotelBookingDetail->id_order.'&vieworder&token='.$this->token.'&conf=4');
+                $id_order = $objHotelBookingDetail->id_order;
+                $order = new Order($id_order);
+                $remainingCheckoutRooms = 0;
+                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                    $orderBookings = $objHotelBookingDetail->getOrderCurrentDataByOrderId(
+                        $id_order,
+                        array(HotelBookingDetail::STATUS_ALLOTED, HotelBookingDetail::STATUS_CHECKED_IN),
+                        0,
+                        0
+                    );
+                    $remainingCheckoutRooms = count($orderBookings);
+                }
+                $hasPendingBills = $order->getTotalPaid() < $order->getOrderTotal();
+
+                if ($remainingCheckoutRooms == 1 && $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT && $hasPendingBills) {
+                    $this->errors[] = Tools::displayError('You cannot checkout the last room while there are pending bills for this order.');
                 } else {
-                    $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
+                    $objHotelBookingDetail->id_status = $newStatus;
+                    if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
+                        $objHotelBookingDetail->check_in = $statusDate;
+                    } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                        $objHotelBookingDetail->check_out = $statusDate;
+                    } else {
+                        $objHotelBookingDetail->check_in = '';
+                        $objHotelBookingDetail->check_out = '';
+                    }
+                    if ($objHotelBookingDetail->save()) {
+                        Hook::exec(
+                            'actionRoomBookingStatusUpdateAfter',
+                            array(
+                                'id_hotel_booking_detail' => $objHotelBookingDetail->id,
+                                'id_order' => $objHotelBookingDetail->id_order,
+                                'id_room' => $objHotelBookingDetail->id_room,
+                                'date_from' => $objHotelBookingDetail->date_from,
+                                'date_to' => $objHotelBookingDetail->date_to
+                            )
+                        );
+
+                        Tools::redirectAdmin(self::$currentIndex . '&id_order=' . (int) $objHotelBookingDetail->id_order . '&vieworder&token=' . $this->token . '&conf=4');
+                    } else {
+                        $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
+                    }
                 }
             }
         } else {
