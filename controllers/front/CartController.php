@@ -315,7 +315,7 @@ class CartControllerCore extends FrontController
             }
 
             if ($occupancyRequiredForBooking && $operator == 'up') {
-                if ($occupancy = json_decode(Tools::getValue('occupancy'), true)) {
+                if ($occupancy = is_array(Tools::getValue('occupancy')) ? Tools::getValue('occupancy') : json_decode(Tools::getValue('occupancy'), true)) {
                     $this->qty = count($occupancy);
                 } else {
                     $this->errors[] = Tools::displayError('Invalid occupnacy.');
@@ -341,7 +341,23 @@ class CartControllerCore extends FrontController
                     $date_to = Tools::getValue('dateTo');
                     $date_from = date("Y-m-d H:i:s", strtotime($date_from));
                     $date_to = date("Y-m-d H:i:s", strtotime($date_to));
-                    $serviceProducts = json_decode(Tools::getValue('serviceProducts'),true);
+
+                    $serviceProducts = Tools::getValue('service_product');
+                    if (is_array($serviceProducts) && !empty($serviceProducts)) {
+                            $formattedServiceProducts = [];
+
+                            foreach ($serviceProducts as $id_product => $data) {
+                                $formattedServiceProducts[] = [
+                                    'id_product' => (int) $id_product,
+                                    'quantity'   => isset($data['quantity']) ? (int) $data['quantity'] : 1,
+                                ];
+                            }
+
+                            $serviceProducts = $formattedServiceProducts;
+                    } else {
+                        $serviceProducts = json_decode(Tools::getValue('serviceProducts'), true);
+                    }
+                    $serviceProducts = is_array($serviceProducts) ? $serviceProducts : [];
 
                     // valdiate occupancy if providede
                     if ($operator == 'up' && $occupancyRequiredForBooking) {

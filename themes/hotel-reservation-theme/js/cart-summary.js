@@ -942,8 +942,8 @@ function updateCartSummary(json)
 		$('input[name=quantity_' + key_for_blockcart_nocustom + '_hidden]').val(product_list[i].id_customization? product_list[i].quantity_without_customization : product_list[i].cart_quantity);
 		if (typeof(product_list[i].customizationQuantityTotal) !== 'undefined' && product_list[i].customizationQuantityTotal > 0)
 			$('#cart_quantity_custom_' + key_for_blockcart).html(product_list[i].customizationQuantityTotal);
-		nbrProducts += parseInt(product_list[i].quantity);
 	}
+	nbrProducts += parseInt(json.total_products_in_cart);
 
 	// Update discounts
 	var discount_count = 0;

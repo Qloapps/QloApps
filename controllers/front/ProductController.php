@@ -1449,8 +1449,8 @@ class ProductControllerCore extends FrontController
         $response = array('status' => false);
         $idProduct = (int) Tools::getValue('id_product');
         if ($this->product->booking_product) {
-            $dateFrom = Tools::getValue('room_check_in');
-            $dateTo = Tools::getValue('room_check_out');
+            $dateFrom = Tools::getValue('dateFrom');
+            $dateTo = Tools::getValue('dateTo');
             $occupancy = Tools::getValue('occupancy');
             if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                 if (!Validate::isOccupancy($occupancy)) {
@@ -1474,9 +1474,9 @@ class ProductControllerCore extends FrontController
             )) {
             }
         } else {
-            $idHotel = Tools::getValue('service_id_hotel');
+            $idHotel = Tools::getValue('id_hotel');
             $id_product_option = Tools::getValue('id_product_option');
-            $quantity = Tools::getValue('service_product_qty');
+            $quantity = Tools::getValue('qty');
             $this->assignServiceProductVars(
                 $id_product_option,
                 $quantity,
@@ -1484,6 +1484,7 @@ class ProductControllerCore extends FrontController
             );
         }
 
+        $this->context->smarty->assign('static_token', Tools::getToken(false));
         $html = $this->context->smarty->fetch('_partials/booking-form.tpl');
         $response['status'] = true;
         $response['html_booking_form'] = $html;
