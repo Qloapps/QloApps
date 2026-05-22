@@ -20,7 +20,7 @@
 * @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
 *}
 
-<a href="{$resetLink|escape:'html'}" title="{l s='Reset Module Crons' mod='qlocrontaskmanager'}"
+<a href="{$resetLink|escape:'html'}" title="{l s='Reset Cron Task' mod='qlocrontaskmanager'}"
     onclick="return confirm('{l s='Are you sure? This will revert the task settings to the module\'s original values.' mod='qlocrontaskmanager' js=1}');">
-    <i class="icon-refresh"></i> {l s='Reset' mod='qlocrontaskmanager'}
+    <i class="icon-refresh"></i> {l s='Reset Task' mod='qlocrontaskmanager'}
 </a>

@@ -151,11 +151,20 @@ class AdminCronTaskManagerController extends ModuleAdminController
     {
         parent::initToolbar();
         unset($this->toolbar_btn['new']);
-        $this->page_header_toolbar_btn['view_all_logs'] = array(
-            'href' => $this->context->link->getAdminLink('AdminCronTaskLogs'),
-            'desc' => $this->l('View All Logs'),
-            'icon' => 'icon-history',
-        );
+        if($this->display  &&  $this->display == 'list') {
+            $this->page_header_toolbar_btn['view_all_logs'] = array(
+                'href' => $this->context->link->getAdminLink('AdminCronTaskLogs'),
+                'desc' => $this->l('View All Logs'),
+                'icon' => 'icon-history',
+            );
+        }else if($this->display  &&  $this->display == 'edit') {
+            $idCronTask = Tools::getValue('id_cron_task');
+            $this->page_header_toolbar_btn['view_logs'] = array(
+                'href' => $this->context->link->getAdminLink('AdminCronTaskLogs') . '&id_cron_task=' . (int) $idCronTask,
+                'desc' => $this->l('View Logs'),
+                'icon' => 'icon-history',
+            );
+        }
     }
 
   
