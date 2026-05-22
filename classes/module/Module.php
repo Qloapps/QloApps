@@ -689,6 +689,7 @@ abstract class ModuleCore
      */
     public function uninstall()
     {
+        Hook::exec('actionModuleUninstallBefore', array('object' => $this));
         // Check module installation id validation
         if (!Validate::isUnsignedId($this->id)) {
             $this->_errors[] = Tools::displayError('The module is not installed.');
