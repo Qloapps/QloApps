@@ -195,7 +195,7 @@ class AdminOrdersControllerCore extends AdminController
                 'displayed' => true,
             ),
             'date_to' => array(
-                'title' => $this->l('Check-out'),
+                'title' => $this->l('Check-out date'),
                 'filter_key' => 'hbd!date_to',
                 'type'=>'date',
                  'callback' => 'formatCheckOutDates',
