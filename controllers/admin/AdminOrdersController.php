@@ -1518,19 +1518,6 @@ class AdminOrdersControllerCore extends AdminController
         );
     }
 
-    protected function addOrderLog($message, Order $order)
-    {
-        PrestaShopLogger::addLog(
-            $message,
-            1,
-            null,
-            'Order',
-            (int)$order->id,
-            true,
-            (int)$this->context->employee->id
-        );
-    }
-
     public function postProcess()
     {
         // Process reallocation of rooms
@@ -1573,7 +1560,7 @@ class AdminOrdersControllerCore extends AdminController
                     // Finally, reallocate the room
                     if ($objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
                         $order = new Order((int)$idOrder);
-                        $this->addOrderLog(
+                        PrestaShopLogger::addLog(
                             sprintf(
                                 $this->l('[%s] Room %s reallocated to Room %s (%s)'),
                                 $order->reference,
@@ -1581,7 +1568,12 @@ class AdminOrdersControllerCore extends AdminController
                                 $objRoomInfo->room_num,
                                 Product::getProductName($idNewRoomType, null, $this->context->language->id)
                             ),
-                            $order
+                            1,
+                            null,
+                            'Order',
+                            (int)$order->id,
+                            true,
+                            (int)$this->context->employee->id
                         );
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=52&token='.$this->token);
                     } else {
@@ -1626,14 +1618,19 @@ class AdminOrdersControllerCore extends AdminController
                     $objBookingDetail = new HotelBookingDetail();
                     if ($objBookingDetail->swapBooking($idHtlBookingFrom, $idHtlBookingToSwap)) {
                         $order = new Order((int)$idOrder);
-                        $this->addOrderLog(
+                        PrestaShopLogger::addLog(
                             sprintf(
                                 $this->l('[%s] Room %s swapped with Room %s'),
                                 $order->reference,
                                 $objHotelBooking->room_num,
                                 $objHotelBookingTo->room_num
                             ),
-                            $order
+                            1,
+                            null,
+                            'Order',
+                            (int)$order->id,
+                            true,
+                            (int)$this->context->employee->id
                         );
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$idOrder.'&vieworder&conf=53&token='.$this->token);
                     } else {
@@ -1731,13 +1728,18 @@ class AdminOrdersControllerCore extends AdminController
                 $result = $order->changeOrderStatus();
                 if ($result['status']) {
                     $newOrderState = new OrderState((int)Tools::getValue('id_order_state'));
-                    $this->addOrderLog(
+                    PrestaShopLogger::addLog(
                         sprintf(
                             $this->l('[%s] Order status updated to %s'),
                             $order->reference,
                             Validate::isLoadedObject($newOrderState) ? $newOrderState->name[(int)$order->id_lang] : Tools::getValue('id_order_state')
                         ),
-                        $order
+                        1,
+                        null,
+                        'Order',
+                        (int)$order->id,
+                        true,
+                        (int)$this->context->employee->id
                     );
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$order->id.'&conf=5&vieworder&token='.$this->token);
                 } else {
@@ -1987,14 +1989,19 @@ class AdminOrdersControllerCore extends AdminController
 
                 // Redirect if no errors
                 if (!count($this->errors)) {
-                    $this->addOrderLog(
+                    PrestaShopLogger::addLog(
                         sprintf(
                             $this->l('[%s] Refund/cancellation request #%s created (reason: %s)'),
                             $order->reference,
                             $objOrderReturn->id,
                             $refundReason
                         ),
-                        $order
+                        1,
+                        null,
+                        'Order',
+                        (int)$order->id,
+                        true,
+                        (int)$this->context->employee->id
                     );
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=3&token='.$this->token);
                 }
@@ -2062,7 +2069,7 @@ class AdminOrdersControllerCore extends AdminController
                             $this->errors[] = Tools::displayError('An error occurred during payment.');
                         }
                     } else {
-                        $this->addOrderLog(
+                        PrestaShopLogger::addLog(
                             sprintf(
                                 $this->l('[%s] Payment of %s %s added via %s'),
                                 $order->reference,
@@ -2070,7 +2077,12 @@ class AdminOrdersControllerCore extends AdminController
                                 $currency->iso_code,
                                 Tools::getValue('payment_method')
                             ),
-                            $order
+                            1,
+                            null,
+                            'Order',
+                            (int)$order->id,
+                            true,
+                            (int)$this->context->employee->id
                         );
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                     }
@@ -2233,14 +2245,19 @@ class AdminOrdersControllerCore extends AdminController
 
                         if ($objPaymentModule->currentOrder) {
                             $newOrder = new Order((int)$objPaymentModule->currentOrder);
-                            $this->addOrderLog(
+                            PrestaShopLogger::addLog(
                                 sprintf(
                                     $this->l('[%s] Order created by admin (payment: %s, amount paid: %s)'),
                                     $newOrder->reference,
                                     $objPaymentModule->displayName,
                                     $amountPaid
                                 ),
-                                $newOrder
+                                1,
+                                null,
+                                'Order',
+                                (int)$newOrder->id,
+                                true,
+                                (int)$this->context->employee->id
                             );
                             Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                         }
@@ -2597,13 +2614,18 @@ class AdminOrdersControllerCore extends AdminController
                         );
                         $order->update();
 
-                        $this->addOrderLog(
+                        PrestaShopLogger::addLog(
                             sprintf(
                                 $this->l('[%s] Voucher %s removed from order'),
                                 $order->reference,
                                 $order_cart_rule->name
                             ),
-                            $order
+                            1,
+                            null,
+                            'Order',
+                            (int)$order->id,
+                            true,
+                            (int)$this->context->employee->id
                         );
                     }
 
@@ -2780,13 +2802,18 @@ class AdminOrdersControllerCore extends AdminController
                         }
 
                         if ($res) {
-                            $this->addOrderLog(
+                            PrestaShopLogger::addLog(
                                 sprintf(
                                     $this->l('[%s] Voucher %s added to order'),
                                     $order->reference,
                                     Tools::getValue('discount_name')
                                 ),
-                                $order
+                                1,
+                                null,
+                                'Order',
+                                (int)$order->id,
+                                true,
+                                (int)$this->context->employee->id
                             );
                             Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
                         } else {
@@ -5413,7 +5440,7 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if ($objBookingDetail->save()) {
-                    $this->addOrderLog(
+                    PrestaShopLogger::addLog(
                         sprintf(
                             $this->l('[%s] Room %s (%s) added to order (check-in: %s, check-out: %s)'),
                             $order->reference,
@@ -5422,7 +5449,12 @@ class AdminOrdersControllerCore extends AdminController
                             date('d M Y', strtotime($objBookingDetail->date_from)),
                             date('d M Y', strtotime($objBookingDetail->date_to))
                         ),
-                        $order
+                        1,
+                        null,
+                        'Order',
+                        (int)$order->id,
+                        true,
+                        (int)$this->context->employee->id
                     );
 
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
@@ -5810,14 +5842,19 @@ class AdminOrdersControllerCore extends AdminController
                             $objServiceProductOrderDetail->save();
                         }
 
-                        $this->addOrderLog(
+                        PrestaShopLogger::addLog(
                             sprintf(
                                 $this->l('[%s] Product %s (qty: %s) added to order'),
                                 $objOrder->reference,
                                 $objProduct->name,
                                 $productInformations['product_quantity']
                             ),
-                            $objOrder
+                            1,
+                            null,
+                            'Order',
+                            (int)$objOrder->id,
+                            true,
+                            (int)$this->context->employee->id
                         );
                         $response['status'] = true;
                     } else {
@@ -6321,7 +6358,7 @@ class AdminOrdersControllerCore extends AdminController
             $view = $this->createTemplate('_product_line.tpl')->fetch();
         }
 
-        $this->addOrderLog(
+        PrestaShopLogger::addLog(
             sprintf(
                 $this->l('[%s] Room %s details edited: dates %s-%s → %s-%s'),
                 $order->reference,
@@ -6331,7 +6368,12 @@ class AdminOrdersControllerCore extends AdminController
                 date('d M Y', strtotime($new_date_from)),
                 date('d M Y', strtotime($new_date_to))
             ),
-            $order
+            1,
+            null,
+            'Order',
+            (int)$order->id,
+            true,
+            (int)$this->context->employee->id
         );
 
         $this->sendChangedNotification($order);
@@ -6470,7 +6512,7 @@ class AdminOrdersControllerCore extends AdminController
                 $response['error'] = Tools::displayError('Some error has been occurred while updating the product. Please try again.');
             } else {
                 $this->sendChangedNotification($objOrder);
-                $this->addOrderLog(
+                PrestaShopLogger::addLog(
                     sprintf(
                         $this->l('[%s] Product %s updated: qty set to %s, unit price (excl. tax) set to %s'),
                         $objOrder->reference,
@@ -6478,7 +6520,12 @@ class AdminOrdersControllerCore extends AdminController
                         $editProductInfo['product_quantity'],
                         $editProductInfo['product_price_tax_excl']
                     ),
-                    $objOrder
+                    1,
+                    null,
+                    'Order',
+                    (int)$objOrder->id,
+                    true,
+                    (int)$this->context->employee->id
                 );
             }
         }
@@ -6815,7 +6862,7 @@ class AdminOrdersControllerCore extends AdminController
             'can_edit' => ($this->tabAccess['edit'] === 1),
         ));
 
-        $this->addOrderLog(
+        PrestaShopLogger::addLog(
             sprintf(
                 $this->l('[%s] Room %s (%s) removed from order (check-in: %s, check-out: %s)'),
                 $order->reference,
@@ -6824,7 +6871,12 @@ class AdminOrdersControllerCore extends AdminController
                 date('d M Y', strtotime($objBookingDetail->date_from)),
                 date('d M Y', strtotime($objBookingDetail->date_to))
             ),
-            $order
+            1,
+            null,
+            'Order',
+            (int)$order->id,
+            true,
+            (int)$this->context->employee->id
         );
 
         $this->sendChangedNotification($order);
@@ -6915,13 +6967,18 @@ class AdminOrdersControllerCore extends AdminController
                 $response['error'] = Tools::displayError('Some error has been occurred while updating the product. Please try again.');
             } else {
                 $this->sendChangedNotification($objOrder);
-                $this->addOrderLog(
+                PrestaShopLogger::addLog(
                     sprintf(
                         $this->l('[%s] Product %s removed from order'),
                         $objOrder->reference,
                         $objOrderDetail->product_name
                     ),
-                    $objOrder
+                    1,
+                    null,
+                    'Order',
+                    (int)$objOrder->id,
+                    true,
+                    (int)$this->context->employee->id
                 );
             }
         }
@@ -7756,7 +7813,7 @@ class AdminOrdersControllerCore extends AdminController
 
                             $result &= $objOrder->update();
                             if ($result) {
-                                $this->addOrderLog(
+                                PrestaShopLogger::addLog(
                                     sprintf(
                                         $this->l('[%s] Room service %s updated (qty: %s, unit price: %s)'),
                                         $objOrder->reference,
@@ -7764,7 +7821,12 @@ class AdminOrdersControllerCore extends AdminController
                                         $objServiceProductOrderDetail->quantity,
                                         $objServiceProductOrderDetail->unit_price_tax_excl
                                     ),
-                                    $objOrder
+                                    1,
+                                    null,
+                                    'Order',
+                                    (int)$objOrder->id,
+                                    true,
+                                    (int)$this->context->employee->id
                                 );
                             }
                         }
@@ -8001,14 +8063,19 @@ class AdminOrdersControllerCore extends AdminController
                             $objServiceProductOrderDetail->name = $service['name'];
                             $objServiceProductOrderDetail->quantity = $objServiceProductCartDetail->quantity;
                             $objServiceProductOrderDetail->save();
-                                $this->addOrderLog(
+                                PrestaShopLogger::addLog(
                                     sprintf(
                                         $this->l('[%s] Service %s added to room %s'),
                                         $order->reference,
                                         $service['name'],
                                         $objHotelBookingDetail->room_num
                                     ),
-                                    $order
+                                    1,
+                                    null,
+                                    'Order',
+                                    (int)$order->id,
+                                    true,
+                                    (int)$this->context->employee->id
                                 );
                             
 
@@ -8331,14 +8398,19 @@ class AdminOrdersControllerCore extends AdminController
                                                         $objHotelBookingDetail->id,
                                                         true
                                                     );
-                                                    $this->addOrderLog(
+                                                    PrestaShopLogger::addLog(
                                                         sprintf(
                                                             $this->l('[%s] New service %s added to room %s'),
                                                             $objOrder->reference,
                                                             $name,
                                                             $objHotelBookingDetail->room_num
                                                         ),
-                                                        $objOrder
+                                                        1,
+                                                        null,
+                                                        'Order',
+                                                        (int)$objOrder->id,
+                                                        true,
+                                                        (int)$this->context->employee->id
                                                     );
                                                 } else {
                                                     $response['hasError'] = true;
@@ -8486,14 +8558,19 @@ class AdminOrdersControllerCore extends AdminController
                     $res &= $order->update();
                 }
                 if ($res) {
-                    $this->addOrderLog(
+                    PrestaShopLogger::addLog(
                         sprintf(
                             $this->l('[%s] Service %s removed from room %s'),
                             $order->reference,
                             $objServiceProductOrderDetail->name,
                             $objHotelBookingDetail->room_num
                         ),
-                        $order
+                        1,
+                        null,
+                        'Order',
+                        (int)$order->id,
+                        true,
+                        (int)$this->context->employee->id
                     );
                     $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
                         $objOrderDetail->id_order,
@@ -8956,14 +9033,19 @@ class AdminOrdersControllerCore extends AdminController
                             HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked Out'),
                         );
                         $statusLabel = isset($statusLabels[$newStatus]) ? $statusLabels[$newStatus] : $newStatus;
-                        $this->addOrderLog(
+                        PrestaShopLogger::addLog(
                             sprintf(
                                 $this->l('[%s] Room %s status updated to %s'),
                                 $order->reference,
                                 $objHotelBookingDetail->room_num,
                                 $statusLabel
                             ),
-                            $order
+                            1,
+                            null,
+                            'Order',
+                            (int)$order->id,
+                            true,
+                            (int)$this->context->employee->id
                         );
 
                         Tools::redirectAdmin(self::$currentIndex . '&id_order=' . (int) $objHotelBookingDetail->id_order . '&vieworder&token=' . $this->token . '&conf=4');
