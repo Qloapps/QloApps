@@ -72,6 +72,8 @@ class AdminOrdersControllerCore extends AdminController
         ) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests,
         (SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as los,
         hbd.`id_room` AS id_room_information,
+        (SELECT GROUP_CONCAT(DISTINCT hbd.`date_from` ORDER BY hbd.`date_from` SEPARATOR \', \') FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) AS date_from,
+        (SELECT GROUP_CONCAT(DISTINCT hbd.`date_to` ORDER BY hbd.`date_to` SEPARATOR \', \') FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) AS date_to,
         (SELECT COUNT(spod.`id_service_product_order_detail`) FROM `'._DB_PREFIX_.'service_product_order_detail` spod WHERE spod.`id_order` = a.`id_order` AND spod.`id_htl_booking_detail`=0) as num_products';
 
         $this->_join = '
@@ -185,16 +187,20 @@ class AdminOrdersControllerCore extends AdminController
                 'displayed' => false,
             ),
             'date_from' => array(
-                'title' => $this->l('Check-in'),
+                'title' => $this->l('Check-in date'),
                 'filter_key' => 'hbd!date_from',
-                'type'=>'date',
-                'displayed' => false,
+                'type' => 'date',
+                'callback' => 'formatCheckInDates',
+                'optional' => true,
+                'displayed' => true,
             ),
             'date_to' => array(
                 'title' => $this->l('Check-out'),
                 'filter_key' => 'hbd!date_to',
                 'type'=>'date',
-                'displayed' => false,
+                 'callback' => 'formatCheckOutDates',
+                'optional' => true,
+                'displayed' => true,
             ),
             'total_guests' => array(
                 'title' => $this->l('Guests'),
@@ -357,6 +363,30 @@ class AdminOrdersControllerCore extends AdminController
             $idCurrency = $row['id_currency'];
         }
         return Tools::displayPrice($echo, (int)$idCurrency);
+    }
+
+    public function formatCheckInDates($dates, $row)
+    {
+        if (empty($dates)) {
+            return '--';
+        }
+        $formatted = array();
+        foreach (explode(', ', $dates) as $date) {
+            $formatted[] = Tools::displayDate(trim($date));
+        }
+        return implode(', ', $formatted);
+    }
+
+    public function formatCheckOutDates($dates, $row)
+    {
+        if (empty($dates)) {
+            return '--';
+        }
+        $formatted = array();
+        foreach (explode(', ', $dates) as $date) {
+            $formatted[] = Tools::displayDate(trim($date));
+        }
+        return implode(', ', $formatted);
     }
 
     public function initPageHeaderToolbar()
