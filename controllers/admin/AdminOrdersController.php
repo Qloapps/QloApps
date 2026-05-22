@@ -492,7 +492,6 @@ class AdminOrdersControllerCore extends AdminController
                     'payment_types' => $paymentTypes,
                     'PAYMENT_TYPE_PAY_AT_HOTEL' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                     'currency' => new Currency((int)$cart->id_currency),
-                    'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
                     'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 ));
@@ -786,6 +785,8 @@ class AdminOrdersControllerCore extends AdminController
                     'order' => $objOrder,
                     'current_index' => self::$currentIndex,
                     'hotel_order_status' => $htlOrderStatus,
+                    'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
+                    'current_room_status' => Tools::getValue('current_room_status')
                 )
             );
             $modal = array(
@@ -3112,9 +3113,6 @@ class AdminOrdersControllerCore extends AdminController
             $this->kpis[] = $helper;
         }
 
-        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-            'kpis' => &$kpis,
-        ));
 
         return parent::renderKpis();
     }
@@ -3627,7 +3625,6 @@ class AdminOrdersControllerCore extends AdminController
             'htl_booking_order_data' => $bookingOrderInfo,
             'hotel_order_status' => $htlOrderStatus,
             'order_detail_data' => $order_detail_data,
-            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'hotel_service_products' => $orderHotelServiceProducts,
             'standalone_service_products' => $orderStandaloneServiceProducts,
@@ -5072,8 +5069,8 @@ class AdminOrdersControllerCore extends AdminController
                 $carrier = new Carrier((int)$order->id_carrier);
                 $tax_calculator = $carrier->getTaxCalculator($invoice_address);
 
-                $order_invoice->total_paid_tax_excl = Tools::ps_round((float)$cart->getOrderTotal(false, $total_method), 2);
-                $order_invoice->total_paid_tax_incl = Tools::ps_round((float)$cart->getOrderTotal($use_taxes, $total_method), 2);
+                $order_invoice->total_paid_tax_excl = Tools::ps_round((float)$cart->getOrderTotal(false, $total_method), _PS_PRICE_COMPUTE_PRECISION_);
+                $order_invoice->total_paid_tax_incl = Tools::ps_round((float)$cart->getOrderTotal($use_taxes, $total_method), _PS_PRICE_COMPUTE_PRECISION_);
                 $order_invoice->total_products = (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_products_wt = (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_shipping_tax_excl = (float)$cart->getTotalShippingCost(null, false);
@@ -5295,7 +5292,8 @@ class AdminOrdersControllerCore extends AdminController
                     $this->context->cart->id,
                     $this->context->cookie->id_guest,
                     $objCartBookingData->id_room,
-                    0
+                    0,
+                    1
                 );
                 $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
                 $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
@@ -5615,8 +5613,8 @@ class AdminOrdersControllerCore extends AdminController
                             $invoice_address = new Address((int) $objOrder->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $objOrder->id_shop)});
                             $carrier = new Carrier((int)$objOrder->id_carrier);
                             $tax_calculator = $carrier->getTaxCalculator($invoice_address);
-                            $objOrderInvoice->total_paid_tax_excl = Tools::ps_round((float)$objCart->getOrderTotal(false, $totalMethod), 2);
-                            $objOrderInvoice->total_paid_tax_incl = Tools::ps_round((float)$objCart->getOrderTotal($useTaxes, $totalMethod), 2);
+                            $objOrderInvoice->total_paid_tax_excl = Tools::ps_round((float)$objCart->getOrderTotal(false, $totalMethod), _PS_PRICE_COMPUTE_PRECISION_);
+                            $objOrderInvoice->total_paid_tax_incl = Tools::ps_round((float)$objCart->getOrderTotal($useTaxes, $totalMethod), _PS_PRICE_COMPUTE_PRECISION_);
                             $objOrderInvoice->total_products = (float)$objCart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                             $objOrderInvoice->total_products_wt = (float)$objCart->getOrderTotal($useTaxes, Cart::ONLY_PRODUCTS);
                             $objOrderInvoice->total_shipping_tax_excl = (float)$objCart->getTotalShippingCost(null, false);
@@ -5873,7 +5871,8 @@ class AdminOrdersControllerCore extends AdminController
                 $cart->id,
                 $cart->id_guest,
                 $id_room,
-                0
+                0,
+                1
             );
 
             $totalRoomPriceAfterTE = (float) $roomTotalPrice['total_price_tax_excl'];
@@ -8403,7 +8402,7 @@ class AdminOrdersControllerCore extends AdminController
                                         $objBookingDetail->date_to
                                     );
                                 }
-                                $objBookingDemand->total_price_tax_excl = $totalPriceTaxIncl = Tools::processPriceRounding(
+                                $objBookingDemand->total_price_tax_excl = $totalPriceTaxExcl = Tools::processPriceRounding(
                                     ($objBookingDemand->unit_price_tax_excl * $numDays),
                                     1,
                                     $order->round_type,
@@ -8503,7 +8502,7 @@ class AdminOrdersControllerCore extends AdminController
                             $order->round_type,
                             $order->round_mode
                         );
-                        $objBookingDemand->total_price_tax_excl = Tools::processPriceRounding(
+                        $objBookingDemand->total_price_tax_incl = Tools::processPriceRounding(
                             ($objBookingDemand->unit_price_tax_incl * $numDays),
                             1,
                             $order->round_type,
@@ -8721,30 +8720,49 @@ class AdminOrdersControllerCore extends AdminController
             }
 
             if (empty($this->errors)) {
-                $objHotelBookingDetail->id_status = $newStatus;
-                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
-                    $objHotelBookingDetail->check_in = $statusDate;
-                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
-                    $objHotelBookingDetail->check_out = $statusDate;
-                } else {
-                    $objHotelBookingDetail->check_in = '';
-                    $objHotelBookingDetail->check_out = '';
-                }
-                if ($objHotelBookingDetail->save()) {
-                    Hook::exec(
-                        'actionRoomBookingStatusUpdateAfter',
-                        array(
-                            'id_hotel_booking_detail' => $objHotelBookingDetail->id,
-                            'id_order' => $objHotelBookingDetail->id_order,
-                            'id_room' => $objHotelBookingDetail->id_room,
-                            'date_from' => $objHotelBookingDetail->date_from,
-                            'date_to' => $objHotelBookingDetail->date_to
-                        )
-                    );
 
-                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $objHotelBookingDetail->id_order.'&vieworder&token='.$this->token.'&conf=4');
+                $id_order = $objHotelBookingDetail->id_order;
+                $order = new Order($id_order);
+                $remainingCheckoutRooms = 0;
+                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                    $orderBookings = $objHotelBookingDetail->getOrderCurrentDataByOrderId(
+                        $id_order,
+                        array(HotelBookingDetail::STATUS_ALLOTED, HotelBookingDetail::STATUS_CHECKED_IN),
+                        0,
+                        0
+                    );
+                    $remainingCheckoutRooms = count($orderBookings);
+                }
+                $hasPendingBills = $order->getTotalPaid() < $order->getOrderTotal();
+
+                if ($remainingCheckoutRooms == 1 && $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT && $hasPendingBills) {
+                    $this->errors[] = Tools::displayError('You cannot checkout the last room while there are pending bills for this order.');
                 } else {
-                    $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
+                    $objHotelBookingDetail->id_status = $newStatus;
+                    if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
+                        $objHotelBookingDetail->check_in = $statusDate;
+                    } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                        $objHotelBookingDetail->check_out = $statusDate;
+                    } else {
+                        $objHotelBookingDetail->check_in = '';
+                        $objHotelBookingDetail->check_out = '';
+                    }
+                    if ($objHotelBookingDetail->save()) {
+                        Hook::exec(
+                            'actionRoomBookingStatusUpdateAfter',
+                            array(
+                                'id_hotel_booking_detail' => $objHotelBookingDetail->id,
+                                'id_order' => $objHotelBookingDetail->id_order,
+                                'id_room' => $objHotelBookingDetail->id_room,
+                                'date_from' => $objHotelBookingDetail->date_from,
+                                'date_to' => $objHotelBookingDetail->date_to
+                            )
+                        );
+
+                        Tools::redirectAdmin(self::$currentIndex . '&id_order=' . (int) $objHotelBookingDetail->id_order . '&vieworder&token=' . $this->token . '&conf=4');
+                    } else {
+                        $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
+                    }
                 }
             }
         } else {
@@ -8790,7 +8808,8 @@ class AdminOrdersControllerCore extends AdminController
                         0,
                         0,
                         0,
-                        0
+                        0,
+                        1
                     );
                     if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
                         $result['has_price_changes'] = 1;

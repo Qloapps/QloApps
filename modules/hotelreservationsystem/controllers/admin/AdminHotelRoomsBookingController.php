@@ -384,7 +384,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'date_to' => $this->date_to,
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'link' => $this->context->link,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
         ));
@@ -892,6 +891,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 // if room is changing in the reallocation
                 if ($objHotelBooking->id_product != $idNewRoomType) {
                     $result['has_room_type_change'] = 1;
+                    $objOrder = new Order($objHotelBooking->id_order);
                     $occupancy = array(
                         array(
                             'adults' => $objHotelBooking->adults,
@@ -908,7 +908,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                         0,
                         0,
                         0,
-                        0
+                        0,
+                        1
                     );
 
                     if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
@@ -981,7 +982,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'SELLING_PREFERENCE_WITH_ROOM_TYPE' => Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
             'SELLING_PREFERENCE_STANDALONE' => Product::SELLING_PREFERENCE_STANDALONE,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'rooms_reallocation_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'rooms_booking_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
