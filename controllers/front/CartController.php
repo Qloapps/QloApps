@@ -106,6 +106,9 @@ class CartControllerCore extends FrontController
                 }
 
                 Tools::redirect('index.php?controller=order&'.(isset($this->id_product) ? 'ipa='.$this->id_product : ''));
+            } elseif ($this->errors && !$this->ajax) {
+                $this->context->cookie->__set('cart_errors', json_encode($this->errors));
+                Tools::redirect('index.php?controller=order&'.(isset($this->id_product) ? 'ipa='.$this->id_product : ''));
             }
         } elseif (!$this->isTokenValid()) {
             if (Tools::getValue('ajax')) {
@@ -435,7 +438,11 @@ class CartControllerCore extends FrontController
                                     $total_available_rooms = $hotelRoomData['stats']['num_avail'];
                                     if (Tools::getValue('op', 'up') == 'up') {
                                         if ($total_available_rooms < $req_rm) {
-                                            die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
+                                            if (Module::isInstalled('blockcart') && Module::isEnabled('blockcart') && Configuration::get('PS_BLOCK_CART_AJAX')) {
+                                                die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
+                                            } else {
+                                                $this->errors[] = Tools::displayError('All rooms are sold out for the selected dates. Please try with different dates.');
+                                            }
                                         } else {
                                             // validate service products if available
                                             if ($serviceProducts) {
@@ -466,10 +473,18 @@ class CartControllerCore extends FrontController
                             }
                         }
                     } else {
-                        die(json_encode(array('status' => 'failed3')));
+                        if (Module::isInstalled('blockcart') && Module::isEnabled('blockcart') && Configuration::get('PS_BLOCK_CART_AJAX')) {
+                            die(json_encode(array('status' => 'failed3')));
+                        } else {
+                            $this->errors[] = Tools::displayError('An error occurred while processing your request.');
+                        }
                     }
                 } else {
-                    die(json_encode(array('status' => 'failed4')));
+                    if (Module::isInstalled('blockcart') && Module::isEnabled('blockcart') && Configuration::get('PS_BLOCK_CART_AJAX')) {
+                        die(json_encode(array('status' => 'failed4')));
+                    } else {
+                        $this->errors[] = Tools::displayError('An error occurred while processing your request.');
+                    }
                 }
             }
         } else {
