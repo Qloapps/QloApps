@@ -201,7 +201,7 @@ var ajaxCart = {
 
                 var date_from = $('#room_check_in').val();
                 var date_to = $('#room_check_out').val();
-                var id_hotel = $('#service_id_hotel').length ? $('#service_id_hotel').val() : 0;
+                var id_hotel = ($('input[name="buying_option"]').length && $('input[name="buying_option"]:checked').val() == '2') ? 0 : ($('#service_id_hotel').length ? $('#service_id_hotel').val() : 0);
                 var occupancy = getBookingOccupancyDetails($(this).closest('.booking_room_fields'), parseInt(booking_product));
 
                 if (occupancy) {

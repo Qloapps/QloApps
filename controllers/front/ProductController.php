@@ -916,9 +916,12 @@ class ProductControllerCore extends FrontController
     public function assignServiceProductVars(
         $idProductOption = false,
         $quantity = 1,
-        $idHotel = false
+        $idHotel = false,
+        $buying_option = false
     ) {
         $smartyVars = array();
+        $smartyVars['sellable_with_hotel'] = Product::isSellableWithHotel($this->product->selling_preference_type);
+        $smartyVars['sellable_as_standalone'] = Product::isSellableAsStandalone($this->product->selling_preference_type);
         if (Product::isSellableWithHotel($this->product->selling_preference_type)) {
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
 
@@ -936,6 +939,9 @@ class ProductControllerCore extends FrontController
         }
         if ($idHotel) {
             $smartyVars['service_id_hotel'] = $idHotel;
+        }
+        if($buying_option) {
+            $smartyVars['buying_option'] = $buying_option;
         }
         $useTax = HotelBookingDetail::useTax();
         $objServiceProductOption = new ServiceProductOption();
@@ -1477,12 +1483,14 @@ class ProductControllerCore extends FrontController
             }
         } else {
             $idHotel = Tools::getValue('service_id_hotel');
+            $buying_option = Tools::getValue('buying_option');
             $id_product_option = Tools::getValue('id_product_option');
             $quantity = Tools::getValue('service_product_qty');
             $this->assignServiceProductVars(
                 $id_product_option,
                 $quantity,
-                $idHotel
+                $idHotel,
+                $buying_option
             );
         }
 

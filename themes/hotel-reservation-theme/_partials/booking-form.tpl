@@ -227,17 +227,44 @@
                             {/if}
                         {/if}
                     {else}
-                        {block name='booking_form_associated_hotels'}
-                            {if isset($associated_hotels) && $associated_hotels}
+                        {block name='booking_form_service_selection'}
+                            {if isset($sellable_with_hotel) && $sellable_with_hotel && isset($sellable_as_standalone) && $sellable_as_standalone}
                                 <div class="form-group">
-                                    <label class="control-label">{l s='Select Hotel'}</label>
-                                    <select class="chosen input-hotel" name="service_id_hotel" id="service_id_hotel">
-                                        {foreach $associated_hotels as $hotel}
-                                            <option value="{$hotel.id_hotel}" {if isset($service_id_hotel) && $service_id_hotel == $hotel['id_hotel']}selected{elseif $hotel@first}selected{/if}>{$hotel.name}</option>
-                                        {/foreach}
-                                    </select>
+                                    <label class="control-label">{l s='Service'}</label>
+                                    <div class="radio-inline">
+                                        <label for="buy_with_hotel" class="top">
+                                            <div class="radio" id="uniform-buy_with_hotel">
+                                                <span class="checked">
+                                                    <input type="radio" name="buying_option" id="buy_with_hotel" value="1" {if isset($buying_option) && $buying_option == '1'}checked="checked"{else if !isset($buying_option)}checked="checked"{/if}>
+                                                </span>
+                                            </div> {l s='Buy with Hotel.'}
+                                        </label>
+                                    </div>
+                                    <div class="radio-inline">
+                                        <label for="buy_standalone" class="top">
+                                            <div class="radio" id="uniform-buy_standalone">
+                                                <span>
+                                                    <input type="radio" name="buying_option" id="buy_standalone" value="2" {if isset($buying_option) && $buying_option == '2'}checked="checked"{/if}>
+                                                </span>
+                                            </div> {l s='Buy Standalone.'}
+                                        </label>
+                                    </div>
                                 </div>
                             {/if}
+                        {/block}
+                        {block name='booking_form_associated_hotels'}
+                            <div id="hotel_selection_block" {if isset($buying_option) && $buying_option == '2'}style="display: none;"{/if}>
+                                {if isset($associated_hotels) && $associated_hotels}
+                                    <div class="form-group">
+                                        <label class="control-label">{l s='Select Hotel'}</label>
+                                        <select class="chosen input-hotel" name="service_id_hotel" id="service_id_hotel">
+                                            {foreach $associated_hotels as $hotel}
+                                                <option value="{$hotel.id_hotel}" {if isset($service_id_hotel) && $service_id_hotel == $hotel['id_hotel']}selected{elseif $hotel@first}selected{/if}>{$hotel.name}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                {/if}
+                            </div>
                         {/block}
                         {block name='booking_form_product_option'}
                             {if isset($product_option) && $product_option}
