@@ -565,34 +565,21 @@ product_tabs['Informations'] = new function(){
 
 		function applySellingPreferenceUIState()
 		{
-			var sellingPreference = parseInt($('#selling_preference_type').val(), 10);
-			var showHotelTree = $.inArray(sellingPreference, [
-				SELLING_PREFERENCE_HOTEL_STANDALONE,
-				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
-				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
-				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
-			]) !== -1;
-			var showRoomTypeTree = $.inArray(sellingPreference, [
-				0,
-				SELLING_PREFERENCE_WITH_ROOM_TYPE,
-				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
-				SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
-				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
-			]) !== -1;
-			var showAutoAddToCart = $.inArray(sellingPreference, [
-				0,
-				SELLING_PREFERENCE_WITH_ROOM_TYPE,
-				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
-				SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
-				SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
-			]) !== -1;
+			var withRoomType = $('#sp_with_room_type').is(':checked');
+			var withHotel = $('#sp_with_hotel').is(':checked');
+			var standalone = $('#sp_standalone').is(':checked');
+
+			// Bitmask: Room Type=1, Hotel=2, Standalone=4
+			var sellingPreference = (withRoomType ? 1 : 0) + (withHotel ? 2 : 0) + (standalone ? 4 : 0);
+			$('#selling_preference_type').val(sellingPreference);
+
 			var $autoAddOff = $('#auto_add_to_cart_off');
 			var $autoAddCheckedInput;
 
-			toggleAssociationFieldNames('#associated_hotel_tree', showHotelTree);
-			toggleAssociationFieldNames('#associated_hotel_rooms_tree', showRoomTypeTree);
+			toggleAssociationFieldNames('#associated_hotel_tree', withHotel);
+			toggleAssociationFieldNames('#associated_hotel_rooms_tree', withRoomType);
 
-			if (showAutoAddToCart) {
+			if (withRoomType) {
 				$('#auto_add_to_cart_container').show('fast');
 				$autoAddCheckedInput = $('input[name="auto_add_to_cart"]:checked');
 				if (!$autoAddCheckedInput.length) {
@@ -609,12 +596,12 @@ product_tabs['Informations'] = new function(){
 			$('#product_options').show('fast');
 		}
 
-		$('#selling_preference_type').on('change',function(){
+		$('#sp_with_room_type, #sp_with_hotel, #sp_standalone').on('change', function(){
 			setTimeout(function() {
 				applySellingPreferenceUIState();
 			}, 0);
 		});
-		$('#selling_preference_type').trigger('change');
+		applySellingPreferenceUIState();
 		$('#simple_product').attr('checked', true);
 
 		$('input[name="type_product"]').on('click', function(e)

@@ -227,7 +227,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (rsp.`id_element` = hrt.`id_product` AND rsp.`element_type` = '.(int)RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.')
                 '.HotelBranchInformation::addHotelRestriction(false, 'hrt');
 
-        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, CASE a.`price_calculation_method` WHEN '.Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY.' THEN "'.$this->l('Only check-in day').'" WHEN '.Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY.' THEN "'.$this->l('Only check-out day').'" WHEN '.Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY.' THEN "'.$this->l('Only during-stay days').'" WHEN '.Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY.' THEN "'.$this->l('Check-in and check-out days').'" WHEN '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY.' THEN "'.$this->l('Check-in | during-stay days').'" WHEN '.Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY.' THEN "'.$this->l('Check-out | during-stay days').'" WHEN '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY.' THEN "'.$this->l('Check-in | check-out | during-stay days').'" ELSE "'.$this->l('Only check-in day').'" END as price_calculation_method_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
+        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= ' COUNT(hrt.`id_product`) as products_associated, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
@@ -302,13 +302,14 @@ class AdminNormalProductsControllerCore extends AdminController
             'callback' => 'getPriceDisplayPreference',
             'list' => $priceAdditionType,
         );
-        $this->fields_list['price_calculation_method_txt'] = array(
+        $this->fields_list['price_calculation_method'] = array(
             'title' => $this->l('Price calculation method'),
             'filter_key' => 'a!price_calculation_method',
             'type' => 'select',
             'list' => $priceCalculationMethod,
             'visible_default' => true,
             'optional' => true,
+            'callback' => 'getPriceCalculationMethod',
         );
         $this->servicesCategory = array();
         $idServiceCategory = Configuration::get('PS_SERVICE_CATEGORY');
@@ -432,23 +433,29 @@ class AdminNormalProductsControllerCore extends AdminController
 
     public function getBuyingOption($selling_preference_type, $row)
     {
-        if ($selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) {
-            return $this->l('With room type');
-        } else if ($selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE) {
-            return $this->l('With hotel|room type');
-        } else if ($selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
-            return $this->l('Standalone');
-        } else if ($selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
-            return $this->l('With hotel');
-        } else if ($selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE) {
-            return $this->l('With hotel|standalone');
-        } else if ($selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE) {
-            return $this->l('With room type|standalone');
-        } else if ($selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE) {
-            return $this->l('With hotel|room type|standalone');
+        $list = $this->fields_list['selling_preference_type']['list'];
+
+        if (!isset($list[$selling_preference_type])) {
+            return '--';
         }
 
-        return '--';
+        $this->context->smarty->assign('selected_options', array_map('trim', explode('|', $list[$selling_preference_type])));
+
+        return $this->context->smarty->fetch('controllers/normal_products/selected_option.tpl');
+    }
+
+    public function getPriceCalculationMethod($txt, $row)
+    {
+        $list = $this->fields_list['price_calculation_method']['list'];
+        $method = (int)$row['price_calculation_method'];
+
+        if (!isset($list[$method])) {
+            return '--';
+        }
+
+        $this->context->smarty->assign('selected_options', array_map('trim', explode('|', $list[$method])));
+
+        return $this->context->smarty->fetch('controllers/normal_products/selected_option.tpl');
     }
 
     public function getHotelName($hotelName, $row)
@@ -480,7 +487,7 @@ class AdminNormalProductsControllerCore extends AdminController
             .'template')) {
             $bo_theme = 'default';
         }
-
+        $this->addJqueryUI('ui.tooltip', 'base', true);
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.iframe-transport.js');
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.fileupload.js');
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.fileupload-process.js');
@@ -2358,6 +2365,14 @@ class AdminNormalProductsControllerCore extends AdminController
 
         if ($this->isProductFieldUpdated('id_category_default') && (!is_array(Tools::getValue('categoryBox')) || !in_array(Tools::getValue('id_category_default'), Tools::getValue('categoryBox')))) {
             $this->errors[] = $this->l('This product must be in the default category.');
+        }
+
+        if (!Tools::getValue('selling_preference_type')) {
+            $this->errors[] = $this->l('Please select at least one buying option.');
+        }
+
+        if (!Tools::getValue('price_calculation_method')) {
+            $this->errors[] = $this->l('Please select at least one price calculation method.');
         }
 
         // Tags

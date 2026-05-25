@@ -64,7 +64,7 @@
 												{foreach from=$products key=data_k item='product' name='myLoop'}
 												{* only show products that are booking or global without room *}
 													{if $product.booking_product || Product::isSellableAsStandalone($product.selling_preference_type) || Product::isSellableWithHotel($product.selling_preference_type)}
-														{if isset($product.hotel_wise_data) && $product.hotel_wise_data}
+														{if Product::isSellableWithHotel($product.selling_preference_type) && isset($product.hotel_wise_data) && $product.hotel_wise_data}
 															{foreach $product.hotel_wise_data as $hotel_wise_data}
 																{include file="./cartrow.tpl" hotel_wise_data=$hotel_wise_data}
 															{/foreach}
@@ -144,7 +144,7 @@
 												{/if}
 											{/block}
 											{block name='blockcart_shopping_cart_total_convenience_fee'}
-												{if isset($total_convenience_fee)}
+												{if isset($total_convenience_fee) && $total_convenience_fee}
 													<div class="cart-prices-line">
 														<span class="price cart_block_convenience_fee ajax_cart_convenience_fee">{convertPrice price=$total_convenience_fee}</span>
 														<span class="price">{l s='Convenience Fees' mod='blockcart'}</strong>
@@ -326,7 +326,7 @@
 								</span>
 							</div> -->
 							{block name='blockcart_layer_cart_total_convenience_fee'}
-								{if isset($total_convenience_fee)}
+								{if isset($total_convenience_fee) && $total_convenience_fee}
 									<div class="layer_cart_row">
 										<strong class="dark">
 											{l s='Convenience Fees' mod='blockcart'}

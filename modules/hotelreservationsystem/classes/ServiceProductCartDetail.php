@@ -95,7 +95,9 @@ class ServiceProductCartDetail extends ObjectModel
                         $objHotelCartBookingData->date_from,
                         $objHotelCartBookingData->date_to
                     );
-                    $updateQty *= $numdays;
+                    if($numdays){
+                        $updateQty *= $numdays;
+                    }
                     if ($objServiceProductCartDetail->delete()) {
                         $objCart = new Cart($product['id_cart']);
                         if (isset(Context::getContext()->controller->controller_type)) {
@@ -269,7 +271,7 @@ class ServiceProductCartDetail extends ObjectModel
                             1,
                             null,
                             $product['htl_cart_booking_id']
-                        )/$numDays;
+                        ) / max($numDays, 1);
                         $priceTaxExcl = Product::getServiceProductPrice(
                             $objProduct->id,
                             $product['id_product_option'],
@@ -284,7 +286,7 @@ class ServiceProductCartDetail extends ObjectModel
                             1,
                             null,
                             $product['htl_cart_booking_id']
-                        )/$numDays;
+                        ) / max($numDays, 1);
 
                         $optionDetails = false;
                         if (ServiceProductOption::productHasOptions($product['id_product'])) {
@@ -461,9 +463,11 @@ class ServiceProductCartDetail extends ObjectModel
                     $objHotelCartBooking->date_from,
                     $objHotelCartBooking->date_to
                 );
-                $quantity = $objServiceProductCartDetail->quantity * $numDays;
+                if($numDays){
+                    $quantity = $quantity * $numDays;
+                }
             }
-
+        
             $objCart = new Cart($idCart);
             return $objCart->updateQty($quantity, $idProduct);
         }
@@ -514,6 +518,16 @@ class ServiceProductCartDetail extends ObjectModel
                     $updateQunatity = $objServiceProductCartDetail->delete();
                 }
                 if ($updateQunatity) {
+                    if (Validate::isLoadedObject($objHotelCartBooking = new HotelCartBookingData($product['id_hotel_cart_booking']))) {
+                        $objProduct = new Product((int) $product['id_product']);
+                        $numDays = Product::getPriceCalculationApplicableDays(
+                            $objProduct->price_calculation_method,
+                            $objHotelCartBooking->date_from,
+                            $objHotelCartBooking->date_to
+                        );
+                        $removedQuantity = $removedQuantity * $numDays;
+                    }
+
                     $objCart = new Cart($idCart);
                     if (isset(Context::getContext()->controller->controller_type)) {
                         $controllerType = Context::getContext()->controller->controller_type;

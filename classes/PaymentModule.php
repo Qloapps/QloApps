@@ -505,7 +505,6 @@ abstract class PaymentModuleCore extends Module
             $objMail = new Mail();
             $objServiceProductCartDetail = new ServiceProductCartDetail();
             $cart_rules = $this->context->cart->getCartRules();
-
             foreach ($order_detail_list as $key => $order_detail) {
                 /** @var OrderDetail $order_detail */
 
@@ -541,7 +540,6 @@ abstract class PaymentModuleCore extends Module
 
                     $product_var_tpl_list = array();
                     $orderServiceProducts = array();
-                    $processedServiceProductCartIds = array();
                     $objProduct = new Product();
 
                     foreach ($order->product_list as $product) {
@@ -970,11 +968,9 @@ abstract class PaymentModuleCore extends Module
                         $objServiceProductCartDetail = new ServiceProductCartDetail();
                         foreach ($normalProducts as $product) {
                             $idProduct = $product['id_product'];
-                            $canSellWithRoomType = Product::isSellableWithRoomType($product['selling_preference_type']);
-                            $canSellWithHotel = Product::isSellableWithHotel($product['selling_preference_type']);
-                            $canSellAsStandalone = Product::isSellableAsStandalone($product['selling_preference_type']);
+                            $productSellingType = $product['selling_preference_type'];
 
-                            if ($canSellWithRoomType && !$canSellWithHotel && !$canSellAsStandalone) {
+                            if (Product::isSellableWithRoomType($productSellingType)) {
                                 if ($roomTypeServices = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $this->context->cart->id,
                                     [],
@@ -983,16 +979,10 @@ abstract class PaymentModuleCore extends Module
                                     null,
                                     $product['id_product']
                                 )) {
-                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
-                                        $idProduct,
-                                        $order->id,
-                                        $product['selling_preference_type']
-                                    );
+
+                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, $product['selling_preference_type']);
                                     foreach ($roomTypeServices as $roomTypeService) {
-                                        if (!Validate::isDate($roomTypeService['date_from'])
-                                            || !Validate::isDate($roomTypeService['date_to'])
-                                            || !(int) $roomTypeService['id_room_type']
-                                        ) {
+                                        if (!$roomTypeService['id_hotel_cart_booking']) {
                                             continue;
                                         }
                                         $roomBookingDetail = $objBookingDetail->getRowByIdOrderIdProductInDateRange(
@@ -1002,9 +992,6 @@ abstract class PaymentModuleCore extends Module
                                             $roomTypeService['date_to'],
                                             $roomTypeService['id_room']
                                         );
-                                        if (empty($roomBookingDetail['id'])) {
-                                            continue;
-                                        }
                                         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                                         $objServiceProductOrderDetail->id_product = $idProduct;
                                         $objServiceProductOrderDetail->id_order = $order->id;
@@ -1021,7 +1008,7 @@ abstract class PaymentModuleCore extends Module
                                         $objServiceProductOrderDetail->save();
                                     }
                                 }
-                            } elseif ($canSellWithHotel && !$canSellWithRoomType && !$canSellAsStandalone) {
+                            } elseif (Product::isSellableWithHotel($productSellingType)) {
                                 if ($hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $this->context->cart->id,
                                     [],
@@ -1030,11 +1017,7 @@ abstract class PaymentModuleCore extends Module
                                     null,
                                     $product['id_product']
                                 )) {
-                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
-                                        $idProduct,
-                                        $order->id,
-                                        $product['selling_preference_type']
-                                    );
+                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, $product['selling_preference_type']);
                                     foreach ($hotelProducts as $hotelProduct) {
                                         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                                         $objServiceProductOrderDetail->id_product = $idProduct;
@@ -1056,9 +1039,10 @@ abstract class PaymentModuleCore extends Module
                                         }
                                         $objServiceProductOrderDetail->quantity = $hotelProduct['quantity'];
                                         $objServiceProductOrderDetail->save();
+
                                     }
                                 }
-                            } elseif ($canSellAsStandalone && !$canSellWithRoomType && !$canSellWithHotel) {
+                            } elseif (Product::isSellableAsStandalone($productSellingType)) {
                                 if ($standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $this->context->cart->id,
                                     [],
@@ -1067,11 +1051,7 @@ abstract class PaymentModuleCore extends Module
                                     null,
                                     $product['id_product']
                                 )) {
-                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct(
-                                        $idProduct,
-                                        $order->id,
-                                        $product['selling_preference_type']
-                                    );
+                                    $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, $product['selling_preference_type']);
                                     foreach ($standaloneProducts as $standaloneProduct) {
                                         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                                         $objServiceProductOrderDetail->id_product = $idProduct;
@@ -1089,7 +1069,7 @@ abstract class PaymentModuleCore extends Module
                                         $objServiceProductOrderDetail->save();
                                     }
                                 }
-                            } 
+                            }
                         }
                     }
 

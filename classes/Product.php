@@ -569,12 +569,10 @@ class ProductCore extends ObjectModel
     const PRICE_ADDITION_TYPE_WITH_ROOM = 1;
     const PRICE_ADDITION_TYPE_INDEPENDENT = 2;
 
-    const PRICE_CALCULATION_METHOD_PER_DAY = 1;
-
     const PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY = 1;
     const PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY = 2;
-    const PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY = 3;
-    const PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY = 4;
+    const PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY = 4;
+    const PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY = 3;
     const PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY = 5;
     const PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY = 6;
     const PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY = 7;
@@ -6909,23 +6907,31 @@ class ProductCore extends ObjectModel
             return (int) $defaultDays;
         }
 
+        $checkin = 1;
+        $checkout = 1;
+        $duringStay = max($numNights - 1, 0);
+
         switch ((int) $priceCalculationMethod) {
             case self::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY:
+                return $checkin;
+
             case self::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY:
-                return 1;
+                return $checkout;
 
             case self::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY:
-                return max($numNights - 1, 1);
+                return $duringStay;
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY:
-                return 2;
+                return $checkin + $checkout;
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY:
+                return $checkin + $duringStay;
+
             case self::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY:
-                return $numNights;
+                return $checkout + $duringStay;
 
             case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY:
-                return $numNights + 1;
+                return $checkin + $checkout + $duringStay;
 
             default:
                 return $numNights;

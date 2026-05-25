@@ -482,7 +482,11 @@ class CartControllerCore extends FrontController
                     if ($product->allow_multiple_quantity) {
                         $finalQuantity = $this->qty;
                         if (isset($productCartDetail) && $productCartDetail) {
-                            $finalQuantity += $productCartDetail['quantity'];
+                            $quantityInCart = Cart::getProductQtyInCart(
+                                $id_cart,
+                                $this->id_product
+                            );
+                            $finalQuantity += $quantityInCart;
                         }
                         if ($product->max_quantity && $finalQuantity > $product->max_quantity) {
                             $this->errors[] = Tools::displayError(sprintf('You cannot add more than %d quantity for this product in the cart.', $product->max_quantity));
@@ -560,22 +564,24 @@ class CartControllerCore extends FrontController
             }
         }
 
-        // Check product quantity availability
-        if ($this->id_product_attribute) {
-            if (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty($this->id_product_attribute, $qty_to_check)) {
+        // Check product quantity availability only when no earlier validation error exists
+        if (!$this->errors) {
+            if ($this->id_product_attribute) {
+                if (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty($this->id_product_attribute, $qty_to_check)) {
+                    $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
+                }
+            } elseif ($product->hasAttributes()) {
+                $minimumQuantity = ($product->out_of_stock == 2) ? !Configuration::get('PS_ORDER_OUT_OF_STOCK') : !$product->out_of_stock;
+                $this->id_product_attribute = Product::getDefaultAttribute($product->id, $minimumQuantity);
+                // @todo do something better than a redirect admin !!
+                if (!$this->id_product_attribute) {
+                    Tools::redirectAdmin($this->context->link->getProductLink($product));
+                } elseif (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty($this->id_product_attribute, $qty_to_check)) {
+                    $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
+                }
+            } elseif (!$product->checkQty($qty_to_check)) {
                 $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
             }
-        } elseif ($product->hasAttributes()) {
-            $minimumQuantity = ($product->out_of_stock == 2) ? !Configuration::get('PS_ORDER_OUT_OF_STOCK') : !$product->out_of_stock;
-            $this->id_product_attribute = Product::getDefaultAttribute($product->id, $minimumQuantity);
-            // @todo do something better than a redirect admin !!
-            if (!$this->id_product_attribute) {
-                Tools::redirectAdmin($this->context->link->getProductLink($product));
-            } elseif (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty($this->id_product_attribute, $qty_to_check)) {
-                $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
-            }
-        } elseif (!$product->checkQty($qty_to_check)) {
-            $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
         }
 
         // If no errors, process product addition
@@ -748,8 +754,20 @@ class CartControllerCore extends FrontController
                             if ($objProduct->allow_multiple_quantity) {
                                 if (!Validate::isUnsignedInt($qty)) {
                                     $this->errors[] = Tools::displayError('The quantity you\'ve entered is invalid.');
-                                } elseif ($objProduct->max_quantity && $qty > $objProduct->max_quantity) {
-                                    $this->errors[] = Tools::displayError(sprintf('cannot add more than %d quantity.', $objProduct->max_quantity));
+                                } else {
+                                    $cartTotalQty  = Cart::getProductQtyInCart((int)$this->context->cart->id,(int)$idServiceProduct);
+                                    $numDays = Product::getPriceCalculationApplicableDays(
+                                        $objProduct->price_calculation_method,
+                                        $objHotelCartBookingData->date_from,
+                                        $objHotelCartBookingData->date_to
+                                    );
+                                    $currentQty = $qty * $numDays;
+                                    $finalQty = (int)$cartTotalQty + $currentQty;
+                                    if ($objProduct->max_quantity && $finalQty > $objProduct->max_quantity) {
+                                        $this->errors[] = Tools::displayError(sprintf('cannot add more than %d quantity.', $objProduct->max_quantity));
+                                    } else if (!Product::isAvailableWhenOutOfStock($objProduct->out_of_stock) && !$objProduct->checkQty($finalQty)) {
+                                        $this->errors[] = Tools::displayError('There isn\'t enough product in stock.');
+                                    }
                                 }
                             } else {
                                 $qty = 1;

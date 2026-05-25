@@ -59,7 +59,7 @@
                                         $service_product.date_from|default:$date_from|default:'',
                                         $service_product.date_to|default:$date_to|default:''
                                     ) > 1}
-                                        <span class="price-label">{l s='/Night'}</span>
+                                        <span class="price-label">{l s='/Day'}</span>
                                     {/if}
                                 {/block}
                                 {if $service_product.allow_multiple_quantity && $service_product.available_for_order && $service_product.max_quantity > 0}

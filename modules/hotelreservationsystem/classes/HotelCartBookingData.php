@@ -1027,6 +1027,25 @@ class HotelCartBookingData extends ObjectModel
                                 }
                             }
                         }
+
+                        // Check available stock: remove if cart quantity exceeds what is in stock.
+                        if (!$toRemoveService) {
+                            $availableQty = Product::getQuantity((int)$service['id_product']);
+                            $totalQty  = Cart::getProductQtyInCart((int)$service['id_cart'],(int)$service['id_product']);
+                            if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$service['id_product']))
+                                && $availableQty !== false
+                                && $availableQty < (int)$totalQty
+                            ) {
+                                $toRemoveService = 1;
+                            }
+                        }
+
+                        // Check max quantity: remove if cart quantity exceeds the product's configured maximum.
+                        if (!$toRemoveService && $product->allow_multiple_quantity && (int)$product->max_quantity > 0) {  
+                            if ((int)$service['quantity'] > (int)$product->max_quantity) {
+                                $toRemoveService = 1;
+                            }
+                        }
                     }
 
                     if ($toRemoveService) {

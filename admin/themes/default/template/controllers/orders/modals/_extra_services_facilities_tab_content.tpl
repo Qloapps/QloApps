@@ -51,7 +51,7 @@
 											<span class="input-group-addon">{$currencySign}</span>
 											<input type="text" class="form-control unit_price" value="{$demand['unit_price_tax_excl']}">
 											{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
-												<span class="input-group-addon">{l s='/ night'}</span>
+												<span class="input-group-addon">{l s='/ day'}</span>
 											{/if}
 										</div>
 									</td>
@@ -122,7 +122,7 @@
 											{/if}
 											<input type="text" class="form-control unit_price" value="{$demand_price}" data-id-product="{$product['id_product']}">
 											{if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
-												<span class="input-group-addon">{l s='/ night'}</span>
+												<span class="input-group-addon">{l s='/ day'}</span>
 											{/if}
 										</div>
 									</td>
@@ -159,7 +159,7 @@
                                     <td>
                                         {displayPrice price=$demand['unit_price_tax_excl'] currency=$orderCurrency}
                                         {if $demand['price_calc_method'] == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY}
-                                            {l s='/ night'}
+                                            {l s='/ day'}
                                         {/if}
                                     </td>
                                     <td>{displayPrice price=$demand['total_price_tax_excl'] currency=$orderCurrency}</td>

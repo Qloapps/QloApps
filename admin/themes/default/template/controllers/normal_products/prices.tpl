@@ -207,21 +207,43 @@ $(document).ready(function () {
 		{if isset($pack) && $pack->isPack($product->id)}<p class="col-lg-9 col-lg-offset-3 help-block">{l s='The sum of prices of the products in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackPrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
 	</div> *}
 		<div class="form-group">
-			<label class="control-label col-lg-3" for="price_calculation_method">
+			<label class="control-label col-lg-3">
 				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select which booking days should be counted when calculating the service price.'}">
 					{l s='Price calculation method'}
-				<span>
+				</span>
 			</label>
-			<div class="col-lg-4">
-				<select name="price_calculation_method" id="price_calculation_method">
-					<option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY}selected="selected"{/if}>{l s='Only check-in day'}</option>
-					<option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY}selected="selected"{/if}>{l s='Only check-out day'}</option>
-					<option value="{Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY}selected="selected"{/if}>{l s='Only during-stay days'}</option>
-					<option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY}selected="selected"{/if}>{l s='Check-in and check-out days'}</option>
-					<option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY}selected="selected"{/if}>{l s='Check-in and during-stay days'}</option>
-					<option value="{Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY}selected="selected"{/if}>{l s='Check-out and during-stay days'}</option>
-					<option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}selected="selected"{/if}>{l s='Check-in, check-out, and during-stay days'}</option>
-				</select>
+			<div class="col-lg-9">
+				<input type="hidden" name="price_calculation_method" id="price_calculation_method" value="{$product->price_calculation_method|intval}">
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" id="pcm_checkin"
+							{if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY
+							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
+							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY
+							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}checked="checked"{/if}>
+						{l s='Check-in day'}
+					</label>
+				</div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" id="pcm_checkout"
+							{if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY
+							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
+							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY
+							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}checked="checked"{/if}>
+						{l s='Check-out day'}
+					</label>
+				</div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" id="pcm_duringstay"
+							{if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY
+							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY
+							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY
+							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}checked="checked"{/if}>
+						{l s='During-stay days'}
+					</label>
+				</div>
 			</div>
 		</div>
 	{* As no use in QloApps currently so commented *}

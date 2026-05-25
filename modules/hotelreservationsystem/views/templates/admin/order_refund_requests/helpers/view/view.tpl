@@ -372,7 +372,7 @@
 							<div class="form-group">
 								<div class="col-sm-3">
 									<label for="id_refund_state" class="control-label">
-										<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Select new state for refund request.' mod='hotelreservationsystem'}"> {l s='Room refund state' mod='hotelreservationsystem'}</span> :
+										<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Select new state for refund request.' mod='hotelreservationsystem'}"> {l s='Room/services refund state' mod='hotelreservationsystem'}</span> :
 									</label>
 								</div>
 								<div class="col-sm-3">

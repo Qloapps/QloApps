@@ -2187,7 +2187,7 @@ class HotelHelper
                 'price' => '250',
                 'auto_add_to_cart' => 1,
                 'show_at_front' => 0,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_BOOKING,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_INDEPENDENT,
                 'en' => array(
                     'name' => 'Internet Handling Charges',

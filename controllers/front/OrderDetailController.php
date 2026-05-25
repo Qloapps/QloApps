@@ -101,7 +101,6 @@ class OrderDetailControllerCore extends FrontController
                 $total_convenience_fee_te = 0;
                 $total_convenience_fee_ti = 0;
                 $roomTypes = array();
-                $processedConvenienceFeeProducts = array();
                 $objOrderReturn = new OrderReturn();
                 $refundedAmount = 0;
                 $refundedAmount = $objOrderReturn->getRefundedAmount($order->id);
@@ -359,17 +358,8 @@ class OrderDetailControllerCore extends FrontController
                                 $value['avg_price_diff_tax_excl'] = abs(Tools::ps_round($value['avg_paid_unit_price_tax_excl'] - $value['product_price_tax_excl'], 6));
                                 $value['avg_price_diff_tax_incl'] = abs(Tools::ps_round($value['avg_paid_unit_price_tax_incl'] - $value['product_price_tax_incl'], 6));
                             }
-                        } else {
-                            $canSellWithRoomType = Product::isSellableWithRoomType($type_value['selling_preference_type']);
-                            $canSellWithHotel = Product::isSellableWithHotel($type_value['selling_preference_type']);
-                            $canSellAsStandalone = Product::isSellableAsStandalone($type_value['selling_preference_type']);
-
-                            if ($canSellWithRoomType
-                                && $type_value['product_auto_add']
-                                && $type_value['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT
-                                && !isset($processedConvenienceFeeProducts[$type_value['product_id']])
-                            ) {
-                                $processedConvenienceFeeProducts[$type_value['product_id']] = true;
+                        } else if (Product::isSellableWithRoomType($type_value['selling_preference_type'])) {
+                            if ($type_value['product_auto_add'] && $type_value['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT) {
                                 $total_convenience_fee_ti += $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                                     $id_order,
                                     $type_value['product_id'],
@@ -395,50 +385,37 @@ class OrderDetailControllerCore extends FrontController
                                     1
                                 );
                             }
-
-                            if ($canSellWithHotel || $canSellAsStandalone) {
-                                $serviceProducts = $objServiceProductOrderDetail->getServiceProductsInOrder(
-                                    $id_order,
-                                    $type_value['id_order_detail'],
-                                    $type_value['product_id']
-                                );
-
-                                foreach ($serviceProducts as $serviceProduct) {
-                                    $idHotel = (int)$serviceProduct['id_hotel'];
-                                    $isRoomLinked = !empty($serviceProduct['id_htl_booking_detail']);
-
-                                    // Room-linked rows are already included in room detail block.
-                                    if ($isRoomLinked) {
-                                        continue;
-                                    }
-
-                                    if ($canSellWithHotel && $idHotel) {
-                                        $hotelProduct = array_merge($type_value, $serviceProduct);
-                                        $hotelServiceProducts[] = $hotelProduct;
-                                        $formattedProduct = $serviceProduct;
-                                        $formattedProduct['refund_denied'] = 0;
-                                        if (isset($serviceProduct['refund_info'])
-                                            && ($serviceProduct['refund_info']['refunded'] && !$serviceProduct['refund_info']['id_customization'])
-                                        ) {
-                                            $formattedProduct['refund_denied'] = 1;
-                                        }
-                                    } elseif ($canSellAsStandalone && !$idHotel) {
-                                        $standaloneProduct = array_merge($type_value, $serviceProduct);
-                                        $standaloneServiceProducts[] = $standaloneProduct;
-                                        $formattedProduct = $serviceProduct;
-                                    } else {
-                                        continue;
-                                    }
-
-                                    if (!isset($serviceProductsFormatted[$serviceProduct['id_product']])) {
-                                        $serviceProductsFormatted[$serviceProduct['id_product']] = array(
-                                            'id_product' => $serviceProduct['id_product'],
-                                            'name' => $serviceProduct['name'],
-                                            'options' => array()
-                                        );
-                                    }
-                                    $serviceProductsFormatted[$serviceProduct['id_product']]['options'][] = $formattedProduct;
+                        } else if (Product::isSellableWithHotel($type_value['selling_preference_type'])) {
+                            $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($id_order, $type_value['id_order_detail'], $type_value['product_id']);
+                            foreach ($hotelProducts as $hotelProduct) {
+                                $hotelServiceProducts[] = array_merge($type_value, $hotelProduct);
+                                if (!isset($serviceProductsFormatted[$hotelProduct['id_product']])) {
+                                    $serviceProductsFormatted[$hotelProduct['id_product']] = array(
+                                        'id_product' => $hotelProduct['id_product'],
+                                        'name' => $hotelProduct['name'],
+                                        'options' => array()
+                                    );
                                 }
+                                $hotelProduct['refund_denied'] = 0;
+                                if (isset($hotelProduct['refund_info'])
+                                    && ($hotelProduct['refund_info']['refunded'] && !$hotelProduct['refund_info']['id_customization'])
+                                ) {
+                                    $hotelProduct['refund_denied'] = 1;
+                                }
+                                $serviceProductsFormatted[$hotelProduct['id_product']]['options'][] = $hotelProduct;
+                            }
+                        } else if (Product::isSellableAsStandalone($type_value['selling_preference_type'])) {
+                            $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($id_order, $type_value['id_order_detail'], $type_value['product_id']);
+                            foreach ($standaloneProducts as $standaloneProduct) {
+                                $standaloneServiceProducts[] = array_merge($type_value, $standaloneProduct);
+                                if (!isset($serviceProductsFormatted[$standaloneProduct['id_product']])) {
+                                    $serviceProductsFormatted[$standaloneProduct['id_product']] = array(
+                                        'id_product' => $standaloneProduct['id_product'],
+                                        'name' => $standaloneProduct['name'],
+                                        'options' => array()
+                                    );
+                                }
+                                $serviceProductsFormatted[$standaloneProduct['id_product']]['options'][] = $standaloneProduct;
                             }
                         }
                         $roomTypes[$type_value['id_product']] = $type_value;

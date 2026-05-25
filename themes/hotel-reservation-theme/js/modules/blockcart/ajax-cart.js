@@ -748,11 +748,12 @@ var ajaxCart = {
 
                 //try to know if the current product is still in the new list
                 var stayInTheCart = false;
-                var isHotelRow = (typeof ids[3] != 'undefined' && parseInt(ids[3], 10) > 0);
+                var isHotelRow = (typeof ids[3] != 'undefined' && parseInt(ids[3]) > 0);
                 for (aProduct in jsonData.products) {
                     //we've called the variable aProduct because IE6 bug if this variable is called product
                     //if product has attributes
-                    if (isHotelRow && (typeof jsonData.products[aProduct]['hotel_wise_data'] != 'undefined' && jsonData.products[aProduct]['hotel_wise_data'].length)) {
+                    if (isHotelRow && jsonData.products[aProduct]['id'] == ids[0]
+                        && (typeof jsonData.products[aProduct]['hotel_wise_data'] != 'undefined' && jsonData.products[aProduct]['hotel_wise_data'].length)) {
                         $.each(jsonData.products[aProduct]['hotel_wise_data'], function() {
                             if (ids[3] == this.id_hotel) {
                                 stayInTheCart = true;
@@ -760,7 +761,20 @@ var ajaxCart = {
                         });
                     } else {
                         if (jsonData.products[aProduct]['id'] == ids[0] && (!ids[1] || jsonData.products[aProduct]['idCombination'] == ids[1])) {
-                            stayInTheCart = true;
+                            var productType = parseInt(jsonData.products[aProduct]['selling_preference_type']);
+                            var isStandaloneRow = (typeof ids[3] == 'undefined' || parseInt(ids[3]) === 0);
+
+                            if (!isStandaloneRow) {
+                            } else if (
+                                ajaxCart.isSellableAsStandalone(productType)
+                                && (ajaxCart.isSellableWithHotel(productType) || ajaxCart.isSellableWithRoomType(productType))
+                            ) {
+                                if (parseInt(jsonData.products[aProduct]['standalone_total_qty']) > 0) {
+                                    stayInTheCart = true;
+                                }
+                            } else {
+                                stayInTheCart = true;
+                            }
                             // update the product customization display (when the product is still in the cart)
                             ajaxCart.hideOldProductCustomizations(jsonData.products[aProduct], productDomId);
                         }
@@ -945,7 +959,7 @@ var ajaxCart = {
 
                 if (product.booking_product) {
                     content += formatCurrency(parseFloat(product.bookingData.total_room_type_amount), currency_format, currency_sign, currency_blank);
-                } else if (typeof(hotel_wise_data) != 'undefined') {
+                } else if (typeof(hotel_wise_data) != 'undefined' && ajaxCart.isSellableWithHotel(product.selling_preference_type)) {
                     content += formatCurrency(parseFloat(hotel_wise_data.amount), currency_format, currency_sign, currency_blank);
                 } else {
                     content += formatCurrency(parseFloat(product.amount), currency_format, currency_sign, currency_blank);

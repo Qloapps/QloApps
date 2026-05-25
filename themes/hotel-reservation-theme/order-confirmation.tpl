@@ -254,9 +254,9 @@
 																								<dt class="col-xs-5">{l s='Unit Price'}</dt>
 																								<dd class="col-xs-7">
 																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$objOrderCurrency}
 																									{else}
-																										{displayWtPriceWithCurrency price=$product.unit_price_tax_excl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.unit_price_tax_excl  currency=$objOrderCurrency}
 																									{/if}
 																								</dd>
 																							</div>
@@ -272,9 +272,9 @@
 																								<dt class="col-xs-5">{l s='Total Pricing'}</dt>
 																								<dd class="col-xs-7">
 																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$objOrderCurrency}
 																									{else}
-																										{displayWtPriceWithCurrency price=$product.total_price_tax_excl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.total_price_tax_excl  currency=$objOrderCurrency}
 																									{/if}
 																								</dd>
 																							</div>
@@ -328,9 +328,9 @@
 																								<dt class="col-xs-5">{l s='Unit Price'}</dt>
 																								<dd class="col-xs-7">
 																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$objOrderCurrency}
 																									{else}
-																										{displayWtPriceWithCurrency price=$product.unit_price_tax_excl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.unit_price_tax_excl  currency=$objOrderCurrency}
 																									{/if}
 																								</dd>
 																							</div>
@@ -346,9 +346,9 @@
 																								<dt class="col-xs-5">{l s='Total Pricing'}</dt>
 																								<dd class="col-xs-7">
 																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$objOrderCurrency}
 																									{else}
-																										{displayWtPriceWithCurrency price=$product.total_price_tax_excl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.total_price_tax_excl  currency=$objOrderCurrency}
 																									{/if}
 																								</dd>
 																							</div>

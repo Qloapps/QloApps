@@ -96,7 +96,7 @@
                                                             $selectedRoomServiceProduct['date_from'],
                                                             $selectedRoomServiceProduct['date_to']
                                                         ) > 1}
-                                                            <span class="input-group-addon">{l s='/ night'}</span>
+                                                            <span class="input-group-addon">{l s='/ day'}</span>
                                                         {/if}
                                                     </div>
                                                 {/if}
@@ -134,16 +134,26 @@
                 </div>
                 <div class="row form-group">
                     <div class="col-sm-6">
-                        <label class="control-label">{l s='Price calculation method'}</label>
-                        <select class="form-control" name="new_service_price_calc_method">
-                            <option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY}" >{l s='Only check-in day'}</option>
-                            <option value="{Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY}" >{l s='Only check-out day'}</option>
-                            <option value="{Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY}" >{l s='Only during-stay days'}</option>
-                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY}" >{l s='Check-in and check-out days'}</option>
-                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY}" >{l s='Check-in and during-stay days'}</option>
-                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY}" >{l s='Check-out and during-stay days'}</option>
-                            <option value="{Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY}" >{l s='Check-in, check-out, and during-stay days'}</option>
-                        </select>
+                        <label class="control-label required">{l s='Price calculation method'}</label>
+                        <input type="hidden" name="new_service_price_calc_method" id="price_calculation_method" value="{$product->price_calculation_method|intval}">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="pcm_checkin">
+                                {l s='Check-in day'}
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="pcm_checkout">
+                                {l s='Check-out day'}
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="pcm_duringstay"/>
+                                {l s='During-stay days'}
+                            </label>
+                        </div>
                     </div>
                     <div class="col-sm-6">
                         <label class="control-label">{l s='Auto added service'}</label>

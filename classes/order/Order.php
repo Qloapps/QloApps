@@ -47,9 +47,6 @@ class OrderCore extends ObjectModel
     const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
 
 
-    const SERVICE_PRODUCT_CONTEXT_ROOM_LINKED = 1;
-    const SERVICE_PRODUCT_CONTEXT_NON_ROOM    = 2;
-
     /** @var int Delivery address id */
     public $id_address_delivery;
 
@@ -2581,12 +2578,11 @@ class OrderCore extends ObjectModel
                     )) {
                         $totals = array_reduce($serviceProductDetail, function ($carry, $item) use ($order_detail) {
                             $objHotelBookingDetail = new HotelBookingDetail((int) $item['id_htl_booking_detail']);
-                            $numDays = 1;
-                            if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
-                                && (!$numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to))
-                            ) {
-                                $numDays = 1;
-                            }
+                            $numDays = Product::getPriceCalculationApplicableDays(
+                                $order_detail['product_price_calculation_method'],
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to
+                            );
 
                             if (!empty($item['id_tax_rules_group'])) {
                                 $qty = isset($item['quantity']) ? $item['quantity'] : 0;
@@ -2637,12 +2633,11 @@ class OrderCore extends ObjectModel
                     // We are getting auto added service for specific room.There will be only on htl_booking_detail but can have multiple auto added service with room.
                     // Note: All the auto added service with room  have same id_tax_rule group 
                     $autoAddedServiceData = array_shift($autoAddedServiceData);
-                    $numDays = 1;
-                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
-                        && (!$numDays = HotelHelper::getNumberOfDays($autoAddedServiceData['date_from'], $autoAddedServiceData['date_to']))
-                    ) {
-                        $numDays = 1;
-                    }
+                    $numDays = Product::getPriceCalculationApplicableDays(
+                        $order_detail['product_price_calculation_method'],
+                        $autoAddedServiceData['date_from'],
+                        $autoAddedServiceData['date_to']
+                    );
                     $autoAddedServices = $autoAddedServiceData['additional_services'];
 
                     // Calculate total quantity of auto-added services

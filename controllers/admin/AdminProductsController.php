@@ -415,9 +415,12 @@ class AdminProductsControllerCore extends AdminController
         );
 
         $objProduct = new Product();
-        $hotelServiceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-        $roomTypeServiceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-        $allServiceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+        $allServiceProducts = array_values(array_filter(
+            $objProduct->getServiceProducts(null),
+            function ($serviceProduct) {
+                return Product::isSellableWithRoomType($serviceProduct['selling_preference_type']);
+            }
+        ));
         $serviceProducts = array();
         foreach ($allServiceProducts as $serviceProduct) {
             $serviceProducts[$serviceProduct['id_product']] = $serviceProduct['name'];
@@ -3152,9 +3155,12 @@ class AdminProductsControllerCore extends AdminController
 
             $objRoomType = new HotelRoomType();
             if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($obj->id)) {
-                $hotelServiceProducts = $obj->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-                $roomTypeServiceProducts = $obj->getServiceProducts(null, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $allServiceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                $allServiceProducts = array_values(array_filter(
+                    $obj->getServiceProducts(null),
+                    function ($serviceProduct) {
+                        return Product::isSellableWithRoomType($serviceProduct['selling_preference_type']);
+                    }
+                ));
 
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();

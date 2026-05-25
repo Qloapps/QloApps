@@ -1015,15 +1015,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         }
                     }
 
-                    $serviceProductPrice = $objOrder->getTotalProductsWithTaxes(
-                        false,
-                        false,
-                        null,
-                        null,
-                        null,
-                        [],
-                        Order::SERVICE_PRODUCT_CONTEXT_ROOM_LINKED
-                    );
+                    $serviceProductPrice = $objOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
                     if ($demands = $objHotelBookingDemands->getExtraDemandsTaxesDetails($objOrder->id)) {
                         $demandsPrice = array_sum(array_column($demands, 'total_price_tax_excl'));
                         // Adding the tax
@@ -1187,12 +1179,11 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                             $objOrderDetail = new OrderDetail($service['id_order_detail']);
                             $objServiceProductOrderDetail = new ServiceProductOrderDetail($service['id_service_product_order_detail']);
                             $quantity = $objServiceProductOrderDetail->quantity;
-                            if ($objOrderDetail->product_price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                $quantity = $quantity * HotelHelper::getNumberOfDays(
-                                    $objHotelBookingDetail->date_from,
-                                    $objHotelBookingDetail->date_to
-                                );
-                            }
+                            $quantity *= Product::getPriceCalculationApplicableDays(
+                                $objOrderDetail->product_price_calculation_method,
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to
+                            );
 
                             if (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']])) {
                                 $oldPriceTaxExcl = $objServiceProductOrderDetail->total_price_tax_excl;

@@ -450,12 +450,11 @@ class OrderDetailCore extends ObjectModel
                         $taxGroupInfo['id_room_type'],
                 )) {
                     $serviceProductData = array_shift($serviceProductData);
-                    $numDays = 1;
-                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
-                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
-                    ) {
-                        $numDays = 1;
-                    }
+                    $numDays = Product::getPriceCalculationApplicableDays(
+                        $this->product_price_calculation_method,
+                        $serviceProductData['date_from'],
+                        $serviceProductData['date_to']
+                    );
 
                     $unit_price_tax_excl = array_reduce($serviceProductData['additional_services'], function ($unitPriceTaxExcl, $item) {
                         return $unitPriceTaxExcl + (isset($item['unit_price_tax_excl']) ? $item['unit_price_tax_excl'] : 0);
@@ -488,12 +487,11 @@ class OrderDetailCore extends ObjectModel
 
                     $serviceProductData = array_shift($serviceProductData);
 
-                    $numDays = 1;
-                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
-                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
-                    ) {
-                        $numDays = 1;
-                    }
+                    $numDays = Product::getPriceCalculationApplicableDays(
+                        $this->product_price_calculation_method,
+                        $serviceProductData['date_from'],
+                        $serviceProductData['date_to']
+                    );
 
                     $quantity = $quantity * $numDays;
                 }

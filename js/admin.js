@@ -1749,3 +1749,15 @@ function closeRecommendation()
 		}
 	});
 }
+
+function applyPriceCalcMethodValue()
+{
+	var ci = $('#pcm_checkin').is(':checked') ? 1 : 0;
+	var co = $('#pcm_checkout').is(':checked') ? 2 : 0;
+	var ds = $('#pcm_duringstay').is(':checked') ? 4 : 0;
+	$('#price_calculation_method').val(ci + co + ds);
+}
+$(document).on('change','#pcm_checkin, #pcm_checkout, #pcm_duringstay', function() {
+	applyPriceCalcMethodValue();
+});
+applyPriceCalcMethodValue();

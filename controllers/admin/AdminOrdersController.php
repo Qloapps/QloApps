@@ -996,25 +996,56 @@ class AdminOrdersControllerCore extends AdminController
                         $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE),
                         $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE),
                         $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)
-                    );                
-                } else {
-                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                    $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
-                }
+                    );   
+                    
+                    if($serviceProducts) {
+                        foreach ($serviceProducts as $key => $servProduct) {
+                            if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$servProduct['id_product']))
+                                && Product::getQuantity((int)$servProduct['id_product']) <= 0
+                            ) {
+                                unset($serviceProducts[$key]);
+                                continue;
+                            }
+                            if (!empty($additionalServices[$productLineData['id']])
+                                && in_array($servProduct['id_product'], array_column($additionalServices[$productLineData['id']]['additional_services'], 'id_product'))
+                            ) {
+                                unset($serviceProducts[$key]);
+                            } else {
 
-                if ($serviceProducts) {
-                    foreach ($serviceProducts as $key => $servProduct) {
-                        $serviceProducts[$key]['price_tax_exc'] = $servProduct['price'];
-                        if (isset($additionalServices[$productLineData['id']])
-                            && in_array($servProduct['id_product'], array_column($additionalServices[$productLineData['id']]['additional_services'], 'id_product'))
-                        ) {
-                            unset($serviceProducts[$key]);
+                                $numDays = Product::getPriceCalculationApplicableDays(
+                                    $servProduct['price_calculation_method'],
+                                    $dateFrom,
+                                    $dateTo
+                                );
+                                $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                                    $servProduct['id_product'],
+                                    0,
+                                    0,
+                                    $idProduct,
+                                    false,
+                                    1,
+                                    $dateFrom,
+                                    $dateTo
+                                ) / max($numDays, 1);
+                            }
                         }
                     }
+                } else {
+                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                    if ($serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null)) {
+                        foreach ($serviceProducts as $key => $servProduct) {
+                            if (isset($additionalServices[$productLineData['id']])
+                                && in_array($servProduct['id_product'], array_column($additionalServices[$productLineData['id']]['additional_services'], 'id_product'))
+                            ) {
+                                unset($serviceProducts[$key]);
+                            }
+                        }
 
-                    $smartyVars['serviceProducts'] = $serviceProducts;
+                    }
                 }
 
+                    
+                $smartyVars['serviceProducts'] = $serviceProducts;
                 $objOrderReturn = new OrderReturn();
                 $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
                 $smartyVars['refundReqBookings'] = $refundReqBookings;
@@ -5469,7 +5500,7 @@ class AdminOrdersControllerCore extends AdminController
                                 1,
                                 $objBookingDetail->date_from,
                                 $objBookingDetail->date_to
-                            ) / $numDays;
+                            ) / max($numDays, 1);
                             $unitPriceTaxExcl = Product::getServiceProductPrice(
                                 (int) $service['id_product'],
                                 0,
@@ -5479,7 +5510,7 @@ class AdminOrdersControllerCore extends AdminController
                                 1,
                                 $objBookingDetail->date_from,
                                 $objBookingDetail->date_to
-                            ) / $numDays;
+                            ) / max($numDays, 1);
 
                             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
                             $objServiceProductOrderDetail->id_product = $service['id_product'];
@@ -6235,61 +6266,67 @@ class AdminOrdersControllerCore extends AdminController
                         && count($orderServiceProduct['additional_services'])
                     ) {
                         foreach ($orderServiceProduct['additional_services'] as $serviceProduct) {
-                            if ($serviceProduct['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                $newNumDays = HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
-                                $objServiceProductOrderDetail = new ServiceProductOrderDetail((int) $serviceProduct['id_service_product_order_detail']);
-                                $unitPriceTaxExcl = $objServiceProductOrderDetail->unit_price_tax_excl;
-                                $unitPriceTaxIncl = $objServiceProductOrderDetail->unit_price_tax_incl;
+                            $newNumDays = Product::getPriceCalculationApplicableDays(
+                                $serviceProduct['price_calculation_method'],
+                                $new_date_from,
+                                $new_date_to
+                            );
+                            $oldNumDays = Product::getPriceCalculationApplicableDays(
+                                $serviceProduct['price_calculation_method'],
+                                $old_date_from,
+                                $old_date_to
+                            );
+                            $objServiceProductOrderDetail = new ServiceProductOrderDetail((int) $serviceProduct['id_service_product_order_detail']);
+                            $unitPriceTaxExcl = $objServiceProductOrderDetail->unit_price_tax_excl;
+                            $unitPriceTaxIncl = $objServiceProductOrderDetail->unit_price_tax_incl;
 
-                                $newTotalPriceTaxExcl = Tools::processPriceRounding(
-                                    ($newNumDays * $unitPriceTaxExcl),
-                                    $objServiceProductOrderDetail->quantity,
-                                    $order->round_type,
-                                    $order->round_mode
-                                );
-                                $newTotalPriceTaxIncl = Tools::processPriceRounding(
-                                    ($newNumDays * $unitPriceTaxIncl),
-                                    $objServiceProductOrderDetail->quantity,
-                                    $order->round_type,
-                                    $order->round_mode
-                                );
+                            $newTotalPriceTaxExcl = Tools::processPriceRounding(
+                                ($newNumDays * $unitPriceTaxExcl),
+                                $objServiceProductOrderDetail->quantity,
+                                $order->round_type,
+                                $order->round_mode
+                            );
+                            $newTotalPriceTaxIncl = Tools::processPriceRounding(
+                                ($newNumDays * $unitPriceTaxIncl),
+                                $objServiceProductOrderDetail->quantity,
+                                $order->round_type,
+                                $order->round_mode
+                            );
 
-                                $order->total_products -= $objServiceProductOrderDetail->total_price_tax_excl;
-                                $order->total_products_wt -= $objServiceProductOrderDetail->total_price_tax_incl;
+                            $order->total_products -= $objServiceProductOrderDetail->total_price_tax_excl;
+                            $order->total_products_wt -= $objServiceProductOrderDetail->total_price_tax_incl;
 
-                                // change order total
-                                $order->total_products += $newTotalPriceTaxExcl;
-                                $order->total_products_wt += $newTotalPriceTaxIncl;
+                            // change order total
+                            $order->total_products += $newTotalPriceTaxExcl;
+                            $order->total_products_wt += $newTotalPriceTaxIncl;
 
-                                $objOrderDetail = new OrderDetail((int) $serviceProduct['id_order_detail']);
-                                $objOrderDetail->total_price_tax_excl -= $objServiceProductOrderDetail->total_price_tax_excl;
-                                $objOrderDetail->total_price_tax_incl -= $objServiceProductOrderDetail->total_price_tax_incl;
+                            $objOrderDetail = new OrderDetail((int) $serviceProduct['id_order_detail']);
+                            $objOrderDetail->total_price_tax_excl -= $objServiceProductOrderDetail->total_price_tax_excl;
+                            $objOrderDetail->total_price_tax_incl -= $objServiceProductOrderDetail->total_price_tax_incl;
 
-                                $objOrderDetail->total_price_tax_excl += $newTotalPriceTaxExcl;
-                                $objOrderDetail->total_price_tax_incl += $newTotalPriceTaxIncl;
+                            $objOrderDetail->total_price_tax_excl += $newTotalPriceTaxExcl;
+                            $objOrderDetail->total_price_tax_incl += $newTotalPriceTaxIncl;
 
-                                $oldNumDays = HotelHelper::getNumberOfDays($old_date_from, $old_date_to);
-                                $oldProductQuantity = $objServiceProductOrderDetail->quantity * $oldNumDays;
-                                $newProductQuantity = $objServiceProductOrderDetail->quantity * $newNumDays;
-                                $objOrderDetail->product_quantity += ($newProductQuantity - $oldProductQuantity);
+                            $oldProductQuantity = $objServiceProductOrderDetail->quantity * $oldNumDays;
+                            $newProductQuantity = $objServiceProductOrderDetail->quantity * $newNumDays;
+                            $objOrderDetail->product_quantity += ($newProductQuantity - $oldProductQuantity);
 
-                                $objOrderDetail->save();
-                                $this->context->cart = new Cart($objServiceProductOrderDetail->id_cart);
-                                $objOrderDetail->updateTaxAmount($order);
+                            $objOrderDetail->save();
+                            $this->context->cart = new Cart($objServiceProductOrderDetail->id_cart);
+                            $objOrderDetail->updateTaxAmount($order);
 
-                                if (isset($order_invoice)) {
-                                    $order_invoice->total_paid_tax_excl -= $objServiceProductOrderDetail->total_price_tax_excl;
-                                    $order_invoice->total_paid_tax_incl -= $objServiceProductOrderDetail->total_price_tax_incl;
+                            if (isset($order_invoice)) {
+                                $order_invoice->total_paid_tax_excl -= $objServiceProductOrderDetail->total_price_tax_excl;
+                                $order_invoice->total_paid_tax_incl -= $objServiceProductOrderDetail->total_price_tax_incl;
 
-                                    $order_invoice->total_paid_tax_excl += (float)$newTotalPriceTaxExcl;
-                                    $order_invoice->total_paid_tax_incl += (float)$newTotalPriceTaxIncl;
-                                }
-                                $objServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
-                                $objServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
-                                $objServiceProductOrderDetail->total_price_tax_excl = $newTotalPriceTaxExcl;
-                                $objServiceProductOrderDetail->total_price_tax_incl = $newTotalPriceTaxIncl;
-                                $objServiceProductOrderDetail->save();
+                                $order_invoice->total_paid_tax_excl += (float)$newTotalPriceTaxExcl;
+                                $order_invoice->total_paid_tax_incl += (float)$newTotalPriceTaxIncl;
                             }
+                            $objServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
+                            $objServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
+                            $objServiceProductOrderDetail->total_price_tax_excl = $newTotalPriceTaxExcl;
+                            $objServiceProductOrderDetail->total_price_tax_incl = $newTotalPriceTaxIncl;
+                            $objServiceProductOrderDetail->save();
                         }
                     }
                 }
@@ -6766,15 +6803,6 @@ class AdminOrdersControllerCore extends AdminController
                 $order_invoice->total_discount_tax_excl = 0;
                 $res &= $order_invoice->update();
             }
-
-            // If no rooms left in the order, Update Order total and discounts to 0
-            $order->total_discounts = 0;
-            $order->total_discounts_tax_incl = 0;
-            $order->total_discounts_tax_excl = 0;
-            $order->total_paid = 0;
-            $order->total_paid_tax_incl = 0;
-            $order->total_paid_tax_excl = 0;
-            $order->update();
         }
 
         // Assign to smarty informations in order to show the new product line
@@ -7479,17 +7507,48 @@ class AdminOrdersControllerCore extends AdminController
                     $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE),
                     $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)
                 );
+                if ($serviceProducts) {
+                    foreach ($serviceProducts as $key => $servProduct) {
+                        if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$servProduct['id_product']))
+                            && Product::getQuantity((int)$servProduct['id_product']) <= 0
+                        ) {
+                            unset($serviceProducts[$key]);
+                            continue;
+                        }
+                        if (!empty($additionalServices[$idHtlBookingDetail])
+                            && in_array($servProduct['id_product'], array_column($additionalServices[$idHtlBookingDetail]['additional_services'], 'id_product'))
+                        ) {
+                            unset($serviceProducts[$key]);
+                        } else {
+
+                            $numDays = Product::getPriceCalculationApplicableDays(
+                                $servProduct['price_calculation_method'],
+                                $dateFrom,
+                                $dateTo
+                            );
+                            
+                            $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                                $servProduct['id_product'],
+                                0,
+                                0,
+                                $idProduct,
+                                false,
+                                1,
+                                $dateFrom,
+                                $dateTo
+                            ) / max($numDays, 1);
+                        }
+                    }
+                }
+
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
-            }
-
-            if ($serviceProducts) {
-                foreach ($serviceProducts as $key => $servProduct) {
-                    $serviceProducts[$key]['price_tax_exc'] = $servProduct['price'];
-                    if (isset($additionalServices[$idHtlBookingDetail]) && $additionalServices[$idHtlBookingDetail]) {
-                        if (in_array($servProduct['id_product'], array_column($additionalServices[$idHtlBookingDetail]['additional_services'], 'id_product'))) {
-                            unset($serviceProducts[$key]);
+                 if ($serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null)) {
+                    foreach ($serviceProducts as $key => $servProduct) {
+                        if (!empty($additionalServices[$idHtlBookingDetail])) {
+                            if (in_array($servProduct['id_product'], array_column($additionalServices[$idHtlBookingDetail]['additional_services'], 'id_product'))) {
+                                unset($serviceProducts[$key]);
+                            }
                         }
                     }
                 }
@@ -7643,13 +7702,11 @@ class AdminOrdersControllerCore extends AdminController
                         $objServiceProductOrderDetail->quantity = $quantity;
                         $objServiceProductOrderDetail->unit_price_tax_excl = $unitPrice;
                         $objServiceProductOrderDetail->unit_price_tax_incl = $unitPrice * $oldTaxMultiplier;
-                        $numDays = 1;
-                        if ($objOrderDetail->product_price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                            $numDays = HotelHelper::getNumberOfDays(
-                                $objHotelBookingDetail->date_from,
-                                $objHotelBookingDetail->date_to
-                            );
-                        }
+                        $numDays = Product::getPriceCalculationApplicableDays(
+                            $objOrderDetail->product_price_calculation_method,
+                            $objHotelBookingDetail->date_from,
+                            $objHotelBookingDetail->date_to
+                        );
                         $objServiceProductOrderDetail->total_price_tax_excl = Tools::processPriceRounding(
                             ($objServiceProductOrderDetail->unit_price_tax_excl * $numDays),
                             $quantity,
@@ -7667,22 +7724,14 @@ class AdminOrdersControllerCore extends AdminController
                             $priceDiffTaxExcl = $objServiceProductOrderDetail->total_price_tax_excl - $oldTotalPriceTaxExcl;
                             $priceDiffTaxIncl = $objServiceProductOrderDetail->total_price_tax_incl - $oldTotalPriceTaxIncl;
 
-                            if ($objOrderDetail->product_price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                $numDays = HotelHelper::getNumberOfDays(
-                                    $objHotelBookingDetail->date_from,
-                                    $objHotelBookingDetail->date_to
-                                );
-                                $quantityDiff = ($objServiceProductOrderDetail->quantity - $oldQuantity)*$numDays;
-                            } else {
-                                $quantityDiff = $objServiceProductOrderDetail->quantity - $oldQuantity;
-                            }
+                            $quantityDiff = ($objServiceProductOrderDetail->quantity - $oldQuantity) * $numDays;
 
                             $objOrderDetail->product_quantity += $quantityDiff;
                             $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
                             $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
 
-                            $objOrderDetail->unit_price_tax_excl = ($objOrderDetail->total_price_tax_excl / $objOrderDetail->product_quantity);
-                            $objOrderDetail->unit_price_tax_incl = ($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity);
+                            $objOrderDetail->unit_price_tax_excl = ($objOrderDetail->total_price_tax_excl / max($objOrderDetail->product_quantity, 1));
+                            $objOrderDetail->unit_price_tax_incl = ($objOrderDetail->total_price_tax_incl / max($objOrderDetail->product_quantity, 1));
 
                             $result &= $objOrderDetail->updateTaxAmount($objOrder);
 
@@ -7770,6 +7819,25 @@ class AdminOrdersControllerCore extends AdminController
                             $response['hasError'] = true;
                             $response['errors'][] = sprintf($this->l('Invalid unit price for %s.'), $objProduct->name);
                         }
+
+                        if ($objProduct->allow_multiple_quantity && Validate::isUnsignedInt($qty[$service])) {
+                            $finalQty = (int)$qty[$service];
+                            $numDays = Product::getPriceCalculationApplicableDays(
+                                Product::getProductPriceCalculation($service),
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to
+                            );
+                            $stockQty = $finalQty * $numDays;
+
+                            if ($objProduct->max_quantity && $finalQty > $objProduct->max_quantity) {
+                                $response['hasError'] = true;
+                                $response['errors'][] = sprintf($this->l('Cannot add more than %d quantity.'), $objProduct->max_quantity).': '.$objProduct->name;
+                            } elseif (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$service)) && !$objProduct->checkQty($stockQty)) {
+                                $response['hasError'] = true;
+                                $response['errors'][] = $this->l('There isn\'t enough product in stock.').': '.$objProduct->name;
+                            }
+                        }
+
                         $selectedServices[$key] = array(
                             'id' => $service,
                             'qty' => $qty[$service],
@@ -7826,7 +7894,7 @@ class AdminOrdersControllerCore extends AdminController
                                 1,
                                 $objHotelBookingDetail->date_from,
                                 $objHotelBookingDetail->date_to
-                            ) / $numDays;
+                            ) / max($numDays, 1);
 
                             if ($initialServicePrice != $service['price']) {
                                 $specific_price = new SpecificPrice();
@@ -7887,7 +7955,7 @@ class AdminOrdersControllerCore extends AdminController
                                         1,
                                         null,
                                         $roomHtlCartInfo['id']
-                                    ) / $numDays;
+                                    ) / max($numDays, 1);
                                     $unitPriceTaxIncl = Product::getServiceProductPrice(
                                         (int) $product['id_product'],
                                         0,
@@ -7902,7 +7970,7 @@ class AdminOrdersControllerCore extends AdminController
                                         1,
                                         null,
                                         $roomHtlCartInfo['id']
-                                    ) / $numDays;
+                                    ) / max($numDays, 1);
 
                                     $totalPriceChangeTaxExcl += $totalPriceTaxExcl = Tools::processPriceRounding(
                                         ($unitPriceTaxExcl * $numDays),
@@ -8047,6 +8115,15 @@ class AdminOrdersControllerCore extends AdminController
                             $response['errors'][] = Tools::displayError('Invalid service name');
                         }
 
+                        if (empty($priceCalcMethod)) {
+                            $response['hasError'] = true;
+                            $response['errors'][] = Tools::displayError('Please select at least one price calculation method.');
+                        } elseif (
+                            !Validate::isUnsignedInt($priceCalcMethod)) {
+                            $response['hasError'] = true;
+                            $response['errors'][] = Tools::displayError('Invalid price calculation method.');
+                        }
+
                         if (!isset($price)) {
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Service price is required');
@@ -8054,7 +8131,6 @@ class AdminOrdersControllerCore extends AdminController
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Invalid service price');
                         }
-
                         // if no validation errors then add service
                         if (!$response['hasError']) {
                             // ======= START: Create Service product  =========
@@ -8164,7 +8240,7 @@ class AdminOrdersControllerCore extends AdminController
                                                                 $objHotelBookingDetail->date_from,
                                                                 $objHotelBookingDetail->date_to,
                                                                 $objCart->id
-                                                            ) / $numDays;
+                                                            ) / max($numDays, 1);
                                                             $unitPriceTaxIncl = Product::getServiceProductPrice(
                                                                 (int)$product['id_product'],
                                                                 0,
@@ -8175,7 +8251,7 @@ class AdminOrdersControllerCore extends AdminController
                                                                 $objHotelBookingDetail->date_from,
                                                                 $objHotelBookingDetail->date_to,
                                                                 $objCart->id
-                                                            ) / $numDays;
+                                                            ) / max($numDays, 1);
 
                                                             $totalPriceChangeTaxExcl += $totalPriceTaxExcl = Tools::processPriceRounding(
                                                                 ($unitPriceTaxExcl * $numDays),
@@ -8358,13 +8434,12 @@ class AdminOrdersControllerCore extends AdminController
 
                 if ($res &= $objServiceProductOrderDetail->delete()) {
                     $order = new Order($objServiceProductOrderDetail->id_order);
-                    if ($objOrderDetail->product_price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                        $numDays = HotelHelper::getNumberOfDays(
-                            $objHotelBookingDetail->date_from,
-                            $objHotelBookingDetail->date_to
-                        );
-                        $quantity = $quantity * $numDays;
-                    }
+                    $numDays = Product::getPriceCalculationApplicableDays(
+                        $objOrderDetail->product_price_calculation_method,
+                        $objHotelBookingDetail->date_from,
+                        $objHotelBookingDetail->date_to
+                    );
+                    $quantity = $quantity * $numDays;
                     if ($quantity >= $objOrderDetail->product_quantity) {
                         $objOrderDetail->delete();
                     } else {

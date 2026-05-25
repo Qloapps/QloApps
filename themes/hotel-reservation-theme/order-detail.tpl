@@ -1133,7 +1133,7 @@
             {addJsDefL name=pending_state_msg}{l s='Pending...' js=1}{/addJsDefL}
             {addJsDefL name=mail_sending_err}{l s='Some error occurred while sending mail to the customer' js=1}{/addJsDefL}
             {addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for booking cancellation.' js=1}{/addJsDefL}
-            {addJsDefL name=no_bookings_selected}{l s='Please select at least one room to proceed for cancellation.' js=1}{/addJsDefL}
+            {addJsDefL name=no_bookings_selected}{l s='Please select at least one room or service to proceed for cancellation.' js=1}{/addJsDefL}
             {addJsDefL name=refund_request_success_txt}{l s='Request for booking cancellation is successffully created.' js=1}{/addJsDefL}
             {addJsDefL name=order_message_choose_txt}{l s='-- Choose --' js=1}{/addJsDefL}
             {addJsDefL name=order_message_success_txt}{l s='Order message sent successfully.' js=1}{/addJsDefL}

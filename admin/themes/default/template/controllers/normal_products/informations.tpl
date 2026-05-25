@@ -231,21 +231,34 @@
 	</div>
     {* Code For Standard product working *}
 	<div class="form-group" id="global_product_type_container">
-		<label class="control-label col-lg-3" for="selling_preference_type">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether this product will be sold with room type or as an standalone product'}">
-				{l s='Product selling preference'}
-			<span>
+		<label class="control-label col-lg-3">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select how this product will be sold: with room types, with hotels, as a standalone product, or in a combination of these options.'}">
+				{l s='Buying Option'}
+			</span>
 		</label>
-		<div class="col-lg-4">
-			<select name="selling_preference_type" id="selling_preference_type">
-                <option value="{Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with room types'}</option>
-                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE}selected="selected"{/if} >{l s='Sell with hotels'}</option>
-                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with hotels and room types'}</option>
-                <option value="{Product::SELLING_PREFERENCE_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE}selected="selected"{/if} >{l s='Sell as standalone product'}</option>
-                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE}selected="selected"{/if} >{l s='Sell with hotels and as standalone product'}</option>
-                <option value="{Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with room types and as standalone product'}</option>
-                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE}selected="selected"{/if} >{l s='Sell with hotels, room types and as standalone product'}</option>
-			</select>
+		<div class="col-lg-9">
+			<input type="hidden" name="selling_preference_type" id="selling_preference_type" value="{$product->selling_preference_type|intval}">
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" id="sp_with_room_type"
+						{if Product::isSellableWithRoomType($product->selling_preference_type) }checked="checked"{/if}>
+					{l s='Sell With Room Type'}
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" id="sp_with_hotel"
+						{if Product::isSellableWithHotel($product->selling_preference_type)}checked="checked"{/if}>
+					{l s='Sell With Hotel'}
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" id="sp_standalone"
+						{if Product::isSellableAsStandalone($product->selling_preference_type) }checked="checked"{/if}>
+					{l s='Sell With Standalone'}
+				</label>
+			</div>
 		</div>
 	</div>
     <div class="form-group" id="associated_hotel_tree" {if ($product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)}style="display:none;"{/if}>
