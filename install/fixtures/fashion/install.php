@@ -35,7 +35,8 @@ class InstallFixturesFashion extends InstallXmlLoader
     public function createEntityCustomer($identifier, array $data, array $data_lang)
     {
         if ($identifier == 'John') {
-            $data['passwd'] = Tools::encrypt('123456789');
+            $objHash = new PasswordHashing();
+            $data['passwd'] = $objHash->passwordHash('123456789');
             $data['last_passwd_gen'] = date('Y-m-d H:i:s');
             $data['birthday'] = date('Y-m-d', strtotime('-30 years'));
             $data['newsletter_date_add'] = date('Y-m-d H:i:s');

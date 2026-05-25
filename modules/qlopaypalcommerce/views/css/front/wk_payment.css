@@ -45,3 +45,15 @@
 @keyframes rotate {
     0% {transform: rotate(0deg);}
     100% {transform: rotate(360deg);}}
+
+p.payment_module a#qlo_paypal_btn {
+    background: url(../../img/paypal-payment-icon.png) 15px 8px no-repeat #fbfbfb;
+}
+
+.qlo_paypal_methods_wrapper {
+    text-align: center;
+    padding: 20px 15px;
+    background: #fbfbfb;
+    border-radius: 3px;
+    border: 1px solid #d6d4d4;
+}

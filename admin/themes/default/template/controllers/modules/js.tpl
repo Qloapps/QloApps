@@ -48,21 +48,65 @@
 	function modules_management(action)
 	{
 		var modules = document.getElementsByName('modules');
-		var module_list = '';
+		var module_list = [];
 		for (var i = 0; i < modules.length; i++)
 		{
-			if (modules[i].checked == true)
+			if (modules[i].checked)
 			{
-				rel = modules[i].getAttribute('data-rel');
+				var rel = modules[i].getAttribute('data-rel');
 				if (rel != "false" && action == "uninstall")
 				{
 					if (!confirm(rel))
 						return false;
 				}
-				module_list += '|'+modules[i].value;
+				module_list.push(modules[i].value);
 			}
 		}
-		document.location.href=currentIndex+'&token='+token+'&'+action+'='+module_list.substring(1, module_list.length);
+		
+		module_list = encodeURIComponent(module_list.join('|'));
+		if (action == 'enable' || action == 'disable') {
+			var type = action == 'disable' ? 0 : 1;
+			document.location.href = currentIndex+'&token='+token+'&enable='+type+'&module_name='+module_list;
+			return false;
+		}
+
+		document.location.href = currentIndex+'&token='+token+'&'+action+'='+module_list;
+		return false;
+	}
+
+	function filter_modules_by_name(table, moduleName)
+	{
+		var moduleNames = moduleName.split('|');
+		var filteredNames = [];
+		for (var i = 0; i < moduleNames.length; i++) {
+			moduleNames[i] = $.trim(moduleNames[i]);
+			if (moduleNames[i] !== '') {
+				filteredNames.push(moduleNames[i].toLowerCase());
+			}
+		}
+
+		if (!filteredNames.length) {
+			return;
+		}
+
+		if (filteredNames.length === 1) {
+			$.uiTableFilter(table, filteredNames[0]);
+			return;
+		}
+
+		table.find('tbody tr').each(function() {
+			var rowText = $(this).text().toLowerCase();
+			var isMatch = false;
+
+			for (var i = 0; i < filteredNames.length; i++) {
+				if (rowText.indexOf(filteredNames[i]) !== -1) {
+					isMatch = true;
+					break;
+				}
+			}
+
+			$(this).toggle(isMatch);
+		});
 	}
 
 	$('document').ready( function() {
@@ -71,7 +115,7 @@
 			$.uiTableFilter($('#moduleContainer').find('table'), anchor);
 
 		if (module_name != '')
-			$.uiTableFilter($('#moduleContainer').find('table'), module_name);
+			filter_modules_by_name($('#moduleContainer').find('table'), module_name);
 
 		$('#moduleQuicksearch').on('keyup', function(){
 			val = this.value;

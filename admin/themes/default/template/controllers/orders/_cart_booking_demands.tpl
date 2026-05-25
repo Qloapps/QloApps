@@ -32,9 +32,7 @@
 					{if isset($selectedRoomDemands) && $selectedRoomDemands}
 						<li role="presentation" class="active"><a href="#room_type_demands_desc" aria-controls="facilities" role="tab" data-toggle="tab">{l s='Facilities'}</a></li>
 					{/if}
-					{if isset($serviceProducts) && $serviceProducts}
-						<li role="presentation" {if !isset($selectedRoomDemands) || !$selectedRoomDemands}class="active"{/if}><a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
-					{/if}
+					<li role="presentation" {if !isset($selectedRoomDemands) || !$selectedRoomDemands}class="active"{/if}><a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
 				</ul>
 				<div class="tab-content">
 					{if isset($selectedRoomDemands) && $selectedRoomDemands}

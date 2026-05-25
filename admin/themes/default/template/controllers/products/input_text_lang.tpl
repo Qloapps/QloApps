@@ -39,7 +39,6 @@
 			class="form-control {if isset($input_class)}{$input_class} {/if}"
 			name="{$input_name}_{$language.id_lang}"
 			value="{$input_value[$language.id_lang]|default:''|escape:'html'}"
-			onkeyup="if (isArrowKey(event)) return ;updateFriendlyURL();"
 			onblur="updateLinkRewrite();"
 			{if isset($required)} required="required"{/if}
 			{if isset($maxchar)} data-maxchar="{$maxchar}"{/if}
