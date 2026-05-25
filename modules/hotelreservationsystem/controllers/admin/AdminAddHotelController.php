@@ -500,6 +500,11 @@ class AdminAddHotelController extends ModuleAdminController
             }
         }
 
+        $amenityCategories = HotelAmenities::getCategories();
+        if ($amenityCategories && !HotelAmenities::hasAmenityItems()) {
+            $this->errors[] = $this->l('No amenities have been created. Please add amenities to at least one category before assigning them.');
+        }
+
         if (!count($this->errors)) {
             if ($idHotel) {
                 $objHotelBranch = new HotelBranchInformation($idHotel);

@@ -28,11 +28,10 @@
 	<input type="hidden" name="submitted_tabs[]" value="Features" />
 	<h3>{l s='Assign features to this room type'}</h3>
 
+	{if isset($room_type_features_tree) && $room_type_features_tree}
 	<div class="alert alert-info">
 		{l s='Select one or more values for each room feature using the tree below.'}
 	</div>
-
-	{if isset($room_type_features_tree) && $room_type_features_tree}
 		<div class="form-group">
 			<label for="room-type-features-tree" class="control-label col-sm-3">
 				<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select the feature values available for this room type.'}">

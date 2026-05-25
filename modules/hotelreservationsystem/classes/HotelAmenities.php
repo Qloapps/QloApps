@@ -71,6 +71,18 @@ class HotelAmenities extends ObjectModel
     }
 
     /**
+     * Returns true if at least one amenity item (child) exists in any category.
+     *
+     * @return bool
+     */
+    public static function hasAmenityItems()
+    {
+        return (bool) Db::getInstance()->getValue(
+            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'htl_amenity` WHERE `parent_amenity_id` != 0'
+        );
+    }
+
+    /**
      * Return all categories (parent_amenity_id = 0) with their child amenities.
      *
      * @param int $idLang

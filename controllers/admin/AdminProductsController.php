@@ -1219,9 +1219,8 @@ class AdminProductsControllerCore extends AdminController
                     }
                 }
 
-                if ($selectedAmenities === count($amenityGroup['children'])) {
-                    $amenityGroup['selected'] = true;
-                }
+            if ($selectedAmenities === count($amenityGroup['children'])) {
+                $amenityGroup['selected'] = true;
             }
         }
 
@@ -2034,6 +2033,11 @@ class AdminProductsControllerCore extends AdminController
 
             $this->assignRoomType($this->object);
             if ($this->isTabSubmitted('Amenities')) {
+                $categories = HotelAmenities::getCategories();
+                if ($categories && !HotelAmenities::hasAmenityItems()) {
+                    $this->errors[] = Tools::displayError('No amenities have been created. Please add amenities to at least one category before assigning them.');
+                    return false;
+                }
                 $selectedAmenities = Tools::getValue('room_type_amenities', array());
                 if (!is_array($selectedAmenities)) {
                     $selectedAmenities = array($selectedAmenities);
