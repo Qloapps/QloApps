@@ -598,7 +598,7 @@ class AdminFeaturesControllerCore extends AdminController
 
         if ('feature_value' === $this->table && !count($this->errors)) {
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay') && ($this->display == 'edit' || $this->display == 'add')) {
-                $this->redirect_after = self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token;
+                $this->redirect_after = self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&conf=3&token='.$this->token;
             } else {
                 $this->redirect_after = self::$currentIndex.'&id_feature='.(int)Tools::getValue('id_feature').'&viewfeature&conf=3&token='.$this->token;
             }
@@ -621,7 +621,7 @@ class AdminFeaturesControllerCore extends AdminController
 
         if ('feature_value' === $this->table && !count($this->errors)) {
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
-                $this->redirect_after = self::$currentIndex.'&updatefeature_value&id_feature_value='.(int)$object->id.'&id_feature='.(int)Tools::getValue('id_feature').'&token='.$this->token;
+                $this->redirect_after = self::$currentIndex.'&addfeature_value&id_feature='.(int)Tools::getValue('id_feature').'&conf=4&token='.$this->token;
             } else {
                 $this->redirect_after = self::$currentIndex.'&id_feature='.(int)Tools::getValue('id_feature').'&viewfeature&conf=4&token='.$this->token;
             }

@@ -27,7 +27,7 @@
 
 	<div class="alert alert-info">
 		{l s='Select the amenities available for this room type using the tree below.'}
-		<a href="{$link->getAdminLink('AdminHotelFeatures')|escape:'html':'UTF-8'}" class="btn btn-link confirm_leave button" target="_blank">
+		<a href="{$link->getAdminLink('AdminHotelAmenities')|escape:'html':'UTF-8'}" class="btn btn-link confirm_leave button" target="_blank">
 			<i class="icon-plus-sign"></i> {l s='Manage amenities'} <i class="icon-external-link-sign"></i>
 		</a>
 	</div>
