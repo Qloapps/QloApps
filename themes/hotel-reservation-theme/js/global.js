@@ -457,3 +457,41 @@ window.addEventListener('online', function () {
 window.addEventListener('offline', function () {
 	onlineFlag = false;
 });
+
+function initPriceCalculationTooltip() {
+    if ($('.price-calculation-info').length) {
+        $('.price-calculation-info').each(function () {
+            if ($(this).hasClass('ui-tooltip-content')) {
+                return;
+            }
+            $(this).tooltip({
+                content: $(this).siblings('.price-calculation-info-container').html(),
+                items: 'span',
+                trigger: 'hover',
+                tooltipClass: 'price-tootip',
+                open: function (event, ui) {
+                    if (typeof (event.originalEvent) === 'undefined') {
+                        return false;
+                    }
+                    var $id = $(ui.tooltip).attr('id');
+                    if ($('div.ui-tooltip').not('#' + $id).length) {
+                        return false;
+                    }
+                },
+                close: function (event, ui) {
+                    ui.tooltip.hover(function () {
+                        $(this).stop(true).fadeTo(400, 1);
+                    }, function () {
+                        $(this).fadeOut('400', function () {
+                            $(this).remove();
+                        });
+                    });
+                }
+            });
+        });
+    }
+}
+
+$(document).ready(function () {
+    initPriceCalculationTooltip();
+});

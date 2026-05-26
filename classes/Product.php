@@ -562,8 +562,8 @@ class ProductCore extends ObjectModel
     const SELLING_PREFERENCE_HOTEL_STANDALONE = 2; // Product to be sold Standalone with Hotels
     const SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE = 3; // Product to be sold Standalone with Hotels and with Room types also
     const SELLING_PREFERENCE_STANDALONE = 4; // Product to be sold standalone
-    const SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE = 5; // Product to be sold standalone with Hotels and with Room types also
-    const SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE = 6; // Product to be sold standalone and with Room types also
+    const SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE = 5; // Product to be sold standalone and with Room types also
+    const SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE = 6; // Product to be sold standalone with Hotels and with Room types also
     const SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE = 7; // Product to be sold standalone with Hotels and with Room types also and standalone
 
     const PRICE_ADDITION_TYPE_WITH_ROOM = 1;

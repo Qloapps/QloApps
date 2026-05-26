@@ -9187,3 +9187,37 @@ div a.our_properties_link{
   color: #fff;
   font-size: 17px;
   font-weight: 400;}
+
+/* price calculation info tooltip */
+.price-calculation-info {
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+.ui-tooltip.price-tootip {
+  box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
+  background: #FFFFFF;
+  border: unset;
+  color: #333;
+  padding: 9px 15px;
+}
+.ui-tooltip.price-tootip .price-info-tooltip-cont {
+  min-width: 160px;
+}
+.ui-tooltip.price-tootip .applied-on-label {
+  margin: 0 0 6px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.ui-tooltip.price-tootip .applied-on-days {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 13px;
+}
+.ui-tooltip.price-tootip .applied-on-days li {
+  padding: 2px 0;
+}
+.price-info-tooltip-cont ul li{
+  list-style: disc;;
+}

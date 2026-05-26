@@ -487,7 +487,7 @@ class AdminNormalProductsControllerCore extends AdminController
             .'template')) {
             $bo_theme = 'default';
         }
-        $this->addJqueryUI('ui.tooltip', 'base', true);
+
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.iframe-transport.js');
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.fileupload.js');
         $this->addJs(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$bo_theme.'/js/jquery.fileupload-process.js');
@@ -1542,6 +1542,9 @@ class AdminNormalProductsControllerCore extends AdminController
                 _PS_JS_DIR_.'jquery/plugins/timepicker/jquery-ui-timepicker-addon.css',
                 _PS_CSS_DIR_.'ps-hotel-reservation.css',
             ));
+        }else {
+            $this->addCSS(__PS_BASE_URI__.$this->admin_webpath.'/themes/default/css/admin-tooltip.css');
+            $this->addJqueryUI('ui.tooltip', 'base', true);
         }
     }
 

@@ -479,3 +479,48 @@ $(document).ready(function() {
 		$(this).prop('selected', false);
 	});
 }); //end dom ready
+
+
+function initAdminTooltip(config) {
+    var $elements = $(config.selector);
+    if (!$elements.length) {
+        return;
+    }
+    $elements.each(function () {
+        if (config.skipIfInitialized && $(this).data('ui-tooltip')) {
+            return;
+        }
+        $(this).tooltip({
+            content: config.getContent,
+            items: config.items,
+            trigger: 'hover',
+            tooltipClass: config.tooltipClass,
+            open: function (event, ui) {
+                if (typeof event.originalEvent === 'undefined') {
+                    return false;
+                }
+                var $id = $(ui.tooltip).attr('id');
+                if ($('div.ui-tooltip').not('#' + $id).length) {
+                    return false;
+                }
+            },
+            close: function (event, ui) {
+                ui.tooltip.hover(
+                    function () { $(this).stop(true).fadeTo(400, 1); },
+                    function () { $(this).fadeOut(400, function () { $(this).remove(); }); }
+                );
+            }
+        });
+    });
+}
+
+$(document).ready(function () {
+    initAdminTooltip({
+        selector: '.selected-option-info',
+        items: '.selected-option-info',
+        tooltipClass: 'admin-info-tooltip',
+        getContent: function () {
+            return $(this).data('options');
+        }
+    });
+});

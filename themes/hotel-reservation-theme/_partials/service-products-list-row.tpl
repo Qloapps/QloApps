@@ -38,6 +38,7 @@
                 {block name='service_product_name'}
                     <div class="col-sm-12 clearfix service-product-block">
                         <span class="service-product-name">{$service_product['name']}</span>
+                        {include file='_partials/price-calculation-info.tpl' pcm=$service_product.price_calculation_method|default:0}
                     </div>
                 {/block}
                 {block name='service_product_description'}

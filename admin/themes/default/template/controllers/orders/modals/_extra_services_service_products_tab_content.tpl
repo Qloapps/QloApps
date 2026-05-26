@@ -53,7 +53,9 @@
                             {foreach $additionalServices['additional_services'] as $service}
                                 <tr class="room_demand_block" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}">
                                     <td>
-                                        <div>{$service['name']|escape:'html':'UTF-8'}</div>
+                                        <div>
+                                            {$service['name']|escape:'html':'UTF-8'}
+                                        </div>
                                         <input value="{$service['id_service_product_order_detail']|escape:'html':'UTF-8'}" name="id_service_product_order_detail[]" type="hidden"/>
                                     </td>
                                     <td>
@@ -134,6 +136,7 @@
 									</td>
 									<td>
 										{$product['name']|escape:'html':'UTF-8'}
+										{include file='controllers/orders/modals/_partials/_price-calculation-info.tpl' pcm=$product['price_calculation_method']|default:0}
 									</td>
 									<td class="text-center">
 										{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
@@ -291,7 +294,10 @@
 						<td>
 							{$service['id_product']|escape:'html':'UTF-8'}{if !$service['product_deleted']} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service['id_product']|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a>{/if}
 						</td>
-						<td>{$service['name']|escape:'html':'UTF-8'}</td>
+						<td>
+                            {$service['name']|escape:'html':'UTF-8'}
+                            {include file='controllers/orders/modals/_partials/_price-calculation-info.tpl' pcm=$service.price_calculation_method|default:0}
+                        </td>
 						<td>
 							{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
 								<span class="badge badge-info label">{l s='Convenience fee'}</span>

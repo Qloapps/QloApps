@@ -362,6 +362,7 @@ $(document).on('click', '.btn-view-extra-services', function(e) {
             if (result.extra_demands) {
                 $('#popup-view-extra-services').html('');
                 $('#popup-view-extra-services').append(result.extra_demands);
+                initPriceCalculationTooltip();
 
                 $.fancybox.open({
                     href: '#popup-view-extra-services',

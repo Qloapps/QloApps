@@ -58,6 +58,7 @@
                                                                 {if $additionalService['allow_multiple_quantity']}
                                                                     <span class="quantity">{l s='(Quantity: %s)' sprintf=[$additionalService['quantity']|string_format:'%02d']}</span>
                                                                 {/if}
+                                                                {include file='_partials/price-calculation-info.tpl' pcm=$additionalService.price_calculation_method|default:0}
                                                             </div>
                                                         </div>
                                                         <div class="">

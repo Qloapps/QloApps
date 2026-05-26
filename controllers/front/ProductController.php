@@ -40,6 +40,7 @@ class ProductControllerCore extends FrontController
         if (count($this->errors)) {
             return;
         }
+        $this->addJqueryUI(array('ui.tooltip'), 'base', true);
 
         if (!$this->useMobileTheme()) {
             $this->addCSS(_THEME_CSS_DIR_.'product.css');

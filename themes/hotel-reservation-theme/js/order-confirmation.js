@@ -49,6 +49,7 @@ $(document).ready(function(){
                 if (result.extra_demands) {
                     $('#rooms_extra_services').html('');
                     $('#rooms_extra_services').append(result.extra_demands);
+                    initPriceCalculationTooltip();
                 }
                 $.fancybox({
                     href: "#rooms_extra_services",

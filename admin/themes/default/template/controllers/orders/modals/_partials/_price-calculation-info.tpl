@@ -20,14 +20,24 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
+{* Required param: pcm — price_calculation_method integer value *}
 
-{capture name='options_list'}
-    <ul>
-        {foreach $selected_options as $opt}
-            <li>{$opt|escape:'html'}</li>
-        {/foreach}
-    </ul>
-{/capture}
-<span class="selected-option-info" data-options="{$smarty.capture.options_list|escape:'html'}">
-    {$selected_options|@count} Selected <i class="icon-info-sign"></i>
+<span class="price-calculation-info">
+	<i class="icon-info-sign"></i>
 </span>
+<div class="price-calculation-info-container" style="display: none;">
+	<div class="price-info-tooltip-cont">
+		<p class="applied-on-label">{l s='Applied on'}</p>
+		<ul class="applied-on-days">
+			{if $pcm == 1 || $pcm == 3 || $pcm == 5 || $pcm == 7}
+				<li>{l s='Check-in day'}</li>
+			{/if}
+			{if $pcm == 4 || $pcm == 5 || $pcm == 6 || $pcm == 7}
+				<li>{l s='During-stay days'}</li>
+			{/if}
+			{if $pcm == 2 || $pcm == 3 || $pcm == 6 || $pcm == 7}
+				<li>{l s='Check-out day'}</li>
+			{/if}
+		</ul>
+	</div>
+</div>

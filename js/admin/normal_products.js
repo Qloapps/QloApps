@@ -568,26 +568,12 @@ product_tabs['Informations'] = new function(){
 			var withRoomType = $('#sp_with_room_type').is(':checked');
 			var withHotel = $('#sp_with_hotel').is(':checked');
 			var standalone = $('#sp_standalone').is(':checked');
+			const sellingPreference =
+				(withRoomType ? SELLING_PREFERENCE_WITH_ROOM_TYPE : 0) |
+				(withHotel ? SELLING_PREFERENCE_HOTEL_STANDALONE : 0) |
+				(standalone ? SELLING_PREFERENCE_STANDALONE : 0);
 
-			var sellingPreference;
-			if (withRoomType && withHotel && standalone) {
-				sellingPreference = 7; // HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
-			} else if (withHotel && standalone) {
-				sellingPreference = 5; // HOTEL_STANDALONE_AND_WITH_STANDALONE
-			} else if (withRoomType && standalone) {
-				sellingPreference = 6; // STANDALONE_AND_WITH_ROOM_TYPE
-			} else if (withRoomType && withHotel) {
-				sellingPreference = 3; // HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
-			} else if (standalone) {
-				sellingPreference = 4; // STANDALONE
-			} else if (withHotel) {
-				sellingPreference = 2; // HOTEL_STANDALONE
-			} else if (withRoomType) {
-				sellingPreference = 1; // WITH_ROOM_TYPE
-			} else {
-				sellingPreference = 0;
-			}
-			$('#selling_preference_type').val(sellingPreference);
+			$('#selling_preference_type').val(sellingPreference);			
 
 			var $autoAddOff = $('#auto_add_to_cart_off');
 			var $autoAddCheckedInput;

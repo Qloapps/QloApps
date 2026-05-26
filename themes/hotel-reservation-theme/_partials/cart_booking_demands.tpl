@@ -134,7 +134,8 @@
 																		{/if}
 																	</div>
 																	<div class="col-xs-10">
-																		<p>{$product['name']|escape:'html':'UTF-8'}</p>
+																		<span>{$product['name']|escape:'html':'UTF-8'}</span>
+																		{include file='_partials/price-calculation-info.tpl' pcm=$product.price_calculation_method|default:0}
 																		{if $product.allow_multiple_quantity}
 																			<div class="qty_container">
 																				<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="room_service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">

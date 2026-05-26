@@ -1,0 +1,79 @@
+/*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*/
+
+/* Trigger element styles */
+.selected-option-info,
+.price-calculation-info {
+    cursor: pointer;
+}
+
+.price-calculation-info {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 4px;
+}
+
+.selected-option-info .icon-info-sign,
+.price-calculation-info .icon-info-sign {
+    color: #00aff0;
+    font-size: 16px;
+}
+
+/* Unified tooltip bubble */
+.ui-tooltip.admin-info-tooltip {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    color: #333;
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+.ui-tooltip.admin-info-tooltip ul {
+    margin: 0;
+    padding: 0 0 0 16px;
+    list-style: disc;
+}
+
+.ui-tooltip.admin-info-tooltip ul li {
+    padding: 2px 0;
+}
+
+.ui-tooltip.admin-info-tooltip .price-info-tooltip-cont {
+    min-width: 160px;
+}
+
+.ui-tooltip.admin-info-tooltip .applied-on-label {
+    margin: 0 0 6px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.ui-tooltip.admin-info-tooltip .applied-on-days {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 13px;
+}
+
+.ui-tooltip.admin-info-tooltip .applied-on-days li {
+    padding: 2px 0;
+}

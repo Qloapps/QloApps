@@ -61,7 +61,10 @@
                                                 <input id="selected_service_product_{$product['id_product']}" type="hidden" value="{if $serviceSelected}1{else}0{/if}" name="selected_service_product[{$product.id_product}]"/>
                                             </td>
                                             <td>
-                                                <p>{$product['name']|escape:'html':'UTF-8'}</p>
+                                                <div>
+                                                    {$product['name']|escape:'html':'UTF-8'}
+                                                    {include file='controllers/orders/modals/_partials/_price-calculation-info.tpl' pcm=$product['price_calculation_method']|default:0}
+                                                </div>
                                             </td>
                                             <td>
                                                 {if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
