@@ -673,9 +673,11 @@
                                     </div>
                                 {/if}
                             {else}
+                                {if $addressAccess['add'] === 1}
                                 <button id="add_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;addaddress&amp;id_order={$order->id|intval}&amp;address_type=2&amp;id_customer={$order->id_customer}&amp;liteDisplaying=1&amp;submitFormAjax=1#">
                                     <i class="icon-plus-circle"></i> {l s='Add Address'}
                                 </button>
+                                {/if}
                                 {if $idCurrentAddress}
                                     <div class="guest_address_actions dropdown">
                                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">

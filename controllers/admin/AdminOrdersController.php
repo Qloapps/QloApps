@@ -3607,6 +3607,7 @@ class AdminOrdersControllerCore extends AdminController
         $hotelStandaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
         $standaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
         $cartRuleAccess = Profile::getProfileAccess($this->context->employee->id_profile, (int)Tab::getIdFromClassName('AdminCartRules'));
+        $addressAccess = Profile::getProfileAccess($this->context->employee->id_profile, (int)Tab::getIdFromClassName('AdminAddresses'));
 
         $this->tpl_view_vars = array(
             'hotelStandaloneProducts' => $hotelStandaloneProducts,
@@ -3676,6 +3677,7 @@ class AdminOrdersControllerCore extends AdminController
             'id_lang' => $this->context->language->id,
             'can_edit' => ($this->tabAccess['edit'] === 1),
             'cartRuleAccess' => $cartRuleAccess,
+            'addressAccess' => $addressAccess,
             'current_id_lang' => $this->context->language->id,
             'invoices_collection' => $order->getInvoicesCollection(),
             'not_paid_invoices_collection' => $order->getNotPaidInvoicesCollection(),
