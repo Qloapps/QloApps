@@ -156,6 +156,12 @@ $(document).ready(function() {
             success: function (response) {
                 allBookings = response.bookings || [];
 
+                currencySign = response.currency.sign;
+                $('#credit_slip_amount')
+                    .closest('.input-group')
+                    .find('.input-group-addon, .input-group-text')
+                    .text(currencySign);
+
                 var addedRoomTypes = {};
                 $.each(allBookings, function (_, booking) {
                     if (!addedRoomTypes[booking.id_product]) {
@@ -166,12 +172,6 @@ $(document).ready(function() {
                         }));
                     }
                 });
-
-                currencySign = response.currency.sign;
-                $('#credit_slip_amount')
-                    .closest('.input-group')
-                    .find('.input-group-addon, .input-group-text')
-                    .text(currencySign);
 
                 $roomTypeSelect.trigger('chosen:updated');
 

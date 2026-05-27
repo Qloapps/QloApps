@@ -115,7 +115,7 @@ class AdminSlipControllerCore extends AdminController
 
     public function initPageHeaderToolbar()
     {
-        if (empty($this->display)) {
+        if (empty($this->display) || $this->display == 'list') {
             $this->page_header_toolbar_btn['new_credit_slip'] = array(
                 'href' => self::$currentIndex . '&add' . $this->table . '&token=' . $this->token,
                 'desc' => $this->l('Add Credit Slip', null, null, false),
@@ -129,8 +129,7 @@ class AdminSlipControllerCore extends AdminController
     public function renderForm()
     {
         if ($this->display == 'add') {
-            $order = new Order();
-            $orderList = $order->getOrdersWithInformations();
+            $orderList = Order::getOrdersWithInformations(null, null, true);
             foreach ($orderList as &$order) {
                 $order['order_label'] = $order['reference'] . ' #' . (int) $order['id_order'];
             }
