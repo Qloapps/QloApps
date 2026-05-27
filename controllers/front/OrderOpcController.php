@@ -44,16 +44,6 @@ class OrderOpcControllerCore extends ParentOrderController
     {
         parent::init();
 
-        if ($this->context->cookie->__isset('cart_errors')) {
-            $cartErrors = json_decode($this->context->cookie->__get('cart_errors'), true);
-            if (is_array($cartErrors)) {
-                foreach ($cartErrors as $cartError) {
-                    $this->errors[] = $cartError;
-                }
-            }
-            $this->context->cookie->__unset('cart_errors');
-        }
-        
         if ($this->nbProducts) {
             $this->context->smarty->assign('virtual_cart', $this->context->cart->isVirtualCart());
         }

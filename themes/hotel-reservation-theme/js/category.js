@@ -67,3 +67,88 @@ function resizeCatimg()
 		}
 	});*/
 /*End*/
+
+$(document).off('click', '.ajax_add_to_cart_button').on('click', '.ajax_add_to_cart_button', function (e) {
+	e.preventDefault();
+	var baseUrl = $(this).attr('href');
+	var occupancy = getBookingOccupancyDetails($(this).closest('.booking_room_fields'), true);
+	if ($(this).prop('disabled') != 'disabled' && occupancy) {
+		var occupancyParams = '';
+		if (Array.isArray(occupancy)) {
+			$.each(occupancy, function(i, room) {
+				occupancyParams += '&occupancy[' + i + '][adults]=' + encodeURIComponent(room.adults);
+				occupancyParams += '&occupancy[' + i + '][children]=' + encodeURIComponent(room.children);
+				if (room.child_ages && room.child_ages.length) {
+					$.each(room.child_ages, function(_, age) {
+						occupancyParams += '&occupancy[' + i + '][child_ages][]=' + encodeURIComponent(age);
+					});
+				}
+			});
+		} else {
+			occupancyParams += '&qty=' + encodeURIComponent(occupancy);
+		}
+		window.location.href = baseUrl + occupancyParams;
+	}
+});
+
+function resetRoomtypeServices(refresh = true) {
+    $('.room_demands_container').find('input.id_room_type_demand:checked').prop('checked', false).uniform();
+    $('#additional_products').empty();
+    $('#additional_products div')
+    $('.remove_roomtype_product').text(select_txt).removeClass('btn-danger remove_roomtype_product').addClass('btn-success add_roomtype_product');
+    if (refresh) {
+        BookingForm.refresh();
+    }
+}
+
+function disableRoomTypeDemands(show) {
+    if (show) {
+        $('.room_demands_container_overlay').show();
+        $('.room_demands_container').find('input:checkbox.id_room_type_demand').prop('checked', false);
+        $('.room_demand_block').find('.id_room_type_demand').prop('checked', false).parent().removeClass('checked');
+        $('.room_demands_container').find('input:checkbox.id_room_type_demand').attr('disabled', 'disabled');
+    } else {
+        $('.room_demands_container_overlay').hide();
+        $('.room_demands_container').find('input:checkbox.id_room_type_demand').removeAttr('disabled');
+        $('.room_demands_container').find('.checker').removeClass('disabled');
+    }
+}
+
+function disableRoomTypeServices(disable) {
+    if (disable) {
+        resetRoomtypeServices(false);
+        $('#service_products_cont').find('button.add_roomtype_product').attr('disabled', 'disabled');
+        $('#service_products_cont').find('.qty_container .qty_direction a').attr('disabled', 'disabled');
+    } else {
+        $('#service_products_cont').find('button.add_roomtype_product').removeAttr('disabled');
+        $('#service_products_cont').find('.qty_container .qty_direction a').removeAttr('disabled');
+    }
+}
+
+function getRoomsExtraDemands()
+{
+    var roomDemands = [];
+
+    $('input:checkbox.id_room_type_demand:checked').each(function () {
+        roomDemands.push({
+            'id_global_demand':$(this).val(),
+            'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
+        });
+    });
+
+    return roomDemands;
+}
+
+function getRoomsServiceProducts()
+{
+    var serviceProducts = [];
+
+    $('#additional_products input.service_product').each(function () {
+        serviceProducts.push({
+            'id_product': $(this).data('id_product'),
+            'quantity':$(this).val(),
+        });
+    });
+
+    return serviceProducts;
+}

@@ -601,8 +601,8 @@ function deleteRoomFromSummary(el)
 			+ '&op=down'
 			+ '&qty='+qty
 			+ '&id_product='+id_product
-			+ '&dateFrom='+date_from
-			+ '&dateTo='+date_to
+			+ '&date_from='+date_from
+			+ '&date_to='+date_to
 			+ '&token=' + static_token
 			+ '&allow_refresh=1',
 		success: function(jsonData)

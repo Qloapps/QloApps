@@ -1449,8 +1449,8 @@ class ProductControllerCore extends FrontController
         $response = array('status' => false);
         $idProduct = (int) Tools::getValue('id_product');
         if ($this->product->booking_product) {
-            $dateFrom = Tools::getValue('dateFrom');
-            $dateTo = Tools::getValue('dateTo');
+            $dateFrom = Tools::getValue('date_from');
+            $dateTo = Tools::getValue('date_to');
             $occupancy = Tools::getValue('occupancy');
             if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                 if (!Validate::isOccupancy($occupancy)) {

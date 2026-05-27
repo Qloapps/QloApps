@@ -37,9 +37,6 @@
 {addJsDef currencySign=$currency->sign|html_entity_decode:2:"UTF-8"}
 {addJsDef currencyFormat=$currency->format|intval}
 {addJsDef currencyBlank=$currency->blank|intval}
-{addJsDef currency_sign=$currency->sign}
-{addJsDef currency_format=$currency->format}
-{addJsDef currency_blank=$currency->blank}
 {addJsDef isLogged=$is_logged|intval}
 {addJsDef isGuest=$is_guest|intval}
 {addJsDef page_name=$page_name|escape:'html':'UTF-8'}
@@ -85,10 +82,4 @@
 {addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
 {addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
 {addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
-{addJsDefL name=customizationIdMessage}{l s='Customization #' mod='blockcart' js=1}{/addJsDefL}
-{addJsDefL name=removingLinkText}{l s='remove this product from my cart' mod='blockcart' js=1}{/addJsDefL}
-{addJsDefL name=freeShippingTranslation}{l s='Free shipping!' mod='blockcart' js=1}{/addJsDefL}
-{addJsDefL name=freeProductTranslation}{l s='Free!' mod='blockcart' js=1}{/addJsDefL}
-{addJsDefL name=delete_txt}{l s='Delete' mod='blockcart' js=1}{/addJsDefL}
-{addJsDefL name=toBeDetermined}{l s='To be determined' mod='blockcart' js=1}{/addJsDefL}
 {/strip}

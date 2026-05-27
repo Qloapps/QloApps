@@ -20,29 +20,6 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 $(document).ready(function(){
-    $(document).off('click', '.ajax_add_to_cart_button').on('click', '.ajax_add_to_cart_button', function (e) {
-        e.preventDefault();
-        var baseUrl = $(this).attr('href');
-        var occupancy = getBookingOccupancyDetails($(this).closest('.booking_room_fields'), true);
-        if ($(this).prop('disabled') != 'disabled' && occupancy) {
-            var occupancyParams = '';
-            if (Array.isArray(occupancy)) {
-                $.each(occupancy, function(i, room) {
-                    occupancyParams += '&occupancy[' + i + '][adults]=' + encodeURIComponent(room.adults);
-                    occupancyParams += '&occupancy[' + i + '][children]=' + encodeURIComponent(room.children);
-                    if (room.child_ages && room.child_ages.length) {
-                        $.each(room.child_ages, function(_, age) {
-                            occupancyParams += '&occupancy[' + i + '][child_ages][]=' + encodeURIComponent(age);
-                        });
-                    }
-                });
-            } else {
-                occupancyParams += '&qty=' + encodeURIComponent(occupancy);
-            }
-            window.location.href = baseUrl + occupancyParams;
-        }
-    });
-
     $(document).on('click', '.booking_occupancy_wrapper .remove-room-link', function(e) {
         e.preventDefault();
 
