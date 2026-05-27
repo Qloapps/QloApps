@@ -483,6 +483,18 @@ class AdminOrdersControllerCore extends AdminController
                     (int) $this->context->employee->id_profile,
                     (int) Tab::getIdFromClassName('AdminCarts')
                 );
+                $adminCustomersAccess = Profile::getProfileAccess(
+                    (int) $this->context->employee->id_profile,
+                    (int) Tab::getIdFromClassName('AdminCustomers')
+                );
+                $adminCartRulesAccess = Profile::getProfileAccess(
+                    (int) $this->context->employee->id_profile,
+                    (int) Tab::getIdFromClassName('AdminCartRules')
+                );
+                $adminAddressesAccess = Profile::getProfileAccess(
+                    (int) $this->context->employee->id_profile,
+                    (int) Tab::getIdFromClassName('AdminAddresses')
+                );
                 $this->context->smarty->assign(array(
                     'order_total' => $cart->getOrderTotal(true),
                     'is_advance_payment_active' => $objHotelAdvancedPayment->isAdvancePaymentAvailableForCurrentCart(),
@@ -497,6 +509,9 @@ class AdminOrdersControllerCore extends AdminController
                     'PAYMENT_TYPE_PAY_AT_HOTEL' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                     'currency' => new Currency((int)$cart->id_currency),
                     'can_edit_booking_carts' => (!empty($adminCartsAccess['edit']) && (int) $adminCartsAccess['edit'] === 1),
+                    'can_add_customers' => (!empty($adminCustomersAccess['add']) && (int) $adminCustomersAccess['add'] === 1),
+                    'can_add_vouchers' => (!empty($adminCartRulesAccess['add']) && (int) $adminCartRulesAccess['add'] === 1),
+                    'can_add_addresses' => (!empty($adminAddressesAccess['add']) && (int) $adminAddressesAccess['add'] === 1),
                     'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
                     'occupancy_required_for_booking' => $occupancyRequiredForBooking,
