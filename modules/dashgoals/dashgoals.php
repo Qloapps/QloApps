@@ -370,8 +370,8 @@ class Dashgoals extends Module
 		} else {
 			// Retrieve gross data from AdminStatsController
 			$visits = AdminStatsController::getVisits(false, $year.date('-01-01'), $year.date('-12-31'), 'month');
-			$orders = AdminStatsController::getOrders($year.date('-01-01'), $year.date('-12-31'), 'month');
-			$sales = AdminStatsController::getTotalSales($year.date('-01-01'), $year.date('-12-31'), 'month');
+			$orders = HotelBookingDetail::getTotalBookings(['date_from' => $year.date('-01-01'), 'date_to' => $year.date('-12-31'), 'granularity' => 'month']);
+			$sales = HotelBookingDetail::getTotalRevenue(['date_from' => $year.date('-01-01'), 'date_to' => $year.date('-12-31'), 'granularity' => 'month']);
 
 			// Now we can calculate the value for every months
 			for ($i = '01'; $i <= 12; $i = sprintf('%02d', $i + 1)) {

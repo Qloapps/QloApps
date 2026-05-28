@@ -1,0 +1,132 @@
+/**
+ * QloHotelReports — Stats module stylesheet
+ */
+
+/* Sub-report tabs */
+.qlo-sub-report-nav {
+    margin: 0 0 5px 0;
+    border-bottom: 2px solid #ddd;
+}
+
+.qlo-sub-report-nav > li > a {
+    border-radius: 3px 3px 0 0;
+    font-size: 13px;
+    padding: 7px 14px;
+    color: #555;
+}
+
+.qlo-sub-report-nav > li.active > a,
+.qlo-sub-report-nav > li.active > a:hover,
+.qlo-sub-report-nav > li.active > a:focus {
+    color: #25b9d7;
+    border-bottom-color: #25b9d7;
+    font-weight: 600;
+}
+
+/* Gap between sub-report tab nav and the filter form below it */
+.qlo-sub-report-nav + form.form-horizontal {
+    margin-top: 15px;
+}
+
+/*
+ * Admin theme overrides <th> to font-weight:normal and only restores bold via
+ * span.title_box.active. We re-apply bold for all report table headers here.
+ * white-space:nowrap prevents column compression so the table overflows its
+ * table-responsive wrapper and horizontal scrolling kicks in.
+ */
+.table > thead > tr > th {
+    font-weight: bold !important;
+    white-space: nowrap;
+}
+
+/* Ensure table-responsive always enables horizontal scroll */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Totals footer */
+.qlo-report-totals td {
+    background: #f0f8f0;
+    border-top: 2px solid #ccc;
+}
+
+/* KPI summary cards (used in room-status sub-report) */
+.qlo-kpi-row {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.qlo-kpi-row > [class*="col-"] {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.qlo-kpi-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 14px 12px;
+    margin-bottom: 12px;
+    text-align: center;
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    min-height: 80px;
+}
+
+.qlo-kpi-card--success { border-color: #5cb85c; background: #f0fff0; }
+.qlo-kpi-card--danger  { border-color: #d9534f; background: #fff5f5; }
+.qlo-kpi-card--warning { border-color: #f0ad4e; background: #fffbf0; }
+
+.qlo-kpi-card .qlo-kpi-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.qlo-kpi-card .qlo-kpi-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1.2;
+}
+
+.qlo-kpi-card--success .qlo-kpi-value { color: #5cb85c; }
+.qlo-kpi-card--danger  .qlo-kpi-value { color: #d9534f; }
+.qlo-kpi-card--warning .qlo-kpi-value { color: #e67e22; }
+
+.qlo-section-heading {
+    margin: 20px 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 6px;
+}
+
+.qlo-text-danger {
+    color: #c0392b;
+    font-weight: 600;
+}
+
+.export-csv {
+    margin-top: 10px;
+}

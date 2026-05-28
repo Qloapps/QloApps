@@ -1,0 +1,480 @@
+{**
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*}
+
+<div class="qlo-report-group-revenue">
+
+    {* ── Sub-report tab nav ──────────────────────────────────────────── *}
+    <ul class="nav nav-pills qlo-sub-report-nav">
+        {foreach $revenue_sub_reports as $reportKey => $reportLabel}
+            <li{if $active_report == $reportKey} class="active"{/if}>
+                <a href="{$filter_base_url|escape:'html':'UTF-8'}&amp;report={$reportKey|escape:'html':'UTF-8'}">{$reportLabel}</a>
+            </li>
+        {/foreach}
+    </ul>
+
+    {* ── Filter bar ──────────────────────────────────────────────────── *}
+    <form method="get" action="{$filter_base_url|escape:'html':'UTF-8'}" class="form-horizontal">
+        <input type="hidden" name="controller" value="AdminStats">
+        <input type="hidden" name="module" value="qlohotelreports">
+        <input type="hidden" name="tab" value="revenue">
+        <input type="hidden" name="report" value="{$active_report|escape:'html':'UTF-8'}">
+        {if isset($smarty.get.token)}<input type="hidden" name="token" value="{$smarty.get.token|escape:'html':'UTF-8'}">{/if}
+
+        {if $hotels|count > 1}
+        <div class="row row-margin-bottom">
+            <label class="control-label col-lg-3">{l s='Hotel' mod='qlohotelreports'}</label>
+            <div class="col-lg-3">
+                <select name="id_hotel" class="form-control">
+                    <option value="0"{if !$id_hotel} selected="selected"{/if}>{l s='All Hotels' mod='qlohotelreports'}</option>
+                    {foreach $hotels as $hotel}
+                    <option value="{$hotel.id|intval}"{if $id_hotel == $hotel.id} selected="selected"{/if}>{$hotel.hotel_name|escape:'html':'UTF-8'}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        {/if}
+        <div class="row row-margin-bottom">
+            <label class="control-label col-lg-3">{l s='Room Type' mod='qlohotelreports'}</label>
+            <div class="col-lg-3">
+                <select name="id_product" class="form-control">
+                    <option value="0">{l s='All' mod='qlohotelreports'}</option>
+                    {foreach $room_types as $roomType}
+                        <option value="{$roomType.id_product|intval}"
+                            {if $filter_id_product == $roomType.id_product}selected="selected"{/if}>
+                            {$roomType.room_type_name|escape:'html':'UTF-8'}
+                        </option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        {if $active_report == 'refund'}
+        <div class="row row-margin-bottom">
+            <label class="control-label col-lg-3">{l s='Refund Status' mod='qlohotelreports'}</label>
+            <div class="col-lg-3">
+                <select name="refund_status" class="form-control">
+                    <option value="0"{if !$filter_refund_status} selected="selected"{/if}>{l s='All' mod='qlohotelreports'}</option>
+                    {foreach $refund_states as $refundState}
+                    <option value="{$refundState.id_order_return_state|intval}"{if $filter_refund_status == $refundState.id_order_return_state} selected="selected"{/if}>
+                        {$refundState.name|escape:'html':'UTF-8'}
+                    </option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        {/if}
+        {if $active_report == 'outstanding'}
+        <div class="row row-margin-bottom">
+            <label class="control-label col-lg-3">{l s='Booking Status' mod='qlohotelreports'}</label>
+            <div class="col-lg-3">
+                <select name="outstanding_status" class="form-control">
+                    <option value="0"{if !$filter_outstanding_status} selected="selected"{/if}>{l s='All' mod='qlohotelreports'}</option>
+                    <option value="2"{if $filter_outstanding_status == 2} selected="selected"{/if}>{l s='Checked-in' mod='qlohotelreports'}</option>
+                    <option value="3"{if $filter_outstanding_status == 3} selected="selected"{/if}>{l s='Checked-out' mod='qlohotelreports'}</option>
+                </select>
+            </div>
+        </div>
+        {/if}
+        <div class="row row-margin-bottom">
+            <div class="col-lg-3 col-lg-offset-3">
+                <button type="submit" class="btn btn-default btn-sm">
+                    <i class="icon-filter"></i> {l s='Apply' mod='qlohotelreports'}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {* ── Revenue Report ──────────────────────────────────────────────── *}
+    {if $active_report == 'revenue'}
+        <div class="row">
+        <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{l s='Date / Period' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Rooms Sold' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Total Bookings' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Room Revenue (excl. Tax)' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Extra Services Revenue' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Discount Amount' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Tax Amount' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Refund Amount' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Total Collection' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Net Revenue' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='ADR (Avg. Daily Rate)' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='RevPAR (Rev. Per Avail. Room)' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Occupancy %' mod='qlohotelreports'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if $daily_rows}
+                        {foreach $daily_rows as $revenueRow}
+                            <tr>
+                                <td>{$revenueRow.date|escape:'html':'UTF-8'}</td>
+                                <td class="text-right">{$revenueRow.rooms_sold|intval}</td>
+                                <td class="text-right">{$revenueRow.bookings|intval}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.room_revenue|string_format:"%.2f"}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.service_revenue|string_format:"%.2f"}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.discounts|string_format:"%.2f"}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.tax_amount|string_format:"%.2f"}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}0.00</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.total_collection|string_format:"%.2f"}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.net_revenue|string_format:"%.2f"}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.adr|string_format:"%.2f"}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.revpar|string_format:"%.2f"}</td>
+                                <td class="text-right">{$revenueRow.occupancy_pct|string_format:"%.1f"}%</td>
+                            </tr>
+                        {/foreach}
+                    {else}
+                        <tr>
+                            <td class="list-empty" colspan="13">
+                                <div class="list-empty-msg">
+                                    <i class="icon-warning-sign list-empty-icon"></i>
+                                    {l s='No revenue data found for the selected date range.' mod='qlohotelreports'}
+                                </div>
+                            </td>
+                        </tr>
+                    {/if}
+                </tbody>
+                {if $daily_rows}
+                <tfoot>
+                    <tr class="qlo-report-totals">
+                        <td><strong>{l s='Total' mod='qlohotelreports'}</strong></td>
+                        <td class="text-right"><strong>{$revenue_totals.rooms_sold}</strong></td>
+                        <td class="text-right"><strong>{$revenue_totals.bookings}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.room_revenue|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.service_revenue|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.discounts|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.tax_amount|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}0.00</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.total_collection|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.net_revenue|string_format:"%.2f"}</strong></td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tfoot>
+                {/if}
+            </table>
+        </div>
+        </div>
+        </div>
+    {/if}
+
+    {* ── Refund Report ───────────────────────────────────────────────── *}
+    {if $active_report == 'refund'}
+        <div class="row">
+        <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{l s='Refund Date' mod='qlohotelreports'}</th>
+                        <th>{l s='Refund ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Original Booking Amount' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Refund Amount' mod='qlohotelreports'}</th>
+                        <th>{l s='Refund Method' mod='qlohotelreports'}</th>
+                        <th>{l s='Refund Status' mod='qlohotelreports'}</th>
+                        <th>{l s='Processed Date' mod='qlohotelreports'}</th>
+                        <th>{l s='Processed By' mod='qlohotelreports'}</th>
+                        <th>{l s='Refund Reason' mod='qlohotelreports'}</th>
+                        <th>{l s='Remarks' mod='qlohotelreports'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if $refunds}
+                        {foreach $refunds as $refund}
+                            <tr>
+                                <td>{if $refund.cancellation_date}{$refund.cancellation_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td>{$refund.id_order_return|intval}</td>
+                                <td>{$refund.id_order|intval}</td>
+                                <td>{$refund.customer_name|escape:'html':'UTF-8'}</td>
+                                <td class="text-right">{$refund.currency_sign|escape:'html':'UTF-8'}{$refund.total_price_tax_incl|string_format:"%.2f"}</td>
+                                <td class="text-right">{$refund.currency_sign|escape:'html':'UTF-8'}{$refund.refunded_amount|string_format:"%.2f"}</td>
+                                <td>{if $refund.refund_method}{$refund.refund_method|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td>{if $refund.refund_status}{$refund.refund_status|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td><span class="text-muted">—</span></td>
+                                <td><span class="text-muted">—</span></td>
+                                <td>{if $refund.cancellation_reason}{$refund.cancellation_reason|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td><span class="text-muted">—</span></td>
+                            </tr>
+                        {/foreach}
+                    {else}
+                        <tr>
+                            <td class="list-empty" colspan="12">
+                                <div class="list-empty-msg">
+                                    <i class="icon-warning-sign list-empty-icon"></i>
+                                    {l s='No refunds found for the selected date range.' mod='qlohotelreports'}
+                                </div>
+                            </td>
+                        </tr>
+                    {/if}
+                </tbody>
+                {if $refunds}
+                <tfoot>
+                    <tr class="qlo-report-totals">
+                        <td colspan="5"><strong>{l s='Total Refunded' mod='qlohotelreports'}</strong></td>
+                        <td class="text-right"><strong>{$total_refunded|string_format:"%.2f"}</strong></td>
+                        <td colspan="6"></td>
+                    </tr>
+                </tfoot>
+                {/if}
+            </table>
+        </div>
+        </div>
+        </div>
+    {/if}
+
+    {* ── Payment / Collection Report ────────────────────────────────── *}
+    {if $active_report == 'payment'}
+        <div class="row">
+        <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{l s='Payment Date' mod='qlohotelreports'}</th>
+                        <th>{l s='Payment ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Booking Ref.' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
+                        <th>{l s='Payment Method' mod='qlohotelreports'}</th>
+                        <th>{l s='Payment Type' mod='qlohotelreports'}</th>
+                        <th>{l s='Currency' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Amount' mod='qlohotelreports'}</th>
+                        <th>{l s='Payment Status' mod='qlohotelreports'}</th>
+                        <th>{l s='Transaction Reference' mod='qlohotelreports'}</th>
+                        <th>{l s='Received By' mod='qlohotelreports'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if $payments}
+                        {foreach $payments as $payment}
+                            <tr>
+                                <td>{$payment.date_add|escape:'html':'UTF-8'}</td>
+                                <td>{$payment.id_order_payment|intval}</td>
+                                <td>{$payment.id_order|intval}</td>
+                                <td>{$payment.reference|escape:'html':'UTF-8'}</td>
+                                <td>{$payment.customer_name|escape:'html':'UTF-8'}</td>
+                                <td>{$payment.payment_method|escape:'html':'UTF-8'}</td>
+                                <td>
+                                    {if $payment.payment_type == 1}{l s='Online' mod='qlohotelreports'}
+                                    {elseif $payment.payment_type == 2}{l s='Pay at Hotel' mod='qlohotelreports'}
+                                    {elseif $payment.payment_type == 3}{l s='Remote Payment' mod='qlohotelreports'}
+                                    {else}<span class="text-muted">—</span>{/if}
+                                </td>
+                                <td>{if $payment.currency_iso}{$payment.currency_iso|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td class="text-right">{$payment.amount|string_format:"%.2f"}</td>
+                                <td>{l s='Success' mod='qlohotelreports'}</td>
+                                <td>{if $payment.transaction_id}{$payment.transaction_id|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td><span class="text-muted">—</span></td>
+                            </tr>
+                        {/foreach}
+                    {else}
+                        <tr>
+                            <td class="list-empty" colspan="12">
+                                <div class="list-empty-msg">
+                                    <i class="icon-warning-sign list-empty-icon"></i>
+                                    {l s='No payments found for the selected date range.' mod='qlohotelreports'}
+                                </div>
+                            </td>
+                        </tr>
+                    {/if}
+                </tbody>
+                {if $payments}
+                <tfoot>
+                    <tr class="qlo-report-totals">
+                        <td colspan="8"><strong>{l s='Total Collected' mod='qlohotelreports'}</strong></td>
+                        <td class="text-right"><strong>{$total_payments|string_format:"%.2f"}</strong></td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tfoot>
+                {/if}
+            </table>
+        </div>
+        </div>
+        </div>
+    {/if}
+
+    {* ── Tax Report ──────────────────────────────────────────────────── *}
+    {if $active_report == 'tax'}
+        <div class="row">
+        <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{l s='Booking Date' mod='qlohotelreports'}</th>
+                        <th>{l s='Booking Ref.' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
+                        <th>{l s='Revenue Source' mod='qlohotelreports'}</th>
+                        <th>{l s='Room Type' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Taxable Amount' mod='qlohotelreports'}</th>
+                        <th>{l s='Tax Name' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Tax Rate %' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Tax Amount' mod='qlohotelreports'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if $tax_rows}
+                        {foreach $tax_rows as $taxRow}
+                            <tr>
+                                <td>{$taxRow.date_add|date_format:'%d-%m-%Y'}</td>
+                                <td>{$taxRow.reference|escape:'html':'UTF-8'}</td>
+                                <td>{$taxRow.customer_name|escape:'html':'UTF-8'}</td>
+                                <td>{l s='Room Charge' mod='qlohotelreports'}</td>
+                                <td>{$taxRow.room_type_name|escape:'html':'UTF-8'}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$taxRow.taxable_amount|string_format:"%.2f"}</td>
+                                <td>{if $taxRow.tax_name}{$taxRow.tax_name|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td class="text-right">{$taxRow.tax_rate|string_format:"%.2f"}%</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$taxRow.tax_amount|string_format:"%.2f"}</td>
+                            </tr>
+                        {/foreach}
+                    {else}
+                        <tr>
+                            <td class="list-empty" colspan="9">
+                                <div class="list-empty-msg">
+                                    <i class="icon-warning-sign list-empty-icon"></i>
+                                    {l s='No tax data found for the selected date range.' mod='qlohotelreports'}
+                                </div>
+                            </td>
+                        </tr>
+                    {/if}
+                </tbody>
+                {if $tax_rows}
+                <tfoot>
+                    <tr class="qlo-report-totals">
+                        <td colspan="5"><strong>{l s='Totals' mod='qlohotelreports'}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tax_totals.taxable_amount|string_format:"%.2f"}</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tax_totals.tax_amount|string_format:"%.2f"}</strong></td>
+                    </tr>
+                </tfoot>
+                {/if}
+            </table>
+        </div>
+        </div>
+        </div>
+
+        {if $tax_by_name}
+        <h4 class="qlo-section-heading" style="margin-top:20px">{l s='Tax Summary by Type' mod='qlohotelreports'}</h4>
+        <div class="row">
+        <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{l s='Tax Name' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Tax Rate %' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Total Taxable Amount' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Total Tax Collected' mod='qlohotelreports'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $tax_by_name as $taxSummary}
+                    <tr>
+                        <td>{$taxSummary.tax_name|escape:'html':'UTF-8'}</td>
+                        <td class="text-right">{$taxSummary.tax_rate|string_format:"%.2f"}%</td>
+                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$taxSummary.taxable_amount|string_format:"%.2f"}</td>
+                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$taxSummary.tax_amount|string_format:"%.2f"}</td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+                <tfoot>
+                    <tr class="qlo-report-totals">
+                        <td colspan="2"><strong>{l s='Grand Total' mod='qlohotelreports'}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tax_totals.taxable_amount|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tax_totals.tax_amount|string_format:"%.2f"}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        </div>
+        </div>
+        {/if}
+    {/if}
+
+    {* ── Outstanding / Balance Due Report ───────────────────────────── *}
+    {if $active_report == 'outstanding'}
+        <div class="row">
+        <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Email' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Phone' mod='qlohotelreports'}</th>
+                        <th>{l s='Room Type' mod='qlohotelreports'}</th>
+                        <th>{l s='Room No.' mod='qlohotelreports'}</th>
+                        <th>{l s='Check-in Date' mod='qlohotelreports'}</th>
+                        <th>{l s='Check-out Date' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Total Charges' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Total Paid' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Outstanding Balance' mod='qlohotelreports'}</th>
+                        <th class="text-center">{l s='Days Overdue' mod='qlohotelreports'}</th>
+                        <th>{l s='Last Payment Date' mod='qlohotelreports'}</th>
+                        <th>{l s='Booking Status' mod='qlohotelreports'}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if $outstanding}
+                        {foreach $outstanding as $outstandingRow}
+                            <tr>
+                                <td>{$outstandingRow.id_order|intval}</td>
+                                <td>{$outstandingRow.customer_name|escape:'html':'UTF-8'}</td>
+                                <td>{if $outstandingRow.email}{$outstandingRow.email|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td>{if $outstandingRow.phone}{$outstandingRow.phone|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td>{$outstandingRow.room_type_name|escape:'html':'UTF-8'}</td>
+                                <td>{$outstandingRow.room_num|escape:'html':'UTF-8'}</td>
+                                <td>{$outstandingRow.date_from|escape:'html':'UTF-8'}</td>
+                                <td>{$outstandingRow.date_to|escape:'html':'UTF-8'}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$outstandingRow.total_charges|string_format:"%.2f"}</td>
+                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$outstandingRow.total_paid|string_format:"%.2f"}</td>
+                                <td class="text-right qlo-text-danger">{$currency_sign|escape:'html':'UTF-8'}{$outstandingRow.balance_due|string_format:"%.2f"}</td>
+                                <td class="text-center">{$outstandingRow.days_overdue|intval}</td>
+                                <td>{if $outstandingRow.last_payment_date}{$outstandingRow.last_payment_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td>
+                                    {if $outstandingRow.id_status == 1}{l s='Confirmed' mod='qlohotelreports'}
+                                    {elseif $outstandingRow.id_status == 2}{l s='Checked In' mod='qlohotelreports'}
+                                    {elseif $outstandingRow.id_status == 3}{l s='Checked Out' mod='qlohotelreports'}
+                                    {else}<span class="text-muted">—</span>{/if}
+                                </td>
+                            </tr>
+                        {/foreach}
+                    {else}
+                        <tr>
+                            <td class="list-empty" colspan="14">
+                                <div class="list-empty-msg">
+                                    <i class="icon-warning-sign list-empty-icon"></i>
+                                    {l s='No outstanding balances found for the selected date range.' mod='qlohotelreports'}
+                                </div>
+                            </td>
+                        </tr>
+                    {/if}
+                </tbody>
+                {if $outstanding}
+                <tfoot>
+                    <tr class="qlo-report-totals">
+                        <td colspan="10"><strong>{l s='Total Outstanding' mod='qlohotelreports'}</strong></td>
+                        <td class="text-right qlo-text-danger"><strong>{$currency_sign|escape:'html':'UTF-8'}{$total_outstanding|string_format:"%.2f"}</strong></td>
+                        <td colspan="3"></td>
+                    </tr>
+                </tfoot>
+                {/if}
+            </table>
+        </div>
+        </div>
+        </div>
+    {/if}
+
+    <a class="btn btn-default export-csv" href="{$export_url|escape:'html':'UTF-8'}">
+        <i class="icon-cloud-download"></i> {l s='CSV Export' mod='qlohotelreports'}
+    </a>
+
+</div>

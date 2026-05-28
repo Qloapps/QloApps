@@ -89,22 +89,22 @@ class DashGuestCycle extends Module
             $dataValue['dgc_guests_children'] = sprintf('%02d', rand(0, $dataValue['dgc_guests_adults']));
         } else {
             // set badges data
-            $arrivalsData = AdminStatsController::getArrivalsByDate($dateToday, $params['id_hotel']);
-            $departuresData = AdminStatsController::getDeparturesByDate($dateToday, $params['id_hotel']);
-            $guestsData = AdminStatsController::getGuestsByDate($dateToday, $params['id_hotel']);
+            $arrivalsData   = HotelBookingDetail::getArrivals(['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']]);
+            $departuresData = HotelBookingDetail::getDepartures(['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']]);
+            $guestsData     = HotelBookingDetail::getTotalGuests(['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']]);
             $dataValue['dgc_arrived'] = sprintf('%02d', $arrivalsData['arrived']);
             $dataValue['dgc_total_arrivals'] = sprintf('%02d', $arrivalsData['total_arrivals']);
             $dataValue['dgc_departed'] = sprintf('%02d', $departuresData['departed']);
             $dataValue['dgc_total_departures'] = sprintf('%02d', $departuresData['total_departures']);
-            $dataValue['dgc_new_bookings'] = sprintf('%02d', count(AdminStatsController::getNewBookingsInfoByDate($dateToday, $params['id_hotel'])));
-            $dataValue['dgc_occupied'] = sprintf('%02d', AdminStatsController::getDistinctRoomBookingsCount(
+            $dataValue['dgc_new_bookings'] = sprintf('%02d', count(HotelBookingDetail::getBookings(['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']])));
+            $dataValue['dgc_occupied'] = sprintf('%02d', HotelBookingDetail::getDistinctRoomBookingsCount(
                 date('Y-m-d', strtotime('-1 day')),
                 $dateToday,
                 $params['id_hotel'],
                 HotelBookingDetail::STATUS_CHECKED_IN
             ));
             $dataValue['dgc_new_messages'] = sprintf('%02d', CustomerMessage::getMessagesByDate($dateToday));
-            $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', AdminStatsController::getCancelledBookingsByDate($dateToday, $params['id_hotel']));
+            $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', HotelBookingDetail::getTotalCancellations(['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']]));
             $dataValue['dgc_guests_adults'] = sprintf('%02d', $guestsData['adults']);
             $dataValue['dgc_guests_children'] = sprintf('%02d', $guestsData['children']);
         }
@@ -152,7 +152,7 @@ class DashGuestCycle extends Module
             unset($header['hotel']);
         }
 
-        $arrivalsInfo = AdminStatsController::getArrivalsInfoByDate($date, $idHotel);
+        $arrivalsInfo = HotelBookingDetail::getArrivalsInfo(['date_from' => $date, 'id_hotel' => $idHotel]);
 
         $body = array();
         foreach ($arrivalsInfo as $arrivalInfo) {
@@ -212,7 +212,7 @@ class DashGuestCycle extends Module
             unset($header['hotel']);
         }
 
-        $departuresInfo = AdminStatsController::getDeparturesInfoByDate($date, $idHotel);
+        $departuresInfo = HotelBookingDetail::getDeparturesInfo(['date_from' => $date, 'id_hotel' => $idHotel]);
 
         $body = array();
         foreach ($departuresInfo as $departureInfo) {
@@ -273,7 +273,7 @@ class DashGuestCycle extends Module
             unset($header['hotel']);
         }
 
-        $inHousesInfo = AdminStatsController::getInHousesInfo($idHotel);
+        $inHousesInfo = HotelBookingDetail::getInHouseInfo(['id_hotel' => $idHotel]);
 
         $body = array();
         foreach ($inHousesInfo as $inHouseInfo) {
@@ -337,7 +337,7 @@ class DashGuestCycle extends Module
             unset($header['hotel']);
         }
 
-        $newBookingsInfo = AdminStatsController::getNewBookingsInfoByDate($date, $idHotel);
+        $newBookingsInfo = HotelBookingDetail::getBookings(['date_from' => $date, 'id_hotel' => $idHotel]);
 
         $body = array();
         foreach ($newBookingsInfo as $newBookingInfo) {
@@ -401,7 +401,7 @@ class DashGuestCycle extends Module
             unset($header['hotel']);
         }
 
-        $cancellationsInfo = AdminStatsController::getCancellationsInfoByDate($date, $idHotel);
+        $cancellationsInfo = HotelBookingDetail::getCancellations(array('date_from' => $date, 'id_hotel' => $idHotel));
 
         $body = array();
         foreach ($cancellationsInfo as $cancellationInfo) {

@@ -154,7 +154,7 @@ class DashProducts extends Module
 		);
 
 		$limit = (int)Configuration::get('DASHPRODUCT_NBR_SHOW_LAST_ORDER') ? (int)Configuration::get('DASHPRODUCT_NBR_SHOW_LAST_ORDER') : 10;
-		$orders = AdminStatsController::getRecentOrdersByHotel($idHotel, $limit);
+		$orders = Order::getRecentOrdersByHotel(['id_hotel' => $idHotel, 'limit' => $limit]);
 
 		$body = array();
 		foreach ($orders as $order) {

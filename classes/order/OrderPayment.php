@@ -163,18 +163,41 @@ class OrderPaymentCore extends ObjectModel
     // ── ANALYTICS ─────────────────────────────────────────────────────────────
 
     /**
-     * Returns total amount paid (sum of order_payment.amount) for the given date range.
+     * Total paid amount for hotel orders in date range, or per-payment rows when detailed.
      *
-     * @param array $params date_from, date_to, id_hotel, id_order, id_customer
-     * @return float
+     * @param array $params    date_from, date_to, id_hotel, id_order, id_customer
+     * @param bool  $detailedInfo  false → float sum; true → array of per-payment rows
+     * @return float|array
      */
-    public static function getTotalPaidAmount(array $params)
+    public static function getTotalPaidAmount(array $params, $detailedInfo = false)
     {
         $dateFrom   = pSQL($params['date_from']);
         $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
         $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
         $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        if ($detailedInfo) {
+            return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+                'SELECT op.`id_order_payment`, op.`date_add`, o.`id_order`,
+                op.`order_reference` AS reference,
+                CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+                op.`payment_method`, op.`payment_type`, op.`amount`, op.`transaction_id`,
+                cur.`iso_code` AS currency_iso
+                FROM `'._DB_PREFIX_.'order_payment` op
+                INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`reference` = op.`order_reference` AND o.`valid` = 1)
+                INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
+                LEFT JOIN `'._DB_PREFIX_.'currency` cur ON (cur.`id_currency` = op.`id_currency`)
+                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0)
+                WHERE op.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+                .($idOrder    ? ' AND o.`id_order` = '.$idOrder       : '')
+                .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
+                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+                GROUP BY op.`id_order_payment`
+                ORDER BY op.`date_add` DESC'
+            );
+        }
 
         return (float) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
             'SELECT IFNULL(SUM(op.`amount` / op.`conversion_rate`), 0)
