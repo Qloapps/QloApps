@@ -46,6 +46,11 @@
     margin-top: 15px;
 }
 
+/* Cancel Bootstrap's label margin-bottom so flex align-items:center works correctly */
+.qlo-sub-report-nav + form .list_filters label {
+    margin-bottom: 0;
+}
+
 /*
  * Admin theme overrides <th> to font-weight:normal and only restores bold via
  * span.title_box.active. We re-apply bold for all report table headers here.

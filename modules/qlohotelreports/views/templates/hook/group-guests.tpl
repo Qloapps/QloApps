@@ -30,70 +30,73 @@
 </ul>
 
 {* ── Filters ─────────────────────────────────────────────────────────────── *}
-<form method="get" action="{$filter_base_url|escape:'html':'UTF-8'}" class="form-horizontal">
+<form method="get" action="{$filter_base_url|escape:'html':'UTF-8'}" class="form-horizontal clearfix list_action_wrapper">
     <input type="hidden" name="controller" value="AdminStats">
     <input type="hidden" name="module" value="qlohotelreports">
     <input type="hidden" name="tab" value="guests">
     <input type="hidden" name="report" value="{$active_report|escape:'html':'UTF-8'}">
     {if isset($smarty.get.token)}<input type="hidden" name="token" value="{$smarty.get.token|escape:'html':'UTF-8'}">{/if}
-    {if $hotels|count > 1}
-    <div class="row row-margin-bottom">
-        <label class="control-label col-lg-3">{l s='Hotel' mod='qlohotelreports'}</label>
-        <div class="col-lg-3">
-            <select name="id_hotel" class="form-control">
-                <option value="0"{if !$id_hotel} selected="selected"{/if}>{l s='All Hotels' mod='qlohotelreports'}</option>
-                {foreach $hotels as $hotel}
-                <option value="{$hotel.id|intval}"{if $id_hotel == $hotel.id} selected="selected"{/if}>{$hotel.hotel_name|escape:'html':'UTF-8'}</option>
-                {/foreach}
-            </select>
+    <div class="list_filters">
+        {if $hotels|count > 1}
+        <div class="row">
+            <label class="col-xs-3">{l s='Hotel' mod='qlohotelreports'}</label>
+            <div class="col-xs-9">
+                <select name="id_hotel" class="form-control">
+                    <option value="0"{if !$id_hotel} selected="selected"{/if}>{l s='All Hotels' mod='qlohotelreports'}</option>
+                    {foreach $hotels as $hotel}
+                    <option value="{$hotel.id|intval}"{if $id_hotel == $hotel.id} selected="selected"{/if}>{$hotel.hotel_name|escape:'html':'UTF-8'}</option>
+                    {/foreach}
+                </select>
+            </div>
         </div>
-    </div>
-    {/if}
-    {if $active_report == 'guest-directory'}
-    <div class="row row-margin-bottom">
-        <label class="control-label col-lg-3">{l s='Guest Type' mod='qlohotelreports'}</label>
-        <div class="col-lg-3">
-            <select name="guest_type" class="form-control">
-                <option value=""{if !$filter_guest_type} selected="selected"{/if}>{l s='All Guests' mod='qlohotelreports'}</option>
-                <option value="new"{if $filter_guest_type == 'new'} selected="selected"{/if}>{l s='New Guests' mod='qlohotelreports'}</option>
-                <option value="returning"{if $filter_guest_type == 'returning'} selected="selected"{/if}>{l s='Returning Guests' mod='qlohotelreports'}</option>
-            </select>
+        {/if}
+        {if $active_report == 'guest-directory'}
+        <div class="row">
+            <label class="col-xs-3">{l s='Guest Type' mod='qlohotelreports'}</label>
+            <div class="col-xs-9">
+                <select name="guest_type" class="form-control">
+                    <option value=""{if !$filter_guest_type} selected="selected"{/if}>{l s='All Guests' mod='qlohotelreports'}</option>
+                    <option value="new"{if $filter_guest_type == 'new'} selected="selected"{/if}>{l s='New Guests' mod='qlohotelreports'}</option>
+                    <option value="returning"{if $filter_guest_type == 'returning'} selected="selected"{/if}>{l s='Returning Guests' mod='qlohotelreports'}</option>
+                </select>
+            </div>
         </div>
-    </div>
-    {/if}
-    {if $active_report == 'services'}
-    <div class="row row-margin-bottom">
-        <label class="control-label col-lg-3">{l s='Service Category' mod='qlohotelreports'}</label>
-        <div class="col-lg-3">
-            <select name="id_category" class="form-control">
-                <option value="0"{if !$filter_id_category} selected="selected"{/if}>{l s='All Categories' mod='qlohotelreports'}</option>
-                {foreach $service_categories as $cat}
-                <option value="{$cat.id_category|intval}"{if $filter_id_category == $cat.id_category} selected="selected"{/if}>
-                    {$cat.name|escape:'html':'UTF-8'}
-                </option>
-                {/foreach}
-            </select>
+        {/if}
+        {if $active_report == 'services'}
+        <div class="row">
+            <label class="col-xs-3">{l s='Service Category' mod='qlohotelreports'}</label>
+            <div class="col-xs-9">
+                <select name="id_category" class="form-control">
+                    <option value="0"{if !$filter_id_category} selected="selected"{/if}>{l s='All Categories' mod='qlohotelreports'}</option>
+                    {foreach $service_categories as $cat}
+                    <option value="{$cat.id_category|intval}"{if $filter_id_category == $cat.id_category} selected="selected"{/if}>
+                        {$cat.name|escape:'html':'UTF-8'}
+                    </option>
+                    {/foreach}
+                </select>
+            </div>
         </div>
-    </div>
-    <div class="row row-margin-bottom">
-        <label class="control-label col-lg-3">{l s='Service Name' mod='qlohotelreports'}</label>
-        <div class="col-lg-3">
-            <select name="id_service_product" class="form-control">
-                <option value="0"{if !$filter_id_service} selected="selected"{/if}>{l s='All Services' mod='qlohotelreports'}</option>
-                {foreach $service_products as $svc}
-                <option value="{$svc.id_product|intval}"{if $filter_id_service == $svc.id_product} selected="selected"{/if}>
-                    {$svc.name|escape:'html':'UTF-8'}
-                </option>
-                {/foreach}
-            </select>
+        <div class="row">
+            <label class="col-xs-3">{l s='Service Name' mod='qlohotelreports'}</label>
+            <div class="col-xs-9">
+                <select name="id_service_product" class="form-control">
+                    <option value="0"{if !$filter_id_service} selected="selected"{/if}>{l s='All Services' mod='qlohotelreports'}</option>
+                    {foreach $service_products as $svc}
+                    <option value="{$svc.id_product|intval}"{if $filter_id_service == $svc.id_product} selected="selected"{/if}>
+                        {$svc.name|escape:'html':'UTF-8'}
+                    </option>
+                    {/foreach}
+                </select>
+            </div>
         </div>
-    </div>
-    {/if}
-    <div class="row row-margin-bottom">
-        <div class="col-lg-3 col-lg-offset-3">
-            <button type="submit" class="btn btn-sm btn-default">
-                <i class="icon-filter"></i> {l s='Apply' mod='qlohotelreports'}
-            </button>
+        {/if}
+        <div class="actions">
+            <hr>
+            <span class="pull-right">
+                <button type="submit" class="btn btn-sm btn-default">
+                    <i class="icon-filter"></i> {l s='Apply' mod='qlohotelreports'}
+                </button>
+            </span>
         </div>
     </div>
 </form>
