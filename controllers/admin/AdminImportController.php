@@ -2835,7 +2835,8 @@ class AdminImportControllerCore extends AdminController
 
                 AdminImportController::arrayWalk($info, array('AdminImportController', 'fillInfo'), $customer);
                 if ($customer->passwd) {
-                    $customer->passwd = Tools::encrypt($customer->passwd);
+                    $objHash = new PasswordHashing();
+                    $customer->passwd = $objHash->passwordHash($customer->passwd);
                 }
 
                 $customers_shop = array();
