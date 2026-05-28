@@ -420,7 +420,7 @@ class HotelRoomInformation extends ObjectModel
                             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                             LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
                             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
-                            WHERE p.`active` = 1 AND hbd.`is_refunded` = 0
+                            WHERE p.`active` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
                             AND hbd.`date_from` < "'.pSQL($next).' 00:00:00"
                             AND hbd.`date_to` > "'.pSQL($current).' 00:00:00"'
                             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
@@ -596,7 +596,7 @@ class HotelRoomInformation extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
-            WHERE p.`active` = 1 AND p.`booking_product` = 1 AND hbd.`is_refunded` = 0
+            WHERE p.`active` = 1 AND p.`booking_product` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
             AND hbd.`date_from` < "'.pSQL($dateTo).'"
             AND IF(hbd.`id_status` = '.$checkedOutStatus.',
                 DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"), hbd.`date_to`
@@ -630,7 +630,7 @@ class HotelRoomInformation extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
             WHERE hri.`id_status` = '.(int) self::STATUS_INACTIVE.'
-            AND p.`active` = 1 AND p.`booking_product` = 1 AND hbd.`is_refunded` = 0
+            AND p.`active` = 1 AND p.`booking_product` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
             AND hbd.`date_from` < "'.pSQL($dateTo).'"
             AND IF(hbd.`id_status` = '.$checkedOutStatus.',
                 DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"), hbd.`date_to`
@@ -672,7 +672,7 @@ class HotelRoomInformation extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
             WHERE hri.`id_status` = '.(int) self::STATUS_TEMPORARY_INACTIVE.'
-            AND p.`active` = 1 AND p.`booking_product` = 1 AND hbd.`is_refunded` = 0
+            AND p.`active` = 1 AND p.`booking_product` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
             AND hrdd.`date_from` < "'.pSQL($dateTo).'" AND hrdd.`date_to` > "'.pSQL($dateFrom).'"
             AND hbd.`date_from` < "'.pSQL($dateTo).'"
             AND IF(hbd.`id_status` = '.$checkedOutStatus.',

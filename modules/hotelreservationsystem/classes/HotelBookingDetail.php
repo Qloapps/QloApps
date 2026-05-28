@@ -3969,6 +3969,7 @@ class HotelBookingDetail extends ObjectModel
             'SELECT COUNT(hbd.`id_room`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_cancelled` = 0
             AND hbd.`is_back_order` = 0
             AND hbd.`date_from` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
@@ -3981,6 +3982,7 @@ class HotelBookingDetail extends ObjectModel
             'SELECT COUNT(hbd.`id_room`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_cancelled` = 0
             AND hbd.`is_back_order` = 0
             AND hbd.`date_from` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
             AND hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN
@@ -4030,6 +4032,7 @@ class HotelBookingDetail extends ObjectModel
                 'SELECT COUNT(hbd.`id_room`)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`is_refunded` = 0
+                AND hbd.`is_cancelled` = 0
                 AND hbd.`is_back_order` = 0
                 AND hbd.`date_from` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
@@ -4067,6 +4070,7 @@ class HotelBookingDetail extends ObjectModel
             'SELECT COUNT(hbd.`id_room`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_cancelled` = 0
             AND hbd.`date_to` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
             AND (hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN.'
                 OR (hbd.`check_in` != "0000:00:00 00:00:00" AND hbd.`check_out` != "0000:00:00 00:00:00"))'
@@ -4080,6 +4084,7 @@ class HotelBookingDetail extends ObjectModel
             'SELECT COUNT(hbd.`id_room`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_cancelled` = 0
             AND hbd.`date_to` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
             AND hbd.`id_status` = '.(int) self::STATUS_CHECKED_OUT.'
             AND hbd.`check_in` != "0000:00:00 00:00:00"'
@@ -4128,6 +4133,7 @@ class HotelBookingDetail extends ObjectModel
                 'SELECT COUNT(hbd.`id_room`)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`is_refunded` = 0
+                AND hbd.`is_cancelled` = 0
                 AND hbd.`date_to` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"
                 AND (hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN
                 .' OR (hbd.`check_in` != "0000-00-00 00:00:00" AND hbd.`check_out` != "0000-00-00 00:00:00"))'
@@ -4165,6 +4171,7 @@ class HotelBookingDetail extends ObjectModel
             'SELECT COUNT(hbd.`id_room`)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_cancelled` = 0
             AND hbd.`is_back_order` = 0
             AND hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN.'
             AND hbd.`date_to` > "'.$dateFrom.' 00:00:00"'
@@ -4200,6 +4207,7 @@ class HotelBookingDetail extends ObjectModel
                 'SELECT COUNT(hbd.`id_room`)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`is_refunded` = 0
+                AND hbd.`is_cancelled` = 0
                 AND hbd.`is_back_order` = 0
                 AND hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN.'
                 AND hbd.`date_to` > "'.pSQL($current).' 00:00:00"'
@@ -4718,6 +4726,7 @@ class HotelBookingDetail extends ObjectModel
             'SELECT SUM(hbd.`adults`) AS adults, SUM(hbd.`children`) AS children
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0
+            AND hbd.`is_cancelled` = 0
             AND hbd.`is_back_order` = 0
             AND hbd.`date_from` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
@@ -4757,6 +4766,7 @@ class HotelBookingDetail extends ObjectModel
                 'SELECT SUM(hbd.`adults`) AS adults, SUM(hbd.`children`) AS children
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`is_refunded` = 0
+                AND hbd.`is_cancelled` = 0
                 AND hbd.`is_back_order` = 0
                 AND hbd.`date_from` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
