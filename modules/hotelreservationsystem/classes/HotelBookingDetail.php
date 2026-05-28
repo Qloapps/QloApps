@@ -4518,22 +4518,25 @@ class HotelBookingDetail extends ObjectModel
      */
     public static function getTaxBreakdown(array $params)
     {
-        $dateFrom  = pSQL($params['date_from']);
-        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
-        $idProduct = isset($params['id_product']) ? (int) $params['id_product']  : 0;
-        $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']     : 0;
+        $dateFrom      = pSQL($params['date_from']);
+        $dateTo        = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel       = isset($params['id_hotel'])        ? $params['id_hotel']         : false;
+        $idProduct     = isset($params['id_product'])      ? (int) $params['id_product'] : 0;
+        $idTax         = isset($params['id_tax'])          ? (int) $params['id_tax']     : 0;
+        $revenueSource = isset($params['revenue_source'])  ? $params['revenue_source']   : 'room';
+        $idLang        = isset($params['id_lang'])         ? (int) $params['id_lang']    : 0;
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
 
-        return Db::getInstance()->executeS(
+        $roomQuery =
             'SELECT hbd.`id_order`, o.`reference`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             hbd.`room_type_name`, hbd.`room_num`, hbd.`date_add`,
             hbd.`total_price_tax_excl` / o.`conversion_rate` AS taxable_amount,
             tl.`name` AS tax_name, t.`rate` AS tax_rate,
-            odt.`total_amount` / o.`conversion_rate` AS tax_amount
+            odt.`total_amount` / o.`conversion_rate` AS tax_amount,
+            "room" AS revenue_source
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
             INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
@@ -4543,9 +4546,35 @@ class HotelBookingDetail extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'tax_lang` tl ON (tl.`id_tax` = t.`id_tax` AND tl.`id_lang` = '.(int) $idLang.')
             WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
-            ORDER BY hbd.`id_order` ASC, tl.`name` ASC'
-        );
+            .($idTax     ? ' AND t.`id_tax` = '.$idTax           : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+
+        $serviceQuery =
+            'SELECT hbd.`id_order`, o.`reference`,
+            CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+            spod.`name` AS room_type_name, hbd.`room_num`, spod.`date_add`,
+            spod.`total_price_tax_excl` / o.`conversion_rate` AS taxable_amount,
+            NULL AS tax_name, NULL AS tax_rate,
+            (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate` AS tax_amount,
+            "service" AS revenue_source
+            FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = spod.`id_htl_booking_detail`)
+            INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
+            INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+            WHERE spod.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
+            AND (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) > 0
+            AND spod.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+
+        if ($revenueSource === 'service') {
+            $sql = $serviceQuery . ' ORDER BY spod.`date_add` ASC';
+        } elseif ($revenueSource === 'all') {
+            $sql = '('.$roomQuery.') UNION ALL ('.$serviceQuery.') ORDER BY id_order ASC, tax_name ASC';
+        } else {
+            $sql = $roomQuery . ' ORDER BY hbd.`id_order` ASC, tl.`name` ASC';
+        }
+
+        return Db::getInstance()->executeS($sql);
     }
 
     /**

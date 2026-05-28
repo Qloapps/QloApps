@@ -729,6 +729,7 @@ class HotelRoomInformation extends ObjectModel
         $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
         $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
         $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
+        $floor     = isset($params['floor'])      ? pSQL($params['floor'])      : '';
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
@@ -754,9 +755,31 @@ class HotelRoomInformation extends ObjectModel
             )
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
             WHERE p.`active` = 1 AND p.`booking_product` = 1'
+            .($floor     ? ' AND hri.`floor` = "'.$floor.'"'     : '')
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
             .($idHotel ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
             ORDER BY hbil.`hotel_name`, pl.`name`, hri.`room_num`'
+        );
+    }
+
+    /**
+     * @param array $params  id_hotel, id_product
+     * @return array  rows with 'floor' key, sorted
+     */
+    public static function getDistinctFloors(array $params = array())
+    {
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT DISTINCT hri.`floor`
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p
+                ON (p.`id_product` = hri.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
+            WHERE hri.`floor` != "" AND hri.`floor` IS NOT NULL'
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
+            .($idHotel ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+            ORDER BY hri.`floor`'
         );
     }
 }

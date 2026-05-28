@@ -599,14 +599,16 @@ class ServiceProductOrderDetail extends ObjectModel
      */
     public static function getTotalServiceRevenue(array $params, $detailedInfo = false)
     {
-        $dateFrom   = pSQL($params['date_from']);
-        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
-        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
-        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
-        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
-        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
-        $idLang     = isset($params['id_lang'])     ? (int) $params['id_lang']     : 0;
+        $dateFrom         = pSQL($params['date_from']);
+        $dateTo           = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel          = isset($params['id_hotel'])          ? $params['id_hotel']                : false;
+        $idProduct        = isset($params['id_product'])        ? (int) $params['id_product']        : 0;
+        $idRoom           = isset($params['id_room'])           ? (int) $params['id_room']           : 0;
+        $idOrder          = isset($params['id_order'])          ? (int) $params['id_order']          : 0;
+        $idCustomer       = isset($params['id_customer'])       ? (int) $params['id_customer']       : 0;
+        $idCategory       = isset($params['id_category'])       ? (int) $params['id_category']       : 0;
+        $idServiceProduct = isset($params['id_service_product']) ? (int) $params['id_service_product'] : 0;
+        $idLang           = isset($params['id_lang'])           ? (int) $params['id_lang']           : 0;
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
@@ -626,10 +628,12 @@ class ServiceProductOrderDetail extends ObjectModel
             AND hbd.`is_refunded` = 0
             AND spod.`is_cancelled` = 0
             AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
-            .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom        : '')
-            .($idOrder    ? ' AND hbd.`id_order` = '.$idOrder      : '')
-            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
+            .($idProduct        ? ' AND hbd.`id_product` = '.$idProduct  : '')
+            .($idRoom           ? ' AND hbd.`id_room` = '.$idRoom        : '')
+            .($idOrder          ? ' AND hbd.`id_order` = '.$idOrder      : '')
+            .($idCustomer       ? ' AND hbd.`id_customer` = '.$idCustomer : '')
+            .($idServiceProduct ? ' AND spod.`id_product` = '.$idServiceProduct : '')
+            .($idCategory       ? ' AND spod.`id_product` IN (SELECT `id_product` FROM `'._DB_PREFIX_.'product` WHERE `id_category_default` = '.$idCategory.')' : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
 
         if ($detailedInfo) {
@@ -757,5 +761,50 @@ class ServiceProductOrderDetail extends ObjectModel
         }
 
         return $result;
+    }
+
+    /**
+     * Distinct service categories that have at least one active service product.
+     *
+     * @param int $idLang
+     * @return array  rows with id_category, name
+     */
+    public static function getServiceCategories($idLang = 0)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+        return Db::getInstance()->executeS(
+            'SELECT DISTINCT c.`id_category`, cl.`name`
+            FROM `'._DB_PREFIX_.'product` p
+            INNER JOIN `'._DB_PREFIX_.'category` c ON (c.`id_category` = p.`id_category_default`)
+            INNER JOIN `'._DB_PREFIX_.'category_lang` cl
+                ON (cl.`id_category` = c.`id_category` AND cl.`id_lang` = '.(int) $idLang.')
+            WHERE p.`booking_product` = 0 AND p.`active` = 1
+            ORDER BY cl.`name` ASC'
+        );
+    }
+
+    /**
+     * Active service products, optionally filtered by category.
+     *
+     * @param int $idLang
+     * @param int $idCategory  0 = all categories
+     * @return array  rows with id_product, name
+     */
+    public static function getServiceProducts($idLang = 0, $idCategory = 0)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+        return Db::getInstance()->executeS(
+            'SELECT p.`id_product`, pl.`name`
+            FROM `'._DB_PREFIX_.'product` p
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+            WHERE p.`booking_product` = 0 AND p.`active` = 1'
+            .($idCategory ? ' AND p.`id_category_default` = '.(int) $idCategory : '').'
+            ORDER BY pl.`name` ASC'
+        );
     }
 }

@@ -77,6 +77,46 @@
             </div>
         </div>
         {/if}
+        {if $active_report == 'payment' && $payment_methods}
+        <div class="row row-margin-bottom">
+            <label class="control-label col-lg-3">{l s='Payment Method' mod='qlohotelreports'}</label>
+            <div class="col-lg-3">
+                <select name="payment_method" class="form-control">
+                    <option value=""{if !$filter_payment_method} selected="selected"{/if}>{l s='All' mod='qlohotelreports'}</option>
+                    {foreach $payment_methods as $pm}
+                    <option value="{$pm.payment_method|escape:'html':'UTF-8'}"{if $filter_payment_method == $pm.payment_method} selected="selected"{/if}>
+                        {$pm.payment_method|escape:'html':'UTF-8'}
+                    </option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        {/if}
+        {if $active_report == 'tax'}
+        <div class="row row-margin-bottom">
+            <label class="control-label col-lg-3">{l s='Revenue Source' mod='qlohotelreports'}</label>
+            <div class="col-lg-3">
+                <select name="revenue_source" class="form-control">
+                    <option value="all"{if $filter_revenue_source == 'all'} selected="selected"{/if}>{l s='All' mod='qlohotelreports'}</option>
+                    <option value="room"{if $filter_revenue_source == 'room'} selected="selected"{/if}>{l s='Room Charges' mod='qlohotelreports'}</option>
+                    <option value="service"{if $filter_revenue_source == 'service'} selected="selected"{/if}>{l s='Service Charges' mod='qlohotelreports'}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row row-margin-bottom">
+            <label class="control-label col-lg-3">{l s='Tax Name' mod='qlohotelreports'}</label>
+            <div class="col-lg-3">
+                <select name="id_tax" class="form-control">
+                    <option value="0"{if !$filter_id_tax} selected="selected"{/if}>{l s='All' mod='qlohotelreports'}</option>
+                    {foreach $tax_names as $tax}
+                    <option value="{$tax.id_tax|intval}"{if $filter_id_tax == $tax.id_tax} selected="selected"{/if}>
+                        {$tax.name|escape:'html':'UTF-8'}{if $tax.rate} ({$tax.rate|string_format:'%.2f'}%){/if}
+                    </option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        {/if}
         <div class="row row-margin-bottom">
             <div class="col-lg-3 col-lg-offset-3">
                 <button type="submit" class="btn btn-default btn-sm">
@@ -325,7 +365,7 @@
                                 <td>{$taxRow.date_add|date_format:'%d-%m-%Y'}</td>
                                 <td>{$taxRow.reference|escape:'html':'UTF-8'}</td>
                                 <td>{$taxRow.customer_name|escape:'html':'UTF-8'}</td>
-                                <td>{l s='Room Charge' mod='qlohotelreports'}</td>
+                                <td>{if $taxRow.revenue_source == 'service'}{l s='Service Charge' mod='qlohotelreports'}{else}{l s='Room Charge' mod='qlohotelreports'}{/if}</td>
                                 <td>{$taxRow.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$taxRow.taxable_amount|string_format:"%.2f"}</td>
                                 <td>{if $taxRow.tax_name}{$taxRow.tax_name|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>

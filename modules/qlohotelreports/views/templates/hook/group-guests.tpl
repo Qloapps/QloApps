@@ -45,6 +45,34 @@
         </div>
     </div>
     {/if}
+    {if $active_report == 'services'}
+    <div class="row row-margin-bottom">
+        <label class="control-label col-lg-3">{l s='Service Category' mod='qlohotelreports'}</label>
+        <div class="col-lg-3">
+            <select name="id_category" class="form-control">
+                <option value="0"{if !$filter_id_category} selected="selected"{/if}>{l s='All Categories' mod='qlohotelreports'}</option>
+                {foreach $service_categories as $cat}
+                <option value="{$cat.id_category|intval}"{if $filter_id_category == $cat.id_category} selected="selected"{/if}>
+                    {$cat.name|escape:'html':'UTF-8'}
+                </option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="row row-margin-bottom">
+        <label class="control-label col-lg-3">{l s='Service Name' mod='qlohotelreports'}</label>
+        <div class="col-lg-3">
+            <select name="id_service_product" class="form-control">
+                <option value="0"{if !$filter_id_service} selected="selected"{/if}>{l s='All Services' mod='qlohotelreports'}</option>
+                {foreach $service_products as $svc}
+                <option value="{$svc.id_product|intval}"{if $filter_id_service == $svc.id_product} selected="selected"{/if}>
+                    {$svc.name|escape:'html':'UTF-8'}
+                </option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    {/if}
     <div class="row row-margin-bottom">
         <div class="col-lg-3 col-lg-offset-3">
             <button type="submit" class="btn btn-sm btn-default">

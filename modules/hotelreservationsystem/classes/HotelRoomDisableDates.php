@@ -151,6 +151,7 @@ class HotelRoomDisableDates extends ObjectModel
         $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
         $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
         $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
+        $floor     = isset($params['floor'])      ? pSQL($params['floor'])      : '';
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
@@ -174,6 +175,7 @@ class HotelRoomDisableDates extends ObjectModel
                 ON (hbil.`id` = hri.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
             WHERE hrdd.`date_from` < "'.$dateTo.' 23:59:59"
             AND hrdd.`date_to` > "'.$dateFrom.' 00:00:00"'
+            .($floor     ? ' AND hri.`floor` = "'.$floor.'"'     : '')
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hri').'
             ORDER BY hbil.`hotel_name`, pl.`name`, hri.`room_num`, hrdd.`date_from` ASC'

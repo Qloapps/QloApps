@@ -47,6 +47,21 @@
             </select>
         </div>
     </div>
+    {if $available_floors}
+    <div class="row row-margin-bottom">
+        <label class="control-label col-lg-3">{l s='Floor' mod='qlohotelreports'}</label>
+        <div class="col-lg-3">
+            <select name="floor" class="form-control">
+                <option value=""{if !$filter_floor} selected="selected"{/if}>{l s='All Floors' mod='qlohotelreports'}</option>
+                {foreach $available_floors as $fl}
+                <option value="{$fl.floor|escape:'html':'UTF-8'}"{if $filter_floor == $fl.floor} selected="selected"{/if}>
+                    {$fl.floor|escape:'html':'UTF-8'}
+                </option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    {/if}
     {/if}
     <div class="row row-margin-bottom">
         <div class="col-lg-3 col-lg-offset-3">

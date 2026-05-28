@@ -173,9 +173,10 @@ class OrderPaymentCore extends ObjectModel
     {
         $dateFrom   = pSQL($params['date_from']);
         $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
-        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
-        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+        $idHotel       = isset($params['id_hotel'])       ? $params['id_hotel']              : false;
+        $idOrder       = isset($params['id_order'])       ? (int) $params['id_order']       : 0;
+        $idCustomer    = isset($params['id_customer'])    ? (int) $params['id_customer']    : 0;
+        $paymentMethod = isset($params['payment_method']) ? pSQL($params['payment_method']) : '';
 
         if ($detailedInfo) {
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
@@ -191,8 +192,9 @@ class OrderPaymentCore extends ObjectModel
                 INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
                     ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0)
                 WHERE op.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-                .($idOrder    ? ' AND o.`id_order` = '.$idOrder       : '')
-                .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
+                .($idOrder       ? ' AND o.`id_order` = '.$idOrder                       : '')
+                .($idCustomer    ? ' AND o.`id_customer` = '.$idCustomer                 : '')
+                .($paymentMethod ? ' AND op.`payment_method` = "'.$paymentMethod.'"'     : '')
                 .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
                 GROUP BY op.`id_order_payment`
                 ORDER BY op.`date_add` DESC'
@@ -205,8 +207,9 @@ class OrderPaymentCore extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'orders` o
                 ON (o.`reference` = op.`order_reference`)
             WHERE op.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-            .($idOrder    ? ' AND o.`id_order` = '.$idOrder       : '')
-            .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '').'
+            .($idOrder       ? ' AND o.`id_order` = '.$idOrder                       : '')
+            .($idCustomer    ? ' AND o.`id_customer` = '.$idCustomer                 : '')
+            .($paymentMethod ? ' AND op.`payment_method` = "'.$paymentMethod.'"'     : '').'
             AND (
                 EXISTS (
                     SELECT 1
@@ -222,6 +225,25 @@ class OrderPaymentCore extends ObjectModel
                     WHERE spod.`id_order` = o.`id_order` AND spod.`id_hotel` = 0 AND spod.`id_htl_booking_detail` = 0
                 )' : '').'
             )'
+        );
+    }
+
+    /**
+     * @param int|false $idHotel
+     * @return array  rows with 'payment_method' key
+     */
+    public static function getDistinctPaymentMethods($idHotel = false)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT DISTINCT op.`payment_method`
+            FROM `'._DB_PREFIX_.'order_payment` op
+            INNER JOIN `'._DB_PREFIX_.'orders` o
+                ON (o.`reference` = op.`order_reference` AND o.`valid` = 1)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0)
+            WHERE op.`payment_method` IS NOT NULL AND op.`payment_method` != ""'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            ORDER BY op.`payment_method`'
         );
     }
 }
