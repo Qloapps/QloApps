@@ -3842,9 +3842,10 @@ class AdminControllerCore extends Controller
                 if ($key == 'passwd' && Tools::getValue('id_'.$table) && empty($value)) {
                     continue;
                 }
-                /* Automatically encrypt password in MD5 */
+                /* Automatically hash password */
                 if ($key == 'passwd' && !empty($value)) {
-                    $value = Tools::encrypt($value);
+                    $objHash = new PasswordHashing();
+                    $value = $objHash->passwordHash($value);
                 }
                 $object->{$key} = $value;
             }
