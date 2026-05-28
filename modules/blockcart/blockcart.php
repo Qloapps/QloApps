@@ -121,7 +121,7 @@ class Blockcart extends Module
 
             if (!$product['booking_product']) {
                 $product['hasOptions'] = ServiceProductOption::productHasOptions($product['id_product']);
-                if (Product::isSellableAsStandalone($product['selling_preference_type'])) {
+                if (Product::isSellableAsStandalone($product['id_product'])) {
                     $product['total_price_tax_incl'] = 0;
                     $product['total_price_tax_excl'] = 0;
                     $product['amount'] = 0;
@@ -148,7 +148,7 @@ class Blockcart extends Module
                     $nbTotalProducts += (int) $product['standalone_total_qty'];
                 }
 
-                if (Product::isSellableWithHotel($product['selling_preference_type'])) {
+                if (Product::isSellableWithHotel($product['id_product'])) {
                     if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                         $params['cart']->id,
                         [(int) $product['selling_preference_type']],
@@ -322,8 +322,8 @@ class Blockcart extends Module
                 $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from'], null, $fullDate);
                 $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to'], null, $fullDate);
             } else {
-                $canSellWithHotel = Product::isSellableWithHotel($objProduct->selling_preference_type);
-                $canSellStandalone = Product::isSellableAsStandalone($objProduct->selling_preference_type);
+                $canSellWithHotel = Product::isSellableWithHotel($objProduct->id);
+                $canSellStandalone = Product::isSellableAsStandalone($objProduct->id);
 
                 if ($canSellWithHotel && !empty($addedProduct['id_hotel'])) {
                     $addedProduct['unit_price'] = RoomTypeServiceProductPrice::getPrice(

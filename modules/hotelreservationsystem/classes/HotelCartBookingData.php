@@ -961,9 +961,9 @@ class HotelCartBookingData extends ObjectModel
                         if (!$product->active || (!$forAdminCart && !$product->available_for_order)) {
                             $toRemoveService = 1;
                         } else if ($checkServiceRoomLink) {
-                            $isSellableWithRoomType = Product::isSellableWithRoomType($product->selling_preference_type);
-                            $isSellableWithHotel = Product::isSellableWithHotel($product->selling_preference_type);
-                            $isSellableAsStandalone = Product::isSellableAsStandalone($product->selling_preference_type);
+                            $isSellableWithRoomType = Product::isSellableWithRoomType($product->id);
+                            $isSellableWithHotel = Product::isSellableWithHotel($product->id);
+                            $isSellableAsStandalone = Product::isSellableAsStandalone($product->id);
 
                             if (ServiceProductOption::productHasOptions($service['id_product'])) {
                                 $skipOptionValidation = false;

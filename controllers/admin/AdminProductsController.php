@@ -418,7 +418,7 @@ class AdminProductsControllerCore extends AdminController
         $allServiceProducts = array_values(array_filter(
             $objProduct->getServiceProducts(null),
             function ($serviceProduct) {
-                return Product::isSellableWithRoomType($serviceProduct['selling_preference_type']);
+                return Product::isSellableWithRoomType($serviceProduct['id_product']);
             }
         ));
         $serviceProducts = array();
@@ -3227,7 +3227,7 @@ class AdminProductsControllerCore extends AdminController
                 $allServiceProducts = array_values(array_filter(
                     $obj->getServiceProducts(null),
                     function ($serviceProduct) {
-                        return Product::isSellableWithRoomType($serviceProduct['selling_preference_type']);
+                        return Product::isSellableWithRoomType($serviceProduct['id_product']);
                     }
                 ));
 

@@ -390,7 +390,7 @@ class OrderDetailCore extends ObjectModel
         /**
          * Calculate tax rule groups for the service product based on each associated room type.
          */
-        if (!$this->is_booking_product && Product::isSellableWithRoomType($this->selling_preference_type)) {
+        if (!$this->is_booking_product && $this->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) {
             if ($this->product_auto_add && $this->product_price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM) {
                 return true;
             }

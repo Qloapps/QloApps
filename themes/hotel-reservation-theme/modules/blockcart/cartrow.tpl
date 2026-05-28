@@ -55,7 +55,7 @@
                     {elseif $product.allow_multiple_quantity}
                         {if isset($hotel_wise_data.id_hotel) && $hotel_wise_data.id_hotel}
                             <span class="quantity product_info_data">{$hotel_wise_data.total_qty}</span>
-                        {elseif Product::isSellableAsStandalone($product.selling_preference_type)}
+                        {elseif Product::isSellableAsStandalone($product.id_product)}
                             <span class="quantity product_info_data">{$product.standalone_total_qty|intval}</span>
                         {/if}
                     {/if}

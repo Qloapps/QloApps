@@ -607,9 +607,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                         foreach ($cart_htl_data[$type_key]['date_diff'] as $key => &$value) {
                             $value['avg_paid_unit_price_tax_excl'] = Tools::ps_round($value['avg_paid_unit_price_tax_excl'] / $value['num_rm'], 6);
                         }
-                    } else if (
-                        Product::isSellableWithHotel($type_value['selling_preference_type'])
-                        || Product::isSellableAsStandalone($type_value['selling_preference_type'])
+                    } else if (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $type_value['selling_preference_type']
+                        || Product::SELLING_PREFERENCE_STANDALONE == $type_value['selling_preference_type']
                     ) {
                         $serviceProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($order_obj->id, $type_value['id_order_detail'], $type_value['product_id']);
                         if ($taxes = OrderDetail::getTaxListStatic($type_value['id_order_detail'])) {
@@ -623,17 +622,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $order_detail_tax_label = HTMLTemplateInvoice::l('No tax');
                         }
                         foreach ($serviceProducts as $serviceProduct) {
-                            $isStandaloneRow = empty($serviceProduct['id_hotel']) && empty($serviceProduct['id_htl_booking_detail']);
-                            $isHotelRow = !empty($serviceProduct['id_hotel']) && empty($serviceProduct['id_htl_booking_detail']);
-
-                            if (!(
-                                ($isStandaloneRow && Product::isSellableAsStandalone($type_value['selling_preference_type']))
-                                || ($isHotelRow && Product::isSellableWithHotel($type_value['selling_preference_type']))
-                            )) {
-                                continue;
-                            }
-
-                            if ($isHotelRow) {
+                            if ($serviceProduct['id_hotel']) {
                                 $objHotel = new HotelBranchInformation($serviceProduct['id_hotel'], $order_obj->id_lang);
                                 $serviceProduct['hotel_name'] = $objHotel->hotel_name;
                             }

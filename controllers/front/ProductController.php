@@ -135,12 +135,12 @@ class ProductControllerCore extends FrontController
         // if product is a service product then check type of selling preference
         if (!$this->product->booking_product) {
             if (
-                Product::isSellableWithRoomType($this->product->selling_preference_type)
-                && !Product::isSellableWithHotel($this->product->selling_preference_type)
-                && !Product::isSellableAsStandalone($this->product->selling_preference_type)
+                Product::isSellableWithRoomType($this->product->id)
+                && !Product::isSellableWithHotel($this->product->id)
+                && !Product::isSellableAsStandalone($this->product->id)
             ) {
                 Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-            } elseif (Product::isSellableWithHotel($this->product->selling_preference_type)) {
+            } elseif (Product::isSellableWithHotel($this->product->id)) {
                 // For any hotel-sellable service product, ensure hotel associations exist.
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $associatedHotels = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($this->product->id);
@@ -921,9 +921,9 @@ class ProductControllerCore extends FrontController
         $buying_option = false
     ) {
         $smartyVars = array();
-        $smartyVars['sellable_with_hotel'] = Product::isSellableWithHotel($this->product->selling_preference_type);
-        $smartyVars['sellable_as_standalone'] = Product::isSellableAsStandalone($this->product->selling_preference_type);
-        if (Product::isSellableWithHotel($this->product->selling_preference_type)) {
+        $smartyVars['sellable_with_hotel'] = Product::isSellableWithHotel($this->product->id);
+        $smartyVars['sellable_as_standalone'] = Product::isSellableAsStandalone($this->product->id);
+        if (Product::isSellableWithHotel($this->product->id)) {
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
 
             if ($associatedHotels = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($this->product->id)['hotel']) {

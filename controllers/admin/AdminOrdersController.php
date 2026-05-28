@@ -3357,14 +3357,14 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $product['image_link'] = $this->context->link->getImageLink($objProduct->link_rewrite, $this->context->language->iso_code.'-default', 'small_default');
             }
-            if (Product::isSellableWithHotel($product['selling_preference_type'])
-                || Product::isSellableAsStandalone($product['selling_preference_type'])
+            if (Product::isSellableWithHotel($product['product_id'])
+                || Product::isSellableAsStandalone($product['product_id'])
             ) {
                 $serviceProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($order->id, $product['id_order_detail'], $product['product_id']);
                 foreach ($serviceProducts as $serviceProduct) {
-                    if (!empty($serviceProduct['id_hotel']) && Product::isSellableWithHotel($product['selling_preference_type'])) {
+                    if (!empty($serviceProduct['id_hotel']) && Product::isSellableWithHotel($product['product_id'])) {
                         $orderHotelServiceProducts[] = array_merge($product, $serviceProduct);
-                    } elseif (!$serviceProduct['id_hotel'] && !$serviceProduct['id_htl_booking_detail'] && Product::isSellableAsStandalone($product['selling_preference_type'])) {
+                    } elseif (!$serviceProduct['id_hotel'] && !$serviceProduct['id_htl_booking_detail'] && Product::isSellableAsStandalone($product['product_id'])) {
                         $orderStandaloneServiceProducts[] = array_merge($product, $serviceProduct);
                     }
                 }
@@ -3702,10 +3702,10 @@ class AdminOrdersControllerCore extends AdminController
         $hotelStandaloneProducts = array();
         $standaloneProducts = array();
         foreach ($allServiceProducts as $serviceProduct) {
-            if (Product::isSellableWithHotel($serviceProduct['selling_preference_type'])) {
+            if (Product::isSellableWithHotel($serviceProduct['id_product'])) {
                 $hotelStandaloneProducts[] = $serviceProduct;
             }
-            if (Product::isSellableAsStandalone($serviceProduct['selling_preference_type'])) {
+            if (Product::isSellableAsStandalone($serviceProduct['id_product'])) {
                 $standaloneProducts[] = $serviceProduct;
             }
         }
@@ -4484,9 +4484,9 @@ class AdminOrdersControllerCore extends AdminController
 
         if ($product->booking_product
             || (
-                Product::isSellableWithRoomType($product->selling_preference_type)
-                && !Product::isSellableWithHotel($product->selling_preference_type)
-                && !Product::isSellableAsStandalone($product->selling_preference_type)
+                Product::isSellableWithRoomType($product->id)
+                && !Product::isSellableWithHotel($product->id)
+                && !Product::isSellableAsStandalone($product->id)
             )
         ) {  die(Tools::jsonEncode(array(
                 'result' => false,
@@ -5585,14 +5585,14 @@ class AdminOrdersControllerCore extends AdminController
             $response['error'] = Tools::displayError('The product object cannot be loaded.');
         }  elseif ($objProduct->booking_product
             || (
-                Product::isSellableWithRoomType($objProduct->selling_preference_type)
-                && !Product::isSellableWithHotel($objProduct->selling_preference_type)
-                && !Product::isSellableAsStandalone($objProduct->selling_preference_type)
+                Product::isSellableWithRoomType($objProduct->id)
+                && !Product::isSellableWithHotel($objProduct->id)
+                && !Product::isSellableAsStandalone($objProduct->id)
             )
         ) {
             $response['status'] = false;
             $response['error'] = Tools::displayError('Invalid product. Please try adding any other product.');
-        } elseif (!Product::isSellableAsStandalone($objProduct->selling_preference_type)
+        } elseif (!Product::isSellableAsStandalone($objProduct->id)
             && (!$addressTax->id_hotel
             || !Validate::isLoadedObject($objHotel = new HotelBranchInformation($addressTax->id_hotel)))
         ) {
@@ -5692,8 +5692,8 @@ class AdminOrdersControllerCore extends AdminController
             if ($response['status']) {
                 // If product is standalone and current order is for a hotel then we have to create a new order for this product
                 $response['new_id_order'] = 0;
-                if (Product::isSellableAsStandalone($objProduct->selling_preference_type)
-                    && !Product::isSellableWithHotel($objProduct->selling_preference_type)
+                if (Product::isSellableAsStandalone($objProduct->id)
+                    && !Product::isSellableWithHotel($objProduct->id)
                     && $addressTax->id_hotel
                 ) {
                     $objPaymentModule = new BoOrder();
@@ -5777,9 +5777,9 @@ class AdminOrdersControllerCore extends AdminController
 
                     $objOrderDetail = new OrderDetail();
                     $cartProducts = $objCart->getProducts();
-                    if (Product::isSellableWithHotel($cartProducts[0]['selling_preference_type']) && $addressTax->id_hotel) {
+                    if (Product::isSellableWithHotel($cartProducts[0]['id_product']) && $addressTax->id_hotel) {
                         $cartProducts[0]['selling_preference_type'] = Product::SELLING_PREFERENCE_HOTEL_STANDALONE;
-                    } elseif (Product::isSellableAsStandalone($cartProducts[0]['selling_preference_type'])) {
+                    } elseif (Product::isSellableAsStandalone($cartProducts[0]['id_product'])) {
                         $cartProducts[0]['selling_preference_type'] = Product::SELLING_PREFERENCE_STANDALONE;
                     }
                     $objOrderDetail->createList($objOrder, $objCart, $objOrder->getCurrentOrderState(), $cartProducts, (isset($objOrderInvoice) ? $objOrderInvoice->id : 0), $useTaxes, (int)Tools::getValue('add_product_warehouse'));
@@ -7993,7 +7993,7 @@ class AdminOrdersControllerCore extends AdminController
                                     $product['total'] = $totalPriceTaxExcl;
                                     $product['total_wt'] = $totalPriceTaxIncl;
 
-                                    if (Product::isSellableWithRoomType($product['selling_preference_type'])) {
+                                    if (Product::isSellableWithRoomType($product['id_product'])) {
                                         $product['selling_preference_type'] = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
                                     }
                                 }

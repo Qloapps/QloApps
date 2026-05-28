@@ -827,7 +827,7 @@ class CartCore extends ObjectModel
         $serviceProducts = array();
         $context = Context::getContext();
         foreach ($productList as $key => $product) {
-            if (!$product['booking_product'] && Product::isSellableAsStandalone($product['selling_preference_type'] && !Product::isSellableWithRoomType($product['selling_preference_type']))) {
+            if (!$product['booking_product'] && Product::isSellableAsStandalone($product['id_product']) && !Product::isSellableWithRoomType($product['id_product'])) {
                 if (Validate::isLoadedObject(
                     $objProduct = new Product($product['id_product'], false, $this->id_lang)
                 )) {
@@ -1659,9 +1659,9 @@ class CartCore extends ObjectModel
                     continue;
                 }
 
-                $canSellWithRoomType = Product::isSellableWithRoomType($product['selling_preference_type']);
-                $canSellWithHotel = Product::isSellableWithHotel($product['selling_preference_type']);
-                $canSellAsStandalone = Product::isSellableAsStandalone($product['selling_preference_type']);
+                $canSellWithRoomType = Product::isSellableWithRoomType($product['id_product']);
+                $canSellWithHotel = Product::isSellableWithHotel($product['id_product']);
+                $canSellAsStandalone = Product::isSellableAsStandalone($product['id_product']);
 
                 if ($canSellWithRoomType) {
                     if ($type == Cart::ONLY_STANDALONE_PRODUCTS && !$canSellAsStandalone && !$canSellWithHotel) {
@@ -1753,9 +1753,6 @@ class CartCore extends ObjectModel
                 $products_total[$id_tax_rules_group.'_'.$id_address] = 0;
             }
             if (!$product['booking_product']) {
-                $canSellWithRoomType = Product::isSellableWithRoomType($product['selling_preference_type']);
-                $canSellWithHotel = Product::isSellableWithHotel($product['selling_preference_type']);
-                $canSellAsStandalone = Product::isSellableAsStandalone($product['selling_preference_type']);
                 $isRoomServiceTotalType = in_array($type, array(
                     Cart::ONLY_ROOM_SERVICES,
                     Cart::ONLY_CONVENIENCE_FEE,
@@ -1764,10 +1761,28 @@ class CartCore extends ObjectModel
                     Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE,
                 ));
 
-                if ($canSellAsStandalone && !$isRoomServiceTotalType) {
-                    $idHotelCartBooking = isset($product['id_hotel_cart_booking']) ? (int)$product['id_hotel_cart_booking'] : 0;
-                    $idHotel = isset($product['id_hotel']) ? (int)$product['id_hotel'] : 0;
+                $singleContextSellTypes = [
+                    Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
+                    Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
+                    Product::SELLING_PREFERENCE_STANDALONE,
+                ];
+                $specificSellType = ($param_product
+                    && isset($product['selling_preference_type'])
+                    && in_array((int)$product['selling_preference_type'], $singleContextSellTypes))
+                    ? (int)$product['selling_preference_type']
+                    : null;
 
+                $sellsAsStandalone = $specificSellType !== null
+                    ? ($specificSellType === Product::SELLING_PREFERENCE_STANDALONE)
+                    : Product::isSellableAsStandalone($product['id_product']);
+                $sellsWithHotel = $specificSellType !== null
+                    ? ($specificSellType === Product::SELLING_PREFERENCE_HOTEL_STANDALONE)
+                    : Product::isSellableWithHotel($product['id_product']);
+                $sellsWithRoomType = $specificSellType !== null
+                    ? ($specificSellType === Product::SELLING_PREFERENCE_WITH_ROOM_TYPE)
+                    : Product::isSellableWithRoomType($product['id_product']);
+
+                if ($sellsAsStandalone && !$isRoomServiceTotalType) {
                     if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                         $this->id,
                         [],
@@ -1791,8 +1806,8 @@ class CartCore extends ObjectModel
                         }
                     }
 
-                }  
-                if ($canSellWithHotel ) {
+                }
+                if ($sellsWithHotel) {
                     if ($type == Cart::ONLY_ROOM_SERVICES
                         || $type == Cart::ONLY_CONVENIENCE_FEE
                         || $type == Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD
@@ -1829,7 +1844,7 @@ class CartCore extends ObjectModel
 
                     if ($serviceProducts) {
                         foreach ($serviceProducts as $serviceProduct) {
-                            if(!empty($serviceProduct['id_hotel']) && empty($serviceProduct['id_hotel_cart_booking'])) {
+                            if (!empty($serviceProduct['id_hotel']) && empty($serviceProduct['id_hotel_cart_booking'])) {
                                 if ($with_taxes) {
                                     $priceAdd = $serviceProduct['total_price_tax_incl'];
                                 } else {
@@ -1845,7 +1860,7 @@ class CartCore extends ObjectModel
                         }
                     }
                 }  
-                if ($canSellWithRoomType && $type !== Cart::ONLY_STANDALONE_PRODUCTS) {
+                if ($sellsWithRoomType && $type !== Cart::ONLY_STANDALONE_PRODUCTS) {
 
                     if ($servicesWithRoom = $objServiceProductCartDetail->getServiceProductsInCart(
                         $this->id,
@@ -2436,7 +2451,7 @@ class CartCore extends ObjectModel
                             }
                         }
                     } else {
-                        if (Product::isSellableWithRoomType($product['selling_preference_type'])) {
+                        if (Product::isSellableWithRoomType($product['id_product'])) {
                             // get standard products which are booked for room types
                             // send id_hotel = 0 for standard products with room types
                             if ($selectedServiceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
@@ -2509,7 +2524,7 @@ class CartCore extends ObjectModel
                                 }
                             }
                         }
-                        if (Product::isSellableAsStandalone($product['selling_preference_type'])) { 
+                        if (Product::isSellableAsStandalone($product['id_product'])) {
                             if ($selectedServiceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                 $this->id,
                                 [],
@@ -2566,8 +2581,7 @@ class CartCore extends ObjectModel
                                 }
                             }
                         }
-
-                        if (Product::isSellableWithHotel($product['selling_preference_type'])) {
+                        if (Product::isSellableWithHotel($product['id_product'])) {
                             if ($selectedServiceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                 $this->id,
                                 [],
@@ -3198,11 +3212,9 @@ class CartCore extends ObjectModel
             $id_address = HotelRoomType::getHotelIdAddressByIdProduct($id_product);
         } else {
             // if the product is a standard product the get the address as per the selling preference
-            $sellingPreferenceType = Product::getSellingPreferenceType($id_product);
-
-            $canSellWithRoomType = Product::isSellableWithRoomType($sellingPreferenceType);
-            $canSellWithHotel = Product::isSellableWithHotel($sellingPreferenceType);
-            $canSellAsStandalone = Product::isSellableAsStandalone($sellingPreferenceType);
+            $canSellWithRoomType = Product::isSellableWithRoomType($id_product);
+            $canSellWithHotel = Product::isSellableWithHotel($id_product);
+            $canSellAsStandalone = Product::isSellableAsStandalone($id_product);
 
             if ($canSellWithHotel) {
                 if ($htlAddress = HotelBranchInformation::getAddress($id_hotel)) {

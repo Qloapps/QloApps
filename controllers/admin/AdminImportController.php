@@ -1901,7 +1901,7 @@ class AdminImportControllerCore extends AdminController
                                 }
 
                                 $objServiceProduct = new Product($idServiceProduct);
-                                if (Product::isSellableWithRoomType($objServiceProduct->selling_preference_type)) {
+                                if (Product::isSellableWithRoomType($objServiceProduct->id)) {
                                     $objRoomTypeServiceProduct->addRoomProductLink(
                                         $objServiceProduct->id,
                                         $product->id,
@@ -2329,7 +2329,7 @@ class AdminImportControllerCore extends AdminController
                     $info['shop'] = explode($this->multiple_value_separator, $info['shop']);
 
                     RoomTypeServiceProduct::deleteRoomProductLink($product->id);
-                    if (Product::isSellableWithRoomType($product->selling_preference_type)) {
+                    if (Product::isSellableWithRoomType($product->id)) {
                         $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                         if (isset($info['id_room_types']) && $info['id_room_types']) {
                             $objRoomTypeServiceProduct->addRoomProductLink(

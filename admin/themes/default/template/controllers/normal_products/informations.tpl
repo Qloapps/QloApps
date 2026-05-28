@@ -241,21 +241,21 @@
 			<div class="checkbox">
 				<label>
 					<input type="checkbox" id="sp_with_room_type"
-						{if Product::isSellableWithRoomType($product->selling_preference_type) }checked="checked"{/if}>
+						{if Product::isSellableWithRoomType($product->id) }checked="checked"{/if}>
 					{l s='Sell With Room Type'}
 				</label>
 			</div>
 			<div class="checkbox">
 				<label>
 					<input type="checkbox" id="sp_with_hotel"
-						{if Product::isSellableWithHotel($product->selling_preference_type)}checked="checked"{/if}>
+						{if Product::isSellableWithHotel($product->id)}checked="checked"{/if}>
 					{l s='Sell With Hotel'}
 				</label>
 			</div>
 			<div class="checkbox">
 				<label>
 					<input type="checkbox" id="sp_standalone"
-						{if Product::isSellableAsStandalone($product->selling_preference_type) }checked="checked"{/if}>
+						{if Product::isSellableAsStandalone($product->id) }checked="checked"{/if}>
 					{l s='Sell With Standalone'}
 				</label>
 			</div>

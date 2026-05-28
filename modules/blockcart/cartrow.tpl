@@ -11,7 +11,7 @@
             </div>
         {/block}
         {block name='blockcart_shopping_cart_hotel_name'}
-            {if Product::isSellableWithHotel($product.selling_preference_type)}
+            {if Product::isSellableWithHotel($product.id_product)}
                 <div class="hotel-name">
                     {$hotel_wise_data.hotel_name|escape:'html':'UTF-8'}
                 </div>
@@ -29,7 +29,7 @@
                     {if !isset($product.is_gift) || !$product.is_gift}
                         {if $product.booking_product}
                             {displayWtPrice p="`$product.bookingData.total_room_type_amount`"}
-                        {else if Product::isSellableWithHotel($product.selling_preference_type)}
+                        {else if Product::isSellableWithHotel($product.id_product)}
                             {if $priceDisplay == $smarty.const.PS_TAX_EXC}{displayWtPrice p="`$hotel_wise_data.total_price_tax_excl`"}{else}{displayWtPrice p="`$hotel_wise_data.total_price_tax_incl`"}{/if}
                         {else}
                             {if $priceDisplay == $smarty.const.PS_TAX_EXC}{displayWtPrice p="`$product.total_price_tax_excl`"}{else}{displayWtPrice p="`$product.total_price_tax_incl`"}{/if}
@@ -53,9 +53,9 @@
                     {if $product.booking_product}
                         <span class="quantity product_info_data">{$product.bookingData['total_num_rooms']}</span>
                     {elseif $product.allow_multiple_quantity}
-                        {if Product::isSellableWithHotel($product.selling_preference_type)}
+                        {if Product::isSellableWithHotel($product.id_product)}
                             <span class="quantity product_info_data">{$hotel_wise_data.total_qty}</span>
-                        {elseif Product::isSellableAsStandalone($product.selling_preference_type)}
+                        {elseif Product::isSellableAsStandalone($product.id_product)}
                             <span class="quantity product_info_data">{$product.cart_quantity}</span>
                         {/if}
                     {/if}
@@ -99,9 +99,9 @@
         {/block}
     {else if $product.hasOptions}
         {block name='blockcart_shopping_cart_options'}
-            {if Product::isSellableWithHotel($product.selling_preference_type)}
+            {if Product::isSellableWithHotel($product.id_product)}
                 {assign var='options' value=$hotel_wise_data.options}
-            {else if Product::isSellableAsStandalone($product.selling_preference_type)}
+            {else if Product::isSellableAsStandalone($product.id_product)}
                 {assign var='options' value=$product.options}
             {/if}
             <div class="table-responsive cart_prod_cont">

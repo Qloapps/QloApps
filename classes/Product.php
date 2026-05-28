@@ -6938,64 +6938,33 @@ class ProductCore extends ObjectModel
         }
     }
     
-    public static function getSellingPreferenceChannels($sellingPreferenceType)
+    public static function isSellableWithRoomType($idProduct)
     {
-        $channels = [
-            'with_room_type' => false,
-            'with_hotel'     => false,
-            'standalone'     => false,
-        ];
-
-        switch ((int) $sellingPreferenceType) {
-            case self::SELLING_PREFERENCE_WITH_ROOM_TYPE:
-                $channels['with_room_type'] = true;
-                break;
-
-            case self::SELLING_PREFERENCE_HOTEL_STANDALONE:
-                $channels['with_hotel'] = true;
-                break;
-
-            case self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE:
-                $channels['with_room_type'] = true;
-                $channels['with_hotel']     = true;
-                break;
-
-            case self::SELLING_PREFERENCE_STANDALONE:
-                $channels['standalone'] = true;
-                break;
-
-            case self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE:
-                $channels['with_hotel'] = true;
-                $channels['standalone'] = true;
-                break;
-
-            case self::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE:
-                $channels['with_room_type'] = true;
-                $channels['standalone']     = true;
-                break;
-
-            case self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE:
-                $channels['with_room_type'] = true;
-                $channels['with_hotel']     = true;
-                $channels['standalone']     = true;
-                break;
-        }
-
-        return $channels;
+        return in_array((int) self::getSellingPreferenceType($idProduct), [
+            self::SELLING_PREFERENCE_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        ]);
     }
 
-    public static function isSellableWithRoomType($sellingPreferenceType)
+    public static function isSellableWithHotel($idProduct)
     {
-        return self::getSellingPreferenceChannels($sellingPreferenceType)['with_room_type'];
+        return in_array((int) self::getSellingPreferenceType($idProduct), [
+            self::SELLING_PREFERENCE_HOTEL_STANDALONE,
+            self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        ]);
     }
 
-    public static function isSellableWithHotel($sellingPreferenceType)
+    public static function isSellableAsStandalone($idProduct)
     {
-        return self::getSellingPreferenceChannels($sellingPreferenceType)['with_hotel'];
-    }
-
-    public static function isSellableAsStandalone($sellingPreferenceType)
-    {
-        return self::getSellingPreferenceChannels($sellingPreferenceType)['standalone'];
+        return in_array((int) self::getSellingPreferenceType($idProduct), [
+            self::SELLING_PREFERENCE_STANDALONE,
+            self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        ]);
     }
 }

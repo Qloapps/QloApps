@@ -415,7 +415,7 @@ class OrderInvoiceCore extends ObjectModel
         $order_detail = array_filter($order_detail, function($v) {
             return ($v['is_booking_product']
                 || ($v['product_auto_add']
-                    && Product::isSellableWithRoomType($v['selling_preference_type'])
+                    && $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE
                     && $v['product_price_addition_type'] == ProductCore::PRICE_ADDITION_TYPE_WITH_ROOM)
             );
         });
@@ -480,7 +480,7 @@ class OrderInvoiceCore extends ObjectModel
         $breakdown = array();
         $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
-            return (!$v['is_booking_product'] && !$v['product_auto_add'] && Product::isSellableWithRoomType($v['selling_preference_type']));
+            return (!$v['is_booking_product'] && !$v['product_auto_add'] && $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
         });
 
         $details = $order->getProductTaxesDetails($order_detail, false,Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
@@ -545,7 +545,7 @@ class OrderInvoiceCore extends ObjectModel
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product']
                 && $v['product_auto_add']
-                && Product::isSellableWithRoomType($v['selling_preference_type'])
+                && $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE
                 && $v['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT
             );
         });
@@ -612,8 +612,8 @@ class OrderInvoiceCore extends ObjectModel
         $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product'] && (
-                Product::isSellableAsStandalone($v['selling_preference_type'])
-                || Product::isSellableWithHotel($v['selling_preference_type'])
+                $v['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE
+                || $v['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
             ));
         });
       

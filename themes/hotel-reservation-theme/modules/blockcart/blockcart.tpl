@@ -63,15 +63,15 @@
 											<dl class="products">
 												{foreach from=$products key=data_k item='product' name='myLoop'}
 												{* only show products that are booking or global without room *}
-													{if $product.booking_product || Product::isSellableAsStandalone($product.selling_preference_type) || Product::isSellableWithHotel($product.selling_preference_type)}
-														{if Product::isSellableWithHotel($product.selling_preference_type) && isset($product.hotel_wise_data) && $product.hotel_wise_data}
+													{if $product.booking_product || Product::isSellableAsStandalone($product.id_product) || Product::isSellableWithHotel($product.id_product)}
+														{if Product::isSellableWithHotel($product.id_product) && isset($product.hotel_wise_data) && $product.hotel_wise_data}
 															{foreach $product.hotel_wise_data as $hotel_wise_data}
 																{include file="./cartrow.tpl" hotel_wise_data=$hotel_wise_data}
 															{/foreach}
 														{/if}
 														{if $product.booking_product
-															|| (!Product::isSellableWithHotel($product.selling_preference_type) && !Product::isSellableWithRoomType($product.selling_preference_type))
-															|| (Product::isSellableAsStandalone($product.selling_preference_type) && $product.standalone_total_qty > 0)}
+															|| (!Product::isSellableWithHotel($product.id_product) && !Product::isSellableWithRoomType($product.id_product))
+															|| (Product::isSellableAsStandalone($product.id_product) && $product.standalone_total_qty > 0)}
 															{include file="./cartrow.tpl" hotel_wise_data=false}
 														{/if}
 													{/if}

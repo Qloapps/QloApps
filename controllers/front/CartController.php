@@ -180,8 +180,8 @@ class CartControllerCore extends FrontController
             }
         } else {
             $idProductOption = Tools::getValue('id_product_option', null);
-            $canSellWithHotel = Product::isSellableWithHotel($product->selling_preference_type);
-            $canSellStandalone = Product::isSellableAsStandalone($product->selling_preference_type);
+            $canSellWithHotel = Product::isSellableWithHotel($product->id);
+            $canSellStandalone = Product::isSellableAsStandalone($product->id);
 
             if ($canSellWithHotel && $this->id_hotel) {
                 $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -460,8 +460,8 @@ class CartControllerCore extends FrontController
             $objHotelCartBookingData = new HotelCartBookingData();
             $idProductOption = Tools::getValue('id_product_option');
             $id_hotel = (int) Tools::getValue('id_hotel');
-            $canSellWithHotel = Product::isSellableWithHotel($product->selling_preference_type);
-            $canSellStandalone = Product::isSellableAsStandalone($product->selling_preference_type);
+            $canSellWithHotel = Product::isSellableWithHotel($product->id);
+            $canSellStandalone = Product::isSellableAsStandalone($product->id);
 
             if ($canSellWithHotel && $id_hotel) {
                 if ($operator == 'up') {
@@ -643,7 +643,7 @@ class CartControllerCore extends FrontController
                     }
                     $this->context->cookie->avail_rooms = $availQty;
                 } elseif (
-                    Product::isSellableWithHotel($product->selling_preference_type)
+                    Product::isSellableWithHotel($product->id)
                     && $id_hotel
                 ) {
                     $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -664,7 +664,7 @@ class CartControllerCore extends FrontController
                             'id_product_option' => isset($idProductOption) ? $idProductOption : null
                         ));
                     }
-                } elseif (Product::isSellableAsStandalone($product->selling_preference_type)) {
+                } elseif (Product::isSellableAsStandalone($product->id)) {
                     $objServiceProductCartDetail = new ServiceProductCartDetail();
                     $update_quantity = $objServiceProductCartDetail->updateCartServiceProduct(
                         $this->context->cart->id,

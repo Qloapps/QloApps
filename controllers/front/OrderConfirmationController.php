@@ -362,7 +362,7 @@ class OrderConfirmationControllerCore extends FrontController
 
                                     $totalRoomsBooked += 1;
                                 }
-                            } else if (Product::isSellableWithHotel($type_value['selling_preference_type'])) {
+                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
 
                                 if (!empty($cover_image_arr)) {
@@ -385,7 +385,7 @@ class OrderConfirmationControllerCore extends FrontController
                                     }
                                     $cart_hotel_service_products[] = $type_value;
                                 }
-                            } else if (Product::isSellableAsStandalone($type_value['selling_preference_type'])) {
+                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
 
                                 if (!empty($cover_image_arr)) {
