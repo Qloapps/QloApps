@@ -94,7 +94,7 @@
                                                             {$cartCurrency->sign}
                                                         </span>
                                                         <input class="service_cart_price_input" id="service_cart_price_{$selectedRoomServiceProduct['id']}_{$product['id_product']}" type="text" value="{$product.price_tax_exc}" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]"/>
-                                                        {if Product::getPriceCalculationApplicableDays(
+                                                        {if Product::getServicePriceBillableDays(
                                                             $product['price_calculation_method'],
                                                             $selectedRoomServiceProduct['date_from'],
                                                             $selectedRoomServiceProduct['date_to']

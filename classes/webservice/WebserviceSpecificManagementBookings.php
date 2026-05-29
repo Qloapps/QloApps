@@ -1193,7 +1193,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                             $objOrderDetail = new OrderDetail($service['id_order_detail']);
                             $objServiceProductOrderDetail = new ServiceProductOrderDetail($service['id_service_product_order_detail']);
                             $quantity = $objServiceProductOrderDetail->quantity;
-                            $quantity *= Product::getPriceCalculationApplicableDays(
+                            $quantity *= Product::getServicePriceBillableDays(
                                 $objOrderDetail->product_price_calculation_method,
                                 $objHotelBookingDetail->date_from,
                                 $objHotelBookingDetail->date_to
@@ -2312,7 +2312,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                             foreach ($services as $service) {
                                 $insertedServiceProductIdOrderDetail = $objBookingDetail->getLastInsertedServiceIdOrderDetail($objOrder->id, $service['id_product']);
                                 
-                                $numDays = Product::getPriceCalculationApplicableDays(
+                                $numDays = Product::getServicePriceBillableDays(
                                     Product::getProductPriceCalculation($service['id_product']),
                                     $objBookingDetail->date_from,
                                     $objBookingDetail->date_to
@@ -2670,7 +2670,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     foreach ($selectedAdditonalServices[$idHotelBooking]['additional_services'] as $service) {
                         $serviceOrderDetail = new OrderDetail($service['id_order_detail']);
                         $cart_quantity = $service['quantity'];
-                        $serviceApplicableDays = Product::getPriceCalculationApplicableDays(
+                        $serviceApplicableDays = Product::getServicePriceBillableDays(
                             $service['price_calculation_method'],
                             $dateFrom,
                             $dateTo
@@ -3189,7 +3189,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     $priceTaxExcl = $objServiceProductOrderDetail->total_price_tax_excl;
                     $priceTaxIncl = $objServiceProductOrderDetail->total_price_tax_incl;
                     $objHotelBookingDetail = new HotelBookingDetail($objServiceProductOrderDetail->id_htl_booking_detail);
-                    $numDays = Product::getPriceCalculationApplicableDays(
+                    $numDays = Product::getServicePriceBillableDays(
                         Product::getProductPriceCalculation($service['id_product']),
                         $objHotelBookingDetail->date_from,
                         $objHotelBookingDetail->date_to
@@ -3285,7 +3285,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     $insertedServiceProductIdOrderDetail = $objHotelBookingDetail->getLastInsertedServiceIdOrderDetail($objOrder->id, $service['id_product']);
                     $objOrderDetail = new OrderDetail($insertedServiceProductIdOrderDetail);
 
-                    $numDays = Product::getPriceCalculationApplicableDays(
+                    $numDays = Product::getServicePriceBillableDays(
                         Product::getProductPriceCalculation($product['id_product']),
                         $objHotelBookingDetail->date_from,
                         $objHotelBookingDetail->date_to
@@ -4214,7 +4214,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                 $services['id_service'] = (int) $service['id_product'];
                                 $services['name'] = $service['name'];
                                 $services['quantity'] = (int) $service['quantity'];
-                                $applicableDays = Product::getPriceCalculationApplicableDays(
+                                $applicableDays = Product::getServicePriceBillableDays(
                                     $service['price_calculation_method'],
                                     $additionalService['date_from'],
                                     $additionalService['date_to']

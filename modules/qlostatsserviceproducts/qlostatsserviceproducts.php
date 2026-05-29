@@ -182,11 +182,11 @@ class QloStatsServiceProducts extends ModuleGrid
         $numNightsSql = 'IFNULL(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0)';
         $applicableDaysSql = 'CASE
             WHEN spod.`id_htl_booking_detail` IS NULL OR spod.`id_htl_booking_detail` = 0 THEN 1
-            WHEN od.`product_price_calculation_method` IN ('.(int)Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY.', '.(int)Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY.') THEN 1
-            WHEN od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY.' THEN GREATEST('.$numNightsSql.' - 1, 1)
+            WHEN od.`product_price_calculation_method` IN ('.(int)Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY.', '.(int)Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY.') THEN 1
+            WHEN od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY.' THEN GREATEST('.$numNightsSql.' - 1, 1)
             WHEN od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY.' THEN 2
-            WHEN od.`product_price_calculation_method` IN ('.(int)Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY.', '.(int)Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY.') THEN GREATEST('.$numNightsSql.', 1)
-            WHEN od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY.' THEN GREATEST('.$numNightsSql.' + 1, 1)
+            WHEN od.`product_price_calculation_method` IN ('.(int)Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY.', '.(int)Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY.') THEN GREATEST('.$numNightsSql.', 1)
+            WHEN od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY.' THEN GREATEST('.$numNightsSql.' + 1, 1)
             ELSE GREATEST('.$numNightsSql.', 1)
         END';
 

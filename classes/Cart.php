@@ -2480,7 +2480,7 @@ class CartCore extends ObjectModel
                                             'id_hotel_cart_booking' => $selectedProduct['id_hotel_cart_booking'],
                                         );
                                     }
-                                    $numDays = Product::getPriceCalculationApplicableDays(
+                                    $numDays = Product::getServicePriceBillableDays(
                                         $selectedProduct['price_calculation_method'],
                                         $selectedProduct['date_from'],
                                         $selectedProduct['date_to']

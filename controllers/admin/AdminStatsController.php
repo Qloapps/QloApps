@@ -2421,9 +2421,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     IFNULL(SUM(
                         CASE
                             WHEN od.`purchase_supplier_price` <> "0.000000"
-                            THEN (od.`purchase_supplier_price` / (IF (od.`product_price_calculation_method` = '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY.', DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1)))
+                            THEN (od.`purchase_supplier_price` / (IF (od.`product_price_calculation_method` = '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY.', DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1)))
                             WHEN od.`purchase_supplier_price` = "0.000000"
-                            THEN ((od.`original_product_price` / o.`conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100) / (IF (od.`product_price_calculation_method` = '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY.', DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1))
+                            THEN ((od.`original_product_price` / o.`conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100) / (IF (od.`product_price_calculation_method` = '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY.', DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1))
                         END
                     ), 0)
                     FROM `'._DB_PREFIX_.'service_product_order_detail` rtspod

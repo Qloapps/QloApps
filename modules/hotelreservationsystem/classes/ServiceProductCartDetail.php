@@ -90,7 +90,7 @@ class ServiceProductCartDetail extends ObjectModel
                 )) {
                     $updateQty = $product['quantity'];
                     $objHotelCartBookingData = new HotelCartBookingData($htlCartBookingId);
-                    $numdays = Product::getPriceCalculationApplicableDays(
+                    $numdays = Product::getServicePriceBillableDays(
                         Product::getProductPriceCalculation($product['id_product']),
                         $objHotelCartBookingData->date_from,
                         $objHotelCartBookingData->date_to
@@ -251,7 +251,7 @@ class ServiceProductCartDetail extends ObjectModel
                             $product['htl_cart_booking_id']
                         );
                     } else {
-                        $numDays = Product::getPriceCalculationApplicableDays(
+                        $numDays = Product::getServicePriceBillableDays(
                             $objProduct->price_calculation_method,
                             $product['date_from'],
                             $product['date_to']
@@ -458,7 +458,7 @@ class ServiceProductCartDetail extends ObjectModel
 
         if ($objServiceProductCartDetail->save()) {
             if (Validate::isLoadedObject($objHotelCartBooking = new HotelCartBookingData($idHtlCartData))) {
-                $numDays = Product::getPriceCalculationApplicableDays(
+                $numDays = Product::getServicePriceBillableDays(
                     $objProduct->price_calculation_method,
                     $objHotelCartBooking->date_from,
                     $objHotelCartBooking->date_to
@@ -520,7 +520,7 @@ class ServiceProductCartDetail extends ObjectModel
                 if ($updateQunatity) {
                     if (Validate::isLoadedObject($objHotelCartBooking = new HotelCartBookingData($product['id_hotel_cart_booking']))) {
                         $objProduct = new Product((int) $product['id_product']);
-                        $numDays = Product::getPriceCalculationApplicableDays(
+                        $numDays = Product::getServicePriceBillableDays(
                             $objProduct->price_calculation_method,
                             $objHotelCartBooking->date_from,
                             $objHotelCartBooking->date_to

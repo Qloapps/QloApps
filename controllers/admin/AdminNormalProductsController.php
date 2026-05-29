@@ -200,13 +200,13 @@ class AdminNormalProductsControllerCore extends AdminController
             Product::PRICE_ADDITION_TYPE_INDEPENDENT => $this->l('Convenience Fee')
         );
         $priceCalculationMethod = array(
-            Product::PRICE_CALCULATION_METHOD_ONLY_CHECKIN_DAY => $this->l('Only check-in day'),
-            Product::PRICE_CALCULATION_METHOD_ONLY_CHECKOUT_DAY => $this->l('Only check-out day'),
-            Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY => $this->l('Only during-stay days'),
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY => $this->l('Only check-in day'),
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY => $this->l('Only check-out day'),
+            Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY => $this->l('Only during-stay days'),
             Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY => $this->l('Check-in and check-out days'),
-            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURINGSTAY => $this->l('Check-in | during-stay days'),
-            Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURINGSTAY => $this->l('Check-out | during-stay days'),
-            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY => $this->l('Check-in | check-out | during-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY => $this->l('Check-in | during-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY => $this->l('Check-out | during-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY => $this->l('Check-in | check-out | during-stay days'),
         );
 
         $this->_join .= '
@@ -331,12 +331,12 @@ class AdminNormalProductsControllerCore extends AdminController
         // Code For Standard product working
         $sellingPreferenceTypes = array(
             Product::SELLING_PREFERENCE_WITH_ROOM_TYPE => $this->l('With room type'),
-            Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With hotel|room type'),
+            Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE => $this->l('With hotel|room type'),
             Product::SELLING_PREFERENCE_STANDALONE => $this->l('Standalone'),
             Product::SELLING_PREFERENCE_HOTEL_STANDALONE => $this->l('With hotel'),
-            Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE => $this->l('With hotel|standalone'),
-            Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With room type|standalone'),
-            Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE => $this->l('With hotel|room type|standalone'),
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE => $this->l('With hotel|standalone'),
+            Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With room type|standalone'),
+            Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE => $this->l('With hotel|room type|standalone'),
         );
         $this->fields_list['selling_preference_type'] = array(
             'type' => 'select',
@@ -3016,15 +3016,15 @@ class AdminNormalProductsControllerCore extends AdminController
 
             $roomTypeSellingPreferences = array(
                 Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
             );
             $hotelSellingPreferences = array(
                 Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
             );
 
             if (in_array((int)$product->selling_preference_type, $roomTypeSellingPreferences, true)) {

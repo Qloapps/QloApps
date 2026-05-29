@@ -84,7 +84,7 @@
                                         <div class="input-group">
                                             <span class="input-group-addon">{$currencySign}</span>
                                             <input type="text" class="form-control unit_price" value="{Tools::ps_round($service['unit_price_tax_excl'], 2)}" data-id-product="{$service['id_product']}" name="service_price[{$service['id_service_product_order_detail']}]">
-                                            {if Product::getPriceCalculationApplicableDays(
+                                            {if Product::getServicePriceBillableDays(
                                                 $service.price_calculation_method,
                                                 $additionalServices['date_from'],
                                                 $additionalServices['date_to']
@@ -159,7 +159,7 @@
 										<div class="input-group">
 											<span class="input-group-addon">{$currencySign}</span>
 											<input type="text" class="form-control unit_price" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]" value="{$product['price_tax_exc']}" data-id-product="{$product.id_product}">
-												{if Product::getPriceCalculationApplicableDays(
+												{if Product::getServicePriceBillableDays(
                                                     $product['price_calculation_method'],
                                                     $additionalServices['date_from'],
                                                     $additionalServices['date_to']
@@ -315,7 +315,7 @@
                         </td>
 						<td>
 							{displayPrice price=$service['unit_price_tax_excl'] currency=$orderCurrency}
-								{if Product::getPriceCalculationApplicableDays(
+								{if Product::getServicePriceBillableDays(
                                     $service['price_calculation_method'],
                                     $additionalServices['date_from'],
                                     $additionalServices['date_to']

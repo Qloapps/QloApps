@@ -450,7 +450,7 @@ class OrderDetailCore extends ObjectModel
                         $taxGroupInfo['id_room_type'],
                 )) {
                     $serviceProductData = array_shift($serviceProductData);
-                    $numDays = Product::getPriceCalculationApplicableDays(
+                    $numDays = Product::getServicePriceBillableDays(
                         $this->product_price_calculation_method,
                         $serviceProductData['date_from'],
                         $serviceProductData['date_to']
@@ -484,7 +484,7 @@ class OrderDetailCore extends ObjectModel
                     $serviceProductData = array_shift($serviceProductData);
                     $unit_price_tax_excl = isset($serviceProductData['unit_price_tax_excl']) ? $serviceProductData['unit_price_tax_excl'] : 0;
 
-                    $numDays = Product::getPriceCalculationApplicableDays(
+                    $numDays = Product::getServicePriceBillableDays(
                         $this->product_price_calculation_method,
                         $serviceProductData['date_from'],
                         $serviceProductData['date_to']

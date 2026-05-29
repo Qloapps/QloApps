@@ -2155,7 +2155,7 @@ class HotelHelper
                 'price' => '250',
                 'auto_add_to_cart' => 1,
                 'show_at_front' => 0,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Room Maintenance Fees',
@@ -2187,7 +2187,7 @@ class HotelHelper
                 'price' => '250',
                 'auto_add_to_cart' => 1,
                 'show_at_front' => 0,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURINGSTAY,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_INDEPENDENT,
                 'en' => array(
                     'name' => 'Internet Handling Charges',
@@ -2220,7 +2220,7 @@ class HotelHelper
                 'price' => '50',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Airport Shuttle',
@@ -2252,7 +2252,7 @@ class HotelHelper
                 'price' => '200',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Cab on Demand',
@@ -2284,7 +2284,7 @@ class HotelHelper
                 'price' => '350',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Breakfast',
@@ -2316,7 +2316,7 @@ class HotelHelper
                 'price' => '450',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ONLY_DURINGSTAY_DAY,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Dinner',

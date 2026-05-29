@@ -140,22 +140,22 @@ var ajaxCart = {
             case SELLING_PREFERENCE_HOTEL_STANDALONE:
                 channels.with_hotel = true;
                 break;
-            case SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE:
+            case SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE:
                 channels.with_room_type = true;
                 channels.with_hotel = true;
                 break;
             case SELLING_PREFERENCE_STANDALONE:
                 channels.standalone = true;
                 break;
-            case SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE:
+            case SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE:
                 channels.with_hotel = true;
                 channels.standalone = true;
                 break;
-            case SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE:
+            case SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE:
                 channels.with_room_type = true;
                 channels.standalone = true;
                 break;
-            case SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE:
+            case SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE:
                 channels.with_room_type = true;
                 channels.with_hotel = true;
                 channels.standalone = true;

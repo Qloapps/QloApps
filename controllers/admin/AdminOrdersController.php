@@ -1013,7 +1013,7 @@ class AdminOrdersControllerCore extends AdminController
                                 unset($serviceProducts[$key]);
                             } else {
 
-                                $numDays = Product::getPriceCalculationApplicableDays(
+                                $numDays = Product::getServicePriceBillableDays(
                                     $servProduct['price_calculation_method'],
                                     $dateFrom,
                                     $dateTo
@@ -4184,9 +4184,9 @@ class AdminOrdersControllerCore extends AdminController
                 $products = array();
                 $standaloneSellingPreferenceTypes = array(
                     Product::SELLING_PREFERENCE_STANDALONE,
-                    Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
-                    Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
-                    Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                    Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                    Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+                    Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
                 );
                 foreach ($standaloneSellingPreferenceTypes as $sellingPreferenceType) {
                     if ($productsByType = Product::searchByName(
@@ -5396,7 +5396,7 @@ class AdminOrdersControllerCore extends AdminController
                     )) {
                         foreach ($services as $service) {
                             $insertedServiceProductIdOrderDetail = $objBookingDetail->getLastInsertedServiceIdOrderDetail($order->id, $service['id_product']);
-                            $numDays = Product::getPriceCalculationApplicableDays(
+                            $numDays = Product::getServicePriceBillableDays(
                                 Product::getProductPriceCalculation($service['id_product']),
                                 $objBookingDetail->date_from,
                                 $objBookingDetail->date_to
@@ -6197,12 +6197,12 @@ class AdminOrdersControllerCore extends AdminController
                         && count($orderServiceProduct['additional_services'])
                     ) {
                         foreach ($orderServiceProduct['additional_services'] as $serviceProduct) {
-                            $newNumDays = Product::getPriceCalculationApplicableDays(
+                            $newNumDays = Product::getServicePriceBillableDays(
                                 $serviceProduct['price_calculation_method'],
                                 $new_date_from,
                                 $new_date_to
                             );
-                            $oldNumDays = Product::getPriceCalculationApplicableDays(
+                            $oldNumDays = Product::getServicePriceBillableDays(
                                 $serviceProduct['price_calculation_method'],
                                 $old_date_from,
                                 $old_date_to
@@ -6589,7 +6589,7 @@ class AdminOrdersControllerCore extends AdminController
                 $serviceOrderDetail = new OrderDetail($service['id_order_detail']);
 
                 $cart_quantity = $service['quantity'];
-                $serviceApplicableDays = Product::getPriceCalculationApplicableDays(
+                $serviceApplicableDays = Product::getServicePriceBillableDays(
                     $service['price_calculation_method'],
                     $selectedAdditonalServices[$idHotelBooking]['date_from'],
                     $selectedAdditonalServices[$idHotelBooking]['date_to']
@@ -7452,7 +7452,7 @@ class AdminOrdersControllerCore extends AdminController
                             unset($serviceProducts[$key]);
                         } else {
 
-                            $numDays = Product::getPriceCalculationApplicableDays(
+                            $numDays = Product::getServicePriceBillableDays(
                                 $servProduct['price_calculation_method'],
                                 $dateFrom,
                                 $dateTo
@@ -7637,7 +7637,7 @@ class AdminOrdersControllerCore extends AdminController
                         $objServiceProductOrderDetail->quantity = $quantity;
                         $objServiceProductOrderDetail->unit_price_tax_excl = $unitPrice;
                         $objServiceProductOrderDetail->unit_price_tax_incl = $unitPrice * $oldTaxMultiplier;
-                        $numDays = Product::getPriceCalculationApplicableDays(
+                        $numDays = Product::getServicePriceBillableDays(
                             $objOrderDetail->product_price_calculation_method,
                             $objHotelBookingDetail->date_from,
                             $objHotelBookingDetail->date_to
@@ -7757,7 +7757,7 @@ class AdminOrdersControllerCore extends AdminController
 
                         if ($objProduct->allow_multiple_quantity && Validate::isUnsignedInt($qty[$service])) {
                             $finalQty = (int)$qty[$service];
-                            $numDays = Product::getPriceCalculationApplicableDays(
+                            $numDays = Product::getServicePriceBillableDays(
                                 Product::getProductPriceCalculation($service),
                                 $objHotelBookingDetail->date_from,
                                 $objHotelBookingDetail->date_to
@@ -7813,7 +7813,7 @@ class AdminOrdersControllerCore extends AdminController
                             $this->context->cart = $cart;
                             $this->context->customer = new Customer($order->id_customer);
 
-                            $numDays = Product::getPriceCalculationApplicableDays(
+                            $numDays = Product::getServicePriceBillableDays(
                                 Product::getProductPriceCalculation($service['id']),
                                 $objHotelBookingDetail->date_from,
                                 $objHotelBookingDetail->date_to
@@ -8133,7 +8133,7 @@ class AdminOrdersControllerCore extends AdminController
 
                                             $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                                             $cartProductProcessed = 1;
-                                            $numDays = Product::getPriceCalculationApplicableDays(
+                                            $numDays = Product::getServicePriceBillableDays(
                                                 Product::getProductPriceCalculation($objServiceProduct->id),
                                                 $objHotelBookingDetail->date_from,
                                                 $objHotelBookingDetail->date_to
@@ -8369,7 +8369,7 @@ class AdminOrdersControllerCore extends AdminController
 
                 if ($res &= $objServiceProductOrderDetail->delete()) {
                     $order = new Order($objServiceProductOrderDetail->id_order);
-                    $numDays = Product::getPriceCalculationApplicableDays(
+                    $numDays = Product::getServicePriceBillableDays(
                         $objOrderDetail->product_price_calculation_method,
                         $objHotelBookingDetail->date_from,
                         $objHotelBookingDetail->date_to

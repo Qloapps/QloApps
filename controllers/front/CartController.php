@@ -756,7 +756,7 @@ class CartControllerCore extends FrontController
                                     $this->errors[] = Tools::displayError('The quantity you\'ve entered is invalid.');
                                 } else {
                                     $cartTotalQty  = Cart::getProductQtyInCart((int)$this->context->cart->id,(int)$idServiceProduct);
-                                    $numDays = Product::getPriceCalculationApplicableDays(
+                                    $numDays = Product::getServicePriceBillableDays(
                                         $objProduct->price_calculation_method,
                                         $objHotelCartBookingData->date_from,
                                         $objHotelCartBookingData->date_to

@@ -2578,7 +2578,7 @@ class OrderCore extends ObjectModel
                     )) {
                         $totals = array_reduce($serviceProductDetail, function ($carry, $item) use ($order_detail) {
                             $objHotelBookingDetail = new HotelBookingDetail((int) $item['id_htl_booking_detail']);
-                            $numDays = Product::getPriceCalculationApplicableDays(
+                            $numDays = Product::getServicePriceBillableDays(
                                 $order_detail['product_price_calculation_method'],
                                 $objHotelBookingDetail->date_from,
                                 $objHotelBookingDetail->date_to
@@ -2633,7 +2633,7 @@ class OrderCore extends ObjectModel
                     // We are getting auto added service for specific room.There will be only on htl_booking_detail but can have multiple auto added service with room.
                     // Note: All the auto added service with room  have same id_tax_rule group 
                     $autoAddedServiceData = array_shift($autoAddedServiceData);
-                    $numDays = Product::getPriceCalculationApplicableDays(
+                    $numDays = Product::getServicePriceBillableDays(
                         $order_detail['product_price_calculation_method'],
                         $autoAddedServiceData['date_from'],
                         $autoAddedServiceData['date_to']

@@ -1217,7 +1217,7 @@ class AdminCartsControllerCore extends AdminController
                             continue;
                         }
 
-                        $numDays = Product::getPriceCalculationApplicableDays(
+                        $numDays = Product::getServicePriceBillableDays(
                             $servProduct['price_calculation_method'],
                             $dateFrom,
                             $dateTo
@@ -1568,7 +1568,7 @@ class AdminCartsControllerCore extends AdminController
                             continue;
                         }
 
-                        $numDays = Product::getPriceCalculationApplicableDays(
+                        $numDays = Product::getServicePriceBillableDays(
                             $servProduct['price_calculation_method'],
                             $objCartBookingData->date_from,
                             $objCartBookingData->date_to
@@ -1683,7 +1683,7 @@ class AdminCartsControllerCore extends AdminController
                                 $cartTotalQty = Cart::getProductQtyInCart($objCart->id, $idServiceProduct);
 
                                 $qty = (int)$serviceQuantities[$idServiceProduct];
-                                $numDays = Product::getPriceCalculationApplicableDays(
+                                $numDays = Product::getServicePriceBillableDays(
                                     $objProduct->price_calculation_method,
                                     $objHotelCartBookingData->date_from,
                                     $objHotelCartBookingData->date_to

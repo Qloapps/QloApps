@@ -592,7 +592,7 @@ abstract class PaymentModuleCore extends Module
                         if (!$product['booking_product']
                             && ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE
                                 || $product['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                                || $product['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
+                                || $product['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE
                             )
                         ) {
                             $cover_image_arr = $objProduct->getCover($product['id_product']);
@@ -1065,7 +1065,7 @@ abstract class PaymentModuleCore extends Module
 
                                     }
                                 }
-                            } elseif (Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE == $product['selling_preference_type']) {
+                            } elseif (Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE == $product['selling_preference_type']) {
                                 $idProductRoomType = null;
                                 $idProductHotel = null;
                                 if (isset($product['id_room_type']) && $product['id_room_type']) {
