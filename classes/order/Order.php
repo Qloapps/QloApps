@@ -2882,27 +2882,13 @@ class OrderCore extends ObjectModel
         }
         // check hotel linked products
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-        $serviceProducts = array();
-        $sellingPreferenceTypes = array(
-            Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
-            Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
-            Product::SELLING_PREFERENCE_STANDALONE,
-            Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
-            Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
-            Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
-        );
-        foreach ($sellingPreferenceTypes as $sellingPreferenceType) {
-            $serviceProducts = array_merge(
-                $serviceProducts,
-                $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, $sellingPreferenceType)
-            );
+        if ($hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)) {
+            $res &= $this->checkList($hotelProducts, $action, false);
+            $hasRoomsOrProducts = 1;
         }
-        $serviceProducts = array_filter($serviceProducts, function ($serviceProduct) {
-            return empty($serviceProduct['id_htl_booking_detail']);
-        });
 
-        if ($serviceProducts) {
-            $res &= $this->checkList($serviceProducts, $action, false);
+        if ($standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE)) {
+            $res &= $this->checkList($standaloneProducts, $action, false);
             $hasRoomsOrProducts = 1;
         }
 

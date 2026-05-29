@@ -99,7 +99,7 @@
                                                             $selectedRoomServiceProduct['date_from'],
                                                             $selectedRoomServiceProduct['date_to']
                                                         ) > 1}
-                                                            <span class="input-group-addon">{l s='/ day'}</span>
+                                                            <span class="input-group-addon">{l s='/ night'}</span>
                                                         {/if}
                                                     </div>
                                                 {/if}

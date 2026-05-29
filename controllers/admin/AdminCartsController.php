@@ -354,12 +354,7 @@ class AdminCartsControllerCore extends AdminController
         $objServiceProductCartDetail = new ServiceProductCartDetail();
         $hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
             $cart->id,
-            [
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
-            ],
+            [],
             $idHotel = null,
             0,
             null,
@@ -373,14 +368,15 @@ class AdminCartsControllerCore extends AdminController
             1
         );
 
+        $hotelProducts = array_filter($hotelProducts, function ($product) {
+            return $product['id_hotel'] > 0 && $product['id_hotel_cart_booking'] == 0;
+        });
+
         $standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
             $cart->id,
-            [
-                Product::SELLING_PREFERENCE_STANDALONE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_STANDALONE,
-                Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
-            ]
+            [],
+            0,
+            0
         );
 
         if (count($standaloneProducts)) {
@@ -1205,20 +1201,22 @@ class AdminCartsControllerCore extends AdminController
             if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                 // get all services
                 $objProduct = new Product();
-                $serviceProducts = array_merge(
-                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE),
-                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE),
-                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE),
-                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)
-                );
+                $serviceProducts = array_values(array_filter(
+                    $objProduct->getServiceProducts(null),
+                    function ($serviceProduct) {
+                        return Product::isSellableWithRoomType($serviceProduct['id_product']);
+                    }
+                ));
                 if ($serviceProducts) {
                     foreach ($serviceProducts as $key => $servProduct) {
+
                         if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$servProduct['id_product']))
                             && Product::getQuantity((int)$servProduct['id_product']) <= 0
                         ) {
                             unset($serviceProducts[$key]);
                             continue;
                         }
+
                         $numDays = Product::getPriceCalculationApplicableDays(
                             $servProduct['price_calculation_method'],
                             $dateFrom,
@@ -1554,14 +1552,22 @@ class AdminCartsControllerCore extends AdminController
             if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                 // get all services
                 $objProduct = new Product();
-                $serviceProducts = array_merge(
-                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE),
-                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE),
-                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_STANDALONE_AND_WITH_ROOM_TYPE),
-                    $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE)
-                );
+                $serviceProducts = array_values(array_filter(
+                    $objProduct->getServiceProducts(null),
+                    function ($serviceProduct) {
+                        return Product::isSellableWithRoomType($serviceProduct['id_product']);
+                    }
+                ));
                 if ($serviceProducts) {
                     foreach ($serviceProducts as $key => $servProduct) {
+
+                        if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$servProduct['id_product']))
+                            && Product::getQuantity((int)$servProduct['id_product']) <= 0
+                        ) {
+                            unset($serviceProducts[$key]);
+                            continue;
+                        }
+
                         $numDays = Product::getPriceCalculationApplicableDays(
                             $servProduct['price_calculation_method'],
                             $objCartBookingData->date_from,
@@ -1578,7 +1584,7 @@ class AdminCartsControllerCore extends AdminController
                             $objCartBookingData->date_from,
                             $objCartBookingData->date_to,
                             $objCartBookingData->id_cart
-                        )/$numDays;
+                        )/ max($numDays, 1);
                     }
                 }
             } else {
@@ -1742,7 +1748,7 @@ class AdminCartsControllerCore extends AdminController
                                 $idServiceProduct,
                                 $operator,
                                 $quantity,
-                                false,
+                                0,
                                 $idCartBooking
                             ))) {
                                 $originalPrice = Product::getPriceStatic($idServiceProduct, false);
