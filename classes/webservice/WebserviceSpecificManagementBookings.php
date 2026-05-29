@@ -3953,7 +3953,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
                                 $objProduct = new Product($service['id_product']);
                                 $services['per_night'] = 0;
-                                if ($objProduct->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                                if ($objProduct->price_calculation_method & Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY) {
                                     $services['per_night'] = 1;
                                 }
 

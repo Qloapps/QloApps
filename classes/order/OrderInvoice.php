@@ -612,8 +612,8 @@ class OrderInvoiceCore extends ObjectModel
         $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product'] && (
-                $v['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE
-                || $v['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
+                $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_STANDALONE
+                || $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTEL
             ));
         });
       

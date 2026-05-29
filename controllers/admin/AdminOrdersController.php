@@ -1156,13 +1156,13 @@ class AdminOrdersControllerCore extends AdminController
             }
 
             $refundReqProducts = $objOrderReturn->getOrderRefundRequestedProducts($objOrder->id, 0, 1, 1);
-            $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
+            $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_WITH_HOTEL);
             foreach($hotelProducts as $key => $product) {
                 if ((in_array($product['id_service_product_order_detail'], $refundReqProducts)) || $product['is_refunded']) {
                     unset($hotelProducts[$key]);
                 }
             }
-            $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE);
+            $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_WITH_STANDALONE);
             foreach($standaloneProducts as $key => $product) {
                 if ((in_array($product['id_service_product_order_detail'], $refundReqProducts)) || $product['is_refunded']) {
                     unset($standaloneProducts[$key]);
@@ -2438,7 +2438,7 @@ class AdminOrdersControllerCore extends AdminController
                     }
 
 
-                    if ($hotelProducts = $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)) {
+                    if ($hotelProducts = $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, Product::SELLING_PREFERENCE_WITH_HOTEL)) {
                         foreach ($hotelProducts as $serviceProduct) {
                             $objRoomTypeServProdOrderDtl = new ServiceProductOrderDetail($serviceProduct['id_service_product_order_detail']);
                             foreach ($fields as $field) {
@@ -2453,7 +2453,7 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
-                    if ($standaloneProducts = $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE)) {
+                    if ($standaloneProducts = $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id, 0, 0, Product::SELLING_PREFERENCE_WITH_STANDALONE)) {
                         foreach ($standaloneProducts as $serviceProduct) {
                             $objRoomTypeServProdOrderDtl = new ServiceProductOrderDetail($serviceProduct['id_service_product_order_detail']);
                             foreach ($fields as $field) {
@@ -2947,8 +2947,8 @@ class AdminOrdersControllerCore extends AdminController
 
             // if order has normal products the add kpi for total products
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-            $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
-            $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE);
+            $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_WITH_HOTEL);
+            $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($objOrder->id, 0, 0, Product::SELLING_PREFERENCE_WITH_STANDALONE);
 
             if ($hotelProducts || $standaloneProducts) {
                 $helper = new HelperKpi();
@@ -3295,14 +3295,14 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $product['image_link'] = $this->context->link->getImageLink($objProduct->link_rewrite, $this->context->language->iso_code.'-default', 'small_default');
             }
-            if ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
-                $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($order->id, $product['id_order_detail'], $product['product_id'], Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
+            if ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTEL) {
+                $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($order->id, $product['id_order_detail'], $product['product_id'], Product::SELLING_PREFERENCE_WITH_HOTEL);
                 foreach ($hotelProducts as $hotelProduct) {
                     $orderHotelServiceProducts[] = array_merge($product, $hotelProduct);
                 }
             }
-            if ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE) {
-                $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($order->id, $product['id_order_detail'], $product['product_id'], Product::SELLING_PREFERENCE_STANDALONE);
+            if ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_STANDALONE) {
+                $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($order->id, $product['id_order_detail'], $product['product_id'], Product::SELLING_PREFERENCE_WITH_STANDALONE);
                 foreach ($standaloneProducts as $standaloneProduct) {
                     $orderStandaloneServiceProducts[] = array_merge($product, $standaloneProduct);
                 }
@@ -3636,8 +3636,8 @@ class AdminOrdersControllerCore extends AdminController
 
         // send hotel standalone and standalone products
         $objProduct = new Product();
-        $hotelStandaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
-        $standaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
+        $hotelStandaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_WITH_HOTEL);
+        $standaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_WITH_STANDALONE);
 
         $this->tpl_view_vars = array(
             'hotelStandaloneProducts' => $hotelStandaloneProducts,
@@ -4183,10 +4183,10 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 $products = array();
                 $standaloneSellingPreferenceTypes = array(
-                    Product::SELLING_PREFERENCE_STANDALONE,
+                    Product::SELLING_PREFERENCE_WITH_STANDALONE,
                     Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
                     Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
-                    Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                    Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
                 );
                 foreach ($standaloneSellingPreferenceTypes as $sellingPreferenceType) {
                     if ($productsByType = Product::searchByName(
@@ -5708,9 +5708,9 @@ class AdminOrdersControllerCore extends AdminController
                     $objOrderDetail = new OrderDetail();
                     $cartProducts = $objCart->getProducts();
                     if (Product::isSellableWithHotel($cartProducts[0]['id_product']) && $addressTax->id_hotel) {
-                        $cartProducts[0]['selling_preference_type'] = Product::SELLING_PREFERENCE_HOTEL_STANDALONE;
+                        $cartProducts[0]['selling_preference_type'] = Product::SELLING_PREFERENCE_WITH_HOTEL;
                     } elseif (Product::isSellableAsStandalone($cartProducts[0]['id_product'])) {
-                        $cartProducts[0]['selling_preference_type'] = Product::SELLING_PREFERENCE_STANDALONE;
+                        $cartProducts[0]['selling_preference_type'] = Product::SELLING_PREFERENCE_WITH_STANDALONE;
                     }
                     $objOrderDetail->createList($objOrder, $objCart, $objOrder->getCurrentOrderState(), $cartProducts, (isset($objOrderInvoice) ? $objOrderInvoice->id : 0), $useTaxes, (int)Tools::getValue('add_product_warehouse'));
 

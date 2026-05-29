@@ -385,7 +385,7 @@ class OrderDetailControllerCore extends FrontController
                                     1
                                 );
                             }
-                        } else if (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $type_value['selling_preference_type']) {
+                        } else if (Product::SELLING_PREFERENCE_WITH_HOTEL == $type_value['selling_preference_type']) {
                             $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($id_order, $type_value['id_order_detail'], $type_value['product_id']);
                             foreach ($hotelProducts as $hotelProduct) {
                                 $hotelServiceProducts[] = array_merge($type_value, $hotelProduct);
@@ -404,7 +404,7 @@ class OrderDetailControllerCore extends FrontController
                                 }
                                 $serviceProductsFormatted[$hotelProduct['id_product']]['options'][] = $hotelProduct;
                             }
-                        } else if (Product::SELLING_PREFERENCE_STANDALONE == $type_value['selling_preference_type']) {
+                        } else if (Product::SELLING_PREFERENCE_WITH_STANDALONE == $type_value['selling_preference_type']) {
                             $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($id_order, $type_value['id_order_detail'], $type_value['product_id']);
                             foreach ($standaloneProducts as $standaloneProduct) {
                                 $standaloneServiceProducts[] = array_merge($type_value, $standaloneProduct);

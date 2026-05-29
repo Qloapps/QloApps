@@ -559,12 +559,12 @@ class ProductCore extends ObjectModel
 
     // Product selling preference types
     const SELLING_PREFERENCE_WITH_ROOM_TYPE = 1; // Product to be sold with Room types
-    const SELLING_PREFERENCE_HOTEL_STANDALONE = 2; // Product to be sold Standalone with Hotels
-    const SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE = 3; // Product to be sold Standalone with Hotels and with Room types also
-    const SELLING_PREFERENCE_STANDALONE = 4; // Product to be sold standalone
+    const SELLING_PREFERENCE_WITH_HOTEL = 2; // Product to be sold Standalone with Hotels
+    const SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE = 3; // Product to be sold Standalone with Hotels and with Room types also
+    const SELLING_PREFERENCE_WITH_STANDALONE = 4; // Product to be sold standalone
     const SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE = 5; // Product to be sold standalone and with Room types also
     const SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE = 6; // Product to be sold standalone with Hotels and with Room types also
-    const SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE = 7; // Product to be sold standalone with Hotels and with Room types also and standalone
+    const SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE = 7; // Product to be sold standalone with Hotels and with Room types also and standalone
 
     const PRICE_ADDITION_TYPE_WITH_ROOM = 1;
     const PRICE_ADDITION_TYPE_INDEPENDENT = 2;
@@ -1456,8 +1456,8 @@ class ProductCore extends ObjectModel
                         '(`element_type` = '.RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$this->id.')
                     )
                     AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. ' 
-                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE.' 
-                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.' 
                     || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE.')
                     AND product_shop.`id_shop` = '.(int)$context->shop->id
                 .($sub_category? ' AND product_shop.`id_category_default` = '.(int)$sub_category : '')
@@ -1503,8 +1503,8 @@ class ProductCore extends ObjectModel
                         '(`element_type` = '.RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$this->id.')
                     )
                     AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. '
-                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE.' 
-                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.' 
                     || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE.')'. '
                     AND product_shop.`id_shop` = '.(int)$context->shop->id
                     .($sub_category? ' AND product_shop.`id_category_default` = '.(int)$sub_category : '')
@@ -1554,8 +1554,8 @@ class ProductCore extends ObjectModel
                         '(`element_type` = '.RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$this->id.')
                     )
                     AND p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE.
-                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE.
-                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.
+                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE.
+                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.
                     ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE.
                     ' AND product_shop.`id_shop` = '.(int)$context->shop->id;
 
@@ -3117,7 +3117,7 @@ class ProductCore extends ObjectModel
         }
 
         if (!Product::isBookingProduct($id_product)
-            && (Product::getSellingPreferenceType($id_product) == Product::SELLING_PREFERENCE_STANDALONE)
+            && (Product::getSellingPreferenceType($id_product) == Product::SELLING_PREFERENCE_WITH_STANDALONE)
             && !$id_address
         ) {
             $serviceAddressPrefrenceType = Configuration::get('PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE');
@@ -6938,29 +6938,29 @@ class ProductCore extends ObjectModel
     {
         return in_array((int) self::getSellingPreferenceType($idProduct), [
             self::SELLING_PREFERENCE_WITH_ROOM_TYPE,
-            self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
             self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
-            self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
         ]);
     }
 
     public static function isSellableWithHotel($idProduct)
     {
         return in_array((int) self::getSellingPreferenceType($idProduct), [
-            self::SELLING_PREFERENCE_HOTEL_STANDALONE,
-            self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
             self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
-            self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
         ]);
     }
 
     public static function isSellableAsStandalone($idProduct)
     {
         return in_array((int) self::getSellingPreferenceType($idProduct), [
-            self::SELLING_PREFERENCE_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_STANDALONE,
             self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
             self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
-            self::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
         ]);
     }
 }

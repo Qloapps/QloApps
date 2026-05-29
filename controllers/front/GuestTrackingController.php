@@ -524,7 +524,7 @@ class GuestTrackingControllerCore extends FrontController
                                         1
                                     );
                                 }
-                            } else if (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $type_value['selling_preference_type']) {
+                            } else if (Product::SELLING_PREFERENCE_WITH_HOTEL == $type_value['selling_preference_type']) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
 
                                 if (!empty($cover_image_arr)) {
@@ -536,7 +536,7 @@ class GuestTrackingControllerCore extends FrontController
                                 foreach ($hotelProducts as $hotelProduct) {
                                     $hotelServiceProducts[] = array_merge($type_value, $hotelProduct);
                                 }
-                            } else if (Product::SELLING_PREFERENCE_STANDALONE == $type_value['selling_preference_type']) {
+                            } else if (Product::SELLING_PREFERENCE_WITH_STANDALONE == $type_value['selling_preference_type']) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
 
                                 if (!empty($cover_image_arr)) {

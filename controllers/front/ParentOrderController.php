@@ -323,10 +323,10 @@ class ParentOrderControllerCore extends FrontController
             }
             $objServiceProductCartDetail = new ServiceProductCartDetail();
             $hotelSellingPreferences = [
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
-                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
                 Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
-                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
             ];
             if ($hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                 $this->context->cart->id,
@@ -352,10 +352,10 @@ class ParentOrderControllerCore extends FrontController
             }
 
             $standaloneSellingPreferences = [
-                Product::SELLING_PREFERENCE_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_STANDALONE,
                 Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
                 Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
             ];
             $standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                 $this->context->cart->id,
@@ -500,10 +500,10 @@ class ParentOrderControllerCore extends FrontController
         } elseif (!Customer::getAddressesTotalById($this->context->customer->id)) {
             $objServiceProductCartDetail = new ServiceProductCartDetail();
             $standaloneSellingPreferences = [
-                Product::SELLING_PREFERENCE_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_STANDALONE,
                 Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
                 Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
             ];
             if (count($objServiceProductCartDetail->getServiceProductsInCart(
                 $this->context->cart->id,

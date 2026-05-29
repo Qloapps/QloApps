@@ -20,24 +20,14 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{* Required param: pcm — price_calculation_method integer value *}
 
-<span class="price-calculation-info">
+<span class="htl-tooltip{if isset($tooltip_class) && $tooltip_class} {$tooltip_class|escape:'html':'UTF-8'}{/if}">
 	<img src="{$img_dir}icon/icon-info.svg" />
 </span>
-<div class="price-calculation-info-container" style="display: none;">
-	<div class="price-info-tooltip-cont">
-		<p class="applied-on-label">{l s='Applied on'}</p>
-		<ul class="applied-on-days">
-			{if $pcm == 1 || $pcm == 3 || $pcm == 5 || $pcm == 7}
-				<li>{l s='Check-in day'}</li>
-			{/if}
-			{if $pcm == 4 || $pcm == 5 || $pcm == 6 || $pcm == 7}
-				<li>{l s='During-stay days'}</li>
-			{/if}
-			{if $pcm == 2 || $pcm == 3 || $pcm == 6 || $pcm == 7}
-				<li>{l s='Check-out day'}</li>
-			{/if}
-		</ul>
-	</div>
+<div class="htl-tooltip-content" style="display: none;">
+	{if isset($allow_html) && $allow_html}
+		{$tooltip_content nofilter}
+	{else}
+		{$tooltip_content|escape:'html':'UTF-8'}
+	{/if}
 </div>

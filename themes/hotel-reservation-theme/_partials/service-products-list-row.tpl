@@ -38,7 +38,33 @@
                 {block name='service_product_name'}
                     <div class="col-sm-12 clearfix service-product-block">
                         <span class="service-product-name">{$service_product['name']}</span>
-                        {include file='_partials/price-calculation-info.tpl' pcm=$service_product.price_calculation_method|default:0}
+                        {assign var='priceCalcMethod' value=$service_product.price_calculation_method|default:0}
+                        {capture name='htl_pcm_tooltip'}
+                        <div class="htl-tooltip-cont">
+                            <p class="htl-tooltip-title">{l s='Applied on:'}</p>
+                            <ul>
+                                {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY
+                                    || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
+                                    || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
+                                    || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
+                                    <li>{l s='Check-in day'}</li>
+                                {/if}
+                                {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY
+                                    || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
+                                    || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
+                                    || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
+                                    <li>{l s='During-stay days'}</li>
+                                {/if}
+                                {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY
+                                    || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
+                                    || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
+                                    || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
+                                    <li>{l s='Check-out day'}</li>
+                                {/if}
+                            </ul>
+                        </div>
+                        {/capture}
+                        {include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}
                     </div>
                 {/block}
                 {block name='service_product_description'}

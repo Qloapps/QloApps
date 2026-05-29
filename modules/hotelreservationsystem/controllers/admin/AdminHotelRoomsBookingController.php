@@ -795,7 +795,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     public function assignServiceProductsForm()
     {
         $objProduct = new Product();
-        $serviceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
+        $serviceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_WITH_STANDALONE);
         $hotelAddressInfo = HotelBranchInformation::getAddress($this->id_hotel);
         $serviceProducts = Product::getProductsProperties($this->context->language->id, $serviceProducts);
         $this->context->smarty->assign(array(
@@ -978,7 +978,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'ALLOTMENT_AUTO' => HotelBookingDetail::ALLOTMENT_AUTO,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
             'SELLING_PREFERENCE_WITH_ROOM_TYPE' => Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
-            'SELLING_PREFERENCE_STANDALONE' => Product::SELLING_PREFERENCE_STANDALONE,
+            'SELLING_PREFERENCE_WITH_STANDALONE' => Product::SELLING_PREFERENCE_WITH_STANDALONE,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'rooms_reallocation_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),

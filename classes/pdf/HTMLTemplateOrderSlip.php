@@ -348,8 +348,8 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
         $breakdown = array();
         $order_detail = array_filter($this->order->products, function($v) {
             return (!$v['is_booking_product'] && (
-                $v['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE
-                || $v['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
+                $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_STANDALONE
+                || $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTEL
             ));
         });
 

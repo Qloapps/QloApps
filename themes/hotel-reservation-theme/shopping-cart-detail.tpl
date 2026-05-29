@@ -120,22 +120,18 @@
                                         <div class="row">
                                             <div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
                                                 <div class="price_block">
-                                                    <p class="total_price">
-                                                        <span>
-                                                            {displayPrice price=($rm_v['amount'])}
-                                                        </span>
+                                                    <div class="total_price">
+                                                        {displayPrice price=($rm_v['amount'])}
                                                         {if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && (in_array($data_v['id_product'], $discounted_products) || $PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN)}
-                                                            <span class="room-price-detail">
-                                                                <img src="{$img_dir}icon/icon-info.svg" />
-                                                            </span>
-                                                            <div class="room-price-detail-container" style="display: none;">
-                                                                <div class="room-price-detail-tooltip-cont">
-                                                                    <div><label>{l s='Room price'}</label> : {displayPrice price=($rm_v['amount_without_auto_add'])}</div>
-                                                                    <div><label>{l s='Additional charges'}</label> : {displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</div>
-                                                                </div>
+                                                            {capture name='htl_room_price_detail_tooltip'}
+                                                            <div class="htl-tooltip-cont">
+                                                                <div class="htl-tooltip-row"><label>{l s='Room price'}</label><span>{displayPrice price=($rm_v['amount_without_auto_add'])}</span></div>
+                                                                <div class="htl-tooltip-row"><label>{l s='Additional charges'}</label><span>{displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</span></div>
                                                             </div>
+                                                            {/capture}
+                                                            {include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_room_price_detail_tooltip allow_html=true tooltip_class='htl-tooltip-room-price-detail'}
                                                         {/if}
-                                                    </p>
+                                                    </div>
                                                     <p class="total_price_detial">
                                                         {l s='Total rooms price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                                     </p>

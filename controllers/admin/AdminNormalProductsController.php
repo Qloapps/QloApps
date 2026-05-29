@@ -331,12 +331,12 @@ class AdminNormalProductsControllerCore extends AdminController
         // Code For Standard product working
         $sellingPreferenceTypes = array(
             Product::SELLING_PREFERENCE_WITH_ROOM_TYPE => $this->l('With room type'),
-            Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE => $this->l('With hotel|room type'),
-            Product::SELLING_PREFERENCE_STANDALONE => $this->l('Standalone'),
-            Product::SELLING_PREFERENCE_HOTEL_STANDALONE => $this->l('With hotel'),
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE => $this->l('With hotel|room type'),
+            Product::SELLING_PREFERENCE_WITH_STANDALONE => $this->l('Standalone'),
+            Product::SELLING_PREFERENCE_WITH_HOTEL => $this->l('With hotel'),
             Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE => $this->l('With hotel|standalone'),
             Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With room type|standalone'),
-            Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE => $this->l('With hotel|room type|standalone'),
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE => $this->l('With hotel|room type|standalone'),
         );
         $this->fields_list['selling_preference_type'] = array(
             'type' => 'select',
@@ -3016,15 +3016,15 @@ class AdminNormalProductsControllerCore extends AdminController
 
             $roomTypeSellingPreferences = array(
                 Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
                 Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
             );
             $hotelSellingPreferences = array(
-                Product::SELLING_PREFERENCE_HOTEL_STANDALONE,
-                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
                 Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
-                Product::SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
             );
 
             if (in_array((int)$product->selling_preference_type, $roomTypeSellingPreferences, true)) {

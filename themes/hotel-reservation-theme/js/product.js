@@ -1171,7 +1171,7 @@ $(document).ready(function() {
                                 triggerElement.hide();
                             }
                         }
-                        initPriceCalculationTooltip();
+                        initHtlTooltip();
                     } else {
                         triggerElement.hide();
                     }

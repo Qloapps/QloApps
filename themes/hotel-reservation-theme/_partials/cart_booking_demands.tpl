@@ -135,7 +135,33 @@
 																	</div>
 																	<div class="col-xs-10">
 																		<span>{$product['name']|escape:'html':'UTF-8'}</span>
-																		{include file='_partials/price-calculation-info.tpl' pcm=$product.price_calculation_method|default:0}
+																		{assign var='priceCalcMethod' value=$product.price_calculation_method|default:0}
+																		{capture name='htl_pcm_tooltip'}
+																		<div class="htl-tooltip-cont">
+																			<p class="htl-tooltip-title">{l s='Applied on:'}</p>
+																			<ul>
+																				{if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY
+																					|| $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
+																					|| $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
+																					|| $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
+																					<li>{l s='Check-in day'}</li>
+																				{/if}
+																				{if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY
+																					|| $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
+																					|| $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
+																					|| $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
+																					<li>{l s='During-stay days'}</li>
+																				{/if}
+																				{if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY
+																					|| $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
+																					|| $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
+																					|| $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
+																					<li>{l s='Check-out day'}</li>
+																				{/if}
+																			</ul>
+																		</div>
+																		{/capture}
+																		{include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}
 																		{if $product.allow_multiple_quantity}
 																			<div class="qty_container">
 																				<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="room_service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">

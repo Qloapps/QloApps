@@ -127,50 +127,26 @@ var ajaxCart = {
     dateFormat: 'DD-MM-YYYY',
     dateFormatFull: 'DD-MM-YYYY HH:mm:ss',
     nb_total_products: 0,
-    getSellingPreferenceChannels: function(sellingPreferenceType) {
-        var channels = {
-            with_room_type: false,
-            with_hotel: false,
-            standalone: false
-        };
-        switch (parseInt(sellingPreferenceType)) {
-            case SELLING_PREFERENCE_WITH_ROOM_TYPE:
-                channels.with_room_type = true;
-                break;
-            case SELLING_PREFERENCE_HOTEL_STANDALONE:
-                channels.with_hotel = true;
-                break;
-            case SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE:
-                channels.with_room_type = true;
-                channels.with_hotel = true;
-                break;
-            case SELLING_PREFERENCE_STANDALONE:
-                channels.standalone = true;
-                break;
-            case SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE:
-                channels.with_hotel = true;
-                channels.standalone = true;
-                break;
-            case SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE:
-                channels.with_room_type = true;
-                channels.standalone = true;
-                break;
-            case SELLING_PREFERENCE_WITH_HOTE_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE:
-                channels.with_room_type = true;
-                channels.with_hotel = true;
-                channels.standalone = true;
-                break;
-        }
-        return channels;
-    },
     isSellableWithRoomType: function(sellingPreferenceType) {
-        return this.getSellingPreferenceChannels(sellingPreferenceType).with_room_type;
+        return (sellingPreferenceType == SELLING_PREFERENCE_WITH_ROOM_TYPE 
+            || sellingPreferenceType == SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE 
+            || sellingPreferenceType == SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE 
+            || sellingPreferenceType == SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+        );
     },
     isSellableWithHotel: function(sellingPreferenceType) {
-        return this.getSellingPreferenceChannels(sellingPreferenceType).with_hotel;
+        return (sellingPreferenceType == SELLING_PREFERENCE_WITH_HOTEL 
+            || sellingPreferenceType == SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE 
+            || sellingPreferenceType == SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE 
+            || sellingPreferenceType == SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+        );
     },
     isSellableAsStandalone: function(sellingPreferenceType) {
-        return this.getSellingPreferenceChannels(sellingPreferenceType).standalone;
+        return (sellingPreferenceType == SELLING_PREFERENCE_WITH_STANDALONE 
+            || sellingPreferenceType == SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE 
+            || sellingPreferenceType == SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE 
+            || sellingPreferenceType == SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE
+        );
     },
     _overrideButtonsInThePage: function () {
         //for every 'add' buttons...

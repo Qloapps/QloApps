@@ -2882,12 +2882,12 @@ class OrderCore extends ObjectModel
         }
         // check hotel linked products
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-        if ($hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)) {
+        if ($hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_WITH_HOTEL)) {
             $res &= $this->checkList($hotelProducts, $action, false);
             $hasRoomsOrProducts = 1;
         }
 
-        if ($standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE)) {
+        if ($standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_WITH_STANDALONE)) {
             $res &= $this->checkList($standaloneProducts, $action, false);
             $hasRoomsOrProducts = 1;
         }
