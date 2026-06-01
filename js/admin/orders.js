@@ -744,7 +744,7 @@ function initRoomEvents()
 				var query = 'ajax=1&token='+token+'&action=addRoomOnOrder&id_order='+id_order+'&';
 
 				// query += $('#add_product_warehouse').serialize()+'&';
-				query += $('#new_room select, #new_room input').serialize();
+				query += $('#new_room select, #new_room input ,#new_room textarea').serialize();
 				if ($('select#add_product_product_invoice').val() == 0)
 					query += '&'+$('tr#new_invoice select, tr#new_invoice input').serialize();
 
@@ -854,46 +854,102 @@ function initRoomEvents()
 			}
 		}
 	});
+	    var DeleteRoomBookingModal = {
+	        show: function(data) {
+	            $(".loading_overlay").show();
 
-    $('.delete_room_line').unbind('click').click(function(e) {
-		if (!confirm(txt_confirm))
-			return false;
-		var tr_product = $(this).closest('.product-line-row');
-		var id_room = tr_product.data('id_room');
-		var id_product = tr_product.data('id_product');
-		var id_hotel = tr_product.data('id_hotel');
-		var date_from = tr_product.data('date_from');
-		var date_to = tr_product.data('date_to');
-		var id_order_detail = tr_product.data('id_order_detail');
-		var id_htl_booking = tr_product.data('id_htl_booking');
-		//var id_order_detail = $(this).closest('.product-line-row').find('td .edit_product_id_order_detail').val();
-		var query = 'ajax=1&action=deleteRoomLine&token='+token+'&id_order='+id_order+'&id_htl_booking='+id_htl_booking+'&id_room='+id_room+'&id_product='+id_product+'&id_hotel='+id_hotel+'&date_from='+date_from+'&date_to='+date_to+'&id_order_detail='+id_order_detail;
-		query += $(this).parent().parent().find('input, select:visible, .edit_product_id_order_detail').serialize();
-		$.ajax({
-			type: 'POST',
-			url: admin_order_tab_link,
-			cache: false,
-			dataType: 'json',
-			data : query,
-			success : function(data)
-			{
-				if (data.result)
-				{
-					tr_product.fadeOut('slow', function() {
-						$(this).remove();
-					});
-					updateAmounts(data.order);
-					updateInvoice(data.invoices);
-					updateDocuments(data.documents_html);
+	            // Remove any previous modal to avoid duplicate IDs/handlers
+	            if ($('#delete-room-booking-modal').length) {
+	                $('#delete-room-booking-modal').remove();
+	                $('.modal-backdrop').remove();
+	                $('body').removeClass('modal-open');
+	            }
 
-					window.location.href = admin_order_tab_link + '&conf=1&vieworder&id_order=' + data.order.id;
-				}
-				else
-					jAlert(data.error);
-			}
-		});
-		e.preventDefault();
-	});
+	            $.ajax({
+	                type: 'POST',
+	                url: admin_order_tab_link,
+	                dataType: 'json',
+	                data: $.extend({ ajax: true, action: 'initDeleteRoomBookingModal' }, data),
+	                beforeSend: function () {
+	                    $("#page-loader").show();
+	                },
+	                success: function (result) {
+	                    if (!result.hasError && result.modalHtml) {
+	                        $('#footer').next('.bootstrap').append(result.modalHtml);
+	                        $('#delete-room-booking-modal').modal('show');
+	                        $('#delete-room-booking-modal').on('hidden.bs.modal', function() {
+	                            $(this).remove();
+	                        });
+	                    } else if (result.error) {
+	                        showErrorMessage(result.error);
+	                    }
+	                },
+	                complete: function () {
+	                    $(".loading_overlay").hide();
+	                    $("#page-loader").hide();
+	                }
+	            });
+	        },
+	        close: function() {
+	            $('#delete-room-booking-modal').modal('hide');
+	        }
+	    };
+
+	    $(document).off('click', '.delete_room_line').on('click', '.delete_room_line', function(e) {
+	        e.preventDefault();
+	        var tr_product = $(this).closest('.product-line-row');
+	        var data = {
+	            id_room : tr_product.data('id_room'),
+	            id_product : tr_product.data('id_product'),
+	            id_hotel : tr_product.data('id_hotel'),
+	            date_from : tr_product.data('date_from'),
+	            date_to : tr_product.data('date_to'),
+	            id_order_detail : tr_product.data('id_order_detail'),
+	            id_htl_booking : tr_product.data('id_htl_booking'),
+	            id_order : id_order
+	        };
+	        DeleteRoomBookingModal.show(data);
+	    });
+
+	    $(document).off('click', '#submitRoomDelete').on('click', '#submitRoomDelete', function(e) {
+	        e.preventDefault();
+	        var remark = $('#room_remark').val().trim();
+	        if (remark === '') {
+	            $('#remarkGroup').addClass('has-error');
+	            $('#room_remark').focus();
+	            return false;
+	        }
+	        var id_room = $('input[name="id_room"]').val();
+	        var id_product = $('input[name="id_product"]').val();
+	        var id_hotel = $('input[name="id_hotel"]').val();
+	        var date_from = $('input[name="date_from"]').val();
+	        var date_to = $('input[name="date_to"]').val();
+	        var id_order_detail = $('input[name="id_order_detail"]').val();
+	        var id_htl_booking = $('input[name="id_htl_booking"]').val();
+	        var id_order = $('input[name="id_order"]').val();
+	        var query = 'ajax=1&action=deleteRoomLine&token='+token+'&id_order='+id_order+'&id_htl_booking='+id_htl_booking+'&id_room='+id_room+'&id_product='+id_product+'&id_hotel='+id_hotel+'&date_from='+date_from+'&date_to='+date_to+'&id_order_detail='+id_order_detail;
+	        query += '&' + $(this).closest('.modal-content').find('input, select:visible, textarea').serialize();
+	        $.ajax({
+	            type: 'POST',
+	            url: admin_order_tab_link,
+	            cache: false,
+	            dataType: 'json',
+	            data: query,
+	            success: function(data)
+	            {
+	                if (data.result)
+	                {
+	                    updateAmounts(data.order);
+	                    updateInvoice(data.invoices);
+	                    updateDocuments(data.documents_html);
+	                    window.location.href = admin_order_tab_link + '&conf=1&vieworder&id_order=' + data.order.id;
+	                }
+	                else {
+	                    jAlert(data.error);
+	                }
+	            }
+	        });
+	    });
 
     // order-payment-modal hide and show
 	$('#add_new_payment').on('click', function(e) {
@@ -1638,7 +1694,7 @@ $(document).ready(function() {
 
         if (confirm(txt_confirm)) {
             let query = 'ajax=1&token='+token+'&action=editRoomOnOrder&'+
-            $('#edit_product').find('input, select').serialize();
+            $('#edit_product').find('input, select ,textarea').serialize();
             $(".loading_overlay").show();
             $.ajax({
                 type: 'POST',
