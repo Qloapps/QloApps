@@ -441,40 +441,6 @@ class HotelReservationSystem extends Module
         }
     }
 
-    public function hookActionProductSave($params)
-    {
-        $obj_htl_rm_info = new HotelRoomType();
-        if ($htl_rm_info = $obj_htl_rm_info->getRoomTypeInfoByIdProduct($params['id_product'])) {
-            $isToggling = Tools::getValue('statusproduct');
-            if (isset($isToggling) && $isToggling) {
-                $prod_htl_id = $htl_rm_info['id_hotel'];
-                if (isset($prod_htl_id) && $prod_htl_id) {
-                    $obj_hotel = new HotelBranchInformation($prod_htl_id);
-                    if (!$obj_hotel->active) {
-                        $obj_hotel->toggleStatus();
-                    }
-                }
-            } else {
-                if (!$params['product']->quantity) {
-                    StockAvailable::setQuantity($params['id_product'], 0, 999999999);
-                }
-                if ($params['id_product']) {
-                    $prod_htl_id = $htl_rm_info['id_hotel'];
-                    if (isset($prod_htl_id) && $prod_htl_id) {
-                        $obj_hotel = new HotelBranchInformation($prod_htl_id);
-                        if (!$obj_hotel->active) {
-                            $obj_product = new Product($params['id_product']);
-                            if ($obj_product->active == 1) {
-                                $this->context->controller->errors[] = $this->l('Room type can not be active as long as hotel is disabled.');
-                                $obj_product->toggleStatus();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public function hookActionOrderStatusPostUpdate($params)
     {
         $objHtlBkDtl = new HotelBookingDetail();
@@ -637,7 +603,6 @@ class HotelReservationSystem extends Module
                 'actionObjectProductDeleteBefore',
                 'displayFooter',
                 'displayAfterDefautlFooterHook',
-                'actionProductSave',
                 'addWebserviceResources',
                 'actionObjectLanguageAddAfter',
                 'actionObjectProfileAddAfter',

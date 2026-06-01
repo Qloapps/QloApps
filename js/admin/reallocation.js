@@ -104,6 +104,7 @@ const RoomReallocationModal = {
                     } else {
                         $(".swap_avail_rooms_container").empty().text(no_swap_rm_avail_txt).addClass('text-danger');
                         $("#swap_room_tab .modal-footer").hide();
+                        $("#swap_room_tab .room_remark").closest('.form-group').hide();
                     }
 
                     // For Rooms Reallocation

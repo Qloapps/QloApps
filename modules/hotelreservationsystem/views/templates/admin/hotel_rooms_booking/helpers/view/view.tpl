@@ -84,7 +84,7 @@
 																		</div>
 																		<div class="form-group col-xs-6 occupancy_count_block">
 																			<label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
-																			<input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$room_occupancy['children']|escape:'htmlall':'UTF-8'}" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
+																			<input type="number" class="form-control num_occupancy num_children" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$room_occupancy['children']|escape:'htmlall':'UTF-8'}" min="0">
 																			({l s='Below' mod='hotelreservationsystem'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
 																		</div>
 																	</div>
@@ -126,7 +126,7 @@
 																	</div>
 																	<div class="form-group col-xs-6 occupancy_count_block">
 																		<label>{l s='Children' mod='hotelreservationsystem'} <span class="label-desc-txt"></span></label>
-																		<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0" {if $max_child_in_room}max="{$max_child_in_room}"{/if}>
+																		<input type="number" class="form-control num_occupancy num_children" name="occupancy[0][children]" value="0" min="0">
 																		({l s='Below' mod='hotelreservationsystem'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='hotelreservationsystem'})
 																	</div>
 																</div>

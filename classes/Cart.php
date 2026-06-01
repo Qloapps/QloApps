@@ -1833,7 +1833,7 @@ class CartCore extends ObjectModel
                         $this->id,
                         [],
                         0,
-                        null,
+                        isset($product['id_hotel_cart_booking']) ? $product['id_hotel_cart_booking'] : null,
                         null,
                         (int)$product['id_product'],
                         null,

@@ -263,7 +263,8 @@ class AdminLoginControllerCore extends AdminController
 
         if (!count($this->errors)) {
             $pwd = Tools::passwdGen(10, 'RANDOM');
-            $employee->passwd = Tools::encrypt($pwd);
+            $objHash = new PasswordHashing();
+            $employee->passwd = $objHash->passwordHash($pwd);
             $employee->last_passwd_gen = date('Y-m-d H:i:s', time());
 
             $params = array(

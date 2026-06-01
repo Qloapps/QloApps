@@ -51,25 +51,31 @@ class AdminModulesCatalogControllerCore extends AdminController
         parent::initContent();
 
         $suggestedModules = Module::getSuggestedModules();
+        $modulesDirOnDisk = Module::getModulesDirOnDisk();
+        $localModuleNames = array();
 
-        $modulesToAdd = array();
-        $dirModules = ModuleCore::getModulesOnDisk();
-        $modules_name = array_column($suggestedModules, 'name');
-        foreach ($dirModules as $mod) {
-            if (($id = array_search($mod->name, $modules_name)) !== false) {
-                if ($mod->installed) {
-                    unset($suggestedModules[$id]);
-                } else {
-                    $suggestedModules[$id]->not_on_disk = false;
-                }
-            } else {
-                if (!$mod->installed) {
-                    $modulesToAdd[] = $mod;
-                }
-            }
+        foreach ($modulesDirOnDisk as $moduleName) {
+            $localModuleNames[Tools::strtolower($moduleName)] = true;
         }
 
-        $modules = array_merge($suggestedModules, $modulesToAdd);
+        $modules = array();
+
+        foreach ($suggestedModules as $suggestedModule) {
+            $moduleName = Tools::strtolower($suggestedModule->name);
+            if (isset($localModuleNames[$moduleName])) {
+                continue;
+            }
+            if (!empty($suggestedModule->compatibility)) {
+                $minVersion = isset($suggestedModule->compatibility['from']) ? $suggestedModule->compatibility['from'] : null;
+                $maxVersion = isset($suggestedModule->compatibility['to']) ? $suggestedModule->compatibility['to'] : null;
+
+                if (($minVersion && version_compare(_QLOAPPS_VERSION_, $minVersion, '<')) || ($maxVersion && version_compare(_QLOAPPS_VERSION_, $maxVersion, '>'))) {
+                    continue;
+                }
+            }
+
+            $modules[] = $suggestedModule;
+        }
 
         $link_admin_modules = $this->context->link->getAdminLink('AdminModules', true);
         foreach ($modules as $key => $module) {

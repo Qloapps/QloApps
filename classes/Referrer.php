@@ -53,7 +53,7 @@ class ReferrerCore extends ObjectModel
         'primary' => 'id_referrer',
         'fields' => array(
             'name' =>                        array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 64),
-            'passwd' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isPasswd', 'size' => 32),
+            'passwd' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isPasswd', 'size' => 60),
             'http_referer_regexp' =>        array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml', 'size' => 64),
             'request_uri_regexp' =>        array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml', 'size' => 64),
             'http_referer_like' =>            array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml', 'size' => 64),
