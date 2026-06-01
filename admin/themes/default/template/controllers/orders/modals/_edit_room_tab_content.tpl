@@ -139,6 +139,12 @@
                 </div>
             </div>
         </div>
+        <div class="row form-group">
+            <div class="col-sm-12">
+             <label class="control-label">{l s='Remark'}</label>
+                <textarea class="form-control room_remark" name="message" maxlength="250"></textarea>
+            </div>
+        </div>
         <div class="product_invoice" style="display: none;">
             <select name="product_invoice" class="edit_product_invoice">
                 {foreach from=$invoices_collection item=invoice}
