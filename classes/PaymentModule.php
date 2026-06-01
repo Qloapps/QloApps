@@ -525,7 +525,7 @@ abstract class PaymentModuleCore extends Module
                             $msg->id_cart = (int)$id_cart;
                             $msg->id_customer = (int)($order->id_customer);
                             $msg->id_order = (int)$order->id;
-                            $msg->private = 1;
+                            $msg->private = 0;
                             $msg->add();
                         }
                     }
@@ -707,28 +707,32 @@ abstract class PaymentModuleCore extends Module
                     if ($old_message && !$old_message['private']) {
                         $update_message = new Message((int)$old_message['id_message']);
                         $update_message->id_order = (int)$order->id;
+                        $update_message->id_employee = (isset($this->context->employee) && $this->context->employee->id) ? (int)$this->context->employee->id : 0;
+                        $update_message->private = !Tools::getValue('visibility');
                         $update_message->update();
-
+                        if (Tools::getValue('visibility')) {
                         // Add this message in the customer thread
                         $customer_thread = new CustomerThread();
-                        $customer_thread->id_contact = 0;
+                        $customer_thread->id_contact = (int)Configuration::get('PS_CUSTOMER_SERVICE_CONTACT');
                         $customer_thread->id_customer = (int)$order->id_customer;
                         $customer_thread->id_shop = (int)$this->context->shop->id;
                         $customer_thread->id_order = (int)$order->id;
                         $customer_thread->id_lang = (int)$this->context->language->id;
                         $customer_thread->email = $this->context->customer->email;
+                        $customer_thread->phone = $this->context->customer->phone ? $this->context->customer->phone : '';
                         $customer_thread->status = CustomerThread::QLO_CUSTOMER_THREAD_STATUS_OPEN;
                         $customer_thread->token = Tools::passwdGen(12);
                         $customer_thread->add();
 
                         $customer_message = new CustomerMessage();
                         $customer_message->id_customer_thread = $customer_thread->id;
-                        $customer_message->id_employee = 0;
+                        $customer_message->id_employee = (isset($this->context->employee) && $this->context->employee->id) ? (int)$this->context->employee->id : 0;
+                        $customer_message->ip_address = (int)ip2long(Tools::getRemoteAddr());
                         $customer_message->message = $update_message->message;
-                        $customer_message->private = !Tools::getValue('visibility');
-
+                        $customer_message->private = 0;
                         if (!$customer_message->add()) {
                             $this->errors[] = Tools::displayError('An error occurred while saving message');
+                            }
                         }
                     }
 
