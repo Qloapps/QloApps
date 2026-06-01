@@ -1219,8 +1219,9 @@ class AdminProductsControllerCore extends AdminController
                     }
                 }
 
-            if ($selectedAmenities === count($amenityGroup['children'])) {
-                $amenityGroup['selected'] = true;
+                if ($selectedAmenities === count($amenityGroup['children'])) {
+                    $amenityGroup['selected'] = true;
+                }
             }
         }
 
