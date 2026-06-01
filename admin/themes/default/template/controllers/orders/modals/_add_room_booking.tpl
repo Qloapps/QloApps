@@ -128,6 +128,12 @@
                     </div>
                 {/if}
             </div>
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <label class="control-label">{l s='Remark'}</label>
+                    <textarea class="form-control room_remark" name="message" maxlength="250"></textarea>
+                </div>
+            </div>
 
             {if isset($invoices_collection) && sizeof($invoices_collection)}
                 <div class="form-group" style="display: none;">
