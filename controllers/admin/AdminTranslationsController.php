@@ -748,25 +748,34 @@ class AdminTranslationsControllerCore extends AdminController
                 $files_list = AdminTranslationsController::filterTranslationFiles($gz->listContent());
                 $files_paths = AdminTranslationsController::filesListToPaths($files_list);
 
+                if (empty($files_list)) {
+                    $this->errors[] = Tools::displayError('No valid translation files found in the archive.');
+                    return false;
+                }
+
                 $uniqid = uniqid();
                 $sandbox = _PS_CACHE_DIR_.'sandbox'.DIRECTORY_SEPARATOR.$uniqid.DIRECTORY_SEPARATOR;
-                if ($gz->extractList($files_paths, $sandbox)) {
-                    foreach ($files_list as $file2check) {
-                        //don't validate index.php, will be overwrite when extract in translation directory
-                        if (pathinfo($file2check['filename'], PATHINFO_BASENAME) == 'index.php') {
-                            continue;
-                        }
-
-                        if (preg_match('@^[0-9a-z-_/\\\\]+\.php$@i', $file2check['filename'])) {
-                            if (!@filemtime($sandbox.$file2check['filename']) || !AdminTranslationsController::checkTranslationFile(file_get_contents($sandbox.$file2check['filename']))) {
-                                $this->errors[] = sprintf(Tools::displayError('Validation failed for: %s'), $file2check['filename']);
-                            }
-                        } elseif (!preg_match('@mails[0-9a-z-_/\\\\]+\.(html|tpl|txt)$@i', $file2check['filename'])) {
-                            $this->errors[] = sprintf(Tools::displayError('Unidentified file found: %s'), $file2check['filename']);
-                        }
-                    }
+                if (!$gz->extractList($files_paths, $sandbox)) {
+                    $this->errors[] = Tools::displayError('The archive cannot be extracted.');
                     Tools::deleteDirectory($sandbox, true);
+                    return false;
                 }
+
+                foreach ($files_list as $file2check) {
+                    //don't validate index.php, will be overwrite when extract in translation directory
+                    if (pathinfo($file2check['filename'], PATHINFO_BASENAME) == 'index.php') {
+                        continue;
+                    }
+
+                    if (preg_match('@^[0-9a-z-_/\\\\]+\.php$@i', $file2check['filename'])) {
+                        if (!@filemtime($sandbox.$file2check['filename']) || !AdminTranslationsController::checkTranslationFile(file_get_contents($sandbox.$file2check['filename']))) {
+                            $this->errors[] = sprintf(Tools::displayError('Validation failed for: %s'), $file2check['filename']);
+                        }
+                    } elseif (!preg_match('@mails[0-9a-z-_/\\\\]+\.(html|tpl|txt)$@i', $file2check['filename'])) {
+                        $this->errors[] = sprintf(Tools::displayError('Unidentified file found: %s'), $file2check['filename']);
+                    }
+                }
+                Tools::deleteDirectory($sandbox, true);
 
                 $i = 0;
                 $tmp_array = array();
@@ -837,11 +846,26 @@ class AdminTranslationsControllerCore extends AdminController
     public static function filterTranslationFiles($list)
     {
         $kept = array();
+        $allowedExtensions = array('php', 'html', 'tpl', 'txt');
         foreach ($list as $file) {
-            if ('index.php' == basename($file['filename'])) {
+            $filename  = $file['filename'];
+            $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+
+            if (!in_array($extension, $allowedExtensions)) {
                 continue;
             }
-            if (preg_match('#^modules/([^/]+)/#', $file['filename'], $m)) {
+
+            if ('index.php' == basename($filename)) {
+                continue;
+            }
+
+            if ($extension === 'php'
+                && !preg_match('#^modules/([^/]+)/#', $filename)
+                && !preg_match('@^translations/[a-z]{2,3}/[a-z0-9_-]+\.php$@i', $filename)) {
+                continue;
+            }
+
+            if (preg_match('#^modules/([^/]+)/#', $filename, $m)) {
                 if (is_dir(_PS_MODULE_DIR_.$m[1])) {
                     $kept[] = $file;
                 }
@@ -3045,8 +3069,13 @@ class AdminTranslationsControllerCore extends AdminController
             $email_file = _PS_ROOT_DIR_.$email;
         }
 
-        $email_html = file_get_contents($email_file);
+        $sanitizedFilePath = realpath($email_file);
+        $permittedMailDir  = realpath(_PS_MAIL_DIR_) . DIRECTORY_SEPARATOR;
 
-        return $email_html;
+        if ($sanitizedFilePath === false || $permittedMailDir === false || strpos($sanitizedFilePath, $permittedMailDir) !== 0) {
+            return false;
+        }
+
+        return file_get_contents($sanitizedFilePath);
     }
 }

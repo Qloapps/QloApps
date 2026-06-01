@@ -36,6 +36,7 @@
 			</a>
 		{/if}
 	</div>
+	{if $can_edit}
 	<div class="well">
 		<form action="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;viewcustomer_thread&amp;id_customer_thread={$id_customer_thread|intval}" method="post" enctype="multipart/form-data" class="form-horizontal">
 			{foreach $actions as $action}
@@ -48,6 +49,7 @@
 			</button>
 		</form>
 	</div>
+	{/if}
 	<div class="row">
 		<div class="message-item-initial media">
 			<span class="avatar-md pull-left"><i class="icon-user icon-3x"></i></span>
@@ -97,6 +99,7 @@
 		{/foreach}
 	</div>
 </div>
+{if $can_edit}
 <div class="panel">
 	<form action="{$link->getAdminLink('AdminCustomerThreads')|escape:'html':'UTF-8'}&amp;id_customer_thread={$thread->id|intval}&amp;viewcustomer_thread" method="post" enctype="multipart/form-data" class="form-horizontal">
 	<h3>{l s="Your answer to"} {if isset($customer->firstname)}{$customer->firstname|escape:'html':'UTF-8'} {$customer->lastname|escape:'html':'UTF-8'} {else} {$thread->email}{/if}</h3>
@@ -125,7 +128,7 @@
 	</div>
 	</form>
 </div>
-
+{/if}
 {if count($timeline_items)}
 <div class="panel">
 	<h3>

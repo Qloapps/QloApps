@@ -923,6 +923,8 @@ $(document).ready(function() {
 
     // set positions of popups when required
     if (page_name == 'index') {
+        setBookingSearchPositions();
+
         $('#hotel_location, #id_hotel_button_chosen, #guest_occupancy').focus(function () {
             setBookingSearchPositions();
         });
@@ -932,6 +934,10 @@ $(document).ready(function() {
             $('#id_hotel_button_chosen .chosen-search input').focus(function () {
                 setBookingSearchPositions();
             });
+        });
+
+        $('select#id_hotel_button').on('chosen:showing_dropdown', function() {
+            setBookingSearchPositions();
         });
 
         $('#daterange_value').click(function () {
@@ -993,9 +999,8 @@ function setBookingSearchPositions() {
         // calculate max height for dropdowns
         let maxHeightNeeded = 0;
         $(inputFieldsAndDropdowns).each(function (i, inputFieldAndDropdown) {
-            if (!inputFieldAndDropdown.input.length) return false;
+            if (!inputFieldAndDropdown.input.length || !inputFieldAndDropdown.input.is(':visible')) return true;
 
-            // find needed space height
             let cssMaxHeight = parseInt(inputFieldAndDropdown.dropdown.css('max-height'));
             if (Number.isInteger(cssMaxHeight)) {
                 maxHeightNeeded = Math.max(maxHeightNeeded, cssMaxHeight);
@@ -1003,7 +1008,7 @@ function setBookingSearchPositions() {
         });
 
         // determine position class
-        if (spaceBottom < maxHeightNeeded && spaceTop > spaceBottom) {
+        if (spaceTop > spaceBottom && (maxHeightNeeded === 0 || spaceBottom < maxHeightNeeded)) {
             positionClass = 'top';
         }
     }

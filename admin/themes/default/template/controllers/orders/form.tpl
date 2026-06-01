@@ -2337,17 +2337,14 @@
                         <label class="control-label col-lg-3" for="order_message">{l s='Order message'}</label>
                         <div class="col-lg-6">
                             <textarea name="order_message" id="order_message" rows="3" cols="45"></textarea>
-                        </div>
-                    </div>
-					<div class="form-group col-lg-12">
-						<span class="col-lg-3"></span>
-						<p class="checkbox col-lg-6">
+							<p class="checkbox">
 							<label class="control-label" for="visibility">
 								<input type="checkbox" name="visibility" id="visibility" value="1" />
 								{l s='Display Message to Customer?'}
 							</label>
 						</p>
-					</div>
+                        </div>
+                    </div>
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
                         {if !$PS_CATALOG_MODE}
                         <div class="col-lg-9 col-lg-offset-3">
