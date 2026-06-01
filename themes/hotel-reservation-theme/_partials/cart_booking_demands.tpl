@@ -175,16 +175,28 @@
 																	</div>
 																</div>
 															</div>
-																<div class="col-xs-4">
-																	{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
-																		<span class="pull-right">
-																			{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}
-																			{if Product::getServicePriceBillableDays(
-																				$product.price_calculation_method,
-																				$cartRoom.date_from|default:'',
-																				$cartRoom.date_to|default:''
-																			) > 1}{l s='/Night'}{/if}
-																		</span>
+															<div class="col-xs-4">
+																{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
+																	<span class="room-service-product-value pull-right" data-unit_price="{if !$priceDisplay}{$product.price_tax_incl}{else}{$product.price_tax_exc}{/if}" data-currency_sign="{$currency->sign}">
+																		{if !$priceDisplay}
+																			{if $serviceSelected}
+																				{convertPrice price=$cartRoom['selected_service'][$product['id_product']]['total_price_tax_incl']}
+																			{else}
+																				{convertPrice price=$product.price_tax_incl}
+																			{/if}
+																		{else}
+																			{if $serviceSelected}
+																				{convertPrice price=$cartRoom['selected_service'][$product['id_product']]['total_price_tax_excl']}
+																			{else}
+																				{convertPrice price=$product.price_tax_exc}
+																			{/if}
+																		{/if}
+																		{if Product::getServicePriceBillableDays(
+																			$product.price_calculation_method,
+																			$cartRoom.date_from|default:'',
+																			$cartRoom.date_to|default:''
+																		) > 1}{l s='/Night'}{/if}
+																	</span>
 
 																	{/if}
 																</div>

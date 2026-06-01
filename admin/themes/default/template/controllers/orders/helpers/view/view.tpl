@@ -712,7 +712,7 @@
                 {if isset($messages) && $messages}
                     <div class="panel order-notes">
                         <div class="panel-heading">
-                            <i class="icon-undo"></i> &nbsp;{l s='Order Private Notes'}
+                            <i class="icon-undo"></i> &nbsp;{l s='Order Notes'}
                         </div>
                         <div class="panel-content">
                             {foreach from=$messages item=message name=customerMessage}
@@ -725,11 +725,11 @@
                                             <span>{$message['elastname']|escape:'html':'UTF-8'}{else}{$message['cfirstname']|escape:'html':'UTF-8'} {$message['clastname']|escape:'html':'UTF-8'}</span>
                                         {/if},
                                         <span class="message-date">&nbsp;<i class="icon-calendar"></i>
-                                            {dateFormat date=$message['date_add']}
+                                            {dateFormat date=$message.date_add full=1}
                                         </span>
-                                        {if ($message['private'] == 1)}
+                                        {* {if ($message['private'] == 1)}
                                             <span class="badge badge-info">{l s='Private'}</span>
-                                        {/if}
+                                        {/if} *}
                                     </p>
                                 </div>
                                 {if !$smarty.foreach.customerMessage.last}<hr/>{/if}

@@ -599,6 +599,9 @@ $(document).ready(function()
 	$(document).on('click', '#rooms_extra_services .qty_up', function(e) {
         e.preventDefault();
         qtyfield = $(this).closest('.qty_container').find('input.qty');
+		roomServiceProductValue = $(this).closest('.room_demand_block').find('.room-service-product-value');
+		roomServiceProductUnitPrice = roomServiceProductValue.data('unit_price');
+		roomServiceProductCurrencySign = roomServiceProductValue.data('currency_sign');
         var newQuantity = parseInt(qtyfield.val()) + 1;
 		if (qtyfield.data('max_quantity') && qtyfield.data('max_quantity') < newQuantity) {
             newQuantity = qtyfield.data('max_quantity');
@@ -608,6 +611,8 @@ $(document).ready(function()
 				showErrorMessage(txtMaxQuantityAdded);
 			}
         } else {
+			roomServiceProductTotalPriceQtyUp = newQuantity*roomServiceProductUnitPrice;
+			roomServiceProductValue.text(roomServiceProductCurrencySign + roomServiceProductTotalPriceQtyUp.toFixed(priceDisplayPrecision))
 			qtyfield.val(newQuantity).trigger('focusout');
 		}
     });
@@ -615,9 +620,15 @@ $(document).ready(function()
     $(document).on('click', '#rooms_extra_services .qty_down', function(e) {
         e.preventDefault();
         qtyfield = $(this).closest('.qty_container').find('input.qty');
+		roomServiceProductValue = $(this).closest('.room_demand_block').find('.room-service-product-value');
+		roomServiceProductUnitPrice = roomServiceProductValue.data('unit_price');
+		roomServiceProductCurrencySign = roomServiceProductValue.data('currency_sign');
         var currentVal = parseInt(qtyfield.val());
         if (!isNaN(currentVal) && currentVal > 1) {
             qtyfield.val(currentVal - 1).trigger('focusout');
+			roomServiceProductTotalPriceQtyDown = qtyfield.val()*roomServiceProductUnitPrice;
+			roomServiceProductValue.text(roomServiceProductCurrencySign + roomServiceProductTotalPriceQtyDown.toFixed(priceDisplayPrecision))
+
         } else {
             qtyfield.val(1);
 			if (currentVal != 1) {
@@ -628,12 +639,20 @@ $(document).ready(function()
 
     $(document).on('focusout', '#rooms_extra_services .qty', function(e) {
         var qty_wntd = $(this).val();
-        if (qty_wntd == '' || !$.isNumeric(qty_wntd)) {
+		roomServiceProductValue = $(this).closest('.room_demand_block').find('.room-service-product-value');
+		roomServiceProductUnitPrice = roomServiceProductValue.data('unit_price');
+		roomServiceProductCurrencySign = roomServiceProductValue.data('currency_sign');
+
+        if (qty_wntd == '' || !$.isNumeric(qty_wntd) || qty_wntd < 1) {
             $(this).val(1);
         }
 		if ($(this).data('max_quantity') && $(this).data('max_quantity') < qty_wntd) {
             $(this).val(qtyfield.data('max_quantity'));
         }
+
+		roomServiceProductTotalPriceQty = $(this).val()*roomServiceProductUnitPrice;
+		roomServiceProductValue.text(roomServiceProductCurrencySign + roomServiceProductTotalPriceQty.toFixed(priceDisplayPrecision))
+
 		if ($(this).closest('.room_demand_block').find('.change_room_type_service_product').is(':checked')) {
 			updateServiceProducts($(this).closest('.room_demand_block').find('.change_room_type_service_product'));
 		}
