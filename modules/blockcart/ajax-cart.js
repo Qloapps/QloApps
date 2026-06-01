@@ -1317,6 +1317,17 @@ var ajaxCart = {
         } else {
             $('.ajax_cart_convenience_fee').parent().hide();
         }
+        if (jsonData.fixed_tax !== undefined) {
+            $('.ajax_cart_fixed_tax').text(jsonData.fixed_tax_format);
+            if (jsonData.fixed_tax_name) {
+                $('.ajax_cart_fixed_tax_name').text(jsonData.fixed_tax_name);
+            }
+            if (parseFloat(jsonData.fixed_tax) > 0) {
+                $('.ajax_cart_fixed_tax').parent().show();
+            } else {
+                $('.ajax_cart_fixed_tax').parent().hide();
+            }
+        }
         $('.ajax_total_price_wt').text(jsonData.total_price_wt);
 
         if (parseFloat(jsonData.free_shipping_float) > 0) {

@@ -25,7 +25,7 @@
 
 <!--  TAX DETAILS -->
 
-{if (isset($tax_breakdowns) && $tax_breakdowns)}
+{if (isset($tax_breakdowns) && $tax_breakdowns) || (isset($fixed_tax_breakdown) && $fixed_tax_breakdown|@count > 0)}
 	{assign var=th_rows value=3}
 	{if isset($showTaxName) && $showTaxName}
 		{assign var=th_rows value=$th_rows+1}
@@ -112,6 +112,24 @@
 				</tr>
 			{/foreach}
 		{/foreach}
+		{if isset($fixed_tax_breakdown) && $fixed_tax_breakdown|@count > 0}
+			{foreach from=$fixed_tax_breakdown key=taxName item=taxData}
+				{assign var=has_line value=true}
+				<tr class="tr-border-top">
+					<td class="white">{l s='Fixed Taxes' pdf='true'}</td>
+					{if isset($showTaxName) && $showTaxName}
+						<td class="white">{$taxName|escape:'html':'UTF-8'}</td>
+					{/if}
+					<td class="white">-</td>
+					{if $display_tax_bases_in_breakdowns}
+						<td class="white">{displayPrice currency=$order->id_currency price=$taxData.total_amount}</td>
+					{/if}
+					<td class="white">
+						{displayPrice currency=$order->id_currency price=$taxData.total_amount}
+					</td>
+				</tr>
+			{/foreach}
+		{/if}
 		{if !$has_line}
 			<tr>
 				<td class="white" colspan="{if $display_tax_bases_in_breakdowns}4{else}3{/if}">

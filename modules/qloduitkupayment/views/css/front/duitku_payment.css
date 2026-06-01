@@ -1,0 +1,47 @@
+/**
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Academic Free License (AFL 3.0)
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/licenses/afl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
+* @license LICENSE.txt
+*/
+
+p.payment_module a.qlo_duitku_payment {
+    background: url('../../img/duitku.png') no-repeat scroll 15px 8px #FBFBFB;}
+.modal-title, .body_title{
+    text-align: center;}
+.modal-footer, .body_content{
+    padding-left:120px;
+    padding-top: 10px;
+    padding-bottom: 10px;}
+.close{
+    padding-right: 30px !important;}
+.duitku_loading_overlay{
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;}
+.duitku_loading_img {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    margin-left: -16px;}

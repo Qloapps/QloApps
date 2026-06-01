@@ -368,6 +368,54 @@ class AdminOrdersControllerCore extends AdminController
                 'icon' => 'process-icon-new'
             );
         }
+        if ($this->display == 'view') {
+            /** @var Order $order */
+            if (Validate::isLoadedObject($order = $this->loadObject())) {
+                // hotel link in header
+                if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
+                    $this->page_header_toolbar_btn['hotel'] = array(
+                        'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
+                        'desc' => $this->l('View Hotel'),
+                        'class' => 'icon-building',
+                        'target' => true,
+                    );
+                }
+
+                if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
+                    $this->page_header_toolbar_btn['file'] = array(
+                        'short' => $this->l('Invoice'),
+                        'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.$order->id,
+                        'desc' => $this->l('View invoice'),
+                        'class' => 'icon-file-text',
+                        'target' => true,
+                    );
+                }
+
+                $this->page_header_toolbar_btn['print'] = array(
+                    'short' => $this->l('Print'),
+                    'href' => 'javascript:window.print()',
+                    'desc' => $this->l('Print order'),
+                    'class' => 'icon-print',
+                );
+
+                if ($this->tabAccess['edit'] === 1) {
+                    if (((int) $order->isReturnable())
+                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG, 0, 0)
+                    ) {
+                        $orderTotalPaid = $order->getTotalPaid();
+                        $orderDiscounts = $order->getCartRules();
+                        $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
+                        $this->page_header_toolbar_btn['cancel'] = array(
+                            'short' => ($hasOrderDiscountOrPayment) ? $this->l('Refund') : $this->l('Cancel'),
+                            'id' => 'desc-order-standard_refund',
+                            'desc' => ($hasOrderDiscountOrPayment) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
+                            'class' => 'icon-exchange',
+                            'target' => true,
+                        );
+                    }
+                }
+            }
+        }
 
         parent::initPageHeaderToolbar();
     }
@@ -437,13 +485,13 @@ class AdminOrdersControllerCore extends AdminController
                     'advance_payment_amount_without_tax' => $cart->getOrderTotal(false, Cart::ADVANCE_PAYMENT),
                     'advance_payment_amount_with_tax' => $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
                     'cart' => $cart,
+                    'customer' => $cart->id_customer ? new Customer($cart->id_customer): null ,
                     'currencies' => Currency::getCurrenciesByIdShop(Context::getContext()->shop->id),
                     'langs' => Language::getLanguages(true, Context::getContext()->shop->id),
                     'payment_modules' => $payment_modules,
                     'payment_types' => $paymentTypes,
                     'PAYMENT_TYPE_PAY_AT_HOTEL' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                     'currency' => new Currency((int)$cart->id_currency),
-                    'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
                     'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 ));
@@ -476,55 +524,6 @@ class AdminOrdersControllerCore extends AdminController
 
     public function initToolbar()
     {
-        if ($this->display == 'view') {
-            /** @var Order $order */
-            if (Validate::isLoadedObject($order = $this->loadObject())) {
-                // hotel link in header
-                if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id)) {
-                    $this->toolbar_btn['hotel'] = array(
-                        'href' => $this->context->link->getAdminLink('AdminAddHotel').'&id='.$idHotel.'&updatehtl_branch_info',
-                        'desc' => $this->l('View Hotel'),
-                        'class' => 'icon-building',
-                        'target' => true,
-                    );
-                }
-
-                if (Configuration::get('PS_INVOICE') && $order->hasInvoice() && !$this->lite_display) {
-                    $this->toolbar_btn['file'] = array(
-                        'short' => $this->l('Invoice'),
-                        'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateInvoicePDF&id_order='.$order->id,
-                        'desc' => $this->l('View invoice'),
-                        'class' => 'icon-file-text',
-                        'target' => true,
-                    );
-                }
-
-                $this->toolbar_btn['print'] = array(
-                    'short' => $this->l('Print'),
-                    'href' => 'javascript:window.print()',
-                    'desc' => $this->l('Print order'),
-                    'class' => 'icon-print',
-                );
-
-                if ($this->tabAccess['edit'] === 1) {
-                    if (((int) $order->isReturnable())
-                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG, 0, 0)
-                    ) {
-                        $orderTotalPaid = $order->getTotalPaid();
-                        $orderDiscounts = $order->getCartRules();
-                        $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
-                        $this->toolbar_btn['cancel'] = array(
-                            'short' => ($hasOrderDiscountOrPayment) ? $this->l('Refund') : $this->l('Cancel'),
-                            'id' => 'desc-order-standard_refund',
-                            'desc' => ($hasOrderDiscountOrPayment) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
-                            'class' => 'icon-exchange',
-                            'target' => true,
-                        );
-                    }
-                }
-            }
-        }
-
         $res = parent::initToolbar();
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && isset($this->toolbar_btn['new']) && Shop::isFeatureActive()) {
             unset($this->toolbar_btn['new']);
@@ -786,6 +785,8 @@ class AdminOrdersControllerCore extends AdminController
                     'order' => $objOrder,
                     'current_index' => self::$currentIndex,
                     'hotel_order_status' => $htlOrderStatus,
+                    'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
+                    'current_room_status' => Tools::getValue('current_room_status')
                 )
             );
             $modal = array(
@@ -3112,9 +3113,6 @@ class AdminOrdersControllerCore extends AdminController
             $this->kpis[] = $helper;
         }
 
-        Hook::exec('action'.$this->controller_name.'KPIListingModifier', array(
-            'kpis' => &$kpis,
-        ));
 
         return parent::renderKpis();
     }
@@ -3305,6 +3303,8 @@ class AdminOrdersControllerCore extends AdminController
         if ($order_detail_data = $objBookingDetail->getOrderFormatedBookinInfoByIdOrder($order->id)) {
             $objBookingDemand = new HotelBookingDemands();
             $objHotelRoomType = new HotelRoomType();
+            $fixedTaxData = HotelFixedTax::getFixedTaxesForOrder($order->id, $this->context->language->id);
+            $fixedTaxByBookingDetail = $fixedTaxData['by_booking_detail'];
             foreach ($order_detail_data as $key => $value) {
                 $order_detail_data[$key]['total_room_price_te'] = $value['total_price_tax_excl'];
                 $order_detail_data[$key]['total_room_price_ti'] = $value['total_price_tax_incl'];
@@ -3484,6 +3484,11 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['amt_with_qty_tax_excl'] = $value['total_price_tax_excl'];
                 $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
+                $roomFixedTax = isset($fixedTaxByBookingDetail[$value['id']]) ? (float)$fixedTaxByBookingDetail[$value['id']] : 0.0;
+                if ($roomFixedTax > 0) {
+                    $order_detail_data[$key]['total_room_price_ti'] += $roomFixedTax;
+                    $total_room_tax += $roomFixedTax;
+                }
                 $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
 
                 if (isset($value['refund_info'])
@@ -3592,16 +3597,22 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
 
-            $messages = array_merge($customerMessages, $messages);
-            usort($messages, function ($a, $b) {
-                return strtotime($a['date_add']) < strtotime($b['date_add']);
-            });
+            if($messages = array_merge($customerMessages, $messages)){
+                usort($messages, function ($a, $b) {
+                    return (strtotime($a['date_add']) < strtotime($b['date_add'])) ? 1 : -1;
+                });
+            }
         }
 
         // send hotel standalone and standalone products
         $objProduct = new Product();
         $hotelStandaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
         $standaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
+
+        $cart = new Cart($order->id_cart);
+        $fixedTax = $fixedTaxData['total'];
+        $fixedTaxName = implode(', ', array_keys($fixedTaxData['breakdown']));
+        $fixedTaxBreakdown = $fixedTaxData['breakdown'];
 
         $this->tpl_view_vars = array(
             'hotelStandaloneProducts' => $hotelStandaloneProducts,
@@ -3626,14 +3637,16 @@ class AdminOrdersControllerCore extends AdminController
             'htl_booking_order_data' => $bookingOrderInfo,
             'hotel_order_status' => $htlOrderStatus,
             'order_detail_data' => $order_detail_data,
-            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'hotel_service_products' => $orderHotelServiceProducts,
             'standalone_service_products' => $orderStandaloneServiceProducts,
             'hotel_booking' => $hotelBooking,
             /*END*/
             'order' => $order,
-            'cart' => new Cart($order->id_cart),
+            'cart' => $cart,
+            'fixed_tax' => $fixedTax,
+            'fixed_tax_name' => $fixedTaxName,
+            'fixed_tax_breakdown' => $fixedTaxBreakdown,
             'customer' => $customer,
             'allowBackdateOrder' => $allowBackdateOrder,
             'gender' => $gender,
@@ -3710,6 +3723,7 @@ class AdminOrdersControllerCore extends AdminController
             'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
             'order_convenience_fee_services' => $orderConvenienceFeeServices,
+            'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
         );
 
         return parent::renderView();
@@ -5325,6 +5339,14 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if ($objBookingDetail->save()) {
+                    // snapshot fixed taxes at admin order creation
+                    HotelFixedTax::saveBookingFixedTaxes(
+                        $objBookingDetail->id,
+                        (array)$objCartBookingData,
+                        $idLang
+                    );
+                    $order->total_paid = $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+                    $order->update();
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                     $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                     $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -6194,13 +6216,28 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
 
-        $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
-        $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
-        $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
-        $order->save();
+        HotelFixedTax::saveBookingFixedTaxes(
+            (int)$obj_booking_detail->id,
+            array(
+                'id_hotel'   => (int)$id_hotel,
+                'date_from'  => $new_date_from,
+                'date_to'    => $new_date_to,
+                'adults'     => (int)$adults,
+                'child_ages' => ($child_ages !== false)
+                    ? (is_array($child_ages) ? json_encode($child_ages) : $child_ages)
+                    : '[]',
+            ),
+            $this->context->language->id
+        );
 
-        // Save order invoice
+        $order->total_paid = $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
+        $order->update();
+
+        // Sync invoice total from order — getOrderTotal() is the single source after snapshot refresh
         if (isset($order_invoice) && $order_invoice instanceof OrderInvoice) {
+            $order_invoice->total_paid_tax_incl = $order->total_paid_tax_incl;
+            $order_invoice->total_paid_tax_excl = $order->total_paid_tax_excl;
             $order_invoice->total_products = $order_invoice->total_paid_tax_excl;
             $order_invoice->total_products_wt = $order_invoice->total_paid_tax_incl;
             $res &= $order_invoice->update();
@@ -6578,6 +6615,9 @@ class AdminOrdersControllerCore extends AdminController
         // Reinject quantity in stock
         $order_detail->reinjectQuantity($order_detail, $order_detail->product_quantity, $delete);
 
+        // Remove fixed tax snapshot before computing totals so getOrderTotal excludes the deleted room
+        HotelFixedTax::deleteByBookingDetail((int)$idHotelBooking);
+
         // Update Order
         // values changes as values are calculated accoding to the quantity of the product by webkul
         $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
@@ -6591,6 +6631,15 @@ class AdminOrdersControllerCore extends AdminController
         $order->total_products_wt = $order->total_products_wt > 0 ? $order->total_products_wt : 0;
 
         $res &= $order->update();
+
+        // Sync invoice total from order — getOrderTotal() is the single source after snapshot deletion
+        if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
+            $order_invoice->total_paid_tax_incl = $order->total_paid_tax_incl;
+            $order_invoice->total_paid_tax_excl = $order->total_paid_tax_excl;
+            $order_invoice->total_products = $order_invoice->total_paid_tax_excl;
+            $order_invoice->total_products_wt = $order_invoice->total_paid_tax_incl;
+            $res &= $order_invoice->update();
+        }
 
         // Update weight SUM
         $order_carrier = new OrderCarrier((int) $order->getIdOrderCarrier());
@@ -7487,7 +7536,7 @@ class AdminOrdersControllerCore extends AdminController
                                 $response['hasError'] = true;
                                 $response['errors'][] = Tools::displayError('Invalid quantity provided for service').': '.$objServiceProductOrderDetail->name;
                             }
-                        } elseif ($serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
+                        } elseif (is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail]) && $serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
                             $response['hasError'] = true;
                             $response['errors'][] = Tools::displayError('Can not order multiple quanitity for service').': '.$objServiceProductOrderDetail->name;
                         }
@@ -7508,7 +7557,11 @@ class AdminOrdersControllerCore extends AdminController
                     $result = true;
                     foreach ($selectedServicesOrderDetails as $idRoomTypeServiceProductOrderDetail) {
                         $objServiceProductOrderDetail = new ServiceProductOrderDetail($idRoomTypeServiceProductOrderDetail);
-                        $quantity = $serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        if(is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail])) {
+                            $quantity = (int)$serviceQuantities[$idRoomTypeServiceProductOrderDetail];
+                        } else {
+                            $quantity = 1;
+                        }
                         $unitPrice = $serviceUnitPrices[$idRoomTypeServiceProductOrderDetail];
 
                         $objHotelBookingDetail = new HotelBookingDetail($objServiceProductOrderDetail->id_htl_booking_detail);
@@ -8715,30 +8768,49 @@ class AdminOrdersControllerCore extends AdminController
             }
 
             if (empty($this->errors)) {
-                $objHotelBookingDetail->id_status = $newStatus;
-                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
-                    $objHotelBookingDetail->check_in = $statusDate;
-                } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
-                    $objHotelBookingDetail->check_out = $statusDate;
-                } else {
-                    $objHotelBookingDetail->check_in = '';
-                    $objHotelBookingDetail->check_out = '';
-                }
-                if ($objHotelBookingDetail->save()) {
-                    Hook::exec(
-                        'actionRoomBookingStatusUpdateAfter',
-                        array(
-                            'id_hotel_booking_detail' => $objHotelBookingDetail->id,
-                            'id_order' => $objHotelBookingDetail->id_order,
-                            'id_room' => $objHotelBookingDetail->id_room,
-                            'date_from' => $objHotelBookingDetail->date_from,
-                            'date_to' => $objHotelBookingDetail->date_to
-                        )
-                    );
 
-                    Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $objHotelBookingDetail->id_order.'&vieworder&token='.$this->token.'&conf=4');
+                $id_order = $objHotelBookingDetail->id_order;
+                $order = new Order($id_order);
+                $remainingCheckoutRooms = 0;
+                if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                    $orderBookings = $objHotelBookingDetail->getOrderCurrentDataByOrderId(
+                        $id_order,
+                        array(HotelBookingDetail::STATUS_ALLOTED, HotelBookingDetail::STATUS_CHECKED_IN),
+                        0,
+                        0
+                    );
+                    $remainingCheckoutRooms = count($orderBookings);
+                }
+                $hasPendingBills = $order->getTotalPaid() < $order->getOrderTotal();
+
+                if ($remainingCheckoutRooms == 1 && $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT && $hasPendingBills) {
+                    $this->errors[] = Tools::displayError('You cannot checkout the last room while there are pending bills for this order.');
                 } else {
-                    $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
+                    $objHotelBookingDetail->id_status = $newStatus;
+                    if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
+                        $objHotelBookingDetail->check_in = $statusDate;
+                    } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
+                        $objHotelBookingDetail->check_out = $statusDate;
+                    } else {
+                        $objHotelBookingDetail->check_in = '';
+                        $objHotelBookingDetail->check_out = '';
+                    }
+                    if ($objHotelBookingDetail->save()) {
+                        Hook::exec(
+                            'actionRoomBookingStatusUpdateAfter',
+                            array(
+                                'id_hotel_booking_detail' => $objHotelBookingDetail->id,
+                                'id_order' => $objHotelBookingDetail->id_order,
+                                'id_room' => $objHotelBookingDetail->id_room,
+                                'date_from' => $objHotelBookingDetail->date_from,
+                                'date_to' => $objHotelBookingDetail->date_to
+                            )
+                        );
+
+                        Tools::redirectAdmin(self::$currentIndex . '&id_order=' . (int) $objHotelBookingDetail->id_order . '&vieworder&token=' . $this->token . '&conf=4');
+                    } else {
+                        $this->errors[] = Tools::displayError('Some error occurred. Please try again.');
+                    }
                 }
             }
         } else {

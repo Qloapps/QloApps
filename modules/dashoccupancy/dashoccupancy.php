@@ -90,21 +90,21 @@ class DashOccupancy extends Module
         if ($occupancyData['count_total']) {
             $dataPieChartBig = array(
                 array(
-                    'label' => $this->l('Occupied Rooms'),
+                    'label' => $this->l('Occupied Room Nights'),
                     'value' => $occupancyData['count_occupied'],
                     'percent' => Tools::ps_round(($occupancyData['count_total']
                         ? ($occupancyData['count_occupied'] / $occupancyData['count_total']) * 100
                         : 0), 2),
                 ),
                 array(
-                    'label' => $this->l('Available Rooms'),
+                    'label' => $this->l('Available Room Nights'),
                     'value' => $occupancyData['count_available'],
                     'percent' => Tools::ps_round(($occupancyData['count_total']
                         ? ($occupancyData['count_available'] / $occupancyData['count_total']) * 100
                         : 0), 2),
                 ),
                 array(
-                    'label' => $this->l('Unavailable Rooms'),
+                    'label' => $this->l('Unavailable Room Nights'),
                     'value' => $occupancyData['count_unavailable'],
                     'percent' => Tools::ps_round(($occupancyData['count_total']
                         ? ($occupancyData['count_unavailable'] / $occupancyData['count_total']) * 100

@@ -5776,10 +5776,13 @@ textarea {
   background: #fff; }
 
 #columns {
+    padding: 0;
+}
+#columns:has(#center_column > *) {
   position: relative;
   padding-bottom: 50px;
-  padding-top: 15px; }
-
+  padding-top: 15px; 
+}
 #index .tab-content {
   margin-top: 35px;
   margin-bottom: 34px; }

@@ -1639,6 +1639,8 @@ class CartCore extends ObjectModel
         $products_total = array();
         $ecotax_total = 0;
         $totalDemandsPrice = 0;
+        $totalFixedTax = 0;
+        $applyFixedTax = ($with_taxes && in_array($type, array(Cart::BOTH, Cart::BOTH_WITHOUT_SHIPPING, Cart::ONLY_PRODUCTS_WITH_DEMANDS)));
         $objCartBookingData = new HotelCartBookingData();
         $objServiceProductCartDetail = new ServiceProductCartDetail();
         $objAdvPayment = new HotelAdvancedPayment();
@@ -1833,7 +1835,7 @@ class CartCore extends ObjectModel
                         $this->id,
                         [],
                         0,
-                        null,
+                        isset($product['id_hotel_cart_booking']) ? $product['id_hotel_cart_booking'] : null,
                         null,
                         (int)$product['id_product'],
                         null,
@@ -1886,6 +1888,11 @@ class CartCore extends ObjectModel
                         $totalPriceByProduct = $roomTotalPrice['total_price_tax_incl'];
                     } else {
                         $totalPriceByProduct = $roomTotalPrice['total_price_tax_excl'];
+                    }
+
+                    if ($applyFixedTax) {
+                        $singleRoomTaxData = HotelFixedTax::getFixedTaxesInCart((int)$this->id, (int)$cartRoomInfo['id_hotel'], (int)$cartRoomInfo['id_product'], (int)$cartRoomInfo['id_room'], $cartRoomInfo['date_from'], $cartRoomInfo['date_to']);
+                        $totalFixedTax += $singleRoomTaxData['total'];
                     }
 
                     // If customer has selected advance payment of the cart
@@ -2048,6 +2055,10 @@ class CartCore extends ObjectModel
 
         if ($type == Cart::BOTH || $type == Cart::ADVANCE_PAYMENT) {
             $order_total += $shipping_fees + $wrapping_fees;
+        }
+
+        if ($applyFixedTax) {
+            $order_total += $totalFixedTax;
         }
 
         if ($order_total < 0 && $type != Cart::ONLY_DISCOUNTS) {
@@ -3931,11 +3942,14 @@ class CartCore extends ObjectModel
         }
 
         $objHotelAdvancedPayment = new HotelAdvancedPayment();
+        $fixedTaxData = HotelFixedTax::getFixedTaxesInCart($this->id, 0, 0, 0, '', '', $id_lang);
+        $fixed_tax = $fixedTaxData['total'];
+        $fixed_tax_name = implode(', ', array_keys($fixedTaxData['breakdown']));
         $total_rooms_with_services_without_discount_te = $total_rooms + $total_demands + $total_additional_services + $total_additional_services_auto_add + $total_standalone_service_products;
         $total_rooms_with_services_without_discount_ti = $total_rooms_wt + $total_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt + $total_standalone_service_products_wt;
 
         $cart_total_without_discount_te = $total_rooms_with_services_without_discount_te + $convenience_fee;
-        $cart_total_without_discount_ti = $total_rooms_with_services_without_discount_ti + $convenience_fee_wt;
+        $cart_total_without_discount_ti = $total_rooms_with_services_without_discount_ti + $convenience_fee_wt + $fixed_tax;
         $total_tax_without_discount = $cart_total_without_discount_ti - $cart_total_without_discount_te;
         if ($total_tax_without_discount < 0) {
             $total_tax_without_discount = 0;
@@ -3986,7 +4000,10 @@ class CartCore extends ObjectModel
             'total_rooms_with_services_without_discount_ti' => $total_rooms_with_services_without_discount_ti,
             'cart_total_without_discount_te' => $cart_total_without_discount_te,
             'cart_total_without_discount_ti' => $cart_total_without_discount_ti,
-            'total_tax_without_discount' => $total_tax_without_discount
+            'total_tax_without_discount' => $total_tax_without_discount,
+            'fixed_tax' => $fixed_tax,
+            'fixed_tax_name' => $fixed_tax_name,
+            'fixed_tax_breakdown' => $fixedTaxData['breakdown'],
         );
         $hook = Hook::exec('actionCartSummary', $summary, null, true);
         if (is_array($hook)) {

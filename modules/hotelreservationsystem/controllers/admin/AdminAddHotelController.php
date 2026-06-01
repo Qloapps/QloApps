@@ -176,6 +176,8 @@ class AdminAddHotelController extends ModuleAdminController
             }
 
             $smartyVars['order_restrict_date_info'] = HotelOrderRestrictDate::getDataByHotelId($idHotel);
+            $smartyVars['hotel_fixed_taxes']     = HotelFixedTax::getHotelFixedTaxesInfo($idHotel, $currentLangId, false);
+            $smartyVars['adminHotelFixedTaxLink'] = $this->context->link->getAdminLink('AdminHotelFixedTax');
             $objHotelFeatures = new HotelFeatures();
             $hotelFeatures = $this->object->getFeaturesOfHotelByHotelId($this->object->id);
             if ($features = $objHotelFeatures->HotelBranchSelectedFeaturesArray($hotelFeatures)) {
@@ -206,17 +208,31 @@ class AdminAddHotelController extends ModuleAdminController
                 $treeContent = $tree->render();
                 $smartyVars['hotel_feature_tree'] = $treeContent;
             }
+
+            $smartyVars['rewrite_url'] = [];
+            $idHotelCategory = (int) $hotelBranchInfo->id_category;
+            if ($idHotelCategory > 0 && !empty($smartyVars['languages'])) {
+                foreach ($smartyVars['languages'] as $lang) {
+                    $idLang = (int) $lang['id_lang'];
+                    $category = new Category($idHotelCategory, $idLang);
+                    if (!Validate::isLoadedObject($category)) {
+                        continue;
+                    }
+
+                    $fullUrl = $this->context->link->getCategoryLink($category, '[REWRITE]', $idLang);
+                    $smartyVars['rewrite_url'][$idLang] = explode('[REWRITE]', $fullUrl);
+                }
+            }
         } else {
             $idCountry = Tools::getValue('hotel_country');
         }
-
         // manage state option
         $stateOptions = null;
         if ($idCountry) {
             $stateOptions = State::getStatesByIdCountry($idCountry);
         }
-
         $smartyVars['state_var'] = $stateOptions;
+        $smartyVars['currency'] = $this->context->currency;
         $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('PS_MAP_ID') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
         $smartyVars['PS_MAX_CHECKOUT_OFFSET'] = (int) Configuration::get('PS_MAX_CHECKOUT_OFFSET');
@@ -258,6 +274,7 @@ class AdminAddHotelController extends ModuleAdminController
         $address = Tools::getValue('address');
         $active = Tools::getValue('ENABLE_HOTEL');
         $fax = Tools::getValue('fax');
+        $vatNumber = trim(Tools::getValue('vat_number'));
         $activeRefund = Tools::getValue('active_refund');
         $enableUseGlobalMaxCheckoutOffset = Tools::getValue('enable_use_global_max_checkout_offset');
         $maxCheckoutOffset = trim(Tools::getValue('max_checkout_offset'));
@@ -386,6 +403,11 @@ class AdminAddHotelController extends ModuleAdminController
 
         if ($fax && !Validate::isGenericName($fax)) {
             $this->errors[] = $this->l('Field fax in invalid.');
+        }
+        if ($vatNumber && !Validate::isGenericName($vatNumber)) {
+            $this->errors[] = $this->l('Field VAT number is invalid.');
+        } else if (Tools::strlen($vatNumber) > 64) {
+            $this->errors[] = $this->l('Field VAT number cannot exceed 64 characters.');
         }
 
         if (!$country) {
@@ -642,6 +664,7 @@ class AdminAddHotelController extends ModuleAdminController
                 $objAddress->id_country = $country;
                 $objAddress->id_state = $state;
                 $objAddress->city = $city;
+                $objAddress->vat_number = $vatNumber;
                 $objAddress->postcode = $zipcode;
                 $hotelName = $objHotelBranch->hotel_name[$defaultLangId];
                 $hotelName = trim(preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName));

@@ -1317,6 +1317,35 @@ var ajaxCart = {
         } else {
             $('.ajax_cart_convenience_fee').parent().hide();
         }
+        if (jsonData.fixed_tax !== undefined) {
+            var breakdown = jsonData.fixed_tax_breakdown || {};
+            var taxNames = Object.keys(breakdown);
+            $('.ajax_cart_fixed_tax_container').each(function () {
+                var $container = $(this);
+                var type = $container.data('container');
+                $container.empty();
+                if (taxNames.length > 0) {
+                    $.each(breakdown, function (taxName, taxData) {
+                        var html;
+                        if (type === 'popup') {
+                            html = '<div class="layer_cart_row ajax_cart_fixed_tax_row">'
+                                + '<strong class="dark"><span>' + taxName + '</span></strong>'
+                                + '<span class="price pull-right">' + taxData.total_amount_format + '</span>'
+                                + '</div>';
+                        } else {
+                            html = '<div class="cart-prices-line ajax_cart_fixed_tax_row">'
+                                + '<span class="price pull-right">' + taxData.total_amount_format + '</span>'
+                                + '<span>' + taxName + '</span>'
+                                + '</div>';
+                        }
+                        $container.append(html);
+                    });
+                    $container.show();
+                } else {
+                    $container.hide();
+                }
+            });
+        }
         $('.ajax_total_price_wt').text(jsonData.total_price_wt);
 
         if (parseFloat(jsonData.free_shipping_float) > 0) {

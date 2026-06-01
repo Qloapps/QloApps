@@ -3142,8 +3142,12 @@ class OrderCore extends ObjectModel
         // Get cart rules total
         $orderTotalDiscount = $this->getCartRulesTotal($useTax);
 
-        // Update order with new amounts after removing cart rule
-        $totalOrder = ($totalExtraDemands + $totalRoomsAndServices) - $orderTotalDiscount;
+        $totalFixedTax = 0;
+        if ($useTax) {
+            $totalFixedTax = HotelFixedTax::getFixedTaxesForOrder($this->id)['total'];
+        }
+
+        $totalOrder = ($totalExtraDemands + $totalRoomsAndServices + $totalFixedTax) - $orderTotalDiscount;
         $totalOrder = $totalOrder > 0 ? $totalOrder : 0;
 
         return $totalOrder;

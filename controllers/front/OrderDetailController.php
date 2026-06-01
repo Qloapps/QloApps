@@ -100,6 +100,9 @@ class OrderDetailControllerCore extends FrontController
                 $total_demands_price_ti = 0;
                 $total_convenience_fee_te = 0;
                 $total_convenience_fee_ti = 0;
+                $fixed_tax = 0;
+                $fixedTaxNames = array();
+                $fixedTaxHotels = array();
                 $roomTypes = array();
                 $objOrderReturn = new OrderReturn();
                 $refundedAmount = 0;
@@ -422,6 +425,18 @@ class OrderDetailControllerCore extends FrontController
                     }
                 }
 
+                // Read fixed taxes from snapshot (falls back for pre-feature orders)
+                $fixedTaxData = HotelFixedTax::getFixedTaxesForOrder($order->id, $this->context->language->id);
+                $fixed_tax = $fixedTaxData['total'];
+                $fixed_tax_name = implode(', ', array_keys($fixedTaxData['breakdown']));
+                $fixed_tax_breakdown = $fixedTaxData['breakdown'];
+                $room_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, true);
+                $room_price_tax_incl = $order->getTotalProductsWithTaxes(false, true);
+                $room_services_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_te;
+                $room_services_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_ti;
+                $total_standard_products_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
+                $total_standard_products_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
+                $total_tax_without_discount = ($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl) + ($total_standard_products_tax_incl - $total_standard_products_tax_excl) + $fixed_tax;
 
                 $this->context->smarty->assign(
                     array(
@@ -429,6 +444,10 @@ class OrderDetailControllerCore extends FrontController
                         'THEME_DIR' => _THEME_DIR_,
                         'total_convenience_fee_ti' => $total_convenience_fee_ti,
                         'total_convenience_fee_te' => $total_convenience_fee_te,
+                        'fixed_tax' => $fixed_tax,
+                        'fixed_tax_name' => $fixed_tax_name,
+                        'fixed_tax_breakdown' => $fixed_tax_breakdown,
+                        'total_tax_without_discount' => $total_tax_without_discount,
                         'total_demands_price_ti' => $total_demands_price_ti,
                         'total_demands_price_te' => $total_demands_price_te,
                         'any_back_order' => $anyBackOrder,

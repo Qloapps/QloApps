@@ -135,6 +135,8 @@ class OrderConfirmationControllerCore extends FrontController
             $orderTotalInfo['total_paid_real'] = 0;
             $orderTotalInfo['total_wrapping'] = 0;
             $orderTotalInfo['total_order_amount'] = 0;
+            $orderTotalInfo['fixed_tax'] = 0;
+            $orderTotalInfo['fixed_tax_name'] = '';
 
             $orders_has_invoice = 1;
             if ($cartOrders = Order::getAllOrdersByCartId($order->id_cart)) {
@@ -439,6 +441,29 @@ class OrderConfirmationControllerCore extends FrontController
                 $totalTaxExcl = $orderTotalInfo['total_rooms_te'] + $orderTotalInfo['total_services_te'] + $orderTotalInfo['total_convenience_fee_te'] + $orderTotalInfo['total_auto_add_services_te'] + $orderTotalInfo['total_demands_price_te'] + $orderTotalInfo['total_standalone_products_te'];
 
                 $orderTotalInfo['total_tax_without_discount'] = $totalTaxIncl - $totalTaxExcl;
+            }
+
+            // Use snapshot totals aggregated across all cart orders
+            $fixedTaxTotal = 0.0;
+            $fixedTaxBreakdown = array();
+            if ($cartOrders) {
+                foreach ($cartOrders as $cartOrder) {
+                    $taxData = HotelFixedTax::getFixedTaxesForOrder((int)$cartOrder['id_order'], $this->context->language->id);
+                    $fixedTaxTotal += $taxData['total'];
+                    foreach ($taxData['breakdown'] as $taxName => $taxInfo) {
+                        if (!isset($fixedTaxBreakdown[$taxName])) {
+                            $fixedTaxBreakdown[$taxName] = $taxInfo;
+                        } else {
+                            $fixedTaxBreakdown[$taxName]['total_amount'] += $taxInfo['total_amount'];
+                        }
+                    }
+                }
+            }
+            $orderTotalInfo['fixed_tax'] = Tools::ps_round($fixedTaxTotal, _PS_PRICE_COMPUTE_PRECISION_);
+            $orderTotalInfo['fixed_tax_name'] = implode(', ', array_keys($fixedTaxBreakdown));
+            $orderTotalInfo['fixed_tax_breakdown'] = $fixedTaxBreakdown;
+            if ($orderTotalInfo['fixed_tax'] > 0) {
+                $orderTotalInfo['total_tax_without_discount'] += $orderTotalInfo['fixed_tax'];
             }
 
             $this->context->smarty->assign('orderTotalInfo', $orderTotalInfo);

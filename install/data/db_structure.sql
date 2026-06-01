@@ -593,7 +593,7 @@ CREATE TABLE `PREFIX_customer` (
   `firstname` varchar(32) NOT NULL,
   `lastname` varchar(32) NOT NULL,
   `email` varchar(128) NOT NULL,
-  `passwd` varchar(32) NOT NULL,
+  `passwd` varchar(60) NOT NULL,
   `last_passwd_gen` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `birthday` date DEFAULT NULL,
   `newsletter` tinyint(1) unsigned NOT NULL DEFAULT '0',
@@ -779,7 +779,7 @@ CREATE TABLE `PREFIX_employee` (
   `lastname` varchar(32) NOT NULL,
   `firstname` varchar(32) NOT NULL,
   `email` varchar(128) NOT NULL,
-  `passwd` varchar(32) NOT NULL,
+  `passwd` varchar(60) NOT NULL,
   `last_passwd_gen` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `stats_date_from` date DEFAULT NULL,
   `stats_date_to` date DEFAULT NULL,
@@ -1781,7 +1781,7 @@ CREATE TABLE `PREFIX_range_weight` (
 CREATE TABLE `PREFIX_referrer` (
   `id_referrer` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(64) NOT NULL,
-  `passwd` varchar(32) DEFAULT NULL,
+  `passwd` varchar(60) DEFAULT NULL,
   `http_referer_regexp` varchar(64) DEFAULT NULL,
   `http_referer_like` varchar(64) DEFAULT NULL,
   `request_uri_regexp` varchar(64) DEFAULT NULL,
@@ -2114,6 +2114,28 @@ CREATE TABLE `PREFIX_tax_rules_group` (
 `deleted` TINYINT(1) UNSIGNED NOT NULL,
 `date_add` DATETIME NOT NULL,
 `date_upd` DATETIME NOT NULL
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_htl_fixed_tax` (
+  `id_fixed_tax` int(11) NOT NULL AUTO_INCREMENT,
+  `id_hotel` int(11) NOT NULL,
+  `amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `price_calc_type` tinyint(1) NOT NULL DEFAULT '1',
+  `occupancy_based_price` tinyint(1) NOT NULL DEFAULT '0',
+  `apply_on_child` tinyint(1) NOT NULL DEFAULT '0',
+  `apply_on_infant` tinyint(1) NOT NULL DEFAULT '0',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  PRIMARY KEY (`id_fixed_tax`),
+  KEY `id_hotel` (`id_hotel`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_htl_fixed_tax_lang` (
+  `id_fixed_tax` int(11) NOT NULL,
+  `id_lang` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id_fixed_tax`, `id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_specific_price_priority` (

@@ -183,6 +183,9 @@
     <tab id="Tax_Rules" id_parent="Localization" active="1" hide_host_mode="0">
       <class_name>AdminTaxRulesGroup</class_name>
     </tab>
+    <tab id="Fixed_Taxes" id_parent="Localization" active="1" hide_host_mode="0">
+      <class_name>AdminHotelFixedTax</class_name>
+    </tab>
     <tab id="Translations" id_parent="Localization" active="1" hide_host_mode="0">
       <class_name>AdminTranslations</class_name>
     </tab>

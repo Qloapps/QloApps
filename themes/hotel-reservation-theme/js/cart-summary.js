@@ -1032,7 +1032,13 @@ function updateCartSummary(json)
 		$('#total_product').html(formatCurrency(json.total_products_wt, currencyFormat, currencySign, currencyBlank));
 	$('#total_price').html(formatCurrency(json.total_price, currencyFormat, currencySign, currencyBlank));
 	$('#total_price_without_tax').html(formatCurrency(json.total_price_without_tax, currencyFormat, currencySign, currencyBlank));
-	$('#total_tax').html(formatCurrency(json.total_tax, currencyFormat, currencySign, currencyBlank));
+	$('#total_tax').html(formatCurrency((json.other_taxes !== undefined ? json.other_taxes : json.total_tax), currencyFormat, currencySign, currencyBlank));
+	if (json.fixed_tax !== undefined) {
+		$('#fixed_tax').html(formatCurrency(json.fixed_tax, currencyFormat, currencySign, currencyBlank));
+	}
+	if (json.fixed_tax !== undefined) {
+		$('#fixed_tax').html(formatCurrency(json.fixed_tax, currencyFormat, currencySign, currencyBlank));
+	}
 
 	$('.cart_total_delivery').show();
 	if (json.total_shipping > 0)

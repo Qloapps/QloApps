@@ -659,6 +659,11 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             $footer['total_convenience_fee_ti'] = $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
         }
 
+        $fixedTaxData = HotelFixedTax::getFixedTaxesForOrder($this->order->id, $this->order->id_lang);
+        $footer['fixed_tax'] = $fixedTaxData['total'];
+        $footer['fixed_tax_name'] = implode(', ', array_keys($fixedTaxData['breakdown']));
+        $footer['fixed_tax_breakdown'] = $fixedTaxData['breakdown'];
+
         $footer['total_paid_real'] = $this->order_invoice->getTotalPaid();
         $footer['total_without_discount_te'] = $footer['room_price_tax_excl'] + $footer['total_convenience_fee_te'] + $footer['additional_service_price_tax_excl'] + $footer['service_products_price_tax_excl'];
         $footer['total_without_discount_ti'] = $footer['room_price_tax_incl'] + $footer['total_convenience_fee_ti'] + $footer['additional_service_price_tax_incl'] + $footer['service_products_price_tax_incl'];
@@ -667,6 +672,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         if ($footer['total_tax_without_discount'] < 0) {
             $footer['total_tax_without_discount'] = 0;
         }
+        $footer['total_tax_and_fixed'] = $footer['total_tax_without_discount'] + $footer['fixed_tax'];
 
         $data = array(
             'cart_htl_data' => $cart_htl_data,
@@ -749,6 +755,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             }
         }
 
+        $fixedTaxData = HotelFixedTax::getFixedTaxesForOrder($this->order->id, $this->order->id_lang);
+
         $data = array(
             'showTaxName' => $showTaxName,
             'use_one_after_another_method' => $this->order_invoice->useOneAfterAnotherTaxComputationMethod(),
@@ -758,6 +766,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'ecotax_tax_breakdown' => $this->order_invoice->getEcoTaxTaxesBreakdown(),
             'wrapping_tax_breakdown' => $this->order_invoice->getWrappingTaxesBreakdown(),
             'tax_breakdowns' => $tax_breakdowns,
+            'fixed_tax_breakdown' => $fixedTaxData['breakdown'],
             'order' => $debug ? null : $this->order,
             'order_invoice' => $debug ? null : $this->order_invoice,
             'carrier' => $debug ? null : $carrier

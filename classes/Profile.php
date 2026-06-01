@@ -141,11 +141,18 @@ class ProfileCore extends ObjectModel
                     );
                 }
             } else {
-                $result = Db::getInstance()->executeS('
-				SELECT *
-				FROM `'._DB_PREFIX_.'access` a
-				LEFT JOIN `'._DB_PREFIX_.'tab` t ON t.id_tab = a.id_tab
-				WHERE `id_profile` = '.(int)$id_profile);
+                if ($result = Db::getInstance()->executeS('
+                    SELECT * FROM `'._DB_PREFIX_.'access` a
+                    LEFT JOIN `'._DB_PREFIX_.'tab` t ON t.id_tab = a.id_tab
+                    WHERE `id_profile` = '.(int)$id_profile)
+                ) {
+                    foreach ($result as $key => $profileAccess) {
+                        $result[$key]['view'] = (int) $profileAccess['view'];
+                        $result[$key]['delete'] = (int) $profileAccess['delete'];
+                        $result[$key]['add'] = (int) $profileAccess['add'];
+                        $result[$key]['edit'] = (int) $profileAccess['edit'];
+                    }
+                }
 
                 foreach ($result as $row) {
                     self::$_cache_accesses[$id_profile][$type][$row[$type]] = $row;

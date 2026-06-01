@@ -106,13 +106,13 @@
 			{displayPrice currency=$order->id_currency price=$footer.total_without_discount_te}
 		</td>
 	</tr>
-	{if $footer.total_tax_without_discount > 0}
+	{if isset($footer.total_tax_and_fixed) && $footer.total_tax_and_fixed > 0}
 	<tr class="bold">
 		<td class="grey">
 			{l s='Total Tax' pdf='true'}
 		</td>
 		<td class="white">
-			{displayPrice currency=$order->id_currency price=$footer.total_tax_without_discount}
+			{displayPrice currency=$order->id_currency price=$footer.total_tax_and_fixed}
 		</td>
 	</tr>
 	{/if}

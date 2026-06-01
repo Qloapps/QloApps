@@ -513,6 +513,18 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id_room_type_bed_type`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_fixed_tax` (
+                `id_booking_fixed_tax` int(11) NOT NULL AUTO_INCREMENT,
+                `id_htl_booking_detail` int(11) NOT NULL,
+                `id_fixed_tax` int(11) DEFAULT NULL,
+                `tax_name` varchar(255) NOT NULL,
+                `amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+                `date_add` datetime NOT NULL,
+                PRIMARY KEY (`id_booking_fixed_tax`),
+                KEY `id_htl_booking_detail` (`id_htl_booking_detail`),
+                KEY `id_fixed_tax` (`id_fixed_tax`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
             "INSERT INTO `"._DB_PREFIX_."htl_settings_link` (`id_settings_link`, `icon`, `link`, `new_window`, `position`, `unremovable`, `active`, `date_add`, `date_upd`) VALUES
             (1, 'icon-cogs', 'index.php?controller=AdminHotelGeneralSettings', 0, 0, 1, 1, NOW(), NOW()),
             (2, 'icon-dollar', 'index.php?controller=AdminHotelFeaturePricesSettings', 0, 2, 1, 1, NOW(), NOW()),
@@ -552,6 +564,7 @@ class HotelReservationSystemDb
             SELECT 5, `id_lang`, 'Hotel Amenities Block', 'Configure Hotels Amenities settings. You can display hotel amenities images using this block. This block will be displayed on home page.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
+
         );
     }
 
@@ -615,7 +628,8 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_room_type_bed_type`,
             `'._DB_PREFIX_.'htl_access`,
             `'._DB_PREFIX_.'htl_settings_link`,
-            `'._DB_PREFIX_.'htl_settings_link_lang`'
+            `'._DB_PREFIX_.'htl_settings_link_lang`,
+            `'._DB_PREFIX_.'htl_booking_fixed_tax`'
         );
     }
 }

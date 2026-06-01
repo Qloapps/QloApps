@@ -208,6 +208,15 @@ class Blockcart extends Module
         $wrappingCost = (float) ($params['cart']->getOrderTotal($useTax, Cart::ONLY_WRAPPING));
         $totalToPay = $params['cart']->getOrderTotal($useTax);
 
+        $fixedTaxData = HotelFixedTax::getFixedTaxesInCart($params['cart']->id, 0, 0, 0, '', '', $this->context->language->id);
+        $fixed_tax = $fixedTaxData['total'];
+        $fixed_tax_name = implode(', ', array_keys($fixedTaxData['breakdown']));
+        $fixed_tax_breakdown = $fixedTaxData['breakdown'];
+        foreach ($fixed_tax_breakdown as $taxName => &$taxData) {
+            $taxData['total_amount_format'] = Tools::displayPrice($taxData['total_amount'], $currency);
+        }
+        unset($taxData);
+
         $tax_cost = 0;
         if ($useTax && $useTax) {
             $totalToPayWithoutTaxes = $params['cart']->getOrderTotal(false);
@@ -399,6 +408,10 @@ class Blockcart extends Module
             'last_added_product' => $addedProduct,
             // 'cart_booking_data' => $htlCartData,
             'total_rooms_in_cart' => $totalRooms,
+            'fixed_tax' => $fixed_tax,
+            'fixed_tax_name' => $fixed_tax_name,
+            'fixed_tax_breakdown' => $fixed_tax_breakdown,
+            'fixed_tax_format' => Tools::displayPrice($fixed_tax, $currency)
         );
 
         if (isset($params['cookie']->avail_rooms)) {

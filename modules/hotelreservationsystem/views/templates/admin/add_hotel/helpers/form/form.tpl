@@ -98,6 +98,12 @@
 						{l s='Features' mod='hotelreservationsystem'}
 					</a>
 				</li>
+				<li>
+					<a href="#hotel-fixed-taxes" data-toggle="tab">
+						<i class="icon-money"></i>
+						{l s='Fixed Taxes' mod='hotelreservationsystem'}
+					</a>
+				</li>
 				{hook h='displayAdminAddHotelFormTab' id_hotel=$hook_arg_id_hotel}
 			</ul>
 			<div class="tab-content panel collapse in">
@@ -193,6 +199,12 @@
 								</span>
 								<input class="reg_sel_input form-control-static" type="text" name="email" id="hotel_email" value="{if isset($smarty.post.email)}{$smarty.post.email}{elseif isset($edit)}{$hotel_info.email|escape:'htmlall':'UTF-8'}{/if}"/>
 							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label" for="vat_number">{l s='VAT Number' mod='hotelreservationsystem'}</label>
+						<div class="col-sm-6">
+							<input autocomplete="off" type="text" class="form-control" id="vat_number" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$address_info.vat_number|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
@@ -345,14 +357,19 @@
 						<div class="col-lg-6">
 						{foreach from=$languages item=language}
 							{assign var="meta_title" value="meta_title_`$language.id_lang`"}
+							<div class="input-group wk_text_field_all wk_text_field_{$language.id_lang}" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}>
+								<span id="meta_title_{$language.id_lang}_counter" class="input-group-addon">
+									<span class="text-count-down">128</span>
+								</span>
 								<input type="text"
 								id="meta_title_{$language.id_lang}"
 								name="meta_title_{$language.id_lang}"
-								value="{if isset($smarty.post.$meta_title)}{$smarty.post.$meta_title|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_title_info[$language.id_lang]|escape:'htmlall':'UTF-8'}{/if}""
-								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
+								value="{if isset($smarty.post.$meta_title)}{$smarty.post.$meta_title|truncate:128:'':true|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_title_info[$language.id_lang]|truncate:128:'':true|escape:'htmlall':'UTF-8'}{/if}"
+								class="form-control"
 								maxlength="128"
-								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
-							{/foreach}
+								data-maxchar="128" />
+							</div>
+						{/foreach}
 						</div>
 					</div>
 					<div class="form-group">
@@ -363,13 +380,18 @@
 						<div class="col-lg-6">
 							{foreach from=$languages item=language}
 								{assign var="meta_description" value="meta_description_`$language.id_lang`"}
-								<input type="text"
-								id="meta_description_{$language.id_lang}"
-								name="meta_description_{$language.id_lang}"
-								value="{if isset($smarty.post.$meta_description)}{$smarty.post.$meta_description|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_description_info[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
-								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
-								maxlength="225"
-								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
+								<div class="input-group wk_text_field_all wk_text_field_{$language.id_lang}" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}>
+									<span id="meta_description_{$language.id_lang}_counter" class="input-group-addon">
+										<span class="text-count-down">255</span>
+									</span>
+									<textarea
+									id="meta_description_{$language.id_lang}"
+									name="meta_description_{$language.id_lang}"
+									class="form-control textarea-autosize"
+									rows="1"
+									maxlength="255"
+									data-maxchar="255">{if isset($smarty.post.$meta_description)}{$smarty.post.$meta_description|truncate:255:'':true|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_description_info[{$language.id_lang}]|truncate:255:'':true|escape:'htmlall':'UTF-8'}{/if}</textarea>
+								</div>
 							{/foreach}
 						</div>
 					</div>
@@ -401,6 +423,20 @@
 							{/foreach}
 						</div>
 					</div>
+					{include file="seo_preview.tpl"
+						languages = $languages
+						preview_link = $rewrite_url|default:''
+						show_label_tooltip = false
+						show_flag = true
+						inputs = [
+    						'meta_title' => $meta_title_info,
+    						'meta_description' => $meta_description_info,
+    						'link_rewrite' => $link_rewrite_info,
+							'meta_keywords' => $meta_keywords_info,
+							'name' => $hotel_info.hotel_name,
+							'description_short' => $hotel_info.short_description
+						]
+					}
 					{hook h='displayAdminAddHotelFormSeoTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				<div class="tab-pane" id="hotel-images">
@@ -601,6 +637,95 @@
 
 					{hook h='displayAdminAddHotelFormFeaturesTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
+
+				<div class="tab-pane" id="hotel-fixed-taxes">
+					{if isset($hotel_info.id) && $hotel_info.id}
+						<div style="padding: 0px 0px 10px; overflow:hidden;">
+							<a href="{$adminHotelFixedTaxLink|escape:'html':'UTF-8'}&addhtl_fixed_tax&id_hotel={$hotel_info.id|intval}"
+							   class="btn btn-info pull-right">
+								<i class="icon-plus"></i>
+								{l s='Add Fixed Tax' mod='hotelreservationsystem'}
+							</a>
+						</div>
+						{if isset($hotel_fixed_taxes) && $hotel_fixed_taxes}
+							<div class="table-responsive">
+								<table class="table table-bordered table-hover">
+									<thead>
+										<tr>
+											<th>{l s='Name' mod='hotelreservationsystem'}</th>
+											<th class="text-center">{l s='Amount' mod='hotelreservationsystem'}</th>
+											<th class="text-center">{l s='Calc. Type' mod='hotelreservationsystem'}</th>
+											<th class="text-center">{l s='Occupancy Based' mod='hotelreservationsystem'}</th>
+											<th class="text-center">{l s='Active' mod='hotelreservationsystem'}</th>
+											<th class="text-right">{l s='Actions' mod='hotelreservationsystem'}</th>
+										</tr>
+									</thead>
+									<tbody>
+										{foreach from=$hotel_fixed_taxes item=tax}
+										<tr>
+											<td>{$tax.name|escape:'html':'UTF-8'}</td>
+											<td class="text-center">{displayPrice price=$tax.amount currency=$defaultCurrency}</td>
+											<td class="text-center">
+												{if $tax.price_calc_type == 1}
+													<span class="badge badge-info">{l s='Per Stay' mod='hotelreservationsystem'}</span>
+												{else}
+													<span class="badge badge-success">{l s='Per Night' mod='hotelreservationsystem'}</span>
+												{/if}
+											</td>
+											<td class="text-center">
+												{if $tax.occupancy_based_price}
+													<span class="badge badge-success">{l s='Yes' mod='hotelreservationsystem'}</span>
+												{else}
+													<span class="badge badge-default">{l s='No' mod='hotelreservationsystem'}</span>
+												{/if}
+											</td>
+											<td class="text-center">
+												{if $tax.active}
+													<i class="icon-check text-success"></i>
+												{else}
+													<i class="icon-remove text-danger"></i>
+												{/if}
+											</td>
+											<td class="text-right">
+												<div class="btn-group-action">
+													<div class="btn-group pull-right">
+														<a href="{$adminHotelFixedTaxLink|escape:'html':'UTF-8'}&id_fixed_tax={$tax.id_fixed_tax|intval}&updatehtl_fixed_tax"
+														   class="btn btn-default" title="{l s='Edit' mod='hotelreservationsystem'}">
+															<i class="icon-pencil"></i> {l s='Edit' mod='hotelreservationsystem'}
+														</a>
+														<button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+															<i class="icon-caret-down"></i>
+														</button>
+														<ul class="dropdown-menu">
+															<li>
+																<a href="{$adminHotelFixedTaxLink|escape:'html':'UTF-8'}&id_fixed_tax={$tax.id_fixed_tax|intval}&deletehtl_fixed_tax"
+																   class="delete"
+																   onclick="if (confirm('{l s='Delete this fixed tax?' mod='hotelreservationsystem' js=1}')){ldelim}return true;{rdelim}else{ldelim}event.stopPropagation(); event.preventDefault();{rdelim}">
+																	<i class="icon-trash"></i> {l s='Delete' mod='hotelreservationsystem'}
+																</a>
+															</li>
+														</ul>
+													</div>
+												</div>
+											</td>
+										</tr>
+										{/foreach}
+									</tbody>
+								</table>
+							</div>
+						{else}
+							<div class="alert alert-warning" style="margin:0;">
+								{l s='No fixed taxes have been created for this hotel yet.' mod='hotelreservationsystem'}
+							</div>
+						{/if}
+					{else}
+						<div class="alert alert-info" style="margin:15px;">
+							<i class="icon-info-sign"></i>
+							{l s='Please save the hotel first to manage fixed taxes.' mod='hotelreservationsystem'}
+						</div>
+					{/if}
+				</div>
+
 				{hook h='displayAdminAddHotelFormTabContent' id_hotel=$hook_arg_id_hotel}
 			</div>
 		</div>
@@ -657,6 +782,33 @@
 			});
 		{/block}
 
+		{foreach from=$languages item=language}
+			countDown($("#meta_title_{$language.id_lang}"), $("#meta_title_{$language.id_lang}_counter"));
+			countDown($("#meta_description_{$language.id_lang}"), $("#meta_description_{$language.id_lang}_counter"));
+		{/foreach}
+
+		$('a[href="#hotel-seo"]').on('shown.bs.tab', function() {
+			$(window).trigger('resize.autosize');
+		});
+
+		// handle case where SEO tab is already active on load
+		if ($('#hotel-seo').hasClass('active')) {
+			$(window).trigger('resize.autosize');
+		}
+
+		// Trigger autosize width recalculation when language is switched
+		$(document).on('wk.lang.changed', function(e, idLang) {
+			$(window).trigger('resize.autosize');
+		});
+	});
+	$(".textarea-autosize").autosize();
+	// After full page load, reinit visible textareas so they start at the correct height
+	$(window).on('load', function() {
+		$(".textarea-autosize:visible").each(function() {
+			var $ta = $(this), val = $ta.val();
+			$ta.val('').trigger('autosize.destroy').removeData('autosize').autosize();
+			if (val) { $ta.val(val).trigger('input'); }
+		});
 	});
 </script>
 {/block}

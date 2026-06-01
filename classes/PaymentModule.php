@@ -898,6 +898,7 @@ abstract class PaymentModuleCore extends Module
                                     }
                                 }
                                 if ($objBookingDetail->save()) {
+                                    HotelFixedTax::saveBookingFixedTaxes($objBookingDetail->id, (array)$objCartBookingData, $idLang);
                                     // save extra demands info
                                     if ($objCartBookingData->extra_demands
                                         && ($extraDemands = json_decode($objCartBookingData->extra_demands, true))
@@ -1251,7 +1252,10 @@ abstract class PaymentModuleCore extends Module
 
                         $service_products_tax = ($standalone_products_price_tax_incl + $hotel_standalone_products_price_tax_incl) - ($standalone_products_price_tax_excl + $hotel_standalone_products_price_tax_excl);
 
-                        $total_order_tax = $room_tax + $additional_service_tax + $total_convenience_fee_tax + $service_products_tax;
+                        $fixedTaxData = HotelFixedTax::getFixedTaxesForOrder($order->id, $this->context->language->id);
+                        $totalFixedTax = $fixedTaxData['total'];
+
+                        $total_order_tax = $room_tax + $additional_service_tax + $total_convenience_fee_tax + $service_products_tax + $totalFixedTax;
 
                         $total_products = Tools::displayPrice(Product::getTaxCalculationMethod() == PS_TAX_EXC ? $order->total_products : $order->total_products_wt, $this->context->currency, false);
 

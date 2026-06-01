@@ -58,6 +58,7 @@
   <tab id="Currencies" name="Currencies"/>
   <tab id="Taxes" name="Taxes"/>
   <tab id="Tax_Rules" name="Tax Rules"/>
+  <tab id="Fixed_Taxes" name="Fixed Taxes"/>
   <tab id="Translations" name="Translations"/>
   <tab id="Modules_1" name="Manage Modules"/>
   <tab id="Modules_Catalog" name="Modules Catalog"/>

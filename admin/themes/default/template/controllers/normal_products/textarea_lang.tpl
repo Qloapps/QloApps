@@ -31,7 +31,7 @@
 						<span class="text-count-down">{$maxchar|intval}</span>
 					</span>
 	{/if}
-					<textarea id="{$input_name}_{$language.id_lang}" name="{$input_name}_{$language.id_lang}" class="{if isset($class)}{$class}{else}textarea-autosize{/if}"{if isset($maxlength) && $maxlength} maxlength="{$maxlength|intval}"{/if}{if isset($maxchar) && $maxchar} data-maxchar="{$maxchar|intval}"{/if}>{if isset($input_value[$language.id_lang])}{$input_value[$language.id_lang]|htmlentitiesUTF8}{/if}</textarea>
+					<textarea id="{$input_name}_{$language.id_lang}" name="{$input_name}_{$language.id_lang}" class="{if isset($class)}{$class}{else}textarea-autosize{/if}" rows="1"{if isset($maxlength) && $maxlength} maxlength="{$maxlength|intval}"{/if}{if isset($maxchar) && $maxchar} data-maxchar="{$maxchar|intval}"{/if}>{if isset($input_value[$language.id_lang])}{$input_value[$language.id_lang]|htmlentitiesUTF8}{/if}</textarea>
 					<span class="counter" data-max="{if isset($max)}{$max|intval}{/if}{if isset($maxlength)}{$maxlength|intval}{/if}{if !isset($max) && !isset($maxlength)}none{/if}"></span>
 			{if isset($maxchar) && $maxchar}
 				</div>
@@ -61,6 +61,10 @@
 		{/foreach}
 		});
 	{/if}
-	$(".textarea-autosize").autosize();
+	$(".textarea-autosize").each(function() {
+		var $ta = $(this), val = $ta.val();
+		$ta.val('').autosize();
+		if (val) { $ta.val(val).trigger('input'); }
+	});
 </script>
 

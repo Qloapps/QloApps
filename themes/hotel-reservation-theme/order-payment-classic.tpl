@@ -158,10 +158,12 @@
                                         <td colspan="2" class="price" id="total_price_without_tax">{displayPrice price=$total_price_without_tax}</td>
                                     </tr>
                                 {/if}
-                                <tr class="cart_total_tax">
-                                    <td colspan="4" class="text-right">{l s='Tax'}</td>
-                                    <td colspan="2" class="price" id="total_tax" >{displayPrice price=$total_tax}</td>
-                                </tr>
+                                {if $other_taxes > 0}
+                                    <tr class="cart_total_tax">
+                                        <td colspan="4" class="text-right">{l s='Tax'}</td>
+                                        <td colspan="2" class="price" id="total_tax" >{displayPrice price=$other_taxes}</td>
+                                    </tr>
+                                {/if}
                             {/if}
                             <tr class="cart_total_price">
                                 <td colspan="4" class="total_price_container text-right"><span>{l s='Total'}</span></td>
