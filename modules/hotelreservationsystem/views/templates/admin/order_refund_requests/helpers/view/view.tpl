@@ -171,35 +171,23 @@
 												<td>{dateFormat date=$booking['date_from'] full=$is_full_date} {l s='To' mod='hotelreservationsystem'} {dateFormat date=$booking['date_to'] full=$is_full_date}</td>
 												<td>
 													{displayPrice price=($booking['total_price_tax_incl'] + $booking['extra_service_total_price_tax_incl']) currency=$orderCurrency['id']}
-													<span class="price_info">
-														&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
-													</span>
-													<div class="price_info_container" style="display: none;">
-														<div>
-															<label>{l s='Room cost:' mod='hotelreservationsystem'}</label>
-															<span class="pull-right">{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</span>
-														</div>
-														<div>
-															<label>{l s='Services cost:' mod='hotelreservationsystem'}</label>
-															<span class="pull-right">{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</span>
-														</div>
+													{capture name='refund_total_tooltip'}
+													<div class="tooltip-cont">
+														<div class="tooltip-row"><label>{l s='Room cost:' mod='hotelreservationsystem'}</label><span>{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</span></div>
+														<div class="tooltip-row"><label>{l s='Services cost:' mod='hotelreservationsystem'}</label><span>{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</span></div>
 													</div>
+													{/capture}
+													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_total_tooltip allow_html=true}
 												</td>
 												<td>
 													{displayPrice price=($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount']) currency=$orderCurrency['id']}
-													<span class="price_info">
-														&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
-													</span>
-													<div class="price_info_container" style="display: none;">
-														<div>
-															<label>{l s='Room paid amount:' mod='hotelreservationsystem'}</label>
-															<span class="pull-right">{displayPrice price=$booking['room_paid_amount'] currency=$orderCurrency['id']}</span>
-														</div>
-														<div>
-															<label>{l s='Services paid amount:' mod='hotelreservationsystem'}</label>
-															<span class="pull-right">{displayPrice price=$booking['extra_service_total_paid_amount'] currency=$orderCurrency['id']}</span>
-														</div>
+													{capture name='refund_paid_tooltip'}
+													<div class="tooltip-cont">
+														<div class="tooltip-row"><label>{l s='Room paid amount:' mod='hotelreservationsystem'}</label><span>{displayPrice price=$booking['room_paid_amount'] currency=$orderCurrency['id']}</span></div>
+														<div class="tooltip-row"><label>{l s='Services paid amount:' mod='hotelreservationsystem'}</label><span>{displayPrice price=$booking['extra_service_total_paid_amount'] currency=$orderCurrency['id']}</span></div>
 													</div>
+													{/capture}
+													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_paid_tooltip allow_html=true}
 												</td>
 												{if !$isRefundCompleted}
 													<td>

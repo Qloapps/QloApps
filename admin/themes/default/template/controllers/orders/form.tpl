@@ -1595,15 +1595,7 @@
 				},
                 complete: function() {
                     $(".loading_overlay").hide();
-					initAdminTooltip({
-						selector: '.price-calculation-info',
-						items: 'span',
-						tooltipClass: 'admin-info-tooltip',
-						skipIfInitialized: true,
-						getContent: function () {
-							return $(this).siblings('.price-calculation-info-container').html();
-						}
-					});
+					initTooltip();
                 }
 			});
 		});
@@ -1824,15 +1816,7 @@
 				},
 				complete: function() {
 					$(".loading_overlay").hide();
-					initAdminTooltip({
-						selector: '.price-calculation-info',
-						items: 'span',
-						tooltipClass: 'admin-info-tooltip',
-						skipIfInitialized: true,
-						getContent: function () {
-							return $(this).siblings('.price-calculation-info-container').html();
-						}
-					});
+					initTooltip();
 				}
 			});
 		});
@@ -1883,15 +1867,7 @@
                 },
                 complete: function() {
                     $(".loading_overlay").hide();
-					initAdminTooltip({
-						selector: '.price-calculation-info',
-						items: 'span',
-						tooltipClass: 'admin-info-tooltip',
-						skipIfInitialized: true,
-						getContent: function () {
-							return $(this).siblings('.price-calculation-info-container').html();
-						}
-					});
+					initTooltip();
                 }
             });
         });

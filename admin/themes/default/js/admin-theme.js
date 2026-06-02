@@ -481,20 +481,19 @@ $(document).ready(function() {
 }); //end dom ready
 
 
-function initAdminTooltip(config) {
-    var $elements = $(config.selector);
-    if (!$elements.length) {
+function initTooltip() {
+    if (!$('.tooltip-trigger').length) {
         return;
     }
-    $elements.each(function () {
-        if (config.skipIfInitialized && $(this).data('ui-tooltip')) {
+    $('.tooltip-trigger').each(function () {
+        if ($(this).data('ui-tooltip')) {
             return;
         }
         $(this).tooltip({
-            content: config.getContent,
-            items: config.items,
+            content: $(this).siblings('.tooltip-content').html(),
+            items: 'span',
             trigger: 'hover',
-            tooltipClass: config.tooltipClass,
+            tooltipClass: 'tooltip-popup',
             open: function (event, ui) {
                 if (typeof event.originalEvent === 'undefined') {
                     return false;
@@ -515,12 +514,5 @@ function initAdminTooltip(config) {
 }
 
 $(document).ready(function () {
-    initAdminTooltip({
-        selector: '.selected-option-info',
-        items: '.selected-option-info',
-        tooltipClass: 'admin-info-tooltip',
-        getContent: function () {
-            return $(this).data('options');
-        }
-    });
+    initTooltip();
 });

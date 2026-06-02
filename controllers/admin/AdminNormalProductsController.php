@@ -200,13 +200,13 @@ class AdminNormalProductsControllerCore extends AdminController
             Product::PRICE_ADDITION_TYPE_INDEPENDENT => $this->l('Convenience Fee')
         );
         $priceCalculationMethod = array(
-            Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY => $this->l('Only check-in day'),
-            Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY => $this->l('Only check-out day'),
-            Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY => $this->l('Only during-stay days'),
-            Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY => $this->l('Check-in and check-out days'),
-            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY => $this->l('Check-in | during-stay days'),
-            Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY => $this->l('Check-out | during-stay days'),
-            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY => $this->l('Check-in | check-out | during-stay days'),
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY => $this->l('On Check-in day'),
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY => $this->l('On Check-out day'),
+            Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY => $this->l('On During-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY => $this->l('Check-in day | Check-out days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY => $this->l('Check-in day | During-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY => $this->l('Check-out day | During-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY => $this->l('Check-in day | During-stay days | Check-out day'),
         );
 
         $this->_join .= '
@@ -331,12 +331,12 @@ class AdminNormalProductsControllerCore extends AdminController
         // Code For Standard product working
         $sellingPreferenceTypes = array(
             Product::SELLING_PREFERENCE_WITH_ROOM_TYPE => $this->l('With room type'),
-            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE => $this->l('With hotel|room type'),
-            Product::SELLING_PREFERENCE_WITH_STANDALONE => $this->l('Standalone'),
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE => $this->l('With hotel | With room type'),
+            Product::SELLING_PREFERENCE_WITH_STANDALONE => $this->l('With Standalone'),
             Product::SELLING_PREFERENCE_WITH_HOTEL => $this->l('With hotel'),
-            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE => $this->l('With hotel|standalone'),
-            Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With room type|standalone'),
-            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE => $this->l('With hotel|room type|standalone'),
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE => $this->l('With hotel | With standalone'),
+            Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With room type | With standalone'),
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE => $this->l('With hotel | With room type | With standalone'),
         );
         $this->fields_list['selling_preference_type'] = array(
             'type' => 'select',
@@ -435,27 +435,38 @@ class AdminNormalProductsControllerCore extends AdminController
     {
         $list = $this->fields_list['selling_preference_type']['list'];
 
-        if (!isset($list[$selling_preference_type])) {
+        if (empty($list[$selling_preference_type])) {
             return '--';
         }
 
-        $this->context->smarty->assign('selected_options', array_map('trim', explode('|', $list[$selling_preference_type])));
+        $options = array_map('trim', explode('|', $list[$selling_preference_type]));
 
-        return $this->context->smarty->fetch('controllers/normal_products/selected_option.tpl');
+        $this->context->smarty->assign(array(
+            'tooltip_items' => $options,
+        ));
+
+        $tooltip = $this->context->smarty->fetch('helpers/tooltip.tpl');
+
+        return count($options) . ' ' . $this->l('Selected') . ' ' . $tooltip;
     }
 
-    public function getPriceCalculationMethod($txt, $row)
+    public function getPriceCalculationMethod($price_calculation_method, $row)
     {
         $list = $this->fields_list['price_calculation_method']['list'];
-        $method = (int)$row['price_calculation_method'];
 
-        if (!isset($list[$method])) {
+        if (empty($list[$price_calculation_method])) {
             return '--';
         }
 
-        $this->context->smarty->assign('selected_options', array_map('trim', explode('|', $list[$method])));
+        $options = array_map('trim', explode('|', $list[$price_calculation_method]));
 
-        return $this->context->smarty->fetch('controllers/normal_products/selected_option.tpl');
+        $this->context->smarty->assign(array(
+            'tooltip_items' => $options,
+        ));
+
+        $tooltip = $this->context->smarty->fetch('helpers/tooltip.tpl');
+
+        return count($options) . ' ' . $this->l('Selected') . ' ' . $tooltip;
     }
 
     public function getHotelName($hotelName, $row)
@@ -1543,7 +1554,6 @@ class AdminNormalProductsControllerCore extends AdminController
                 _PS_CSS_DIR_.'ps-hotel-reservation.css',
             ));
         }else {
-            $this->addCSS(__PS_BASE_URI__.$this->admin_webpath.'/themes/default/css/admin-tooltip.css');
             $this->addJqueryUI('ui.tooltip', 'base', true);
         }
     }
@@ -2374,7 +2384,10 @@ class AdminNormalProductsControllerCore extends AdminController
             $this->errors[] = $this->l('Please select at least one buying option.');
         }
 
-        if (!Tools::getValue('price_calculation_method')) {
+        $priceCalculationMethod = Tools::getValue('price_calculation_method');
+        $id = Tools::getValue('id_'.$this->table);
+
+        if (isset($priceCalculationMethod, $id) && empty($priceCalculationMethod) && !empty($id)) {
             $this->errors[] = $this->l('Please select at least one price calculation method.');
         }
 

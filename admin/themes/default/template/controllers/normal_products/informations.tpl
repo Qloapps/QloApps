@@ -230,8 +230,8 @@
 		</script>
 	</div>
     {* Code For Standard product working *}
-	<div class="form-group" id="global_product_type_container">
-		<label class="control-label col-lg-3">
+	<div class="form-group " id="global_product_type_container">
+		<label class="control-label required col-lg-3">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select how this product will be sold: with room types, with hotels, as a standalone product, or in a combination of these options.'}">
 				{l s='Buying Option'}
 			</span>

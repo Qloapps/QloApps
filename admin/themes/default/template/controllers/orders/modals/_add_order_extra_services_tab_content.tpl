@@ -63,7 +63,34 @@
                                             <td>
                                                 <div>
                                                     {$product['name']|escape:'html':'UTF-8'}
-                                                    {include file='controllers/orders/modals/_partials/_price-calculation-info.tpl' pcm=$product['price_calculation_method']|default:0}
+                                                    {capture name='room_type_service_tooltip_content'}
+                                                    {assign var="priceCalcMethod" value=$product['price_calculation_method']|default:0}
+                                                    <div class="tooltip-cont">
+                                                        <div class="tooltip-row"><label>{l s='Applied on:'}</label></div>
+                                                        <ul class="tooltip-days">
+                                                            {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY
+                                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
+                                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
+                                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
+                                                                <li>{l s='Check-in day'}</li>
+                                                            {/if}
+                                                            {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY
+                                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
+                                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
+                                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
+                                                                <li>{l s='During-stay days'}</li>
+                                                            {/if}
+                                                            {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY
+                                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
+                                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
+                                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
+                                                                <li>{l s='Check-out day'}</li>
+                                                            {/if}
+                                                        </ul>
+                                                    </div>
+                                                    {/capture}
+
+                                                    {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_tooltip_content allow_html=true}
                                                 </div>
                                             </td>
                                             <td>
