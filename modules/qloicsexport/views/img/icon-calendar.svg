@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="18px" viewBox="0 0 16 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 51.3 (57544) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-calendar</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Occupancy-Wise-Search-1" transform="translate(-673.000000, -446.000000)" stroke="#000000" stroke-width="1.5">
+            <g id="hero">
+                <g id="search" transform="translate(319.000000, 170.000000)">
+                    <g id="all-actionables-[20v]" transform="translate(30.000000, 108.000000)">
+                        <g id="check-in" transform="translate(0.000000, 150.000000)">
+                            <g id="check-out" transform="translate(182.000000, 0.000000)">
+                                <g id="icon-calendar" transform="translate(143.000000, 19.000000)">
+                                    <rect id="Rectangle-path" x="0" y="1.55555556" width="14" height="14" rx="2"></rect>
+                                    <path d="M10.1111111,0 L10.1111111,3.11111111" id="Shape"></path>
+                                    <path d="M3.88888889,0 L3.88888889,3.11111111" id="Shape"></path>
+                                    <path d="M0,6.22222222 L14,6.22222222" id="Shape"></path>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

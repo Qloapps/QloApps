@@ -238,13 +238,13 @@
 														</div>
 													{/block}
 													{block name='product_info_tab_room_guests'}
-														{if isset($room_type_info['adults']) && isset($room_type_info['children']) }
+														{if isset($room_type_info['max_adults']) && isset($room_type_info['max_children']) }
 															<div class="info_margin_div">
 																<div class="room_info_heading">
 																	<span>{l s='Max Capacity'}</span>
 																</div>
 																<div class="room_info_content">
-																	<p>{$room_type_info['adults']} {l s='Adults'}, {$room_type_info['children']} {if $room_type_info['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if} ({l s='Max guests'}: {$room_type_info['max_guests']|escape:'htmlall':'UTF-8'})</p>
+																	<p>{$room_type_info['max_adults']} {l s='Adults'}, {$room_type_info['max_children']} {if $room_type_info['max_children'] > 1}{l s='Children'}{else}{l s='Child'}{/if} ({l s='Max guests'}: {$room_type_info['max_guests']|escape:'htmlall':'UTF-8'})</p>
 																</div>
 															</div>
 														{/if}
@@ -351,6 +351,30 @@
 																	<a class="btn btn-primary btn-show-more-images hide" data-id-product="{$product->id}" data-next-page="1">
 																		<span>{l s='SHOW MORE'}</span>
 																	</a>
+																</div>
+															</div>
+															<div class="htl-full-gallery-modal" id="htl-img-gallery-modal" style="display:none;">
+																<div class="htl-full-gallery__overlay"></div>
+																<div class="htl-full-gallery__container">
+																	<button class="htl-full-gallery__close" type="button"><i class="icon-remove"></i></button>
+																	<div class="htl-full-gallery__header">
+																		<h2 class="htl-full-gallery__hotel-name">{if isset($hotel_name) && $hotel_name}{$hotel_name|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}</h2>
+																	</div>
+																	<div class="htl-full-gallery__tabs">
+																		<div class="htl-full-gallery__tabs-wrapper">
+																			<button class="htl-gallery-tab active" data-category="all">{l s='All Photos'}</button>
+																		</div>
+																	</div>
+																	<div class="htl-full-gallery__main">
+																		<button class="htl-full-gallery__nav htl-full-gallery__nav--prev" type="button"><i class="icon-chevron-left"></i></button>
+																		<div class="htl-full-gallery__image-container">
+																			<img src="" alt="" class="htl-full-gallery__main-image" id="htl-main-image">
+																		</div>
+																		<button class="htl-full-gallery__nav htl-full-gallery__nav--next" type="button"><i class="icon-chevron-right"></i></button>
+																	</div>
+																	<div class="htl-full-gallery__thumbnails">
+																		<div class="htl-gallery-thumbnails__scroll" id="htl-gallery-thumbnail"></div>
+																	</div>
 																</div>
 															</div>
 														{/if}
@@ -878,6 +902,7 @@
 			{addJsDefL name=service_updated_txt}{l s='Service updated' js=1}{/addJsDefL}
 			{addJsDefL name=max_service_product_qty_txt}{l s='Maximum allowed quantity in the cart is' js=1}{/addJsDefL}
 			{addJsDefL name=out_of_stock_text}{l s='Requested quantitity is out of stock' js=1}{/addJsDefL}
+			{addJsDefL name=htl_gallery_all_photos}{l s='All Photos' js=1}{/addJsDefL}
 		{/strip}
 	{/block}
 	{/if}

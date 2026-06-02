@@ -87,9 +87,26 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_image` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_hotel` int(10) unsigned NOT NULL,
+                `id_htl_image_category` int(10) unsigned DEFAULT NULL,
                 `cover` tinyint(1) NOT NULL DEFAULT '0',
+                KEY `id_hotel` (`id_hotel`),
+                KEY `id_htl_image_category` (`id_htl_image_category`),
                 PRIMARY KEY  (`id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_image_category` (
+                `id_htl_image_category` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_htl_image_category`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_image_category_lang` (
+                `id_htl_image_category` int(10) unsigned NOT NULL,
+                `id_lang` int(10) unsigned NOT NULL,
+                `name` varchar(128) NOT NULL,
+                PRIMARY KEY (`id_htl_image_category`, `id_lang`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_branch_features` (
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -578,6 +595,8 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_branch_info`,
             `'._DB_PREFIX_.'htl_branch_info_lang`,
             `'._DB_PREFIX_.'htl_image`,
+            `'._DB_PREFIX_.'htl_image_category`,
+            `'._DB_PREFIX_.'htl_image_category_lang`,
             `'._DB_PREFIX_.'htl_branch_features`,
             `'._DB_PREFIX_.'htl_features`,
             `'._DB_PREFIX_.'htl_features_lang`,

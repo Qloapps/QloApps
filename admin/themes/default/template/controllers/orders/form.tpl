@@ -1572,6 +1572,7 @@
 					id_room: idRoom,
 					id_cart: idCart,
 					id_product: idProduct,
+					id_customer: id_customer,
 					id_hotel_cart_booking: idHotelCartBooking,
 					action: 'getRoomTypeCartDemands',
 					ajax: true
@@ -1877,7 +1878,7 @@
             <i class="icon-user"></i>
             {l s='Customer'}
         </div>
-        <div id="search-customer-form-group" class="form-group">
+        <div id="search-customer-form-group" {if isset($cart->id_customer) && $cart->id_customer &&  isset($customer) && $customer }style="display:none;"{/if} class="form-group">
             <label class="control-label col-lg-3">
                 <span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Search for an existing customer by typing the first letters of his/her name.'}">
                     {l s='Search for a customer'}
@@ -1904,7 +1905,26 @@
             </div>
         </div>
         <div class="row">
-            <div id="customers"></div>
+            <div id="customers">
+			 	{if isset($cart->id_customer) && $cart->id_customer && isset($customer) && $customer }
+					<div class="customerCard col-lg-4 selected-customer">
+						<div class="panel">
+							<div class="panel-heading">
+							<i class="icon-ok text-success"></i>{$customer->firstname} {$customer->lastname} <span class="pull-right">#{$customer->id}</span>
+							</div>
+							<span>{$customer->email}</span><br>
+							<span class="text-muted"></span><br>
+							<div class="panel-footer">
+							<a href="{$link->getAdminLink('AdminCustomers')}&id_customer={$customer->id}&viewcustomer&liteDisplaying=1" class="btn btn-default fancybox">
+								<i class="icon-search"></i> Details </a>
+								<button type="button" data-id_cart="6" data-customer="2" class="btn btn-default pull-right change-customer">
+									<i class="icon-refresh"></i>&nbsp;Change 
+								</button>
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
         </div>
         {*<div id="carts">
             <button type="button" id="show_old_carts" class="btn btn-default pull-right" data-toggle="collapse" data-target="#old_carts_orders">
@@ -1962,7 +1982,7 @@
     </div>
 	{include file='controllers/orders/_current_cart_details_data.tpl'}
 
-    <form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;addorder=1&amp;cart_id={$cart->id}" method="post" style="display:none" id="cart_detail_form">
+    <form class="form-horizontal" action="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&amp;addorder=1&amp;cart_id={$cart->id}" method="post" {if !isset($customer) && !$customer }style="display:none;"{/if} id="cart_detail_form">
         <div class="panel" id="products_part" style="display:none;">
             <div class="panel-heading">
                 <i class="icon-shopping-cart"></i>
@@ -2317,17 +2337,14 @@
                         <label class="control-label col-lg-3" for="order_message">{l s='Order message'}</label>
                         <div class="col-lg-6">
                             <textarea name="order_message" id="order_message" rows="3" cols="45"></textarea>
-                        </div>
-                    </div>
-					<div class="form-group col-lg-12">
-						<span class="col-lg-3"></span>
-						<p class="checkbox col-lg-6">
+							<p class="checkbox">
 							<label class="control-label" for="visibility">
 								<input type="checkbox" name="visibility" id="visibility" value="1" />
 								{l s='Display Message to Customer?'}
 							</label>
 						</p>
-					</div>
+                        </div>
+                    </div>
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
                         {if !$PS_CATALOG_MODE}
                         <div class="col-lg-9 col-lg-offset-3">
@@ -2430,7 +2447,6 @@
     </form>
 {strip}
 	{addJsDef max_child_age=$max_child_age}
-	{addJsDef max_child_in_room=$max_child_in_room}
 	{addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
 	{addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
 	{addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}

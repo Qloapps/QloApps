@@ -542,7 +542,7 @@ class OrderReturnCore extends ObjectModel
      * Sets the new order return state
      * @param int $newOrderReturnState
      */
-    public function changeIdOrderReturnState($newOrderReturnState, $idLang = 0)
+    public function changeIdOrderReturnState($newOrderReturnState, $idLang = 0, $sendMails = true)
     {
         $objOrder = new Order($this->id_order);
         if (!$idLang) {
@@ -555,11 +555,12 @@ class OrderReturnCore extends ObjectModel
                 $this->state = $newOrderReturnState;
                 $this->save();
 
-                if ($objOrderReturnState->send_email_to_customer
+                if ($sendMails && (
+                    $objOrderReturnState->send_email_to_customer
                     || $objOrderReturnState->send_email_to_superadmin
                     || $objOrderReturnState->send_email_to_employee
                     || $objOrderReturnState->send_email_to_hotelier
-                ) {
+                )) {
                     // Lets create data for the email templates
                     $objMail = new Mail();
                     $idHotel = 0;

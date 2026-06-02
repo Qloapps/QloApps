@@ -255,7 +255,7 @@
 		<value>1</value>
 	</configuration>
 	<configuration id="PS_CUSTOMER_SERVICE_FILE_UPLOAD" name="PS_CUSTOMER_SERVICE_FILE_UPLOAD">
-		<value>1</value>
+		<value>0</value>
 	</configuration>
 	<configuration id="PS_CUSTOMER_SERVICE_SIGNATURE" name="PS_CUSTOMER_SERVICE_SIGNATURE">
 		<value/>
@@ -957,10 +957,10 @@
       <value>0</value>
     </configuration>
 	<configuration id="PS_CUSTOMER_SERVICE_REQUIRED_NAME" name="PS_CUSTOMER_SERVICE_REQUIRED_NAME">
-      <value>1</value>
+      <value>0</value>
     </configuration>
 	<configuration id="PS_CUSTOMER_SERVICE_DISPLAY_NAME" name="PS_CUSTOMER_SERVICE_DISPLAY_NAME">
-      <value>1</value>
+      <value>0</value>
     </configuration>
 	<configuration id="PS_CUSTOMER_SERVICE_REQUIRED_PHONE" name="PS_CUSTOMER_SERVICE_REQUIRED_PHONE">
       <value>1</value>
@@ -969,7 +969,10 @@
       <value>1</value>
     </configuration>
 	<configuration id="PS_CUSTOMER_SERVICE_DISPLAY_CONTACT" name="PS_CUSTOMER_SERVICE_DISPLAY_CONTACT">
-      <value>1</value>
+      <value>0</value>
+    </configuration>
+	<configuration id="PS_CUSTOMER_SERVICE_CONTACT" name="PS_CUSTOMER_SERVICE_CONTACT">
+      <value>2</value>
     </configuration>
 	<configuration id="PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE" name="PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE">
       <value>1</value>

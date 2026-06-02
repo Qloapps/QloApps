@@ -284,11 +284,11 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $featureImpactPriceTI = 0;
         $productPriceTI = Product::getPriceStatic((int) $id_product, 1, 0, 6, null, 0, $use_reduc, 1, 0, null, null, null, $nothing, 1, 1, null, 1, 0, 0, $id_group);
         $productPriceTE = Product::getPriceStatic((int) $id_product, 0, 0, 6, null, 0, $use_reduc, 1, 0, null, null, null, $nothing, 1, 1, null, 1, 0, 0, $id_group);
-        if ($productPriceTE) {
-            $taxRate = (($productPriceTI-$productPriceTE)/$productPriceTE)*100;
-        } else {
-            $taxRate = 0;
-        }
+        $id_address =  HotelRoomType::getHotelIdAddressByIdProduct($id_product);
+        $objAddress = new Address($id_address);
+        $id_tax_rule_group = Product::getIdTaxRulesGroupByIdProduct((int)$id_product);
+        $tax_calculator = TaxManagerFactory::getManager($objAddress, $id_tax_rule_group)->getTaxCalculator();
+        $taxRate = $tax_calculator->getTotalRate();
 
         if (is_array($occupancy) && count($occupancy)) {
             $quantity = count($occupancy);

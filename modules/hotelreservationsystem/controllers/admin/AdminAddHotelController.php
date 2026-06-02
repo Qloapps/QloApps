@@ -206,9 +206,26 @@ class AdminAddHotelController extends ModuleAdminController
                 $treeContent = $tree->render();
                 $smartyVars['hotel_feature_tree'] = $treeContent;
             }
+
+            $smartyVars['rewrite_url'] = [];
+            $idHotelCategory = (int) $hotelBranchInfo->id_category;
+            if ($idHotelCategory > 0 && !empty($smartyVars['languages'])) {
+                foreach ($smartyVars['languages'] as $lang) {
+                    $idLang = (int) $lang['id_lang'];
+                    $category = new Category($idHotelCategory, $idLang);
+                    if (!Validate::isLoadedObject($category)) {
+                        continue;
+                    }
+
+                    $fullUrl = $this->context->link->getCategoryLink($category, '[REWRITE]', $idLang);
+                    $smartyVars['rewrite_url'][$idLang] = explode('[REWRITE]', $fullUrl);
+                }
+            }
         } else {
             $idCountry = Tools::getValue('hotel_country');
         }
+
+        $smartyVars['hotelImageCategories'] = HotelImageCategory::getImageCategories((int) $this->context->language->id);
 
         // manage state option
         $stateOptions = null;
@@ -258,6 +275,7 @@ class AdminAddHotelController extends ModuleAdminController
         $address = Tools::getValue('address');
         $active = Tools::getValue('ENABLE_HOTEL');
         $fax = Tools::getValue('fax');
+        $vatNumber = trim(Tools::getValue('vat_number'));
         $activeRefund = Tools::getValue('active_refund');
         $enableUseGlobalMaxCheckoutOffset = Tools::getValue('enable_use_global_max_checkout_offset');
         $maxCheckoutOffset = trim(Tools::getValue('max_checkout_offset'));
@@ -386,6 +404,11 @@ class AdminAddHotelController extends ModuleAdminController
 
         if ($fax && !Validate::isGenericName($fax)) {
             $this->errors[] = $this->l('Field fax in invalid.');
+        }
+        if ($vatNumber && !Validate::isGenericName($vatNumber)) {
+            $this->errors[] = $this->l('Field VAT number is invalid.');
+        } else if (Tools::strlen($vatNumber) > 64) {
+            $this->errors[] = $this->l('Field VAT number cannot exceed 64 characters.');
         }
 
         if (!$country) {
@@ -642,6 +665,7 @@ class AdminAddHotelController extends ModuleAdminController
                 $objAddress->id_country = $country;
                 $objAddress->id_state = $state;
                 $objAddress->city = $city;
+                $objAddress->vat_number = $vatNumber;
                 $objAddress->postcode = $zipcode;
                 $hotelName = $objHotelBranch->hotel_name[$defaultLangId];
                 $hotelName = trim(preg_replace('/[0-9!<>,;?=+()@#"°{}_$%:]*$/u', '', $hotelName));
@@ -869,7 +893,15 @@ class AdminAddHotelController extends ModuleAdminController
     {
         $response = array('success' => false);
         $idHotel = Tools::getValue('id_hotel');
+        $idHtlImageCategory = (int) Tools::getValue('id_htl_image_category');
         if ($idHotel) {
+            if ($idHtlImageCategory) {
+                if (!Validate::isLoadedObject(new HotelImageCategory($idHtlImageCategory))) {
+                    $response['errors'][] = $this->l('Selected image category is invalid.');
+                    $this->ajaxDie(json_encode($response));
+                }
+            }
+
             $invalidImg = ImageManager::validateUpload(
                 $_FILES['hotel_image'],
                 Tools::getMaxUploadSize()
@@ -877,11 +909,15 @@ class AdminAddHotelController extends ModuleAdminController
             if (!$invalidImg) {
                 // Add Hotel images
                 $objHotelImage = new HotelImage();
-                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel);
+                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'],$idHotel,$idHtlImageCategory);
                 if ($imageDetail) {
                     $response['success'] = true;
                     $imageDetail['image_link'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'],ImageType::getFormatedName('large')));
                     $imageDetail['image_link_small'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'], ImageType::getFormatedName('small')));
+                    $imageDetail['id_htl_image_category'] = $idHtlImageCategory;
+                    if (!isset($imageDetail['category_name'])) {
+                        $imageDetail['category_name'] = HotelImageCategory::getCategoryName($idHtlImageCategory);
+                    }
                     $response['data']['image_info'] = $imageDetail;
                     // get image row
                     $this->context->smarty->assign(array(

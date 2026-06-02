@@ -26,6 +26,7 @@
             <tr>
                 <th class="text-center">{l s='Image Id' mod='hotelreservationsystem'}</th>
                 <th class="text-center">{l s='Image' mod='hotelreservationsystem'}</th>
+                <th class="text-center">{l s='Category' mod='hotelreservationsystem'}</th>
                 <th class="text-center">{l s='Cover' mod='hotelreservationsystem'}</th>
                 <th class="text-center">{l s='Action' mod='hotelreservationsystem'}</th>
             </tr>

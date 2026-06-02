@@ -21,32 +21,61 @@
 */
 
 $(document).ready(function () {
-    $('.htl-img-preview').fancybox({
-        width: 'auto',
-        height: 'auto',
-        autoSize : false,
-        maxWidth: 700,
-        'hideOnContentClick': false,
-    });
-
-    $("#hotel_images").on("change", function(event) {
-        const files = Array.from(event.target.files);
-        uploadSelectedImages(files);
-    });
-
-    function uploadSelectedImages(files)
+    function initHotelImagePreview()
     {
-        if (files.length == 0) return; // all done
-        let file = files[0];
-        files.splice(0, 1);
-        createImageUploadRequest(file).then((formData) => {
-            uploadHotelImages(formData).then(() => {
-                uploadSelectedImages(files)
-            });
-        })
+        $('.htl-img-preview').fancybox({
+            width: 'auto',
+            height: 'auto',
+            autoSize : false,
+            maxWidth: 700,
+            'hideOnContentClick': false,
+        });
     }
 
-    function createImageUploadRequest(file)
+    initHotelImagePreview();
+
+    $('body').on('click', '#upload_hotel_images_btn', function(event) {
+        event.preventDefault();
+        var files = Array.from($('#hotel_images')[0].files || []);
+        var idHtlImageCategory = parseInt($('#id_htl_image_category').val(), 10);
+        var triggerElement = $(this);
+
+        if (isNaN(idHtlImageCategory) || idHtlImageCategory < 0) {
+            idHtlImageCategory = 0;
+        }
+
+        if (!files.length) {
+            showErrorMessage(imgSelectErrorMsg);
+            return;
+        }
+
+        triggerElement.prop('disabled', true).addClass('disabled');
+        uploadSelectedImages(files, idHtlImageCategory).then(function() {
+            $('#hotel_images').val('');
+            showSuccessMessage(imgUploadSuccessMsg);
+        }, function(errorMsg) {
+            showErrorMessage(errorMsg || imgUploadErrorMsg);
+        }).then(function() {
+            triggerElement.prop('disabled', false).removeClass('disabled');
+        });
+    });
+
+    function uploadSelectedImages(files, idHtlImageCategory)
+    {
+        if (files.length == 0) {
+            return Promise.resolve();
+        }
+
+        let file = files[0];
+        files.splice(0, 1);
+        return createImageUploadRequest(file, idHtlImageCategory).then((formData) => {
+            return uploadHotelImages(formData).then(() => {
+                return uploadSelectedImages(files, idHtlImageCategory);
+            });
+        });
+    }
+
+    function createImageUploadRequest(file, idHtlImageCategory)
     {
         return new Promise((resolve, reject) => {
             if (typeof file != 'undefined') {
@@ -57,10 +86,13 @@ $(document).ready(function () {
                     var idHotel = $("#id-hotel").val();
                     formData.append('hotel_image', file);
                     formData.append('id_hotel', idHotel);
+                    formData.append('id_htl_image_category', idHtlImageCategory);
                     formData.append('ajax', true);
                     formData.append('action', 'uploadHotelImages');
                     resolve(formData);
                 }
+            } else {
+                reject(imgUploadErrorMsg);
             }
         });
     }
@@ -79,20 +111,17 @@ $(document).ready(function () {
                     if (response.success) {
                         $('.list-empty-tr').remove();
                         $("#hotel-image-table tbody").append(response.data.image_row);
-                        showSuccessMessage(imgUploadSuccessMsg);
-                        resolve(imgUploadSuccessMsg);
+                        initHotelImagePreview();
+                        resolve(response);
                     } else {
-                        if (typeof response.errors != 'undefined') {
-                            showErrorMessage(response.errors);
-                            reject(response.errors);
+                        if (typeof response.errors != 'undefined' && response.errors.length) {
+                            reject(response.errors.join('<br>'));
                         } else {
-                            showErrorMessage(imgUploadErrorMsg);
                             reject(imgUploadErrorMsg);
                         }
                     }
                 },
                 error: function(data) {
-                    showErrorMessage(imgUploadErrorMsg);
                     reject(imgUploadErrorMsg);
                 }
             });

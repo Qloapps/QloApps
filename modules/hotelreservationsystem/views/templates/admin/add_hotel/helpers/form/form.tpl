@@ -196,6 +196,12 @@
 						</div>
 					</div>
 					<div class="form-group">
+						<label class="col-sm-3 control-label" for="vat_number">{l s='VAT Number' mod='hotelreservationsystem'}</label>
+						<div class="col-sm-6">
+							<input autocomplete="off" type="text" class="form-control" id="vat_number" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$address_info.vat_number|escape:'htmlall':'UTF-8'}{/if}" />
+						</div>
+					</div>
+					<div class="form-group">
 						<label class="col-sm-3 control-label required">{l s='Address :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
 							<textarea name="address" rows="4" cols="35" >{if isset($smarty.post.address)}{$smarty.post.address}{elseif isset($edit)}{$address_info.address1|escape:'htmlall':'UTF-8'}{/if}</textarea>
@@ -345,14 +351,19 @@
 						<div class="col-lg-6">
 						{foreach from=$languages item=language}
 							{assign var="meta_title" value="meta_title_`$language.id_lang`"}
+							<div class="input-group wk_text_field_all wk_text_field_{$language.id_lang}" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}>
+								<span id="meta_title_{$language.id_lang}_counter" class="input-group-addon">
+									<span class="text-count-down">128</span>
+								</span>
 								<input type="text"
 								id="meta_title_{$language.id_lang}"
 								name="meta_title_{$language.id_lang}"
-								value="{if isset($smarty.post.$meta_title)}{$smarty.post.$meta_title|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_title_info[$language.id_lang]|escape:'htmlall':'UTF-8'}{/if}""
-								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
+								value="{if isset($smarty.post.$meta_title)}{$smarty.post.$meta_title|truncate:128:'':true|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_title_info[$language.id_lang]|truncate:128:'':true|escape:'htmlall':'UTF-8'}{/if}"
+								class="form-control"
 								maxlength="128"
-								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
-							{/foreach}
+								data-maxchar="128" />
+							</div>
+						{/foreach}
 						</div>
 					</div>
 					<div class="form-group">
@@ -363,13 +374,18 @@
 						<div class="col-lg-6">
 							{foreach from=$languages item=language}
 								{assign var="meta_description" value="meta_description_`$language.id_lang`"}
-								<input type="text"
-								id="meta_description_{$language.id_lang}"
-								name="meta_description_{$language.id_lang}"
-								value="{if isset($smarty.post.$meta_description)}{$smarty.post.$meta_description|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_description_info[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
-								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
-								maxlength="225"
-								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
+								<div class="input-group wk_text_field_all wk_text_field_{$language.id_lang}" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}>
+									<span id="meta_description_{$language.id_lang}_counter" class="input-group-addon">
+										<span class="text-count-down">255</span>
+									</span>
+									<textarea
+									id="meta_description_{$language.id_lang}"
+									name="meta_description_{$language.id_lang}"
+									class="form-control textarea-autosize"
+									rows="1"
+									maxlength="255"
+									data-maxchar="255">{if isset($smarty.post.$meta_description)}{$smarty.post.$meta_description|truncate:255:'':true|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_description_info[{$language.id_lang}]|truncate:255:'':true|escape:'htmlall':'UTF-8'}{/if}</textarea>
+								</div>
 							{/foreach}
 						</div>
 					</div>
@@ -401,6 +417,20 @@
 							{/foreach}
 						</div>
 					</div>
+					{include file="seo_preview.tpl"
+						languages = $languages
+						preview_link = $rewrite_url|default:''
+						show_label_tooltip = false
+						show_flag = true
+						inputs = [
+    						'meta_title' => $meta_title_info,
+    						'meta_description' => $meta_description_info,
+    						'link_rewrite' => $link_rewrite_info,
+							'meta_keywords' => $meta_keywords_info,
+							'name' => $hotel_info.hotel_name,
+							'description_short' => $hotel_info.short_description
+						]
+					}
 					{hook h='displayAdminAddHotelFormSeoTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
 				<div class="tab-pane" id="hotel-images">
@@ -408,11 +438,39 @@
 
 					{if isset($hotel_info.id) && $hotel_info.id}
 						<div class="form-group row">
-							<label for="hotel_images" class="col-sm-3 control-label padding-top-0">
-								{l s='Upload images' mod='hotelreservationsystem'}&nbsp;:&nbsp;&nbsp;
+							<label for="hotel_images" class="col-sm-1 control-label">
+								{l s='Upload images' mod='hotelreservationsystem'}
 							</label>
-							<div class="col-sm-5">
-								<input class="form-control-static" type="file" accept="image/gif, image/jpg, image/jpeg, image/png" id="hotel_images" name="hotel_images[]" multiple>
+							<div class="col-sm-11">
+								<div class="panel panel-default" style="margin-bottom:0;">
+									<div class="panel-body" style="padding-bottom:10px;">
+										<div class="row">
+											<div class="col-sm-5">
+												<label class="control-label" for="hotel_images">{l s='Select images' mod='hotelreservationsystem'}</label>
+												<input class="form-control" type="file" accept="image/gif, image/jpg, image/jpeg, image/png" id="hotel_images" name="hotel_images[]" multiple>
+												<p class="help-block" style="margin-bottom:0;">{l s='You can select multiple images.' mod='hotelreservationsystem'}</p>
+											</div>
+											<div class="col-sm-4">
+												<label class="control-label" for="id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+												<select class="form-control" id="id_htl_image_category" name="id_htl_image_category">
+													<option value="0">{l s='Select category (optional)' mod='hotelreservationsystem'}</option>
+													{if isset($hotelImageCategories) && $hotelImageCategories}
+														{foreach from=$hotelImageCategories item=hotelImageCategory}
+															<option value="{$hotelImageCategory.id_htl_image_category|intval}">{$hotelImageCategory.name|escape:'html':'UTF-8'}</option>
+														{/foreach}
+													{/if}
+												</select>
+												<p class="help-block" style="margin-bottom:2px;">{l s='If not selected, image will be uncategorized.' mod='hotelreservationsystem'} &mdash; <a href="{$link->getAdminLink('AdminHotelImageCategory')|escape:'html':'UTF-8'}&amp;addhtl_image_category" target="_blank" style="white-space:nowrap;">{l s='Create image category' mod='hotelreservationsystem'} <i class="icon-external-link" style="font-size:11px;"></i></a></p>
+											</div>
+											<div class="col-sm-3">
+												<label class="control-label">&nbsp;</label>
+												<button class="btn btn-primary btn-block" id="upload_hotel_images_btn" type="button">
+													<i class="icon-upload"></i> {l s='Upload' mod='hotelreservationsystem'}
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 						<hr>
@@ -621,10 +679,11 @@
 	</form>
 </div>
 
-{strip}
-	{addJsDef adminHotelCtrlUrl = $link->getAdminlink('AdminAddHotel')}
-		{addJsDefL name=imgUploadSuccessMsg}{l s='Image Successfully Uploaded' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+	{strip}
+		{addJsDef adminHotelCtrlUrl = $link->getAdminlink('AdminAddHotel')}
+			{addJsDefL name=imgUploadSuccessMsg}{l s='Image Successfully Uploaded' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+		{addJsDefL name=imgSelectErrorMsg}{l s='Please select at least one image before uploading.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+		{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 
 	{addJsDefL name=coverImgSuccessMsg}{l s='Cover image changed successfully' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=coverImgErrorMsg}{l s='Error while changing cover image' js=1 mod='hotelreservationsystem'}{/addJsDefL}
@@ -657,6 +716,33 @@
 			});
 		{/block}
 
+		{foreach from=$languages item=language}
+			countDown($("#meta_title_{$language.id_lang}"), $("#meta_title_{$language.id_lang}_counter"));
+			countDown($("#meta_description_{$language.id_lang}"), $("#meta_description_{$language.id_lang}_counter"));
+		{/foreach}
+
+		$('a[href="#hotel-seo"]').on('shown.bs.tab', function() {
+			$(window).trigger('resize.autosize');
+		});
+
+		// handle case where SEO tab is already active on load
+		if ($('#hotel-seo').hasClass('active')) {
+			$(window).trigger('resize.autosize');
+		}
+
+		// Trigger autosize width recalculation when language is switched
+		$(document).on('wk.lang.changed', function(e, idLang) {
+			$(window).trigger('resize.autosize');
+		});
+	});
+	$(".textarea-autosize").autosize();
+	// After full page load, reinit visible textareas so they start at the correct height
+	$(window).on('load', function() {
+		$(".textarea-autosize:visible").each(function() {
+			var $ta = $(this), val = $ta.val();
+			$ta.val('').trigger('autosize.destroy').removeData('autosize').autosize();
+			if (val) { $ta.val(val).trigger('input'); }
+		});
 	});
 </script>
 {/block}
