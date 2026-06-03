@@ -248,19 +248,19 @@
                         <td>{if $outOfOrderRow.floor}{$outOfOrderRow.floor|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
                         <td>{$outOfOrderRow.room_type_name|escape:'html':'UTF-8'}</td>
                         <td class="text-center">
-                            {if $outOfOrderRow.id_status == 2}
-                                <span class="label label-default">{l s='Out of Order' mod='qlohotelreports'}</span>
-                            {else}
-                                <span class="label label-warning">{l s='Under Maintenance' mod='qlohotelreports'}</span>
+                            {if isset($room_statuses[$outOfOrderRow.id_status])}
+                                <span class="label {$room_statuses[$outOfOrderRow.id_status].class|escape:'html':'UTF-8'}">{$room_statuses[$outOfOrderRow.id_status].label|escape:'html':'UTF-8'}</span>
                             {/if}
                         </td>
                         <td>{if $outOfOrderRow.reason}{$outOfOrderRow.reason|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
-                        <td>{$outOfOrderRow.disabled_from|escape:'html':'UTF-8'}</td>
-                        <td>{$outOfOrderRow.disabled_to|escape:'html':'UTF-8'}</td>
+                        <td>{if $outOfOrderRow.disabled_from}{$outOfOrderRow.disabled_from|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
+                        <td>{if $outOfOrderRow.disabled_to}{$outOfOrderRow.disabled_to|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
                         <td>&mdash;</td>
-                        <td class="text-center">{$outOfOrderRow.disabled_days|intval}</td>
+                        <td class="text-center">{if $outOfOrderRow.disabled_days}{$outOfOrderRow.disabled_days|intval}{else}&mdash;{/if}</td>
                         <td class="text-center">
-                            {if $outOfOrderRow.disabled_to >= $today}
+                            {if !$outOfOrderRow.disabled_from}
+                                <span class="label label-default">{l s='Permanent' mod='qlohotelreports'}</span>
+                            {elseif $outOfOrderRow.disabled_to >= $today}
                                 <span class="label label-danger">{l s='Active' mod='qlohotelreports'}</span>
                             {else}
                                 <span class="label label-success">{l s='Resolved' mod='qlohotelreports'}</span>

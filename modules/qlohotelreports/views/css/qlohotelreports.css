@@ -22,8 +22,12 @@
 
 /* Sub-report tabs */
 .qlo-sub-report-nav {
-    margin: 0 0 5px 0;
-    border-bottom: 2px solid #ddd;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* Handles both horizontal and vertical spacing automatically */
+    /* margin: 0 0 18px 0; */
+    padding-bottom: 8px; /* Adds breathing room above the border */
+    border-bottom: 1px solid #eee;
 }
 
 .qlo-sub-report-nav > li > a {

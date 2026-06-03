@@ -716,16 +716,20 @@ class HotelRoomInformation extends ObjectModel
     }
 
     /**
-     * Per-room snapshot showing current room status and active guest if occupied.
-     * "Active" means a booking whose date_from <= date_from param < date_to.
+     * Room status for a date range — for reporting use only.
+     * A room is Occupied if any booking overlaps [date_from, date_to).
+     * A room is Under Maintenance if any disable-date entry overlaps the range
+     * AND hri.id_status = STATUS_TEMPORARY_INACTIVE; otherwise treated as Active.
+     * Each room appears exactly once regardless of how many bookings fall in range.
      *
-     * @param array $params  date_from (as-of date), id_hotel, id_product, id_lang
-     * @return array  rows with id_room, room_num, id_status, room_type_name, hotel_name,
-     *                id_order, date_from, date_to, booking_status, guest_name
+     * @param array $params  date_from, date_to, id_hotel, id_product, floor, id_lang
+     * @return array  rows: id_room, room_num, floor, id_status, room_type_name, hotel_name,
+     *                      id_order, date_from, date_to, booking_status, guest_name
      */
-    public static function getRoomCurrentStatus(array $params)
+    public static function getRoomStatusForReports(array $params)
     {
-        $asOf      = isset($params['date_from']) ? pSQL($params['date_from']) : pSQL(date('Y-m-d'));
+        $dateFrom  = pSQL($params['date_from']);
+        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
         $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
         $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
         $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
@@ -735,10 +739,14 @@ class HotelRoomInformation extends ObjectModel
         }
 
         return Db::getInstance()->executeS(
-            'SELECT hri.`id` AS id_room, hri.`room_num`, hri.`id_status`, hri.`floor`,
+            'SELECT hri.`id` AS id_room, hri.`room_num`, hri.`floor`,
+            CASE WHEN hri.`id_status` = '.(int) self::STATUS_TEMPORARY_INACTIVE.' AND hrdd.`id_room` IS NULL
+                 THEN '.(int) self::STATUS_ACTIVE.'
+                 ELSE hri.`id_status`
+            END AS id_status,
             pl.`name` AS room_type_name, hbil.`hotel_name`,
-            hbd.`id_order`, hbd.`date_from`, hbd.`date_to`,
-            hbd.`id_status` AS booking_status,
+            bkgs.`id_order`, bkgs.`date_from`, bkgs.`date_to`,
+            bkgs.`id_status` AS booking_status,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS guest_name
             FROM `'._DB_PREFIX_.'htl_room_information` hri
             INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
@@ -747,13 +755,25 @@ class HotelRoomInformation extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hri.`id_hotel`)
             INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
                 ON (hbil.`id` = hri.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
-            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (
-                hbd.`id_room` = hri.`id`
-                AND hbd.`is_refunded` = 0
-                AND hbd.`date_from` <= "'.$asOf.'"
-                AND hbd.`date_to` > "'.$asOf.'"
-            )
-            LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+            LEFT JOIN (
+                SELECT `id_room`
+                FROM `'._DB_PREFIX_.'htl_room_disable_dates`
+                WHERE `date_from` < "'.$dateTo.'" AND `date_to` > "'.$dateFrom.'"
+                GROUP BY `id_room`
+            ) hrdd ON (hrdd.`id_room` = hri.`id`)
+            LEFT JOIN (
+                SELECT hbd.`id_room`,
+                    MIN(hbd.`id_order`) AS `id_order`,
+                    MIN(hbd.`date_from`) AS `date_from`,
+                    MAX(hbd.`date_to`) AS `date_to`,
+                    MIN(hbd.`id_status`) AS `id_status`,
+                    MIN(hbd.`id_customer`) AS `id_customer`
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`is_refunded` = 0
+                AND hbd.`date_from` < "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'"
+                GROUP BY hbd.`id_room`
+            ) bkgs ON (bkgs.`id_room` = hri.`id`)
+            LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = bkgs.`id_customer`)
             WHERE p.`active` = 1 AND p.`booking_product` = 1'
             .($floor     ? ' AND hri.`floor` = "'.$floor.'"'     : '')
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')

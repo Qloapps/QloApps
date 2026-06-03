@@ -930,21 +930,29 @@ class HotelBranchInformation extends ObjectModel
 
     public static function addHotelRestriction($idsHotel, $alias = null, $identifier = 'id_hotel', $idProfile = null)
     {
-        if (!$idProfile) {
+        if (!$idProfile && isset(Context::getContext()->employee->id_profile)) {
             $idProfile = Context::getContext()->employee->id_profile;
         }
 
-        $accessedIds = self::getProfileAccessedHotels($idProfile, 1, 1);
-        if (!$idsHotel) {
-            $idsHotel = $accessedIds;
-        } else {
-            if (!is_array($idsHotel)) {
-                $idsHotel = array($idsHotel);
+        if (!$idProfile && !$idsHotel) {
+            return '';
+        }
+
+        if ($idProfile) {
+            $accessedIds = self::getProfileAccessedHotels($idProfile, 1, 1);
+            if (!$idsHotel) {
+                $idsHotel = $accessedIds;
+            } else {
+                if (!is_array($idsHotel)) {
+                    $idsHotel = array($idsHotel);
+                }
+                // check if passed hotel id's are available for current employee
+                $idsHotel = array_filter($idsHotel, function ($idHotel) use($accessedIds)  {
+                    return in_array($idHotel, $accessedIds);
+                });
             }
-            // check if passed hotel id's are available for current employee
-            $idsHotel = array_filter($idsHotel, function ($idHotel) use($accessedIds)  {
-                return in_array($idHotel, $accessedIds);
-            });
+        } elseif (!is_array($idsHotel)) {
+            $idsHotel = array($idsHotel);
         }
 
         $restriction = ' AND ';

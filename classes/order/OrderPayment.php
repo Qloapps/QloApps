@@ -183,8 +183,8 @@ class OrderPaymentCore extends ObjectModel
                 'SELECT op.`id_order_payment`, op.`date_add`, o.`id_order`,
                 op.`order_reference` AS reference,
                 CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-                op.`payment_method`, op.`payment_type`, op.`amount`, op.`transaction_id`,
-                cur.`iso_code` AS currency_iso
+                op.`payment_method`, op.`payment_type`, op.`amount`, op.`conversion_rate`,
+                op.`transaction_id`, cur.`iso_code` AS currency_iso, cur.`sign` AS currency_sign
                 FROM `'._DB_PREFIX_.'order_payment` op
                 INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`reference` = op.`order_reference` AND o.`valid` = 1)
                 INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)

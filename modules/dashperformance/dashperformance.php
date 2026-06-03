@@ -85,7 +85,7 @@ class DashPerformance extends Module
 
             $data['dp_average_daily_rate'] = Tools::displayPrice(HotelBookingDetail::getAverageDailyRate($kpiParams));
 
-            $data['dp_direct_revenue_ratio'] = sprintf('%0.2f', HotelBookingDetail::getDirectRevenueRatio($kpiParams)).'%';
+            $data['dp_direct_revenue_ratio'] = sprintf('%0.2f', Order::getDirectRevenueRatio($kpiParams)).'%';
 
             $data['dp_average_occupancy_rate'] = sprintf('%0.2f', HotelBookingDetail::getOccupancyRate($kpiParams)).'%';
 

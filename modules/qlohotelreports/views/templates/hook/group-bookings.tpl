@@ -146,15 +146,10 @@
                                 <td class="text-right">{$reservation.children|intval}</td>
                                 <td class="text-right">{$reservation.currency_sign|escape:'html':'UTF-8'}{$reservation.unit_price_tax_excl|string_format:"%.2f"}</td>
                                 <td>
-                                    {if $reservation.booking_type == 1}{l s='Online / Direct' mod='qlohotelreports'}
-                                    {elseif $reservation.booking_type == 2}{l s='Walk-in / Admin' mod='qlohotelreports'}
-                                    {else}{l s='Other' mod='qlohotelreports'}{/if}
+                                    {if isset($booking_sources[$reservation.booking_type])}{$booking_sources[$reservation.booking_type]|escape:'html':'UTF-8'}{else}{l s='Other' mod='qlohotelreports'}{/if}
                                 </td>
                                 <td>
-                                    {if $reservation.id_status == 1}{l s='Confirmed' mod='qlohotelreports'}
-                                    {elseif $reservation.id_status == 2}{l s='Checked In' mod='qlohotelreports'}
-                                    {elseif $reservation.id_status == 3}{l s='Checked Out' mod='qlohotelreports'}
-                                    {else}{$reservation.id_status|intval}{/if}
+                                    {if isset($booking_statuses[$reservation.id_status])}{$booking_statuses[$reservation.id_status]|escape:'html':'UTF-8'}{else}{$reservation.id_status|intval}{/if}
                                 </td>
                                 <td class="text-right">{$reservation.currency_sign|escape:'html':'UTF-8'}{$reservation.total_price_tax_excl|string_format:"%.2f"}</td>
                                 <td class="text-right">{$reservation.currency_sign|escape:'html':'UTF-8'}{$reservation.tax_amount|string_format:"%.2f"}</td>
@@ -189,10 +184,10 @@
                         <td class="text-right"><strong>{$reservation_totals.children}</strong></td>
                         <td></td>
                         <td colspan="2"></td>
-                        <td class="text-right"><strong>{$reservation_totals.total_price_tax_excl|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$reservation_totals.tax_amount|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$reservation_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$reservation_totals.balance_due|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$reservation_totals.total_price_tax_excl|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$reservation_totals.tax_amount|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$reservation_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$reservation_totals.balance_due|string_format:"%.2f"}</strong></td>
                         <td colspan="3"></td>
                     </tr>
                 </tfoot>
@@ -312,7 +307,7 @@
                 <tfoot>
                     <tr class="qlo-report-totals">
                         <td colspan="5"><strong>{l s='Totals' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right"><strong>{$no_show_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$no_show_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
                         <td></td>
                     </tr>
                 </tfoot>
@@ -379,7 +374,7 @@
                         <td class="text-right"><strong>{$arrival_totals.los}</strong></td>
                         <td class="text-right"><strong>{$arrival_totals.adults}</strong></td>
                         <td class="text-right"><strong>{$arrival_totals.children}</strong></td>
-                        <td></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$arrival_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
                     </tr>
                 </tfoot>
                 {/if}
@@ -445,7 +440,7 @@
                         <td class="text-right"><strong>{$departure_totals.los}</strong></td>
                         <td class="text-right"><strong>{$departure_totals.adults}</strong></td>
                         <td class="text-right"><strong>{$departure_totals.children}</strong></td>
-                        <td></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$departure_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
                     </tr>
                 </tfoot>
                 {/if}
@@ -457,8 +452,8 @@
 
     {* ── In-House Report ─────────────────────────────────────────────── *}
     {if $active_report == 'in-house'}
-        <div class="alert alert-warning">
-            {l s='In-House report shows current occupancy as of today. The date range filter does not apply.' mod='qlohotelreports'}
+        <div class="alert alert-info">
+            {l s='Showing guests who were in-house at any point during the selected date range.' mod='qlohotelreports'}
         </div>
         <div class="row">
         <div class="col-lg-12">
@@ -510,10 +505,11 @@
                 {if $in_house}
                 <tfoot>
                     <tr class="qlo-report-totals">
-                        <td colspan="8"><strong>{l s='Totals' mod='qlohotelreports'}</strong></td>
+                        <td colspan="7"><strong>{l s='Totals' mod='qlohotelreports'}</strong></td>
+                        <td class="text-right"><strong>{$in_house_totals.los}</strong></td>
                         <td class="text-right"><strong>{$in_house_totals.adults}</strong></td>
                         <td class="text-right"><strong>{$in_house_totals.children}</strong></td>
-                        <td></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$in_house_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
                     </tr>
                 </tfoot>
                 {/if}

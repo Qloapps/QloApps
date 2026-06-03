@@ -608,6 +608,7 @@ class ServiceProductOrderDetail extends ObjectModel
         $idCustomer       = isset($params['id_customer'])       ? (int) $params['id_customer']       : 0;
         $idCategory       = isset($params['id_category'])       ? (int) $params['id_category']       : 0;
         $idServiceProduct = isset($params['id_service_product']) ? (int) $params['id_service_product'] : 0;
+        $granularity      = isset($params['granularity'])       ? $params['granularity']             : false;
         $idLang           = isset($params['id_lang'])           ? (int) $params['id_lang']           : 0;
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -635,6 +636,22 @@ class ServiceProductOrderDetail extends ObjectModel
             .($idServiceProduct ? ' AND spod.`id_product` = '.$idServiceProduct : '')
             .($idCategory       ? ' AND spod.`id_product` IN (SELECT `id_product` FROM `'._DB_PREFIX_.'product` WHERE `id_category_default` = '.$idCategory.')' : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+
+        if ($granularity === 'day' || $granularity === 'month') {
+            $groupLen = $granularity === 'month' ? 7 : 10;
+            $tsSuffix = $granularity === 'month' ? '-01' : '';
+            $rows     = Db::getInstance()->executeS(
+                'SELECT LEFT(o.`invoice_date`, '.$groupLen.') AS grp,
+                IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0) AS amt
+                '.$baseFrom.' '.$baseWhere.'
+                GROUP BY LEFT(o.`invoice_date`, '.$groupLen.')'
+            );
+            $result = array();
+            foreach ($rows as $row) {
+                $result[strtotime($row['grp'].$tsSuffix)] = (float) $row['amt'];
+            }
+            return $result;
+        }
 
         if ($detailedInfo) {
             return Db::getInstance()->executeS(
@@ -805,6 +822,106 @@ class ServiceProductOrderDetail extends ObjectModel
             WHERE p.`booking_product` = 0 AND p.`active` = 1'
             .($idCategory ? ' AND p.`id_category_default` = '.(int) $idCategory : '').'
             ORDER BY pl.`name` ASC'
+        );
+    }
+
+    /**
+     * Tax breakdown for service product orders in a date range.
+     * Returns one row per service line. Tax amount = total_incl - total_excl (no order_detail_tax join
+     * since services use a flat tax difference rather than per-rule breakdown).
+     *
+     * $params: date_from, date_to, id_hotel, id_lang
+     *
+     * @param array $params
+     * @return array  rows: id_order, reference, customer_name, room_type_name (service name),
+     *                      room_num, date_add, taxable_amount, tax_name (NULL), tax_rate (NULL),
+     *                      tax_amount, revenue_source ('service')
+     */
+    /**
+     * Prorated service product purchase cost per night across a date range.
+     * Uses booking-overlap filter (date_from < next AND date_to > current).
+     * Supplier price used when non-zero; otherwise estimated from margin config.
+     * Per-booking-calculation-method services are divided by booking length.
+     *
+     * @param array $params  date_from, date_to, id_hotel
+     * @return array  unix_timestamp => float
+     */
+    public static function getServiceOperatingExpensesForDiscreteDates(array $params)
+    {
+        $dateFrom = $params['date_from'];
+        $dateTo   = isset($params['date_to']) ? $params['date_to'] : date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
+        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : null;
+        $margin   = (int) Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN');
+
+        $result  = array();
+        $current = $dateFrom;
+        while ($current < $dateTo) {
+            $next = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+            $ts   = strtotime($current);
+
+            $result[$ts] = (float) Db::getInstance()->getValue(
+                'SELECT IFNULL(SUM(
+                    IF(od.`purchase_supplier_price` <> "0.000000",
+                       od.`purchase_supplier_price`
+                           / IF(od.`product_price_calculation_method` = '.Product::PRICE_CALCULATION_METHOD_PER_BOOKING.',
+                               DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1),
+                       ((od.`original_product_price` / o.`conversion_rate`) * '.$margin.' / 100)
+                           / IF(od.`product_price_calculation_method` = '.Product::PRICE_CALCULATION_METHOD_PER_BOOKING.',
+                               DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1))
+                ), 0)
+                FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+                LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (spod.`id_htl_booking_detail` = hbd.`id`)
+                LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = spod.`id_product`)
+                LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = spod.`id_order_detail`)
+                LEFT JOIN `'._DB_PREFIX_.'orders` o ON (od.`id_order` = o.`id_order`)
+                WHERE p.`active` = 1 AND o.`valid` = 1 AND hbd.`is_refunded` = 0
+                AND hbd.`date_from` < "'.pSQL($next).' 00:00:00"
+                AND hbd.`date_to`   > "'.pSQL($current).' 00:00:00"'
+                .(!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '')
+            );
+
+            $current = $next;
+        }
+
+        return $result;
+    }
+
+    public static function getTaxBreakdown(array $params)
+    {
+        $dateFrom = pSQL($params['date_from']);
+        $dateTo   = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
+        $idTax    = isset($params['id_tax'])   ? (int) $params['id_tax'] : 0;
+        $idLang   = isset($params['id_lang'])  ? (int) $params['id_lang'] : 0;
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT hbd.`id_order`, o.`reference`,
+            CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+            spod.`name` AS room_type_name, hbd.`room_num`, spod.`date_add`,
+            spod.`total_price_tax_excl` / o.`conversion_rate` AS taxable_amount,
+            MAX(tl.`name`) AS tax_name,
+            MAX(t.`rate`) AS tax_rate,
+            (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate` AS tax_amount,
+            "service" AS revenue_source
+            FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = spod.`id_htl_booking_detail`)
+            INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
+            INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+            LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = spod.`id_order_detail`)
+            LEFT JOIN `'._DB_PREFIX_.'order_detail_tax` odt ON (odt.`id_order_detail` = od.`id_order_detail`)
+            LEFT JOIN `'._DB_PREFIX_.'tax` t ON (t.`id_tax` = odt.`id_tax`)
+            LEFT JOIN `'._DB_PREFIX_.'tax_lang` tl ON (tl.`id_tax` = t.`id_tax` AND tl.`id_lang` = '.(int) $idLang.')
+            WHERE spod.`is_cancelled` = 0
+            AND hbd.`is_refunded` = 0
+            AND (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) > 0
+            AND spod.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idTax ? ' AND odt.`id_tax` = '.$idTax : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            GROUP BY spod.`id_service_product_order_detail`
+            ORDER BY spod.`date_add` ASC'
         );
     }
 }

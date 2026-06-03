@@ -179,13 +179,13 @@
                         {if $prev_date != '' && $prev_date != $availabilityRow.date}
                         <tr class="qlo-subtotal-row">
                             <td><strong>{$prev_date|escape:'html':'UTF-8'} {l s='Total' mod='qlohotelreports'}</strong></td>
-                            <td>&mdash;</td>
+                            <td class="text-center">&mdash;</td>
                             <td class="text-center"><strong>{$date_total|intval}</strong></td>
                             <td class="text-center"><strong>{$date_booked|intval}</strong></td>
                             <td class="text-center"><strong>{$date_ooo|intval}</strong></td>
                             <td class="text-center"><strong>{$date_avail|intval}</strong></td>
-                            <td>&mdash;</td>
-                            <td>&mdash;</td>
+                            <td class="text-center">&mdash;</td>
+                            <td class="text-center">&mdash;</td>
                         </tr>
                         {assign var="date_total" value=0}
                         {assign var="date_booked" value=0}
@@ -204,7 +204,7 @@
                         <td class="text-center">{$availabilityRow.rooms_booked|intval}</td>
                         <td class="text-center">{$availabilityRow.out_of_order|intval}</td>
                         <td class="text-center">{$availabilityRow.available|intval}</td>
-                        <td class="text-right">&mdash;</td>
+                        <td class="text-center">&mdash;</td>
                         <td class="text-center">{$availabilityRow.occupancy_pct|string_format:'%.1f'}%</td>
                     </tr>
                     {/foreach}
@@ -254,7 +254,7 @@
         {assign var="cnt_total" value=$cnt_total+1}
         {if $room.id_order}
             {assign var="cnt_occupied" value=$cnt_occupied+1}
-        {elseif $room.id_status == 2 || $room.id_status == 3}
+        {elseif isset($room_statuses[$room.id_status])}
             {assign var="cnt_ooo" value=$cnt_ooo+1}
         {else}
             {assign var="cnt_available" value=$cnt_available+1}
@@ -313,10 +313,8 @@
                         <td class="text-center">
                             {if $room.id_order}
                                 <span class="label label-danger">{l s='Occupied' mod='qlohotelreports'}</span>
-                            {elseif $room.id_status == 2}
-                                <span class="label label-default">{l s='Under Maintenance' mod='qlohotelreports'}</span>
-                            {elseif $room.id_status == 3}
-                                <span class="label label-warning">{l s='Under Maintenance' mod='qlohotelreports'}</span>
+                            {elseif isset($room_statuses[$room.id_status])}
+                                <span class="label {$room_statuses[$room.id_status].class|escape:'html':'UTF-8'}">{$room_statuses[$room.id_status].label|escape:'html':'UTF-8'}</span>
                             {else}
                                 <span class="label label-success">{l s='Vacant' mod='qlohotelreports'}</span>
                             {/if}

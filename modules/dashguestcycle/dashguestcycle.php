@@ -89,13 +89,12 @@ class DashGuestCycle extends Module
             $dataValue['dgc_guests_children'] = sprintf('%02d', rand(0, $dataValue['dgc_guests_adults']));
         } else {
             // set badges data
-            $arrivalsData   = HotelBookingDetail::getArrivals(['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']]);
-            $departuresData = HotelBookingDetail::getDepartures(['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']]);
-            $guestsData     = HotelBookingDetail::getTotalGuests(['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']]);
-            $dataValue['dgc_arrived'] = sprintf('%02d', $arrivalsData['arrived']);
-            $dataValue['dgc_total_arrivals'] = sprintf('%02d', $arrivalsData['total_arrivals']);
-            $dataValue['dgc_departed'] = sprintf('%02d', $departuresData['departed']);
-            $dataValue['dgc_total_departures'] = sprintf('%02d', $departuresData['total_departures']);
+            $kpiParams = ['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']];
+            $guestsData = HotelBookingDetail::getTotalGuests($kpiParams);
+            $dataValue['dgc_arrived']          = sprintf('%02d', count(HotelBookingDetail::getArrivalsInfo(array_merge($kpiParams, ['id_status' => HotelBookingDetail::STATUS_CHECKED_IN]))));
+            $dataValue['dgc_total_arrivals']   = sprintf('%02d', HotelBookingDetail::getTotalArrivals($kpiParams));
+            $dataValue['dgc_departed']         = sprintf('%02d', count(HotelBookingDetail::getDeparturesInfo(array_merge($kpiParams, ['id_status' => HotelBookingDetail::STATUS_CHECKED_OUT]))));
+            $dataValue['dgc_total_departures'] = sprintf('%02d', HotelBookingDetail::getTotalDepartures($kpiParams));
             $dataValue['dgc_new_bookings'] = sprintf('%02d', count(HotelBookingDetail::getBookings(['date_from' => $dateToday, 'id_hotel' => $params['id_hotel']])));
             $dataValue['dgc_occupied'] = sprintf('%02d', HotelBookingDetail::getDistinctRoomBookingsCount(
                 date('Y-m-d', strtotime('-1 day')),

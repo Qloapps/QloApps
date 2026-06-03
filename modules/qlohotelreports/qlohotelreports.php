@@ -149,12 +149,12 @@ class QloHotelReports extends Module
                 . ($idProduct ? '&id_product=' . $idProduct : '');
 
             $bookingSubReports = array(
-                'reservation'  => $this->l('Reservation'),
-                'cancellation' => $this->l('Cancellation'),
-                'no-show'      => $this->l('No-Show'),
+                'reservation'  => $this->l('Reservations'),
                 'arrivals'     => $this->l('Arrivals'),
-                'departures'   => $this->l('Departures'),
                 'in-house'     => $this->l('In-House'),
+                'departures'   => $this->l('Departures'),
+                'no-show'      => $this->l('No-Shows'),
+                'cancellation' => $this->l('Cancellations'),
             );
 
             $this->context->smarty->assign(array(
@@ -188,14 +188,13 @@ class QloHotelReports extends Module
             $currencyMap = $this->currencySignMap();
 
             if ($report === 'reservation') {
-                $reservations = HotelBookingDetail::getBookings(array(
-                    'date_from'     => $dateFrom,
-                    'date_to'       => $dateTo,
-                    'id_hotel'      => $idHotel ?: false,
-                    'id_product'    => $idProduct,
-                    'id_status'     => $idStatus,
-                    'booking_type'  => $bookingType,
-                    'detailed_info' => true,
+                $reservations = HotelBookingDetail::getBookingsInfo(array(
+                    'date_from'    => $dateFrom,
+                    'date_to'      => $dateTo,
+                    'id_hotel'     => $idHotel ?: false,
+                    'id_product'   => $idProduct,
+                    'id_status'    => $idStatus,
+                    'booking_type' => $bookingType,
                 ));
                 $this->attachCurrencyToRows($reservations, $currencyMap, $currency->sign, $currency->iso_code);
 
@@ -203,13 +202,17 @@ class QloHotelReports extends Module
                     'total_price_tax_excl' => 0.0, 'tax_amount' => 0.0,
                     'total_price_tax_incl' => 0.0, 'balance_due' => 0.0);
                 foreach ($reservations as $row) {
+                    $rate = (float) $row['conversion_rate'];
+                    if ($rate <= 0) {
+                        $rate = 1.0;
+                    }
                     $totals['nights']               += (int) $row['nights'];
                     $totals['adults']               += (int) $row['adults'];
                     $totals['children']             += (int) $row['children'];
-                    $totals['total_price_tax_excl'] += (float) $row['total_price_tax_excl'];
-                    $totals['tax_amount']           += (float) $row['tax_amount'];
-                    $totals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'];
-                    $totals['balance_due']          += max(0.0, (float) $row['balance_due']);
+                    $totals['total_price_tax_excl'] += (float) $row['total_price_tax_excl'] / $rate;
+                    $totals['tax_amount']           += (float) $row['tax_amount'] / $rate;
+                    $totals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'] / $rate;
+                    $totals['balance_due']          += max(0.0, (float) $row['balance_due'] / $rate);
                 }
 
                 $this->context->smarty->assign(array(
@@ -247,10 +250,12 @@ class QloHotelReports extends Module
 
                 $noShowTotals = array('los' => 0, 'adults' => 0, 'children' => 0, 'total_price_tax_incl' => 0.0);
                 foreach ($noShows as $row) {
+                    $rate = (float) $row['conversion_rate'];
+                    if ($rate <= 0) { $rate = 1.0; }
                     $noShowTotals['los']                  += (int)   $row['los'];
                     $noShowTotals['adults']               += (int)   $row['adults'];
                     $noShowTotals['children']             += (int)   $row['children'];
-                    $noShowTotals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'];
+                    $noShowTotals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'] / $rate;
                 }
 
                 $this->context->smarty->assign(array(
@@ -266,11 +271,14 @@ class QloHotelReports extends Module
                 ));
                 $this->attachCurrencyToRows($arrivals, $currencyMap, $currency->sign, $currency->iso_code);
 
-                $arrivalTotals = array('adults' => 0, 'children' => 0, 'los' => 0);
+                $arrivalTotals = array('adults' => 0, 'children' => 0, 'los' => 0, 'total_price_tax_incl' => 0.0);
                 foreach ($arrivals as $row) {
-                    $arrivalTotals['adults']   += (int) $row['adults'];
-                    $arrivalTotals['children'] += (int) $row['children'];
-                    $arrivalTotals['los']      += (int) $row['los'];
+                    $rate = (float) $row['conversion_rate'];
+                    if ($rate <= 0) { $rate = 1.0; }
+                    $arrivalTotals['adults']               += (int)   $row['adults'];
+                    $arrivalTotals['children']             += (int)   $row['children'];
+                    $arrivalTotals['los']                  += (int)   $row['los'];
+                    $arrivalTotals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'] / $rate;
                 }
 
                 $this->context->smarty->assign(array(
@@ -286,11 +294,14 @@ class QloHotelReports extends Module
                 ));
                 $this->attachCurrencyToRows($departures, $currencyMap, $currency->sign, $currency->iso_code);
 
-                $departureTotals = array('adults' => 0, 'children' => 0, 'los' => 0);
+                $departureTotals = array('adults' => 0, 'children' => 0, 'los' => 0, 'total_price_tax_incl' => 0.0);
                 foreach ($departures as $row) {
-                    $departureTotals['adults']   += (int) $row['adults'];
-                    $departureTotals['children'] += (int) $row['children'];
-                    $departureTotals['los']      += (int) $row['los'];
+                    $rate = (float) $row['conversion_rate'];
+                    if ($rate <= 0) { $rate = 1.0; }
+                    $departureTotals['adults']               += (int)   $row['adults'];
+                    $departureTotals['children']             += (int)   $row['children'];
+                    $departureTotals['los']                  += (int)   $row['los'];
+                    $departureTotals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'] / $rate;
                 }
 
                 $this->context->smarty->assign(array(
@@ -299,15 +310,21 @@ class QloHotelReports extends Module
                 ));
             } elseif ($report === 'in-house') {
                 $inHouse = HotelBookingDetail::getInHouseInfo(array(
+                    'date_from'  => $dateFrom,
+                    'date_to'    => $dateTo,
                     'id_hotel'   => $idHotel ?: false,
                     'id_product' => $idProduct,
                 ));
                 $this->attachCurrencyToRows($inHouse, $currencyMap, $currency->sign, $currency->iso_code);
 
-                $inHouseTotals = array('adults' => 0, 'children' => 0);
+                $inHouseTotals = array('adults' => 0, 'children' => 0, 'los' => 0, 'total_price_tax_incl' => 0.0);
                 foreach ($inHouse as $row) {
-                    $inHouseTotals['adults']   += (int) $row['adults'];
-                    $inHouseTotals['children'] += (int) $row['children'];
+                    $rate = (float) $row['conversion_rate'];
+                    if ($rate <= 0) { $rate = 1.0; }
+                    $inHouseTotals['adults']               += (int)   $row['adults'];
+                    $inHouseTotals['children']             += (int)   $row['children'];
+                    $inHouseTotals['los']                  += (int)   $row['los'];
+                    $inHouseTotals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'] / $rate;
                 }
 
                 $this->context->smarty->assign(array(
@@ -324,7 +341,7 @@ class QloHotelReports extends Module
             $outstandingStatus = (int) Tools::getValue('outstanding_status', 0);
             $paymentMethod     = pSQL(Tools::getValue('payment_method', ''));
             $idTax             = (int) Tools::getValue('id_tax', 0);
-            $revenueSource     = Tools::getValue('revenue_source', 'room');
+            $revenueSource     = Tools::getValue('revenue_source', 'all');
             if (!in_array($revenueSource, array('room', 'service', 'all'))) {
                 $revenueSource = 'room';
             }
@@ -355,6 +372,16 @@ class QloHotelReports extends Module
                 'filter_outstanding_status' => $outstandingStatus,
                 'filter_payment_method'     => $paymentMethod,
                 'payment_methods'           => OrderPayment::getDistinctPaymentMethods($idHotel ?: false),
+                'payment_types'             => array(
+                    OrderPayment::PAYMENT_TYPE_ONLINE         => $this->l('Online'),
+                    OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL   => $this->l('Pay at Hotel'),
+                    OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT => $this->l('Remote Payment'),
+                ),
+                'booking_statuses'          => array(
+                    HotelBookingDetail::STATUS_ALLOTED     => $this->l('Allotted'),
+                    HotelBookingDetail::STATUS_CHECKED_IN  => $this->l('Checked In'),
+                    HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked Out'),
+                ),
                 'filter_id_tax'             => $idTax,
                 'filter_revenue_source'     => $revenueSource,
                 'tax_names'                 => Tax::getTaxes($idLang),
@@ -378,7 +405,7 @@ class QloHotelReports extends Module
             if ($report === 'revenue') {
                 $dailyRoomDetailed  = HotelBookingDetail::getDatewiseRoomRevenue($baseParams, true);
                 $dailyServiceRev    = ServiceProductOrderDetail::getDatewiseServiceRevenue($baseParams);
-                $rawDiscounts       = HotelBookingDetail::getTotalDiscounts(array(
+                $rawDiscounts       = Order::getTotalDiscounts(array(
                     'date_from'   => $dateFrom,
                     'date_to'     => $dateTo,
                     'id_hotel'    => $idHotel ?: false,
@@ -478,9 +505,10 @@ class QloHotelReports extends Module
                 );
                 $totalPayments = 0.0;
                 foreach ($payments as $row) {
-                    $totalPayments += (float) $row['amount'];
+                    $rate = (float) $row['conversion_rate'];
+                    if ($rate <= 0) { $rate = 1.0; }
+                    $totalPayments += (float) $row['amount'] / $rate;
                 }
-                // ddd($payments);
                 $this->context->smarty->assign(array(
                     'payments'       => $payments,
                     'total_payments' => $totalPayments,
@@ -572,6 +600,10 @@ class QloHotelReports extends Module
                     'id_hotel' => $idHotel,
                     'id_lang'  => $idLang,
                 )),
+                'room_statuses'         => array(
+                    HotelRoomInformation::STATUS_INACTIVE           => array('label' => $this->l('Out of Order'),      'class' => 'label-default'),
+                    HotelRoomInformation::STATUS_TEMPORARY_INACTIVE => array('label' => $this->l('Under Maintenance'), 'class' => 'label-warning'),
+                ),
                 'filter_base_url'       => $filterBaseUrl,
                 'export_url'            => $filterBaseUrl
                     . '&report=' . $report
@@ -629,8 +661,9 @@ class QloHotelReports extends Module
                     'availability_rows' => $availabilityRows,
                 ));
             } elseif ($report === 'room-status') {
-                $rooms = HotelRoomInformation::getRoomCurrentStatus(array(
+                $rooms = HotelRoomInformation::getRoomStatusForReports(array(
                     'date_from'  => $dateFrom,
+                    'date_to'    => $dateTo,
                     'id_hotel'   => $idHotel ?: false,
                     'id_product' => $idProduct,
                     'floor'      => $floor,
@@ -757,7 +790,7 @@ class QloHotelReports extends Module
             ));
 
             if ($report === 'source') {
-                $sourceRows = HotelBookingDetail::getBookings(array_merge($baseParams, array('group_by' => 'channel')));
+                $sourceRows = HotelBookingDetail::getChannelStats($baseParams);
                 $sourceTotals = array(
                     'bookings' => 0, 'room_nights' => 0,
                     'revenue_excl' => 0.0, 'revenue_incl' => 0.0,
@@ -779,7 +812,7 @@ class QloHotelReports extends Module
                     'source_totals'  => $sourceTotals,
                 ));
             } elseif ($report === 'payment-method') {
-                $paymentRows = HotelBookingDetail::getBookings(array_merge($baseParams, array('group_by' => 'payment_method')));
+                $paymentRows = HotelBookingDetail::getPaymentMethodStats($baseParams);
                 $totalBookings = 0;
                 $totalRevenue  = 0.0;
                 foreach ($paymentRows as $row) {
@@ -829,6 +862,10 @@ class QloHotelReports extends Module
                     'id_hotel' => $idHotel,
                     'id_lang'  => $idLang,
                 )),
+                'room_statuses'        => array(
+                    HotelRoomInformation::STATUS_INACTIVE           => array('label' => $this->l('Out of Order'),      'class' => 'label-default'),
+                    HotelRoomInformation::STATUS_TEMPORARY_INACTIVE => array('label' => $this->l('Under Maintenance'), 'class' => 'label-warning'),
+                ),
                 'export_url'           => $filterBaseUrl
                     . '&report=' . $report
                     . ($floor ? '&floor=' . urlencode($floor) : '')
@@ -1036,6 +1073,8 @@ class QloHotelReports extends Module
 
         if ($report === 'in-house') {
             $rows = HotelBookingDetail::getInHouseInfo(array(
+                'date_from'  => $dateFrom,
+                'date_to'    => $dateTo,
                 'id_hotel'   => $idHotel ?: false,
                 'id_product' => $idProduct,
             ));
@@ -1107,14 +1146,13 @@ class QloHotelReports extends Module
             $idStatus    = (int) Tools::getValue('booking_status', 0);
             $bookingType = (int) Tools::getValue('booking_type', 0);
 
-            $rows = HotelBookingDetail::getBookings(array(
-                'date_from'     => $dateFrom,
-                'date_to'       => $dateTo,
-                'id_hotel'      => $idHotel ?: false,
-                'id_product'    => $idProduct,
-                'id_status'     => $idStatus,
-                'booking_type'  => $bookingType,
-                'detailed_info' => true,
+            $rows = HotelBookingDetail::getBookingsInfo(array(
+                'date_from'    => $dateFrom,
+                'date_to'      => $dateTo,
+                'id_hotel'     => $idHotel ?: false,
+                'id_product'   => $idProduct,
+                'id_status'    => $idStatus,
+                'booking_type' => $bookingType,
             ));
             $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->sign, $defaultCurrency->iso_code);
 
@@ -1224,6 +1262,8 @@ class QloHotelReports extends Module
                 $this->l('Payment Status'),
             ));
             foreach ($rows as $row) {
+                $rate = isset($row['conversion_rate']) ? (float) $row['conversion_rate'] : 1.0;
+                if ($rate <= 0) { $rate = 1.0; }
                 fputcsv($out, array(
                     isset($row['date_add']) ? $row['date_add'] : '',
                     $row['id_order'],
@@ -1231,8 +1271,8 @@ class QloHotelReports extends Module
                     $row['customer_name'],
                     $row['payment_method'],
                     isset($row['payment_type']) ? $row['payment_type'] : '',
-                    number_format((float) $row['amount'], 2, '.', ''),
-                    isset($row['currency_iso']) ? $row['currency_iso'] : '',
+                    number_format((float) $row['amount'] / $rate, 2, '.', ''),
+                    $currencyIso,
                     isset($row['transaction_id']) ? $row['transaction_id'] : '',
                     $this->l('Success'),
                 ));
@@ -1356,7 +1396,7 @@ class QloHotelReports extends Module
         } else {
             $dailyRoomDetailed = HotelBookingDetail::getDatewiseRoomRevenue($baseParams, true);
             $dailyServiceRev   = ServiceProductOrderDetail::getDatewiseServiceRevenue($baseParams);
-            $rawDiscounts      = HotelBookingDetail::getTotalDiscounts(array(
+            $rawDiscounts      = Order::getTotalDiscounts(array(
                 'date_from' => $dateFrom, 'date_to' => $dateTo,
                 'id_hotel'  => $idHotel ?: false, 'granularity' => 'day',
             ));
@@ -1461,8 +1501,9 @@ class QloHotelReports extends Module
             }
         } elseif ($report === 'room-status') {
             $csvFloorOcc = pSQL(Tools::getValue('floor', ''));
-            $rows = HotelRoomInformation::getRoomCurrentStatus(array(
+            $rows = HotelRoomInformation::getRoomStatusForReports(array(
                 'date_from'  => $dateFrom,
+                'date_to'    => $dateTo,
                 'id_hotel'   => $idHotel ?: false,
                 'id_product' => $idProduct,
                 'floor'      => $csvFloorOcc,
@@ -1714,7 +1755,7 @@ class QloHotelReports extends Module
         );
 
         if ($report === 'source') {
-            $rows = HotelBookingDetail::getBookings(array_merge($baseParams, array('group_by' => 'channel')));
+            $rows = HotelBookingDetail::getChannelStats($baseParams);
             $totalRevExcl = 0.0;
             foreach ($rows as $r) {
                 $totalRevExcl += (float) $r['revenue_excl'];
@@ -1760,7 +1801,7 @@ class QloHotelReports extends Module
                 ));
             }
         } elseif ($report === 'payment-method') {
-            $rows = HotelBookingDetail::getBookings(array_merge($baseParams, array('group_by' => 'payment_method')));
+            $rows = HotelBookingDetail::getPaymentMethodStats($baseParams);
             header('Content-Disposition: attachment; filename="payment-methods-'.$dateFrom.'-to-'.$dateTo.'.csv"');
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");

@@ -156,29 +156,46 @@ class HotelRoomDisableDates extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
+        $hotelRestriction = HotelBranchInformation::addHotelRestriction($idHotel, 'hri');
+        $floorFilter      = $floor     ? ' AND hri.`floor` = "'.$floor.'"'     : '';
+        $productFilter    = $idProduct ? ' AND hri.`id_product` = '.$idProduct : '';
+        $sharedJoins      =
+            'INNER JOIN `'._DB_PREFIX_.'product` p
+                ON (p.`id_product` = hri.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hri.`id_hotel`)
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+                ON (hbil.`id` = hri.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')';
+
         return Db::getInstance()->executeS(
             'SELECT hrdd.`id`, hrdd.`id_room`, hrdd.`id_room_type`,
             hrdd.`date_from` AS disabled_from, hrdd.`date_to` AS disabled_to,
             DATEDIFF(hrdd.`date_to`, hrdd.`date_from`) AS disabled_days,
             hrdd.`reason`,
             hri.`room_num`, hri.`floor`, hri.`id_hotel`, hri.`id_status`,
-            pl.`name` AS room_type_name,
-            hbil.`hotel_name`
+            pl.`name` AS room_type_name, hbil.`hotel_name`
             FROM `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
             INNER JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hrdd.`id_room`)
-            INNER JOIN `'._DB_PREFIX_.'product` p
-                ON (p.`id_product` = hri.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
-            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
-                ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
-            INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hri.`id_hotel`)
-            INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
-                ON (hbil.`id` = hri.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
+            '.$sharedJoins.'
             WHERE hrdd.`date_from` < "'.$dateTo.' 23:59:59"
             AND hrdd.`date_to` > "'.$dateFrom.' 00:00:00"'
-            .($floor     ? ' AND hri.`floor` = "'.$floor.'"'     : '')
-            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri').'
-            ORDER BY hbil.`hotel_name`, pl.`name`, hri.`room_num`, hrdd.`date_from` ASC'
+            .$floorFilter.$productFilter.$hotelRestriction.'
+
+            UNION ALL
+
+            SELECT NULL AS id, hri.`id` AS id_room, hri.`id_product` AS id_room_type,
+            NULL AS disabled_from, NULL AS disabled_to,
+            NULL AS disabled_days,
+            NULL AS reason,
+            hri.`room_num`, hri.`floor`, hri.`id_hotel`, hri.`id_status`,
+            pl.`name` AS room_type_name, hbil.`hotel_name`
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            '.$sharedJoins.'
+            WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_INACTIVE
+            .$floorFilter.$productFilter.$hotelRestriction.'
+
+            ORDER BY `hotel_name`, `room_type_name`, `room_num`, `disabled_from` ASC'
         );
     }
 

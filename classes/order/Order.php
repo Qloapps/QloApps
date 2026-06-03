@@ -3521,4 +3521,103 @@ class OrderCore extends ObjectModel
             ORDER BY balance_due DESC'
         );
     }
+
+    /**
+     * Total order-level discounts (vouchers) applied to hotel orders in the date range.
+     * Filters to orders that contain a hotel booking via EXISTS subquery.
+     * Returns a positive number representing the discount amount.
+     *
+     * $params: date_from, date_to, id_hotel, id_customer, granularity ('day'|false)
+     *
+     * @param array $params
+     * @return float|array  scalar when no granularity, timestamp => float when granularity='day'
+     */
+    public static function getTotalDiscounts(array $params)
+    {
+        $dateFrom    = pSQL($params['date_from']);
+        $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel     = isset($params['id_hotel'])     ? $params['id_hotel']           : false;
+        $idCustomer  = isset($params['id_customer'])  ? (int) $params['id_customer'] : 0;
+        $granularity = isset($params['granularity'])  ? $params['granularity']       : false;
+
+        $hotelExists = ' AND EXISTS (
+            SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`id_order` = o.`id_order`'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .')';
+
+        if ($granularity === 'day') {
+            $rows = Db::getInstance()->executeS(
+                'SELECT LEFT(o.`invoice_date`, 10) AS grp,
+                IFNULL(SUM(o.`total_discounts_tax_excl` / o.`conversion_rate`), 0) AS amt
+                FROM `'._DB_PREFIX_.'orders` o
+                WHERE o.`valid` = 1
+                AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+                .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
+                .$hotelExists.'
+                GROUP BY LEFT(o.`invoice_date`, 10)'
+            );
+            $result = array();
+            foreach ($rows as $row) {
+                $result[strtotime($row['grp'])] = (float) $row['amt'];
+            }
+            return $result;
+        }
+
+        return (float) Db::getInstance()->getValue(
+            'SELECT IFNULL(SUM(o.`total_discounts_tax_excl` / o.`conversion_rate`), 0)
+            FROM `'._DB_PREFIX_.'orders` o
+            WHERE o.`valid` = 1
+            AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
+            .$hotelExists
+        );
+    }
+
+    /**
+     * Percentage of revenue from the direct channel (PS_SHOP_DOMAIN).
+     * Computes net revenue per order (paid minus refunds), then returns direct_revenue / total_revenue * 100.
+     *
+     * @param array $params  date_from, date_to, id_hotel
+     * @return float  0–100
+     */
+    public static function getDirectRevenueRatio(array $params)
+    {
+        $dateFrom = pSQL($params['date_from']);
+        $dateTo   = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
+
+        if ($params['date_from'] === (isset($params['date_to']) ? $params['date_to'] : $params['date_from'])) {
+            $dateTo = pSQL(date('Y-m-d', strtotime('+1 day', strtotime($params['date_from']))));
+        }
+
+        $row = Db::getInstance()->getRow(
+            'SELECT
+                IFNULL(SUM(net_rev), 0) AS total_revenue,
+                IFNULL(SUM(IF(is_direct, net_rev, 0)), 0) AS direct_revenue
+            FROM (
+                SELECT
+                    (o.`total_paid_tax_excl` / o.`conversion_rate`)
+                    - IFNULL((
+                        SELECT SUM(orr.`refunded_amount`)
+                        FROM `'._DB_PREFIX_.'order_return` orr
+                        WHERE orr.`id_order` = o.`id_order`
+                    ), 0) AS net_rev,
+                    (o.`source` = "'.pSQL(Configuration::get('PS_SHOP_DOMAIN')).'") AS is_direct
+                FROM `'._DB_PREFIX_.'orders` o
+                WHERE o.`valid` = 1
+                AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
+                AND EXISTS (
+                    SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`'
+                    .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+                )
+            ) AS t'
+        );
+
+        $totalRevenue  = $row ? (float) $row['total_revenue']  : 0;
+        $directRevenue = $row ? (float) $row['direct_revenue'] : 0;
+
+        return $totalRevenue ? (($directRevenue / $totalRevenue) * 100) : 0;
+    }
 }

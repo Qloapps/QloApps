@@ -300,7 +300,6 @@
                         <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th>{l s='Payment Method' mod='qlohotelreports'}</th>
                         <th>{l s='Payment Type' mod='qlohotelreports'}</th>
-                        <th>{l s='Currency' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Amount' mod='qlohotelreports'}</th>
                         <th>{l s='Payment Status' mod='qlohotelreports'}</th>
                         <th>{l s='Transaction Reference' mod='qlohotelreports'}</th>
@@ -318,13 +317,9 @@
                                 <td>{$payment.customer_name|escape:'html':'UTF-8'}</td>
                                 <td>{$payment.payment_method|escape:'html':'UTF-8'}</td>
                                 <td>
-                                    {if $payment.payment_type == 1}{l s='Online' mod='qlohotelreports'}
-                                    {elseif $payment.payment_type == 2}{l s='Pay at Hotel' mod='qlohotelreports'}
-                                    {elseif $payment.payment_type == 3}{l s='Remote Payment' mod='qlohotelreports'}
-                                    {else}<span class="text-muted">—</span>{/if}
+                                    {if isset($payment_types[$payment.payment_type])}{$payment_types[$payment.payment_type]|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}
                                 </td>
-                                <td>{if $payment.currency_iso}{$payment.currency_iso|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
-                                <td class="text-right">{$payment.amount|string_format:"%.2f"}</td>
+                                <td class="text-right">{if $payment.currency_sign}{$payment.currency_sign|escape:'html':'UTF-8'}{else}{$currency_sign|escape:'html':'UTF-8'}{/if}{$payment.amount|string_format:"%.2f"}</td>
                                 <td>{l s='Success' mod='qlohotelreports'}</td>
                                 <td>{if $payment.transaction_id}{$payment.transaction_id|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td><span class="text-muted">—</span></td>
@@ -332,7 +327,7 @@
                         {/foreach}
                     {else}
                         <tr>
-                            <td class="list-empty" colspan="12">
+                            <td class="list-empty" colspan="11">
                                 <div class="list-empty-msg">
                                     <i class="icon-warning-sign list-empty-icon"></i>
                                     {l s='No payments found for the selected date range.' mod='qlohotelreports'}
@@ -344,8 +339,8 @@
                 {if $payments}
                 <tfoot>
                     <tr class="qlo-report-totals">
-                        <td colspan="8"><strong>{l s='Total Collected' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right"><strong>{$total_payments|string_format:"%.2f"}</strong></td>
+                        <td colspan="7"><strong>{l s='Total Collected' mod='qlohotelreports'}</strong></td>
+                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$total_payments|string_format:"%.2f"}</strong></td>
                         <td colspan="3"></td>
                     </tr>
                 </tfoot>
@@ -497,10 +492,7 @@
                                 <td class="text-center">{$outstandingRow.days_overdue|intval}</td>
                                 <td>{if $outstandingRow.last_payment_date}{$outstandingRow.last_payment_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>
-                                    {if $outstandingRow.id_status == 1}{l s='Confirmed' mod='qlohotelreports'}
-                                    {elseif $outstandingRow.id_status == 2}{l s='Checked In' mod='qlohotelreports'}
-                                    {elseif $outstandingRow.id_status == 3}{l s='Checked Out' mod='qlohotelreports'}
-                                    {else}<span class="text-muted">—</span>{/if}
+                                    {if isset($booking_statuses[$outstandingRow.id_status])}{$booking_statuses[$outstandingRow.id_status]|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}
                                 </td>
                             </tr>
                         {/foreach}
