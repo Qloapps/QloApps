@@ -403,8 +403,8 @@ class QloHotelReports extends Module
             ));
 
             if ($report === 'revenue') {
-                $dailyRoomDetailed  = HotelBookingDetail::getDatewiseRoomRevenue($baseParams, true);
-                $dailyServiceRev    = ServiceProductOrderDetail::getDatewiseServiceRevenue($baseParams);
+                $dailyRoomDetailed  = HotelBookingDetail::getDatewiseRoomRevenueTax($baseParams);
+                $dailyServiceData   = ServiceProductOrderDetail::getDatewiseServiceRevenueTax($baseParams);
                 $rawDiscounts       = Order::getTotalDiscounts(array(
                     'date_from'   => $dateFrom,
                     'date_to'     => $dateTo,
@@ -432,14 +432,15 @@ class QloHotelReports extends Module
                 );
 
                 foreach ($dailyRoomDetailed as $ts => $roomData) {
-                    $roomRev   = $roomData['room_revenue'];
-                    $taxAmt    = $roomData['tax_amount'];
-                    $svcRev    = isset($dailyServiceRev[$ts]) ? $dailyServiceRev[$ts] : 0.0;
-                    $disc      = isset($dailyDiscounts[$ts])  ? $dailyDiscounts[$ts]  : 0.0;
-                    $bkgs      = isset($dailyBookings[$ts])   ? $dailyBookings[$ts]   : 0;
-                    $rooms     = isset($dailyRoomsOccupied[$ts]) ? $dailyRoomsOccupied[$ts] : 0;
-                    $netRev    = $roomRev + $svcRev - $disc;
-                    $totalCol  = $netRev + $taxAmt;
+                    $svcDay  = isset($dailyServiceData[$ts]) ? $dailyServiceData[$ts] : array('service_revenue' => 0.0, 'tax_amount' => 0.0);
+                    $roomRev = $roomData['room_revenue'];
+                    $taxAmt  = $roomData['tax_amount'] + $svcDay['tax_amount'];
+                    $svcRev  = $svcDay['service_revenue'];
+                    $disc    = isset($dailyDiscounts[$ts])    ? $dailyDiscounts[$ts]    : 0.0;
+                    $bkgs    = isset($dailyBookings[$ts])     ? $dailyBookings[$ts]     : 0;
+                    $rooms   = isset($dailyRoomsOccupied[$ts]) ? $dailyRoomsOccupied[$ts] : 0;
+                    $netRev  = $roomRev + $svcRev - $disc;
+                    $totalCol = $netRev + $taxAmt;
                     $adrDay    = $rooms > 0 ? round($roomRev / $rooms, 2) : 0.0;
                     $revparDay = $totalRoomsInventory > 0 ? round($roomRev / $totalRoomsInventory, 2) : 0.0;
                     $occPct    = $totalRoomsInventory > 0 ? round($rooms / $totalRoomsInventory * 100, 1) : 0.0;
@@ -500,8 +501,8 @@ class QloHotelReports extends Module
                     'total_refunded' => $totalRefunded,
                 ));
             } elseif ($report === 'payment') {
-                $payments      = OrderPayment::getTotalPaidAmount(
-                    array_merge($baseParams, array('payment_method' => $paymentMethod)), true
+                $payments      = OrderPayment::getPaymentsInfo(
+                    array_merge($baseParams, array('payment_method' => $paymentMethod))
                 );
                 $totalPayments = 0.0;
                 foreach ($payments as $row) {
@@ -725,10 +726,10 @@ class QloHotelReports extends Module
             ));
 
             if ($report === 'services') {
-                $serviceRows = ServiceProductOrderDetail::getTotalServiceRevenue(array_merge($baseParams, array(
-                    'id_category'       => $idCategory,
+                $serviceRows = ServiceProductOrderDetail::getServicesInfo(array_merge($baseParams, array(
+                    'id_category'        => $idCategory,
                     'id_service_product' => $idServiceProduct,
-                )), true);
+                )));
                 $totalExcl   = 0.0;
                 $totalTax    = 0.0;
                 $totalIncl   = 0.0;
@@ -1249,8 +1250,8 @@ class QloHotelReports extends Module
 
         if ($report === 'payment') {
             $csvPaymentMethod = pSQL(Tools::getValue('payment_method', ''));
-            $rows = OrderPayment::getTotalPaidAmount(
-                array_merge($baseParams, array('payment_method' => $csvPaymentMethod)), true
+            $rows = OrderPayment::getPaymentsInfo(
+                array_merge($baseParams, array('payment_method' => $csvPaymentMethod))
             );
             header('Content-Disposition: attachment; filename="payment-report-'.$dateFrom.'-to-'.$dateTo.'.csv"');
             $out = fopen('php://output', 'w');
@@ -1394,8 +1395,8 @@ class QloHotelReports extends Module
                 ));
             }
         } else {
-            $dailyRoomDetailed = HotelBookingDetail::getDatewiseRoomRevenue($baseParams, true);
-            $dailyServiceRev   = ServiceProductOrderDetail::getDatewiseServiceRevenue($baseParams);
+            $dailyRoomDetailed = HotelBookingDetail::getDatewiseRoomRevenueTax($baseParams);
+            $dailyServiceData  = ServiceProductOrderDetail::getDatewiseServiceRevenueTax($baseParams);
             $rawDiscounts      = Order::getTotalDiscounts(array(
                 'date_from' => $dateFrom, 'date_to' => $dateTo,
                 'id_hotel'  => $idHotel ?: false, 'granularity' => 'day',
@@ -1422,10 +1423,11 @@ class QloHotelReports extends Module
                 $this->l('Currency'),
             ));
             foreach ($dailyRoomDetailed as $ts => $roomData) {
-                $svcRev      = isset($dailyServiceRev[$ts]) ? (float) $dailyServiceRev[$ts] : 0.0;
-                $disc        = isset($dailyDiscounts[$ts])  ? (float) $dailyDiscounts[$ts]  : 0.0;
+                $svcDay      = isset($dailyServiceData[$ts]) ? $dailyServiceData[$ts] : array('service_revenue' => 0.0, 'tax_amount' => 0.0);
+                $svcRev      = $svcDay['service_revenue'];
+                $disc        = isset($dailyDiscounts[$ts]) ? (float) $dailyDiscounts[$ts] : 0.0;
                 $roomRevExcl = (float) $roomData['room_revenue'];
-                $taxAmt      = (float) $roomData['tax_amount'];
+                $taxAmt      = (float) $roomData['tax_amount'] + $svcDay['tax_amount'];
                 $collection  = $roomRevExcl + $svcRev;
                 $netRevenue  = $collection - $disc;
                 $roomsSold   = isset($dailyRoomsOcc[$ts]) ? (int) $dailyRoomsOcc[$ts] : 0;
@@ -1645,13 +1647,12 @@ class QloHotelReports extends Module
             $idLangSvc        = Context::getContext()->language->id;
             $csvIdCategory    = (int) Tools::getValue('id_category', 0);
             $csvIdServiceProd = (int) Tools::getValue('id_service_product', 0);
-            $rows = ServiceProductOrderDetail::getTotalServiceRevenue(
+            $rows = ServiceProductOrderDetail::getServicesInfo(
                 array_merge($baseParams, array(
                     'id_lang'            => $idLangSvc,
                     'id_category'        => $csvIdCategory,
                     'id_service_product' => $csvIdServiceProd,
-                )),
-                true
+                ))
             );
             header('Content-Disposition: attachment; filename="services-report-'.$dateFrom.'-to-'.$dateTo.'.csv"');
             $out = fopen('php://output', 'w');

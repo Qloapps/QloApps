@@ -597,7 +597,7 @@ class ServiceProductOrderDetail extends ObjectModel
      * @param bool  $detailedInfo false → float sum; true → array of per-service-line rows
      * @return float|array
      */
-    public static function getTotalServiceRevenue(array $params, $detailedInfo = false)
+    public static function getTotalServiceRevenue(array $params)
     {
         $dateFrom         = pSQL($params['date_from']);
         $dateTo           = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
@@ -653,33 +653,82 @@ class ServiceProductOrderDetail extends ObjectModel
             return $result;
         }
 
-        if ($detailedInfo) {
-            return Db::getInstance()->executeS(
-                'SELECT spod.`id_service_product_order_detail`, spod.`date_add`,
-                o.`id_order`, o.`reference`,
-                CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-                spod.`name` AS service_name,
-                IFNULL(cl.`name`, "") AS service_category,
-                spod.`quantity`,
-                (spod.`unit_price_tax_excl` / o.`conversion_rate`) AS unit_price,
-                spod.`hotel_name`, hbd.`room_num`, hbd.`room_type_name`,
-                hbd.`date_from`, hbd.`date_to`,
-                (spod.`total_price_tax_excl` / o.`conversion_rate`) AS total_price_tax_excl,
-                ((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate`) AS tax_amount,
-                (spod.`total_price_tax_incl` / o.`conversion_rate`) AS total_price_tax_incl
-                '.$baseFrom.'
-                LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
-                LEFT JOIN `'._DB_PREFIX_.'product` sp ON (sp.`id_product` = spod.`id_product`)
-                LEFT JOIN `'._DB_PREFIX_.'category_lang` cl
-                    ON (cl.`id_category` = sp.`id_category_default` AND cl.`id_lang` = '.(int) $idLang.')
-                '.$baseWhere.'
-                ORDER BY o.`invoice_date` DESC, spod.`id_service_product_order_detail` ASC'
-            );
-        }
-
         return (float) Db::getInstance()->getValue(
             'SELECT IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0)
             '.$baseFrom.' '.$baseWhere
+        );
+    }
+
+    /**
+     * Per-service-line rows for a date range. One row per service order line.
+     * Used by services report — returns full detail including customer, category, pricing.
+     *
+     * @param array $params  date_from, date_to, id_hotel, id_product, id_room, id_order,
+     *                       id_customer, id_category, id_service_product, id_lang
+     * @return array  rows: id_service_product_order_detail, date_add, id_order, reference,
+     *                      customer_name, service_name, service_category, quantity, unit_price,
+     *                      hotel_name, room_num, room_type_name, date_from, date_to,
+     *                      total_price_tax_excl, tax_amount, total_price_tax_incl
+     */
+    public static function getServicesInfo(array $params)
+    {
+        $dateFrom         = pSQL($params['date_from']);
+        $dateTo           = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel          = isset($params['id_hotel'])          ? $params['id_hotel']                : false;
+        $idProduct        = isset($params['id_product'])        ? (int) $params['id_product']        : 0;
+        $idRoom           = isset($params['id_room'])           ? (int) $params['id_room']           : 0;
+        $idOrder          = isset($params['id_order'])          ? (int) $params['id_order']          : 0;
+        $idCustomer       = isset($params['id_customer'])       ? (int) $params['id_customer']       : 0;
+        $idCategory       = isset($params['id_category'])       ? (int) $params['id_category']       : 0;
+        $idServiceProduct = isset($params['id_service_product']) ? (int) $params['id_service_product'] : 0;
+        $idLang           = isset($params['id_lang'])           ? (int) $params['id_lang']           : 0;
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $baseFrom =
+            'FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (spod.`id_htl_booking_detail` = hbd.`id`)
+            LEFT JOIN `'._DB_PREFIX_.'product` p
+                ON (p.`id_product` = hbd.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'orders` o
+                ON (o.`id_order` = hbd.`id_order`)';
+
+        $baseWhere =
+            'WHERE p.`active` = 1
+            AND o.`valid` = 1
+            AND hbd.`is_refunded` = 0
+            AND spod.`is_cancelled` = 0
+            AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idProduct        ? ' AND hbd.`id_product` = '.$idProduct  : '')
+            .($idRoom           ? ' AND hbd.`id_room` = '.$idRoom        : '')
+            .($idOrder          ? ' AND hbd.`id_order` = '.$idOrder      : '')
+            .($idCustomer       ? ' AND hbd.`id_customer` = '.$idCustomer : '')
+            .($idServiceProduct ? ' AND spod.`id_product` = '.$idServiceProduct : '')
+            .($idCategory       ? ' AND spod.`id_product` IN (SELECT `id_product` FROM `'._DB_PREFIX_.'product` WHERE `id_category_default` = '.$idCategory.')' : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+
+        return Db::getInstance()->executeS(
+            'SELECT spod.`id_service_product_order_detail`, spod.`date_add`,
+            o.`id_order`, o.`reference`,
+            CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+            spod.`name` AS service_name,
+            IFNULL(cl.`name`, "") AS service_category,
+            spod.`quantity`,
+            (spod.`unit_price_tax_excl` / o.`conversion_rate`) AS unit_price,
+            spod.`hotel_name`, hbd.`room_num`, hbd.`room_type_name`,
+            hbd.`date_from`, hbd.`date_to`,
+            (spod.`total_price_tax_excl` / o.`conversion_rate`) AS total_price_tax_excl,
+            ((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate`) AS tax_amount,
+            (spod.`total_price_tax_incl` / o.`conversion_rate`) AS total_price_tax_incl
+            '.$baseFrom.'
+            LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
+            LEFT JOIN `'._DB_PREFIX_.'product` sp ON (sp.`id_product` = spod.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'category_lang` cl
+                ON (cl.`id_category` = sp.`id_category_default` AND cl.`id_lang` = '.(int) $idLang.')
+            '.$baseWhere.'
+            ORDER BY o.`invoice_date` DESC, spod.`id_service_product_order_detail` ASC'
         );
     }
 
@@ -733,6 +782,63 @@ class ServiceProductOrderDetail extends ObjectModel
 
             $result[$ts] = (float) Cache::retrieve($cacheKey);
             $current     = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Service revenue with tax per day, keyed by Unix timestamp.
+     * Used by revenue report daily table — needs both excl and tax columns per day.
+     *
+     * @param array $params  date_from, date_to, id_hotel, id_product, id_room, id_order, id_customer
+     * @return array  timestamp => ['service_revenue' => float, 'tax_amount' => float]
+     */
+    public static function getDatewiseServiceRevenueTax(array $params)
+    {
+        $dateFrom   = $params['date_from'];
+        $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $result  = array();
+        $current = $dateFrom;
+
+        $whereFilters =
+            ($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
+            .($idRoom    ? ' AND hbd.`id_room` = '.$idRoom        : '')
+            .($idOrder   ? ' AND hbd.`id_order` = '.$idOrder      : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+
+        $joins =
+            'FROM `'._DB_PREFIX_.'service_product_order_detail` spod
+            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (spod.`id_htl_booking_detail` = hbd.`id`)
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)';
+
+        while ($current <= $dateTo) {
+            $next = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+            $ts   = strtotime($current);
+            $row  = Db::getInstance()->getRow(
+                'SELECT
+                IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0) AS service_revenue,
+                IFNULL(SUM((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount
+                '.$joins.'
+                WHERE p.`active` = 1 AND o.`valid` = 1 AND hbd.`is_refunded` = 0
+                AND spod.`is_cancelled` = 0
+                AND o.`invoice_date` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
+                .$whereFilters
+            );
+            $result[$ts] = array(
+                'service_revenue' => (float) $row['service_revenue'],
+                'tax_amount'      => (float) $row['tax_amount'],
+            );
+            $current = $next;
         }
 
         return $result;

@@ -3882,7 +3882,7 @@ class HotelBookingDetail extends ObjectModel
      * @param array $params
      * @return array  timestamp => float
      */
-    public static function getDatewiseRoomRevenue(array $params, $detailedInfo = false)
+    public static function getDatewiseRoomRevenue(array $params)
     {
         $dateFrom   = $params['date_from'];
         $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
@@ -3908,10 +3908,9 @@ class HotelBookingDetail extends ObjectModel
                 .(is_array($idHotel) ? implode('_', $idHotel) : (int) $idHotel)
                 .'_'.$idProduct.'_'.$idRoom;
 
-            if ($detailedInfo) {
-                $row = Db::getInstance()->getRow(
-                    'SELECT IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS room_revenue,
-                    IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount
+            if (!Cache::isStored($cacheKey)) {
+                $value = Db::getInstance()->getValue(
+                    'SELECT IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0)
                     FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                     LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
                     LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
@@ -3919,26 +3918,58 @@ class HotelBookingDetail extends ObjectModel
                     AND o.`invoice_date` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
                     .$whereFilters
                 );
-                $result[$ts] = array(
-                    'room_revenue' => (float) $row['room_revenue'],
-                    'tax_amount'   => (float) $row['tax_amount'],
-                );
-            } else {
-                if (!Cache::isStored($cacheKey)) {
-                    $value = Db::getInstance()->getValue(
-                        'SELECT IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0)
-                        FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                        LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
-                        LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-                        WHERE p.`active` = 1 AND o.`valid` = 1 AND hbd.`is_refunded` = 0
-                        AND o.`invoice_date` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
-                        .$whereFilters
-                    );
-                    Cache::store($cacheKey, $value);
-                }
-                $result[$ts] = (float) Cache::retrieve($cacheKey);
+                Cache::store($cacheKey, $value);
             }
+            $result[$ts] = (float) Cache::retrieve($cacheKey);
+            $current     = $next;
+        }
 
+        return $result;
+    }
+
+    /**
+     * Daily room revenue with tax breakdown — one entry per day, keyed by Unix timestamp.
+     * Used by revenue report daily table (needs excl + tax columns per day).
+     *
+     * @param array $params  date_from, date_to, id_hotel, id_product, id_room, id_order, id_customer
+     * @return array  timestamp => ['room_revenue' => float, 'tax_amount' => float]
+     */
+    public static function getDatewiseRoomRevenueTax(array $params)
+    {
+        $dateFrom   = $params['date_from'];
+        $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
+        $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
+        $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
+        $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+
+        $result  = array();
+        $current = $dateFrom;
+
+        $whereFilters = ($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+            .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
+            .($idOrder    ? ' AND hbd.`id_order` = '.$idOrder        : '')
+            .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+
+        while ($current <= $dateTo) {
+            $next = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+            $ts   = strtotime($current);
+            $row  = Db::getInstance()->getRow(
+                'SELECT IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS room_revenue,
+                IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
+                LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+                WHERE p.`active` = 1 AND o.`valid` = 1 AND hbd.`is_refunded` = 0
+                AND o.`invoice_date` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
+                .$whereFilters
+            );
+            $result[$ts] = array(
+                'room_revenue' => (float) $row['room_revenue'],
+                'tax_amount'   => (float) $row['tax_amount'],
+            );
             $current = $next;
         }
 

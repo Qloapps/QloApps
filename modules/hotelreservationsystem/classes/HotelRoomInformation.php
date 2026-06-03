@@ -330,8 +330,6 @@ class HotelRoomInformation extends ObjectModel
         return $this->delete();
     }
 
-    // ── ANALYTICS ─────────────────────────────────────────────────────────────
-
     /**
      * Total room count. Optional hotel and active filters.
      *

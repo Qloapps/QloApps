@@ -3149,8 +3149,6 @@ class OrderCore extends ObjectModel
         return $totalOrder;
     }
 
-    // ── ANALYTICS ─────────────────────────────────────────────────────────────
-
     /**
      * Returns total purchase cost (supplier prices) for orders in the given date range.
      * Replicates: AdminStatsController::getPurchases()
