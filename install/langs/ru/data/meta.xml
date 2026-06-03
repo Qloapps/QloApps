@@ -19,7 +19,7 @@
     <url_rewrite>contact-us</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title>Отель Прайм</title>
+    <title></title>
     <description>Место, где комфорт и роскошь сочетаются с природой!</description>
     <keywords/>
     <url_rewrite/>
@@ -41,18 +41,6 @@
     <description>Введите адрес электронной почты, использованный при регистрации, и мы отправим на него ваш логин и новый пароль</description>
     <keywords>забыли пароль, e-mail, новый пароль,восстановить пароль</keywords>
     <url_rewrite>password-recovery</url_rewrite>
-  </meta>
-  <meta id="prices-drop" id_shop="1">
-    <title>Снижение цен</title>
-    <description>Наши скидки</description>
-    <keywords>снижение цен, распродажи</keywords>
-    <url_rewrite>prices-drop</url_rewrite>
-  </meta>
-  <meta id="sitemap" id_shop="1">
-    <title>Карта сайта</title>
-    <description>Потерялись? Найдите то, что ищете</description>
-    <keywords>карта сайта</keywords>
-    <url_rewrite>sitemap</url_rewrite>
   </meta>
   <meta id="supplier" id_shop="1">
     <title>Поставщики</title>
@@ -138,18 +126,6 @@
     <keywords/>
     <url_rewrite>order</url_rewrite>
   </meta>
-  <meta id="search" id_shop="1">
-    <title>Поиск</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>search</url_rewrite>
-  </meta>
-  <meta id="stores" id_shop="1">
-    <title>Магазины</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>stores</url_rewrite>
-  </meta>
   <meta id="order-opc" id_shop="1">
     <title>Быстрый заказ</title>
     <description/>
@@ -161,11 +137,5 @@
     <description/>
     <keywords/>
     <url_rewrite>guest-tracking</url_rewrite>
-  </meta>
-  <meta id="products-comparison" id_shop="1">
-    <title>Products Comparison</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>products-comparison</url_rewrite>
   </meta>
 </entity_meta>

@@ -19,7 +19,7 @@
     <url_rewrite>contact</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title>Hotel Prime</title>
+    <title></title>
     <description>Un loc unde confortul și luxul se îmbină cu natura!</description>
     <keywords/>
     <url_rewrite/>
@@ -41,18 +41,6 @@
     <description>Introduceți adresa de e-mail folosită la înregistrare pentru putea primi un mesaj cu o nouă parolă</description>
     <keywords/>
     <url_rewrite>recuperare-parola</url_rewrite>
-  </meta>
-  <meta id="prices-drop" id_shop="1">
-    <title>Reduceri de preț</title>
-    <description>Ofertele nostre speciale</description>
-    <keywords/>
-    <url_rewrite>reduceri-de-pret</url_rewrite>
-  </meta>
-  <meta id="sitemap" id_shop="1">
-    <title>Sitemap</title>
-    <description>V-ați rătăcit? Găsiți ceea ce căutați</description>
-    <keywords/>
-    <url_rewrite>sitemap</url_rewrite>
   </meta>
   <meta id="supplier" id_shop="1">
     <title>Furnizori</title>
@@ -138,18 +126,6 @@
     <keywords/>
     <url_rewrite>comanda</url_rewrite>
   </meta>
-  <meta id="search" id_shop="1">
-    <title>Căutare</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>cautare</url_rewrite>
-  </meta>
-  <meta id="stores" id_shop="1">
-    <title>Magazine</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>magazine</url_rewrite>
-  </meta>
   <meta id="order-opc" id_shop="1">
     <title>Comandă</title>
     <description/>
@@ -167,11 +143,5 @@
     <description/>
     <keywords/>
     <url_rewrite>confirmare-comanda</url_rewrite>
-  </meta>
-  <meta id="products-comparison" id_shop="1">
-    <title>Comparație între produse</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>comparare-produse</url_rewrite>
   </meta>
 </entity_meta>

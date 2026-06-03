@@ -19,7 +19,7 @@
     <url_rewrite>צור-קשר</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title>מלון פריים</title>
+    <title></title>
     <description>מקום שבו נוחות ולוקסוס משתלבים עם הטבע!</description>
     <keywords/>
     <url_rewrite/>
@@ -41,18 +41,6 @@
     <description>הכנס את כתובת המייל שאיתה נרשמת, וישלח לך מייל שחזור סיסמה</description>
     <keywords/>
     <url_rewrite>שחזור-סיסמה</url_rewrite>
-  </meta>
-  <meta id="prices-drop" id_shop="1">
-    <title>ירידת מחירים</title>
-    <description>מוצרים מיוחדים</description>
-    <keywords/>
-    <url_rewrite>ירידת-מחירים</url_rewrite>
-  </meta>
-  <meta id="sitemap" id_shop="1">
-    <title>מפת האתר</title>
-    <description>אבוד ? מצא כאן את יעדך באתר</description>
-    <keywords/>
-    <url_rewrite>מפת-האתר</url_rewrite>
   </meta>
   <meta id="supplier" id_shop="1">
     <title>ספקים</title>
@@ -138,18 +126,6 @@
     <keywords/>
     <url_rewrite>הזמנה</url_rewrite>
   </meta>
-  <meta id="search" id_shop="1">
-    <title>חפש</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>חפש</url_rewrite>
-  </meta>
-  <meta id="stores" id_shop="1">
-    <title>חנויות</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>חנויות</url_rewrite>
-  </meta>
   <meta id="order-opc" id_shop="1">
     <title>הזמנה</title>
     <description/>
@@ -167,11 +143,5 @@
     <description/>
     <keywords/>
     <url_rewrite>אימות-הזמנה</url_rewrite>
-  </meta>
-  <meta id="products-comparison" id_shop="1">
-    <title>השוואת מוצרים</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>השוואת-מוצרים</url_rewrite>
   </meta>
 </entity_meta>

@@ -19,7 +19,7 @@
     <url_rewrite>contattarci</url_rewrite>
   </meta>
   <meta id='index' id_shop='1'>
-    <title>Hotel Prime</title>
+    <title></title>
 <description>Un luogo dove il comfort e il lusso si mescolano con la natura!</description>
     <keywords/>
     <url_rewrite/>
@@ -41,18 +41,6 @@
     <description>Inserisci l&apos;indirizzo e-mail che usi per accedere, per ricevere un&apos;e-mail con una nuova password</description>
     <keywords>dimenticato, password, e-mail, nuovo, reset</keywords>
     <url_rewrite>recupero-password</url_rewrite>
-  </meta>
-  <meta id='prices-drop' id_shop='1'>
-    <title>Calo dei prezzi</title>
-    <description>I nostri prodotti speciali</description>
-    <keywords>speciali, riduzione prezzi</keywords>
-    <url_rewrite>calo-prezzi</url_rewrite>
-  </meta>
-  <meta id='sitemap' id_shop='1'>
-    <title>Mappa del sito</title>
-    <description>Vi siete persi? Trovate quello che state cercando</description>
-    <keywords>sitemap</keywords>
-    <url_rewrite>mappa del sito</url_rewrite>
   </meta>
   <meta id='supplier' id_shop='1'>
     <title>Fornitori</title>
@@ -138,18 +126,6 @@
     <keywords/>
     <url_rewrite>ordine</url_rewrite>
   </meta>
-  <meta id='search' id_shop='1'>
-    <title>Ricerca</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>ricerca</url_rewrite>
-  </meta>
-  <meta id='stores' id_shop='1'>
-    <title>Negozi</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>negozi</url_rewrite>
-  </meta>
   <meta id='order-opc' id_shop='1'>
     <title>Ordine</title>
     <description/>
@@ -167,11 +143,5 @@
     <description/>
     <keywords/>
     <url_rewrite>conferma-ordine</url_rewrite>
-  </meta>
-  <meta id='products-comparison' id_shop='1'>
-    <title>Confronto prodotti</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>confronto-prodotti</url_rewrite>
   </meta>
 </entity_meta>

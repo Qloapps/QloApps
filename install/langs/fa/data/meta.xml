@@ -19,7 +19,7 @@
     <url_rewrite>contact-us</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title>هتل پرایم</title>
+    <title></title>
     <description>مکانی که در آن راحتی و لوکس بودن با طبیعت ترکیب شده‌اند!</description>
     <keywords/>
     <url_rewrite/>
@@ -41,18 +41,6 @@
     <description>برای دریافت رمز عبور خود توسط ایمیل میتوانید پست الکترونیکی که با آن ثبت نام کرده بودید را وارد کنید</description>
     <keywords/>
     <url_rewrite>password-recovery</url_rewrite>
-  </meta>
-  <meta id="prices-drop" id_shop="1">
-    <title>کاهش قیمت ها</title>
-    <description>محصولات ویژه ما</description>
-    <keywords/>
-    <url_rewrite>prices-drop</url_rewrite>
-  </meta>
-  <meta id="sitemap" id_shop="1">
-    <title>نقشه سایت</title>
-    <description>گمشده اید؟ آنچه را که به دنبالش هستید پیدا کنید</description>
-    <keywords/>
-    <url_rewrite>sitemap</url_rewrite>
   </meta>
   <meta id="supplier" id_shop="1">
     <title>تامین کننده ها</title>
@@ -138,18 +126,6 @@
     <keywords/>
     <url_rewrite>order</url_rewrite>
   </meta>
-  <meta id="search" id_shop="1">
-    <title>جستجو</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>search</url_rewrite>
-  </meta>
-  <meta id="stores" id_shop="1">
-    <title>مغازه‌ها</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>stores</url_rewrite>
-  </meta>
   <meta id="order-opc" id_shop="1">
     <title>سفارش</title>
     <description/>
@@ -167,11 +143,5 @@
     <description/>
     <keywords/>
     <url_rewrite>order-confirmation</url_rewrite>
-  </meta>
-  <meta id="products-comparison" id_shop="1">
-    <title>مقایسه محصولات</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>products-comparison</url_rewrite>
   </meta>
 </entity_meta>

@@ -19,7 +19,7 @@
     <url_rewrite>contact-us</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title>Khách sạn Prime</title>
+    <title></title>
     <description>Nơi mà sự thoải mái và sang trọng hòa quyện với thiên nhiên!</description>
     <keywords/>
     <url_rewrite/>
@@ -41,18 +41,6 @@
     <description>Enter the e-mail address you use to sign in to receive an e-mail with a new password</description>
     <keywords/>
     <url_rewrite>password-recovery</url_rewrite>
-  </meta>
-  <meta id="prices-drop" id_shop="1">
-    <title>Giảm giá</title>
-    <description>Our special products</description>
-    <keywords/>
-    <url_rewrite>prices-drop</url_rewrite>
-  </meta>
-  <meta id="sitemap" id_shop="1">
-    <title>Sơ đồ web</title>
-    <description>Lost ? Find what your are looking for</description>
-    <keywords/>
-    <url_rewrite>sitemap</url_rewrite>
   </meta>
   <meta id="supplier" id_shop="1">
     <title>Nhà cung cấp</title>
@@ -138,18 +126,6 @@
     <keywords/>
     <url_rewrite>order</url_rewrite>
   </meta>
-  <meta id="search" id_shop="1">
-    <title>Search</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>search</url_rewrite>
-  </meta>
-  <meta id="stores" id_shop="1">
-    <title>Stores</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>stores</url_rewrite>
-  </meta>
   <meta id="order-opc" id_shop="1">
     <title>Đơn hàng</title>
     <description/>
@@ -167,11 +143,5 @@
     <description/>
     <keywords/>
     <url_rewrite>order-confirmation</url_rewrite>
-  </meta>
-  <meta id="products-comparison" id_shop="1">
-    <title>Products Comparison</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>products-comparison</url_rewrite>
   </meta>
 </entity_meta>

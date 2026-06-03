@@ -19,7 +19,7 @@
     <url_rewrite>hubungi-kami</url_rewrite>
   </meta>
   <meta id='index' id_shop='1'>
-    <title>Hotel Prime</title>
+    <title></title>
     <description>Tempat di mana kenyamanan dan kemewahan berpadu dengan alam!</description>
     <keywords/>
     <url_rewrite/>
@@ -41,18 +41,6 @@
     <description>Isi alamat e-mail dengan alamat e-mail yang Anda gunakan sewaktu mendaftar yang akan digunakan untuk mengirim password baru</description>
     <keywords>forgot, password, e-mail, new, reset</keywords>
     <url_rewrite>lupa-password</url_rewrite>
-  </meta>
-  <meta id='prices-drop' id_shop='1'>
-    <title>Turun harga</title>
-    <description>Daftar produk diskon</description>
-    <keywords>special, prices drop</keywords>
-    <url_rewrite>turun-harga</url_rewrite>
-  </meta>
-  <meta id='sitemap' id_shop='1'>
-    <title>Sitemap</title>
-    <description>Tersesat ? Temukan yang anda cari</description>
-    <keywords>sitemap</keywords>
-    <url_rewrite>sitemap</url_rewrite>
   </meta>
   <meta id='supplier' id_shop='1'>
     <title>Supplier</title>
@@ -138,18 +126,6 @@
     <keywords/>
     <url_rewrite>order</url_rewrite>
   </meta>
-  <meta id='search' id_shop='1'>
-    <title>Cari</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>cari</url_rewrite>
-  </meta>
-  <meta id='stores' id_shop='1'>
-    <title>Toko</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>toko</url_rewrite>
-  </meta>
   <meta id='order-opc' id_shop='1'>
     <title>Order</title>
     <description/>
@@ -167,11 +143,5 @@
     <description/>
     <keywords/>
     <url_rewrite>konfirmasi-pembelian</url_rewrite>
-  </meta>
-  <meta id="products-comparison" id_shop="1">
-    <title>Products Comparison</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>products-comparison</url_rewrite>
   </meta>
 </entity_meta>

@@ -19,7 +19,7 @@
     <url_rewrite>contact-us</url_rewrite>
   </meta>
   <meta id='index' id_shop='1'>
-    <title>হোটেল প্রাইম</title>
+    <title></title>
     <description>এটি এমন একটি স্থান যেখানে আরাম এবং বিলাসিতা প্রকৃতির সাথে মিলিত হয়েছে!</description>
     <keywords/>
     <url_rewrite/>
@@ -41,18 +41,6 @@
     <description>আপনার নতুন পাসওয়ার্ড মেইল এ পেতে রেজিসট্রেসন মেইল ঠিকানা দিন</description>
     <keywords/>
     <url_rewrite>password-recovery</url_rewrite>
-  </meta>
-  <meta id='prices-drop' id_shop='1'>
-    <title>মূল্য কমানো</title>
-    <description>আমাদের বিশেষ পণ্য </description>
-    <keywords/>
-    <url_rewrite>prices-drop</url_rewrite>
-  </meta>
-  <meta id='sitemap' id_shop='1'>
-    <title>সাইট ম্যাপ </title>
-    <description>ভুলে গেছেন? যা চান তা খুজুন </description>
-    <keywords/>
-    <url_rewrite>sitemap</url_rewrite>
   </meta>
   <meta id='supplier' id_shop='1'>
     <title>সরবরাহকারী </title>
@@ -138,18 +126,6 @@
     <keywords/>
     <url_rewrite>order</url_rewrite>
   </meta>
-  <meta id='search' id_shop='1'>
-    <title>খোজ </title>
-    <description/>
-    <keywords/>
-    <url_rewrite>search</url_rewrite>
-  </meta>
-  <meta id='stores' id_shop='1'>
-    <title>দোকান </title>
-    <description/>
-    <keywords/>
-    <url_rewrite>stores</url_rewrite>
-  </meta>
   <meta id='order-opc' id_shop='1'>
     <title>অর্ডার </title>
     <description/>
@@ -167,11 +143,5 @@
     <description/>
     <keywords/>
     <url_rewrite>order-confirmation</url_rewrite>
-  </meta>
-  <meta id="products-comparison" id_shop="1">
-    <title>Products Comparison</title>
-    <description/>
-    <keywords/>
-    <url_rewrite>products-comparison</url_rewrite>
   </meta>
 </entity_meta>
