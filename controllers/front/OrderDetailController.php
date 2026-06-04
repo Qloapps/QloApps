@@ -490,7 +490,7 @@ class OrderDetailControllerCore extends FrontController
                         'deliveryAddressFormatedValues' => $deliveryAddressFormatedValues,
                         'deliveryState' => (Validate::isLoadedObject($addressDelivery) && $addressDelivery->id_state) ? new State($addressDelivery->id_state) : false,
                         'is_guest' => false,
-                        'messages' => CustomerMessage::getMessagesByOrderId((int) $order->id),
+                        'messages' => CustomerMessage::getMessagesByOrderId((int) $order->id, false),
                         'CUSTOMIZE_FILE' => Product::CUSTOMIZE_FILE,
                         'CUSTOMIZE_TEXTFIELD' => Product::CUSTOMIZE_TEXTFIELD,
                         'isRecyclable' => Configuration::get('PS_RECYCLABLE_PACK'),
