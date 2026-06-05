@@ -1354,7 +1354,7 @@ class HotelBookingDetail extends ObjectModel
 
         $selectBookedRoomSearch = 'SELECT `id`, `id_order`, `id_product`, `id_room`, `id_hotel`, `id_customer`, `booking_type`, `id_status` AS booking_status, `comment`, `room_num`, `date_from`, IF(`id_status` = '. self::STATUS_CHECKED_OUT.', `check_out`,`date_to`) AS `date_to`, `check_in`, `check_out`, `date_to` AS `booking_date_to`';
         $joinBookedRoomSearch = '';
-        $whereBookedRoomSearch = 'WHERE `id_hotel` = '.(int)$idHotel.' AND `is_back_order` = 0 AND `is_refunded` = 0 AND IF(`id_status` = '. self::STATUS_CHECKED_OUT.', (
+        $whereBookedRoomSearch = 'WHERE `id_hotel` = '.(int)$idHotel.' AND `is_back_order` = 0 AND `is_refunded` = 0 AND IF(`id_status` = '. self::STATUS_CHECKED_OUT.', (DATE_FORMAT(`check_out`, "%Y-%m-%d") != DATE_FORMAT(\''.pSQL($dateFrom).'\', "%Y-%m-%d")) AND (
             (`date_from` <= \''.pSQL($dateFrom).'\' AND `check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\') OR
             (`date_from` >= \''.pSQL($dateFrom).'\' AND `check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.pSQL($dateTo).'\') OR
             (`date_from` >= \''.pSQL($dateFrom).'\' AND `date_from` < \''.pSQL($dateTo).'\' AND `check_out` >= \''.pSQL($dateTo).'\') OR
