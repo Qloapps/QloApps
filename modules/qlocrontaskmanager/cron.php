@@ -35,7 +35,9 @@ if (!$token || $token !== $expectedToken) {
 $module = Module::getInstanceByName('qlocrontaskmanager');
 
 if (!$module || !$module->active) {
-    die('Module not active');
+    die('Cron module not active');
 }
 
-$module->dispatch();
+require_once dirname(__FILE__) . '/classes/QctmCronTask.php';
+$objCronTask = new QctmCronTask();
+$objCronTask->dispatch();

@@ -174,7 +174,8 @@ class QloCronTaskManager extends Module
         if (method_exists($module, 'hookRegisterCronTasks')) {
             $tasks = $module->hookRegisterCronTasks();
             if (!empty($tasks) && is_array($tasks)) {
-                $this->registerTasksForModule($module->id, $tasks);
+                $objCronTask = new QctmCronTask();
+                $objCronTask->registerTasksForModule($module->id, $tasks);
             }
         }
     }
@@ -186,164 +187,6 @@ class QloCronTaskManager extends Module
         }
 
         QctmCronTask::deleteByModule($params['object']->id);
-    }
-
-    protected function syncAllExistingModules()
-    {
-        $allTasks = Hook::exec('registerCronTasks', array(), null, true);
-
-        if (!empty($allTasks) && is_array($allTasks)) {
-            foreach ($allTasks as $moduleName => $tasks) {
-                if (!empty($tasks) && is_array($tasks)) {
-                    $module = Module::getInstanceByName($moduleName);
-                    if($module){
-                        $this->registerTasksForModule($module->id, $tasks);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Register tasks for a specific module after validation
-     *
-     * @param string $moduleName
-     * @param array $tasks
-     */
-    protected function registerTasksForModule($idModule, $tasks)
-    {
-        $module = Module::getInstanceById($idModule);
-        if (!$module) {
-            return;
-        }
-
-
-        foreach ($tasks as $task) {
-            if (!$this->validateTask($module, $task)) {
-                continue;
-            }
-
-            if (QctmCronTask::getByModuleAndName($idModule, $task['name'])) {
-                continue;
-            }
-
-            $cronTask = new QctmCronTask();
-            $cronTask->id_module = $idModule;
-            $cronTask->task_name = $task['name'];
-            $cronTask->description = $task['description'];
-            $cronTask->cron_expression = $task['cron'];
-            $cronTask->callback = $task['callback'];
-            $cronTask->active = 1;
-            $cronTask->is_system = 0;
-            if (!$cronTask->save()) {
-                PrestaShopLogger::addLog(
-                    'QloCronTaskManager: failed to register task "' . $task['name'] . '" for module "' . $module->name . '"',
-                    3
-                );
-            }
-        }
-    }
-
-    /**
-     * Validate a task definition array
-     *
-     * @param string $moduleName
-     * @param array $task
-     * @return bool
-     */
-    protected function validateTask(Module $module, $task)
-    {
-        if (!Validate::isGenericName($task['name']) || !Validate::isGenericName($task['description'])
-            || !Validate::isString($task['cron']) || !Validate::isString($task['callback'])) {
-            return false;
-        }
-
-        if (!\Cron\CronExpression::isValidExpression($task['cron'])) {
-            return false;
-        }
-
-        if (!method_exists($module, $task['callback'])) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public function dispatch()
-    {
-        if (!$this->active) {
-            return;
-        }
-
-        $tasks = QctmCronTask::getActiveTasks();
-        if (empty($tasks)) {
-            return;
-        }
-
-        $now = new DateTime();
-
-        foreach ($tasks as $task) {
-            if (!\Cron\CronExpression::isValidExpression($task['cron_expression'])) {
-                QctmCronTaskLog::addLog(
-                    $task['id_cron_task'],
-                    QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_ERROR,
-                    'Invalid cron expression "' . $task['cron_expression'] . '"'
-                );
-                continue;
-            }
-
-            $cron = \Cron\CronExpression::factory($task['cron_expression']);
-
-            if (!$cron->isDue($now)) {
-                continue;
-            }
-
-            $module = Module::getInstanceById($task['id_module']);
-
-            if (!$module) {
-                QctmCronTaskLog::addLog(
-                    $task['id_cron_task'],
-                    QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_ERROR,
-                    'Module with ID "' . (int) $task['id_module'] . '" could not be loaded'
-                );
-                continue;
-            }
-
-            if (!$module->active) {
-                continue;
-            }
-
-            $callback = $task['callback'];
-
-            if (!method_exists($module, $callback)) {
-                QctmCronTaskLog::addLog(
-                    $task['id_cron_task'],
-                    QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_ERROR,
-                    'Callback method "' . $callback . '" not found on module "' . $module->name . '"'
-                );
-                continue;
-            }
-
-            $startTime = microtime(true);
-
-            try {
-                $module->{$callback}();
-
-                QctmCronTaskLog::addLog(
-                    $task['id_cron_task'],
-                    QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_SUCCESS,
-                    null,
-                    round(microtime(true) - $startTime, 4)
-                );
-            } catch (\Throwable $e) {
-                QctmCronTaskLog::addLog(
-                    $task['id_cron_task'],
-                    QctmCronTaskLog::QCTM_CRON_TASK_LOG_STATUS_ERROR,
-                    $e->getMessage(),
-                    round(microtime(true) - $startTime, 4)
-                );
-            }
-        }
     }
 
     /**
@@ -361,6 +204,7 @@ class QloCronTaskManager extends Module
     public function install()
     {
         $db = new QctmCronTaskManagerDb();
+        $objCronTask = new QctmCronTask();
 
         if (!parent::install()
             || !$this->registerHooks()
@@ -372,7 +216,7 @@ class QloCronTaskManager extends Module
             return false;
         }
 
-        $this->syncAllExistingModules();
+        $objCronTask->syncAllExistingModules();
 
         return true;
     }

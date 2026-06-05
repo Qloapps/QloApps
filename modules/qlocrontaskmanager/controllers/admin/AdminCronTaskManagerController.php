@@ -372,6 +372,11 @@ class AdminCronTaskManagerController extends ModuleAdminController
 
         foreach ($tasks as $task) {
             if ($task['name'] === $cronTask->task_name) {
+                if (!$cronTask->validateTask($module, $task)) {
+                    $this->errors[] = $this->l('Module returned an invalid task definition (bad cron expression or missing callback).');
+                    return false;
+                }
+
                 $cronTask->cron_expression = $task['cron'];
                 $cronTask->description = $task['description'];
                 $cronTask->callback = $task['callback'];
