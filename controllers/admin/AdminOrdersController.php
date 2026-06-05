@@ -7751,6 +7751,7 @@ class AdminOrdersControllerCore extends AdminController
                         $response['hasError'] = true;
                         $response['errors'][] = Tools::displayError('Error while updating service, please try again after refresing the page');
                     } else {
+                        $this->sendChangedNotification($objOrder);
                         $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
                             $objOrderDetail->id_order,
                             $objHotelBookingDetail->id_product,
@@ -8007,6 +8008,8 @@ class AdminOrdersControllerCore extends AdminController
                             }
                         }
                     }
+
+                    $this->sendChangedNotification($order);
                     $response['service_panel'] = $this->processRenderServicesPanel(
                         $order->id,
                         $objHotelBookingDetail->id_product,
@@ -8289,6 +8292,7 @@ class AdminOrdersControllerCore extends AdminController
 
                                                 // Save changes of order
                                                 if ($objOrder->update()) {
+                                                    $this->sendChangedNotification($objOrder);
                                                     $response['service_panel'] = $this->processRenderServicesPanel(
                                                         $objOrder->id,
                                                         $objHotelBookingDetail->id_product,
