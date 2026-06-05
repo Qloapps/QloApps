@@ -498,7 +498,6 @@ class FrontControllerCore extends Controller
             'is_occupancy_wise_search'    => $isOccupancyWiseSearch,
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'show_full_date' => $this->show_full_date
         ));
 

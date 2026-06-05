@@ -1040,8 +1040,8 @@ class HotelHelper
             $home_banner_default_title = $homeBannerTitleLang[$objDefaultLanguage->iso_code];
         }
 
-        Configuration::updateValue('WK_HOTEL_LOCATION_ENABLE', 1);
-        Configuration::updateValue('WK_HOTEL_NAME_ENABLE', 1);
+        Configuration::updateValue('WK_HOTEL_LOCATION_ENABLE', 0);
+        Configuration::updateValue('WK_HOTEL_NAME_ENABLE', 0);
         Configuration::updateValue('WK_HOTEL_NAME_SEARCH_THRESHOLD', 5);
         Configuration::updateValue('WK_SEARCH_AUTO_FOCUS_NEXT_FIELD', 1);
         Configuration::updateValue('WK_ROOM_LEFT_WARNING_NUMBER', 10);
@@ -1063,7 +1063,7 @@ class HotelHelper
         Configuration::updateValue('WK_ADVANCED_PAYMENT_INC_TAX', 1);
 
         Configuration::updateValue('WK_GLOBAL_CHILD_MAX_AGE', 15);
-        Configuration::updateValue('WK_GLOBAL_MAX_CHILD_IN_ROOM', 0);
+        Configuration::updateValue('QLO_GLOBAL_MAX_INFANT_AGE', 1);
 
         Configuration::updateValue('PS_MAX_CHECKOUT_OFFSET', 365);
         Configuration::updateValue('PS_MIN_BOOKING_OFFSET', 0);
