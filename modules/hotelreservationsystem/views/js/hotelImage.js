@@ -52,6 +52,7 @@ $(document).ready(function () {
         triggerElement.prop('disabled', true).addClass('disabled');
         uploadSelectedImages(files, idHtlImageCategory).then(function() {
             $('#hotel_images').val('');
+            $('#hotel_images-name').val('');
             showSuccessMessage(imgUploadSuccessMsg);
         }, function(errorMsg) {
             showErrorMessage(errorMsg || imgUploadErrorMsg);

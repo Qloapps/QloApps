@@ -523,7 +523,7 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelFeatures', 'Manage Hotel Features', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRules', 'Manage Order Refund Rules', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRequests', 'Manage Order Refund Requests', 'AdminHotelReservationSystemManagement');
-        $this->installTab('AdminHotelImageCategory', 'Manage Hotel Image Category', 'AdminHotelReservationSystemManagement');
+        $this->installTab('AdminHotelImageCategory', 'Hotel Image Category', 'AdminHotelReservationSystemManagement');
 
         $this->installTab('AdminHotelConfigurationSetting', 'General Settings', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelBedTypes', 'Bed Types', 'AdminCatalog');

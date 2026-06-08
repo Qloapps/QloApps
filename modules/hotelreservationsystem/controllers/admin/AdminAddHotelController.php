@@ -838,10 +838,12 @@ class AdminAddHotelController extends ModuleAdminController
                 $conf = 4;
             }
 
+            $tabParam = Tools::getValue('htl_active_tab') ? '&htl_active_tab='.urlencode(Tools::getValue('htl_active_tab')) : '';
+
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
-                Tools::redirectAdmin(self::$currentIndex.'&id='.(int) $newIdHotel.'&update'.$this->table.'&conf='.$conf.'&token='.$this->token                );
+                Tools::redirectAdmin(self::$currentIndex.'&id='.(int) $newIdHotel.'&update'.$this->table.'&conf='.$conf.'&token='.$this->token.$tabParam);
             } else {
-                Tools::redirectAdmin(self::$currentIndex.'&conf='.$conf.'&token='.$this->token);
+                Tools::redirectAdmin(self::$currentIndex.'&conf='.$conf.'&token='.$this->token.$tabParam);
             }
         }
 

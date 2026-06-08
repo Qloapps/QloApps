@@ -31,7 +31,7 @@
         {if isset($image.category_name) && $image.category_name}
             {$image.category_name|escape:'html':'UTF-8'}
         {else}
-            {l s='Uncategorized' mod='hotelreservationsystem'}
+            &mdash;
         {/if}
     </td>
     <td class="text-center {if $image.cover == 1}cover-image-td{/if}">
