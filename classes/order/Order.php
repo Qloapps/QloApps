@@ -1905,7 +1905,15 @@ class OrderCore extends ObjectModel
             $order_payment_detail->id_order = $this->id;
             $order_payment_detail->id_order_payment = (int)$payment->id;
             $order_payment_detail->amount = $amount;
+            $receipt_number = Configuration::get('PS_PAYMENT_RECEIPTS_START_NUMBER', null, null, $this->id_shop);
+            // If payment start number has been set, you clean the value of this configuration
+            if ($receipt_number) {
+                Configuration::updateValue('PS_PAYMENT_RECEIPTS_START_NUMBER', false, false, null, $this->id_shop);
+            }else{
+                $receipt_number = OrderPaymentDetail::getLastPaymentReceiptNumber() + 1;
+            }
 
+            $order_payment_detail->receipt_number = $receipt_number;
             if ($payment->id_currency == $this->id_currency) {
                 $this->total_paid_real += $order_payment_detail->amount;
             } else {
@@ -1934,6 +1942,8 @@ class OrderCore extends ObjectModel
         }
         return false;
     }
+
+
 
     /**
      * Returns the correct product taxes breakdown.
@@ -3147,5 +3157,27 @@ class OrderCore extends ObjectModel
         $totalOrder = $totalOrder > 0 ? $totalOrder : 0;
 
         return $totalOrder;
+    }
+
+    public function getPaymentsTypes()
+    {
+        $module = Module::getInstanceByName('hotelreservationsystem');
+        return array(
+            OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL => array(
+                'key' => 'PAYMENT_TYPE_PAY_AT_HOTEL',
+                'value' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
+                'name' => $module->l('Pay at hotel')
+            ),
+            OrderPayment::PAYMENT_TYPE_ONLINE => array(
+                'key' => 'PAYMENT_TYPE_ONLINE',
+                'value' => OrderPayment::PAYMENT_TYPE_ONLINE,
+                'name' => $module->l('Online')
+            ),
+            OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT => array(
+                'key' => 'PAYMENT_TYPE_REMOTE_PAYMENT',
+                'value' => OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT,
+                'name' => $module->l('Remote payment')
+            ),
+        );
     }
 }
