@@ -20,38 +20,23 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-/* Sub-report tabs */
-.qlo-sub-report-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px; /* Handles both horizontal and vertical spacing automatically */
-    /* margin: 0 0 18px 0; */
-    padding-bottom: 8px; /* Adds breathing room above the border */
-    border-bottom: 1px solid #eee;
+/* Report page heading */
+.qlo-report-heading {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #25b9d7;
 }
 
-.qlo-sub-report-nav > li > a {
-    border-radius: 3px 3px 0 0;
-    font-size: 13px;
-    padding: 7px 14px;
-    color: #555;
+/* Gap above the filter form */
+form.form-horizontal.list_action_wrapper {
+    margin-top: 0;
 }
 
-.qlo-sub-report-nav > li.active > a,
-.qlo-sub-report-nav > li.active > a:hover,
-.qlo-sub-report-nav > li.active > a:focus {
-    color: #25b9d7;
-    border-bottom-color: #25b9d7;
-    font-weight: 600;
-}
-
-/* Gap between sub-report tab nav and the filter form below it */
-.qlo-sub-report-nav + form.form-horizontal {
-    margin-top: 15px;
-}
-
-/* Cancel Bootstrap's label margin-bottom so flex align-items:center works correctly */
-.qlo-sub-report-nav + form .list_filters label {
+/* Cancel Bootstrap's label margin-bottom inside filter bar */
+form.list_action_wrapper .list_filters label {
     margin-bottom: 0;
 }
 

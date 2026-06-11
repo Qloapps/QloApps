@@ -20,21 +20,13 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{* ── Sub-report nav ──────────────────────────────────────────────────────── *}
-<ul class="nav nav-pills qlo-sub-report-nav">
-    {foreach $channel_sub_reports as $reportKey => $reportLabel}
-    <li{if $active_report == $reportKey} class="active"{/if}>
-        <a href="{$filter_base_url|escape:'html':'UTF-8'}&report={$reportKey|escape:'html':'UTF-8'}">{$reportLabel|escape:'html':'UTF-8'}</a>
-    </li>
-    {/foreach}
-</ul>
+<h3 class="qlo-report-heading">{$report_label|escape:'html':'UTF-8'}</h3>
 
 {* ── Filters ─────────────────────────────────────────────────────────────── *}
 <form method="get" action="{$filter_base_url|escape:'html':'UTF-8'}" class="form-horizontal clearfix list_action_wrapper">
     <input type="hidden" name="controller" value="AdminStats">
     <input type="hidden" name="module" value="qlohotelreports">
-    <input type="hidden" name="tab" value="channels">
-    <input type="hidden" name="report" value="{$active_report|escape:'html':'UTF-8'}">
+    <input type="hidden" name="tab" value="{$active_report|escape:'html':'UTF-8'}">
     {if isset($smarty.get.token)}<input type="hidden" name="token" value="{$smarty.get.token|escape:'html':'UTF-8'}">{/if}
     <div class="list_filters">
         {if $hotels|count > 1}

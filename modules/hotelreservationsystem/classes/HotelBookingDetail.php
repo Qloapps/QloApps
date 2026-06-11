@@ -4189,7 +4189,9 @@ class HotelBookingDetail extends ObjectModel
         return Db::getInstance()->executeS(
             'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-            DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+            DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
+            IF(hbd.`check_in` > "0000-00-00 00:00:00", hbd.`check_in`, CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`)) AS actual_checkin,
+            IF(hbd.`check_out` > "0000-00-00 00:00:00", hbd.`check_out`, CONCAT(DATE(hbd.`date_to`), " ", hbd.`check_out_time`)) AS actual_checkout
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
@@ -4226,7 +4228,9 @@ class HotelBookingDetail extends ObjectModel
         return Db::getInstance()->executeS(
             'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-            DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+            DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
+            IF(hbd.`check_in` > "0000-00-00 00:00:00", hbd.`check_in`, CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`)) AS actual_checkin,
+            IF(hbd.`check_out` > "0000-00-00 00:00:00", hbd.`check_out`, CONCAT(DATE(hbd.`date_to`), " ", hbd.`check_out_time`)) AS actual_checkout
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
@@ -4263,7 +4267,9 @@ class HotelBookingDetail extends ObjectModel
         return Db::getInstance()->executeS(
             'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-            DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+            DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
+            IF(hbd.`check_in` > "0000-00-00 00:00:00", hbd.`check_in`, CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`)) AS actual_checkin,
+            IF(hbd.`check_out` > "0000-00-00 00:00:00", hbd.`check_out`, CONCAT(DATE(hbd.`date_to`), " ", hbd.`check_out_time`)) AS actual_checkout
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
@@ -4348,6 +4354,8 @@ class HotelBookingDetail extends ObjectModel
             hbd.`id_product`, hbd.`room_type_name`, hbd.`id_room`, hbd.`room_num`,
             hbd.`date_from`, hbd.`date_to`,
             DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS nights,
+            CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`) AS hotel_check_in,
+            CONCAT(DATE(hbd.`date_to`), " ", hbd.`check_out_time`) AS hotel_check_out,
             hbd.`adults`, hbd.`children`,
             hbd.`unit_price_tax_excl`, hbd.`total_price_tax_excl`,
             (hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) AS tax_amount,
@@ -4579,6 +4587,8 @@ class HotelBookingDetail extends ObjectModel
             hbd.`room_type_name`, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             hbd.`id_hotel`, hbd.`hotel_name`, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
             hbd.`date_from`, hbd.`date_to`, hbd.`id_order`,
+            CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`) AS hotel_check_in,
+            CONCAT(DATE(hbd.`date_to`), " ", hbd.`check_out_time`) AS hotel_check_out,
             o.`current_state`, osl.`name` AS state_name'
             . $extraSelect .'
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd

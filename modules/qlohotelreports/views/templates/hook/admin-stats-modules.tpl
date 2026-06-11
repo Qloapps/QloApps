@@ -21,10 +21,10 @@
 *}
 <script type="text/javascript">
 $(document).ready(function() {
-    {if isset($smarty.get.report) && $smarty.get.report}
+    {if isset($smarty.get.tab) && $smarty.get.tab}
     var form = document.getElementById('calendar_form');
-    if (form && form.action.indexOf('&report=') === -1) {
-        form.action += '&report=' + encodeURIComponent('{$smarty.get.report|escape:'html':'UTF-8'}');
+    if (form && form.action.indexOf('&tab=') === -1) {
+        form.action += '&tab=' + encodeURIComponent('{$smarty.get.tab|escape:'html':'UTF-8'}');
     }
     {/if}
 

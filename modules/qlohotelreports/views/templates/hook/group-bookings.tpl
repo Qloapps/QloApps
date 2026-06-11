@@ -22,21 +22,13 @@
 
 <div class="qlo-report-group-bookings">
 
-    {* ── Sub-report tab nav ──────────────────────────────────────────── *}
-    <ul class="nav nav-pills qlo-sub-report-nav">
-        {foreach $booking_sub_reports as $reportKey => $reportLabel}
-            <li{if $active_report == $reportKey} class="active"{/if}>
-                <a href="{$filter_base_url|escape:'html':'UTF-8'}&amp;report={$reportKey|escape:'html':'UTF-8'}">{$reportLabel}</a>
-            </li>
-        {/foreach}
-    </ul>
+    <h3 class="qlo-report-heading">{$report_label|escape:'html':'UTF-8'}</h3>
 
     {* ── Filter bar ──────────────────────────────────────────────────── *}
     <form method="get" action="{$filter_base_url|escape:'html':'UTF-8'}" class="form-horizontal clearfix list_action_wrapper">
         <input type="hidden" name="controller" value="AdminStats">
         <input type="hidden" name="module" value="qlohotelreports">
-        <input type="hidden" name="tab" value="bookings">
-        <input type="hidden" name="report" value="{$active_report|escape:'html':'UTF-8'}">
+        <input type="hidden" name="tab" value="{$active_report|escape:'html':'UTF-8'}">
         {if isset($smarty.get.token)}<input type="hidden" name="token" value="{$smarty.get.token|escape:'html':'UTF-8'}">{/if}
         <div class="list_filters">
             {if $hotels|count > 1}
@@ -139,8 +131,8 @@
                                 <td>{if $reservation.phone}{$reservation.phone|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{$reservation.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$reservation.room_num|escape:'html':'UTF-8'}</td>
-                                <td>{$reservation.date_from|escape:'html':'UTF-8'}</td>
-                                <td>{$reservation.date_to|escape:'html':'UTF-8'}</td>
+                                <td>{$reservation.hotel_check_in|escape:'html':'UTF-8'}</td>
+                                <td>{$reservation.hotel_check_out|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$reservation.nights|intval}</td>
                                 <td class="text-right">{$reservation.adults|intval}</td>
                                 <td class="text-right">{$reservation.children|intval}</td>
@@ -227,7 +219,7 @@
                                 <td>{$cancellation.customer_name|escape:'html':'UTF-8'}</td>
                                 <td>{$cancellation.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$cancellation.room_num|escape:'html':'UTF-8'}</td>
-                                <td>{$cancellation.date_from|escape:'html':'UTF-8'}</td>
+                                <td>{$cancellation.hotel_check_in|escape:'html':'UTF-8'}</td>
                                 <td>{if $cancellation.cancellation_date}{$cancellation.cancellation_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $cancellation.cancellation_reason}{$cancellation.cancellation_reason|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td><span class="text-muted">—</span></td>
@@ -287,7 +279,7 @@
                                 <td>{$noShow.customer_name|escape:'html':'UTF-8'}</td>
                                 <td>{$noShow.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$noShow.room_num|escape:'html':'UTF-8'}</td>
-                                <td>{$noShow.date_from|escape:'html':'UTF-8'}</td>
+                                <td>{$noShow.actual_checkin|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$noShow.currency_sign|escape:'html':'UTF-8'}{$noShow.total_price_tax_incl|string_format:"%.2f"}</td>
                                 <td class="text-right"><span class="text-muted">—</span></td>
                             </tr>
@@ -348,8 +340,8 @@
                                 <td>{$arrival.hotel_name|escape:'html':'UTF-8'}</td>
                                 <td>{$arrival.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$arrival.room_num|escape:'html':'UTF-8'}</td>
-                                <td>{$arrival.date_from|escape:'html':'UTF-8'}</td>
-                                <td>{$arrival.date_to|escape:'html':'UTF-8'}</td>
+                                <td>{$arrival.actual_checkin|escape:'html':'UTF-8'}</td>
+                                <td>{$arrival.actual_checkout|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$arrival.los|intval}</td>
                                 <td class="text-right">{$arrival.adults|intval}</td>
                                 <td class="text-right">{$arrival.children|intval}</td>
@@ -414,8 +406,8 @@
                                 <td>{$departure.hotel_name|escape:'html':'UTF-8'}</td>
                                 <td>{$departure.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$departure.room_num|escape:'html':'UTF-8'}</td>
-                                <td>{$departure.date_from|escape:'html':'UTF-8'}</td>
-                                <td>{$departure.date_to|escape:'html':'UTF-8'}</td>
+                                <td>{$departure.actual_checkin|escape:'html':'UTF-8'}</td>
+                                <td>{$departure.actual_checkout|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$departure.los|intval}</td>
                                 <td class="text-right">{$departure.adults|intval}</td>
                                 <td class="text-right">{$departure.children|intval}</td>
@@ -483,8 +475,8 @@
                                 <td>{$inHouseGuest.hotel_name|escape:'html':'UTF-8'}</td>
                                 <td>{$inHouseGuest.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$inHouseGuest.room_num|escape:'html':'UTF-8'}</td>
-                                <td>{$inHouseGuest.date_from|escape:'html':'UTF-8'}</td>
-                                <td>{$inHouseGuest.date_to|escape:'html':'UTF-8'}</td>
+                                <td>{$inHouseGuest.actual_checkin|escape:'html':'UTF-8'}</td>
+                                <td>{$inHouseGuest.actual_checkout|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$inHouseGuest.los|intval}</td>
                                 <td class="text-right">{$inHouseGuest.adults|intval}</td>
                                 <td class="text-right">{$inHouseGuest.children|intval}</td>

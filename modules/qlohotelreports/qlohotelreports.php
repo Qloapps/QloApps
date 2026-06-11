@@ -21,26 +21,43 @@
  * @copyright Since 2010 Webkul
  * @license https://opensource.org/license/osl-3.0-php Open Software License version 3.0
  */
-
+    
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
 class QloHotelReports extends Module
 {
-    public const REPORT_GROUP_DEFAULT = 'bookings';
+    public const REPORT_DEFAULT = 'reservation';
 
     /**
-     * Report group registry: key => array('label' => translatable string, 'tpl' => template filename)
+     * Flat report registry: each report is its own tab.
+     * key => array('label' => translatable string, 'tpl' => template filename)
      * Labels are plain English; call $this->l($config['label']) at render time.
      */
-    private static $reportGroups = array(
-        'bookings'  => array('label' => 'Bookings',                'tpl' => 'group-bookings.tpl'),
-        'revenue'   => array('label' => 'Revenue & Finance',       'tpl' => 'group-revenue.tpl'),
-        'occupancy' => array('label' => 'Occupancy & Availability', 'tpl' => 'group-occupancy.tpl'),
-        'channels'  => array('label' => 'Channels',                'tpl' => 'group-channels.tpl'),
-        'guests'    => array('label' => 'Guests & Services',        'tpl' => 'group-guests.tpl'),
-        'property'  => array('label' => 'Property & Summary',      'tpl' => 'group-property.tpl'),
+    private static $reports = array(
+        'reservation'      => array('label' => 'Reservations',         'tpl' => 'group-bookings.tpl'),
+        'arrivals'         => array('label' => 'Arrivals',              'tpl' => 'group-bookings.tpl'),
+        'in-house'         => array('label' => 'In-House',              'tpl' => 'group-bookings.tpl'),
+        'departures'       => array('label' => 'Departures',            'tpl' => 'group-bookings.tpl'),
+        'no-show'          => array('label' => 'No-Shows',              'tpl' => 'group-bookings.tpl'),
+        'cancellation'     => array('label' => 'Cancellations',         'tpl' => 'group-bookings.tpl'),
+        'revenue'          => array('label' => 'Revenue',               'tpl' => 'group-revenue.tpl'),
+        'refund'           => array('label' => 'Refunds',               'tpl' => 'group-revenue.tpl'),
+        'payment'          => array('label' => 'Payments',              'tpl' => 'group-revenue.tpl'),
+        'tax'              => array('label' => 'Tax',                   'tpl' => 'group-revenue.tpl'),
+        'outstanding'      => array('label' => 'Outstanding',           'tpl' => 'group-revenue.tpl'),
+        'occupancy'        => array('label' => 'Occupancy',             'tpl' => 'group-occupancy.tpl'),
+        'availability'     => array('label' => 'Availability',          'tpl' => 'group-occupancy.tpl'),
+        'room-status'      => array('label' => 'Room Status',           'tpl' => 'group-occupancy.tpl'),
+        'room-perf'        => array('label' => 'Room Type Performance', 'tpl' => 'group-occupancy.tpl'),
+        'source'           => array('label' => 'Booking Source',        'tpl' => 'group-channels.tpl'),
+        'payment-method'   => array('label' => 'Payment Methods',       'tpl' => 'group-channels.tpl'),
+        'services'         => array('label' => 'Services',              'tpl' => 'group-guests.tpl'),
+        'guest-directory'  => array('label' => 'Guest Directory',       'tpl' => 'group-guests.tpl'),
+        'daily-summary'    => array('label' => 'Daily Summary',         'tpl' => 'group-property.tpl'),
+        'hotel-comparison' => array('label' => 'Hotel Comparison',      'tpl' => 'group-property.tpl'),
+        'out-of-order'     => array('label' => 'Out of Order Rooms',    'tpl' => 'group-property.tpl'),
     );
 
     public function __construct()
@@ -75,14 +92,11 @@ class QloHotelReports extends Module
      */
     public function getStatsTabs()
     {
-        return array(
-            array('key' => 'bookings',  'label' => $this->l('Bookings')),
-            array('key' => 'revenue',   'label' => $this->l('Revenue & Finance')),
-            array('key' => 'occupancy', 'label' => $this->l('Occupancy & Availability')),
-            array('key' => 'channels',  'label' => $this->l('Channels')),
-            array('key' => 'guests',    'label' => $this->l('Guests & Services')),
-            array('key' => 'property',  'label' => $this->l('Property & Summary')),
-        );
+        $tabs = array();
+        foreach (self::$reports as $key => $config) {
+            $tabs[] = array('key' => $key, 'label' => $this->l($config['label']));
+        }
+        return $tabs;
     }
 
     public function hookActionAdminControllerSetMedia()
@@ -95,9 +109,9 @@ class QloHotelReports extends Module
 
     public function hookAdminStatsModules($params)
     {
-        $reportGroup = Tools::getValue('tab', self::REPORT_GROUP_DEFAULT);
-        if (!array_key_exists($reportGroup, self::$reportGroups)) {
-            $reportGroup = self::REPORT_GROUP_DEFAULT;
+        $report = Tools::getValue('tab', self::REPORT_DEFAULT);
+        if (!array_key_exists($report, self::$reports)) {
+            $report = self::REPORT_DEFAULT;
         }
 
         $dateFrom = $this->context->employee->stats_date_from;
@@ -108,18 +122,22 @@ class QloHotelReports extends Module
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
 
         if (Tools::getValue('export')) {
-            if ($reportGroup === 'bookings') {
-                $this->exportBookingsCsv($dateFrom, $dateTo, $idHotel, Tools::getValue('report', 'reservation'));
-            } elseif ($reportGroup === 'revenue') {
-                $this->exportRevenueCsv($dateFrom, $dateTo, $idHotel, (int) Tools::getValue('id_product', 0));
-            } elseif ($reportGroup === 'occupancy') {
-                $this->exportOccupancyCsv($dateFrom, $dateTo, $idHotel, $idLang);
-            } elseif ($reportGroup === 'guests') {
-                $this->exportGuestsCsv($dateFrom, $dateTo, $idHotel, Tools::getValue('report', 'services'));
-            } elseif ($reportGroup === 'channels') {
-                $this->exportChannelsCsv($dateFrom, $dateTo, $idHotel, Tools::getValue('report', 'source'));
-            } elseif ($reportGroup === 'property') {
-                $this->exportPropertyCsv($dateFrom, $dateTo, $idHotel, $idLang, Tools::getValue('report', 'daily-summary'));
+            $bookingReports  = array('reservation', 'arrivals', 'departures', 'in-house', 'no-show', 'cancellation');
+            $revenueReports  = array('revenue', 'refund', 'payment', 'tax', 'outstanding');
+            $occupancyReports = array('occupancy', 'availability', 'room-status', 'room-perf');
+
+            if (in_array($report, $bookingReports)) {
+                $this->exportBookingsCsv($dateFrom, $dateTo, $idHotel, $report);
+            } elseif (in_array($report, $revenueReports)) {
+                $this->exportRevenueCsv($dateFrom, $dateTo, $idHotel, (int) Tools::getValue('id_product', 0), $report);
+            } elseif (in_array($report, $occupancyReports)) {
+                $this->exportOccupancyCsv($dateFrom, $dateTo, $idHotel, $idLang, $report);
+            } elseif ($report === 'services' || $report === 'guest-directory') {
+                $this->exportGuestsCsv($dateFrom, $dateTo, $idHotel, $report);
+            } elseif ($report === 'source' || $report === 'payment-method') {
+                $this->exportChannelsCsv($dateFrom, $dateTo, $idHotel, $report);
+            } else {
+                $this->exportPropertyCsv($dateFrom, $dateTo, $idHotel, $idLang, $report);
             }
             return '';
         }
@@ -127,7 +145,8 @@ class QloHotelReports extends Module
         $baseUrl = $this->context->link->getAdminLink('AdminStats') . '&module=' . $this->name;
 
         $this->context->smarty->assign(array(
-            'report_group'   => $reportGroup,
+            'active_report'  => $report,
+            'report_label'   => $this->l(self::$reports[$report]['label']),
             'date_from'      => $dateFrom,
             'date_to'        => $dateTo,
             'hotels'         => $hotels,
@@ -135,31 +154,19 @@ class QloHotelReports extends Module
             'currency_sign'  => $currency->sign,
             'currency_iso'   => $currency->iso_code,
             'group_tpl_path' => _PS_MODULE_DIR_ . $this->name . '/views/templates/hook/'
-                . self::$reportGroups[$reportGroup]['tpl'],
+                . self::$reports[$report]['tpl'],
         ));
 
-        if ($reportGroup === 'bookings') {
-            $report      = Tools::getValue('report', 'reservation');
+        if (in_array($report, array('reservation', 'arrivals', 'in-house', 'departures', 'no-show', 'cancellation'))) {
             $idProduct   = (int) Tools::getValue('id_product', 0);
             $idStatus    = (int) Tools::getValue('booking_status', 0);
             $bookingType = (int) Tools::getValue('booking_type', 0);
 
-            $filterBaseUrl = $baseUrl . '&tab=bookings'
+            $filterBaseUrl = $baseUrl . '&tab=' . $report
                 . ($idHotel ? '&id_hotel=' . $idHotel : '')
                 . ($idProduct ? '&id_product=' . $idProduct : '');
 
-            $bookingSubReports = array(
-                'reservation'  => $this->l('Reservations'),
-                'arrivals'     => $this->l('Arrivals'),
-                'in-house'     => $this->l('In-House'),
-                'departures'   => $this->l('Departures'),
-                'no-show'      => $this->l('No-Shows'),
-                'cancellation' => $this->l('Cancellations'),
-            );
-
             $this->context->smarty->assign(array(
-                'booking_sub_reports'   => $bookingSubReports,
-                'active_report'         => $report,
                 'room_types'            => HotelRoomInformation::getRoomTypes(array(
                     'id_hotel' => $idHotel,
                     'id_lang'  => $idLang,
@@ -178,7 +185,6 @@ class QloHotelReports extends Module
                 ),
                 'filter_base_url'       => $filterBaseUrl,
                 'export_url'            => $filterBaseUrl
-                    . '&report=' . $report
                     . '&id_product=' . $idProduct
                     . '&booking_status=' . $idStatus
                     . '&booking_type=' . $bookingType
@@ -195,7 +201,7 @@ class QloHotelReports extends Module
                     'id_product'   => $idProduct,
                     'id_status'    => $idStatus,
                     'booking_type' => $bookingType,
-                ));
+                ))  ;
                 $this->attachCurrencyToRows($reservations, $currencyMap, $currency->sign, $currency->iso_code);
 
                 $totals = array('nights' => 0, 'adults' => 0, 'children' => 0,
@@ -334,8 +340,7 @@ class QloHotelReports extends Module
             }
         }
 
-        if ($reportGroup === 'revenue') {
-            $report            = Tools::getValue('report', 'revenue');
+        if (in_array($report, array('revenue', 'refund', 'payment', 'tax', 'outstanding'))) {
             $idProduct         = (int) Tools::getValue('id_product', 0);
             $refundStatus      = (int) Tools::getValue('refund_status', 0);
             $outstandingStatus = (int) Tools::getValue('outstanding_status', 0);
@@ -345,17 +350,9 @@ class QloHotelReports extends Module
             if (!in_array($revenueSource, array('room', 'service', 'all'))) {
                 $revenueSource = 'room';
             }
-            $filterBaseUrl = $baseUrl . '&tab=revenue'
+            $filterBaseUrl = $baseUrl . '&tab=' . $report
                 . ($idHotel ? '&id_hotel=' . $idHotel : '')
                 . ($idProduct ? '&id_product=' . $idProduct : '');
-
-            $revenueSubReports = array(
-                'revenue'     => $this->l('Revenue'),
-                'refund'      => $this->l('Refunds'),
-                'payment'     => $this->l('Payments'),
-                'tax'         => $this->l('Tax'),
-                'outstanding' => $this->l('Outstanding'),
-            );
 
             $baseParams = array(
                 'date_from'  => $dateFrom,
@@ -365,8 +362,6 @@ class QloHotelReports extends Module
             );
 
             $this->context->smarty->assign(array(
-                'revenue_sub_reports'       => $revenueSubReports,
-                'active_report'             => $report,
                 'filter_id_product'         => $idProduct,
                 'filter_refund_status'      => $refundStatus,
                 'filter_outstanding_status' => $outstandingStatus,
@@ -392,7 +387,6 @@ class QloHotelReports extends Module
                 )),
                 'filter_base_url'           => $filterBaseUrl,
                 'export_url'             => $filterBaseUrl
-                    . '&report=' . $report
                     . '&id_product=' . $idProduct
                     . ($report === 'refund'       && $refundStatus      ? '&refund_status='      . $refundStatus                  : '')
                     . ($report === 'outstanding'  && $outstandingStatus ? '&outstanding_status=' . $outstandingStatus              : '')
@@ -566,20 +560,13 @@ class QloHotelReports extends Module
             }
         }
 
-        if ($reportGroup === 'occupancy') {
-            $report        = Tools::getValue('report', 'occupancy');
+        if (in_array($report, array('occupancy', 'availability', 'room-status', 'room-perf'))) {
             $idProduct     = (int) Tools::getValue('id_product', 0);
             $floor         = pSQL(Tools::getValue('floor', ''));
-            $filterBaseUrl = $baseUrl . '&tab=occupancy'
+            $filterBaseUrl = $baseUrl . '&tab=' . $report
                 . ($idHotel   ? '&id_hotel='   . $idHotel   : '')
                 . ($idProduct ? '&id_product=' . $idProduct : '');
 
-            $occupancySubReports = array(   
-                'occupancy'    => $this->l('Occupancy'),
-                'availability' => $this->l('Availability'),
-                'room-status'  => $this->l('Room Status'),
-                'room-perf'    => $this->l('Room Type Performance'),
-            );
 
             $baseParams = array(
                 'date_from'  => $dateFrom,
@@ -589,8 +576,6 @@ class QloHotelReports extends Module
             );
 
             $this->context->smarty->assign(array(
-                'occupancy_sub_reports' => $occupancySubReports,
-                'active_report'         => $report,
                 'filter_id_product'     => $idProduct,
                 'filter_floor'          => $floor,
                 'available_floors'      => HotelRoomInformation::getDistinctFloors(array(
@@ -607,7 +592,6 @@ class QloHotelReports extends Module
                 ),
                 'filter_base_url'       => $filterBaseUrl,
                 'export_url'            => $filterBaseUrl
-                    . '&report=' . $report
                     . '&id_product=' . $idProduct
                     . ($floor ? '&floor=' . urlencode($floor) : '')
                     . '&export=1',
@@ -687,19 +671,14 @@ class QloHotelReports extends Module
             }
         }
 
-        if ($reportGroup === 'guests') {
-            $report           = Tools::getValue('report', 'services');
+        if ($report === 'services' || $report === 'guest-directory') {
             $guestType        = pSQL(Tools::getValue('guest_type', ''));
             $idCategory       = (int) Tools::getValue('id_category', 0);
             $idServiceProduct = (int) Tools::getValue('id_service_product', 0);
-            $filterBaseUrl    = $baseUrl . '&tab=guests'
+            $filterBaseUrl    = $baseUrl . '&tab=' . $report
                 . ($idHotel         ? '&id_hotel='          . $idHotel         : '')
                 . ($guestType       ? '&guest_type='        . urlencode($guestType) : '');
 
-            $guestSubReports = array(
-                'services'        => $this->l('Services'),
-                'guest-directory' => $this->l('Guest Directory'),
-            );
 
             $baseParams = array(
                 'date_from' => $dateFrom,
@@ -709,8 +688,6 @@ class QloHotelReports extends Module
             );
 
             $this->context->smarty->assign(array(
-                'guest_sub_reports'     => $guestSubReports,
-                'active_report'         => $report,
                 'filter_base_url'       => $filterBaseUrl,
                 'filter_guest_type'     => $guestType,
                 'filter_id_category'    => $idCategory,
@@ -718,7 +695,6 @@ class QloHotelReports extends Module
                 'service_categories'    => ServiceProductOrderDetail::getServiceCategories($idLang),
                 'service_products'      => ServiceProductOrderDetail::getServiceProducts($idLang, $idCategory),
                 'export_url'            => $filterBaseUrl
-                    . '&report=' . $report
                     . ($report === 'services' && $idCategory       ? '&id_category='        . $idCategory                    : '')
                     . ($report === 'services' && $idServiceProduct ? '&id_service_product=' . $idServiceProduct              : '')
                     . ($report === 'guest-directory' && $guestType ? '&guest_type='         . urlencode($guestType)          : '')
@@ -763,17 +739,12 @@ class QloHotelReports extends Module
             }
         }
 
-        if ($reportGroup === 'channels') {
-            $report      = Tools::getValue('report', 'source');
+        if ($report === 'source' || $report === 'payment-method') {
             $bookingType = (int) Tools::getValue('booking_type', 0);
-            $filterBaseUrl = $baseUrl . '&tab=channels'
+            $filterBaseUrl = $baseUrl . '&tab=' . $report
                 . ($idHotel    ? '&id_hotel='    . $idHotel    : '')
                 . ($bookingType ? '&booking_type=' . $bookingType : '');
 
-            $channelSubReports = array(
-                'source'         => $this->l('Booking Source'),
-                'payment-method' => $this->l('Payment Methods'),
-            );
 
             $baseParams = array(
                 'date_from'    => $dateFrom,
@@ -783,11 +754,9 @@ class QloHotelReports extends Module
             );
 
             $this->context->smarty->assign(array(
-                'channel_sub_reports' => $channelSubReports,
-                'active_report'       => $report,
                 'filter_base_url'     => $filterBaseUrl,
                 'filter_booking_type' => $bookingType,
-                'export_url'          => $filterBaseUrl . '&report=' . $report . '&export=1',
+                'export_url'          => $filterBaseUrl . '&export=1',
             ));
 
             if ($report === 'source') {
@@ -828,19 +797,13 @@ class QloHotelReports extends Module
             }
         }
 
-        if ($reportGroup === 'property') {
-            $report    = Tools::getValue('report', 'daily-summary');
+        if (in_array($report, array('daily-summary', 'hotel-comparison', 'out-of-order'))) {
             $idProduct = (int) Tools::getValue('id_product', 0);
             $floor     = pSQL(Tools::getValue('floor', ''));
-            $filterBaseUrl = $baseUrl . '&tab=property'
+            $filterBaseUrl = $baseUrl . '&tab=' . $report
                 . ($idHotel    ? '&id_hotel='   . $idHotel    : '')
                 . ($idProduct  ? '&id_product=' . $idProduct  : '');
 
-            $propertySubReports = array(
-                'daily-summary'    => $this->l('Daily Summary'),
-                'hotel-comparison' => $this->l('Hotel Comparison'),
-                'out-of-order'     => $this->l('Out of Order Rooms'),
-            );
 
             $baseParams = array(
                 'date_from'  => $dateFrom,
@@ -850,8 +813,6 @@ class QloHotelReports extends Module
             );
 
             $this->context->smarty->assign(array(
-                'property_sub_reports' => $propertySubReports,
-                'active_report'        => $report,
                 'filter_base_url'      => $filterBaseUrl,
                 'filter_id_product'    => $idProduct,
                 'filter_floor'         => $floor,
@@ -868,7 +829,6 @@ class QloHotelReports extends Module
                     HotelRoomInformation::STATUS_TEMPORARY_INACTIVE => array('label' => $this->l('Under Maintenance'), 'class' => 'label-warning'),
                 ),
                 'export_url'           => $filterBaseUrl
-                    . '&report=' . $report
                     . ($floor ? '&floor=' . urlencode($floor) : '')
                     . '&export=1',
             ));
@@ -1014,7 +974,7 @@ class QloHotelReports extends Module
             foreach ($rows as $row) {
                 fputcsv($out, array(
                     $row['id_order'], $row['customer_name'],
-                    $row['room_type_name'], $row['room_num'], $row['date_from'],
+                    $row['room_type_name'], $row['room_num'], $row['actual_checkin'],
                     number_format((float) $row['total_price_tax_incl'], 2, '.', ''),
                     '',
                     $row['currency_iso'],
@@ -1061,8 +1021,8 @@ class QloHotelReports extends Module
             foreach ($rows as $row) {
                 fputcsv($out, array(
                     $row['id_order'], $row['customer_name'], $row['hotel_name'],
-                    $row['room_type_name'], $row['room_num'], $row['date_from'],
-                    $row['date_to'], $row['los'], $row['adults'], $row['children'],
+                    $row['room_type_name'], $row['room_num'], $row['actual_checkin'],
+                    $row['actual_checkout'], $row['los'], $row['adults'], $row['children'],
                     $row['total_price_tax_incl'],
                     isset($statusLabels[$row['id_status']]) ? $statusLabels[$row['id_status']] : $row['id_status'],
                     $row['currency_iso'],
@@ -1092,8 +1052,8 @@ class QloHotelReports extends Module
             foreach ($rows as $row) {
                 fputcsv($out, array(
                     $row['id_order'], $row['customer_name'], $row['hotel_name'],
-                    $row['room_type_name'], $row['room_num'], $row['date_from'],
-                    $row['date_to'], $row['los'], $row['adults'],
+                    $row['room_type_name'], $row['room_num'], $row['actual_checkin'],
+                    $row['actual_checkout'], $row['los'], $row['adults'],
                     $row['children'], $row['total_price_tax_incl'], $row['currency_iso'],
                 ));
             }
@@ -1133,7 +1093,7 @@ class QloHotelReports extends Module
                     $row['customer_name'],
                     $row['room_type_name'],
                     $row['room_num'],
-                    $row['date_from'],
+                    $row['hotel_check_in'],
                     isset($row['cancellation_date']) ? $row['cancellation_date'] : '',
                     isset($row['cancellation_reason']) ? $row['cancellation_reason'] : '',
                     '',
@@ -1208,8 +1168,8 @@ class QloHotelReports extends Module
                     isset($row['phone']) ? $row['phone'] : '',
                     $row['room_type_name'],
                     $row['room_num'],
-                    $row['date_from'],
-                    $row['date_to'],
+                    $row['hotel_check_in'],
+                    $row['hotel_check_out'],
                     $row['nights'],
                     $row['adults'],
                     $row['children'],
@@ -1235,9 +1195,8 @@ class QloHotelReports extends Module
     /**
      * Stream CSV for a Revenue & Finance sub-report and exit.
      */
-    private function exportRevenueCsv($dateFrom, $dateTo, $idHotel, $idProduct)
+    private function exportRevenueCsv($dateFrom, $dateTo, $idHotel, $idProduct, $report)
     {
-        $report      = Tools::getValue('report', 'revenue');
         $currencyIso = (new Currency(Configuration::get('PS_CURRENCY_DEFAULT')))->iso_code;
         $baseParams  = array(
             'date_from'  => $dateFrom,
@@ -1460,9 +1419,8 @@ class QloHotelReports extends Module
     /**
      * Stream CSV for an Occupancy sub-report and exit.
      */
-    private function exportOccupancyCsv($dateFrom, $dateTo, $idHotel, $idLang)
+    private function exportOccupancyCsv($dateFrom, $dateTo, $idHotel, $idLang, $report)
     {
-        $report      = Tools::getValue('report', 'occupancy');
         $currencyIso = (new Currency(Configuration::get('PS_CURRENCY_DEFAULT')))->iso_code;
         $idProduct   = (int) Tools::getValue('id_product', 0);
         $baseParams  = array(
