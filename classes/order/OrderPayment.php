@@ -160,7 +160,6 @@ class OrderPaymentCore extends ObjectModel
         return Db::getInstance()->getValue('SELECT (SUM(`amount` * `conversion_rate`) / SUM(`amount`)) FROM `'._DB_PREFIX_.'order_payment` WHERE `order_reference` = \''.pSQL($order_reference).'\' AND `id_currency` = '.(int)$idCurrency);
     }
 
-
     /**
      * Per-payment rows for a date range. One row per order_payment entry.
      * Used by payment report — returns full detail including customer, currency, transaction ID.
