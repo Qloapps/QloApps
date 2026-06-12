@@ -21,4 +21,22 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-require(dirname(__FILE__).'/vendor/autoload.php');
+define('_PS_ROOT_DIR_', dirname(__DIR__));
+
+// Load all QloApps path constants (_PS_CLASS_DIR_, _PS_CONFIG_DIR_, etc.)
+require_once dirname(__DIR__) . '/config/defines.inc.php';
+
+// DB constants not in defines.inc.php (normally set by settings.inc.php)
+if (!defined('_DB_PREFIX_'))        define('_DB_PREFIX_', 'ps_');
+if (!defined('_PS_USE_SQL_SLAVE_')) define('_PS_USE_SQL_SLAVE_', 1);
+
+// Composer autoloader (PHPUnit and its dependencies)
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+// Stubs for classes that require a live DB, config secrets, or heavy dependencies.
+// Registered BEFORE the QloApps autoloader so stubs shadow the real classes.
+require_once __DIR__ . '/Unit/stubs/CoreStubs.php';
+
+// QloApps class autoloader — loads real classes not covered by stubs above.
+// pSQL/bqSQL are defined here via config/alias.php.
+require_once dirname(__DIR__) . '/config/autoload.php';

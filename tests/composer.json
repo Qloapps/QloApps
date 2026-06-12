@@ -1,9 +1,0 @@
-{
-    "name": "qloapps/qloapps-unit-tests",
-    "description": "Unit tests for Qloapps Download",
-    "license": "OSL",
-    "require": {
-        "phpunit/phpunit": "~4.5",
-        "phake/phake": "@stable"
-    }
-}

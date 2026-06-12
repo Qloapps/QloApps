@@ -1,7 +1,22 @@
-<phpunit bootstrap="bootstrap.php">
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+    bootstrap="bootstrap.php"
+    failOnEmptyTestSuite="false"
+    failOnRisky="true"
+    failOnWarning="true"
+    beStrictAboutTestsThatDoNotTestAnything="true"
+    beStrictAboutOutputDuringTests="true"
+>
     <testsuites>
         <testsuite name="Unit">
             <directory>Unit</directory>
         </testsuite>
     </testsuites>
+
+    <source>
+        <include>
+            <directory suffix=".php">../classes</directory>
+        </include>
+    </source>
 </phpunit>
