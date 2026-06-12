@@ -5861,19 +5861,18 @@ class AdminOrdersControllerCore extends AdminController
             $objOrderHistory->add();
         } else {
             $currentOrderState = $objOrder->getCurrentOrderState();
-            if ($currentOrderState->paid == 1) {
-                $psOsPartialPaymentAccepted = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-                $psOSPaymentComplete = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
-
-                if ($currentOrderState->id == $psOSPaymentComplete && $objOrder->module == 'free_order') {
-                    $targetState = Configuration::get('PS_OS_AWAITING_PAYMENT');
-                } elseif ($currentOrderState->id != $psOsPartialPaymentAccepted) {
-                    $targetState = $psOsPartialPaymentAccepted;
-                }
-                 
+            if ($currentOrderState->paid == 1) {                 
                 // calculate due amount
                 $dueAmount = $objOrder->total_paid_tax_incl - $objOrder->total_paid_real;
                 if ($dueAmount > 0) {
+                    $psOsPartialPaymentAccepted = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                    $psOSPaymentComplete = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+
+                    if ($currentOrderState->id == $psOSPaymentComplete && $objOrder->total_paid_real == 0) {
+                        $targetState = Configuration::get('PS_OS_AWAITING_PAYMENT');
+                    } elseif ($currentOrderState->id != $psOsPartialPaymentAccepted) {
+                        $targetState = $psOsPartialPaymentAccepted;
+                    }
                     $objOrderHistory = new OrderHistory();
                     $objOrderHistory->id_order = $objOrder->id;
                     $objOrderHistory->id_employee = (int) $this->context->employee->id;
