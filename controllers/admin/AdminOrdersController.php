@@ -72,8 +72,7 @@ class AdminOrdersControllerCore extends AdminController
         ) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests,
         (SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as los,
         hbd.`id_room` AS id_room_information,
-        (SELECT GROUP_CONCAT(DISTINCT hbd.`date_from` ORDER BY hbd.`date_from` SEPARATOR \', \') FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) AS date_from,
-        (SELECT GROUP_CONCAT(DISTINCT hbd.`date_to` ORDER BY hbd.`date_to` SEPARATOR \', \') FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) AS date_to,
+        (SELECT GROUP_CONCAT(CONCAT(ps.period, \'~\', ps.cnt) ORDER BY ps.period SEPARATOR \'::\') FROM (SELECT CONCAT(hbd.`date_from`, \'|\', hbd.`date_to`) AS period, COUNT(*) AS cnt FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order` GROUP BY hbd.`date_from`, hbd.`date_to`) AS ps) AS stay_periods,
         (SELECT COUNT(spod.`id_service_product_order_detail`) FROM `'._DB_PREFIX_.'service_product_order_detail` spod WHERE spod.`id_order` = a.`id_order` AND spod.`id_htl_booking_detail`=0) as num_products';
 
         $this->_join = '
@@ -187,19 +186,23 @@ class AdminOrdersControllerCore extends AdminController
                 'displayed' => false,
             ),
             'date_from' => array(
-                'title' => $this->l('Check-in date'),
+                'title' => $this->l('Check-in'),
                 'filter_key' => 'hbd!date_from',
-                'type' => 'date',
-                'callback' => 'formatCheckInDates',
-                'optional' => true,
-                'displayed' => true,
+                'type'=>'date',
+                'displayed' => false,
             ),
             'date_to' => array(
-                'title' => $this->l('Check-out date'),
+                'title' => $this->l('Check-out'),
                 'filter_key' => 'hbd!date_to',
                 'type'=>'date',
-                 'callback' => 'formatCheckOutDates',
+                'displayed' => false,
+            ),
+            'stay_periods' => array(
+                'title' => $this->l('Stay Periods'),
+                'type' => 'text',
+                'callback' => 'formatStayPeriods',
                 'optional' => true,
+                'search' => false,
                 'displayed' => true,
             ),
             'total_guests' => array(
@@ -365,28 +368,33 @@ class AdminOrdersControllerCore extends AdminController
         return Tools::displayPrice($echo, (int)$idCurrency);
     }
 
-    public function formatCheckInDates($dates, $row)
+    public function formatStayPeriods($value, $row)
     {
-        if (empty($dates)) {
+        if (empty($value)) {
             return '--';
         }
         $formatted = array();
-        foreach (explode(', ', $dates) as $date) {
-            $formatted[] = Tools::displayDate(trim($date));
+        foreach (explode('::', $value) as $chunk) {
+            $countParts = explode('~', $chunk);
+            $dateParts  = explode('|', $countParts[0]);
+            if (count($dateParts) === 2) {
+                $formatted[] = array(
+                    'from'  => Tools::displayDate(trim($dateParts[0])),
+                    'to'    => Tools::displayDate(trim($dateParts[1])),
+                    'count' => isset($countParts[1]) ? (int)$countParts[1] : 1,
+                );
+            }
         }
-        return implode(', ', $formatted);
-    }
 
-    public function formatCheckOutDates($dates, $row)
-    {
-        if (empty($dates)) {
-            return '--';
+        $datesDisplay = array();
+        foreach (array_slice($formatted, 0, 2) as $entry) {
+            $datesDisplay[] = $entry['from'].' - '.$entry['to'];
         }
-        $formatted = array();
-        foreach (explode(', ', $dates) as $date) {
-            $formatted[] = Tools::displayDate(trim($date));
-        }
-        return implode(', ', $formatted);
+
+        $icon = ' <i class="icon-info-sign stay-period-tip" data-stay-tip="'
+            .htmlspecialchars(json_encode($formatted)).'"></i>';
+
+        return implode('<br>', $datesDisplay).$icon;
     }
 
     public function initPageHeaderToolbar()
@@ -1312,7 +1320,12 @@ class AdminOrdersControllerCore extends AdminController
         parent::setMedia();
 
         $this->addJqueryUI('ui.datepicker');
+        $this->addJqueryUI('ui.tooltip', 'base', true);
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
+
+        if ($this->display != 'view') {
+            $this->addJS(_PS_JS_DIR_.'admin/orders_stay_periods.js');
+        }
 
         if ($this->display == 'view') {
             if ($this->loadObject()) {
@@ -1424,6 +1437,8 @@ class AdminOrdersControllerCore extends AdminController
         $this->tpl_list_vars['title'] = $this->l('Orders');
 
         $this->_new_list_header_design = true;
+
+        $this->content .= $this->context->smarty->fetch('controllers/orders/_stay_periods_tooltip.tpl');
 
         return parent::renderList();
     }
