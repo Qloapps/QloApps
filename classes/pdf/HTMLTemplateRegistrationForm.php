@@ -49,11 +49,10 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
      */
     public function getHeader()
     {
-        if ((bool)Configuration::get('QLO_GUEST_REG_ENABLE_HEADER')) {
-            return parent::getHeader();
-        }
+        $this->assignCommonHeaderData();
+        $this->smarty->assign(array('header' => self::l('Guest Registration Card')));
 
-        return '';
+        return $this->smarty->fetch($this->getTemplate('header'));
     }
 
     /**
@@ -84,18 +83,6 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
             }
         }
 
-        // Property logo: hotel image first, then shop logo
-        $propertyLogoPath = '';
-        if ($idHotel && ($cover = HotelImage::getCover($idHotel))) {
-            $imgPath = rtrim(_PS_HOTEL_IMG_DIR_, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.(int)$idHotel.DIRECTORY_SEPARATOR.(int)$cover['id'].'.jpg';
-            if (file_exists($imgPath)) {
-                $propertyLogoPath = $imgPath;
-            }
-        }
-        if (!$propertyLogoPath) {
-            $propertyLogoPath = (string)$this->getLogo();
-        }
-
         $ratePerNight = '';
         $arrivalDateTime = '';
         $departureDateTime = '';
@@ -118,46 +105,39 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
 
         // Additional guests rows based on max_guests of the room type
         $additionalGuestsRows = 0;
-        if (Validate::isLoadedObject($hotelBookingDetail) && $hotelBookingDetail->id_product) {
-            $roomTypeDetails = (new HotelRoomType())->getRoomTypeDetailByRoomTypeIds((string)(int)$hotelBookingDetail->id_product, false);
-            if (!empty($roomTypeDetails) && isset($roomTypeDetails[0]['max_guests'])) {
-                $maxGuests = (int)$roomTypeDetails[0]['max_guests'];
-                $additionalGuestsRows = ($maxGuests > 1) ? ($maxGuests - 1) : 0;
+        if (Validate::isLoadedObject($hotelBookingDetail)) {
+            $totalGuests = (int)$hotelBookingDetail->adults + (int)$hotelBookingDetail->children;
+            $additionalGuestsRows = ($totalGuests > 1) ? ($totalGuests - 1) : 0;
+        }
+        
+        $guestRegCardFields = array();
+        $guestRegCardInfoJson = Configuration::get('QLO_GUEST_REGISTRATION_CARD_INFO');
+        if ($guestRegCardInfoJson !== false && $guestRegCardInfoJson !== '') {
+            $decoded = Tools::jsonDecode($guestRegCardInfoJson, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $sectionId => $fieldIds) {
+                    $fieldIds = array_map('intval', (array)$fieldIds);
+                    if (!empty($fieldIds)) {
+                        $guestRegCardFields[(int)$sectionId] = array_flip($fieldIds);
+                    }
+                }
             }
         }
 
-        // Optional sections
-        $sectionsValue = Configuration::get('QLO_GUEST_REG_OPTIONAL_SECTIONS');
-        if ($sectionsValue === false || $sectionsValue === '') {
-            $selectedSections = array(1, 2, 3, 4, 5, 6);
-        } else {
-            $decoded = Tools::jsonDecode($sectionsValue, true);
-            $selectedSections = is_array($decoded) ? array_map('intval', $decoded) : array();
-        }
-
         $this->smarty->assign(array(
-            'style_tab'                      => $this->smarty->fetch($this->getTemplate('invoice.style-tab')),
-            'hotel'                          => $objHotelBranchInformation,
-            'property_logo_path'             => $propertyLogoPath,
-            'property_city_country'          => implode(', ', array_filter(array($objHotelBranchInformation ? (string)$objHotelBranchInformation->city : '', $hotelCountry))),
-            'booking_reference'              => $this->order->getUniqReference(),
-            'arrival_date_time'              => $arrivalDateTime,
-            'departure_date_time'            => $departureDateTime,
-            'room_type'                      => Validate::isLoadedObject($hotelBookingDetail) ? $hotelBookingDetail->room_type_name : '',
-            'room_number'                    => Validate::isLoadedObject($hotelBookingDetail) ? $hotelBookingDetail->room_num : '',
-            'adults'                         => Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->adults : 0,
-            'children'                       => Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->children : 0,
-            'rate_per_night'                 => $ratePerNight,
-            'additional_guests_rows'         => $additionalGuestsRows,
-            'purpose_of_visit_options'       => GuestVisitPurpose::getGuestVisitPurposes(1, $idLang),
-            'identity_proof_options'         => IdProof::getRegistrationIdProofs(1, $idLang),
-            'payment_method_options'         => GuestRegistrationPaymentMethod::getRegistrationPaymentMethods(1, $idLang),
-            'show_property_logo'             => in_array(1, $selectedSections),
-            'show_additional_guests'         => in_array(2, $selectedSections),
-            'show_billing_corporate_details' => in_array(3, $selectedSections),
-            'show_payment_deposit'           => in_array(4, $selectedSections),
-            'show_property_regulations'      => in_array(5, $selectedSections),
-            'show_office_use_only'           => in_array(6, $selectedSections),
+            'style_tab'              => $this->smarty->fetch($this->getTemplate('invoice.style-tab')),
+            'hotel'                  => $objHotelBranchInformation,
+            'hotel_country'          => $hotelCountry,
+            'booking_reference'      => $this->order->getUniqReference(),
+            'arrival_date_time'      => $arrivalDateTime,
+            'departure_date_time'    => $departureDateTime,
+            'room_type'              => Validate::isLoadedObject($hotelBookingDetail) ? $hotelBookingDetail->room_type_name : '',
+            'room_number'            => Validate::isLoadedObject($hotelBookingDetail) ? $hotelBookingDetail->room_num : '',
+            'adults'                 => Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->adults : 0,
+            'children'               => Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->children : 0,
+            'rate_per_night'         => $ratePerNight,
+            'additional_guests_rows' => $additionalGuestsRows,
+            'guest_reg_card_fields'             => $guestRegCardFields,
         ));
 
         return $this->smarty->fetch($this->getTemplate('registration-form'));
