@@ -668,10 +668,13 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         $refundStatus = $this->l('Approved/Refunded');
                     }
 
+                    $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$objOrder->id);
+                    $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                     PrestaShopLogger::addLog(
                         sprintf(
-                            $this->l('[%s] Refund request #%s status updated to %s'),
+                            $this->l('[%s] Hotel: %s | Refund request #%s status updated to %s'),
                             $objOrder->reference,
+                            $objHotelBranch->hotel_name,
                             $idOrderReturn,
                             $refundStatus
                         ),

@@ -1639,8 +1639,9 @@ class AdminOrdersControllerCore extends AdminController
 	                        $message->save();
                             PrestaShopLogger::addLog(
                                 sprintf(
-                                    $this->l('[%s] Room %s reallocated to Room %s (%s)'),
+                                    $this->l('[%s] Hotel: %s | Room: %s reallocated to Room: %s (%s)'),
                                     $order->reference,
+                                    $objHotelBooking->hotel_name,
                                     $objHotelBooking->room_num,
                                     $objRoomInfo->room_num,
                                     Product::getProductName($idNewRoomType, null, $this->context->language->id)
@@ -1711,9 +1712,11 @@ class AdminOrdersControllerCore extends AdminController
 	                        $message->save();
                             PrestaShopLogger::addLog(
                                 sprintf(
-                                    $this->l('[%s] Room %s swapped with Room %s'),
+                                    $this->l('[%s] Hotel: %s | Room: %s swapped with Hotel: %s | Room: %s'),
                                     $order->reference,
+                                    $objHotelBooking->hotel_name,
                                     $objHotelBooking->room_num,
+                                    $objHotelBookingTo->hotel_name,
                                     $objHotelBookingTo->room_num
                                 ),
                                 1,
@@ -1819,10 +1822,13 @@ class AdminOrdersControllerCore extends AdminController
                 $result = $order->changeOrderStatus();
                 if ($result['status']) {
                     $newOrderState = new OrderState((int)Tools::getValue('id_order_state'));
+                    $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$order->id);
+                    $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                     PrestaShopLogger::addLog(
                         sprintf(
-                            $this->l('[%s] Order status updated to %s'),
+                            $this->l('[%s] Hotel: %s | Order status updated to %s'),
                             $order->reference,
+                            $objHotelBranch->hotel_name,
                             Validate::isLoadedObject($newOrderState) ? $newOrderState->name[(int)$order->id_lang] : Tools::getValue('id_order_state')
                         ),
                         1,
@@ -2078,10 +2084,13 @@ class AdminOrdersControllerCore extends AdminController
 
                 // Redirect if no errors
                 if (!count($this->errors)) {
+                    $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$order->id);
+                    $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                     PrestaShopLogger::addLog(
                         sprintf(
-                            $this->l('[%s] Refund/cancellation request #%s created (reason: %s)'),
+                            $this->l('[%s] Hotel: %s | Refund/cancellation request #%s created (reason: %s)'),
                             $order->reference,
+                            $objHotelBranch->hotel_name,
                             $objOrderReturn->id,
                             $refundReason
                         ),
@@ -2158,10 +2167,13 @@ class AdminOrdersControllerCore extends AdminController
                             $this->errors[] = Tools::displayError('An error occurred during payment.');
                         }
                     } else {
+                        $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$order->id);
+                        $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                         PrestaShopLogger::addLog(
                             sprintf(
-                                $this->l('[%s] Payment of %s %s added via %s'),
+                                $this->l('[%s] Hotel: %s | Payment of %s %s added via %s'),
                                 $order->reference,
+                                $objHotelBranch->hotel_name,
                                 $amount,
                                 $currency->iso_code,
                                 Tools::getValue('payment_method')
@@ -2334,10 +2346,13 @@ class AdminOrdersControllerCore extends AdminController
 
                         if ($objPaymentModule->currentOrder) {
                             $newOrder = new Order((int)$objPaymentModule->currentOrder);
+                            $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$newOrder->id);
+                            $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                             PrestaShopLogger::addLog(
                                 sprintf(
-                                    $this->l('[%s] Order created by admin (payment: %s, amount paid: %s)'),
+                                    $this->l('[%s] Hotel: %s | Order created by admin (payment: %s, amount paid: %s)'),
                                     $newOrder->reference,
+                                    $objHotelBranch->hotel_name,
                                     $objPaymentModule->displayName,
                                     $amountPaid
                                 ),
@@ -2703,10 +2718,13 @@ class AdminOrdersControllerCore extends AdminController
                         );
                         $order->update();
 
+                        $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$order->id);
+                        $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                         PrestaShopLogger::addLog(
                             sprintf(
-                                $this->l('[%s] Voucher %s removed from order'),
+                                $this->l('[%s] Hotel: %s | Voucher %s removed from order'),
                                 $order->reference,
+                                $objHotelBranch->hotel_name,
                                 $order_cart_rule->name
                             ),
                             1,
@@ -2891,10 +2909,13 @@ class AdminOrdersControllerCore extends AdminController
                         }
 
                         if ($res) {
+                            $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$order->id);
+                            $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                             PrestaShopLogger::addLog(
                                 sprintf(
-                                    $this->l('[%s] Voucher %s added to order'),
+                                    $this->l('[%s] Hotel: %s | Voucher %s added to order'),
                                     $order->reference,
+                                    $objHotelBranch->hotel_name,
                                     Tools::getValue('discount_name')
                                 ),
                                 1,
@@ -5546,8 +5567,9 @@ class AdminOrdersControllerCore extends AdminController
                 if ($objBookingDetail->save()) {
                     PrestaShopLogger::addLog(
                         sprintf(
-                            $this->l('[%s] Room %s (%s) added to order (check-in: %s, check-out: %s)'),
+                            $this->l('[%s] Hotel: %s | Room: %s (%s) added to order (check-in: %s, check-out: %s)'),
                             $order->reference,
+                            $objBookingDetail->hotel_name,
                             $objBookingDetail->room_num,
                             $objBookingDetail->room_type_name,
                             date('d M Y', strtotime($objBookingDetail->date_from)),
@@ -5946,10 +5968,13 @@ class AdminOrdersControllerCore extends AdminController
                             $objServiceProductOrderDetail->save();
                         }
 
+                        $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$objOrder->id);
+                        $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                         PrestaShopLogger::addLog(
                             sprintf(
-                                $this->l('[%s] Product %s (qty: %s) added to order'),
+                                $this->l('[%s] Hotel: %s | Product %s (qty: %s) added to order'),
                                 $objOrder->reference,
+                                $objHotelBranch->hotel_name,
                                 $objProduct->name,
                                 $productInformations['product_quantity']
                             ),
@@ -6481,8 +6506,9 @@ class AdminOrdersControllerCore extends AdminController
 
         PrestaShopLogger::addLog(
             sprintf(
-                $this->l('[%s] Room %s details edited: dates %s-%s → %s-%s'),
+                $this->l('[%s] Hotel: %s | Room: %s | dates edited: %s-%s to %s-%s'),
                 $order->reference,
+                $obj_booking_detail->hotel_name,
                 $obj_booking_detail->room_num,
                 date('d M Y', strtotime($old_date_from)),
                 date('d M Y', strtotime($old_date_to)),
@@ -6633,10 +6659,13 @@ class AdminOrdersControllerCore extends AdminController
                 $response['error'] = Tools::displayError('Some error has been occurred while updating the product. Please try again.');
             } else {
                 $this->sendChangedNotification($objOrder);
+                $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$objOrder->id);
+                $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                 PrestaShopLogger::addLog(
                     sprintf(
-                        $this->l('[%s] Product %s updated: qty set to %s, unit price (excl. tax) set to %s'),
+                        $this->l('[%s] Hotel: %s | Product %s updated: qty set to %s, unit price (excl. tax) set to %s'),
                         $objOrder->reference,
+                        $objHotelBranch->hotel_name,
                         $objServiceProductOrderDetail->name,
                         $editProductInfo['product_quantity'],
                         $editProductInfo['product_price_tax_excl']
@@ -7000,8 +7029,9 @@ class AdminOrdersControllerCore extends AdminController
 
         PrestaShopLogger::addLog(
             sprintf(
-                $this->l('[%s] Room %s (%s) removed from order (check-in: %s, check-out: %s)'),
+                $this->l('[%s] Hotel: %s | Room: %s (%s) removed from order (check-in: %s, check-out: %s)'),
                 $order->reference,
+                $objBookingDetail->hotel_name,
                 $objBookingDetail->room_num,
                 $order_detail->product_name,
                 date('d M Y', strtotime($objBookingDetail->date_from)),
@@ -7103,10 +7133,13 @@ class AdminOrdersControllerCore extends AdminController
                 $response['error'] = Tools::displayError('Some error has been occurred while updating the product. Please try again.');
             } else {
                 $this->sendChangedNotification($objOrder);
+                $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$objOrder->id);
+                $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
                 PrestaShopLogger::addLog(
                     sprintf(
-                        $this->l('[%s] Product %s removed from order'),
+                        $this->l('[%s] Hotel: %s | Product %s removed from order'),
                         $objOrder->reference,
+                        $objHotelBranch->hotel_name,
                         $objOrderDetail->product_name
                     ),
                     1,
@@ -7951,8 +7984,10 @@ class AdminOrdersControllerCore extends AdminController
                             if ($result) {
                                 PrestaShopLogger::addLog(
                                     sprintf(
-                                        $this->l('[%s] Room service %s updated (qty: %s, unit price: %s)'),
+                                        $this->l('[%s] Hotel: %s | Room: %s | Service "%s" updated (qty: %s, unit price: %s)'),
                                         $objOrder->reference,
+                                        $objHotelBookingDetail->hotel_name,
+                                        $objHotelBookingDetail->room_num,
                                         $objServiceProductOrderDetail->name,
                                         $objServiceProductOrderDetail->quantity,
                                         $objServiceProductOrderDetail->unit_price_tax_excl
@@ -8201,10 +8236,11 @@ class AdminOrdersControllerCore extends AdminController
                             $objServiceProductOrderDetail->save();
                                 PrestaShopLogger::addLog(
                                     sprintf(
-                                        $this->l('[%s] Service %s added to room %s'),
+                                        $this->l('[%s] Hotel: %s | Room: %s | Service %s added'),
                                         $order->reference,
-                                        $service['name'],
-                                        $objHotelBookingDetail->room_num
+                                        $objHotelBookingDetail->hotel_name,
+                                        $objHotelBookingDetail->room_num,
+                                        $service['name']
                                     ),
                                     1,
                                     null,
@@ -8536,10 +8572,11 @@ class AdminOrdersControllerCore extends AdminController
                                                     );
                                                     PrestaShopLogger::addLog(
                                                         sprintf(
-                                                            $this->l('[%s] New service %s added to room %s'),
+                                                            $this->l('[%s] Hotel: %s | Room: %s | New custom service %s added'),
                                                             $objOrder->reference,
-                                                            $name,
-                                                            $objHotelBookingDetail->room_num
+                                                            $objHotelBookingDetail->hotel_name,
+                                                            $objHotelBookingDetail->room_num,
+                                                            $name
                                                         ),
                                                         1,
                                                         null,
@@ -8696,10 +8733,11 @@ class AdminOrdersControllerCore extends AdminController
                 if ($res) {
                     PrestaShopLogger::addLog(
                         sprintf(
-                            $this->l('[%s] Service %s removed from room %s'),
+                            $this->l('[%s] Hotel: %s | Room: %s | Service %s removed'),
                             $order->reference,
-                            $objServiceProductOrderDetail->name,
-                            $objHotelBookingDetail->room_num
+                            $objHotelBookingDetail->hotel_name,
+                            $objHotelBookingDetail->room_num,
+                            $objServiceProductOrderDetail->name
                         ),
                         1,
                         null,
@@ -9171,8 +9209,9 @@ class AdminOrdersControllerCore extends AdminController
                         $statusLabel = isset($statusLabels[$newStatus]) ? $statusLabels[$newStatus] : $newStatus;
                         PrestaShopLogger::addLog(
                             sprintf(
-                                $this->l('[%s] Room %s status updated to %s'),
+                                $this->l('[%s] Hotel: %s | Room: %s | Status updated to %s'),
                                 $order->reference,
+                                $objHotelBookingDetail->hotel_name,
                                 $objHotelBookingDetail->room_num,
                                 $statusLabel
                             ),
