@@ -152,6 +152,11 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
 
         $modules = $this->getModules();
         $module_instance = array();
+
+        // Collects sub-tabs for modules that expose multiple report pages under one stats entry.
+        // A module opts in by implementing getStatsTabs(), returning: array( ['key' => 'tab_key', 'label' => 'Display Label'], ... )
+        // 'key' becomes the `tab` GET param; the module reads it in hookAdminStatsModules() to render the correct report. 
+        // Modules without getStatsTabs() are unaffected.
         $module_tabs = array();
         foreach ($modules as $m => $module) {
             if ($module_instance[$module['name']] = Module::getInstanceByName($module['name'])) {
@@ -170,11 +175,12 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $tpl->assign(array(
             'current' => self::$currentIndex,
             'current_module_name' => Tools::getValue('module', 'statsforecast'),
-            'current_tab' => Tools::getValue('tab', ''),
+            'current_tab' => Tools::getValue('tab', ''), // active sub-tab key
             'token' => $this->token,
             'modules' => $modules,
             'module_instance' => $module_instance,
             'module_tabs' => $module_tabs,
+            // module_tabs Stores sub-tabs per module: array( 'module_name' => [ ['key'=>'tab_key', 'label'=>'Label'], ... ] )
         ));
 
         return $tpl->fetch();
