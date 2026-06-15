@@ -134,6 +134,9 @@
     <configuration id="PS_INVOICE_PREFIX" name="PS_INVOICE_PREFIX">
       <value>#IN</value>
     </configuration>
+	<configuration id="PS_PAYMENT_RECEIPTS_PREFIX" name="PS_PAYMENT_RECEIPTS_PREFIX">
+      <value>#IN</value>
+    </configuration>
     <configuration id="PS_INVCE_INVOICE_ADDR_RULES" name="PS_INVCE_INVOICE_ADDR_RULES">
       <value>{"avoid":[]}</value>
     </configuration>
@@ -150,6 +153,9 @@
 		<value>#RE</value>
 	</configuration>
 	<configuration id="PS_INVOICE" name="PS_INVOICE">
+		<value>1</value>
+	</configuration>
+	<configuration id="PS_PAYMENT_RECEIPTS" name="PS_PAYMENT_RECEIPTS">
 		<value>1</value>
 	</configuration>
 	<configuration id="PS_PASSWD_TIME_BACK" name="PS_PASSWD_TIME_BACK">
