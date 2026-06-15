@@ -169,7 +169,6 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
             }
         }
 
-        // Allow third-party modules to add, remove, or modify tabs at runtime.
         Hook::exec('actionStatsTabsModifier', array(
             'stats_tabs' => &$statsTabs
         ));
