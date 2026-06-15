@@ -2307,7 +2307,9 @@ class AdminControllerCore extends Controller
             $this->content .= $this->renderDetails();
         } elseif (!$this->ajax) {
             $this->content .= $this->renderModulesList();
-            $this->content .= $this->renderKpis();
+            if ($this->tabAccess['kpi'] === 1) {
+                $this->content .= $this->renderKpis();
+            }
             $this->content .= $this->renderList();
             $this->content .= $this->renderOptions();
 

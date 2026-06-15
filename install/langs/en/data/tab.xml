@@ -32,6 +32,7 @@
   <tab id="Attachments" name="Attachments"/>
   <tab id="Orders_1" name="Orders"/>
   <tab id="Invoices" name="Invoices"/>
+  <tab id="Payment_Receipts" name="Payment Receipts"/>
   <!-- <tab id="Merchandise_Returns" name="Merchandise Returns"/> -->
   <tab id="Delivery_Slips" name="Delivery Slips"/>
   <tab id="Credit_Slips" name="Credit Slips"/>

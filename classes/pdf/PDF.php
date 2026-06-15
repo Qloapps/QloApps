@@ -42,6 +42,7 @@ class PDFCore
     const TEMPLATE_ORDER_SLIP = 'OrderSlip';
     const TEMPLATE_DELIVERY_SLIP = 'DeliverySlip';
     const TEMPLATE_SUPPLY_ORDER_FORM = 'SupplyOrderForm';
+    const TEMPLATE_PAYMENT_RECEIPT = 'PaymentReceipt';
 
     /**
      * @param $objects

@@ -56,7 +56,7 @@ class AdminAccessControllerCore extends AdminController
     {
         $current_profile = (int)$this->getCurrentProfileId();
         $profiles = Profile::getProfiles($this->context->language->id);
-        $tabs = Tab::getTabs($this->context->language->id);
+        $tabs = Tab::getTabs($this->context->language->id, null, true);
         $accesses = array();
         foreach ($profiles as $profile) {
             $accesses[$profile['id_profile']] = Profile::getProfileAccesses($profile['id_profile']);
@@ -214,7 +214,7 @@ class AdminAccessControllerCore extends AdminController
 
         if (Tools::isSubmit('submitAddAccess')) {
             $perm = Tools::getValue('perm');
-            if (!in_array($perm, array('view', 'add', 'edit', 'delete', 'all'))) {
+            if (!in_array($perm, array('view', 'add', 'edit', 'delete', 'all', 'kpi'))) {
                 throw new PrestaShopException('permission does not exist');
             }
 

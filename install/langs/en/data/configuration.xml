@@ -3,6 +3,9 @@
   <configuration id="PS_INVOICE_PREFIX">
     <value>#IN</value>
   </configuration>
+  <configuration id="PS_PAYMENT_RECEIPTS_PREFIX" name="PS_PAYMENT_RECEIPTS_PREFIX">
+    <value>#IN</value>
+  </configuration>
   <configuration id="PS_DELIVERY_PREFIX">
     <value>#DE</value>
   </configuration>
