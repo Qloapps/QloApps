@@ -42,6 +42,22 @@
     <keywords>forgot, password, e-mail, new, reset</keywords>
     <url_rewrite>wachtwoord-opvragen</url_rewrite>
   </meta>
+<!--
+  <meta id='prices-drop' id_shop='1'>
+    <title>Prijsverlaging</title>
+    <description>Onze speciale producten</description>
+    <keywords>special, prices drop</keywords>
+    <url_rewrite>prijs-verlaging</url_rewrite>
+  </meta>
+-->
+<!--
+  <meta id='sitemap' id_shop='1'>
+    <title>Sitemap</title>
+    <description>De weg kwijt? Vinden wat u zoekt</description>
+    <keywords>sitemap</keywords>
+    <url_rewrite>sitemap</url_rewrite>
+  </meta>
+-->
   <meta id='supplier' id_shop='1'>
     <title>Leveranciers</title>
     <description>Lijst met leveranciers</description>
@@ -120,6 +136,22 @@
     <keywords/>
     <url_rewrite>bestelling</url_rewrite>
   </meta>
+<!--
+  <meta id='search' id_shop='1'>
+    <title>Zoeken</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>zoeken</url_rewrite>
+  </meta>
+-->
+<!--
+  <meta id='stores' id_shop='1'>
+    <title>Winkels</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>winkels</url_rewrite>
+  </meta>
+-->
   <meta id='order-opc' id_shop='1'>
     <title>Bestelling</title>
     <description/>
@@ -138,4 +170,12 @@
     <keywords/>
     <url_rewrite>order-bevestiging</url_rewrite>
   </meta>
+<!--
+  <meta id='products-comparison' id_shop='1'>
+    <title>Productvergelijking</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>product-vergelijking</url_rewrite>
+  </meta>
+-->
 </entity_meta>

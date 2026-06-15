@@ -42,6 +42,22 @@
     <keywords/>
     <url_rewrite>password-recovery</url_rewrite>
   </meta>
+<!--
+  <meta id="prices-drop" id_shop="1">
+    <title>کاهش قیمت ها</title>
+    <description>محصولات ویژه ما</description>
+    <keywords/>
+    <url_rewrite>prices-drop</url_rewrite>
+  </meta>
+-->
+<!--
+  <meta id="sitemap" id_shop="1">
+    <title>نقشه سایت</title>
+    <description>گمشده اید؟ آنچه را که به دنبالش هستید پیدا کنید</description>
+    <keywords/>
+    <url_rewrite>sitemap</url_rewrite>
+  </meta>
+-->
   <meta id="supplier" id_shop="1">
     <title>تامین کننده ها</title>
     <description>لیست تامین کننده ها</description>
@@ -126,6 +142,22 @@
     <keywords/>
     <url_rewrite>order</url_rewrite>
   </meta>
+<!--
+  <meta id="search" id_shop="1">
+    <title>جستجو</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>search</url_rewrite>
+  </meta>
+-->
+<!--
+  <meta id="stores" id_shop="1">
+    <title>مغازه‌ها</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>stores</url_rewrite>
+  </meta>
+-->
   <meta id="order-opc" id_shop="1">
     <title>سفارش</title>
     <description/>
@@ -144,4 +176,12 @@
     <keywords/>
     <url_rewrite>order-confirmation</url_rewrite>
   </meta>
+<!--
+  <meta id="products-comparison" id_shop="1">
+    <title>مقایسه محصولات</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>products-comparison</url_rewrite>
+  </meta>
+-->
 </entity_meta>

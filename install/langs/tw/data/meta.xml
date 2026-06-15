@@ -42,6 +42,22 @@
     <keywords>forgot, password, e-mail, new, reset</keywords>
     <url_rewrite>password-recovery</url_rewrite>
   </meta>
+<!--
+  <meta id="prices-drop" id_shop="1">
+    <title>降價</title>
+    <description>我們的特價產品</description>
+    <keywords>special, prices drop</keywords>
+    <url_rewrite>prices-drop</url_rewrite>
+  </meta>
+-->
+<!--
+  <meta id="sitemap" id_shop="1">
+    <title>網站地圖</title>
+    <description>找不到網頁？可以參考這兒</description>
+    <keywords>sitemap</keywords>
+    <url_rewrite>sitemap</url_rewrite>
+  </meta>
+-->
   <meta id="supplier" id_shop="1">
     <title>供應商</title>
     <description>供應商列表</description>
@@ -126,6 +142,22 @@
     <keywords/>
     <url_rewrite>order</url_rewrite>
   </meta>
+<!--
+  <meta id="search" id_shop="1">
+    <title>搜尋</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>search</url_rewrite>
+  </meta>
+-->
+<!--
+  <meta id="stores" id_shop="1">
+    <title>商店</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>stores</url_rewrite>
+  </meta>
+-->
   <meta id="order-opc" id_shop="1">
     <title>訂單</title>
     <description/>
@@ -144,4 +176,12 @@
     <keywords/>
     <url_rewrite>order-confirmation</url_rewrite>
   </meta>
+<!--
+  <meta id="products-comparison" id_shop="1">
+    <title>Products Comparison</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>products-comparison</url_rewrite>
+  </meta>
+-->
 </entity_meta>
