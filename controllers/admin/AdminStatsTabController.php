@@ -151,24 +151,28 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $tpl = $this->createTemplate('menu.tpl');
 
         $modules = $this->getModules();
-        $module_instance = array();
 
-        // Collects sub-tabs for modules that expose multiple report pages under one stats entry.
-        // A module opts in by implementing getStatsTabs(), returning: array( ['key' => 'tab_key', 'label' => 'Display Label'], ... )
-        // 'key' becomes the `tab` GET param; the module reads it in hookAdminStatsModules() to render the correct report. 
-        // Modules without getStatsTabs() are unaffected.
-        $module_tabs = array();
+        // Keyed by module name. Each entry holds display_name and optionally tabs.
+        // tabs is populated only if the module implements getStatsTabs(), returning:
+        //   array( 'tab_key' => ['key' => 'tab_key', 'label' => 'Label'], ... )
+        // 'key' maps to the `tab` GET param; read in hookAdminStatsModules() to render the correct report.
+        $statsTabs = array();
         foreach ($modules as $m => $module) {
-            if ($module_instance[$module['name']] = Module::getInstanceByName($module['name'])) {
-                $modules[$m]['displayName'] = $module_instance[$module['name']]->displayName;
-                if (method_exists($module_instance[$module['name']], 'getStatsTabs')) {
-                    $module_tabs[$module['name']] = $module_instance[$module['name']]->getStatsTabs();
+            if ($moduleObj = Module::getInstanceByName($module['name'])) {
+                $statsTabs[$module['name']] = array('display_name' => $moduleObj->displayName);
+                if (method_exists($moduleObj, 'getStatsTabs')) {
+                    $statsTabs[$module['name']]['tabs'] = $moduleObj->getStatsTabs();
                 }
             } else {
-                unset($module_instance[$module['name']]);
+                unset($statsTabs[$module['name']]);
                 unset($modules[$m]);
             }
         }
+
+        // Allow third-party modules to add, remove, or modify tabs at runtime.
+        Hook::exec('actionStatsTabsModifier', array(
+            'stats_tabs' => &$statsTabs
+        ));
 
         uasort($modules, array($this, 'checkModulesNames'));
 
@@ -178,9 +182,7 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
             'current_tab' => Tools::getValue('tab', ''), // active sub-tab key
             'token' => $this->token,
             'modules' => $modules,
-            'module_instance' => $module_instance,
-            'module_tabs' => $module_tabs,
-            // module_tabs Stores sub-tabs per module: array( 'module_name' => [ ['key'=>'tab_key', 'label'=>'Label'], ... ] )
+            'module_tabs' => $statsTabs,
         ));
 
         return $tpl->fetch();
