@@ -3215,8 +3215,9 @@ class AdminOrdersControllerCore extends AdminController
         if (!Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
             return;
         }
-
-        $this->content .= $this->renderKpis();
+        if ($this->tabAccess['kpi'] === 1) {
+            $this->content .= $this->renderKpis();
+        }
 
         $customer = new Customer($order->id_customer);
         $carrier = new Carrier($order->id_carrier);

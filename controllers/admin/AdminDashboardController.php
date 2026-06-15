@@ -168,6 +168,10 @@ class AdminDashboardControllerCore extends AdminController
             return parent::renderOptions();
         }
 
+        if ($this->tabAccess['kpi'] === 1) {
+            $this->content .= $this->renderKpis();
+        }
+
         // $translations = array(
         // 	'Calendar' => $this->l('Calendar', 'AdminStatsTab'),
         // 	'Day' => $this->l('Day', 'AdminStatsTab'),
