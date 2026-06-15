@@ -28,7 +28,6 @@ class HotelAmenities extends ObjectModel
     public $parent_amenity_id;
     public $position;
     public $active;
-    public $is_featured;
     public $logo_type;
     public $logo;
     public $date_add;
@@ -42,7 +41,6 @@ class HotelAmenities extends ObjectModel
             'parent_amenity_id' => array('type' => self::TYPE_INT, 'required' => true),
             'position'          => array('type' => self::TYPE_INT),
             'active'            => array('type' => self::TYPE_INT, 'required' => true),
-            'is_featured'       => array('type' => self::TYPE_INT),
             'logo_type'         => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'logo'              => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'date_add'          => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
@@ -114,7 +112,7 @@ class HotelAmenities extends ObjectModel
                 );
 
                 $children = Db::getInstance()->executeS(
-                    'SELECT ha.`id_htl_amenity`, ha.`active`, ha.`is_featured`, ha.`logo_type`, ha.`logo`, hal.`name`
+                    'SELECT ha.`id_htl_amenity`, ha.`active`, ha.`logo_type`, ha.`logo`, hal.`name`
                     FROM `'._DB_PREFIX_.'htl_amenity` ha
                     LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
                         ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')

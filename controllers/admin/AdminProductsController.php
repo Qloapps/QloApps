@@ -2043,7 +2043,11 @@ class AdminProductsControllerCore extends AdminController
                 if (!is_array($selectedAmenities)) {
                     $selectedAmenities = array($selectedAmenities);
                 }
-                if (!(new HotelRoomTypeAmenities())->saveRoomTypeAmenities((int)$this->object->id, $selectedAmenities)) {
+                $featuredAmenities = Tools::getValue('featured_amenities', array());
+                if (!is_array($featuredAmenities)) {
+                    $featuredAmenities = array($featuredAmenities);
+                }
+                if (!(new HotelRoomTypeAmenities())->saveRoomTypeAmenities((int)$this->object->id, $selectedAmenities, $featuredAmenities)) {
                     $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
                     return false;
                 }
@@ -2299,7 +2303,11 @@ class AdminProductsControllerCore extends AdminController
                         if (!is_array($selectedAmenities)) {
                             $selectedAmenities = array($selectedAmenities);
                         }
-                        if (!(new HotelRoomTypeAmenities())->saveRoomTypeAmenities((int)$object->id, $selectedAmenities)) {
+                        $featuredAmenities = Tools::getValue('featured_amenities', array());
+                        if (!is_array($featuredAmenities)) {
+                            $featuredAmenities = array($featuredAmenities);
+                        }
+                        if (!(new HotelRoomTypeAmenities())->saveRoomTypeAmenities((int)$object->id, $selectedAmenities, $featuredAmenities)) {
                             $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
                             return false;
                         }
@@ -4972,6 +4980,7 @@ class AdminProductsControllerCore extends AdminController
                             ->setUseCheckBox(true)
                             ->setAutoSelectChildren(true)
                             ->setUseBulkActions(true)
+                            ->setUseSearch(true)
                             ->setHeaderTemplate('tree_header_room.tpl');
                         $data->assign('room_type_features_tree', $tree->render());
                     }
@@ -5017,8 +5026,10 @@ class AdminProductsControllerCore extends AdminController
                         ->setUseCheckBox(true)
                         ->setAutoSelectChildren(true)
                         ->setUseBulkActions(true)
+                        ->setUseSearch(true)
                         ->setHeaderTemplate('tree_header_room.tpl');
                     $data->assign('room_type_amenities_tree', $tree->render());
+                    $data->assign('featured_amenity_ids', HotelRoomTypeAmenities::getFeaturedAmenityIds((int)$obj->id));
                 }
             } else {
                 $this->displayWarning($this->l('You must save the room type in this shop before adding amenities.'));

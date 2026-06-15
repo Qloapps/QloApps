@@ -23,7 +23,6 @@
 <div class="panel">
 	<div class="panel-heading">
 		<i class="icon-list"></i> {l s='Manage Amenities' mod='hotelreservationsystem'}
-		<div id="htl_featured_loader" style="display:inline-block;margin-left:10px;vertical-align:middle;"></div>
 	</div>
 	<div class="row">
 		{if $amenities_tree}
@@ -54,7 +53,6 @@
 										<col style="width:60px;">
 										<col style="width:400px;">
 										<col style="width:50px;">
-										<col style="width:100px;">
 										<col style="width:200px;">
 									</colgroup>
 									<thead>
@@ -62,7 +60,6 @@
 											<th>{l s='Logo' mod='hotelreservationsystem'}</th>
 											<th>{l s='Name' mod='hotelreservationsystem'}</th>
 											<th class="text-center">{l s='Active' mod='hotelreservationsystem'}</th>
-											<th class="text-center">{l s='Featured' mod='hotelreservationsystem'}</th>
 											<th class="text-right">{l s='Actions' mod='hotelreservationsystem'}</th>
 										</tr>
 									</thead>
@@ -87,15 +84,6 @@
 													   title="{if $amenity.active}{l s='Enabled' mod='hotelreservationsystem'}{else}{l s='Disabled' mod='hotelreservationsystem'}{/if}">
 														<i class="icon-check{if !$amenity.active} hidden{/if}"></i>
 														<i class="icon-remove{if $amenity.active} hidden{/if}"></i>
-													</a>
-												</td>
-												<td class="text-center">
-													<a href="javascript:void(0)"
-													   class="list-action-enable htl-toggle-featured{if $amenity.is_featured} action-enabled{else} action-disabled{/if}"
-													   data-amenity-id="{$amenity.id}"
-													   title="{if $amenity.is_featured}{l s='Featured' mod='hotelreservationsystem'}{else}{l s='Not Featured' mod='hotelreservationsystem'}{/if}">
-														<i class="icon-check{if !$amenity.is_featured} hidden{/if}"></i>
-														<i class="icon-remove{if $amenity.is_featured} hidden{/if}"></i>
 													</a>
 												</td>
 												<td class="text-right">
@@ -138,8 +126,6 @@
 	{addJsDef delete_url=$admin_link js=1 mod='hotelreservationsystem'}
 	{addJsDefL name=confirm_delete_msg}{l s='Are you sure you want to delete this? This action cannot be undone.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=error_delete_msg}{l s='An error occurred while deleting. Please try again.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=error_featured_msg}{l s='An error occurred while updating. Please try again.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=success_featured_msg}{l s='Amenity is featured successfully.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 {/strip}
 
 <script type="text/javascript">
@@ -188,47 +174,6 @@
 				} else {
 					alert(r.msg || error_delete_msg);
 				}
-			}
-		});
-	});
-
-	var featuredAjaxPending = false;
-	$(document).on('click', '.htl-toggle-featured', function (e) {
-		e.preventDefault();
-		if (featuredAjaxPending) { return; }
-		featuredAjaxPending = true;
-		$('#htl_featured_loader').html('<img src="{$smarty.const._PS_ADMIN_IMG_}ajax-loader.gif" alt="" />');
-		$('.htl-toggle-featured').addClass('disabled').css('pointer-events', 'none');
-		var $btn = $(this);
-		$.ajax({
-			url: delete_url,
-			type: 'POST',
-			data: {
-				ajax: 1,
-				action: 'ToggleFeatured',
-				id_amenity: $btn.data('amenity-id'),
-				token: '{$token|escape:'javascript'}'
-			},
-			success: function (res) {
-				var r = $.parseJSON(res);
-				$('#htl_featured_loader').html('');
-				featuredAjaxPending = false;
-				$('.htl-toggle-featured').removeClass('disabled').css('pointer-events', '');
-				if (r.status) {
-					var featured = r.is_featured;
-					$btn.toggleClass('action-enabled', featured).toggleClass('action-disabled', !featured);
-					$btn.find('.icon-check').toggleClass('hidden', !featured);
-					$btn.find('.icon-remove').toggleClass('hidden', featured);
-					showSuccessMessage(success_featured_msg);
-				} else {
-					showErrorMessage(r.msg || error_featured_msg);
-				}
-			},
-			error: function () {
-				$('#htl_featured_loader').html('');
-				featuredAjaxPending = false;
-				$('.htl-toggle-featured').removeClass('disabled').css('pointer-events', '');
-				showErrorMessage(error_featured_msg);
 			}
 		});
 	});

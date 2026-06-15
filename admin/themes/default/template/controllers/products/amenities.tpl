@@ -43,6 +43,18 @@
 				{$room_type_amenities_tree}
 			</div>
 		</div>
+
+		<div class="form-group">
+			<label class="control-label col-sm-3">
+				<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select which of the chosen amenities should be featured for this room type.'}">
+					{l s='Featured amenities'}
+				</span>
+			</label>
+			<div class="col-sm-5">
+				<select name="featured_amenities[]" id="rt_featured_amenities" class="form-control chosen" multiple>
+				</select>
+			</div>
+		</div>
 	{else}
 		<div class="alert alert-warning">
 			<i class="icon-warning-sign"></i> {l s='No amenities have been defined yet.'}
@@ -55,4 +67,50 @@
 		<button type="submit" name="submitAddproductAndStay" class="btn btn-default pull-right" disabled="disabled"><i class="process-icon-loading"></i> {l s='Save and stay'}</button>
 	</div>
 </div>
+
+{if isset($featured_amenity_ids)}
+<script type="text/javascript">
+(function ($) {
+	var featuredIds = {$featured_amenity_ids|json_encode};
+	var $select = $('#rt_featured_amenities');
+
+	function syncFeaturedSelect() {
+		var existing = {};
+		$select.find('option').each(function () {
+			existing[$(this).val()] = true;
+		});
+
+		$('input[name="room_type_amenities[]"]').each(function () {
+			var $cb = $(this);
+			var id = $cb.val();
+			var name = $cb.siblings('label.tree-toggler').text().trim();
+			if ($cb.is(':checked')) {
+				if (!existing[id]) {
+					var selected = featuredIds.indexOf(parseInt(id)) !== -1;
+					$select.append(
+						$('<option></option>').val(id).text(name).prop('selected', selected)
+					);
+				}
+			} else {
+				$select.find('option[value="' + id + '"]').remove();
+			}
+		});
+
+		$select.trigger('chosen:updated');
+	}
+
+	$(document).on('click', '#room-type-amenities-tree :input[type="checkbox"]', function () {
+		setTimeout(syncFeaturedSelect, 0);
+	});
+
+	$(document).on('click', '#check-all-room-type-amenities-tree, #uncheck-all-room-type-amenities-tree', function () {
+		setTimeout(syncFeaturedSelect, 0);
+	});
+
+	$(document).ready(function () {
+		syncFeaturedSelect();
+	});
+}(jQuery));
+</script>
+{/if}
 {/if}

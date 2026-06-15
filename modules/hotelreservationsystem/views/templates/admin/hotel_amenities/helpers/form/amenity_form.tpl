@@ -101,23 +101,6 @@
 			</div>
 
 			<div class="form-group">
-				<label class="col-lg-3 control-label">
-					{l s='Feature this Amenity' mod='hotelreservationsystem'}
-				</label>
-				<div class="col-lg-9">
-					<span class="switch prestashop-switch fixed-width-lg">
-						<input type="radio" name="is_featured" id="is_featured_on" value="1"
-							{if (isset($smarty.post.is_featured) && $smarty.post.is_featured == '1') || (!isset($smarty.post.is_featured) && isset($amenity.is_featured) && $amenity.is_featured)}checked="checked"{/if} />
-						<label for="is_featured_on">{l s='Yes'}</label>
-						<input type="radio" name="is_featured" id="is_featured_off" value="0"
-							{if (isset($smarty.post.is_featured) && $smarty.post.is_featured == '0') || (!isset($smarty.post.is_featured) && (!isset($amenity.is_featured) || !$amenity.is_featured))}checked="checked"{/if} />
-						<label for="is_featured_off">{l s='No'}</label>
-						<a class="slide-button btn"></a>
-					</span>
-				</div>
-			</div>
-
-			<div class="form-group">
 				<label class="col-lg-3 control-label required">{l s='Logo Type' mod='hotelreservationsystem'}</label>
 				<div class="col-lg-4">
 					<select name="logo_type" id="htl_logo_type_select" class="form-control">

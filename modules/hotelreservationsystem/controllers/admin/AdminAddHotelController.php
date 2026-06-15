@@ -202,9 +202,11 @@ class AdminAddHotelController extends ModuleAdminController
                 $tree->setShowCollapseExpandButton(true)
                     ->setUseCheckBox(true)
                     ->setAutoSelectChildren(true)
-                    ->setUseBulkActions(true);
+                    ->setUseBulkActions(true)
+                    ->setUseSearch(true);
                 $treeContent = $tree->render();
                 $smartyVars['hotel_amenity_tree'] = $treeContent;
+                $smartyVars['hotel_featured_amenity_ids'] = HotelBranchAmenities::getFeaturedAmenityIds((int)$idHotel);
             }
 
             $smartyVars['rewrite_url'] = [];
@@ -283,6 +285,7 @@ class AdminAddHotelController extends ModuleAdminController
         $map_formated_address = Tools::getValue('locformatedAddr');
         $map_input_text = Tools::getValue('googleInputField');
         $hotelAmenities = Tools::getValue('id_amenities', array());
+        $hotelFeaturedAmenities = Tools::getValue('hotel_featured_amenities', array());
         $shortDescriptionMaxChar = Configuration::get('PS_SHORT_DESC_LIMIT') ? Configuration::get('PS_SHORT_DESC_LIMIT') : Configuration::PS_SHORT_DESC_LIMIT;
 
         // check if field is atleast in default language. Not available in default prestashop
@@ -829,7 +832,7 @@ class AdminAddHotelController extends ModuleAdminController
                 $objHotelOrderRestrictDate->save();
 
                 $objHotelAmenities = new HotelBranchAmenities();
-                if (!$objHotelAmenities->saveBranchAmenities($idHotel, $hotelAmenities)) {
+                if (!$objHotelAmenities->saveBranchAmenities($idHotel, $hotelAmenities, $hotelFeaturedAmenities)) {
                     $this->errors[] = $this->l('Some problem occurred while assigning amenities to the hotel.');
                 }
             }

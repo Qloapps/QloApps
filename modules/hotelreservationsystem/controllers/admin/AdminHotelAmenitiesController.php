@@ -112,7 +112,6 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                         'id'               => $objHotelAmenities->id,
                         'parent_amenity_id' => $idCategory,
                         'active'           => (int)$objHotelAmenities->active,
-                        'is_featured'      => (int)$objHotelAmenities->is_featured,
                         'logo_type'        => $objHotelAmenities->logo_type,
                         'logo'             => $objHotelAmenities->logo,
                         'name'             => is_array($objHotelAmenities->name) ? $objHotelAmenities->name : array(),
@@ -222,7 +221,6 @@ class AdminHotelAmenitiesController extends ModuleAdminController
             $idAmenity   = (int)Tools::getValue('id');
             $idCategory  = (int)Tools::getValue('id_category');
             $active      = (int)Tools::getValue('active');
-            $isFeatured  = (int)Tools::getValue('is_featured');
             $logoType    = Tools::getValue('logo_type');
             $languages   = Language::getLanguages(false);
             $defaultLang = (int)Configuration::get('PS_LANG_DEFAULT');
@@ -266,7 +264,6 @@ class AdminHotelAmenitiesController extends ModuleAdminController
             }
             $objHotelAmenities->parent_amenity_id = $idCategory;
             $objHotelAmenities->active            = $active;
-            $objHotelAmenities->is_featured       = $isFeatured;
             $objHotelAmenities->logo_type         = ($logoType === 'icon') ? 'icon' : 'image';
             $objHotelAmenities->logo              = ($logoType === 'icon') ? $logoValue : $objHotelAmenities->logo;
 
@@ -351,30 +348,6 @@ class AdminHotelAmenitiesController extends ModuleAdminController
             }
         } else {
             $response['msg'] = $this->l('You do not have permission to delete.');
-        }
-
-        $this->ajaxDie(json_encode($response));
-    }
-
-    public function ajaxProcessToggleFeatured()
-    {
-        $response = array('status' => false);
-
-        if ($this->tabAccess['edit']) {
-            $objHotelAmenities = new HotelAmenities((int)Tools::getValue('id_amenity'));
-            if (Validate::isLoadedObject($objHotelAmenities)) {
-                $objHotelAmenities->is_featured = $objHotelAmenities->is_featured ? 0 : 1;
-                if ($objHotelAmenities->save()) {
-                    $response['status']      = true;
-                    $response['is_featured'] = (bool)$objHotelAmenities->is_featured;
-                } else {
-                    $response['msg'] = $this->l('Error updating amenity.');
-                }
-            } else {
-                $response['msg'] = $this->l('Amenity not found.');
-            }
-        } else {
-            $response['msg'] = $this->l('You do not have permission to edit.');
         }
 
         $this->ajaxDie(json_encode($response));
