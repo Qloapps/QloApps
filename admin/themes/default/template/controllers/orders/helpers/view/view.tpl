@@ -456,7 +456,7 @@
                                         <th><span class="title_box ">{l s='Transaction ID'}</span></th>
                                         <th><span class="title_box ">{l s='Amount'}</span></th>
                                         <th><span class="title_box ">{l s='Invoice'}</span></th>
-                                        <th></th>
+                                        <th colspan="3"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -468,6 +468,11 @@
                                             <td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
                                             <td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
                                             <td>{if isset($payment['invoice_number'])}{$payment['invoice_number']}{else}--{/if}</td>
+                                            {if isset($receipt_management_active) && $receipt_management_active}
+                                                <td class="actions">
+                                                    <a target="_blank" class="btn btn-default" href="{$link->getAdminLink('AdminPdf')}&submitAction=generatePaymentReceipt&id_order_payment_detail={$payment['id_order_payment_detail']}"><i class="icon-file-text"></i> {l s='Receipt'}</a>
+                                                </td>
+                                            {/if}
                                             <td class="actions">
                                                 <a class="open_payment_information btn btn-default" href="#" data-card_number="{if $payment['card_number']}{$payment['card_number']}{else}{l s='Not defined'}{/if}"  data-card_brand="{if $payment['card_brand']}{$payment['card_brand']}{else}{l s='Not defined'}{/if}"  data-card_expiration="{if $payment['card_expiration']}{$payment['card_expiration']}{else}{l s='Not defined'}{/if}"  data-card_holder="{if $payment['card_holder']}{$payment['card_holder']}{else}{l s='Not defined'}{/if}" data-payment_date="{if $payment['date_add']}{$payment['date_add']}{else}{l s='Not defined'}{/if}" data-payment_method="{if $payment['payment_method']}{$payment['payment_method']}{else}{l s='Not defined'}{/if}" data-payment_source="{if $payment_types[$payment['payment_type']]['name']}{$payment_types[$payment['payment_type']]['name']}{else}{l s='Not defined'}{/if}" data-transaction_id="{if $payment['transaction_id']}{$payment['transaction_id']}{else}{l s='Not defined'}{/if}" data-amount="{if $payment['amount']}{displayPrice currency={$payment['id_currency']} price={$payment['amount']}}{else}{l s='Not defined'}{/if}" data-invoice_number="{if isset($payment['invoice_number']) && $payment['invoice_number']}{$payment['invoice_number']}{else}{l s='Not defined'}{/if}"><i class="icon-search"></i> {l s='Details'}</a>
                                             </td>

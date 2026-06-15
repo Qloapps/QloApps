@@ -81,7 +81,7 @@ class ProfileCore extends ObjectModel
     public function add($autodate = true, $null_values = false)
     {
         if (parent::add($autodate, true)) {
-            $result = Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.'access (SELECT '.(int)$this->id.', id_tab, 0, 0, 0, 0 FROM '._DB_PREFIX_.'tab)');
+            $result = Db::getInstance()->execute('INSERT INTO '._DB_PREFIX_.'access (SELECT '.(int)$this->id.', id_tab, 0, 0, 0, 0, 0 FROM '._DB_PREFIX_.'tab)');
             $result &= Db::getInstance()->execute('
 				INSERT INTO '._DB_PREFIX_.'module_access
 				(`id_profile`, `id_module`, `configure`, `view`, `uninstall`)
@@ -138,6 +138,7 @@ class ProfileCore extends ObjectModel
                         'add' => 1,
                         'edit' => 1,
                         'delete' => 1,
+                        'kpi' => 1,
                     );
                 }
             } else {
@@ -151,6 +152,7 @@ class ProfileCore extends ObjectModel
                         $result[$key]['delete'] = (int) $profileAccess['delete'];
                         $result[$key]['add'] = (int) $profileAccess['add'];
                         $result[$key]['edit'] = (int) $profileAccess['edit'];
+                        $result[$key]['kpi'] = (int) $profileAccess['kpi'];
                     }
                 }
 
