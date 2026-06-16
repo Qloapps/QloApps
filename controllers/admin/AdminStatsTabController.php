@@ -159,6 +159,7 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $statsTabs = array();
         foreach ($modules as $m => $module) {
             if ($moduleObj = Module::getInstanceByName($module['name'])) {
+                $modules[$m]['displayName'] = $moduleObj->displayName;
                 $statsTabs[$module['name']] = array('display_name' => $moduleObj->displayName);
                 if (method_exists($moduleObj, 'getStatsTabs')) {
                     $statsTabs[$module['name']]['tabs'] = $moduleObj->getStatsTabs();
