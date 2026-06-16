@@ -21,19 +21,13 @@
 
 <table width="100%" id="body" border="0" cellpadding="0" cellspacing="0" style="margin:0;">
 	<tr>
-		<td colspan="12">
-			<table width="100%" cellpadding="3" cellspacing="0" nobr="true">
-				<tr>
-					<td width="100%" class="center" style="font-size: 12pt; font-weight: bold;">
-						{if $hotel}{$hotel->hotel_name|escape:'html':'UTF-8'}{/if}
-					</td>
-				</tr>
-				<tr>
-					<td width="100%" class="center">
-						{if $hotel && $hotel->city}{$hotel->city|escape:'html':'UTF-8'}{if $hotel_country}, {/if}{/if}{if $hotel_country}{$hotel_country|escape:'html':'UTF-8'}{/if}
-					</td>
-				</tr>
-			</table>
+		<td colspan="12" class="center" style="font-size: 12pt; font-weight: bold; vertical-align: top;">
+			{if $hotel}{$hotel->hotel_name|escape:'html':'UTF-8'}{/if}
+		</td>
+	</tr>
+	<tr>
+		<td colspan="12" class="center" style="vertical-align: top;">
+			{if $hotel && $hotel->city}{$hotel->city|escape:'html':'UTF-8'}{if $hotel_country}, {/if}{/if}{if $hotel_country}{$hotel_country|escape:'html':'UTF-8'}{/if}
 		</td>
 	</tr>
 

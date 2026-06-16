@@ -140,7 +140,7 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
             'guest_reg_card_fields'  => $guestRegCardFields,
         ));
 
-        return $this->smarty->fetch($this->getTemplate('guest-registration-card'));
+        return $this->smarty->fetch($this->getTemplate('guest-registration-form'));
     }
 
     /**
@@ -150,7 +150,7 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
      */
     public function getBulkFilename()
     {
-        return 'guest-registration-cards.pdf';
+        return 'guest-registration-forms.pdf';
     }
 
     /**
@@ -160,7 +160,7 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
      */
     public function getFilename()
     {
-        $filename = 'guest-registration-card-'.$this->order->reference;
+        $filename = 'guest-registration-form-'.$this->order->reference;
         if ($this->id_hotel_booking_detail) {
             $filename .= '-room-'.$this->id_hotel_booking_detail;
         }
