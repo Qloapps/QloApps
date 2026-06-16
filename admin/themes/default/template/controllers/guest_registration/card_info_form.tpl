@@ -58,7 +58,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <h4 class="modal-title" id="guestRegPreviewModalLabel">{$guest_reg_preview_title|escape:'html':'UTF-8'}</h4>
+                <h4 class="modal-title" id="guestRegPreviewModalLabel">{$guest_reg_card_preview_title|escape:'html':'UTF-8'}</h4>
             </div>
             <div class="modal-body text-center">
                 <img src="{$guest_reg_card_preview_img_url|escape:'html':'UTF-8'}" alt="{$guest_reg_card_preview_title|escape:'html':'UTF-8'}" class="img-responsive" style="max-width:100%;" />
@@ -66,30 +66,3 @@
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-(function ($) {
-    $(document).ready(function () {
-        // Bubble-up: checking a leaf checks the parent folder.
-        // Unchecking a leaf keeps parent checked if any sibling is still checked.
-        $('#grc-card-info-tree').on('click', ':input[type=checkbox]', function () {
-            var $cb = $(this);
-            if (!$cb.closest('.tree-item').length) {
-                return;
-            }
-            var $parentFolderCb = $cb.closest('ul.tree').prev('span.tree-folder-name').find(':input[type=checkbox]:first');
-            if (!$parentFolderCb.length) {
-                return;
-            }
-            if ($cb.is(':checked')) {
-                $parentFolderCb.prop('checked', true).parent().addClass('tree-selected');
-            } else {
-                var anySiblingChecked = $cb.closest('ul.tree').find(':input[type=checkbox]:checked').length > 0;
-                if (anySiblingChecked) {
-                    $parentFolderCb.prop('checked', true).parent().addClass('tree-selected');
-                }
-            }
-        });
-    });
-}(jQuery));
-</script>

@@ -24,8 +24,6 @@
 
 class AdminGuestRegistrationControllerCore extends AdminController
 {
-    const CONF_GUEST_REG_CARD_INFO = 'QLO_GUEST_REGISTRATION_CARD_INFO';
-
     // Section IDs
     const GRC_SECTION_GUEST_INFO          = 1;
     const GRC_SECTION_TRAVEL_INFO         = 2;
@@ -119,25 +117,24 @@ class AdminGuestRegistrationControllerCore extends AdminController
     {
         $this->display = 'options';
         $this->initToolbar();
-        $this->initPageHeaderToolbar();
         parent::initContent();
     }
 
     public function renderOptions()
     {
-        $savedJson = Configuration::get(self::CONF_GUEST_REG_CARD_INFO);
-        $selectedInfo = array();
-        if ($savedJson !== false && $savedJson !== '') {
-            $decoded = Tools::jsonDecode($savedJson, true);
-            if (is_array($decoded)) {
-                $selectedInfo = $decoded;
+        $grcInfoJson = Configuration::get('QLO_GUEST_REGISTRATION_CARD_INFO');
+        $savedSections = array();
+        if ($grcInfoJson !== false && $grcInfoJson !== '') {
+            $grcData = Tools::jsonDecode($grcInfoJson, true);
+            if (is_array($grcData)) {
+                $savedSections = $grcData;
             }
         }
 
-        $allSelected = empty($selectedInfo);
+        $allSelected = empty($savedSections);
         $nodes = array();
         foreach ($this->getRegistrationCardInfo() as $sectionId => $section) {
-            $sectionFields = isset($selectedInfo[$sectionId]) ? $selectedInfo[$sectionId] : array();
+            $sectionFields = isset($savedSections[$sectionId]) ? $savedSections[$sectionId] : array();
             $fieldNodes = array();
             foreach ($section['fields'] as $fieldId => $fieldName) {
                 $fieldSelected = $allSelected || in_array($fieldId, $sectionFields);
@@ -179,12 +176,6 @@ class AdminGuestRegistrationControllerCore extends AdminController
         $this->toolbar_title = array($this->l('Guest Registration Card'));
     }
 
-    public function initPageHeaderToolbar()
-    {
-        parent::initPageHeaderToolbar();
-        unset($this->page_header_toolbar_btn['cancel']);
-    }
-
     public function postProcess()
     {
         if (Tools::isSubmit('submitGrcCardInfo')) {
@@ -199,7 +190,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
                 $this->errors[] = $this->l('Please select at least one field for the Guest Registration Card.');
                 return;
             }
-            Configuration::updateValue(self::CONF_GUEST_REG_CARD_INFO, Tools::jsonEncode($grcInfo));
+            Configuration::updateValue('QLO_GUEST_REGISTRATION_CARD_INFO', Tools::jsonEncode($grcInfo));
             Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
             return;
         }

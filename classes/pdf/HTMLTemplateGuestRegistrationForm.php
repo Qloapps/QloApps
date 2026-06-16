@@ -22,7 +22,7 @@
  * @license https://opensource.org/license/osl-3.0-php Open Software License version 3.0
  */
 
-class HTMLTemplateRegistrationFormCore extends HTMLTemplate
+class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
 {
     public $order;
     public $available_in_your_account = false;
@@ -111,11 +111,11 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
         }
         
         $guestRegCardFields = array();
-        $guestRegCardInfoJson = Configuration::get('QLO_GUEST_REGISTRATION_CARD_INFO');
-        if ($guestRegCardInfoJson !== false && $guestRegCardInfoJson !== '') {
-            $decoded = Tools::jsonDecode($guestRegCardInfoJson, true);
-            if (is_array($decoded)) {
-                foreach ($decoded as $sectionId => $fieldIds) {
+        $grcInfoJson = Configuration::get('QLO_GUEST_REGISTRATION_CARD_INFO');
+        if ($grcInfoJson !== false && $grcInfoJson !== '') {
+            $grcData = Tools::jsonDecode($grcInfoJson, true);
+            if (is_array($grcData)) {
+                foreach ($grcData as $sectionId => $fieldIds) {
                     $fieldIds = array_map('intval', (array)$fieldIds);
                     if (!empty($fieldIds)) {
                         $guestRegCardFields[(int)$sectionId] = array_flip($fieldIds);
@@ -137,10 +137,10 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
             'children'               => Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->children : 0,
             'rate_per_night'         => $ratePerNight,
             'additional_guests_rows' => $additionalGuestsRows,
-            'guest_reg_card_fields'             => $guestRegCardFields,
+            'guest_reg_card_fields'  => $guestRegCardFields,
         ));
 
-        return $this->smarty->fetch($this->getTemplate('registration-form'));
+        return $this->smarty->fetch($this->getTemplate('guest-registration-card'));
     }
 
     /**
@@ -150,7 +150,7 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
      */
     public function getBulkFilename()
     {
-        return 'registration-forms.pdf';
+        return 'guest-registration-cards.pdf';
     }
 
     /**
@@ -160,7 +160,7 @@ class HTMLTemplateRegistrationFormCore extends HTMLTemplate
      */
     public function getFilename()
     {
-        $filename = 'registration-form-'.$this->order->reference;
+        $filename = 'guest-registration-card-'.$this->order->reference;
         if ($this->id_hotel_booking_detail) {
             $filename .= '-room-'.$this->id_hotel_booking_detail;
         }

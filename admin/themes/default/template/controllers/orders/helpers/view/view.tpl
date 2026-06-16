@@ -145,7 +145,7 @@
                                                                 <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span> <i class="icon-file-text"></i>
                                                             </a>
 
-                                                            <a title="{l s='Guest Registration Card'}" class="btn btn-default" href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateRegistrationFormPDF&amp;id_order={$data['id_order']}&amp;id_hotel_booking_detail={$data['id']}" target="_blank">
+                                                            <a title="{l s='Guest Registration Card'}" class="btn btn-default" href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateGuestRegistrationFormPDF&amp;id_order={$data['id_order']}&amp;id_hotel_booking_detail={$data['id']}" target="_blank">
                                                                 <i class="icon-download"></i> {l s='GRC'}
                                                             </a>
 
