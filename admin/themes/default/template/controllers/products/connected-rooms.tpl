@@ -22,7 +22,7 @@
 {if isset($htl_connected_rooms) && $htl_connected_rooms|@count > 0}
     <span class="connected-room-tooltip-trigger"
         data-connected-details='{json_encode($htl_connected_rooms)|escape:'html':'UTF-8'}'>
-        <i class="icon-random connected-room-icon"></i>
+        <i class="icon-random" style="color: #008abd; cursor: pointer;"></i>
     </span>
 {/if}
 <script>

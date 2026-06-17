@@ -542,7 +542,6 @@ class AdminProductsControllerCore extends AdminController
         $this->addJs(__PS_BASE_URI__.'js/vendor/ladda.js');
         $this->addCSS(_PS_JS_DIR_.'fullcalendar/main.css');
         $this->addJs(_PS_JS_DIR_.'fullcalendar/main.js');
-        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
 
         $this->addJS(_PS_JS_DIR_.'/datatable/jquery.dataTables.min.js');
         $this->addJS(_PS_JS_DIR_.'/datatable/dataTables.bootstrap.js');

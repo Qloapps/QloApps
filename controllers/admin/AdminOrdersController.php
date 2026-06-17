@@ -1347,10 +1347,8 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->addJqueryUI('ui.datepicker');
         $this->addJqueryUI('ui.tooltip', 'base', true);
-        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
 
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
-        $this->addJqueryUI('ui.tooltip', 'base', true);
 
         if ($this->display == 'view') {
             if ($this->loadObject()) {
@@ -3219,9 +3217,8 @@ class AdminOrdersControllerCore extends AdminController
         if (!Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
             return;
         }
-        if ($this->tabAccess['kpi'] === 1) {
-            $this->content .= $this->renderKpis();
-        }
+
+        $this->content .= $this->renderKpis();
 
         $customer = new Customer($order->id_customer);
         $carrier = new Carrier($order->id_carrier);
