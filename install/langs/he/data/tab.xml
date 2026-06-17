@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="שוברי זיכוי"/>
   <tab id="Statuses" name="סטטוסי הזמנה ומלאי"/>
   <tab id="Order_Messages" name="תבניות עבור הודעות הזמנה"/>
+  <tab id="Guest_Registration" name="כרטיס רישום אורח"/>
   <tab id="Customers_1" name="לקוחות"/>
   <tab id="Addresses" name="כתובות"/>
   <tab id="Groups" name="קבוצות"/>

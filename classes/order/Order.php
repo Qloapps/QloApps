@@ -46,6 +46,85 @@ class OrderCore extends ObjectModel
     const ORDER_COMPLETE_CANCELLATION_FLAG = 2;
     const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
 
+    // Guest Registration Card — Section IDs
+    const GRC_SECTION_GUEST_INFO          = 1;
+    const GRC_SECTION_TRAVEL_INFO         = 2;
+    const GRC_SECTION_BOOKING_INFO        = 3;
+    const GRC_SECTION_IDENTIFICATION      = 4;
+    const GRC_SECTION_ADDITIONAL_GUESTS   = 5;
+    const GRC_SECTION_BILLING_CORPORATE   = 6;
+    const GRC_SECTION_PAYMENT_DEPOSIT     = 7;
+    const GRC_SECTION_GUEST_SIGNATURE     = 8;
+    const GRC_SECTION_PROPERTY_REGS       = 9;
+    const GRC_SECTION_OFFICE_USE_ONLY     = 10;
+
+    // Guest Registration Card — Guest Information fields (section 1)
+    const GRC_GUEST_TITLE                 = 1;
+    const GRC_GUEST_FULL_NAME             = 2;
+    const GRC_GUEST_PHONE                 = 3;
+    const GRC_GUEST_EMAIL                 = 4;
+    const GRC_GUEST_DOB                   = 5;
+    const GRC_GUEST_NATIONALITY           = 6;
+    const GRC_GUEST_CITY_COUNTRY          = 7;
+    const GRC_GUEST_POSTAL_CODE           = 8;
+    const GRC_GUEST_ADDRESS               = 9;
+
+    // Guest Registration Card — Travel Information fields (section 2)
+    const GRC_TRAVEL_ARRIVED_FROM         = 1;
+    const GRC_TRAVEL_NEXT_DESTINATION     = 2;
+    const GRC_TRAVEL_FLIGHT_TRAIN         = 3;
+    const GRC_TRAVEL_VEHICLE_REG          = 4;
+    const GRC_TRAVEL_PURPOSE_OF_VISIT     = 5;
+
+    // Guest Registration Card — Booking Information fields (section 3)
+    const GRC_BOOKING_REFERENCE           = 1;
+    const GRC_BOOKING_RATE_PER_NIGHT      = 2;
+    const GRC_BOOKING_ARRIVAL             = 3;
+    const GRC_BOOKING_DEPARTURE           = 4;
+    const GRC_BOOKING_ROOM_TYPE           = 5;
+    const GRC_BOOKING_ROOM_NUMBER         = 6;
+    const GRC_BOOKING_NUM_GUESTS          = 7;
+
+    // Guest Registration Card — Identification Document fields (section 4)
+    const GRC_ID_IDENTITY_PROOF           = 1;
+    const GRC_ID_NUMBER                   = 2;
+    const GRC_ID_PASSPORT_NO              = 3;
+    const GRC_ID_PLACE_OF_ISSUE           = 4;
+    const GRC_ID_DATE_OF_ISSUE            = 5;
+    const GRC_ID_DATE_OF_EXPIRY           = 6;
+    const GRC_ID_VISA_NUMBER              = 7;
+    const GRC_ID_VALID_UNTIL              = 8;
+    const GRC_ID_ARRIVAL_DATE_IN_COUNTRY  = 9;
+
+    // Guest Registration Card — Additional Guests fields (section 5)
+    const GRC_ADD_GUEST_NAME              = 1;
+    const GRC_ADD_GUEST_ID_TYPE           = 2;
+    const GRC_ADD_GUEST_ID_NUMBER         = 3;
+    const GRC_ADD_GUEST_NATIONALITY       = 4;
+
+    // Guest Registration Card — Billing & Corporate Details fields (section 6)
+    const GRC_BILLING_COMPANY             = 1;
+    const GRC_BILLING_TAX_ID              = 2;
+
+    // Guest Registration Card — Payment & Deposit fields (section 7)
+    const GRC_PAYMENT_METHOD              = 1;
+    const GRC_PAYMENT_CARD_NUMBER         = 2;
+    const GRC_PAYMENT_SECURITY_DEPOSIT    = 3;
+
+    // Guest Registration Card — Guest Signature fields (section 8)
+    const GRC_SIG_SIGNATURE               = 1;
+    const GRC_SIG_DATE                    = 2;
+
+    // Guest Registration Card — Property Regulations fields (section 9)
+    const GRC_PROP_CHECKIN_CHECKOUT_TIME  = 1;
+    const GRC_PROP_HOTEL_POLICIES         = 2;
+
+    // Guest Registration Card — For Office Use Only fields (section 10)
+    const GRC_OFFICE_STAFF_NAME           = 1;
+    const GRC_OFFICE_CHECKIN_TIME         = 2;
+    const GRC_OFFICE_ID_VERIFIED          = 3;
+    const GRC_OFFICE_REG_NO               = 4;
+
     /** @var int Delivery address id */
     public $id_address_delivery;
 
@@ -2415,6 +2494,121 @@ class OrderCore extends ObjectModel
             return 0;
         }
         return ($a->date_add < $b->date_add) ? -1 : 1;
+    }
+
+    /**
+     * Returns all Guest Registration Card sections and their fields.
+     * Modules may add, remove, or reorder sections/fields via the hook.
+     *
+     * @return array  sectionId => ['name' => string, 'fields' => [fieldId => string, ...]]
+     */
+    public static function getRegistrationCardInfo()
+    {
+        $guestRegCardInfo = array(
+            self::GRC_SECTION_GUEST_INFO => array(
+                'name'   => Translate::getAdminTranslation('Guest Information', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_GUEST_TITLE        => Translate::getAdminTranslation('Title', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_GUEST_FULL_NAME    => Translate::getAdminTranslation('Full Name', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_GUEST_PHONE        => Translate::getAdminTranslation('Phone / Mobile', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_GUEST_EMAIL        => Translate::getAdminTranslation('Email', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_GUEST_DOB          => Translate::getAdminTranslation('Date of Birth', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_GUEST_NATIONALITY  => Translate::getAdminTranslation('Nationality', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_GUEST_CITY_COUNTRY => Translate::getAdminTranslation('City / Country', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_GUEST_POSTAL_CODE  => Translate::getAdminTranslation('Postal Code', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_GUEST_ADDRESS      => Translate::getAdminTranslation('Address', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+            self::GRC_SECTION_TRAVEL_INFO => array(
+                'name'   => Translate::getAdminTranslation('Travel Information', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_TRAVEL_ARRIVED_FROM     => Translate::getAdminTranslation('Arrived From', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_TRAVEL_NEXT_DESTINATION => Translate::getAdminTranslation('Next Destination', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_TRAVEL_FLIGHT_TRAIN     => Translate::getAdminTranslation('Flight / Train Number', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_TRAVEL_VEHICLE_REG      => Translate::getAdminTranslation('Vehicle Reg. No.', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_TRAVEL_PURPOSE_OF_VISIT => Translate::getAdminTranslation('Purpose of Visit', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+            self::GRC_SECTION_BOOKING_INFO => array(
+                'name'   => Translate::getAdminTranslation('Booking Information', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_BOOKING_REFERENCE      => Translate::getAdminTranslation('Booking Reference No.', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_BOOKING_RATE_PER_NIGHT => Translate::getAdminTranslation('Rate per Night', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_BOOKING_ARRIVAL        => Translate::getAdminTranslation('Arrival Date & Time', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_BOOKING_DEPARTURE      => Translate::getAdminTranslation('Departure Date & Time', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_BOOKING_ROOM_TYPE      => Translate::getAdminTranslation('Room Type', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_BOOKING_ROOM_NUMBER    => Translate::getAdminTranslation('Room Number', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_BOOKING_NUM_GUESTS     => Translate::getAdminTranslation('Number of Guests', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+            self::GRC_SECTION_IDENTIFICATION => array(
+                'name'   => Translate::getAdminTranslation('Identification Document', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_ID_IDENTITY_PROOF          => Translate::getAdminTranslation('Identity Proof', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ID_NUMBER                  => Translate::getAdminTranslation('ID Number', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ID_PASSPORT_NO             => Translate::getAdminTranslation('Passport No.', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ID_PLACE_OF_ISSUE          => Translate::getAdminTranslation('Place of Issue', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ID_DATE_OF_ISSUE           => Translate::getAdminTranslation('Date of Issue', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ID_DATE_OF_EXPIRY          => Translate::getAdminTranslation('Date of Expiry', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ID_VISA_NUMBER             => Translate::getAdminTranslation('Visa Number', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ID_VALID_UNTIL             => Translate::getAdminTranslation('Valid Until', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ID_ARRIVAL_DATE_IN_COUNTRY => Translate::getAdminTranslation('Arrival Date in Country', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+            self::GRC_SECTION_ADDITIONAL_GUESTS => array(
+                'name'   => Translate::getAdminTranslation('Additional Guests', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_ADD_GUEST_NAME        => Translate::getAdminTranslation('Guest Name', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ADD_GUEST_ID_TYPE     => Translate::getAdminTranslation('ID Type', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ADD_GUEST_ID_NUMBER   => Translate::getAdminTranslation('ID Number', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_ADD_GUEST_NATIONALITY => Translate::getAdminTranslation('Nationality', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+            self::GRC_SECTION_BILLING_CORPORATE => array(
+                'name'   => Translate::getAdminTranslation('Billing & Corporate Details', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_BILLING_COMPANY => Translate::getAdminTranslation('Company / Agent', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_BILLING_TAX_ID  => Translate::getAdminTranslation('Tax ID / VAT No.', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+            self::GRC_SECTION_PAYMENT_DEPOSIT => array(
+                'name'   => Translate::getAdminTranslation('Payment & Deposit', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_PAYMENT_METHOD           => Translate::getAdminTranslation('Payment Method', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_PAYMENT_CARD_NUMBER      => Translate::getAdminTranslation('Credit Card Number', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_PAYMENT_SECURITY_DEPOSIT => Translate::getAdminTranslation('Security Deposit', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+            self::GRC_SECTION_GUEST_SIGNATURE => array(
+                'name'   => Translate::getAdminTranslation('Guest Signature', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_SIG_SIGNATURE => Translate::getAdminTranslation('Signature', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_SIG_DATE      => Translate::getAdminTranslation('Date', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+            self::GRC_SECTION_PROPERTY_REGS => array(
+                'name'   => Translate::getAdminTranslation('Property Regulations', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_PROP_CHECKIN_CHECKOUT_TIME => Translate::getAdminTranslation('Check-in / Check-out Time', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_PROP_HOTEL_POLICIES        => Translate::getAdminTranslation('Hotel Policies', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+            self::GRC_SECTION_OFFICE_USE_ONLY => array(
+                'name'   => Translate::getAdminTranslation('For Office Use Only', 'AdminGuestRegistrationController', false, false),
+                'fields' => array(
+                    self::GRC_OFFICE_STAFF_NAME   => Translate::getAdminTranslation('Staff Name', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_OFFICE_CHECKIN_TIME => Translate::getAdminTranslation('Check-in Time', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_OFFICE_ID_VERIFIED  => Translate::getAdminTranslation('ID Verified', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_OFFICE_REG_NO       => Translate::getAdminTranslation('Registration No.', 'AdminGuestRegistrationController', false, false),
+                ),
+            ),
+        );
+
+        Hook::exec('actionAdminGuestRegistrationControllerGuestRegCardInfoModifier', array(
+            'guest_registration_info' => &$guestRegCardInfo,
+        ));
+
+        return $guestRegCardInfo;
     }
 
     public function getWsShippingNumber()
