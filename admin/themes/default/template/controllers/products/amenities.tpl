@@ -51,7 +51,7 @@
 				</span>
 			</label>
 			<div class="col-sm-5">
-				<select name="featured_amenities[]" id="rt_featured_amenities" class="form-control chosen" multiple>
+				<select name="featured_amenities[]" id="rt_featured_amenities" class="form-control" multiple>
 				</select>
 			</div>
 		</div>
@@ -72,14 +72,14 @@
 <script type="text/javascript">
 (function ($) {
 	var featuredIds = {$featured_amenity_ids|json_encode};
-	var $select = $('#rt_featured_amenities');
+	var chosenReady = false;
 
 	function syncFeaturedSelect() {
+		var $select = $('#rt_featured_amenities');
 		var existing = {};
 		$select.find('option').each(function () {
 			existing[$(this).val()] = true;
 		});
-
 		$('input[name="room_type_amenities[]"]').each(function () {
 			var $cb = $(this);
 			var id = $cb.val();
@@ -87,29 +87,38 @@
 			if ($cb.is(':checked')) {
 				if (!existing[id]) {
 					var selected = featuredIds.indexOf(parseInt(id)) !== -1;
-					$select.append(
-						$('<option></option>').val(id).text(name).prop('selected', selected)
-					);
+					$select.append($('<option></option>').val(id).text(name).prop('selected', selected));
 				}
 			} else {
 				$select.find('option[value="' + id + '"]').remove();
 			}
 		});
-
-		$select.trigger('chosen:updated');
+		if (chosenReady) {
+			$select.trigger('chosen:updated');
+		}
 	}
 
 	$(document).on('click', '#room-type-amenities-tree :input[type="checkbox"]', function () {
 		setTimeout(syncFeaturedSelect, 0);
 	});
-
 	$(document).on('click', '#check-all-room-type-amenities-tree, #uncheck-all-room-type-amenities-tree', function () {
 		setTimeout(syncFeaturedSelect, 0);
 	});
 
-	$(document).ready(function () {
+	function initChosen() {
+		var $select = $('#rt_featured_amenities');
 		syncFeaturedSelect();
-	});
+		$select.chosen({ disable_search_threshold: 5, search_contains: true });
+		chosenReady = true;
+		$select.trigger('chosen:updated');
+	}
+
+	var $tabContent = $('#product-tab-content-Amenities');
+	if ($tabContent.is(':visible')) {
+		initChosen();
+	} else {
+		$tabContent.one('displayed', initChosen);
+	}
 }(jQuery));
 </script>
 {/if}
