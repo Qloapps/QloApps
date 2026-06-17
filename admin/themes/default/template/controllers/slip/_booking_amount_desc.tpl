@@ -19,5 +19,8 @@
 * @copyright Since 2010 Webkul
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
-
-{l s='Total cost of room and service:'} <strong><span id="booking-amount">-</span></strong>
+{l s='Total room price:'} <strong><span id="booking-room-amount">-</span></strong><br>
+{l s='Total service price:'} <strong><span id="booking-service-amount">-</span></strong><br>
+{l s='Total order amount:'} <strong><span id="booking-amount">-</span></strong><br>
+{l s='Total credit slip amount for this order:'} <strong><span id="booking-total-slip-amount">-</span></strong><br>
+<span id="booking-slip-ids-wrapper" style="display:none;">{l s='Credit slip which are generated is -'} <strong><span id="booking-slip-ids"></span></strong></span>

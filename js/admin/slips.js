@@ -134,6 +134,9 @@ $(document).ready(function() {
         if (!idOrder) {
             $('#order-info').hide();
             $('#order-view-link').hide();
+            $('#booking-total-slip-amount').text('-');
+            $('#booking-slip-ids').html('');
+            $('#booking-slip-ids-wrapper').hide();
             return;
         }
 
@@ -157,6 +160,22 @@ $(document).ready(function() {
                 allBookings = response.bookings || [];
 
                 currencySign = response.currency.sign;
+                var totalSlipAmount = parseFloat(response.total_slip_amount || 0);
+                $('#booking-total-slip-amount').text(currencySign + ' ' + totalSlipAmount.toFixed(2));
+                var slipIds = response.slip_ids || [];
+                if (slipIds.length) {
+                    var links = slipIds.map(function (id) {
+                        var href = admin_order_slip_tab_link
+                            + '&order_slipFilter_id_order_slip=' + id
+                            + '&submitFilterorder_slip=1';
+                        return '<a href="' + href + '">#' + id + '</a>';
+                    });
+                    $('#booking-slip-ids').html(links.join(', '));
+                    $('#booking-slip-ids-wrapper').show();
+                } else {
+                    $('#booking-slip-ids').html('');
+                    $('#booking-slip-ids-wrapper').hide();
+                }
                 $('#credit_slip_amount')
                     .closest('.input-group')
                     .find('.input-group-addon, .input-group-text')
@@ -228,8 +247,12 @@ $(document).ready(function() {
             var roomCost = parseFloat(booking.total_price_tax_incl);
             var serviceCost = parseFloat(booking.extra_service_total_price_tax_incl || 0);
             var total = roomCost + serviceCost;
+            $('#booking-room-amount').text(currencySign + ' ' + roomCost.toFixed(2));
+            $('#booking-service-amount').text(currencySign + ' ' + serviceCost.toFixed(2));
             $('#booking-amount').text(currencySign + ' ' + total.toFixed(2));
         } else {
+            $('#booking-room-amount').text('-');
+            $('#booking-service-amount').text('-');
             $('#booking-amount').text('-');
         }
     });
