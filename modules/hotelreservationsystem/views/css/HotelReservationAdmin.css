@@ -635,3 +635,163 @@ body.adminhotelroomsbooking .ui-tooltip {
 .error-border {
     outline: rgb(210, 124, 130) solid 1px;
     border-radius: 2px;}
+
+.qlo-video-preview-card {
+    background: #111;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    max-width: 480px;
+    display: inline-block;
+    vertical-align: top;
+    width: 100%;
+}
+
+.qlo-video-preview-player {
+    display: block;
+    width: 100%;
+    max-height: 240px;
+    background: #000;
+}
+
+.qlo-video-url-preview {
+    padding: 14px 16px;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0;
+    word-break: break-all;
+    font-size: 13px;
+    color: #444;
+}
+
+.qlo-video-url-preview .icon-link {
+    margin-right: 6px;
+    color: #5bc0de;
+    font-size: 14px;
+}
+
+.wk-inline-hint {
+    display: inline-block;
+    margin: 6px 0 0 10px;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+@keyframes wkSlideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.qlo-anim-slide-left {
+    animation: wkSlideInLeft 0.22s ease forwards;
+}
+
+#qlo-img-form-panel .panel {
+    border-left: 3px solid #5cb85c;
+}
+
+#qlo-img-form-panel .panel-heading {
+    background-color: #f0fff0;
+}
+
+.qlo-img-thumb {
+    width: 120px;
+    height: 75px;
+    -o-object-fit: cover;
+    object-fit: cover;
+    display: block;
+}
+
+#qlo-image-table tbody tr.qlo-img-row:hover {
+    background-color: #f9f9f9;
+}
+
+.qlo-img-tagline-cell {
+    max-width: 220px;
+    color: #555;
+    vertical-align: middle !important;
+}
+
+.wk-row-placeholder {
+    background: #eef6ff !important;
+    border: 1px dashed #99c0e0 !important;
+}
+
+.wk-row-placeholder td {
+    padding: 0 !important;
+    height: 85px;
+}
+
+
+/* ---- File list in add-image form ---- */
+.qlo-files-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    max-width: 520px;
+}
+.qlo-files-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 3px;
+    margin-bottom: 5px;
+    background: #f9f9f9;
+    font-size: 13px;
+}
+.qlo-files-list li:last-child {
+    margin-bottom: 0;
+}
+.qlo-files-list .qlo-file-name {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+    color: #333;
+}
+.qlo-files-list .qlo-file-size {
+    font-size: 11px;
+    color: #999;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.qlo-files-list .qlo-remove-file {
+    flex-shrink: 0;
+    padding: 3px 8px;
+    line-height: 1;
+    font-size: 13px;
+    color: #999;
+    border-color: #ccc;
+    background: #fff;
+}
+.qlo-files-list .qlo-remove-file:hover,
+.qlo-files-list .qlo-remove-file:focus {
+    color: #c0392b;
+    border-color: #c0392b;
+    background: #fff5f5;
+}
+
+/* ---- Edit preview image in form ---- */
+#qlo-img-edit-thumb {
+    max-width: 160px;
+    max-height: 100px;
+    object-fit: cover;
+    border-radius: 3px;
+}
+
+/* ---- Inline multilingual input (inside input-group-btn) ---- */
+.wk-inline-lang-input {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}

@@ -457,17 +457,16 @@ class OrderDetailCore extends ObjectModel
                         $numDays = 1;
                     }
 
-                    $unit_price_tax_excl = array_reduce($serviceProductData['additional_services'], function ($unitPriceTaxExcl, $item) {
-                        return $unitPriceTaxExcl + (isset($item['unit_price_tax_excl']) ? $item['unit_price_tax_excl'] : 0);
-                    }, 0);
-
                     $quantity = array_reduce($serviceProductData['additional_services'], function ($totalQty, $item) {
                         return $totalQty + (isset($item['quantity']) ? $item['quantity'] : 0);
                     }, 0);
 
+                    $firstServiceProduct = array_shift($serviceProductData['additional_services']);
+
+                    $unit_price_tax_excl = isset($firstServiceProduct['unit_price_tax_excl']) ? $firstServiceProduct['unit_price_tax_excl'] : 0;
+
                     $quantity = $quantity * $numDays;
 
-                    $firstServiceProduct = array_shift($serviceProductData['additional_services']);
                     $tax_manager = TaxManagerFactory::getManager($this->vat_address, (int)$firstServiceProduct['id_tax_rules_group']);
                     $this->tax_calculator = $tax_manager->getTaxCalculator();
                 } elseif ($serviceProductData = $objServiceProductCartDetail->getServiceProductsInCart(
@@ -478,15 +477,13 @@ class OrderDetailCore extends ObjectModel
                     $taxGroupInfo['id_room_type'],
                     $this->product_id
                 )) {
-                    $unit_price_tax_excl = array_reduce($serviceProductData, function ($unitPriceTaxExcl, $item) {
-                        return $unitPriceTaxExcl + (isset($item['unit_price_tax_excl']) ? $item['unit_price_tax_excl'] : 0);
-                    }, 0);
 
                     $quantity = array_reduce($serviceProductData, function ($totalQty, $item) {
                         return $totalQty + (isset($item['quantity']) ? $item['quantity'] : 0);
                     }, 0);
 
                     $serviceProductData = array_shift($serviceProductData);
+                    $unit_price_tax_excl = isset($serviceProductData['unit_price_tax_excl']) ? $serviceProductData['unit_price_tax_excl'] : 0;
 
                     $numDays = 1;
                     if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)

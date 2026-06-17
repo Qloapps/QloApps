@@ -498,7 +498,6 @@ class FrontControllerCore extends Controller
             'is_occupancy_wise_search'    => $isOccupancyWiseSearch,
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
-            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'show_full_date' => $this->show_full_date
         ));
 
@@ -1216,6 +1215,42 @@ class FrontControllerCore extends Controller
             'content_only'          => (int)Tools::getValue('content_only'),
             'WK_DISPLAY_PROPERTIES_LINK_IN_HEADER' => Configuration::get('WK_DISPLAY_PROPERTIES_LINK_IN_HEADER'),
         ));
+
+        if ($this->php_self === 'index') {
+            $mediaTypeInt = (int)(Configuration::get('QLO_HEADER_MEDIA_TYPE') ?: HotelHeaderImage::MEDIA_TYPE_IMAGE);
+            if ($mediaTypeInt === HotelHeaderImage::MEDIA_TYPE_VIDEO) {
+                $videoConfig = HotelHeaderImage::getVideoConfig();
+                if ($videoConfig) {
+                    $mimeMap = array('mp4' => 'video/mp4', 'webm' => 'video/webm', 'ogg' => 'video/ogg');
+                    if ($videoConfig['source_type'] === 'upload') {
+                        $ext = strtolower(pathinfo($videoConfig['name'], PATHINFO_EXTENSION));
+                    } else {
+                        $urlPath = parse_url($videoConfig['name'], PHP_URL_PATH);
+                        $ext = strtolower(pathinfo($urlPath ?: '', PATHINFO_EXTENSION));
+                    }
+                    $videoConfig['mime_type'] = isset($mimeMap[$ext]) ? $mimeMap[$ext] : 'video/mp4';
+                    $headerMediaItems = array($videoConfig);
+                } else {
+                    $headerMediaItems = array();
+                }
+            } else {
+                $headerMediaItems = HotelHeaderImage::getItems();
+            }
+            $this->context->smarty->assign(array(
+                'QLO_HEADER_MEDIA_TYPE'         => $mediaTypeInt,
+                'QLO_HEADER_MEDIA_TYPE_IMAGE'   => HotelHeaderImage::MEDIA_TYPE_IMAGE,
+                'QLO_HEADER_MEDIA_TYPE_VIDEO'   => HotelHeaderImage::MEDIA_TYPE_VIDEO,
+                'WK_HEADER_NAV_TYPE_DOTS'       => HotelHeaderImage::NAV_TYPE_DOTS,
+                'QLO_HEADER_ANIM_TYPE_SLIDE'    => HotelHeaderImage::ANIM_TYPE_SLIDE,
+                'headerMediaItems'              => $headerMediaItems,
+                'headerSliderConfig'            => array(
+                    'nav_type'  => (int)(Configuration::get('QLO_HEADER_SLIDER_NAV_TYPE') ?: HotelHeaderImage::NAV_TYPE_DOTS),
+                    'auto_play' => (int)Configuration::get('QLO_HEADER_SLIDER_AUTO_PLAY'),
+                    'interval'  => (int)Configuration::get('QLO_HEADER_SLIDER_INTERVAL'),
+                    'anim_type' => (int)(Configuration::get('QLO_HEADER_SLIDER_ANIM_TYPE') ?: HotelHeaderImage::ANIM_TYPE_SLIDE),
+                ),
+            ));
+        }
 
         $this->context->smarty->assign($this->initLogoAndFavicon());
     }

@@ -527,7 +527,10 @@ class AdminControllerCore extends Controller
             29 => $this->l('Successful upgrade'),
             30 => $this->l('A partial refund was successfully created.'),
             31 => $this->l('The discount was successfully generated.'),
-            32 => $this->l('Successfully signed in to PrestaShop Addons')
+            32 => $this->l('Successfully signed in to PrestaShop Addons'),
+            33 => $this->l('The selected module(s) have been successfully enabled.'),
+            34 => $this->l('The selected module(s) have been successfully disabled.'),
+
         );
 
         if (!$this->identifier) {
@@ -1427,8 +1430,8 @@ class AdminControllerCore extends Controller
                     } elseif ($this->postImage($object->id) && !count($this->errors) && $this->_redirect) {
                         $parent_id = (int)Tools::getValue('id_parent', 1);
                         // Specific back redirect
-                        if ($back = Tools::getValue('back')) {
-                            $this->redirect_after = urldecode($back).'&conf=4';
+                        if (($back = Tools::secureReferrer(Tools::getValue('back'))) && $back != __PS_BASE_URI__) {
+                                $this->redirect_after=urldecode($back).'&conf=4';
                         }
                         // Specific scene feature
                         // @todo change stay_here submit name (not clear for redirect to scene ... )
@@ -2304,7 +2307,9 @@ class AdminControllerCore extends Controller
             $this->content .= $this->renderDetails();
         } elseif (!$this->ajax) {
             $this->content .= $this->renderModulesList();
-            $this->content .= $this->renderKpis();
+            if ($this->tabAccess['kpi'] === 1) {
+                $this->content .= $this->renderKpis();
+            }
             $this->content .= $this->renderList();
             $this->content .= $this->renderOptions();
 
@@ -3839,9 +3844,10 @@ class AdminControllerCore extends Controller
                 if ($key == 'passwd' && Tools::getValue('id_'.$table) && empty($value)) {
                     continue;
                 }
-                /* Automatically encrypt password in MD5 */
+                /* Automatically hash password */
                 if ($key == 'passwd' && !empty($value)) {
-                    $value = Tools::encrypt($value);
+                    $objHash = new PasswordHashing();
+                    $value = $objHash->passwordHash($value);
                 }
                 $object->{$key} = $value;
             }

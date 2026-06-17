@@ -8,6 +8,7 @@ CREATE TABLE `PREFIX_access` (
   `add` int(11) NOT NULL,
   `edit` int(11) NOT NULL,
   `delete` int(11) NOT NULL,
+  `kpi` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_profile`,`id_tab`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
@@ -593,7 +594,7 @@ CREATE TABLE `PREFIX_customer` (
   `firstname` varchar(32) NOT NULL,
   `lastname` varchar(32) NOT NULL,
   `email` varchar(128) NOT NULL,
-  `passwd` varchar(32) NOT NULL,
+  `passwd` varchar(60) NOT NULL,
   `last_passwd_gen` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `birthday` date DEFAULT NULL,
   `newsletter` tinyint(1) unsigned NOT NULL DEFAULT '0',
@@ -779,7 +780,7 @@ CREATE TABLE `PREFIX_employee` (
   `lastname` varchar(32) NOT NULL,
   `firstname` varchar(32) NOT NULL,
   `email` varchar(128) NOT NULL,
-  `passwd` varchar(32) NOT NULL,
+  `passwd` varchar(60) NOT NULL,
   `last_passwd_gen` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `stats_date_from` date DEFAULT NULL,
   `stats_date_to` date DEFAULT NULL,
@@ -1514,6 +1515,7 @@ CREATE TABLE `PREFIX_order_payment_detail` (
 	`id_order_payment` INT(10) unsigned NOT NULL,
 	`id_order` INT(10) unsigned NOT NULL,
 	`amount` DECIMAL(10,2) NOT NULL,
+  `receipt_number` INT(10) NOT NULL,
 	`date_add` DATETIME NOT NULL,
 	PRIMARY KEY (`id_order_payment_detail`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
@@ -1781,7 +1783,7 @@ CREATE TABLE `PREFIX_range_weight` (
 CREATE TABLE `PREFIX_referrer` (
   `id_referrer` int(10) unsigned NOT NULL auto_increment,
   `name` varchar(64) NOT NULL,
-  `passwd` varchar(32) DEFAULT NULL,
+  `passwd` varchar(60) DEFAULT NULL,
   `http_referer_regexp` varchar(64) DEFAULT NULL,
   `http_referer_like` varchar(64) DEFAULT NULL,
   `request_uri_regexp` varchar(64) DEFAULT NULL,

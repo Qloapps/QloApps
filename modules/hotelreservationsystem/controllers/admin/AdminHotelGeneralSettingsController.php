@@ -30,10 +30,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         $this->bootstrap = true;
         parent::__construct();
 
-        $psImgUrl = $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('WK_HOTEL_HEADER_IMAGE'));
-        if ($imgExist = (bool)Tools::file_get_contents($psImgUrl)) {
-            $image = '<img class="img-thumbnail img-responsive" style="max-width:200px" src="'.$psImgUrl.'">';
-        }
         $objHotelInfo = new HotelBranchInformation();
         if (!$hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1)) {
             $hotelsInfo = array();
@@ -136,14 +132,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'validation' => 'isGenericName',
                         'hint' => $this->l('Enter Hotel name in case of single hotel or enter your hotels chain name in case of multiple hotels.'),
                     ),
-                    'WK_HTL_TAG_LINE' => array(
-                        'title' => $this->l('Hotel Tag Line'),
-                        'type' => 'textareaLang',
-                        'lang' => true,
-                        'required' => true,
-                        'validation' => 'isGenericName',
-                        'hint' => $this->l('This will display hotel tag line in hotel page.'),
-                    ),
                     'WK_HTL_SHORT_DESC' => array(
                         'title' => $this->l('Hotel Short Description'),
                         'type' => 'textareaLang',
@@ -166,14 +154,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('The year when your hotel site was launched.'),
                         'type' => 'text',
                         'class' => 'fixed-width-xxl',
-                    ),
-                    'WK_HTL_HEADER_IMAGE' => array(
-                        'title' => $this->l('Header Background Image'),
-                        'type' => 'file',
-                        'image' => $imgExist ? $image : false,
-                        'hint' => $this->l('This image appears as header background image on home page.'),
-                        'name' => 'WK_HOTEL_HEADER_IMAGE',
-                        'url' => _PS_IMG_,
                     ),
                      'WK_DISPLAY_PROPERTIES_LINK_IN_HEADER' => array(
                         'title' => $this->l('Display Our Properties link in Header'),
@@ -378,14 +358,14 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('Enter the age of the guest,  which that guest will be considered as child.'),
                         'class' => 'fixed-width-xxl',
                     ),
-                    'WK_GLOBAL_MAX_CHILD_IN_ROOM' => array(
-                        'title' => $this->l('Maximum children allowed in a room'),
+                    'QLO_GLOBAL_MAX_INFANT_AGE' => array(
+                        'title' => $this->l('Consider guest as Infant below age'),
                         'type' => 'text',
                         'required' => true,
                         'validation' => 'isUnsignedInt',
-                        'hint' => $this->l('Enter number of the child allowed in a room.'),
-                        'desc' => $this->l('Set as 0 if you do not want to limit children in a room.'),
+                        'hint' => $this->l('Enter the maximum age (in years) below which a guest is considered an infant.'),
                         'class' => 'fixed-width-xxl',
+                        'desc' => $this->l('Infant age must be at least 1 and less than the child max age.'),
                     ),
                 ),
                 'submit' => array(
@@ -531,13 +511,25 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             // Validation for the occupancy settings
             // max age of infant after which guest will considered as child // below 18
             $globalChildMaxAge = Tools::getValue('WK_GLOBAL_CHILD_MAX_AGE');
-            $globalMaxChildInRoom = Tools::getValue('WK_GLOBAL_MAX_CHILD_IN_ROOM');
+            $globalInfantAge = Tools::getValue('QLO_GLOBAL_MAX_INFANT_AGE');
+
             if (!Validate::isUnsignedInt($globalChildMaxAge)) {
                 $this->errors[] = $this->l('Invalid value for "Consider guest as child below age".');
             } else if ($globalChildMaxAge <= 0) {
                 $this->errors[] = $this->l('The value for "Consider guest as child below age" must be at least 1.');
             }
 
+            if ($globalInfantAge === '' || $globalInfantAge === false) {
+                $this->context->controller->errors[] = $this->l('Infant age is required');
+            } elseif (!Validate::isUnsignedInt($globalInfantAge)) {
+                $this->context->controller->errors[] = $this->l('Invalid infant age');
+            } elseif ($globalInfantAge <= 0) {
+                $this->context->controller->errors[] = $this->l('The value for infant age must be at least 1.');
+            } elseif ($globalInfantAge >= $globalChildMaxAge) {
+                $this->context->controller->errors[] = sprintf($this->l('The infant age cannot be greater than the Global child age (%s years)'), $globalChildMaxAge);
+            } else {
+                Configuration::updateValue('QLO_GLOBAL_MAX_INFANT_AGE', $globalInfantAge);
+            }
             // End occupancy fields validation
 
             if (!$hotelNameSearchThreshold && $hotelNameSearchThreshold !== '0') {
@@ -557,17 +549,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     }
                 }
             }
-            if (!trim(Tools::getValue('WK_HTL_TAG_LINE_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Hotel tag line is required at least in ').$objDefaultLanguage['name'];
-            } else {
-                foreach ($languages as $lang) {
-                    if (trim(Tools::getValue('WK_HTL_TAG_LINE_'.$lang['id_lang']))) {
-                        if (!Validate::isGenericName(Tools::getValue('WK_HTL_TAG_LINE_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid Hotel tag line in ').$lang['name'];
-                        }
-                    }
-                }
-            }
             if (!trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Hotel short description is required at least in ').
                 $objDefaultLanguage['name'];
@@ -577,24 +558,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         if (!Validate::isGenericName(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
                             $this->errors[] = $this->l('Invalid hotel short description in ').$lang['name'];
                         }
-                    }
-                }
-            }
-            if ($_FILES['WK_HOTEL_HEADER_IMAGE']['name']) {
-                if ($error = ImageManager::validateUpload($_FILES['WK_HOTEL_HEADER_IMAGE'], Tools::getMaxUploadSize())) {
-                    $this->errors[] = $error;
-                }
-
-                if (!count($this->errors)) {
-                    $file_name = 'hotel_header_image_'.time().'.jpg';
-                    $img_path = _PS_IMG_DIR_.$file_name;
-
-                    if (ImageManager::resize($_FILES['WK_HOTEL_HEADER_IMAGE']['tmp_name'], $img_path)) {
-                        $olderHeaderImg = _PS_IMG_DIR_.Configuration::get('WK_HOTEL_HEADER_IMAGE');
-                        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', $file_name);
-                        Tools::deleteFile($olderHeaderImg);
-                    } else {
-                        $this->errors[] = $this->l('Some error occured while uoploading image.Please try again.');
                     }
                 }
             }
@@ -648,11 +611,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
                         $_POST['WK_HTL_CHAIN_NAME_'.$lang['id_lang']] = trim(
                             Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId)
-                        );
-                    }
-                    if (!trim(Tools::getValue('WK_HTL_TAG_LINE_'.$lang['id_lang']))) {
-                        $_POST['WK_HTL_TAG_LINE_'.$lang['id_lang']] = trim(
-                            Tools::getValue('WK_HTL_TAG_LINE_'.$defaultLangId)
                         );
                     }
                     if (!trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {

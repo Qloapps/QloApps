@@ -74,6 +74,9 @@ class HotelReservationSystem extends Module
             }
         }
         //End
+        if (Tools::getValue('controller') == 'index') {
+            $this->context->controller->addJS($this->_path.'views/js/HotelHeaderMediaFront.js');
+        }
         $this->context->controller->addCSS($this->_path.'/views/css/HotelReservationFront.css');
         $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
     }
@@ -325,12 +328,20 @@ class HotelReservationSystem extends Module
     public function hookDisplayAfterHookTop()
     {
         if (Tools::getValue('controller') == 'index') {
-            $this->context->smarty->assign(
-                array(
-                    'WK_HTL_CHAIN_NAME' => Configuration::get('WK_HTL_CHAIN_NAME', $this->context->language->id),
-                    'WK_HTL_TAG_LINE' => Configuration::get('WK_HTL_TAG_LINE', $this->context->language->id),
-                )
-            );
+            $headerMediaItems = $this->context->smarty->getTemplateVars('headerMediaItems');
+            $firstItem = ($headerMediaItems && !empty($headerMediaItems[0])) ? $headerMediaItems[0] : array();
+            $tagLine   = !empty($firstItem['tag_line']) ? $firstItem['tag_line'] : '';
+            $this->context->smarty->assign(array(
+                'WK_HTL_CHAIN_NAME'          => Configuration::get('WK_HTL_CHAIN_NAME', $this->context->language->id),
+                'wkHeaderMediaTagLine'       => $tagLine,
+                'wkTagLineColor'             => !empty($firstItem['tag_line_color'])       ? $firstItem['tag_line_color']       : '#ffffff',
+                'wkTagLineFontSize'          => !empty($firstItem['tag_line_font_size'])   ? (int)$firstItem['tag_line_font_size']   : 16,
+                'wkTagLineFontWeight'        => !empty($firstItem['tag_line_font_weight']) ? $firstItem['tag_line_font_weight'] : '400',
+                'QLO_HOTEL_NAME_ENABLE'      => (int)Configuration::get('QLO_HOTEL_NAME_ENABLE'),
+                'wkHeaderContentAlign'       => (int)(Configuration::get('QLO_HEADER_CONTENT_ALIGN') ?: HotelHeaderImage::CONTENT_ALIGN_CENTER),
+                'QLO_HEADER_MEDIA_TYPE'      => (int)(Configuration::get('QLO_HEADER_MEDIA_TYPE') ?: HotelHeaderImage::MEDIA_TYPE_IMAGE),
+                'QLO_HEADER_MEDIA_TYPE_VIDEO' => HotelHeaderImage::MEDIA_TYPE_VIDEO,
+            ));
             return $this->display(__FILE__, 'headerHotelDescBlock.tpl');
         }
     }
@@ -486,7 +497,6 @@ class HotelReservationSystem extends Module
             // update configuration keys
             $configKeys = array(
                 'WK_HTL_CHAIN_NAME',
-                'WK_HTL_TAG_LINE',
                 'WK_HTL_SHORT_DESC',
             );
             HotelHelper::updateConfigurationLangKeys($newIdLang, $configKeys);
@@ -530,6 +540,7 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', 'AdminHotelConfigurationSetting', false);
+        $this->installTab('AdminHotelHeaderImage', 'Header Image Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminBookingDocument', 'Booking Documents', false, false);
 
         return true;
@@ -637,9 +648,10 @@ class HotelReservationSystem extends Module
             'WK_ROOM_LEFT_WARNING_NUMBER',
             'WK_HTL_ESTABLISHMENT_YEAR',
             'WK_HTL_CHAIN_NAME',
+            'WK_HTL_TAG_LINE',
             'WK_TITLE_HEADER_BLOCK',
             'WK_CONTENT_HEADER_BLOCK',
-            'WK_HTL_HEADER_IMAGE',
+            'WK_HOTEL_HEADER_IMAGE',
             'WK_ALLOW_ADVANCED_PAYMENT',
             'WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT',
             'WK_ADVANCED_PAYMENT_INC_TAX',
@@ -648,7 +660,15 @@ class HotelReservationSystem extends Module
             'WK_HOTEL_NAME_ENABLE',
             'WK_CUSTOMER_SUPPORT_PHONE_NUMBER',
             'WK_CUSTOMER_SUPPORT_EMAIL',
-            'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST'
+            'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST',
+            'QLO_HEADER_MEDIA_TYPE',
+            'QLO_HOTEL_NAME_ENABLE',
+            'QLO_HEADER_VIDEO_SOURCE_TYPE',
+            'QLO_HEADER_VIDEO_NAME',
+            'QLO_HEADER_SLIDER_NAV_TYPE',
+            'QLO_HEADER_SLIDER_AUTO_PLAY',
+            'QLO_HEADER_SLIDER_INTERVAL',
+            'QLO_HEADER_SLIDER_ANIM_TYPE',
         );
         foreach ($configKeys as $key) {
             if (!Configuration::deleteByName($key)) {

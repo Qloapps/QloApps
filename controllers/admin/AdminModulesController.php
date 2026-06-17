@@ -624,21 +624,57 @@ class AdminModulesControllerCore extends AdminController
     public function postProcessEnable()
     {
         if ($this->tabAccess['edit'] === 1) {
-            $module = Module::getInstanceByName(Tools::getValue('module_name'));
-            if (Validate::isLoadedObject($module)) {
+
+            $moduleNames = array_unique(array_filter(
+                explode('|', strip_tags((string) Tools::getValue('module_name')))
+            ));
+
+            $enable = Tools::getValue('enable');
+
+            if (empty($moduleNames)) {
+                $this->errors[] = Tools::displayError('You must select at least one module.');
+                return;
+            }
+            $modules = array();
+
+            foreach ($moduleNames as $moduleName) {
+                if (!Validate::isModuleName($moduleName)) {
+                    $this->errors[] = Tools::displayError('Invalid module name ') . ': ' . $moduleName;
+                    continue;
+                }
+
+                if (!Module::isInstalled($moduleName)) {
+                    $this->errors[] = Tools::displayError('This module is not installed ') . ': ' . $moduleName;
+                    continue;
+                }
+
+                $module = Module::getInstanceByName($moduleName);
+                if (!Validate::isLoadedObject($module)) {
+                    $this->errors[] = Tools::displayError('Cannot load the module\'s object ') . ': ' . $moduleName;
+                    continue;
+                }
+
                 if (!$module->getPermission('configure')) {
-                    $this->errors[] = Tools::displayError('You do not have the permission to use this module.');
-                } else {
-                    if (Tools::getValue('enable')) {
+                    $this->errors[] = Tools::displayError('You do not have the permission to use this module ') . ': ' . $module->displayName;
+                    continue;
+                }
+
+                $modules[] = $module;
+            }
+
+            if (empty($this->errors)) {
+                foreach ($modules as $module) {
+                    if ($enable) {
                         $module->enable();
                     } else {
                         $module->disable();
                     }
-                    Tools::redirectAdmin($this->getCurrentUrl('enable'));
                 }
-            } else {
-                $this->errors[] = Tools::displayError('Cannot load the module\'s object.');
+
+
+                Tools::redirectAdmin($this->getCurrentUrl(array('enable','conf')).'&conf='.($enable ? 33 : 34));
             }
+
         } else {
             $this->errors[] = Tools::displayError('You do not have permission to add this.');
         }

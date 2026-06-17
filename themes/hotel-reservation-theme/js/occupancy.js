@@ -58,8 +58,6 @@ $(document).ready(function(){
 			let max_child_in_room;
 			if ($(this).closest(".booking_occupancy_wrapper").find('.max_children').val()) {
 				max_child_in_room = $(this).closest(".booking_occupancy_wrapper").find('.max_children').val();
-			} else {
-				max_child_in_room = window.max_child_in_room;
 			}
             if (elementVal < max_child_in_room && elementVal < max_allowed_for_current) {
                 element.val(elementVal + 1);
