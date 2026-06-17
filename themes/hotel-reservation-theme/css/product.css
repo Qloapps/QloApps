@@ -1295,6 +1295,9 @@ Quick View Styles
 .room_feature_group {
   margin-bottom: 15px;}
 .room_feature_group .room_info_heading {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   margin-bottom: 3px;}
 
 .product_wrapper .form-control {

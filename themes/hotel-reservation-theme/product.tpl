@@ -267,22 +267,30 @@
 															<div class="info_margin_div">
 																{assign var="current_feature_name" value=""}
 																{assign var="current_feature_values" value=""}
+																{assign var="current_feature_id" value=0}
 																{foreach from=$room_dynamic_features item=feature}
 																	{if $feature.name != $current_feature_name}
 																		{if $current_feature_name != ""}
 																			<div class="room_feature_group">
-																				<div class="room_info_heading"><span>{$current_feature_name|escape:'html':'UTF-8'}</span></div>
+																				<div class="room_info_heading">
+																					<img src="{$smarty.const._PS_IMG_}rf/{$current_feature_id|intval}.jpg" alt="{$current_feature_name|escape:'html':'UTF-8'}" title="{$current_feature_name|escape:'html':'UTF-8'}" style="max-height:20px;max-width:20px;" onerror="this.style.display='none'" />
+																					<span>{$current_feature_name|escape:'html':'UTF-8'}</span>
+																				</div>
 																				<div class="room_info_content">{$current_feature_values|escape:'html':'UTF-8'}</div>
 																			</div>
 																		{/if}
 																		{assign var="current_feature_name" value=$feature.name}
+																		{assign var="current_feature_id" value=$feature.id_feature}
 																		{assign var="current_feature_values" value=$feature.value}
 																	{else}
 																		{assign var="current_feature_values" value="`$current_feature_values`, `$feature.value`"}
 																	{/if}
 																	{if $feature@last}
 																		<div class="room_feature_group">
-																			<div class="room_info_heading"><span>{$current_feature_name|escape:'html':'UTF-8'}</span></div>
+																			<div class="room_info_heading">
+																				<img src="{$smarty.const._PS_IMG_}rf/{$current_feature_id|intval}.jpg" alt="{$current_feature_name|escape:'html':'UTF-8'}" title="{$current_feature_name|escape:'html':'UTF-8'}" style="max-height:20px;max-width:20px;" onerror="this.style.display='none'" />
+																				<span>{$current_feature_name|escape:'html':'UTF-8'}</span>
+																			</div>
 																			<div class="room_info_content">{$current_feature_values|escape:'html':'UTF-8'}</div>
 																		</div>
 																	{/if}
