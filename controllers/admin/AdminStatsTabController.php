@@ -153,20 +153,16 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $modules = $this->getModules();
 
         // Keyed by module name. Each entry holds display_name and optionally tabs.
-        // tabs is populated only if the module implements getStatsTabs(), returning:
-        //   array( 'tab_key' => ['key' => 'tab_key', 'label' => 'Label'], ... )
         // 'key' maps to the `tab` GET param; read in hookAdminStatsModules() to render the correct report.
+        // tabs populated only if module implements getStatsTabs(), returning:
+        //   array( ['key' => 'tab_key', 'label' => 'Label'], ... )
         $statsTabs = array();
-        foreach ($modules as $m => $module) {
+        foreach ($modules as $module) {
             if ($moduleObj = Module::getInstanceByName($module['name'])) {
-                $modules[$m]['displayName'] = $moduleObj->displayName;
                 $statsTabs[$module['name']] = array('display_name' => $moduleObj->displayName);
                 if (method_exists($moduleObj, 'getStatsTabs')) {
                     $statsTabs[$module['name']]['tabs'] = $moduleObj->getStatsTabs();
                 }
-            } else {
-                unset($statsTabs[$module['name']]);
-                unset($modules[$m]);
             }
         }
 
@@ -174,14 +170,13 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
             'stats_tabs' => &$statsTabs
         ));
 
-        uasort($modules, array($this, 'checkModulesNames'));
+        uasort($statsTabs, array($this, 'checkModulesNames'));
 
         $tpl->assign(array(
             'current' => self::$currentIndex,
             'current_module_name' => Tools::getValue('module', 'statsforecast'),
             'current_tab' => Tools::getValue('tab', ''), // active sub-tab key
             'token' => $this->token,
-            'modules' => $modules,
             'module_tabs' => $statsTabs,
         ));
 
@@ -190,7 +185,7 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
 
     public function checkModulesNames($a, $b)
     {
-        return ($a['displayName'] > $b['displayName']) ? 1 : 0;
+        return ($a['display_name'] > $b['display_name']) ? 1 : 0;
     }
 
     protected function getModules()
