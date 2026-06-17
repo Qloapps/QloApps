@@ -8,6 +8,7 @@ CREATE TABLE `PREFIX_access` (
   `add` int(11) NOT NULL,
   `edit` int(11) NOT NULL,
   `delete` int(11) NOT NULL,
+  `kpi` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_profile`,`id_tab`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
