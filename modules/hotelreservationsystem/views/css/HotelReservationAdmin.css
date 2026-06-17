@@ -249,9 +249,9 @@ p.room_cat_data
 
 .indi_cont
 {
-    margin: 10px 0px;
+    display: flex;
+    align-items: center;
 }
-
 
 .cart-table-thead
 {
@@ -606,6 +606,61 @@ body.adminhotelroomsbooking .ui-tooltip {
     border: unset;
     padding: 10px;
     box-shadow: 0px 0px 15px 0px #00000026;
+}
+#fullcalendar .fc-daygrid-day-events {
+    height: 0 ;
+    min-height: 0;
+    overflow: visible;
+}
+#fullcalendar .fc-event.search-result-event {
+    background-color: #FFFFFF;
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+    border-left-width: 5px;
+    border-left-style: solid;
+    border-radius: 3px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+    margin: 1px 4px;
+    padding: 2px 8px;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+#fullcalendar .fc-event.search-result-event .fc-event-title {
+    font-size: 14px;
+    font-weight: 400;
+    color: #333333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 1px;
+}
+#fullcalendar .fc-event.search-result-event .search-bar-count {
+    font-weight: 600;
+}
+#fullcalendar .fc-event.search-result-event:not(.fc-event-start) {
+    border-left: none;
+    padding-left: 13px;
+    margin-left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+#fullcalendar .fc-event.search-result-event:not(.fc-event-end) {
+    margin-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+#fullcalendar .fc-event.search-result-event:not(.fc-event-start) .fc-event-main {
+    visibility: hidden;
+}
+.calendar-legend {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: nowrap;
+    padding-top: 14px;
 }
 
 #room-reallocation-modal .modal-footer {
