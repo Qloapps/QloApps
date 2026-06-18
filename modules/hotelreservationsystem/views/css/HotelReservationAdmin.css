@@ -612,17 +612,17 @@ body.adminhotelroomsbooking .ui-tooltip {
     min-height: 0;
     overflow: visible;
 }
+#fullcalendar .fc-event.search-result-event:not(.fc-event-start) .fc-event-main {
+    visibility: hidden;
+}
 #fullcalendar .fc-event.search-result-event {
     background-color: #FFFFFF;
-    border-top: none;
-    border-right: none;
-    border-bottom: none;
-    border-left-width: 5px;
-    border-left-style: solid;
+    border: none;
+    border-left: 5px solid;
     border-radius: 3px;
     box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
     margin: 1px 4px;
-    padding: 2px 8px;
+    padding: 2px 4px;
     line-height: 1.4;
     display: flex;
     align-items: center;
@@ -637,9 +637,6 @@ body.adminhotelroomsbooking .ui-tooltip {
     text-overflow: ellipsis;
     padding: 1px;
 }
-#fullcalendar .fc-event.search-result-event .search-bar-count {
-    font-weight: 600;
-}
 #fullcalendar .fc-event.search-result-event:not(.fc-event-start) {
     border-left: none;
     padding-left: 13px;
@@ -651,9 +648,6 @@ body.adminhotelroomsbooking .ui-tooltip {
     margin-right: 0;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-}
-#fullcalendar .fc-event.search-result-event:not(.fc-event-start) .fc-event-main {
-    visibility: hidden;
 }
 .calendar-legend {
     display: flex;

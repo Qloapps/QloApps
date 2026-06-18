@@ -45,24 +45,14 @@ $(document).ready(function() {
 
             },
             eventContent: function(info) {
-                if (info.event.extendedProps.is_notification) {
-                    return false;
+                if (info.event.classNames.indexOf('search-result-event') !== -1) {
+                    return { html: '<div class="fc-event-title">' + info.event.title.replace(/^(\S+)/, '<strong>$1</strong>') + '</div>' };
                 }
             },
             eventDidMount: function(info) {
                 if (info.event.extendedProps.is_notification) {
                     var $cell = $(info.el).closest('td');
-                    var stats = info.event.extendedProps.data.stats;
-                    var bgColor;
-                    if (stats.num_avail > 0) {
-                        bgColor = '#D9EFD8';
-                    } else if (stats.num_part_avai > 0) {
-                        bgColor = '#FFF3CD';
-                    } else if (stats.num_booked == stats.total_rooms && stats.total_rooms != 0) {
-                        bgColor = '#C3E1FB';
-                    } else {
-                        bgColor = '#FFC4C4';
-                    }
+                    $cell.css('background-color', info.event.backgroundColor);
                     $cell.tooltip({
                         content: function()
                         {
@@ -122,10 +112,6 @@ $(document).ready(function() {
                         });
                     }
                 });
-                    info.event.remove();
-                    setTimeout(function() {
-                        $cell.find('.fc-daygrid-day-frame').css('background-color', bgColor);
-                    }, 0);
             } else {
                 $(info.el).tooltip({
                     content: function()
@@ -184,6 +170,7 @@ $(document).ready(function() {
                             });
                         }
                     });
+                    info.el.style.borderLeftColor = info.event.extendedProps.data.eventColor;
                 }
             },
             datesSet: function(arg) {
