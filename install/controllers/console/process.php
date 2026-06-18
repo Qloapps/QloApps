@@ -122,16 +122,6 @@ class InstallControllerConsoleProcess extends InstallControllerConsole
             if (!$this->processConfigureShop()) {
                 $this->printErrors();
             }
-            if ($this->datas->ssl !== false && $this->datas->ssl !== '') {
-                $ssl_raw = strtolower(trim((string)$this->datas->ssl));
-                if (!in_array($ssl_raw, array('0', '1', 'true', 'false'), true)) {
-                    echo 'Invalid value for --ssl. Accepted values: 1, 0, true, false.'."\n";
-                    die;
-                }
-                $ssl_value = (int) filter_var($ssl_raw, FILTER_VALIDATE_BOOLEAN);
-                Configuration::updateValue('PS_SSL_ENABLED', $ssl_value);
-                Configuration::updateValue('PS_SSL_ENABLED_EVERYWHERE', $ssl_value);
-            }
         }
 
         if (in_array('fixtures', $steps)) {
@@ -248,6 +238,7 @@ class InstallControllerConsoleProcess extends InstallControllerConsole
             'admin_lastname' =>            $this->datas->admin_lastname,
             'admin_password' =>            $this->datas->admin_password,
             'admin_email' =>            $this->datas->admin_email,
+            'enable_ssl' =>            $this->datas->enable_ssl,
             'marketing_consent' =>      $this->datas->marketing_consent,
             'configuration_agrement' =>    true,
             'send_informations' => true,

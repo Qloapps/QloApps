@@ -151,10 +151,10 @@ class Datas
             'default' => 1,
             'help' => 'Get news from QloApps',
         ),
-        'ssl' => array(
+        'enable_ssl' => array(
             'name' => 'ssl',
-            'default' => '',
-            'help' => 'Enable SSL: --ssl=1 or --ssl=true to enable, --ssl=0 or --ssl=false to disable',
+            'default' => 0,
+            'help' => 'Enable SSL for QloApps',
         ),
     );
 
