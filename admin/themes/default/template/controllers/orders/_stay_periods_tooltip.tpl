@@ -20,7 +20,6 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-
 <div id="stay-period-tpl"
      style="display:none;"
      data-label-dates="{l s='Dates'}"

@@ -393,7 +393,6 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $output = implode('<br>', $datesDisplay);
-
         $totalRooms = array_sum(array_column($formatted, 'count'));
 
         if ($totalRooms > 1) {
@@ -401,7 +400,6 @@ class AdminOrdersControllerCore extends AdminController
                 .htmlspecialchars(json_encode($formatted)).'">+'
                 .($totalRooms - 1).'</span>';
         }
-
         return $output;
     }
 
