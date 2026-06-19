@@ -1639,10 +1639,12 @@ class AdminOrdersControllerCore extends AdminController
 	                        $message->save();
                             PrestaShopLogger::addLog(
                                 sprintf(
-                                    $this->l('[%s] Hotel: %s | Room: %s reallocated to Room: %s (%s)'),
+                                    $this->l('[%s] Hotel: %s | Room: %s (check-in: %s, check-out: %s) reallocated to Room: %s (%s)'),
                                     $order->reference,
                                     $objHotelBooking->hotel_name,
                                     $objHotelBooking->room_num,
+                                    date('d M Y', strtotime($objHotelBooking->date_from)),
+                                    date('d M Y', strtotime($objHotelBooking->date_to)),
                                     $objRoomInfo->room_num,
                                     Product::getProductName($idNewRoomType, null, $this->context->language->id)
                                 ),
@@ -1712,12 +1714,16 @@ class AdminOrdersControllerCore extends AdminController
 	                        $message->save();
                             PrestaShopLogger::addLog(
                                 sprintf(
-                                    $this->l('[%s] Hotel: %s | Room: %s swapped with Hotel: %s | Room: %s'),
+                                    $this->l('[%s] Hotel: %s | Room: %s (check-in: %s, check-out: %s) swapped with Hotel: %s | Room: %s (check-in: %s, check-out: %s)'),
                                     $order->reference,
                                     $objHotelBooking->hotel_name,
                                     $objHotelBooking->room_num,
+                                    date('d M Y', strtotime($objHotelBooking->date_from)),
+                                    date('d M Y', strtotime($objHotelBooking->date_to)),
                                     $objHotelBookingTo->hotel_name,
-                                    $objHotelBookingTo->room_num
+                                    $objHotelBookingTo->room_num,
+                                    date('d M Y', strtotime($objHotelBookingTo->date_from)),
+                                    date('d M Y', strtotime($objHotelBookingTo->date_to))
                                 ),
                                 1,
                                 null,
@@ -6506,7 +6512,7 @@ class AdminOrdersControllerCore extends AdminController
 
         PrestaShopLogger::addLog(
             sprintf(
-                $this->l('[%s] Hotel: %s | Room: %s | dates edited: %s-%s to %s-%s'),
+                $this->l('[%s] Hotel: %s | Room: %s | dates edited: %s - %s to %s - %s'),
                 $order->reference,
                 $obj_booking_detail->hotel_name,
                 $obj_booking_detail->room_num,
@@ -7984,10 +7990,12 @@ class AdminOrdersControllerCore extends AdminController
                             if ($result) {
                                 PrestaShopLogger::addLog(
                                     sprintf(
-                                        $this->l('[%s] Hotel: %s | Room: %s | Service "%s" updated (qty: %s, unit price: %s)'),
+                                        $this->l('[%s] Hotel: %s | Room: %s (check-in: %s, check-out: %s) | Service %s updated (qty: %s, unit price: %s)'),
                                         $objOrder->reference,
                                         $objHotelBookingDetail->hotel_name,
                                         $objHotelBookingDetail->room_num,
+                                        date('d M Y', strtotime($objHotelBookingDetail->date_from)),
+                                        date('d M Y', strtotime($objHotelBookingDetail->date_to)),
                                         $objServiceProductOrderDetail->name,
                                         $objServiceProductOrderDetail->quantity,
                                         $objServiceProductOrderDetail->unit_price_tax_excl
@@ -8236,10 +8244,12 @@ class AdminOrdersControllerCore extends AdminController
                             $objServiceProductOrderDetail->save();
                                 PrestaShopLogger::addLog(
                                     sprintf(
-                                        $this->l('[%s] Hotel: %s | Room: %s | Service %s added'),
+                                        $this->l('[%s] Hotel: %s | Room: %s (check-in: %s, check-out: %s) | Service %s added'),
                                         $order->reference,
                                         $objHotelBookingDetail->hotel_name,
                                         $objHotelBookingDetail->room_num,
+                                        date('d M Y', strtotime($objHotelBookingDetail->date_from)),
+                                        date('d M Y', strtotime($objHotelBookingDetail->date_to)),
                                         $service['name']
                                     ),
                                     1,
@@ -8572,10 +8582,12 @@ class AdminOrdersControllerCore extends AdminController
                                                     );
                                                     PrestaShopLogger::addLog(
                                                         sprintf(
-                                                            $this->l('[%s] Hotel: %s | Room: %s | New custom service %s added'),
+                                                            $this->l('[%s] Hotel: %s | Room: %s (check-in: %s, check-out: %s) | New custom service %s added'),
                                                             $objOrder->reference,
                                                             $objHotelBookingDetail->hotel_name,
                                                             $objHotelBookingDetail->room_num,
+                                                            date('d M Y', strtotime($objHotelBookingDetail->date_from)),
+                                                            date('d M Y', strtotime($objHotelBookingDetail->date_to)),
                                                             $name
                                                         ),
                                                         1,
@@ -8733,10 +8745,12 @@ class AdminOrdersControllerCore extends AdminController
                 if ($res) {
                     PrestaShopLogger::addLog(
                         sprintf(
-                            $this->l('[%s] Hotel: %s | Room: %s | Service %s removed'),
+                            $this->l('[%s] Hotel: %s | Room: %s (check-in: %s, check-out: %s) | Service %s removed'),
                             $order->reference,
                             $objHotelBookingDetail->hotel_name,
                             $objHotelBookingDetail->room_num,
+                            date('d M Y', strtotime($objHotelBookingDetail->date_from)),
+                            date('d M Y', strtotime($objHotelBookingDetail->date_to)),
                             $objServiceProductOrderDetail->name
                         ),
                         1,
@@ -9209,10 +9223,12 @@ class AdminOrdersControllerCore extends AdminController
                         $statusLabel = isset($statusLabels[$newStatus]) ? $statusLabels[$newStatus] : $newStatus;
                         PrestaShopLogger::addLog(
                             sprintf(
-                                $this->l('[%s] Hotel: %s | Room: %s | Status updated to %s'),
+                                $this->l('[%s] Hotel: %s | Room: %s (check-in: %s, check-out: %s) | Status updated to %s'),
                                 $order->reference,
                                 $objHotelBookingDetail->hotel_name,
                                 $objHotelBookingDetail->room_num,
+                                date('d M Y', strtotime($objHotelBookingDetail->date_from)),
+                                date('d M Y', strtotime($objHotelBookingDetail->date_to)),
                                 $statusLabel
                             ),
                             1,
