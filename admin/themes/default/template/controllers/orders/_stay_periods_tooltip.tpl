@@ -20,39 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<style>
-    .stay-period-tooltip {
-        border: none;
-        box-shadow: 0 0 5px #aaa;
-        -webkit-box-shadow: 0 0 5px #aaa;
-        padding-bottom: 10px;
-        min-width: 260px;
-    }
-    .stay-period-tooltip .tip_date {
-        font-weight: bold;
-    }
-    .stay-period-tooltip .tip-body {
-        display: table;
-        width: 100%;
-        margin-top: 6px;
-    }
-    .stay-period-tooltip .stay_period {
-        display: table-row;
-    }
-    .stay-period-tooltip .tip_element_head,
-    .stay-period-tooltip .tip_element_value {
-        display: table-cell;
-        padding: 3px 6px;
-    }
-    .stay-period-tooltip .tip_element_value {
-        text-align: right;
-    }
-    .stay-period-tooltip .stay_period_header .tip_element_head,
-    .stay-period-tooltip .stay_period_header .tip_element_value {
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 5px;
-    }
-</style>
+
 <div id="stay-period-tpl"
      style="display:none;"
      data-label-dates="{l s='Dates'}"

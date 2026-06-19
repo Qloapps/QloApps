@@ -204,6 +204,7 @@ class AdminOrdersControllerCore extends AdminController
                 'optional' => true,
                 'search' => false,
                 'displayed' => true,
+                'visible_default' => true,
             ),
             'total_guests' => array(
                 'title' => $this->l('Guests'),
@@ -221,7 +222,7 @@ class AdminOrdersControllerCore extends AdminController
                 'visible_default' => true
             ),
             'los' => array(
-                'title' => $this->l('Stay period'),
+                'title' => $this->l('Stay duration'),
                 'align' => 'text-center',
                 'type' => 'range',
                 'havingFilter' => true,
@@ -387,14 +388,21 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $datesDisplay = array();
-        foreach (array_slice($formatted, 0, 2) as $entry) {
+        foreach (array_slice($formatted, 0, 1) as $entry) {
             $datesDisplay[] = $entry['from'].' - '.$entry['to'];
         }
 
-        $icon = ' <i class="icon-info-sign stay-period-tip" data-stay-tip="'
-            .htmlspecialchars(json_encode($formatted)).'"></i>';
+        $output = implode('<br>', $datesDisplay);
 
-        return implode('<br>', $datesDisplay).$icon;
+        $totalRooms = array_sum(array_column($formatted, 'count'));
+
+        if ($totalRooms > 1) {
+            $output .= ' <span class="stay-period-badge stay-period-tip" data-stay-tip="'
+                .htmlspecialchars(json_encode($formatted)).'">+'
+                .($totalRooms - 1).'</span>';
+        }
+
+        return $output;
     }
 
     public function initPageHeaderToolbar()
@@ -1389,6 +1397,7 @@ class AdminOrdersControllerCore extends AdminController
 
         if ($this->display != 'view') {
             $this->addJS(_PS_JS_DIR_.'admin/orders_stay_periods.js');
+            $this->addCSS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/css/controllers/orders.css');
         }
 
         if ($this->display == 'view') {
