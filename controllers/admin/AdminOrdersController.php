@@ -397,7 +397,7 @@ class AdminOrdersControllerCore extends AdminController
         $totalRooms = array_sum(array_column($formatted, 'count'));
 
         if ($totalRooms > 1) {
-            $output .= ' <span class="stay-period-badge stay-period-tip" data-stay-tip="'
+            $output .= ' <span class="qlo-stay-period-badge qlo-stay-period-tip" data-stay-tip="'
                 .htmlspecialchars(json_encode($formatted)).'">+'
                 .($totalRooms - 1).'</span>';
         }

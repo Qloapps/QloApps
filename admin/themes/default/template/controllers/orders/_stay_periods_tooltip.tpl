@@ -25,10 +25,10 @@
      style="display:none;"
      data-label-dates="{l s='Dates'}"
      data-label-rooms="{l s='Rooms'}">
-    <div class="tooltip_cont">
-        <div class="tip_header">
-            <div class="tip_date">{l s='Stay Periods'}</div>
+    <div class="qlo-tooltip-cont">
+        <div class="qlo-tip-header">
+            <div class="qlo-tip-date">{l s='Stay Periods'}</div>
         </div>
-        <div class="tip-body"></div>
+        <div class="qlo-tip-body"></div>
     </div>
 </div>

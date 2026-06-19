@@ -1,6 +1,6 @@
 /**
  * Stay Periods tooltip initialisation for the Admin Orders list.
- * Reads structured JSON from data-stay-tip on each .stay-period-tip icon,
+ * Reads structured JSON from data-stay-tip on each .qlo-stay-period-tip icon,
  * clones the hidden #stay-period-tpl template, fills it, and returns it
  * as the jQuery UI tooltip content.
  */
@@ -8,26 +8,26 @@ $(document).ready(function () {
     var closeTimer = null;
 
     function buildTooltip(periods) {
-        var $tpl  = $('#stay-period-tpl .tooltip_cont').clone();
-        var $body = $tpl.find('.tip-body').empty();
+        var $tpl  = $('#stay-period-tpl .qlo-tooltip-cont').clone();
+        var $body = $tpl.find('.qlo-tip-body').empty();
 
         $body.append(
-            $('<div class="stay_period stay_period_header">').append(
-                $('<span class="tip_element_head">').text($('#stay-period-tpl').data('label-dates')),
-                $('<span class="tip_element_value">').text($('#stay-period-tpl').data('label-rooms'))
+            $('<div class="qlo-stay-period qlo-stay-period-header">').append(
+                $('<span class="qlo-tip-element-head">').text($('#stay-period-tpl').data('label-dates')),
+                $('<span class="qlo-tip-element-value">').text($('#stay-period-tpl').data('label-rooms'))
             )
         );
 
         $.each(periods, function (_, p) {
             $body.append(
-                $('<div class="stay_period">').append(
-                    $('<span class="tip_element_head">').text(p.from + ' – ' + p.to),
-                    $('<span class="tip_element_value">').text(p.count)
+                $('<div class="qlo-stay-period">').append(
+                    $('<span class="qlo-tip-element-head">').text(p.from + ' – ' + p.to),
+                    $('<span class="qlo-tip-element-value">').text(p.count)
                 )
             );
         });
         return $('<div>', {
-            'class': 'ui-tooltip ui-widget ui-corner-all ui-widget-content stay-period-tooltip',
+            'class': 'ui-tooltip ui-widget ui-corner-all ui-widget-content qlo-stay-period-tooltip',
             'role' : 'tooltip'
         }).append(
             $('<div class="ui-tooltip-content">').append($tpl)
@@ -46,13 +46,13 @@ $(document).ready(function () {
         }, 300);
     }
 
-    $(document).on('mouseenter', '.stay-period-tip', function () {
+    $(document).on('mouseenter', '.qlo-stay-period-tip', function () {
         cancelClose();
 
         var periods = $(this).data('stay-tip');
         if (!periods || !periods.length) { return; }
 
-        $('.stay-period-tooltip').stop(true).remove();
+        $('.qlo-stay-period-tooltip').stop(true).remove();
 
         var $icon = $(this);
         var $tip  = buildTooltip(periods).appendTo('body').hide().fadeIn(200);
@@ -71,8 +71,8 @@ $(document).ready(function () {
             scheduleClose($tip);
         });
 
-    }).on('mouseleave', '.stay-period-tip', function () {
-        var $tip = $('.stay-period-tooltip');
+    }).on('mouseleave', '.qlo-stay-period-tip', function () {
+        var $tip = $('.qlo-stay-period-tooltip');
         if ($tip.length) {
             scheduleClose($tip);
         }
