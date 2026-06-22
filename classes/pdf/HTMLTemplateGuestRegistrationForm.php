@@ -127,14 +127,16 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
         // When nothing saved, show all sections and fields
         $allVisible = empty($grcFields);
 
-        // Compute per-field visibility using Order constants — no magic numbers
+        // One pass: build false|string label for every field directly.
+        // false = hidden, non-empty string = visible (used for both visibility check and label text in template).
         $grcInfo = Order::getRegistrationCardInfo();
-        $fieldVisibility = array();
+        $fieldLabels = array();
         foreach ($grcInfo as $sectionId => $section) {
             $isSectionEnabled = $allVisible || isset($grcFields[$sectionId]);
-            $fieldVisibility[$sectionId] = array();
-            foreach ($section['fields'] as $fieldId => $dummy) {
-                $fieldVisibility[$sectionId][$fieldId] = $isSectionEnabled && ($allVisible || isset($grcFields[$sectionId][$fieldId]));
+            $fieldLabels[$sectionId] = array();
+            foreach ($section['fields'] as $fieldId => $fieldLabel) {
+                $isVisible = $isSectionEnabled && ($allVisible || isset($grcFields[$sectionId][$fieldId]));
+                $fieldLabels[$sectionId][$fieldId] = $isVisible ? $fieldLabel : false;
             }
         }
 
@@ -153,72 +155,72 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
         // Template uses {if $labels.key} for visibility AND {$labels.key} for label — no separate boolean assigns.
         $labels = array(
             // Section 1: Guest Information
-            'title'        => ($fieldVisibility[$section1][Order::GRC_GUEST_TITLE] ?? false)        ? $grcInfo[$section1]['fields'][Order::GRC_GUEST_TITLE]        : false,
-            'full_name'    => ($fieldVisibility[$section1][Order::GRC_GUEST_FULL_NAME] ?? false)    ? $grcInfo[$section1]['fields'][Order::GRC_GUEST_FULL_NAME]    : false,
-            'phone'        => ($fieldVisibility[$section1][Order::GRC_GUEST_PHONE] ?? false)        ? $grcInfo[$section1]['fields'][Order::GRC_GUEST_PHONE]        : false,
-            'email'        => ($fieldVisibility[$section1][Order::GRC_GUEST_EMAIL] ?? false)        ? $grcInfo[$section1]['fields'][Order::GRC_GUEST_EMAIL]        : false,
-            'dob'          => ($fieldVisibility[$section1][Order::GRC_GUEST_DOB] ?? false)          ? $grcInfo[$section1]['fields'][Order::GRC_GUEST_DOB]          : false,
-            'nationality'  => ($fieldVisibility[$section1][Order::GRC_GUEST_NATIONALITY] ?? false)  ? $grcInfo[$section1]['fields'][Order::GRC_GUEST_NATIONALITY]  : false,
-            'city_country' => ($fieldVisibility[$section1][Order::GRC_GUEST_CITY_COUNTRY] ?? false) ? $grcInfo[$section1]['fields'][Order::GRC_GUEST_CITY_COUNTRY] : false,
-            'postal_code'  => ($fieldVisibility[$section1][Order::GRC_GUEST_POSTAL_CODE] ?? false)  ? $grcInfo[$section1]['fields'][Order::GRC_GUEST_POSTAL_CODE]  : false,
-            'address'      => ($fieldVisibility[$section1][Order::GRC_GUEST_ADDRESS] ?? false)      ? $grcInfo[$section1]['fields'][Order::GRC_GUEST_ADDRESS]      : false,
-            
+            'title'        => $fieldLabels[$section1][Order::GRC_GUEST_TITLE],
+            'full_name'    => $fieldLabels[$section1][Order::GRC_GUEST_FULL_NAME],
+            'phone'        => $fieldLabels[$section1][Order::GRC_GUEST_PHONE],
+            'email'        => $fieldLabels[$section1][Order::GRC_GUEST_EMAIL],
+            'dob'          => $fieldLabels[$section1][Order::GRC_GUEST_DOB],
+            'nationality'  => $fieldLabels[$section1][Order::GRC_GUEST_NATIONALITY],
+            'city_country' => $fieldLabels[$section1][Order::GRC_GUEST_CITY_COUNTRY],
+            'postal_code'  => $fieldLabels[$section1][Order::GRC_GUEST_POSTAL_CODE],
+            'address'      => $fieldLabels[$section1][Order::GRC_GUEST_ADDRESS],
+
             // Section 2: Travel Information
-            'arrived_from' => ($fieldVisibility[$section2][Order::GRC_TRAVEL_ARRIVED_FROM] ?? false)     ? $grcInfo[$section2]['fields'][Order::GRC_TRAVEL_ARRIVED_FROM]     : false,
-            'next_dest'    => ($fieldVisibility[$section2][Order::GRC_TRAVEL_NEXT_DESTINATION] ?? false) ? $grcInfo[$section2]['fields'][Order::GRC_TRAVEL_NEXT_DESTINATION] : false,
-            'flight'       => ($fieldVisibility[$section2][Order::GRC_TRAVEL_FLIGHT_TRAIN] ?? false)     ? $grcInfo[$section2]['fields'][Order::GRC_TRAVEL_FLIGHT_TRAIN]     : false,
-            'vehicle'      => ($fieldVisibility[$section2][Order::GRC_TRAVEL_VEHICLE_REG] ?? false)      ? $grcInfo[$section2]['fields'][Order::GRC_TRAVEL_VEHICLE_REG]      : false,
-            'purpose'      => ($fieldVisibility[$section2][Order::GRC_TRAVEL_PURPOSE_OF_VISIT] ?? false) ? $grcInfo[$section2]['fields'][Order::GRC_TRAVEL_PURPOSE_OF_VISIT] : false,
-            
+            'arrived_from' => $fieldLabels[$section2][Order::GRC_TRAVEL_ARRIVED_FROM],
+            'next_dest'    => $fieldLabels[$section2][Order::GRC_TRAVEL_NEXT_DESTINATION],
+            'flight'       => $fieldLabels[$section2][Order::GRC_TRAVEL_FLIGHT_TRAIN],
+            'vehicle'      => $fieldLabels[$section2][Order::GRC_TRAVEL_VEHICLE_REG],
+            'purpose'      => $fieldLabels[$section2][Order::GRC_TRAVEL_PURPOSE_OF_VISIT],
+
             // Section 3: Booking Information
-            'booking_ref'         => ($fieldVisibility[$section3][Order::GRC_BOOKING_REFERENCE] ?? false)      ? $grcInfo[$section3]['fields'][Order::GRC_BOOKING_REFERENCE]      : false,
-            'booking_rate'        => ($fieldVisibility[$section3][Order::GRC_BOOKING_RATE_PER_NIGHT] ?? false) ? $grcInfo[$section3]['fields'][Order::GRC_BOOKING_RATE_PER_NIGHT] : false,
-            'booking_arrival'     => ($fieldVisibility[$section3][Order::GRC_BOOKING_ARRIVAL] ?? false)        ? $grcInfo[$section3]['fields'][Order::GRC_BOOKING_ARRIVAL]        : false,
-            'booking_departure'   => ($fieldVisibility[$section3][Order::GRC_BOOKING_DEPARTURE] ?? false)      ? $grcInfo[$section3]['fields'][Order::GRC_BOOKING_DEPARTURE]      : false,
-            'booking_room_type'   => ($fieldVisibility[$section3][Order::GRC_BOOKING_ROOM_TYPE] ?? false)      ? $grcInfo[$section3]['fields'][Order::GRC_BOOKING_ROOM_TYPE]      : false,
-            'booking_room_number' => ($fieldVisibility[$section3][Order::GRC_BOOKING_ROOM_NUMBER] ?? false)    ? $grcInfo[$section3]['fields'][Order::GRC_BOOKING_ROOM_NUMBER]    : false,
-            'num_guests'          => ($fieldVisibility[$section3][Order::GRC_BOOKING_NUM_GUESTS] ?? false)     ? $grcInfo[$section3]['fields'][Order::GRC_BOOKING_NUM_GUESTS]     : false,
-            
+            'booking_ref'         => $fieldLabels[$section3][Order::GRC_BOOKING_REFERENCE],
+            'booking_rate'        => $fieldLabels[$section3][Order::GRC_BOOKING_RATE_PER_NIGHT],
+            'booking_arrival'     => $fieldLabels[$section3][Order::GRC_BOOKING_ARRIVAL],
+            'booking_departure'   => $fieldLabels[$section3][Order::GRC_BOOKING_DEPARTURE],
+            'booking_room_type'   => $fieldLabels[$section3][Order::GRC_BOOKING_ROOM_TYPE],
+            'booking_room_number' => $fieldLabels[$section3][Order::GRC_BOOKING_ROOM_NUMBER],
+            'num_guests'          => $fieldLabels[$section3][Order::GRC_BOOKING_NUM_GUESTS],
+
             // Section 4: Identification Document
-            'id_proof'           => ($fieldVisibility[$section4][Order::GRC_ID_IDENTITY_PROOF] ?? false)          ? $grcInfo[$section4]['fields'][Order::GRC_ID_IDENTITY_PROOF]          : false,
-            'id_number'          => ($fieldVisibility[$section4][Order::GRC_ID_NUMBER] ?? false)                  ? $grcInfo[$section4]['fields'][Order::GRC_ID_NUMBER]                  : false,
-            'passport'           => ($fieldVisibility[$section4][Order::GRC_ID_PASSPORT_NO] ?? false)             ? $grcInfo[$section4]['fields'][Order::GRC_ID_PASSPORT_NO]             : false,
-            'place_of_issue'     => ($fieldVisibility[$section4][Order::GRC_ID_PLACE_OF_ISSUE] ?? false)          ? $grcInfo[$section4]['fields'][Order::GRC_ID_PLACE_OF_ISSUE]          : false,
-            'date_of_issue'      => ($fieldVisibility[$section4][Order::GRC_ID_DATE_OF_ISSUE] ?? false)           ? $grcInfo[$section4]['fields'][Order::GRC_ID_DATE_OF_ISSUE]           : false,
-            'date_of_expiry'     => ($fieldVisibility[$section4][Order::GRC_ID_DATE_OF_EXPIRY] ?? false)          ? $grcInfo[$section4]['fields'][Order::GRC_ID_DATE_OF_EXPIRY]          : false,
-            'visa'               => ($fieldVisibility[$section4][Order::GRC_ID_VISA_NUMBER] ?? false)             ? $grcInfo[$section4]['fields'][Order::GRC_ID_VISA_NUMBER]             : false,
-            'valid_until'        => ($fieldVisibility[$section4][Order::GRC_ID_VALID_UNTIL] ?? false)             ? $grcInfo[$section4]['fields'][Order::GRC_ID_VALID_UNTIL]             : false,
-            'arrival_in_country' => ($fieldVisibility[$section4][Order::GRC_ID_ARRIVAL_DATE_IN_COUNTRY] ?? false) ? $grcInfo[$section4]['fields'][Order::GRC_ID_ARRIVAL_DATE_IN_COUNTRY] : false,
-            
+            'id_proof'           => $fieldLabels[$section4][Order::GRC_ID_IDENTITY_PROOF],
+            'id_number'          => $fieldLabels[$section4][Order::GRC_ID_NUMBER],
+            'passport'           => $fieldLabels[$section4][Order::GRC_ID_PASSPORT_NO],
+            'place_of_issue'     => $fieldLabels[$section4][Order::GRC_ID_PLACE_OF_ISSUE],
+            'date_of_issue'      => $fieldLabels[$section4][Order::GRC_ID_DATE_OF_ISSUE],
+            'date_of_expiry'     => $fieldLabels[$section4][Order::GRC_ID_DATE_OF_EXPIRY],
+            'visa'               => $fieldLabels[$section4][Order::GRC_ID_VISA_NUMBER],
+            'valid_until'        => $fieldLabels[$section4][Order::GRC_ID_VALID_UNTIL],
+            'arrival_in_country' => $fieldLabels[$section4][Order::GRC_ID_ARRIVAL_DATE_IN_COUNTRY],
+
             // Section 5: Additional Guests
-            'addguest_name'        => ($fieldVisibility[$section5][Order::GRC_ADD_GUEST_NAME] ?? false)        ? $grcInfo[$section5]['fields'][Order::GRC_ADD_GUEST_NAME]        : false,
-            'addguest_id_type'     => ($fieldVisibility[$section5][Order::GRC_ADD_GUEST_ID_TYPE] ?? false)     ? $grcInfo[$section5]['fields'][Order::GRC_ADD_GUEST_ID_TYPE]     : false,
-            'addguest_id_number'   => ($fieldVisibility[$section5][Order::GRC_ADD_GUEST_ID_NUMBER] ?? false)   ? $grcInfo[$section5]['fields'][Order::GRC_ADD_GUEST_ID_NUMBER]   : false,
-            'addguest_nationality' => ($fieldVisibility[$section5][Order::GRC_ADD_GUEST_NATIONALITY] ?? false) ? $grcInfo[$section5]['fields'][Order::GRC_ADD_GUEST_NATIONALITY] : false,
-            
+            'addguest_name'        => $fieldLabels[$section5][Order::GRC_ADD_GUEST_NAME],
+            'addguest_id_type'     => $fieldLabels[$section5][Order::GRC_ADD_GUEST_ID_TYPE],
+            'addguest_id_number'   => $fieldLabels[$section5][Order::GRC_ADD_GUEST_ID_NUMBER],
+            'addguest_nationality' => $fieldLabels[$section5][Order::GRC_ADD_GUEST_NATIONALITY],
+
             // Section 6: Billing & Corporate
-            'company' => ($fieldVisibility[$section6][Order::GRC_BILLING_COMPANY] ?? false) ? $grcInfo[$section6]['fields'][Order::GRC_BILLING_COMPANY] : false,
-            'tax_id'  => ($fieldVisibility[$section6][Order::GRC_BILLING_TAX_ID] ?? false)  ? $grcInfo[$section6]['fields'][Order::GRC_BILLING_TAX_ID]  : false,
-            
+            'company' => $fieldLabels[$section6][Order::GRC_BILLING_COMPANY],
+            'tax_id'  => $fieldLabels[$section6][Order::GRC_BILLING_TAX_ID],
+
             // Section 7: Payment & Deposit
-            'payment_method'   => ($fieldVisibility[$section7][Order::GRC_PAYMENT_METHOD] ?? false)           ? $grcInfo[$section7]['fields'][Order::GRC_PAYMENT_METHOD]           : false,
-            'card_number'      => ($fieldVisibility[$section7][Order::GRC_PAYMENT_CARD_NUMBER] ?? false)      ? $grcInfo[$section7]['fields'][Order::GRC_PAYMENT_CARD_NUMBER]      : false,
-            'security_deposit' => ($fieldVisibility[$section7][Order::GRC_PAYMENT_SECURITY_DEPOSIT] ?? false) ? $grcInfo[$section7]['fields'][Order::GRC_PAYMENT_SECURITY_DEPOSIT] : false,
-            
+            'payment_method'   => $fieldLabels[$section7][Order::GRC_PAYMENT_METHOD],
+            'card_number'      => $fieldLabels[$section7][Order::GRC_PAYMENT_CARD_NUMBER],
+            'security_deposit' => $fieldLabels[$section7][Order::GRC_PAYMENT_SECURITY_DEPOSIT],
+
             // Section 8: Guest Signature
-            'signature' => ($fieldVisibility[$section8][Order::GRC_SIG_SIGNATURE] ?? false) ? $grcInfo[$section8]['fields'][Order::GRC_SIG_SIGNATURE] : false,
-            'sig_date'  => ($fieldVisibility[$section8][Order::GRC_SIG_DATE] ?? false)      ? $grcInfo[$section8]['fields'][Order::GRC_SIG_DATE]      : false,
-            
-            // Section 9: Property Regulations (checkin/checkout share one visibility flag)
-            'checkin_time'   => ($fieldVisibility[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ?? false) ? Translate::getAdminTranslation('Check-in Time', 'AdminGuestRegistrationController', false, false)  : false,
-            'checkout_time'  => ($fieldVisibility[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ?? false) ? Translate::getAdminTranslation('Check-out Time', 'AdminGuestRegistrationController', false, false) : false,
-            'hotel_policies' => ($fieldVisibility[$section9][Order::GRC_PROP_HOTEL_POLICIES] ?? false) ? $grcInfo[$section9]['fields'][Order::GRC_PROP_HOTEL_POLICIES] : false,
-            
+            'signature' => $fieldLabels[$section8][Order::GRC_SIG_SIGNATURE],
+            'sig_date'  => $fieldLabels[$section8][Order::GRC_SIG_DATE],
+
+            // Section 9: Property Regulations (checkin/checkout share one flag; labels come from Translate, not grcInfo)
+            'checkin_time'   => $fieldLabels[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? Translate::getAdminTranslation('Check-in Time', 'AdminGuestRegistrationController', false, false)  : false,
+            'checkout_time'  => $fieldLabels[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? Translate::getAdminTranslation('Check-out Time', 'AdminGuestRegistrationController', false, false) : false,
+            'hotel_policies' => $fieldLabels[$section9][Order::GRC_PROP_HOTEL_POLICIES],
+
             // Section 10: For Office Use Only
-            'staff_name'          => ($fieldVisibility[$section10][Order::GRC_OFFICE_STAFF_NAME] ?? false)   ? $grcInfo[$section10]['fields'][Order::GRC_OFFICE_STAFF_NAME]   : false,
-            'office_checkin_time' => ($fieldVisibility[$section10][Order::GRC_OFFICE_CHECKIN_TIME] ?? false) ? $grcInfo[$section10]['fields'][Order::GRC_OFFICE_CHECKIN_TIME] : false,
-            'id_verified'         => ($fieldVisibility[$section10][Order::GRC_OFFICE_ID_VERIFIED] ?? false)  ? $grcInfo[$section10]['fields'][Order::GRC_OFFICE_ID_VERIFIED]  : false,
-            'reg_no'              => ($fieldVisibility[$section10][Order::GRC_OFFICE_REG_NO] ?? false)       ? $grcInfo[$section10]['fields'][Order::GRC_OFFICE_REG_NO]       : false,
+            'staff_name'          => $fieldLabels[$section10][Order::GRC_OFFICE_STAFF_NAME],
+            'office_checkin_time' => $fieldLabels[$section10][Order::GRC_OFFICE_CHECKIN_TIME],
+            'id_verified'         => $fieldLabels[$section10][Order::GRC_OFFICE_ID_VERIFIED],
+            'reg_no'              => $fieldLabels[$section10][Order::GRC_OFFICE_REG_NO],
         );
 
         $showLocalIdGroup = (bool)$labels['id_proof'] || (bool)$labels['id_number'];
@@ -241,16 +243,16 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
             'additional_guests_rows' => $additionalGuestsRows,
 
             // Section visibility
-            'show_section_guest_info'        => !empty(array_filter($fieldVisibility[$section1] ?? array())),
-            'show_section_travel_info'       => !empty(array_filter($fieldVisibility[$section2] ?? array())),
-            'show_section_booking_info'      => !empty(array_filter($fieldVisibility[$section3] ?? array())),
-            'show_section_identification'    => !empty(array_filter($fieldVisibility[$section4] ?? array())),
-            'show_section_additional_guests' => !empty(array_filter($fieldVisibility[$section5] ?? array())),
-            'show_section_billing_corporate' => !empty(array_filter($fieldVisibility[$section6] ?? array())),
-            'show_section_payment_deposit'   => !empty(array_filter($fieldVisibility[$section7] ?? array())),
-            'show_section_guest_signature'   => !empty(array_filter($fieldVisibility[$section8] ?? array())),
-            'show_section_property_regs'     => !empty(array_filter($fieldVisibility[$section9] ?? array())),
-            'show_section_office_use'        => !empty(array_filter($fieldVisibility[$section10] ?? array())),
+            'show_section_guest_info'        => !empty(array_filter($fieldLabels[$section1])),
+            'show_section_travel_info'       => !empty(array_filter($fieldLabels[$section2])),
+            'show_section_booking_info'      => !empty(array_filter($fieldLabels[$section3])),
+            'show_section_identification'    => !empty(array_filter($fieldLabels[$section4])),
+            'show_section_additional_guests' => !empty(array_filter($fieldLabels[$section5])),
+            'show_section_billing_corporate' => !empty(array_filter($fieldLabels[$section6])),
+            'show_section_payment_deposit'   => !empty(array_filter($fieldLabels[$section7])),
+            'show_section_guest_signature'   => !empty(array_filter($fieldLabels[$section8])),
+            'show_section_property_regs'     => !empty(array_filter($fieldLabels[$section9])),
+            'show_section_office_use'        => !empty(array_filter($fieldLabels[$section10])),
 
             'section_additional_guests' => $grcInfo[$section5]['name'],
             'section_property_regs'     => $grcInfo[$section9]['name'],
