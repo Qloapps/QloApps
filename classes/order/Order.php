@@ -2604,7 +2604,7 @@ class OrderCore extends ObjectModel
             ),
         );
 
-        Hook::exec('actionAdminGuestRegistrationControllerGuestRegCardInfoModifier', array(
+        Hook::exec('actionGuestRegCardInfoModifier', array(
             'guest_registration_info' => &$guestRegCardInfo,
         ));
 
