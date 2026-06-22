@@ -32,7 +32,7 @@
         "source": "https://github.com/Qloapps/QloApps"
     },
     "require": {
-        "php": ">8.0 <8.5",
+        "php": ">8.0 <8.6",
         "ext-curl": "*",
         "ext-dom": "*",
         "ext-gd": "*",

@@ -30,9 +30,9 @@ class HttpHelper {
 		$this->_initCurl();
 	}
 
-	public function __destruct() {
-		curl_close($this->_curl);
-	}
+	public function __destruct()
+    {
+    }
 
 	private function _initCurl() {
 		if(!function_exists('curl_version')) {
