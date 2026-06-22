@@ -2509,7 +2509,7 @@ class OrderCore extends ObjectModel
                 'name'   => Translate::getAdminTranslation('Guest Information', 'AdminGuestRegistrationController', false, false),
                 'fields' => array(
                     self::GRC_GUEST_TITLE        => Translate::getAdminTranslation('Title', 'AdminGuestRegistrationController', false, false),
-                    self::GRC_GUEST_FULL_NAME    => Translate::getAdminTranslation('Full Name', 'AdminGuestRegistrationController', false, false),
+                    self::GRC_GUEST_FULL_NAME    => Translate::getAdminTranslation('Full Name (As per ID)', 'AdminGuestRegistrationController', false, false),
                     self::GRC_GUEST_PHONE        => Translate::getAdminTranslation('Phone / Mobile', 'AdminGuestRegistrationController', false, false),
                     self::GRC_GUEST_EMAIL        => Translate::getAdminTranslation('Email', 'AdminGuestRegistrationController', false, false),
                     self::GRC_GUEST_DOB          => Translate::getAdminTranslation('Date of Birth', 'AdminGuestRegistrationController', false, false),
