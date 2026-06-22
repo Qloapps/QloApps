@@ -30,7 +30,7 @@ FreeFont covers the following character ranges
 * geometrical shapes, box drawing
 * musical symbols, gaming symbols, miscellaneous symbols
   etc.
-For more detail see <http://www.gnu.org/software/freefont/coverage.html>
+For more detail see <https://www.gnu.org/software/freefont/coverage.html>
 
 Editing
 -------
@@ -108,7 +108,7 @@ Further information
 -------------------
 
 Home page of GNU FreeFont:
-	http://www.gnu.org/software/freefont/
+	https://www.gnu.org/software/freefont/
 
 More information is at the main project page of Free UCS scalable fonts:
 	http://savannah.gnu.org/projects/freefont/
