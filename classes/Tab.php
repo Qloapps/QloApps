@@ -137,12 +137,12 @@ class TabCore extends ObjectModel
         }
 
         /* Query definition */
-        $query = 'REPLACE INTO `'._DB_PREFIX_.'access` (`id_profile`, `id_tab`, `view`, `add`, `edit`, `delete`) VALUES ';
-        $query .= '(1, '.(int)$id_tab.', 1, 1, 1, 1),';
+        $query = 'REPLACE INTO `'._DB_PREFIX_.'access` (`id_profile`, `id_tab`, `view`, `add`, `edit`, `delete`, `kpi`) VALUES ';
+        $query .= '(1, '.(int)$id_tab.', 1, 1, 1, 1, 1),';
 
         foreach ($profiles as $profile) {
             $rights = $profile['id_profile'] == $context->employee->id_profile ? 1 : 0;
-            $query .= '('.(int)$profile['id_profile'].', '.(int)$id_tab.', '.(int)$rights.', '.(int)$rights.', '.(int)$rights.', '.(int)$rights.'),';
+            $query .= '('.(int)$profile['id_profile'].', '.(int)$id_tab.', '.(int)$rights.', '.(int)$rights.', '.(int)$rights.', '.(int)$rights.', '.(int)$rights.'),';
         }
         $query = trim($query, ', ');
         return Db::getInstance()->execute($query);
@@ -247,7 +247,7 @@ class TabCore extends ObjectModel
      * @return array tabs
      */
     protected static $_cache_tabs = array();
-    public static function getTabs($id_lang, $id_parent = null)
+    public static function getTabs($id_lang, $id_parent = null, $include_kpi = false)
     {
         if (!isset(self::$_cache_tabs[$id_lang])) {
             self::$_cache_tabs[$id_lang] = array();
@@ -274,10 +274,52 @@ class TabCore extends ObjectModel
             foreach (self::$_cache_tabs[$id_lang] as $array_parent) {
                 $array_all = array_merge($array_all, $array_parent);
             }
-            return $array_all;
+            $tabs = $array_all;
+        } else {
+            $tabs = isset(self::$_cache_tabs[$id_lang][$id_parent]) ? self::$_cache_tabs[$id_lang][$id_parent] : array();
         }
 
-        return (isset(self::$_cache_tabs[$id_lang][$id_parent]) ? self::$_cache_tabs[$id_lang][$id_parent] : array());
+        if ($include_kpi) {
+            $hookKpiClasses = array();
+            $hookRows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
+                SELECT DISTINCT SUBSTRING(h.`name`, 7, LENGTH(h.`name`) - 24) AS `class_name`
+                FROM `'._DB_PREFIX_.'hook` h
+                INNER JOIN `'._DB_PREFIX_.'hook_module` hm
+                    ON hm.`id_hook` = h.`id_hook`
+                    AND hm.`id_shop` = '.(int)Context::getContext()->shop->id.'
+                INNER JOIN `'._DB_PREFIX_.'module` m
+                    ON m.`id_module` = hm.`id_module` AND m.`active` = 1
+                WHERE h.`name` LIKE \'action%KPIListingModifier\''
+            );
+            if (is_array($hookRows)) {
+                foreach ($hookRows as $row) {
+                    $hookKpiClasses[$row['class_name']] = true;
+                }
+            }
+
+            foreach ($tabs as &$tab) {
+                if (!empty($tab['module'])) {
+                    $file = _PS_MODULE_DIR_.$tab['module'].'/controllers/admin/'.$tab['class_name'].'Controller.php';
+                    $class_name = $tab['class_name'].'Controller';
+                } else {
+                    $file = _PS_CONTROLLER_DIR_.'admin/'.$tab['class_name'].'Controller.php';
+                    $class_name = $tab['class_name'].'ControllerCore';
+                }
+                if (file_exists($file) && !class_exists($class_name)) {
+                    require_once $file;
+                }
+                try {
+                    $objreflect = new ReflectionMethod($class_name, 'renderKpis');
+                    $tab['has_kpi'] = ($objreflect->getDeclaringClass()->getName() === $class_name)
+                        || isset($hookKpiClasses[$tab['class_name']]);
+                } catch (ReflectionException $e) {
+                    $tab['has_kpi'] = isset($hookKpiClasses[$tab['class_name']]);
+                }
+            }
+            unset($tab);
+        }
+        
+        return $tabs;
     }
 
     /**
