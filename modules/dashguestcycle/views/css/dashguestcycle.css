@@ -20,76 +20,6 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-#dashguestcycle {
-	padding-bottom: 5px;
-}
-
-#dashguestcycle .badges-wrapper {
-	white-space: nowrap;
-	overflow: auto;
-	margin: -5px;
-	margin-bottom: 0px;
-	padding-bottom: 10px;
-	font-size: 0;
-}
-
-#dashguestcycle .badge-wrapper {
-	display: inline-block;
-	width: 14.28%;
-	min-width: 145px;
-	padding: 5px;
-}
-
-#dashguestcycle .badge-item {
-	position: relative;
-	min-width: 135px;
-	height: 80px;
-	border-radius: 10px;
-	background: #FFFFFF;
-	box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.15);
-}
-
-#dashguestcycle .badge-strip {
-	position: absolute;
-	width: 10px;
-	height: 100%;
-	border-top-left-radius: 10px;
-	border-bottom-left-radius: 10px;
-}
-
-#dashguestcycle .badge-content-wrapper {
-	height: 100%;
-}
-
-#dashguestcycle .badge-content-wrapper p {
-	color: #00AFF0;
-	margin-bottom: 0;
-}
-
-#dashguestcycle .title-wrapper, #dashguestcycle .value-wrapper {
-	display: table;
-	width: 100%;
-	height: 50%;
-	padding: 0 10px;
-}
-
-#dashguestcycle .title-wrapper p {
-	display: table-cell;
-	vertical-align: middle;
-	font-weight: normal;
-	font-size: 13px;
-	line-height: 15px;
-	white-space: normal;
-}
-
-#dashguestcycle .value-wrapper p {
-	display: table-cell;
-	vertical-align: top;
-	font-weight: bold;
-	font-size: 24px;
-	line-height: 30px;
-}
-
 #dashguestcycle .tab-content {
 	max-height: 300px;
 	overflow-y: auto;
@@ -97,4 +27,107 @@
 
 #dashguestcycle table tbody>tr>td {
     padding: 8px 7px;
+}
+
+/* ── KPI row container: strip panel chrome ──────────────────────────────── */
+.kpi-container {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 0 15px !important;
+}
+
+.kpi-container .kpis-wrap {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    gap: 8px;
+    margin: 0 !important;
+}
+
+.kpi-container .kpis-wrap .kpi-wrap {
+    width: 14.28% !important;
+    min-width: 110px;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.kpi-container .box-stats {
+    height: 80px !important;
+    background: #fff !important;
+    border-radius: 10px !important;
+    overflow: hidden;
+    font-size: inherit !important;
+}
+
+.kpi-container .box-stats .kpi-content {
+    border: none !important;
+    border-left: 10px solid !important;
+    border-radius: 0 !important;
+    height: 100% !important;
+    padding: 8px 12px !important;
+    align-items: center !important;
+    gap: 0 !important;
+}
+
+.kpi-container .box-stats .kpi-content .kpi-data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 4px;
+}
+
+.kpi-container .box-stats .kpi-content .title-subtitle {
+    justify-content: center !important;
+    width: 100%;
+}
+
+.kpi-container .box-stats .kpi-content .title-subtitle .title-container .title {
+    font-size: 13px !important;
+    font-weight: normal !important;
+    color: #555 !important;
+    display: block;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kpi-container .box-stats .kpi-content .value-container {
+    width: 100%;
+    text-align: center;
+}
+
+.kpi-container .box-stats .kpi-content .value-container .value {
+    font-size: 24px !important;
+    font-weight: bold !important;
+    min-height: auto !important;
+    display: block;
+    text-align: center;
+}
+
+.kpi-container .box-stats .kpi-content .arrow {
+    display: none !important;
+}
+
+.kpi-container .box-stats.color1 .kpi-content { border-left-color: #266FFE !important; }
+.kpi-container .box-stats.color1 .value        { color: #266FFE !important; }
+
+.kpi-container .box-stats.color2 .kpi-content { border-left-color: #72C3F0 !important; }
+.kpi-container .box-stats.color2 .value        { color: #72C3F0 !important; }
+
+.kpi-container .box-stats.color3 .kpi-content { border-left-color: #56CE56 !important; }
+.kpi-container .box-stats.color3 .value        { color: #56CE56 !important; }
+
+.kpi-container .box-stats.color4 .kpi-content { border-left-color: #FFC148 !important; }
+.kpi-container .box-stats.color4 .value        { color: #FFC148 !important; }
+
+.kpi-container .box-stats.color5 .kpi-content { border-left-color: #A569DF !important; }
+.kpi-container .box-stats.color5 .value        { color: #A569DF !important; }
+
+.kpi-container .box-stats.color6 .kpi-content { border-left-color: #FF4036 !important; }
+.kpi-container .box-stats.color6 .value        { color: #FF4036 !important; }
+
+.kpi-container .actions-wrap {
+    display: none !important;
 }

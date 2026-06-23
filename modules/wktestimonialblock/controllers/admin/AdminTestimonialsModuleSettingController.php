@@ -260,7 +260,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
         }
 
         if (isset($_FILES['testimonial_image']) && $_FILES['testimonial_image']['tmp_name']) {
-            if ($error = ImageManager::validateUpload($_FILES['testimonial_image'], Tools::getMaxUploadSize())) {
+            if ($error = ImageManager::validateUpload($_FILES['testimonial_image'], Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                 $this->errors[] = $error;
             }
         }
@@ -401,7 +401,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
         Media::addJsDef(
             array(
                 'filesizeError' => $this->l('File exceeds maximum size.', null, true),
-                'maxSizeAllowed' => Tools::getMaxUploadSize(),
+                'maxSizeAllowed' => Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)),
             )
         );
         $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/WkTestimonialBlockAdmin.js');

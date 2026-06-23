@@ -893,7 +893,7 @@ class AdminCategoriesControllerCore extends AdminController
                 $formated_medium = ImageType::getFormatedName('medium');
                 foreach ($images_types as $k => $image_type) {
                     if ($formated_medium == $image_type['name']) {
-                        if ($error = ImageManager::validateUpload($_FILES[$name], Tools::getMaxUploadSize())) {
+                        if ($error = ImageManager::validateUpload($_FILES[$name], Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                             $this->errors[] = $error;
                         } elseif (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES[$name]['tmp_name'], $tmpName)) {
                             $ret = false;

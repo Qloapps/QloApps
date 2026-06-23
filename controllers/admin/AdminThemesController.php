@@ -311,7 +311,7 @@ class AdminThemesControllerCore extends AdminController
                     'label' => $this->l('Preview image for the theme'),
                     'name' => 'image_preview',
                     'display_image' => true,
-                    'hint' => sprintf($this->l('Maximum image size: %1s'), Tools::formatBytes(Tools::getMaxUploadSize())),
+                    'hint' => sprintf($this->l('Maximum image size: %1s'), Tools::formatBytes(Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))).'<br />'.$this->l('This image will be used in the theme list to illustrate your theme.'),
                     'image' => $image_url,
                 ),
                 array(
@@ -585,7 +585,7 @@ class AdminThemesControllerCore extends AdminController
             }
 
             if (isset($_FILES['image_preview']) && $_FILES['image_preview']['error'] == 0) {
-                if (@getimagesize($_FILES['image_preview']['tmp_name']) && !ImageManager::validateUpload($_FILES['image_preview'], Tools::getMaxUploadSize())) {
+                if (@getimagesize($_FILES['image_preview']['tmp_name']) && !ImageManager::validateUpload($_FILES['image_preview'], Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                     move_uploaded_file($_FILES['image_preview']['tmp_name'], _PS_ALL_THEMES_DIR_.$new_dir.'/preview.jpg');
                 } else {
                     $this->errors[] = $this->l('Image is not valid.');
@@ -2727,7 +2727,7 @@ class AdminThemesControllerCore extends AdminController
     {
         $id_shop = Context::getContext()->shop->id;
         if (isset($_FILES[$field_name]['tmp_name']) && $_FILES[$field_name]['tmp_name'] && $_FILES[$field_name]['size']) {
-            if ($error = ImageManager::validateUpload($_FILES[$field_name], Tools::getMaxUploadSize())) {
+            if ($error = ImageManager::validateUpload($_FILES[$field_name], Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                 $this->errors[] = $error;
                 return false;
             }

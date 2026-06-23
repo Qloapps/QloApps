@@ -41,9 +41,11 @@ $(document).ready(function () {
         files.splice(0, 1);
         createImageUploadRequest(file).then((formData) => {
             uploadHotelImages(formData).then(() => {
-                uploadSelectedImages(files)
+                uploadSelectedImages(files);
             });
-        })
+        }).catch(() => {
+            uploadSelectedImages(files);
+        });
     }
 
     function createImageUploadRequest(file)
@@ -51,7 +53,8 @@ $(document).ready(function () {
         return new Promise((resolve, reject) => {
             if (typeof file != 'undefined') {
                 if (file.size > maxSizeAllowed) {
-                    reject(filesizeError + '[' + file.name +  ']');
+                    showErrorMessage(filesizeError + '[' + file.name + ']');
+                    reject(filesizeError + '[' + file.name + ']');
                 } else {
                     var formData = new FormData();
                     var idHotel = $("#id-hotel").val();

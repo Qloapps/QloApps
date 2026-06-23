@@ -603,7 +603,7 @@ class AdminFeaturesControllerCore extends AdminController
             $featureImage = $_FILES['logo'];
             if (!$idFeature || (isset($featureImage['tmp_name']) && $featureImage['tmp_name'])) {
                 if ($featureImage && $featureImage['tmp_name'] && $featureImage['name']) {
-                    if ($error = ImageManager::validateUpload($featureImage, Tools::getMaxUploadSize())) {
+                    if ($error = ImageManager::validateUpload($featureImage, Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                         $this->errors[] = $error;
                     }
                 } else {

@@ -28,7 +28,7 @@ class HelperImageUploaderCore extends HelperUploader
 {
     public function getMaxSize()
     {
-        return (int)Tools::getMaxUploadSize();
+        return Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024));
     }
 
     public function getSavePath()
@@ -64,7 +64,7 @@ class HelperImageUploaderCore extends HelperUploader
             return false;
         }
 
-        if ($error = ImageManager::validateUpload($file, Tools::getMaxUploadSize($this->getMaxSize()), $this->getAcceptTypes())) {
+        if ($error = ImageManager::validateUpload($file, $this->getMaxSize(), $this->getAcceptTypes())) {
             $file['error'] = $error;
             return false;
         }

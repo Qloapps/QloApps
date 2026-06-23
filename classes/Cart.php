@@ -1862,53 +1862,55 @@ class CartCore extends ObjectModel
                 // by webkul to calculate rates of the product from hotelreservation syatem tables with feature prices....
                 $totalPriceByProduct = 0;
                 $priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
-                foreach ($roomTypesByIdProduct as $key => $cartRoomInfo) {
-                    $occupancy = array(
-                        array(
-                            'adults' => $cartRoomInfo['adults'],
-                            'children' => $cartRoomInfo['children'],
-                            'child_ages' => json_decode($cartRoomInfo['child_ages'])
-                        )
+
+                if ($type == Cart::ADVANCE_PAYMENT || $type == Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS) {
+                    // getProductMinAdvPaymentAmountByIdCart already aggregates all rooms for this product internally,
+                    // so call it once and add once — not inside the per-room loop.
+                    $advProductPrice = $objAdvPayment->getProductMinAdvPaymentAmountByIdCart(
+                        $this->id,
+                        $product['id_product'],
+                        0,
+                        0,
+                        $with_taxes
                     );
-                    // get the real price of the room type
-                    $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                        $cartRoomInfo['id_product'],
-                        $cartRoomInfo['date_from'],
-                        $cartRoomInfo['date_to'],
-                        $occupancy,
-                        Group::getCurrent()->id,
-                        $cartRoomInfo['id_cart'],
-                        $cartRoomInfo['id_guest'],
-                        $cartRoomInfo['id_room'],
-                        0
-                    );
-                    if ($with_taxes) {
-                        $totalPriceByProduct = $roomTotalPrice['total_price_tax_incl'];
-                    } else {
-                        $totalPriceByProduct = $roomTotalPrice['total_price_tax_excl'];
-                    }
-
-                    // If customer has selected advance payment of the cart
-                    if ($type == Cart::ADVANCE_PAYMENT || $type == Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS) {
-                        $advProductPrice = $objAdvPayment->getProductMinAdvPaymentAmountByIdCart(
-                            $this->id,
-                            $cartRoomInfo['id_product'],
-                            0,
-                            0,
-                            $with_taxes
-                        );
-
-                        // set advance payment  price only if it is greater than real price
-                        if ($advProductPrice < $totalPriceByProduct) {
-                            $totalPriceByProduct = $advProductPrice;
-                        }
-                    }
-
-                    // Rounding as per configurations
                     if ($ps_round_type == Order::ROUND_TOTAL) {
-                        $products_total[$id_tax_rules_group.'_'.$id_address] += Tools::processPriceRounding($totalPriceByProduct);
+                        $products_total[$id_tax_rules_group.'_'.$id_address] += Tools::processPriceRounding($advProductPrice);
                     } else {
-                        $products_total[$id_tax_rules_group] += Tools::processPriceRounding($totalPriceByProduct);
+                        $products_total[$id_tax_rules_group] += Tools::processPriceRounding($advProductPrice);
+                    }
+                } else {
+                    foreach ($roomTypesByIdProduct as $key => $cartRoomInfo) {
+                        $occupancy = array(
+                            array(
+                                'adults' => $cartRoomInfo['adults'],
+                                'children' => $cartRoomInfo['children'],
+                                'child_ages' => json_decode($cartRoomInfo['child_ages'])
+                            )
+                        );
+                        // get the real price of the room type
+                        $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                            $cartRoomInfo['id_product'],
+                            $cartRoomInfo['date_from'],
+                            $cartRoomInfo['date_to'],
+                            $occupancy,
+                            Group::getCurrent()->id,
+                            $cartRoomInfo['id_cart'],
+                            $cartRoomInfo['id_guest'],
+                            $cartRoomInfo['id_room'],
+                            0
+                        );
+                        if ($with_taxes) {
+                            $totalPriceByProduct = $roomTotalPrice['total_price_tax_incl'];
+                        } else {
+                            $totalPriceByProduct = $roomTotalPrice['total_price_tax_excl'];
+                        }
+
+                        // Rounding as per configurations
+                        if ($ps_round_type == Order::ROUND_TOTAL) {
+                            $products_total[$id_tax_rules_group.'_'.$id_address] += Tools::processPriceRounding($totalPriceByProduct);
+                        } else {
+                            $products_total[$id_tax_rules_group] += Tools::processPriceRounding($totalPriceByProduct);
+                        }
                     }
                 }
             }

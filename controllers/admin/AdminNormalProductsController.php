@@ -96,7 +96,7 @@ class AdminNormalProductsControllerCore extends AdminController
         $this->imageType = 'jpg';
         $this->_defaultOrderBy = 'id_product';
         $this->max_file_size = (int)(Configuration::get('PS_LIMIT_UPLOAD_FILE_VALUE') * 1000000);
-        $this->max_image_size = (int)Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE');
+        $this->max_image_size = Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024));
         $this->allow_export = true;
 
         // @since 1.5 : translations for tabs
@@ -1866,7 +1866,7 @@ class AdminNormalProductsControllerCore extends AdminController
         if (!isset($_FILES['image_product']['tmp_name'])) {
             return false;
         }
-        if ($error = ImageManager::validateUpload($_FILES['image_product'])) {
+        if ($error = ImageManager::validateUpload($_FILES['image_product'], $this->max_image_size)) {
             $this->errors[] = $error;
         } else {
             $image = new Image($id_image);
