@@ -104,7 +104,6 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $action .= ($module ? '&module='.Tools::safeOutput($module) : '');
         $action .= (($id_product = Tools::getValue('id_product')) ? '&id_product='.Tools::safeOutput($id_product) : '');
         $action .= (($id_hotel = Tools::getValue('id_hotel')) ? '&id_hotel='.Tools::safeOutput($id_hotel) : '');
-        $action .= (($tab = Tools::getValue('tab')) ? '&tab='.Tools::safeOutput($tab) : '');
         $tpl->assign(array(
             'current' => self::$currentIndex,
             'token' => $token,
@@ -152,13 +151,9 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
 
         $modules = $this->getModules();
         $module_instance = array();
-        $module_tabs = array();
         foreach ($modules as $m => $module) {
             if ($module_instance[$module['name']] = Module::getInstanceByName($module['name'])) {
                 $modules[$m]['displayName'] = $module_instance[$module['name']]->displayName;
-                if (method_exists($module_instance[$module['name']], 'getStatsTabs')) {
-                    $module_tabs[$module['name']] = $module_instance[$module['name']]->getStatsTabs();
-                }
             } else {
                 unset($module_instance[$module['name']]);
                 unset($modules[$m]);
@@ -170,11 +165,9 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $tpl->assign(array(
             'current' => self::$currentIndex,
             'current_module_name' => Tools::getValue('module', 'statsforecast'),
-            'current_tab' => Tools::getValue('tab', ''),
             'token' => $this->token,
             'modules' => $modules,
-            'module_instance' => $module_instance,
-            'module_tabs' => $module_tabs,
+            'module_instance' => $module_instance
         ));
 
         return $tpl->fetch();

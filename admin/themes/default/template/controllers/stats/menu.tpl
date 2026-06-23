@@ -28,14 +28,7 @@
 		{if count($modules)}
 			{foreach $modules as $module}
 				{if $module_instance[$module.name]}
-					{if isset($module_tabs[$module.name]) && $module_tabs[$module.name]}
-						{foreach $module_tabs[$module.name] as $tab}
-							{assign var="tab_active" value=($current_module_name == $module.name && $current_tab == $tab.key)}
-							<a class="list-group-item{if $tab_active} active{/if}" href="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;module={$module.name|escape:'html':'UTF-8'}&amp;tab={$tab.key|escape:'html':'UTF-8'}">{$tab.label}</a>
-						{/foreach}
-					{else}
-						<a class="list-group-item{if ($current_module_name && $current_module_name == $module.name)} active{/if}" href="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;module={$module.name}">{$module_instance[$module.name]->displayName}</a>
-					{/if}
+					<a class="list-group-item{if ($current_module_name && $current_module_name == $module.name)} active{/if}" href="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;module={$module.name}">{$module_instance[$module.name]->displayName}</a>
 				{/if}
 			{/foreach}
 		{else}
