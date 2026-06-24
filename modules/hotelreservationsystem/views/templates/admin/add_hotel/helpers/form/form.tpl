@@ -628,56 +628,73 @@
 							</div>
 						</div>
 
-						{if isset($hotel_selected_amenities)}
-							<div class="form-group">
-								<label class="control-label col-sm-3">
-									<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select which of the chosen amenities should be featured for this hotel.' mod='hotelreservationsystem'}'>{l s='Featured amenities' mod='hotelreservationsystem'}</span>
-								</label>
-								<div class="col-sm-7">
-									<select name="hotel_featured_amenities[]" id="htl_featured_amenities" class="form-control" multiple>
-										{foreach $hotel_selected_amenities as $amenity}
-											<option value="{$amenity.id|intval}"{if $amenity.is_featured} selected="selected"{/if}>{$amenity.name|escape:'htmlall':'UTF-8'}</option>
-										{/foreach}
-									</select>
-								</div>
+						<div class="form-group">
+							<label class="control-label col-sm-3">
+								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select which of the chosen amenities should be featured for this hotel.' mod='hotelreservationsystem'}'>{l s='Featured amenities' mod='hotelreservationsystem'}</span>
+							</label>
+							<div class="col-sm-7">
+								<select name="hotel_featured_amenities[]" id="htl_featured_amenities" class="form-control" multiple>
+								</select>
 							</div>
-							<script type="text/javascript">
-							(function ($) {
-								var $select = $('#htl_featured_amenities');
-								var chosenReady = false;
+						</div>
 
-								function syncSelect() {
-									$select.find('option').each(function () {
-										if (!$('input[name="id_amenities[]"][value="' + $(this).val() + '"]').is(':checked')) {
-											$(this).remove();
-										}
-									});
-									$('input[name="id_amenities[]"]:checked').each(function () {
-										if (!$select.find('option[value="' + $(this).val() + '"]').length) {
-											$select.append($('<option>').val($(this).val()).text($(this).siblings('label.tree-toggler').text().trim()));
-										}
-									});
-									if (chosenReady) {
-										$select.trigger('chosen:updated');
-									}
-								}
+						{if isset($hotel_featured_amenity_ids)}
+						<script type="text/javascript">
+						(function ($) {
+							var featuredIds = {$hotel_featured_amenity_ids|json_encode};
+							var $select = $('#htl_featured_amenities');
+							var chosenReady = false;
 
-								$(document).on('click', '#hotel-amenities-tree :checkbox', function () {
-									setTimeout(syncSelect, 0);
-								});
-								$(document).on('click', '#check-all-hotel-amenities-tree, #uncheck-all-hotel-amenities-tree', function () {
-									setTimeout(syncSelect, 0);
+							function syncFeaturedSelect() {
+								var existing = {};
+								$select.find('option').each(function () {
+									existing[$(this).val()] = true;
 								});
 
-								$('a[href="#hotel-features"]').on('shown.bs.tab', function () {
-									if (!chosenReady) {
-										$select.chosen({ disable_search_threshold: 5, search_contains: true });
-										chosenReady = true;
+								$('input[name="id_amenities[]"]').each(function () {
+									var $cb = $(this);
+									var id = $cb.val();
+									var name = $cb.siblings('label.tree-toggler').text().trim();
+									if ($cb.is(':checked')) {
+										if (!existing[id]) {
+											var selected = featuredIds.indexOf(parseInt(id)) !== -1;
+											$select.append(
+												$('<option></option>').val(id).text(name).prop('selected', selected)
+											);
+										}
+									} else {
+										$select.find('option[value="' + id + '"]').remove();
 									}
+								});
+
+								if (chosenReady) {
 									$select.trigger('chosen:updated');
-								});
-							}(jQuery));
-							</script>
+								}
+							}
+
+							$(document).on('click', '#hotel-amenities-tree :input[type="checkbox"]', function () {
+								setTimeout(syncFeaturedSelect, 0);
+							});
+
+							$(document).on('click', '#check-all-hotel-amenities-tree, #uncheck-all-hotel-amenities-tree', function () {
+								setTimeout(syncFeaturedSelect, 0);
+							});
+
+							$('a[href="#hotel-features"]').on('shown.bs.tab', function () {
+								syncFeaturedSelect();
+								if (!chosenReady) {
+									$select.chosen({ disable_search_threshold: 5, search_contains: true });
+									chosenReady = true;
+								} else {
+									$select.trigger('chosen:updated');
+								}
+							});
+
+							$(document).ready(function () {
+								syncFeaturedSelect();
+							});
+						}(jQuery));
+						</script>
 						{/if}
 					{elseif isset($hotel_info.id) && $hotel_info.id}
 						<div class="alert alert-warning">
