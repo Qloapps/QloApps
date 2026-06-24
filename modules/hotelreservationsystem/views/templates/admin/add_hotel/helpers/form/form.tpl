@@ -214,11 +214,11 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-3 required" for="hotel_country">{l s='Rating :' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-sm-3 " for="hotel_country">{l s='Rating :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
 							<div style="width: 195px;">
 								<select class="form-control" name="hotel_rating" id="hotel_rating" value="">
-									<option value="">{l s='No star' mod='hotelreservationsystem'}</option>
+									<option value="0">{l s='No star' mod='hotelreservationsystem'}</option>
 									<option value="1" {if (isset($smarty.post.hotel_rating) && $smarty.post.hotel_rating == '1') || isset($edit) && $hotel_info['rating'] == '1'}selected{/if}>*</option>
 									<option value="2" {if (isset($smarty.post.hotel_rating) && $smarty.post.hotel_rating == '2') || isset($edit) && $hotel_info['rating'] == '2'}selected{/if}>**</option>
 									<option value="3" {if (isset($smarty.post.hotel_rating) && $smarty.post.hotel_rating == '3') || isset($edit) && $hotel_info['rating'] == '3'}selected{/if}>***</option>
