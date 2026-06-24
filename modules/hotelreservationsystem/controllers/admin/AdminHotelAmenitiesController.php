@@ -241,6 +241,8 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 $logoValue = trim(Tools::getValue('logo_icon'));
                 if (!$logoValue) {
                     $this->errors[] = $this->l('Icon class is required.');
+                } elseif (!preg_match('/^icon-/', $logoValue)) {
+                    $this->errors[] = $this->l('Icon class must start with "icon-" (e.g. icon-wifi).');
                 } elseif (!Validate::isGenericName(str_replace('-', ' ', $logoValue))) {
                     $this->errors[] = $this->l('Icon name is invalid.');
                 }

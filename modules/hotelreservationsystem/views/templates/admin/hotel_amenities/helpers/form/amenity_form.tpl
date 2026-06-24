@@ -118,7 +118,7 @@
 
 			<div class="form-group" id="htl_logo_image_row"
 				 {if (isset($smarty.post.logo_type) && $smarty.post.logo_type == 'icon') || (!isset($smarty.post.logo_type) && isset($amenity.logo_type) && $amenity.logo_type == 'icon')}style="display:none;"{/if}>
-				<label class="col-lg-3 control-label">{l s='Logo Image' mod='hotelreservationsystem'}</label>
+				<label class="col-lg-3 control-label required">{l s='Logo Image' mod='hotelreservationsystem'}</label>
 				<div class="col-lg-5">
 					{if $existing_img}
 						<div style="margin-bottom:8px;">

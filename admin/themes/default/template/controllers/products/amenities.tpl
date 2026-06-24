@@ -26,10 +26,12 @@
 	<h3>{l s='Amenities'}</h3>
 
 	<div class="alert alert-info">
+		<p>{l s='If you want to add a new amenity, please use the following link.'}
+			<a href="{$link->getAdminLink('AdminHotelAmenities')|escape:'html':'UTF-8'}" class="btn btn-link button" target="_blank">
+				<i class="icon-plus-sign"></i> {l s='Manage amenities'} <i class="icon-external-link-sign"></i>
+			</a>
+		</p>
 		{l s='Select the amenities available for this room type using the tree below.'}
-		<a href="{$link->getAdminLink('AdminHotelAmenities')|escape:'html':'UTF-8'}" class="btn btn-link confirm_leave button" target="_blank">
-			<i class="icon-plus-sign"></i> {l s='Manage amenities'} <i class="icon-external-link-sign"></i>
-		</a>
 	</div>
 
 	{if isset($room_type_amenities_tree) && $room_type_amenities_tree}
@@ -50,7 +52,7 @@
 					{l s='Featured amenities'}
 				</span>
 			</label>
-			<div class="col-sm-5">
+			<div class="col-sm-7">
 				<select name="featured_amenities[]" id="rt_featured_amenities" class="form-control" multiple>
 				</select>
 			</div>
