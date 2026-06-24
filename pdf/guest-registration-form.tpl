@@ -44,21 +44,21 @@
 									{if $labels.title || $labels.full_name}
 									<tr>
 										{if $labels.title && $labels.full_name}
-											<td width="25%" class="bold">{$labels.title|upper}:</td>
+											<td width="25%" class="bold">{l s=$labels.title pdf='true'}:</td>
 											<td width="25%" class="white">
 												<span style="font-family: freeserif;">&#9633;</span> {l s='Mr.' pdf='true'} &nbsp;
 												<span style="font-family: freeserif;">&#9633;</span> {l s='Ms.' pdf='true'} &nbsp;
 											</td>
-											<td width="25%" class="bold">{$labels.full_name}:</td>
+											<td width="25%" class="bold">{l s=$labels.full_name pdf='true'}:</td>
 											<td width="25%" class="white">________________________</td>
 										{elseif $labels.title}
-											<td width="25%" class="bold">{$labels.title|upper}:</td>
+											<td width="25%" class="bold">{l s=$labels.title pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">
 												<span style="font-family: freeserif;">&#9633;</span> {l s='Mr.' pdf='true'} &nbsp;
 												<span style="font-family: freeserif;">&#9633;</span> {l s='Ms.' pdf='true'} &nbsp;
 											</td>
 										{else}
-											<td width="25%" class="bold">{$labels.full_name}:</td>
+											<td width="25%" class="bold">{l s=$labels.full_name pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">________________________</td>
 										{/if}
 									</tr>
@@ -66,15 +66,15 @@
 									{if $labels.phone || $labels.email}
 									<tr>
 										{if $labels.phone && $labels.email}
-											<td width="25%" class="bold">{$labels.phone}:</td>
+											<td width="25%" class="bold">{l s=$labels.phone pdf='true'}:</td>
 											<td width="25%" class="white">________________________</td>
-											<td width="25%" class="bold">{$labels.email}:</td>
+											<td width="25%" class="bold">{l s=$labels.email pdf='true'}:</td>
 											<td width="25%" class="white">________________________</td>
 										{elseif $labels.phone}
-											<td width="25%" class="bold">{$labels.phone}:</td>
+											<td width="25%" class="bold">{l s=$labels.phone pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">________________________</td>
 										{else}
-											<td width="25%" class="bold">{$labels.email}:</td>
+											<td width="25%" class="bold">{l s=$labels.email pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">________________________</td>
 										{/if}
 									</tr>
@@ -82,15 +82,15 @@
 									{if $labels.dob || $labels.nationality}
 									<tr>
 										{if $labels.dob && $labels.nationality}
-											<td width="25%" class="bold">{$labels.dob}:</td>
+											<td width="25%" class="bold">{l s=$labels.dob pdf='true'}:</td>
 											<td width="25%" class="white">____ / ____ / ________</td>
-											<td width="25%" class="bold">{$labels.nationality}:</td>
+											<td width="25%" class="bold">{l s=$labels.nationality pdf='true'}:</td>
 											<td width="25%" class="white">________________________</td>
 										{elseif $labels.dob}
-											<td width="25%" class="bold">{$labels.dob}:</td>
+											<td width="25%" class="bold">{l s=$labels.dob pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">____ / ____ / ________</td>
 										{else}
-											<td width="25%" class="bold">{$labels.nationality}:</td>
+											<td width="25%" class="bold">{l s=$labels.nationality pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">________________________</td>
 										{/if}
 									</tr>
@@ -98,22 +98,22 @@
 									{if $labels.city_country || $labels.postal_code}
 									<tr>
 										{if $labels.city_country && $labels.postal_code}
-											<td width="25%" class="bold">{$labels.city_country}:</td>
+											<td width="25%" class="bold">{l s=$labels.city_country pdf='true'}:</td>
 											<td width="25%" class="white">________________________</td>
-											<td width="25%" class="bold">{$labels.postal_code}:</td>
+											<td width="25%" class="bold">{l s=$labels.postal_code pdf='true'}:</td>
 											<td width="25%" class="white">________________________</td>
 										{elseif $labels.city_country}
-											<td width="25%" class="bold">{$labels.city_country}:</td>
+											<td width="25%" class="bold">{l s=$labels.city_country pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">________________________</td>
 										{else}
-											<td width="25%" class="bold">{$labels.postal_code}:</td>
+											<td width="25%" class="bold">{l s=$labels.postal_code pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">________________________</td>
 										{/if}
 									</tr>
 									{/if}
 									{if $labels.address}
 									<tr>
-										<td width="25%" class="bold">{$labels.address}:</td>
+										<td width="25%" class="bold">{l s=$labels.address pdf='true'}:</td>
 										<td width="75%" colspan="3" class="white">__________________________________________________________________________________</td>
 									</tr>
 									{/if}
@@ -139,15 +139,15 @@
 									{if $labels.arrived_from || $labels.next_dest}
 									<tr>
 										{if $labels.arrived_from && $labels.next_dest}
-											<td width="25%" class="bold">{$labels.arrived_from}:</td>
+											<td width="25%" class="bold">{l s=$labels.arrived_from pdf='true'}:</td>
 											<td width="25%" class="white">________________________</td>
-											<td width="25%" class="bold">{$labels.next_dest}:</td>
+											<td width="25%" class="bold">{l s=$labels.next_dest pdf='true'}:</td>
 											<td width="25%" class="white">___________________</td>
 										{elseif $labels.arrived_from}
-											<td width="25%" class="bold">{$labels.arrived_from}:</td>
+											<td width="25%" class="bold">{l s=$labels.arrived_from pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">________________________</td>
 										{else}
-											<td width="25%" class="bold">{$labels.next_dest}:</td>
+											<td width="25%" class="bold">{l s=$labels.next_dest pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">___________________</td>
 										{/if}
 									</tr>
@@ -155,22 +155,22 @@
 									{if $labels.flight || $labels.vehicle}
 									<tr>
 										{if $labels.flight && $labels.vehicle}
-											<td width="25%" class="bold">{$labels.flight}:</td>
+											<td width="25%" class="bold">{l s=$labels.flight pdf='true'}:</td>
 											<td width="25%" class="white">________________________</td>
-											<td width="25%" class="bold">{$labels.vehicle}:</td>
+											<td width="25%" class="bold">{l s=$labels.vehicle pdf='true'}:</td>
 											<td width="25%" class="white">___________________</td>
 										{elseif $labels.flight}
-											<td width="25%" class="bold">{$labels.flight}:</td>
+											<td width="25%" class="bold">{l s=$labels.flight pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">________________________</td>
 										{else}
-											<td width="25%" class="bold">{$labels.vehicle}:</td>
+											<td width="25%" class="bold">{l s=$labels.vehicle pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">___________________</td>
 										{/if}
 									</tr>
 									{/if}
 									{if $labels.purpose}
 									<tr>
-										<td width="25%" class="bold">{$labels.purpose}:</td>
+										<td width="25%" class="bold">{l s=$labels.purpose pdf='true'}:</td>
 										<td width="75%" colspan="3" class="white">________________________</td>
 									</tr>
 									{/if}
@@ -196,17 +196,17 @@
 									{if $labels.booking_ref || $labels.booking_rate}
 									<tr>
 										{if $labels.booking_ref && $labels.booking_rate}
-											<td width="25%" class="bold">{$labels.booking_ref}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_ref pdf='true'}:</td>
 											<td width="25%" class="white">{$booking_reference|escape:'html':'UTF-8'}</td>
-											<td width="25%" class="bold">{$labels.booking_rate}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_rate pdf='true'}:</td>
 											<td width="25%" class="white">
 												{if $rate_per_night}{$rate_per_night|escape:'html':'UTF-8'}{else}__________{/if}
 											</td>
 										{elseif $labels.booking_ref}
-											<td width="25%" class="bold">{$labels.booking_ref}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_ref pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">{$booking_reference|escape:'html':'UTF-8'}</td>
 										{else}
-											<td width="25%" class="bold">{$labels.booking_rate}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_rate pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">
 												{if $rate_per_night}{$rate_per_night|escape:'html':'UTF-8'}{else}__________{/if}
 											</td>
@@ -216,21 +216,21 @@
 									{if $labels.booking_arrival || $labels.booking_departure}
 									<tr>
 										{if $labels.booking_arrival && $labels.booking_departure}
-											<td width="25%" class="bold">{$labels.booking_arrival}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_arrival pdf='true'}:</td>
 											<td width="25%" class="white">
 												{if $arrival_date_time}{$arrival_date_time|escape:'html':'UTF-8'}{else}____ / ____ / ____  ______{/if}
 											</td>
-											<td width="25%" class="bold">{$labels.booking_departure}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_departure pdf='true'}:</td>
 											<td width="25%" class="white">
 												{if $departure_date_time}{$departure_date_time|escape:'html':'UTF-8'}{else}____ / ____ / ____  ______{/if}
 											</td>
 										{elseif $labels.booking_arrival}
-											<td width="25%" class="bold">{$labels.booking_arrival}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_arrival pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">
 												{if $arrival_date_time}{$arrival_date_time|escape:'html':'UTF-8'}{else}____ / ____ / ____  ______{/if}
 											</td>
 										{else}
-											<td width="25%" class="bold">{$labels.booking_departure}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_departure pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">
 												{if $departure_date_time}{$departure_date_time|escape:'html':'UTF-8'}{else}____ / ____ / ____  ______{/if}
 											</td>
@@ -240,22 +240,22 @@
 									{if $labels.booking_room_type || $labels.booking_room_number}
 									<tr>
 										{if $labels.booking_room_type && $labels.booking_room_number}
-											<td width="25%" class="bold">{$labels.booking_room_type}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_room_type pdf='true'}:</td>
 											<td width="25%" class="white">{$room_type|escape:'html':'UTF-8'}</td>
-											<td width="25%" class="bold">{$labels.booking_room_number}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_room_number pdf='true'}:</td>
 											<td width="25%" class="white">{$room_number|escape:'html':'UTF-8'}</td>
 										{elseif $labels.booking_room_type}
-											<td width="25%" class="bold">{$labels.booking_room_type}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_room_type pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">{$room_type|escape:'html':'UTF-8'}</td>
 										{else}
-											<td width="25%" class="bold">{$labels.booking_room_number}:</td>
+											<td width="25%" class="bold">{l s=$labels.booking_room_number pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">{$room_number|escape:'html':'UTF-8'}</td>
 										{/if}
 									</tr>
 									{/if}
 									{if $labels.num_guests}
 									<tr>
-										<td width="25%" class="bold">{$labels.num_guests}:</td>
+										<td width="25%" class="bold">{l s=$labels.num_guests pdf='true'}:</td>
 										<td width="25%" class="white">
 											{l s='Adults:' pdf='true'} {$adults|escape:'html':'UTF-8'} &nbsp;
 											{l s='Children:' pdf='true'} {$children|escape:'html':'UTF-8'}
@@ -285,13 +285,13 @@
 								<table width="100%" cellpadding="4" cellspacing="0">
 									{if $labels.id_proof}
 									<tr>
-										<td width="25%" class="bold">{$labels.id_proof}:</td>
+										<td width="25%" class="bold">{l s=$labels.id_proof pdf='true'}:</td>
 										<td width="75%" class="white">________________________________</td>
 									</tr>
 									{/if}
 									{if $labels.id_number}
 									<tr>
-										<td width="25%" class="bold">{$labels.id_number}:</td>
+										<td width="25%" class="bold">{l s=$labels.id_number pdf='true'}:</td>
 										<td width="75%" class="white">________________________________</td>
 									</tr>
 									{/if}
@@ -307,15 +307,15 @@
 									{if $labels.passport || $labels.place_of_issue}
 									<tr>
 										{if $labels.passport && $labels.place_of_issue}
-											<td width="25%" class="bold">{$labels.passport}:</td>
+											<td width="25%" class="bold">{l s=$labels.passport pdf='true'}:</td>
 											<td width="25%" class="white">____________________</td>
-											<td width="25%" class="bold">{$labels.place_of_issue}:</td>
+											<td width="25%" class="bold">{l s=$labels.place_of_issue pdf='true'}:</td>
 											<td width="25%" class="white">____________________</td>
 										{elseif $labels.passport}
-											<td width="25%" class="bold">{$labels.passport}:</td>
+											<td width="25%" class="bold">{l s=$labels.passport pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">____________________</td>
 										{else}
-											<td width="25%" class="bold">{$labels.place_of_issue}:</td>
+											<td width="25%" class="bold">{l s=$labels.place_of_issue pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">____________________</td>
 										{/if}
 									</tr>
@@ -323,15 +323,15 @@
 									{if $labels.date_of_issue || $labels.date_of_expiry}
 									<tr>
 										{if $labels.date_of_issue && $labels.date_of_expiry}
-											<td width="25%" class="bold">{$labels.date_of_issue}:</td>
+											<td width="25%" class="bold">{l s=$labels.date_of_issue pdf='true'}:</td>
 											<td width="25%" class="white">____ / ____ / ____</td>
-											<td width="25%" class="bold">{$labels.date_of_expiry}:</td>
+											<td width="25%" class="bold">{l s=$labels.date_of_expiry pdf='true'}:</td>
 											<td width="25%" class="white">____ / ____ / ____</td>
 										{elseif $labels.date_of_issue}
-											<td width="25%" class="bold">{$labels.date_of_issue}:</td>
+											<td width="25%" class="bold">{l s=$labels.date_of_issue pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">____ / ____ / ____</td>
 										{else}
-											<td width="25%" class="bold">{$labels.date_of_expiry}:</td>
+											<td width="25%" class="bold">{l s=$labels.date_of_expiry pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">____ / ____ / ____</td>
 										{/if}
 									</tr>
@@ -339,22 +339,22 @@
 									{if $labels.visa || $labels.valid_until}
 									<tr>
 										{if $labels.visa && $labels.valid_until}
-											<td width="25%" class="bold">{$labels.visa}:</td>
+											<td width="25%" class="bold">{l s=$labels.visa pdf='true'}:</td>
 											<td width="25%" class="white">____________________</td>
-											<td width="25%" class="bold">{$labels.valid_until}:</td>
+											<td width="25%" class="bold">{l s=$labels.valid_until pdf='true'}:</td>
 											<td width="25%" class="white">____ / ____ / ____</td>
 										{elseif $labels.visa}
-											<td width="25%" class="bold">{$labels.visa}:</td>
+											<td width="25%" class="bold">{l s=$labels.visa pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">____________________</td>
 										{else}
-											<td width="25%" class="bold">{$labels.valid_until}:</td>
+											<td width="25%" class="bold">{l s=$labels.valid_until pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">____ / ____ / ____</td>
 										{/if}
 									</tr>
 									{/if}
 									{if $labels.arrival_in_country}
 									<tr>
-										<td width="25%" class="bold">{$labels.arrival_in_country}:</td>
+										<td width="25%" class="bold">{l s=$labels.arrival_in_country pdf='true'}:</td>
 										<td width="75%" class="white">____ / ____ / ____</td>
 									</tr>
 									{/if}
@@ -385,10 +385,10 @@
 								<table width="100%" cellpadding="4" cellspacing="0">
 									<tr>
 										<th class="header small" width="8%">{l s='S.No.' pdf='true'}</th>
-										{if $labels.addguest_name}<th class="header small" width="40%">{$labels.addguest_name}</th>{/if}
-										{if $labels.addguest_id_type}<th class="header small" width="20%">{$labels.addguest_id_type}</th>{/if}
-										{if $labels.addguest_id_number}<th class="header small" width="17%">{$labels.addguest_id_number}</th>{/if}
-										{if $labels.addguest_nationality}<th class="header small" width="15%">{$labels.addguest_nationality}</th>{/if}
+										{if $labels.addguest_name}<th class="header small" width="40%">{l s=$labels.addguest_name pdf='true'}</th>{/if}
+										{if $labels.addguest_id_type}<th class="header small" width="20%">{l s=$labels.addguest_id_type pdf='true'}</th>{/if}
+										{if $labels.addguest_id_number}<th class="header small" width="17%">{l s=$labels.addguest_id_number pdf='true'}</th>{/if}
+										{if $labels.addguest_nationality}<th class="header small" width="15%">{l s=$labels.addguest_nationality pdf='true'}</th>{/if}
 									</tr>
 									{section name=ag loop=$additional_guests_rows}
 										<tr class="color_line_even">
@@ -429,13 +429,13 @@
 								<table width="100%" cellpadding="4" cellspacing="0">
 									{if $labels.company}
 									<tr>
-										<td width="25%" class="bold">{$labels.company}:</td>
+										<td width="25%" class="bold">{l s=$labels.company pdf='true'}:</td>
 										<td width="75%" class="white">______________________________________________</td>
 									</tr>
 									{/if}
 									{if $labels.tax_id}
 									<tr>
-										<td width="25%" class="bold">{$labels.tax_id}:</td>
+										<td width="25%" class="bold">{l s=$labels.tax_id pdf='true'}:</td>
 										<td width="75%" class="white">______________________________________________</td>
 									</tr>
 									{/if}
@@ -460,22 +460,22 @@
 								<table width="100%" cellpadding="4" cellspacing="0">
 									{if $labels.payment_method}
 									<tr>
-										<td width="25%" class="bold">{$labels.payment_method}:</td>
+										<td width="25%" class="bold">{l s=$labels.payment_method pdf='true'}:</td>
 										<td width="75%" class="white">________________________________</td>
 									</tr>
 									{/if}
 									{if $labels.card_number || $labels.security_deposit}
 									<tr>
 										{if $labels.card_number && $labels.security_deposit}
-											<td width="25%" class="bold">{$labels.card_number}:</td>
+											<td width="25%" class="bold">{l s=$labels.card_number pdf='true'}:</td>
 											<td width="35%" class="white">________________________________</td>
-											<td width="20%" class="bold">{$labels.security_deposit}:</td>
+											<td width="20%" class="bold">{l s=$labels.security_deposit pdf='true'}:</td>
 											<td width="20%" class="white">__________________</td>
 										{elseif $labels.card_number}
-											<td width="25%" class="bold">{$labels.card_number}:</td>
+											<td width="25%" class="bold">{l s=$labels.card_number pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">________________________________</td>
 										{else}
-											<td width="25%" class="bold">{$labels.security_deposit}:</td>
+											<td width="25%" class="bold">{l s=$labels.security_deposit pdf='true'}:</td>
 											<td width="75%" colspan="3" class="white">__________________</td>
 										{/if}
 									</tr>
@@ -503,15 +503,15 @@
 							<table width="100%" cellpadding="4" cellspacing="0">
 								<tr>
 									{if $labels.signature && $labels.sig_date}
-										<td width="20%" class="bold">{$labels.signature}:</td>
+										<td width="20%" class="bold">{l s=$labels.signature pdf='true'}:</td>
 										<td width="50%" class="white">______________________________________</td>
-										<td width="10%" class="bold">{$labels.sig_date}:</td>
+										<td width="10%" class="bold">{l s=$labels.sig_date pdf='true'}:</td>
 										<td width="20%" class="white">____ / ____ / ________</td>
 									{elseif $labels.signature}
-										<td width="20%" class="bold">{$labels.signature}:</td>
+										<td width="20%" class="bold">{l s=$labels.signature pdf='true'}:</td>
 										<td width="80%" colspan="3" class="white">______________________________________</td>
 									{else}
-										<td width="20%" class="bold">{$labels.sig_date}:</td>
+										<td width="20%" class="bold">{l s=$labels.sig_date pdf='true'}:</td>
 										<td width="80%" colspan="3" class="white">____ / ____ / ________</td>
 									{/if}
 								</tr>
@@ -539,10 +539,10 @@
 						{if $labels.checkin_time}
 						<tr>
 							<td class="white">
-								<strong> {$labels.checkin_time}:</strong>
+								<strong> {l s=$labels.checkin_time pdf='true'}:</strong>
 								{if $hotel && $hotel->check_in && $hotel->check_in != '00:00:00'}{$hotel->check_in|escape:'html':'UTF-8'}{else}__________{/if}
 								&nbsp;&nbsp;&nbsp;
-								<strong>{$labels.checkout_time}:</strong>
+								<strong>{l s=$labels.checkout_time pdf='true'}:</strong>
 								{if $hotel && $hotel->check_out && $hotel->check_out != '00:00:00'}{$hotel->check_out|escape:'html':'UTF-8'}{else}__________{/if}
 							</td>
 						</tr>
@@ -550,7 +550,7 @@
 						{if $labels.hotel_policies}
 						<tr>
 							<td class="white">
-								<strong> {$labels.hotel_policies}:</strong>
+								<strong> {l s=$labels.hotel_policies pdf='true'}:</strong>
 								{if $hotel && $hotel->policies && !($hotel->policies|@is_array)}
 									{$hotel->policies}
 								{else}
@@ -580,15 +580,15 @@
 									{if $labels.staff_name || $labels.office_checkin_time}
 									<tr>
 										{if $labels.staff_name && $labels.office_checkin_time}
-											<td width="20%" class="bold">{$labels.staff_name}:</td>
+											<td width="20%" class="bold">{l s=$labels.staff_name pdf='true'}:</td>
 											<td width="30%" class="white">____________________</td>
-											<td width="20%" class="bold">{$labels.office_checkin_time}:</td>
+											<td width="20%" class="bold">{l s=$labels.office_checkin_time pdf='true'}:</td>
 											<td width="30%" class="white">____________________</td>
 										{elseif $labels.staff_name}
-											<td width="20%" class="bold">{$labels.staff_name}:</td>
+											<td width="20%" class="bold">{l s=$labels.staff_name pdf='true'}:</td>
 											<td width="80%" colspan="3" class="white">____________________</td>
 										{else}
-											<td width="20%" class="bold">{$labels.office_checkin_time}:</td>
+											<td width="20%" class="bold">{l s=$labels.office_checkin_time pdf='true'}:</td>
 											<td width="80%" colspan="3" class="white">____________________</td>
 										{/if}
 									</tr>
@@ -596,15 +596,15 @@
 									{if $labels.id_verified || $labels.reg_no}
 									<tr>
 										{if $labels.id_verified && $labels.reg_no}
-											<td width="20%" class="bold">{$labels.id_verified}:</td>
+											<td width="20%" class="bold">{l s=$labels.id_verified pdf='true'}:</td>
 											<td width="30%" class="white"><span style="font-family: freeserif;">&#9633;</span> {l s='Yes' pdf='true'} &nbsp; <span style="font-family: freeserif;">&#9633;</span> {l s='No' pdf='true'}</td>
-											<td width="20%" class="bold">{$labels.reg_no}:</td>
+											<td width="20%" class="bold">{l s=$labels.reg_no pdf='true'}:</td>
 											<td width="30%" class="white">____________________</td>
 										{elseif $labels.id_verified}
-											<td width="20%" class="bold">{$labels.id_verified}:</td>
+											<td width="20%" class="bold">{l s=$labels.id_verified pdf='true'}:</td>
 											<td width="80%" colspan="3" class="white"><span style="font-family: freeserif;">&#9633;</span> {l s='Yes' pdf='true'} &nbsp; <span style="font-family: freeserif;">&#9633;</span> {l s='No' pdf='true'}</td>
 										{else}
-											<td width="20%" class="bold">{$labels.reg_no}:</td>
+											<td width="20%" class="bold">{l s=$labels.reg_no pdf='true'}:</td>
 											<td width="80%" colspan="3" class="white">____________________</td>
 										{/if}
 									</tr>

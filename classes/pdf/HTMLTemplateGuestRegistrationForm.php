@@ -211,9 +211,9 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
             'signature' => $fieldLabels[$section8][Order::GRC_SIG_SIGNATURE],
             'sig_date'  => $fieldLabels[$section8][Order::GRC_SIG_DATE],
 
-            // Section 9: Property Regulations (checkin/checkout share one flag; labels come from Translate, not grcInfo)
-            'checkin_time'   => $fieldLabels[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? Translate::getAdminTranslation('Check-in Time', 'AdminGuestRegistrationController', false, false)  : false,
-            'checkout_time'  => $fieldLabels[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? Translate::getAdminTranslation('Check-out Time', 'AdminGuestRegistrationController', false, false) : false,
+            // Section 9: Property Regulations (checkin/checkout share one visibility flag; two separate PDF sub-labels)
+            'checkin_time'   => $fieldLabels[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? 'Check-in Time'  : false,
+            'checkout_time'  => $fieldLabels[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? 'Check-out Time' : false,
             'hotel_policies' => $fieldLabels[$section9][Order::GRC_PROP_HOTEL_POLICIES],
 
             // Section 10: For Office Use Only
