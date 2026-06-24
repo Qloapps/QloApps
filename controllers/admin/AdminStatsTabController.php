@@ -166,11 +166,11 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
             }
         }
 
+        uasort($statsTabs, array($this, 'checkModulesNames'));
+
         Hook::exec('actionStatsTabsModifier', array(
             'stats_tabs' => &$statsTabs
         ));
-
-        uasort($statsTabs, array($this, 'checkModulesNames'));
 
         $tpl->assign(array(
             'current' => self::$currentIndex,
@@ -185,7 +185,7 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
 
     public function checkModulesNames($a, $b)
     {
-        return ($a['display_name'] > $b['display_name']) ? 1 : 0;
+        return $a['display_name'] <=> $b['display_name'];
     }
 
     protected function getModules()
