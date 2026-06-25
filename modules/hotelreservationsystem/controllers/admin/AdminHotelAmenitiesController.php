@@ -99,6 +99,14 @@ class AdminHotelAmenitiesController extends ModuleAdminController
         $defaultLang = (int)Configuration::get('PS_LANG_DEFAULT');
         $adminLink   = Context::getContext()->link->getAdminLink('AdminHotelAmenities');
 
+        $this->context->smarty->assign(array(
+            'languages'       => $languages,
+            'default_lang_id' => $defaultLang,
+            'current_index'   => self::$currentIndex,
+            'token'           => $this->token,
+            'admin_link'      => $adminLink,
+        ));
+
         if (Tools::isSubmit('add'.$this->table.'_item') || Tools::isSubmit('update'.$this->table.'_item')) {
             $idAmenity  = (int)Tools::getValue('id');
             $idCategory = (int)Tools::getValue('id_category');
@@ -109,64 +117,44 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 if (Validate::isLoadedObject($objHotelAmenities)) {
                     $idCategory = (int)$objHotelAmenities->parent_amenity_id;
                     $amenity = array(
-                        'id'               => $objHotelAmenities->id,
+                        'id'                => $objHotelAmenities->id,
                         'parent_amenity_id' => $idCategory,
-                        'active'           => (int)$objHotelAmenities->active,
-                        'logo_type'        => $objHotelAmenities->logo_type,
-                        'logo'             => $objHotelAmenities->logo,
-                        'name'             => is_array($objHotelAmenities->name) ? $objHotelAmenities->name : array(),
+                        'active'            => (int)$objHotelAmenities->active,
+                        'logo_type'         => $objHotelAmenities->logo_type,
+                        'logo'              => $objHotelAmenities->logo,
+                        'name'              => is_array($objHotelAmenities->name) ? $objHotelAmenities->name : array(),
                     );
                 }
             }
 
             $imgPath = $this->module->getLocalPath().self::IMG_DIR.$idAmenity.'.jpg';
-            $imgUrl  = ($idAmenity && file_exists($imgPath))
-                ? $this->module->getPathUri().self::IMG_DIR.$idAmenity.'.jpg'
-                : false;
-
             $this->context->smarty->assign(array(
-                'languages'       => $languages,
-                'default_lang_id' => $defaultLang,
-                'amenity'         => $amenity,
-                'id_category'     => $idCategory,
-                'existing_img'    => $imgUrl,
-                'current_index'   => self::$currentIndex,
-                'token'           => $this->token,
-                'admin_link'      => $adminLink,
+                'amenity'      => $amenity,
+                'id_category'  => $idCategory,
+                'existing_img' => ($idAmenity && file_exists($imgPath))
+                    ? $this->module->getPathUri().self::IMG_DIR.$idAmenity.'.jpg'
+                    : false,
             ));
+        } else {
+            $idCategory = (int)Tools::getValue('id');
+            $category   = array();
 
-            return $this->context->smarty->createTemplate(
-                $this->module->getLocalPath().'views/templates/admin/hotel_amenities/helpers/form/amenity_form.tpl'
-            )->fetch();
-        }
-
-        // category form (add or edit)
-        $idCategory = (int)Tools::getValue('id');
-        $category   = array();
-
-        if ($idCategory) {
-            $objHotelAmenities = new HotelAmenities($idCategory);
-            if (Validate::isLoadedObject($objHotelAmenities)) {
-                $category = array(
-                    'id'       => $objHotelAmenities->id,
-                    'position' => $objHotelAmenities->position,
-                    'name'     => is_array($objHotelAmenities->name) ? $objHotelAmenities->name : array(),
-                );
+            if ($idCategory) {
+                $objHotelAmenities = new HotelAmenities($idCategory);
+                if (Validate::isLoadedObject($objHotelAmenities)) {
+                    $category = array(
+                        'id'       => $objHotelAmenities->id,
+                        'position' => $objHotelAmenities->position,
+                        'name'     => is_array($objHotelAmenities->name) ? $objHotelAmenities->name : array(),
+                    );
+                }
             }
+
+            $this->context->smarty->assign('category', $category);
         }
 
-        $this->context->smarty->assign(array(
-            'languages'       => $languages,
-            'default_lang_id' => $defaultLang,
-            'category'        => $category,
-            'current_index'   => self::$currentIndex,
-            'token'           => $this->token,
-            'admin_link'      => $adminLink,
-        ));
-
-        return $this->context->smarty->createTemplate(
-            $this->module->getLocalPath().'views/templates/admin/hotel_amenities/helpers/form/category_form.tpl'
-        )->fetch();
+        $this->fields_form = array('submit' => array('title' => $this->l('Save')));
+        return parent::renderForm();
     }
 
     public function postProcess()
