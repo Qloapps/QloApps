@@ -159,7 +159,11 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $statsTabs = array();
         foreach ($modules as $module) {
             if ($moduleObj = Module::getInstanceByName($module['name'])) {
-                $statsTabs[$module['name']] = array('display_name' => $moduleObj->displayName);
+                ddd($moduleObj);
+                $statsTabs[$module['name']] = array(
+                    'display_name' => $moduleObj->displayName,
+                    'position' => property_exists($moduleObj, 'stats_position') ? (int)$moduleObj->stats_position : PHP_INT_MAX,
+                );
                 if (method_exists($moduleObj, 'getStatsTabs')) {
                     $statsTabs[$module['name']]['tabs'] = $moduleObj->getStatsTabs();
                 }
@@ -185,6 +189,9 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
 
     public function checkModulesNames($a, $b)
     {
+        if ($a['position'] !== $b['position']) {
+            return $a['position'] <=> $b['position'];
+        }
         return $a['display_name'] <=> $b['display_name'];
     }
 
