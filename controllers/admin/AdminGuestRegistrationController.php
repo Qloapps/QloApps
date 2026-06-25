@@ -36,12 +36,12 @@ class AdminGuestRegistrationControllerCore extends AdminController
 
     public function initContent()
     {
-        $this->display = 'options';
+        $this->display = 'view';
         $this->initToolbar();
         parent::initContent();
     }
 
-    public function renderOptions()
+    public function renderView()
     {
         $grcInfoJson = Configuration::get('QLO_GUEST_REGISTRATION_CARD_INFO');
         $savedSections = array();
@@ -89,7 +89,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
             'guest_reg_card_preview_title'   => $this->l('Guest Registration Card Preview'),
         ));
 
-        return $this->createTemplate('card_info_form.tpl')->fetch();
+        return parent::renderView();
     }
 
     public function initToolbarTitle()
