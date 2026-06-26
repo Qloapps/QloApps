@@ -21,10 +21,12 @@
 */
 
 var QhrReviewForm = {
-    init: function(idOrder, idHotel, hotelName) {
+    orderSecureKey: '',
+    init: function(idOrder, idHotel, hotelName, secureKey) {
         $('#add-review-form').find('[name="id_order"]').val(idOrder);
         $('#add-review-form').find('[name="id_hotel"]').val(idHotel);
         $('#add-review-popup').find('.hotel-name').html(hotelName);
+        QhrReviewForm.orderSecureKey = secureKey || '';
         QhrReviewImages.init();
     },
     show: function() {
@@ -47,6 +49,7 @@ var QhrReviewForm = {
         formData.append('ajax', true);
         formData.append('token', qlo_hotel_review_js_vars.review_ajax_token);
         formData.append('action', 'AddReview');
+        formData.append('order_secure_key', QhrReviewForm.orderSecureKey);
         $.ajax({
             url: qlo_hotel_review_js_vars.review_ajax_link,
             data: formData,
@@ -202,7 +205,8 @@ $(document).on('click', '#add-review-btn', function(e) {
     var idOrder = parseInt($(this).data('id-order'));
     var idHotel = parseInt($(this).data('id-hotel'));
     var hotelName = $(this).data('hotel-name');
-    QhrReviewForm.init(idOrder, idHotel, hotelName);
+    var secureKey = $(this).data('secure-key') || '';
+    QhrReviewForm.init(idOrder, idHotel, hotelName, secureKey);
     QhrReviewForm.show();
 });
 

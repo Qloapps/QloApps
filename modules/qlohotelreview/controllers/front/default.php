@@ -61,6 +61,12 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
             $errors['general'][] = $objModule->l('Invalid order ID.', 'default');
         }
 
+        $submittedSecureKey = Tools::getValue('order_secure_key', '');
+        if (!Validate::isLoadedObject($objOrder) || !$submittedSecureKey || $submittedSecureKey !== $objOrder->secure_key ) {
+            $errors['general'][] = $objModule->l('You are not authorized to submit a review.', 'default');
+            $this->ajaxDie(json_encode(array('status' => false, 'errors' => $errors)));
+        }
+
         if (!$subject) {
             $errors['by_key']['subject'] = $objModule->l('This field can not be empty.', 'default');
         } elseif(!Validate::isGenericName($subject)) {
