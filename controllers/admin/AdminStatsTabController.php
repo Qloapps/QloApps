@@ -161,7 +161,7 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
             if ($moduleObj = Module::getInstanceByName($module['name'])) {
                 $statsTabs[$module['name']] = array(
                     'display_name' => $moduleObj->displayName,
-                    'position' => property_exists($moduleObj, 'stats_position') ? (int)$moduleObj->stats_position : PHP_INT_MAX,
+                    'position' => property_exists($moduleObj, 'stats_position') ? (int)$moduleObj->stats_position : null,
                 );
                 if (method_exists($moduleObj, 'getStatsTabs')) {
                     $statsTabs[$module['name']]['tabs'] = $moduleObj->getStatsTabs();
@@ -169,7 +169,47 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
             }
         }
 
-        uasort($statsTabs, array($this, 'checkModulesNames'));
+        // Split into modules with explicit stats_position vs those without
+        $positionedModules = array_filter($statsTabs, fn($d) => $d['position'] !== null);
+        $defaultModules = array_filter($statsTabs, fn($d) => $d['position'] === null);
+
+        // Default modules sort A-Z by display name
+        uasort($defaultModules, fn($a, $b) => $a['display_name'] <=> $b['display_name']);
+        // Positioned modules sort by slot number, alphabetical within same slot
+        uasort($positionedModules, fn($a, $b) => $a['position'] !== $b['position']
+            ? $a['position'] <=> $b['position']
+            : $a['display_name'] <=> $b['display_name']);
+
+        // Group positioned modules by slot so same-slot modules stay consecutive
+        $modulesBySlot = [];
+        foreach ($positionedModules as $name => $data) {
+            $modulesBySlot[$data['position']][$name] = $data;
+        }
+
+        // Build final list: insert each slot group at its absolute position,
+        // adjusting for slots already taken by previously inserted positioned modules
+        $defaultKeys = array_keys($defaultModules);
+        $defaultCount = count($defaultKeys);
+        $statsTabs = [];
+        $defaultModulesIndex = 0;
+        $positionedModulesCount = 0;
+
+        foreach ($modulesBySlot as $slot => $group) {
+            $defaultsBefore = max(0, $slot - 1 - $positionedModulesCount);
+            while ($defaultModulesIndex < $defaultsBefore && $defaultModulesIndex < $defaultCount) {
+                $key = $defaultKeys[$defaultModulesIndex++];
+                $statsTabs[$key] = $defaultModules[$key];
+            }
+            foreach ($group as $name => $data) {
+                $statsTabs[$name] = $data;
+                $positionedModulesCount++;
+            }
+        }
+
+        while ($defaultModulesIndex < $defaultCount) {
+            $key = $defaultKeys[$defaultModulesIndex++];
+            $statsTabs[$key] = $defaultModules[$key];
+        }
 
         Hook::exec('actionStatsTabsModifier', array(
             'stats_tabs' => &$statsTabs
