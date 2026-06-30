@@ -276,6 +276,42 @@ class TranslateCore
     }
 
     /**
+     * Get a translation for a core class (used via ObjectModel::l())
+     *
+     * @param string $string String to translate
+     * @param string $class Class name (e.g. 'Order', 'HotelBookingDetail')
+     * @param bool $addslashes
+     * @param bool $htmlentities
+     * @return string
+     */
+    public static function getClassTranslation($string, $class = '', $addslashes = false, $htmlentities = false)
+    {
+        global $_LANGCLASS;
+
+        $iso = Context::getContext()->language->iso_code;
+        if (empty($iso)) {
+            $iso = Language::getIsoById((int)Configuration::get('PS_LANG_DEFAULT'));
+        }
+
+        $file = _PS_TRANSLATIONS_DIR_.$iso.'/class.php';
+        if (!isset($_LANGCLASS) && file_exists($file)) {
+            include_once($file);
+        }
+
+        $string = preg_replace("/\\\*'/", "\'", $string);
+        $key = md5($string);
+
+        $str = (isset($_LANGCLASS) && is_array($_LANGCLASS) && array_key_exists($class.$key, $_LANGCLASS))
+            ? $_LANGCLASS[$class.$key]
+            : $string;
+
+        if ($addslashes) {
+            return addslashes($str);
+        }
+        return $htmlentities ? htmlspecialchars(stripslashes($str), ENT_QUOTES, 'utf-8') : stripslashes($str);
+    }
+
+    /**
      * Check if string use a specif syntax for sprintf and replace arguments if use it
      *
      * @param $string
@@ -390,6 +426,12 @@ class TranslateCore
                 } else {
                     $regex = '/\{l\s*s=([\'\"])'._PS_TRANS_PATTERN_.'\1(\s*sprintf=.*)?(\s*js=1)?(\s*pdf=\'true\')?\s*\}/U';
                 }
+                break;
+
+            case 'class':
+                // Parsing core class files for self::l() calls only
+                // ClassName::l() is intentionally excluded to avoid matching Mail::l() and similar
+                $regex = '/(?:self)::l\((\')'._PS_TRANS_PATTERN_.'\'[\)|\,]/U';
                 break;
         }
 

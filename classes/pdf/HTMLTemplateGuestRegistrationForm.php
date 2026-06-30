@@ -50,7 +50,7 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
     public function getHeader()
     {
         $this->assignCommonHeaderData();
-        $this->smarty->assign(array('header' => self::l('Guest Registration Card')));
+        $this->smarty->assign(array('header' => HTMLTemplateGuestRegistrationForm::l('Guest Registration Card')));
 
         return $this->smarty->fetch($this->getTemplate('header'));
     }
