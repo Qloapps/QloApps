@@ -23,22 +23,22 @@
                                 <tr>
                                     {if $smarty.foreach.demandRow.first}
                                         <td rowspan="{$roomDemand['extra_demands']|count}">
-                                            <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                            <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
                                                 {$data_v['name']}<br>
                                                 {$rm_v['data_form']|date_format:"%d-%m-%Y"} {l s='to'} {$rm_v['data_to']|date_format:"%d-%m-%Y"}<br>
                                                 <strong>{l s='Room'} - {$roomCount}</strong>
-                                            </font>
+                                            </span>
                                         </td>
                                     {/if}
                                     <td>
-                                        <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
                                             {$demand['name']}
-                                        </font>
+                                        </span>
                                     </td>
                                     <td>
-                                        <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
                                             {convertPrice price=$demand['total_price_tax_excl']}
-                                        </font>
+                                        </span>
                                     </td>
                                 </tr>
                             {/foreach}
@@ -81,31 +81,31 @@
                                 <tr>
                                     {if $smarty.foreach.serviceRow.first}
                                         <td rowspan="{$roomService['additional_services']|count}">
-                                            <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                            <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
                                                 {$data_v['name']}<br>
                                                 {$rm_v['data_form']|date_format:"%d-%m-%Y"} {l s='to'} {$rm_v['data_to']|date_format:"%d-%m-%Y"}<br>
                                                 <strong>{l s='Room'} - {$roomCount}</strong>
-                                            </font>
+                                            </span>
                                         </td>
                                     {/if}
                                     <td>
-                                        <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
                                             {$service['name']}
-                                        </font>
+                                        </span>
                                     </td>
                                     <td>
-                                        <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
                                             {if $service['allow_multiple_quantity']}
                                                 {$service['quantity']}
                                             {else}
                                                 {l s='--'}
                                             {/if}
-                                        </font>
+                                        </span>
                                     </td>
                                     <td>
-                                        <font size="2" face="Open-sans, sans-serif" color="#555454">
+                                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
                                             {convertPrice price=$service['total_price_tax_excl']}
-                                        </font>
+                                        </span>
                                     </td>
                                 </tr>
                             {/foreach}
