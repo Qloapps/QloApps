@@ -19,6 +19,7 @@
 * @copyright Since 2010 Webkul
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
+
 <script type="text/javascript">
 $(document).ready(function() {
     {if isset($smarty.get.tab) && $smarty.get.tab}
