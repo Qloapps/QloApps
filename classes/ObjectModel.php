@@ -1123,6 +1123,25 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
     }
 
     /**
+     * Get a translation for this core class.
+     * Strings translated via Localization > Translations > Core class translations.
+     *
+     * @param string $string String to translate (must be a literal for the scanner)
+     * @param string $class Class context (defaults to calling class)
+     * @return string
+     */
+    public static function l($string, $class = null)
+    {
+        if (!$class) {
+            $class = get_called_class();
+            if (substr($class, -4) === 'Core') {
+                $class = substr($class, 0, -4);
+            }
+        }
+        return Translate::getClassTranslation($string, $class);
+    }
+
+    /**
      * @deprecated 1.5.0.1 Use validateController() instead
      * @param bool $htmlentities
      *
