@@ -4330,7 +4330,7 @@ class HotelBookingDetail extends ObjectModel
      * Used by reservation report — returns full per-line detail including pricing,
      * guest contact, balance due, and created_by employee.
      *
-     * @param array $params  date_from, date_to, id_hotel, id_customer, id_product, id_status, booking_type
+     * @param array $params  date_from, date_to, id_hotel, id_customer, id_product, id_status, booking_type, id_order_state
      * @return array  rows: id, id_order, id_customer, customer_name, phone, id_hotel, hotel_name,
      *                      id_product, room_type_name, id_room, room_num, date_from, date_to, nights,
      *                      adults, children, unit_price_tax_excl, total_price_tax_excl, tax_amount,
@@ -4339,27 +4339,30 @@ class HotelBookingDetail extends ObjectModel
      */
     public static function getBookingsInfo(array $params)
     {
-        $dateFrom    = pSQL($params['date_from']);
-        $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel     = isset($params['id_hotel'])     ? $params['id_hotel']          : false;
-        $idCustomer  = isset($params['id_customer'])  ? (int) $params['id_customer'] : 0;
-        $idProduct   = isset($params['id_product'])   ? (int) $params['id_product']  : 0;
-        $idStatus    = isset($params['id_status'])    ? (int) $params['id_status']   : 0;
-        $bookingType = isset($params['booking_type']) ? (int) $params['booking_type']: 0;
+        $dateFrom     = pSQL($params['date_from']);
+        $dateTo       = pSQL(isset($params['date_to'])    ? $params['date_to']       : $params['date_from']);
+        $idHotel      = isset($params['id_hotel'])        ? $params['id_hotel']       : false;
+        $idCustomer   = isset($params['id_customer'])     ? (int) $params['id_customer']  : 0;
+        $idProduct    = isset($params['id_product'])      ? (int) $params['id_product']   : 0;
+        $idStatus     = isset($params['id_status'])       ? (int) $params['id_status']    : 0;
+        $bookingType  = isset($params['booking_type'])    ? (int) $params['booking_type'] : 0;
+        $idOrderState = isset($params['id_order_state'])  ? (int) $params['id_order_state'] : 0;
 
         return Db::getInstance()->executeS(
             'SELECT hbd.`id`, hbd.`id_order`, hbd.`id_customer`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-            a.`phone`, hbd.`id_hotel`, hbd.`hotel_name`,
+            c.`phone`, hbd.`id_hotel`, hbd.`hotel_name`,
             hbd.`id_product`, hbd.`room_type_name`, hbd.`id_room`, hbd.`room_num`,
             hbd.`date_from`, hbd.`date_to`,
             DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS nights,
             CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`) AS hotel_check_in,
             CONCAT(DATE(hbd.`date_to`), " ", hbd.`check_out_time`) AS hotel_check_out,
             hbd.`adults`, hbd.`children`,
-            hbd.`unit_price_tax_excl`, hbd.`total_price_tax_excl`,
-            (hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) AS tax_amount,
-            hbd.`total_price_tax_incl`,
+            hbd.`unit_price_tax_excl`,
+            (hbd.`total_price_tax_excl` + COALESCE(svc.`svc_excl`, 0)) AS total_price_tax_excl,
+            ((hbd.`total_price_tax_incl` + COALESCE(svc.`svc_incl`, 0))
+                - (hbd.`total_price_tax_excl` + COALESCE(svc.`svc_excl`, 0))) AS tax_amount,
+            (hbd.`total_price_tax_incl` + COALESCE(svc.`svc_incl`, 0)) AS total_price_tax_incl,
             o.`total_paid_tax_incl` AS order_total,
             o.`total_paid_real` AS order_paid,
             (o.`total_paid_tax_incl` - o.`total_paid_real`) AS balance_due,
@@ -4373,12 +4376,20 @@ class HotelBookingDetail extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
-            LEFT JOIN `'._DB_PREFIX_.'address` a ON (a.`id_address` = o.`id_address_invoice`)
+            LEFT JOIN (
+                SELECT `id_htl_booking_detail`,
+                       COALESCE(SUM(`total_price_tax_excl`), 0) AS svc_excl,
+                       COALESCE(SUM(`total_price_tax_incl`), 0) AS svc_incl
+                FROM `'._DB_PREFIX_.'service_product_order_detail`
+                WHERE `is_cancelled` = 0
+                GROUP BY `id_htl_booking_detail`
+            ) svc ON (svc.`id_htl_booking_detail` = hbd.`id`)
             WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-            .($idCustomer  ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-            .($idProduct   ? ' AND hbd.`id_product` = '.$idProduct    : '')
-            .($idStatus    ? ' AND hbd.`id_status` = '.$idStatus      : '')
-            .($bookingType ? ' AND hbd.`booking_type` = '.$bookingType : '')
+            .($idCustomer   ? ' AND hbd.`id_customer` = '.$idCustomer    : '')
+            .($idProduct    ? ' AND hbd.`id_product` = '.$idProduct      : '')
+            .($idStatus     ? ' AND hbd.`id_status` = '.$idStatus        : '')
+            .($bookingType  ? ' AND hbd.`booking_type` = '.$bookingType  : '')
+            .($idOrderState ? ' AND o.`current_state` = '.$idOrderState  : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
             ORDER BY hbd.`date_add` DESC'
         );

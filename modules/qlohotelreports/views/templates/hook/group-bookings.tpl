@@ -80,6 +80,19 @@
                     </select>
                 </div>
             </div>
+            <div class="row">
+                <label class="col-xs-3">{l s='Order Status' mod='qlohotelreports'}</label>
+                <div class="col-xs-9">
+                    <select name="id_order_state" class="form-control">
+                        <option value="0">{l s='All' mod='qlohotelreports'}</option>
+                        {foreach $order_states as $state}
+                        <option value="{$state.id_order_state|intval}"{if $filter_id_order_state == $state.id_order_state}selected="selected"{/if}>
+                            {$state.name|escape:'html':'UTF-8'}
+                        </option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
             {/if}
             <div class="actions">
                 <hr>
@@ -110,7 +123,7 @@
                         <th class="text-right">{l s='Nights' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Adults' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Children' mod='qlohotelreports'}</th>
-                        <th class="text-right">{l s='Rate Per Night' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Room Rate Per Night' mod='qlohotelreports'}</th>
                         <th>{l s='Booking Source' mod='qlohotelreports'}</th>
                         <th>{l s='Booking Status' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Total (excl. Tax)' mod='qlohotelreports'}</th>

@@ -158,36 +158,40 @@ class QloHotelReports extends Module
         ));
 
         if (in_array($report, array('reservation', 'arrivals', 'in-house', 'departures', 'no-show', 'cancellation'))) {
-            $idProduct   = (int) Tools::getValue('id_product', 0);
-            $idStatus    = (int) Tools::getValue('booking_status', 0);
-            $bookingType = (int) Tools::getValue('booking_type', 0);
+            $idProduct    = (int) Tools::getValue('id_product', 0);
+            $idStatus     = (int) Tools::getValue('booking_status', 0);
+            $bookingType  = (int) Tools::getValue('booking_type', 0);
+            $idOrderState = (int) Tools::getValue('id_order_state', 0);
 
             $filterBaseUrl = $baseUrl . '&tab=' . $report
                 . ($idHotel ? '&id_hotel=' . $idHotel : '')
                 . ($idProduct ? '&id_product=' . $idProduct : '');
 
             $this->context->smarty->assign(array(
-                'room_types'            => HotelRoomInformation::getRoomTypes(array(
+                'room_types'             => HotelRoomInformation::getRoomTypes(array(
                     'id_hotel' => $idHotel,
                     'id_lang'  => $idLang,
                 )),
-                'filter_id_product'     => $idProduct,
-                'filter_booking_status' => $idStatus,
-                'filter_booking_type'   => $bookingType,
-                'booking_statuses'      => array(
+                'filter_id_product'      => $idProduct,
+                'filter_booking_status'  => $idStatus,
+                'filter_booking_type'    => $bookingType,
+                'filter_id_order_state'  => $idOrderState,
+                'booking_statuses'       => array(
                     HotelBookingDetail::STATUS_ALLOTED     => $this->l('Allotted'),
                     HotelBookingDetail::STATUS_CHECKED_IN  => $this->l('Checked In'),
                     HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked Out'),
                 ),
-                'booking_sources'       => array(
+                'booking_sources'        => array(
                     HotelBookingDetail::ALLOTMENT_AUTO   => $this->l('Online / Direct'),
                     HotelBookingDetail::ALLOTMENT_MANUAL => $this->l('Walk-in / Admin'),
                 ),
-                'filter_base_url'       => $filterBaseUrl,
-                'export_url'            => $filterBaseUrl
-                    . '&id_product=' . $idProduct
-                    . '&booking_status=' . $idStatus
-                    . '&booking_type=' . $bookingType
+                'order_states'           => OrderState::getOrderStates($idLang),
+                'filter_base_url'        => $filterBaseUrl,
+                'export_url'             => $filterBaseUrl
+                    . ($idProduct    ? '&id_product='      . $idProduct    : '')
+                    . ($idStatus     ? '&booking_status='  . $idStatus     : '')
+                    . ($bookingType  ? '&booking_type='    . $bookingType  : '')
+                    . ($idOrderState ? '&id_order_state='  . $idOrderState : '')
                     . '&export=1',
             ));
 
@@ -195,18 +199,20 @@ class QloHotelReports extends Module
 
             if ($report === 'reservation') {
                 $reservations = HotelBookingDetail::getBookingsInfo(array(
-                    'date_from'    => $dateFrom,
-                    'date_to'      => $dateTo,
-                    'id_hotel'     => $idHotel ?: false,
-                    'id_product'   => $idProduct,
-                    'id_status'    => $idStatus,
-                    'booking_type' => $bookingType,
-                ))  ;
+                    'date_from'        => $dateFrom,
+                    'date_to'          => $dateTo,
+                    'id_hotel'         => $idHotel ?: false,
+                    'id_product'       => $idProduct,
+                    'id_status'        => $idStatus,
+                    'booking_type'     => $bookingType,
+                    'id_order_state' => $idOrderState,
+                ));
                 $this->attachCurrencyToRows($reservations, $currencyMap, $currency->sign, $currency->iso_code);
 
                 $totals = array('nights' => 0, 'adults' => 0, 'children' => 0,
                     'total_price_tax_excl' => 0.0, 'tax_amount' => 0.0,
                     'total_price_tax_incl' => 0.0, 'balance_due' => 0.0);
+                $countedOrderIds = array();
                 foreach ($reservations as $row) {
                     $rate = (float) $row['conversion_rate'];
                     if ($rate <= 0) {
@@ -218,7 +224,11 @@ class QloHotelReports extends Module
                     $totals['total_price_tax_excl'] += (float) $row['total_price_tax_excl'] / $rate;
                     $totals['tax_amount']           += (float) $row['tax_amount'] / $rate;
                     $totals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'] / $rate;
-                    $totals['balance_due']          += max(0.0, (float) $row['balance_due'] / $rate);
+                    $idOrder = (int) $row['id_order'];
+                    if (!isset($countedOrderIds[$idOrder])) {
+                        $countedOrderIds[$idOrder] = true;
+                        $totals['balance_due'] += max(0.0, (float) $row['balance_due'] / $rate);
+                    }
                 }
 
                 $this->context->smarty->assign(array(
@@ -1104,16 +1114,18 @@ class QloHotelReports extends Module
                 ));
             }
         } else {
-            $idStatus    = (int) Tools::getValue('booking_status', 0);
-            $bookingType = (int) Tools::getValue('booking_type', 0);
+            $idStatus     = (int) Tools::getValue('booking_status', 0);
+            $bookingType  = (int) Tools::getValue('booking_type', 0);
+            $idOrderState = (int) Tools::getValue('id_order_state', 0);
 
             $rows = HotelBookingDetail::getBookingsInfo(array(
-                'date_from'    => $dateFrom,
-                'date_to'      => $dateTo,
-                'id_hotel'     => $idHotel ?: false,
-                'id_product'   => $idProduct,
-                'id_status'    => $idStatus,
-                'booking_type' => $bookingType,
+                'date_from'        => $dateFrom,
+                'date_to'          => $dateTo,
+                'id_hotel'         => $idHotel ?: false,
+                'id_product'       => $idProduct,
+                'id_status'        => $idStatus,
+                'booking_type'     => $bookingType,
+                'id_order_state' => $idOrderState,
             ));
             $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->sign, $defaultCurrency->iso_code);
 
@@ -1141,7 +1153,7 @@ class QloHotelReports extends Module
                 $this->l('Nights'),
                 $this->l('Adults'),
                 $this->l('Children'),
-                $this->l('Rate Per Night'),
+                $this->l('Room Rate Per Night'),
                 $this->l('Booking Source'),
                 $this->l('Booking Status'),
                 $this->l('Total (excl. Tax)'),
