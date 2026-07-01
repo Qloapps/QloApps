@@ -1336,7 +1336,7 @@ class AdminTranslationsControllerCore extends AdminController
                 'file' => 'pdf.php'
             ),
             'class' => array(
-                'name' => $this->l('Core class translations'),
+                'name' => $this->l('System translations'),
                 'var' => '_LANGCLASS',
                 'dir' => _PS_TRANSLATIONS_DIR_.$this->lang_selected->iso_code.'/',
                 'file' => 'class.php'
