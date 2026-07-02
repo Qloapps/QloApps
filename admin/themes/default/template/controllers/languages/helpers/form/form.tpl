@@ -69,11 +69,11 @@
 						<div class="margin-form" style="margin-top:4px;">
 							{foreach $list.files as $key => $file}
 								{if !file_exists($key)}
-									<font color="red">
+									<span style="color:red;">
 								{/if}
 								{$key}
 								{if !file_exists($key)}
-									</font>
+									</span>
 								{/if}
 								<br />
 							{/foreach}

@@ -391,12 +391,15 @@ class AdminOrdersControllerCore extends AdminController
                     );
                 }
 
-                $this->page_header_toolbar_btn['print'] = array(
-                    'short' => $this->l('Print'),
-                    'href' => 'javascript:window.print()',
-                    'desc' => $this->l('Print order'),
-                    'class' => 'icon-print',
-                );
+                if (HotelBookingDetail::getIdHotelByIdOrder($order->id, false) && !$this->lite_display) {
+                    $this->page_header_toolbar_btn['booking_voucher'] = array(
+                        'short' => $this->l('Booking Voucher'),
+                        'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateBookingVoucherPDF&id_order='.$order->id,
+                        'desc' => $this->l('View booking voucher'),
+                        'class' => 'icon-file-text',
+                        'target' => true,
+                    );
+                }
 
                 if ($this->tabAccess['edit'] === 1) {
                     if (((int) $order->isReturnable())
