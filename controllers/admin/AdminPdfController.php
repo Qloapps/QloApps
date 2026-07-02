@@ -64,6 +64,15 @@ class AdminPdfControllerCore extends AdminController
         }
     }
 
+    public function processGenerateBookingVoucherPDF()
+    {
+        if (Tools::isSubmit('id_order')) {
+            $this->generateBookingVoucherPDFByIdOrder(Tools::getValue('id_order'));
+        } else {
+            die(Tools::displayError('The order ID is missing.'));
+        }
+    }
+
     public function processGenerateOrderSlipPDF()
     {
         $order_slip = new OrderSlip((int)Tools::getValue('id_order_slip'));
@@ -223,6 +232,23 @@ class AdminPdfControllerCore extends AdminController
 
         Hook::exec('actionPDFInvoiceRender', array('order_invoice_list' => array($order_invoice)));
         $this->generatePDF($order_invoice, PDF::TEMPLATE_INVOICE);
+    }
+
+    public function generateBookingVoucherPDFByIdOrder($id_order)
+    {
+        $order = new Order((int)$id_order);
+        if (!Validate::isLoadedObject($order)) {
+            die(Tools::displayError('The order cannot be found within your database.'));
+        }
+
+        $objHotelBookingDetail = new HotelBookingDetail();
+        $bookingDetails = $objHotelBookingDetail->getBookingDataByOrderId((int)$order->id);
+        if (empty($bookingDetails)) {
+            die(Tools::displayError('No booking voucher is available for this order.'));
+        }
+
+        $pdf = new PDF($order, PDF::TEMPLATE_BOOKING_VOUCHER, Context::getContext()->smarty);
+        $pdf->render('I');
     }
 
     public function generatePDF($object, $template)
