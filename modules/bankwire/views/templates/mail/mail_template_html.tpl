@@ -25,7 +25,7 @@
 			<tr>
 				<td width="10" style="padding:7px 0">&nbsp;</td>
 				<td style="padding:7px 0">
-					<font size="2" face="Open-sans, sans-serif" color="#555454">
+					<div style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
                         <p style="border-bottom:1px solid #D6D4D4;margin:3px 0 7px;text-transform:uppercase;font-weight:500;font-size:18px;padding-bottom:10px">
                             {l s='Here are the bank details for your transfer:' mod='bankwire' lang=$lang}
                         </p>
@@ -35,7 +35,7 @@
                             <span style="color:#333"><strong>{l s='Account details:' mod='bankwire' lang=$lang}</strong></span> {$bankwire_details}<br />
                             <span style="color:#333"><strong>{l s='Bank address:' mod='bankwire' lang=$lang}</strong></span> {$bankwire_address}
                         </span>
-                    </font>
+                    </div>
                 </td>
                 <td width="10" style="padding:7px 0">&nbsp;</td>
             </tr>
