@@ -96,6 +96,59 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         return parent::renderList();
     }
 
+    /**
+     * Return taxes for the rule-form dropdown, filtered by whether this TRG is a tourism group.
+     *
+     * @return array
+     */
+    protected function getTaxOptionsForGroup()
+    {
+        $idTrg = (int) Tools::getValue('id_tax_rules_group');
+        $isTourism = false;
+        if ($idTrg) {
+            $trg = new TaxRulesGroup($idTrg);
+            if (Validate::isLoadedObject($trg)) {
+                $isTourism = (bool) $trg->is_tourism_tax_rule;
+            }
+        }
+
+        $idLang = (int) $this->context->language->id;
+        $sql = new DbQuery();
+        if ($isTourism) {
+            $sql->select(
+                't.`id_tax`, tl.`name`,'
+                . ' IFNULL(ht.`tax_type`, 0) AS ht_tax_type,'
+                . ' IFNULL(ht.`tax_value`, 0) AS ht_tax_value'
+            );
+        } else {
+            $sql->select('t.`id_tax`, tl.`name`, t.`rate`');
+        }
+        $sql->from('tax', 't');
+        $sql->leftJoin('tax_lang', 'tl', 't.`id_tax` = tl.`id_tax` AND tl.`id_lang` = ' . $idLang);
+        if ($isTourism) {
+            $sql->leftJoin('htl_tourism_tax', 'ht', 'ht.`id_tax` = t.`id_tax`');
+        }
+        $sql->where('t.`deleted` != 1 AND t.`active` = 1');
+        $sql->where('t.`is_tourism_tax` = ' . ($isTourism ? 1 : 0));
+        $sql->orderBy('tl.`name` ASC');
+
+        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+
+        if ($isTourism && is_array($rows)) {
+            $currency = $this->context->currency;
+            $currencySign = Tools::safeOutput(trim($currency->prefix . $currency->suffix));
+            foreach ($rows as &$row) {
+                $typeLabel = ((int) $row['ht_tax_type'] === 1)
+                    ? (float) $row['ht_tax_value'] . '%'
+                    : $currencySign . ' ' . (float) $row['ht_tax_value'];
+                $row['name'] = $row['name'] . ' (' . $typeLabel . ')';
+            }
+            unset($row);
+        }
+
+        return $rows;
+    }
+
     public function initRulesList($id_group)
     {
         $this->table = 'tax_rule';
@@ -127,7 +180,10 @@ class AdminTaxRulesGroupControllerCore extends AdminController
             ),
             'rate' => array(
                 'title' => $this->l('Tax'),
-                'class' => 'fixed-width-sm'
+                'class' => 'fixed-width-sm',
+                'callback' => 'displayTaxRuleRate',
+                'orderby' => false,
+                'search' => false,
             ),
             'description' => array(
                 'title' => $this->l('Description')
@@ -141,7 +197,10 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 			c.`name` AS country_name,
 			s.`name` AS state_name,
 			CONCAT_WS(" - ", a.`zipcode_from`, a.`zipcode_to`) AS zipcode,
-			t.rate';
+			t.`rate`,
+			t.`is_tourism_tax`,
+			IFNULL(ht.`tax_type`, 0) AS ht_tax_type,
+			IFNULL(ht.`tax_value`, 0) AS ht_tax_value';
 
         $this->_join = '
 			LEFT JOIN `'._DB_PREFIX_.'country_lang` c
@@ -149,7 +208,9 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 			LEFT JOIN `'._DB_PREFIX_.'state` s
 				ON (a.`id_state` = s.`id_state`)
 			LEFT JOIN `'._DB_PREFIX_.'tax` t
-				ON (a.`id_tax` = t.`id_tax`)';
+				ON (a.`id_tax` = t.`id_tax`)
+			LEFT JOIN `'._DB_PREFIX_.'htl_tourism_tax` ht
+				ON (ht.`id_tax` = t.`id_tax`)';
         $this->_where = 'AND `id_tax_rules_group` = '.(int)$id_group;
         $this->_use_found_rows = false;
 
@@ -194,7 +255,19 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     )
-                )
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Tourism tax rule group'),
+                    'name' => 'is_tourism_tax_rule',
+                    'required' => false,
+                    'is_bool' => true,
+                    'hint' => $this->l('Mark this group as tourism-only. All tax rules added here must reference tourism taxes.'),
+                    'values' => array(
+                        array('id' => 'is_tourism_tax_rule_on', 'value' => 1, 'label' => $this->l('Yes')),
+                        array('id' => 'is_tourism_tax_rule_off', 'value' => 0, 'label' => $this->l('No')),
+                    )
+                ),
             ),
             'submit' => array(
                 'title' => $this->l('Save and stay'),
@@ -309,7 +382,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                         $this->l('- This tax only: Will apply only this tax').'<br>',
                         $this->l('- Combine: Combine taxes (e.g.: 10% + 5% = 15%)').'<br>',
                         $this->l('- One after another: Apply taxes one after another (e.g.: 0 + 10% = 0 + 5% = 5.5)')
-                    )
+                    ),
                 ),
                 array(
                     'type' => 'select',
@@ -317,7 +390,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                     'name' => 'id_tax',
                     'required' => false,
                     'options' => array(
-                        'query' => Tax::getTaxes((int)$this->context->language->id),
+                        'query' => $this->getTaxOptionsForGroup(),
                         'id' => 'id_tax',
                         'name' => 'name',
                         'default' => array(
@@ -325,7 +398,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                             'label' => $this->l('No Tax')
                         )
                     ),
-                    'hint' => sprintf($this->l('(Total tax: %s)'), '9%')
+                    'hint' => $this->l('Select the tax to apply for this rule.')
                 ),
                 array(
                     'type' => 'text',
@@ -373,6 +446,86 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         return $helper->generateForm($this->fields_form);
     }
 
+
+    /**
+     * List column callback: render the Tax column in the tax rules list.
+     * Tourism-fixed taxes show the currency sign; tourism-percent and regular VAT taxes show %.
+     *
+     * @param mixed $value  t.rate (always 0 for tourism taxes)
+     * @param array $row    Full list row — includes is_tourism_tax, ht_tax_type, ht_tax_value
+     * @return string
+     */
+    public function displayTaxRuleRate($value, $row)
+    {
+        if (!(int) $row['is_tourism_tax']) {
+            return Tools::safeOutput($value) . '%';
+        }
+        $displayValue = Tools::safeOutput((float) $row['ht_tax_value']);
+        if ((int) $row['ht_tax_type'] === 1) {
+            return $displayValue . '%';
+        }
+        $currency = $this->context->currency;
+        $currencySign = Tools::safeOutput(trim($currency->prefix . $currency->suffix));
+        return $currencySign . ' ' . $displayValue;
+    }
+
+    public function postProcess()
+    {
+        if ($this->action == 'save') {
+            $idGroup = (int) Tools::getValue('id_tax_rules_group');
+            $newIsTourism = (int) Tools::getValue('is_tourism_tax_rule');
+
+            if ($idGroup) {
+                $trg = new TaxRulesGroup($idGroup);
+                if (Validate::isLoadedObject($trg)) {
+                    $oldIsTourism = (int) $trg->is_tourism_tax_rule;
+
+                    // Tourism → VAT: block while tourism tax rules still exist in this group.
+                    if ($oldIsTourism === 1 && $newIsTourism === 0) {
+                        $hasConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'tax_rule` tr
+                             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = tr.`id_tax`
+                             WHERE tr.`id_tax_rules_group` = ' . $idGroup . '
+                             AND t.`is_tourism_tax` = 1'
+                        );
+                        if ($hasConflict) {
+                            $this->errors[] = $this->l(
+                                'Cannot convert this to a VAT group: it still contains tourism taxes. Remove the tourism tax rules first.'
+                            );
+                            // Reset POST to DB state: getFieldValue() prefers $_POST over the DB
+                            // object, so without this reset the toggle, behavior dropdown, and tax
+                            // dropdown would render inconsistently (toggle=NO, sub-forms=tourism state).
+                            $_POST['is_tourism_tax_rule'] = $oldIsTourism;
+                            $this->display = 'edit';
+                            return;
+                        }
+                    }
+
+                    // VAT → Tourism: block while regular VAT tax rules still exist in this group.
+                    // "No Tax" rules (id_tax = 0) are type-neutral and are excluded from the check.
+                    if ($oldIsTourism === 0 && $newIsTourism === 1) {
+                        $hasConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'tax_rule` tr
+                             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = tr.`id_tax`
+                             WHERE tr.`id_tax_rules_group` = ' . $idGroup . '
+                             AND tr.`id_tax` != 0
+                             AND t.`is_tourism_tax` = 0'
+                        );
+                        if ($hasConflict) {
+                            $this->errors[] = $this->l(
+                                'Cannot convert this to a tourism group: it still contains VAT taxes. Remove the VAT tax rules first.'
+                            );
+                            // Same reason: reset POST to DB state so the whole form is consistent.
+                            $_POST['is_tourism_tax_rule'] = $oldIsTourism;
+                            $this->display = 'edit';
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        parent::postProcess();
+    }
 
     public function initProcess()
     {

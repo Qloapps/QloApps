@@ -40,7 +40,7 @@
                                 <th><span class="title_box">{l s='Refund/Cancel Status'}</span></th>
                                 <th><span class="title_box">{l s='Refunded amount'}</span></th>
                             {/if}
-                            {if ($can_edit && !$order->hasBeenDelivered())}
+                            {if (isset($can_edit) && $can_edit && !$order->hasBeenDelivered())}
                             <th class="fixed-width-md"><span class="title_box">{l s='Actions'}</th>
                             {/if}
                         </tr>
@@ -62,4 +62,83 @@
             {l s='Room information not available.'}
         </div>
     </div>
+{/if}
+
+{if isset($use_tourism_tax) && $use_tourism_tax}
+<style>
+.ui-tooltip.price_info-tooltip { border: unset; padding: 10px; box-shadow: 0px 0px 15px 0px #00000026; }
+.ui-tooltip.price_info-tooltip span { margin-left: 15px; }
+.ui-tooltip.price_info-tooltip label { font-weight: 600; }
+</style>
+<script>
+$(document).ready(function () {
+    if ($('#customer_cart_details .price_info').length) {
+        $('#customer_cart_details .price_info').each(function (i, element) {
+            $(this).find('img').tooltip({
+                content: $(this).closest('td').find('.price_info_container').html(),
+                items: 'img',
+                trigger: 'hover',
+                tooltipClass: 'price_info-tooltip',
+                open: function (event, ui) {
+                    if (typeof(event.originalEvent) === 'undefined') {
+                        return false;
+                    }
+                    var $id = $(ui.tooltip).attr('id');
+                    if ($('div.ui-tooltip').not('#' + $id).length) {
+                        return false;
+                    }
+                },
+                close: function (event, ui) {
+                    ui.tooltip.hover(function () {
+                        $(this).stop(true).fadeTo(400, 1);
+                    }, function () {
+                        $(this).fadeOut('400', function () {
+                            $(this).remove();
+                        });
+                    });
+                }
+            });
+        });
+    }
+
+    function ttAjax(action, data) {
+        $.ajax({
+            type: 'POST',
+            url: admin_order_tab_link,
+            data: $.extend({ ajax: 1, action: action }, data),
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.hasError && resp.errors && resp.errors.length) {
+                    showErrorMessage(resp.errors.join('<br>'));
+                } else {
+                    window.location.reload();
+                }
+            },
+            error: function () {
+                showErrorMessage('{l s='Tourism tax request failed. Please try again.' js=1}');
+            }
+        });
+    }
+
+    $(document).on('click', '.tt-apply-booking', function (e) {
+        e.preventDefault();
+        ttAjax('ApplyTourismTax', { id_htl_booking: $(this).data('id_htl_booking') });
+    });
+
+    $(document).on('click', '.tt-exempt-booking', function (e) {
+        e.preventDefault();
+        ttAjax('ExemptTourismTax', { id_htl_booking: $(this).data('id_htl_booking') });
+    });
+
+    $(document).on('click', '.tt-apply-all-bookings', function (e) {
+        e.preventDefault();
+        ttAjax('ApplyTourismTax', { id_order: $(this).data('id_order') });
+    });
+
+    $(document).on('click', '.tt-exempt-all-bookings', function (e) {
+        e.preventDefault();
+        ttAjax('ExemptTourismTax', { id_order: $(this).data('id_order') });
+    });
+});
+</script>
 {/if}

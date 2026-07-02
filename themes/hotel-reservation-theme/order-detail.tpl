@@ -380,6 +380,22 @@
                                             </td>
                                         </tr>
 
+                                        {if isset($tourism_tax_breakdown) && $tourism_tax_breakdown}
+                                            {foreach from=$tourism_tax_breakdown item=ttRow}
+                                                <tr class="item">
+                                                    <td>
+                                                        {$ttRow.tax_name|escape:'htmlall':'UTF-8'}
+                                                        {if $ttRow.collection_type == 1}
+                                                            &nbsp;({l s='payable at hotel'})
+                                                        {/if}
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <span class="price">{displayWtPriceWithCurrency price=$ttRow.total_amount currency=$currency}</span>
+                                                    </td>
+                                                </tr>
+                                            {/foreach}
+                                        {/if}
+
                                         {if $order->total_discounts > 0}
                                             <tr>
                                                 <td>{l s='Total Vouchers'}</td>

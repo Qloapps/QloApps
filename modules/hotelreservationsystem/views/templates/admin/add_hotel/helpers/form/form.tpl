@@ -98,6 +98,14 @@
 						{l s='Features' mod='hotelreservationsystem'}
 					</a>
 				</li>
+				{if $use_tourism_tax}
+				<li>
+					<a href="#hotel-tourism-tax" data-toggle="tab">
+						<i class="icon-time"></i>
+						{l s='Tourism Tax' mod='hotelreservationsystem'}
+					</a>
+				</li>
+				{/if}
 				{hook h='displayAdminAddHotelFormTab' id_hotel=$hook_arg_id_hotel}
 			</ul>
 			<div class="tab-content panel collapse in">
@@ -631,6 +639,25 @@
 
 					{hook h='displayAdminAddHotelFormFeaturesTabAfter' id_hotel=$hook_arg_id_hotel}
 				</div>
+				{if $use_tourism_tax}
+				<div class="tab-pane" id="hotel-tourism-tax">
+					<div class="form-group">
+						<label class="control-label col-lg-3">
+							{l s='Collection Time' mod='hotelreservationsystem'}
+						</label>
+						<div class="col-lg-4">
+							<select name="tourism_tax_collection_type" id="tourism_tax_collection_type" class="fixed-width-xl">
+								<option value="0" {if $tourism_tax_collection_type == 0}selected="selected"{/if}>
+									{l s='At time of booking' mod='hotelreservationsystem'}
+								</option>
+								<option value="1" {if $tourism_tax_collection_type == 1}selected="selected"{/if}>
+									{l s='Manual After arrival' mod='hotelreservationsystem'}
+								</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				{/if}
 				{hook h='displayAdminAddHotelFormTabContent' id_hotel=$hook_arg_id_hotel}
 			</div>
 		</div>

@@ -95,6 +95,20 @@
             <span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
         </p>
     {/if}
+    {if $show_taxes && ((!isset($tourism_tax_grossed_up) || !$tourism_tax_grossed_up) || ($use_taxes && $priceDisplay != 0))}
+        {if isset($tourism_tax_online) && $tourism_tax_online > 0}
+            <p class="cart_total_tourism_tax">
+                <span>{l s='Tourism Tax'}</span>
+                <span class="cart_total_values">{displayPrice price=$tourism_tax_online}</span>
+            </p>
+        {/if}
+        {if isset($tourism_tax_at_hotel) && $tourism_tax_at_hotel > 0}
+            <p class="cart_total_tourism_tax_at_hotel">
+                <span>{l s='Tourism Tax (payable at hotel)'}</span>
+                <span class="cart_total_values">{displayPrice price=$tourism_tax_at_hotel}</span>
+            </p>
+        {/if}
+    {/if}
     <p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">
         <span>
             {if $display_tax_label}

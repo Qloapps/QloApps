@@ -433,6 +433,53 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $totalPrice['total_price_tax_incl'] = Tools::processPriceRounding($totalPrice['total_price_tax_incl'], $quantity);
         $totalPrice['total_price_tax_excl'] = Tools::processPriceRounding($totalPrice['total_price_tax_excl'], $quantity);
 
+        $totalPrice['tourism_tax_online']   = 0.0;
+        $totalPrice['tourism_tax_at_hotel'] = 0.0;
+        if (Configuration::get('QLO_USE_TOURISM_TAX')
+            && is_array($occupancy) && !empty($occupancy) && isset($occupancy[0]['adults'])
+        ) {
+            $idTourismTrg = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                'SELECT `id_tourism_tax_rules_group`
+                 FROM `' . _DB_PREFIX_ . 'product_shop` product_shop
+                 WHERE `id_product` = ' . (int) $id_product
+                . Shop::addSqlRestriction(false)
+            );
+            if ($idTourismTrg) {
+                $idHotel = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                    'SELECT `id_hotel` FROM `' . _DB_PREFIX_ . 'htl_room_type`
+                     WHERE `id_product` = ' . (int) $id_product
+                );
+                $branchObj      = new HotelBranchInformation($idHotel);
+                $collectionType = (int) $branchObj->tourism_tax_collection_type;
+                $checkInDt      = new DateTime($date_from);
+                $checkOutDt     = new DateTime($date_to);
+                $numNights      = max(1, (int) $checkInDt->diff($checkOutDt)->days);
+                $unitPriceTe    = (float) $totalPrice['total_price_tax_excl'] / $numNights;
+                $idLang         = (int) Context::getContext()->language->id;
+                foreach ($occupancy as $roomOcc) {
+                    $childAges = !empty($roomOcc['child_ages']) ? (array) $roomOcc['child_ages'] : array();
+                    $rows = HotelTourismTaxCalculator::compute(
+                        $idTourismTrg,
+                        $objAddress,
+                        $unitPriceTe,
+                        $date_from,
+                        $numNights,
+                        (int) $roomOcc['adults'],
+                        $childAges,
+                        $id_currency,
+                        $collectionType,
+                        $idLang
+                    );
+                    $amount = (float) array_sum(array_column($rows, 'total_amount'));
+                    if ($collectionType === 0) {
+                        $totalPrice['tourism_tax_online'] += $amount;
+                    } else {
+                        $totalPrice['tourism_tax_at_hotel'] += $amount;
+                    }
+                }
+            }
+        }
+
         return $totalPrice;
     }
 

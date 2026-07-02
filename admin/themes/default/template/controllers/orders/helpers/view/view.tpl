@@ -852,6 +852,18 @@
                                         <i class="icon-plus-sign"></i> {l s='Add Rooms'}
                                     </button>
                                 {/if}
+                                {if isset($use_tourism_tax) && $use_tourism_tax && $order_detail_data}
+                                    {if isset($order_tourism_tax_has_applied) && $order_tourism_tax_has_applied}
+                                        <button type="button" class="btn btn-default pull-right tt-exempt-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px">
+                                            <i class="icon-ban-circle"></i> {l s='Exempt Tourism Tax'}
+                                        </button>
+                                    {/if}
+                                    {if isset($order_tourism_tax_has_unapplied) && $order_tourism_tax_has_unapplied}
+                                        <button type="button" class="btn btn-default pull-right tt-apply-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px">
+                                            <i class="icon-check"></i> {l s='Apply Tourism Tax'}
+                                        </button>
+                                    {/if}
+                                {/if}
                             </div>
                             {* by webkul this code is added for showing rooms information on the order detail page *}
                             {include file='controllers/orders/_rooms_informaion_table.tpl'}

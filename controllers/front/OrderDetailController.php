@@ -429,6 +429,7 @@ class OrderDetailControllerCore extends FrontController
                         'THEME_DIR' => _THEME_DIR_,
                         'total_convenience_fee_ti' => $total_convenience_fee_ti,
                         'total_convenience_fee_te' => $total_convenience_fee_te,
+                        'tourism_tax_breakdown' => Configuration::get('QLO_USE_TOURISM_TAX') ? HotelOrderTourismTax::getBreakdownForInvoice((int) $id_order) : array(),
                         'total_demands_price_ti' => $total_demands_price_ti,
                         'total_demands_price_te' => $total_demands_price_te,
                         'any_back_order' => $anyBackOrder,

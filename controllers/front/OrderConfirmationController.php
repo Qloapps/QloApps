@@ -135,6 +135,8 @@ class OrderConfirmationControllerCore extends FrontController
             $orderTotalInfo['total_paid_real'] = 0;
             $orderTotalInfo['total_wrapping'] = 0;
             $orderTotalInfo['total_order_amount'] = 0;
+            $orderTotalInfo['tourism_tax_online']   = 0.0;
+            $orderTotalInfo['tourism_tax_at_hotel'] = 0.0;
 
             $orders_has_invoice = 1;
             if ($cartOrders = Order::getAllOrdersByCartId($order->id_cart)) {
@@ -432,6 +434,17 @@ class OrderConfirmationControllerCore extends FrontController
                     $orderTotalInfo['total_tax'] += $objCartOrder->total_paid_tax_incl - $objCartOrder->total_paid_tax_excl;
                     $orderTotalInfo['total_paid'] += $objCartOrder->total_paid;
                     $orderTotalInfo['total_paid_real'] += $objCartOrder->total_paid_real;
+
+                    if (Configuration::get('QLO_USE_TOURISM_TAX')) {
+                        $ttBreakdown = HotelOrderTourismTax::getBreakdownForInvoice($idOrder);
+                        foreach ($ttBreakdown as $ttRow) {
+                            if ((int) $ttRow['collection_type'] === 0) {
+                                $orderTotalInfo['tourism_tax_online'] += (float) $ttRow['total_amount'];
+                            } else {
+                                $orderTotalInfo['tourism_tax_at_hotel'] += (float) $ttRow['total_amount'];
+                            }
+                        }
+                    }
                 }
 
                 $totalTaxIncl = $orderTotalInfo['total_rooms_ti'] + $orderTotalInfo['total_services_ti'] + $orderTotalInfo['total_convenience_fee_ti'] + $orderTotalInfo['total_auto_add_services_ti'] + $orderTotalInfo['total_demands_price_ti'] + $orderTotalInfo['total_standalone_products_ti'];

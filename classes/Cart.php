@@ -1638,6 +1638,7 @@ class CartCore extends ObjectModel
         }
         $products_total = array();
         $ecotax_total = 0;
+        $tourism_tax_total = 0.0;
         $totalDemandsPrice = 0;
         $objCartBookingData = new HotelCartBookingData();
         $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -1911,6 +1912,10 @@ class CartCore extends ObjectModel
                         } else {
                             $products_total[$id_tax_rules_group] += Tools::processPriceRounding($totalPriceByProduct);
                         }
+
+                        if ($with_taxes && in_array($type, array(Cart::BOTH, Cart::BOTH_WITHOUT_SHIPPING))) {
+                            $tourism_tax_total += $roomTotalPrice['tourism_tax_online'];
+                        }
                     }
                 }
             }
@@ -2050,6 +2055,10 @@ class CartCore extends ObjectModel
 
         if ($type == Cart::BOTH || $type == Cart::ADVANCE_PAYMENT) {
             $order_total += $shipping_fees + $wrapping_fees;
+        }
+
+        if ($tourism_tax_total > 0) {
+            $order_total += $tourism_tax_total;
         }
 
         if ($order_total < 0 && $type != Cart::ONLY_DISCOUNTS) {
@@ -3942,6 +3951,15 @@ class CartCore extends ObjectModel
         if ($total_tax_without_discount < 0) {
             $total_tax_without_discount = 0;
         }
+        $tourism_tax_online = $total_tax - $total_tax_without_discount;
+        if ($tourism_tax_online > 0) {
+            if (Configuration::get('QLO_TOURISM_TAX_GROSSED_UP')) {
+                $total_rooms_wt += $tourism_tax_online;
+                $total_rooms_with_services_without_discount_ti += $tourism_tax_online;
+            } else {
+                $total_tax_without_discount += $tourism_tax_online;
+            }
+        }
 
         $summary = array(
             'delivery' => $delivery,
@@ -3988,7 +4006,9 @@ class CartCore extends ObjectModel
             'total_rooms_with_services_without_discount_ti' => $total_rooms_with_services_without_discount_ti,
             'cart_total_without_discount_te' => $cart_total_without_discount_te,
             'cart_total_without_discount_ti' => $cart_total_without_discount_ti,
-            'total_tax_without_discount' => $total_tax_without_discount
+            'total_tax_without_discount' => $total_tax_without_discount,
+            'tourism_tax_online' => max(0.0, (float) $tourism_tax_online),
+            'tourism_tax_grossed_up' => (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP'),
         );
         $hook = Hook::exec('actionCartSummary', $summary, null, true);
         if (is_array($hook)) {

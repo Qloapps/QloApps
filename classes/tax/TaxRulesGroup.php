@@ -40,6 +40,9 @@ class TaxRulesGroupCore extends ObjectModel
     /** @var string Object last modification date */
     public $date_upd;
 
+    /** @var int 1 = all rules in this TRG reference tourism taxes only */
+    public $is_tourism_tax_rule = 0;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -47,11 +50,12 @@ class TaxRulesGroupCore extends ObjectModel
         'table' => 'tax_rules_group',
         'primary' => 'id_tax_rules_group',
         'fields' => array(
-            'name' =>        array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 64),
-            'active' =>        array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'deleted' =>    array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'date_add' =>    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'date_upd' =>    array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
+            'name' =>                   array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 64),
+            'active' =>                 array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'deleted' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'is_tourism_tax_rule' =>    array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'date_add' =>               array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
+            'date_upd' =>               array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
     );
 
@@ -139,23 +143,32 @@ class TaxRulesGroupCore extends ObjectModel
         return false;
     }
 
-    public static function getTaxRulesGroups($only_active = true)
+    /**
+     * @param bool $only_active
+     * @param bool $isTourismTax  true = return only tourism TRGs; false (default) = return standard TRGs
+     * @return array
+     */
+    public static function getTaxRulesGroups($only_active = true, $isTourismTax = false)
     {
         return Db::getInstance()->executeS('
 			SELECT DISTINCT g.id_tax_rules_group, g.name, g.active
 			FROM `'._DB_PREFIX_.'tax_rules_group` g'
-            .Shop::addSqlAssociation('tax_rules_group', 'g').' WHERE deleted = 0'
+            .Shop::addSqlAssociation('tax_rules_group', 'g').' WHERE deleted = 0
+			AND g.`is_tourism_tax_rule` = '.($isTourismTax ? 1 : 0)
             .($only_active ? ' AND g.`active` = 1' : '').'
 			ORDER BY name ASC');
     }
 
     /**
-    * @return array an array of tax rules group formatted as $id => $name
-    */
-    public static function getTaxRulesGroupsForOptions()
+     * @param bool $onlyActive
+     * @param bool $isTourismTax  true = tourism TRG list with "None" placeholder; false (default) = standard TRG list with "No tax" placeholder
+     * @return array
+     */
+    public static function getTaxRulesGroupsForOptions($onlyActive = true, $isTourismTax = false)
     {
-        $tax_rules[] = array('id_tax_rules_group' => 0, 'name' => Tools::displayError('No tax'));
-        return array_merge($tax_rules, TaxRulesGroup::getTaxRulesGroups());
+        $placeholder = $isTourismTax ? Tools::displayError('None') : Tools::displayError('No tax');
+        $tax_rules = array(array('id_tax_rules_group' => 0, 'name' => $placeholder));
+        return array_merge($tax_rules, TaxRulesGroup::getTaxRulesGroups($onlyActive, $isTourismTax));
     }
 
     public function delete()

@@ -902,6 +902,43 @@ abstract class PaymentModuleCore extends Module
                                     }
                                 }
                                 if ($objBookingDetail->save()) {
+                                    if (Configuration::get('QLO_USE_TOURISM_TAX')) {
+                                        $idTourismTrg = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                                            'SELECT `id_tourism_tax_rules_group`
+                                             FROM `' . _DB_PREFIX_ . 'product_shop` product_shop
+                                             WHERE `id_product` = ' . (int) $idProduct
+                                            . Shop::addSqlRestriction(false, 'product_shop')
+                                        );
+                                        if ($idTourismTrg) {
+                                            $htlTaxAddressId = Cart::getIdAddressForTaxCalculation($idProduct);
+                                            $htlTaxAddress   = new Address($htlTaxAddressId ?: 0);
+                                            $checkInDt   = new DateTime($objBookingDetail->date_from);
+                                            $checkOutDt  = new DateTime($objBookingDetail->date_to);
+                                            $ttNumNights = max(1, (int) $checkInDt->diff($checkOutDt)->days);
+                                            $ttNumAdults = (int) $objCartBookingData->adults;
+                                            $ttChildAges = !empty($objCartBookingData->child_ages) ? (array) json_decode($objCartBookingData->child_ages, true) : array();
+                                            $ttUnitTe = (float) $total_price['total_price_tax_excl'] / $ttNumNights;
+                                            $ttCollType = Validate::isLoadedObject($objHotelBranch) ? (int) $objHotelBranch->tourism_tax_collection_type : 0;
+                                            
+                                            HotelTourismTaxCalculator::computeAndSave(
+                                                $order->id,
+                                                (int) $id_order_detail,
+                                                $objBookingDetail->id,
+                                                (int) $objCartBookingData->id_hotel,
+                                                $idTourismTrg,
+                                                $htlTaxAddress,
+                                                $ttUnitTe,
+                                                $objBookingDetail->date_from,
+                                                $ttNumNights,
+                                                $ttNumAdults,
+                                                $ttChildAges,
+                                                (int) $this->context->cart->id_currency,
+                                                $ttCollType,
+                                                (int) $idLang
+                                            );
+                                        }
+                                    }
+
                                     // save extra demands info
                                     if ($objCartBookingData->extra_demands
                                         && ($extraDemands = json_decode($objCartBookingData->extra_demands, true))

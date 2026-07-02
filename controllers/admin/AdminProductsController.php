@@ -4157,6 +4157,11 @@ class AdminProductsControllerCore extends AdminController
             $data->assign('productFeaturePrices', $productFeaturePrices);
         }
 
+        if (Configuration::get('QLO_USE_TOURISM_TAX')) {
+            $data->assign('tourismTaxRulesGroups', TaxRulesGroup::getTaxRulesGroupsForOptions(true, true));
+            $data->assign('id_tourism_tax_rules_group', isset($product->id_tourism_tax_rules_group) ? (int) $product->id_tourism_tax_rules_group : 0);
+        }
+
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
 

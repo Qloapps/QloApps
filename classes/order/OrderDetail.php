@@ -131,6 +131,9 @@ class OrderDetailCore extends ObjectModel
     /** @var float */
     public $ecotax_tax_rate;
 
+    /** @var float Tourism tax charged online for this order detail line */
+    public $tourism_tax_amount = 0;
+
     /** @var int */
     public $discount_quantity_applied;
 
@@ -218,7 +221,8 @@ class OrderDetailCore extends ObjectModel
             'tax_computation_method' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_tax_rules_group' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'ecotax' =>                    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
-            'ecotax_tax_rate' =>            array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
+            'ecotax_tax_rate' =>           array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
+            'tourism_tax_amount' =>        array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'discount_quantity_applied' =>    array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'download_hash' =>                array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'download_nb' =>                array('type' => self::TYPE_INT, 'validate' => 'isInt'),

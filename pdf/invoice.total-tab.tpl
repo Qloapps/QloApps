@@ -116,6 +116,26 @@
 		</td>
 	</tr>
 	{/if}
+	{if isset($footer.tourism_tax_online) && $footer.tourism_tax_online > 0}
+	<tr class="bold">
+		<td class="grey">
+			{l s='Tourism Tax' pdf='true'}
+		</td>
+		<td class="white">
+			{displayPrice currency=$order->id_currency price=$footer.tourism_tax_online}
+		</td>
+	</tr>
+	{/if}
+	{if isset($footer.tourism_tax_at_hotel) && $footer.tourism_tax_at_hotel > 0}
+	<tr>
+		<td class="grey">
+			{l s='Tourism Tax (payable at hotel)' pdf='true'}
+		</td>
+		<td class="white">
+			{displayPrice currency=$order->id_currency price=$footer.tourism_tax_at_hotel}
+		</td>
+	</tr>
+	{/if}
 
 	{if $footer.product_discounts_tax_incl > 0}
 		<tr class="bold">

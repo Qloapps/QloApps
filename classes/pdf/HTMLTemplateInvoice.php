@@ -692,6 +692,22 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             $footer['total_tax_without_discount'] = 0;
         }
 
+        $ttBreakdown = Configuration::get('QLO_USE_TOURISM_TAX') ? HotelOrderTourismTax::getBreakdownForInvoice((int) $this->order->id) : array();
+        $footer['tourism_tax_breakdown'] = $ttBreakdown;
+        $footer['tourism_tax_online']    = 0.0;
+        $footer['tourism_tax_at_hotel']  = 0.0;
+        foreach ($ttBreakdown as $ttRow) {
+            if ((int) $ttRow['collection_type'] === 0) {
+                $footer['tourism_tax_online'] += (float) $ttRow['total_amount'];
+            } else {
+                $footer['tourism_tax_at_hotel'] += (float) $ttRow['total_amount'];
+            }
+        }
+
+        if ($footer['tourism_tax_online'] > 0) {
+            $footer['total_tax_without_discount'] = max(0.0, $footer['total_tax_without_discount'] - $footer['tourism_tax_online']);
+        }
+
         $data = array(
             'cart_htl_data' => $cart_htl_data,
             'is_hotel_order' => HotelBookingDetail::getIdHotelByIdOrder($this->order->id),
@@ -812,6 +828,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'shipping_tax' => $this->order_invoice->getShippingTaxesBreakdown($this->order),
             'ecotax_tax' => $this->order_invoice->getEcoTaxTaxesBreakdown(),
             'wrapping_tax' => $this->order_invoice->getWrappingTaxesBreakdown(),
+            'tourism_tax' => $this->order_invoice->getTourismTaxBreakdown(),
         );
 
         foreach ($breakdowns as $type => $bd) {

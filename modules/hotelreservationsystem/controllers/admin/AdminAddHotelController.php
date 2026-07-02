@@ -236,6 +236,8 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['PS_MAX_CHECKOUT_OFFSET'] = (int) Configuration::get('PS_MAX_CHECKOUT_OFFSET');
         $smartyVars['PS_MIN_BOOKING_OFFSET'] = (int) Configuration::get('PS_MIN_BOOKING_OFFSET');
         $smartyVars['WK_ORDER_REFUND_ALLOWED'] = Configuration::get('WK_ORDER_REFUND_ALLOWED');
+        $smartyVars['tourism_tax_collection_type'] = (int) $this->object->tourism_tax_collection_type;
+        $smartyVars['use_tourism_tax'] = (int) Configuration::get('QLO_USE_TOURISM_TAX');
 
         $this->context->smarty->assign($smartyVars);
 
@@ -518,6 +520,7 @@ class AdminAddHotelController extends ModuleAdminController
             }
             $objHotelBranch->active = $active;
             $objHotelBranch->active_refund = $activeRefund;
+            $objHotelBranch->tourism_tax_collection_type = (int) Tools::getValue('tourism_tax_collection_type', 0);
             $objHotelBranch->fax = $fax;
 
             // lang fields

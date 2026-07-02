@@ -1277,6 +1277,7 @@ CREATE TABLE `PREFIX_order_detail` (
   `tax_rate` DECIMAL(10,3) NOT NULL DEFAULT '0.000',
   `ecotax` decimal(21,6) NOT NULL DEFAULT '0.00',
   `ecotax_tax_rate` DECIMAL(5,3) NOT NULL DEFAULT '0.000',
+  `tourism_tax_amount` DECIMAL(21,6) NOT NULL DEFAULT '0.000000',
   `discount_quantity_applied` TINYINT(1) NOT NULL DEFAULT '0',
   `download_hash` varchar(255) DEFAULT NULL,
   `download_nb` int(10) unsigned DEFAULT '0',
@@ -1527,6 +1528,7 @@ CREATE TABLE `PREFIX_product` (
   `id_category_default` int(10) unsigned DEFAULT NULL,
   `id_shop_default` int(10) unsigned NOT NULL DEFAULT 1,
   `id_tax_rules_group` INT(11) UNSIGNED NOT NULL,
+  `id_tourism_tax_rules_group` INT(11) UNSIGNED NOT NULL DEFAULT '0',
   `on_sale` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `online_only` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `ean13` varchar(13) DEFAULT NULL,
@@ -1590,6 +1592,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_product_shop` (
   `id_shop` int(10) unsigned NOT NULL,
   `id_category_default` int(10) unsigned DEFAULT NULL,
   `id_tax_rules_group` INT(11) UNSIGNED NOT NULL,
+  `id_tourism_tax_rules_group` INT(11) UNSIGNED NOT NULL DEFAULT '0',
   `on_sale` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `online_only` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `ecotax` decimal(17,6) NOT NULL DEFAULT '0.000000',
@@ -1988,6 +1991,7 @@ CREATE TABLE `PREFIX_tag_count` (
 CREATE TABLE `PREFIX_tax` (
   `id_tax` int(10) unsigned NOT NULL auto_increment,
   `rate` DECIMAL(10, 3) NOT NULL,
+  `is_tourism_tax` TINYINT(1) NOT NULL DEFAULT '0',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_tax`)
@@ -2113,6 +2117,7 @@ CREATE TABLE `PREFIX_tax_rules_group` (
 `id_tax_rules_group` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 `name` VARCHAR( 50 ) NOT NULL,
 `active` INT NOT NULL,
+`is_tourism_tax_rule` TINYINT(1) NOT NULL DEFAULT '0',
 `deleted` TINYINT(1) UNSIGNED NOT NULL,
 `date_add` DATETIME NOT NULL,
 `date_upd` DATETIME NOT NULL

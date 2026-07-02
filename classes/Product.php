@@ -226,6 +226,9 @@ class ProductCore extends ObjectModel
 
     public $id_tax_rules_group = 1;
 
+    /** @var int Tourism tax rules group id (0 = no tourism tax) */
+    public $id_tourism_tax_rules_group = 0;
+
     /**
      * We keep this variable for retrocompatibility for themes
      * @deprecated 1.5.0
@@ -313,8 +316,9 @@ class ProductCore extends ObjectModel
 
             /* Shop fields */
             'id_category_default' =>        array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
-            'id_tax_rules_group' =>        array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
-            'on_sale' =>                    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
+            'id_tax_rules_group' =>              array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
+            'id_tourism_tax_rules_group' =>      array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
+            'on_sale' =>                         array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'online_only' =>                array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'ecotax' =>                    array('type' => self::TYPE_FLOAT, 'shop' => true, 'validate' => 'isPrice'),
             'minimal_quantity' =>            array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedInt'),

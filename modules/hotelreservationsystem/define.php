@@ -61,5 +61,12 @@ require_once 'classes/ServiceProductOption.php';
 require_once 'classes/HotelSettingsLink.php';
 require_once 'classes/HotelBookingDocument.php';
 
+require_once 'classes/HotelTourismTax.php';
+require_once 'classes/HotelTourismTaxTier.php';
+require_once 'classes/HotelTourismTaxChildRange.php';
+require_once 'classes/HotelOrderTourismTax.php';
+require_once 'classes/HotelBookingTaxExemption.php';
+require_once 'classes/HotelTourismTaxCalculator.php';
+
 // Web services classes
 require_once 'classes/WebserviceSpecificManagementHotelAri.php';

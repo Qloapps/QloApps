@@ -481,6 +481,26 @@
 																<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_tax_without_discount'] currency=$objOrderCurrency convert=1}</span>
 															</td>
 														</tr>
+														{if isset($orderTotalInfo['tourism_tax_online']) && $orderTotalInfo['tourism_tax_online'] > 0}
+															<tr class="item">
+																<td>
+																	<strong>{l s='Tourism Tax'}</strong>
+																</td>
+																<td class="text-right">
+																	<span>{displayWtPriceWithCurrency price=$orderTotalInfo['tourism_tax_online'] currency=$objOrderCurrency}</span>
+																</td>
+															</tr>
+														{/if}
+														{if isset($orderTotalInfo['tourism_tax_at_hotel']) && $orderTotalInfo['tourism_tax_at_hotel'] > 0}
+															<tr class="item">
+																<td>
+																	<strong>{l s='Tourism Tax (payable at hotel)'}</strong>
+																</td>
+																<td class="text-right">
+																	<span>{displayWtPriceWithCurrency price=$orderTotalInfo['tourism_tax_at_hotel'] currency=$objOrderCurrency}</span>
+																</td>
+															</tr>
+														{/if}
 														{if $order->total_discounts > 0}
 															<tr class="item">
 																<td>

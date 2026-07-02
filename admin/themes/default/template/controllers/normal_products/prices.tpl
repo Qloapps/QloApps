@@ -197,6 +197,23 @@ $(document).ready(function () {
 			<input maxlength="27" id="ecotax" name="ecotax" type="text" value="{$product->ecotax|string_format:$priceDisplayPrecisionFormat}" onkeyup="$('#priceType').val('TI');if (isArrowKey(event))return; calcPriceTE(); this.value = this.value.replace(/,/g, '.'); if (parseInt(this.value) > getE('priceTE').value) this.value = getE('priceTE').value; if (isNaN(this.value)) this.value = 0;" />
 		</div>
 	</div>
+	{if isset($tourismTaxRulesGroups)}
+	<div class="form-group">
+		<div class="col-lg-1"></div>
+		<label class="control-label col-lg-2" for="id_tourism_tax_rules_group">{l s='Tourism Tax Rule:'}</label>
+		<div class="col-lg-4">
+			<select name="id_tourism_tax_rules_group" id="id_tourism_tax_rules_group">
+				{foreach from=$tourismTaxRulesGroups item=ttrg}
+					<option value="{$ttrg.id_tax_rules_group|intval}"
+						{if isset($id_tourism_tax_rules_group) && $id_tourism_tax_rules_group == $ttrg.id_tax_rules_group}selected="selected"{/if}>
+						{$ttrg.name|escape:'htmlall':'UTF-8'}
+					</option>
+				{/foreach}
+			</select>
+		</div>
+	</div>
+	{/if}
+
 	{* <div class="form-group {if $product->auto_add_to_cart && $product->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}hide_on_auto_add_Withroom{/if}" {if !$country_display_tax_label || $tax_exclude_taxe_option}style="display:none;"{/if} {if $product->auto_add_to_cart && $product->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}style="display:none"{/if}>
 		<label class="control-label col-lg-3" for="priceTI">{l s='Retail price with tax'}</label>
 		<div class="input-group col-lg-2">
