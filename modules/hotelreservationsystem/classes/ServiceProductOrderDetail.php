@@ -1016,15 +1016,14 @@ class ServiceProductOrderDetail extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = spod.`id_htl_booking_detail`)
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
             INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
-            LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = spod.`id_order_detail`)
-            LEFT JOIN `'._DB_PREFIX_.'order_detail_tax` odt ON (odt.`id_order_detail` = od.`id_order_detail`)
-            LEFT JOIN `'._DB_PREFIX_.'tax` t ON (t.`id_tax` = odt.`id_tax`)
+            LEFT JOIN `'._DB_PREFIX_.'tax_rule` tr ON (tr.`id_tax_rules_group` = spod.`id_tax_rules_group`)
+            LEFT JOIN `'._DB_PREFIX_.'tax` t ON (t.`id_tax` = tr.`id_tax`)
             LEFT JOIN `'._DB_PREFIX_.'tax_lang` tl ON (tl.`id_tax` = t.`id_tax` AND tl.`id_lang` = '.(int) $idLang.')
             WHERE spod.`is_cancelled` = 0
             AND hbd.`is_refunded` = 0
             AND (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) > 0
             AND spod.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-            .($idTax ? ' AND odt.`id_tax` = '.$idTax : '')
+            .($idTax ? ' AND t.`id_tax` = '.$idTax : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
             GROUP BY spod.`id_service_product_order_detail`
             ORDER BY spod.`date_add` ASC'
