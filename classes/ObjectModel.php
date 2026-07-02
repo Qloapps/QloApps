@@ -1130,7 +1130,7 @@ abstract class ObjectModelCore implements Core_Foundation_Database_EntityInterfa
      * @param string $class Class context (defaults to calling class)
      * @return string
      */
-    public static function l($string, $class = null)
+    protected static function l($string, $class = null)
     {
         if (!$class) {
             $class = get_called_class();

@@ -280,11 +280,9 @@ class TranslateCore
      *
      * @param string $string String to translate
      * @param string $class Class name (e.g. 'Order', 'HotelBookingDetail')
-     * @param bool $addslashes
-     * @param bool $htmlentities
      * @return string
      */
-    public static function getClassTranslation($string, $class = '', $addslashes = false, $htmlentities = false)
+    public static function getClassTranslation($string, $class = '')
     {
         global $_LANGCLASS;
 
@@ -305,10 +303,7 @@ class TranslateCore
             ? $_LANGCLASS[$class.$key]
             : $string;
 
-        if ($addslashes) {
-            return addslashes($str);
-        }
-        return $htmlentities ? htmlspecialchars(stripslashes($str), ENT_QUOTES, 'utf-8') : stripslashes($str);
+        return stripslashes($str);
     }
 
     /**
@@ -429,9 +424,8 @@ class TranslateCore
                 break;
 
             case 'class':
-                // Parsing core class files for self::l() calls only
-                // ClassName::l() is intentionally excluded to avoid matching Mail::l() and similar
-                $regex = '/(?:self)::l\((\')'._PS_TRANS_PATTERN_.'\'[\)|\,]/U';
+                // Only self:: and static:: — ClassName::l() excluded to avoid matching Mail::l() and similar
+                $regex = '/(?:self|static)::l\((\')'._PS_TRANS_PATTERN_.'\'[\)|\,]/U';
                 break;
         }
 
