@@ -68,6 +68,11 @@ $(document).ready(function() {
                         },
                         items: "td",
                         trigger : 'hover',
+                        position: {
+                            my: "left top",
+                            at: "left+50% bottom-50%",
+                            collision: "flipfit"
+                        },
                         show: {
                             delay: 100,
                         },
@@ -132,6 +137,7 @@ $(document).ready(function() {
                     },
                     items: "div",
                     trigger : 'hover',
+                    track: true,
                     show: {
                         delay: 100,
                     },
@@ -171,6 +177,7 @@ $(document).ready(function() {
                         }
                     });
                     info.el.style.borderLeftColor = info.event.extendedProps.data.eventColor;
+                    resizeSearchResultEventBar($(info.el));
                 }
             },
             datesSet: function(arg) {
@@ -180,6 +187,36 @@ $(document).ready(function() {
             }
         });
         calendar.render();
+
+        var searchResultResizeTimer;
+        $(window).on('resize', function() {
+            clearTimeout(searchResultResizeTimer);
+            searchResultResizeTimer = setTimeout(function() {
+                $('#fullcalendar .fc-event.search-result-event').each(function() {
+                    resizeSearchResultEventBar($(this));
+                });
+            }, 150);
+        });
+    }
+
+    function resizeSearchResultEventBar($bar) {
+        requestAnimationFrame(function() {
+            var $td = $bar.closest('td');
+            if (!$td.length) {
+                return;
+            }
+            var cellHeight = $td.outerHeight();
+            if (!cellHeight) {
+                return;
+            }
+            $bar.css('transform', '');
+            $bar.css('height', (cellHeight * 0.35) + 'px');
+            var cellRect = $td.get(0).getBoundingClientRect();
+            var barRect = $bar.get(0).getBoundingClientRect();
+            var desiredTop = cellRect.top + (cellRect.height - barRect.height) / 2;
+            var delta = desiredTop - barRect.top;
+            $bar.css('transform', 'translateY(' + delta + 'px)');
+        });
     }
 
     function removeInitializedTooltips() {

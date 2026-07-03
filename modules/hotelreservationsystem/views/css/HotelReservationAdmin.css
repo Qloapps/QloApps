@@ -550,7 +550,7 @@ p.room_cat_data
 
 /* book now full calender */
 .fc .fc-daygrid-day.fc-day-today {
-    background-color: unset;
+    background-color: #E3E7F3 !important;
 }
 .fc-daygrid-day-top {
     justify-content: space-between;}
@@ -558,13 +558,6 @@ p.room_cat_data
         color: #333;
         font-size: 14px;
         text-decoration: none;}
-    .fc .fc-daygrid-day.fc-day-today a.fc-daygrid-day-number {
-        background-color: #FC3D39;
-        color: #FFFFFF;
-        line-height: 1;
-        border-radius: 50%;
-        padding: 5px 8px;
-    }
     .fc-daygrid-day-top .day-info {
 
         font-size: 15px;
@@ -628,6 +621,9 @@ body.adminhotelroomsbooking .ui-tooltip {
     align-items: center;
     overflow: hidden;
 }
+#fullcalendar .fc-event.search-result-event .fc-event-main {
+    overflow: hidden;
+}
 #fullcalendar .fc-event.search-result-event .fc-event-title {
     font-size: 14px;
     font-weight: 400;
@@ -635,7 +631,6 @@ body.adminhotelroomsbooking .ui-tooltip {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 1px;
 }
 #fullcalendar .fc-event.search-result-event:not(.fc-event-start) {
     border-left: none;
