@@ -324,7 +324,7 @@ class AdminCartRulesControllerCore extends AdminController
             }
 
             // These are checkboxes (which aren't sent through POST when they are not check), so they are forced to 0
-            foreach (array('country', 'carrier', 'group', 'cart_rule', 'product', 'shop') as $type) {
+            foreach (array('country', 'carrier', 'group', 'cart_rule', 'product', 'shop', 'hotel') as $type) {
                 if (!Tools::getValue($type.'_restriction')) {
                     $_POST[$type.'_restriction'] = 0;
                 }
@@ -380,7 +380,7 @@ class AdminCartRulesControllerCore extends AdminController
     {
         // All the associations are deleted for an update, then recreated when we call the "afterAdd" method
         $id_cart_rule = Tools::getValue('id_cart_rule');
-        foreach (array('country', 'carrier', 'group', 'product_rule_group', 'shop') as $type) {
+        foreach (array('country', 'carrier', 'group', 'hotel', 'product_rule_group', 'shop') as $type) {
             Db::getInstance()->delete('cart_rule_'.$type, '`id_cart_rule` = '.(int)$id_cart_rule);
         }
         Db::getInstance()->delete('cart_rule_product_rule', 'NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'cart_rule_product_rule_group`
@@ -414,7 +414,7 @@ class AdminCartRulesControllerCore extends AdminController
      */
     protected function afterAdd($currentObject)
     {
-        // Add restrictions for generic entities like country, carrier and group
+        // Add restrictions for generic entities like country, carrier, group, hotel and shop
         foreach (array('country', 'carrier', 'group', 'shop') as $type) {
             if (Tools::getValue($type.'_restriction') && is_array($array = Tools::getValue($type.'_select')) && count($array)) {
                 $values = array();
@@ -423,6 +423,14 @@ class AdminCartRulesControllerCore extends AdminController
                 }
                 Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_'.$type.'` (`id_cart_rule`, `id_'.$type.'`) VALUES '.implode(',', $values));
             }
+        }
+        // Add hotel restrictions
+        if (Tools::getValue('hotel_restriction') && is_array($array = Tools::getValue('hotel_select')) && count($array)) {
+            $values = array();
+            foreach ($array as $id) {
+                $values[] = '('.(int)$currentObject->id.','.(int)$id.')';
+            }
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_hotel` (`id_cart_rule`, `id_hotel`) VALUES '.implode(',', $values));
         }
         // Add cart rule restrictions
         if (Tools::getValue('cart_rule_restriction') && is_array($array = Tools::getValue('cart_rule_select')) && count($array)) {
@@ -803,6 +811,7 @@ class AdminCartRulesControllerCore extends AdminController
         $languages = Language::getLanguages();
         $countries = $current_object->getAssociatedRestrictions('country', true, true);
         $groups = $current_object->getAssociatedRestrictions('group', false, true);
+        $hotels = $current_object->getHotelRestrictions($this->context->employee->id_profile);
         $shops = $current_object->getAssociatedRestrictions('shop', false, false);
         $cart_rules = $current_object->getAssociatedRestrictions('cart_rule', false, true, 0, $limit);
         $carriers = $current_object->getAssociatedRestrictions('carrier', true, false);
@@ -862,6 +871,7 @@ class AdminCartRulesControllerCore extends AdminController
                 'countries' => $countries,
                 'carriers' => $carriers,
                 'groups' => $groups,
+                'hotels' => $hotels,
                 'shops' => $shops,
                 'cart_rules' => $cart_rules,
                 'product_rule_groups' => $product_rule_groups,
