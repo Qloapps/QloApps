@@ -93,7 +93,7 @@ class HotelReservationSystemDb
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_amenity` (
                 `id_htl_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                `parent_amenity_id` int(10) unsigned NOT NULL,
+                `id_parent` int(10) unsigned NOT NULL,
                 `position` int(10) unsigned NOT NULL,
                 `active` int(2) NOT NULL DEFAULT '0',
                 `logo_type` varchar(10) NOT NULL DEFAULT 'icon',

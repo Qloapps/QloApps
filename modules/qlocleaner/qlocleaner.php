@@ -705,6 +705,7 @@ class QloCleaner extends Module
                 array('htl_cart_booking_data', 'id_order', 'orders', 'id_order'),
                 array('htl_cart_booking_data', 'id_customer', 'customer', 'id_customer'),
                 array('htl_branch_amenity', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_branch_amenity', 'amenity_id', 'htl_amenity', 'id_htl_amenity'),
                 array('htl_image', 'id_hotel', 'htl_branch_info', 'id'),
                 array('htl_branch_info', 'id_category', 'category', 'id_category'),
                 array('htl_room_information', 'id_product', 'product', 'id_product'),

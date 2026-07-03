@@ -123,9 +123,8 @@
 				<label class="col-lg-3 control-label required">{l s='Logo Image' mod='hotelreservationsystem'}</label>
 				<div class="col-lg-5">
 					{if $existing_img}
-						<div style="margin-bottom:8px;">
-							<img src="{$existing_img|escape:'htmlall':'UTF-8'}" alt=""
-								 style="max-width:80px;max-height:80px;border:1px solid #ddd;padding:4px;" />
+						<div class="htl-amenity-preview">
+							<img src="{$existing_img|escape:'htmlall':'UTF-8'}" alt="" />
 						</div>
 					{/if}
 					<input id="logo_image" type="file" name="logo_image" accept="image/*" class="hide" />
@@ -174,37 +173,6 @@
 	</div>
 </div>
 
-<script type="text/javascript">
-$(document).ready(function () {
-	$('#htl_logo_type_select').on('change', function () {
-		if ($(this).val() === 'icon') {
-			$('#htl_logo_image_row').hide();
-			$('#htl_logo_icon_row').show();
-		} else {
-			$('#htl_logo_icon_row').hide();
-			$('#htl_logo_image_row').show();
-		}
-	});
-
-	$('#logo_image-selectbutton').on('click', function () {
-		$('#logo_image').trigger('click');
-	});
-
-	$('#logo_image-name').on('click', function () {
-		$('#logo_image').trigger('click');
-	});
-
-	$('#logo_image').on('change', function () {
-		var files = this.files;
-		if (files && files.length > 0) {
-			$('#logo_image-name').val(files[0].name);
-		} else {
-			var name = $(this).val().split(/[\\/]/);
-			$('#logo_image-name').val(name[name.length - 1]);
-		}
-	});
-});
-</script>
 
 {else}
 

@@ -23,7 +23,7 @@
 {if isset($product->id)}
 <div id="product-features" class="panel product-tab">
 	<input type="hidden" name="submitted_tabs[]" value="Features" />
-	<h3>{l s='Features'}</h3>
+	<h3>{l s='Assign features to this room type'}</h3>
 
 	<div class="alert alert-info">
 		{l s='You can specify a value for each relevant feature regarding this room type. Empty fields will not be displayed.'}<br/>
@@ -50,7 +50,7 @@
 				<td>{$available_feature.name}</td>
 				<td>
 					<input type="hidden" id="feature_{$available_feature.id_feature}_value" name="feature_{$available_feature.id_feature}_value" value="{$value.id_feature_value}">
-					<img class="img img-responsive" width="15px" src="{$base_url}img/rf/{$available_feature.id_feature}.jpg" title="Room image" />
+					<img class="img img-responsive" width="15px" src="{$base_url}img/rf/{$value.value}" title="Room image" />
 				</td>
 				{/foreach}
 				<!--<td>

@@ -43,9 +43,9 @@ class HotelHelper
         Media::addJsDef($jsVars);
     }
 
-    public function insertHotelCommonFeatures()
+    public function insertHotelCommonAmenities()
     {
-        $parent_features_arr = array(
+        $parent_amenities_arr = array(
             'Business Services' => array(
                 'name' => array(
                     'en' => 'Business Services',
@@ -55,7 +55,7 @@ class HotelHelper
                     'ru' => 'Бизнес-услуги',
                     'es' => 'Servicios empresariales',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Business Center',
                         'nl' => 'Businesscentrum',
@@ -123,7 +123,7 @@ class HotelHelper
                     'ru' => 'Дополнительные услуги',
                     'es' => 'Servicios complementarios',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Internet Access Free',
                         'nl' => 'Gratis internettoegang',
@@ -175,7 +175,7 @@ class HotelHelper
                     'ru' => 'Развлечения',
                     'es' => 'Entretenimiento',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'DiscoTheatre',
                         'nl' => 'Discotheek/theater',
@@ -243,7 +243,7 @@ class HotelHelper
                     'ru' => 'Удобства',
                     'es' => 'Instalaciones',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Laundry Service',
                         'nl' => 'Wasservice',
@@ -359,7 +359,7 @@ class HotelHelper
                     'ru' => 'Общие услуги',
                     'es' => 'Servicios generales',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Room Service',
                         'nl' => 'Roomservice',
@@ -443,7 +443,7 @@ class HotelHelper
                     'ru' => 'В помещении',
                     'es' => 'Interior',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Parking',
                         'nl' => 'Parkeren',
@@ -479,7 +479,7 @@ class HotelHelper
                     'ru' => 'Интернет',
                     'es' => 'Internet',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Internet Access-Surcharge',
                         'nl' => 'Internettoegang - toeslag',
@@ -507,7 +507,7 @@ class HotelHelper
                     'ru' => 'На открытом воздухе',
                     'es' => 'Al aire libre',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Gardens',
                         'nl' => 'Tuinen',
@@ -591,7 +591,7 @@ class HotelHelper
                     'ru' => 'Парковка',
                     'es' => 'Aparcamiento',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Parking (Surcharge)',
                         'nl' => 'Parkeren (toeslag)',
@@ -627,7 +627,7 @@ class HotelHelper
                     'ru' => 'Спорт и отдых',
                     'es' => 'Deportes y recreación',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Health Club / Gym Facility Available',
                         'nl' => 'Health Club / Sportschool beschikbaar',
@@ -823,7 +823,7 @@ class HotelHelper
                     'ru' => 'Водные удобства',
                     'es' => 'Instalaciones acuáticas',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Swimming Pool',
                         'nl' => 'Zwembad',
@@ -875,7 +875,7 @@ class HotelHelper
                     'ru' => 'Вино и ужин',
                     'es' => 'Vino y cena',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Bar / Lounge',
                         'nl' => 'Bar / Lounge',
@@ -979,42 +979,42 @@ class HotelHelper
         $languages = Language::getLanguages(false);
         $imgDir = dirname(__FILE__).'/../views/img/hotel_amenities/';
         $i = 1;
-        $childCounter = 0;
-        foreach ($parent_features_arr as $key => $value) {
-            $obj_feature = new HotelAmenities();
+        $defaultImageIndex = 0;
+        foreach ($parent_amenities_arr as $key => $value) {
+            $obj_amenity = new HotelAmenities();
             foreach ($languages as $lang) {
                 if (isset($value['name'][$lang['iso_code']])) {
-                    $obj_feature->name[$lang['id_lang']] = $value['name'][$lang['iso_code']];
+                    $obj_amenity->name[$lang['id_lang']] = $value['name'][$lang['iso_code']];
                 } else {
-                    $obj_feature->name[$lang['id_lang']] = $value['name']['en'];
+                    $obj_amenity->name[$lang['id_lang']] = $value['name']['en'];
                 }
             }
 
-            $obj_feature->active = 1;
-            $obj_feature->position = $i;
-            $obj_feature->parent_amenity_id = 0;
-            $obj_feature->save();
-            $parent_amenity_id = $obj_feature->id;
-            foreach ($value['features'] as $val) {
-                ++$childCounter;
-                $obj_feature = new HotelAmenities();
+            $obj_amenity->active = 1;
+            $obj_amenity->position = $i;
+            $obj_amenity->id_parent = 0;
+            $obj_amenity->save();
+            $idParent = $obj_amenity->id;
+            foreach ($value['amenities'] as $val) {
+                ++$defaultImageIndex;
+                $obj_amenity = new HotelAmenities();
                 foreach ($languages as $lang) {
                     if (isset($val[$lang['iso_code']])) {
-                        $obj_feature->name[$lang['id_lang']] = $val[$lang['iso_code']];
+                        $obj_amenity->name[$lang['id_lang']] = $val[$lang['iso_code']];
                     } else {
-                        $obj_feature->name[$lang['id_lang']] = $val['en'];
+                        $obj_amenity->name[$lang['id_lang']] = $val['en'];
                     }
                 }
-                $obj_feature->active            = 1;
-                $obj_feature->parent_amenity_id = $parent_amenity_id;
-                $obj_feature->save();
+                $obj_amenity->active            = 1;
+                $obj_amenity->id_parent = $idParent;
+                $obj_amenity->save();
 
-                $srcImg = $imgDir.'_default/'.$childCounter.'.jpg';
+                $srcImg = $imgDir.'_default/'.$defaultImageIndex.'.jpg';
                 if (file_exists($srcImg)) {
-                    if (ImageManager::resize($srcImg, $imgDir.$obj_feature->id.'.jpg')) {
-                        $obj_feature->logo_type = 'image';
-                        $obj_feature->logo      = $obj_feature->id.'.jpg';
-                        $obj_feature->save();
+                    if (ImageManager::resize($srcImg, $imgDir.$obj_amenity->id.'.jpg')) {
+                        $obj_amenity->logo_type = 'image';
+                        $obj_amenity->logo      = $obj_amenity->id.'.jpg';
+                        $obj_amenity->save();
                     }
                 }
             }

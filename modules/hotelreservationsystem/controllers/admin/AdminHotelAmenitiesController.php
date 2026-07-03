@@ -115,10 +115,10 @@ class AdminHotelAmenitiesController extends ModuleAdminController
             if ($idAmenity) {
                 $objHotelAmenities = new HotelAmenities($idAmenity);
                 if (Validate::isLoadedObject($objHotelAmenities)) {
-                    $idCategory = (int)$objHotelAmenities->parent_amenity_id;
+                    $idCategory = (int)$objHotelAmenities->id_parent;
                     $amenity = array(
                         'id'                => $objHotelAmenities->id,
-                        'parent_amenity_id' => $idCategory,
+                        'id_parent' => $idCategory,
                         'active'            => (int)$objHotelAmenities->active,
                         'logo_type'         => $objHotelAmenities->logo_type,
                         'logo'              => $objHotelAmenities->logo,
@@ -186,7 +186,7 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 $val = trim(Tools::getValue('cat_name_'.$lang['id_lang']));
                 $objHotelAmenities->name[$lang['id_lang']] = $val ?: $nameDefault;
             }
-            $objHotelAmenities->parent_amenity_id = 0;
+            $objHotelAmenities->id_parent = 0;
             $objHotelAmenities->position          = $pos;
             $objHotelAmenities->active            = 1;
 
@@ -252,7 +252,7 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 $val = trim(Tools::getValue('amenity_name_'.$lang['id_lang']));
                 $objHotelAmenities->name[$lang['id_lang']] = $val ?: $nameDefault;
             }
-            $objHotelAmenities->parent_amenity_id = $idCategory;
+            $objHotelAmenities->id_parent = $idCategory;
             $objHotelAmenities->active            = $active;
             $objHotelAmenities->logo_type         = ($logoType === 'icon') ? 'icon' : 'image';
             $objHotelAmenities->logo              = ($logoType === 'icon') ? $logoValue : $objHotelAmenities->logo;
@@ -346,7 +346,7 @@ class AdminHotelAmenitiesController extends ModuleAdminController
     public function setMedia()
     {
         parent::setMedia();
-        $this->addJs(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelReservationAdmin.js');
-        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
+        $this->addJs(_MODULE_DIR_.'hotelreservationsystem/views/js/hotelAmenity.js');
+        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/hotelAmenity.css');
     }
 }

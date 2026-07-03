@@ -25,7 +25,7 @@
 class HotelAmenities extends ObjectModel
 {
     public $name;
-    public $parent_amenity_id;
+    public $id_parent;
     public $position;
     public $active;
     public $logo_type;
@@ -38,7 +38,7 @@ class HotelAmenities extends ObjectModel
         'primary'   => 'id_htl_amenity',
         'multilang' => true,
         'fields'    => array(
-            'parent_amenity_id' => array('type' => self::TYPE_INT, 'required' => true),
+            'id_parent' => array('type' => self::TYPE_INT, 'required' => true),
             'position'          => array('type' => self::TYPE_INT),
             'active'            => array('type' => self::TYPE_INT, 'required' => true),
             'logo_type'         => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
@@ -76,12 +76,12 @@ class HotelAmenities extends ObjectModel
     public static function hasAmenityItems()
     {
         return (bool) Db::getInstance()->getValue(
-            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'htl_amenity` WHERE `parent_amenity_id` != 0'
+            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'htl_amenity` WHERE `id_parent` != 0'
         );
     }
 
     /**
-     * Return all categories (parent_amenity_id = 0) with their child amenities.
+     * Return all categories (id_parent = 0) with their child amenities.
      *
      * @param int $idLang
      * @return array|false
@@ -98,7 +98,7 @@ class HotelAmenities extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
                 ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE ha.`parent_amenity_id` = 0
+            WHERE ha.`id_parent` = 0
             ORDER BY ha.`position` ASC'
         );
 
@@ -116,7 +116,7 @@ class HotelAmenities extends ObjectModel
                     FROM `'._DB_PREFIX_.'htl_amenity` ha
                     LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
                         ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-                    WHERE ha.`parent_amenity_id` = '.(int)$parent['id_htl_amenity']
+                    WHERE ha.`id_parent` = '.(int)$parent['id_htl_amenity']
                 );
 
                 if ($children) {
@@ -151,7 +151,7 @@ class HotelAmenities extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
                 ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE ha.`parent_amenity_id` = 0'
+            WHERE ha.`id_parent` = 0'
         );
 
         if ($parents) {
@@ -162,7 +162,7 @@ class HotelAmenities extends ObjectModel
                     FROM `'._DB_PREFIX_.'htl_amenity` ha
                     LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
                         ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-                    WHERE ha.`parent_amenity_id` = '.(int)$parent['id_htl_amenity']
+                    WHERE ha.`id_parent` = '.(int)$parent['id_htl_amenity']
                 );
 
                 if ($children) {
@@ -213,7 +213,7 @@ class HotelAmenities extends ObjectModel
     public function getChildAmenitiesByParentAmenityId($parentId)
     {
         return Db::getInstance()->executeS(
-            'SELECT `id_htl_amenity` FROM `'._DB_PREFIX_.'htl_amenity` WHERE `parent_amenity_id` = '.(int)$parentId
+            'SELECT `id_htl_amenity` FROM `'._DB_PREFIX_.'htl_amenity` WHERE `id_parent` = '.(int)$parentId
         );
     }
 
@@ -227,7 +227,7 @@ class HotelAmenities extends ObjectModel
     {
         $rows = Db::getInstance()->executeS(
             'SELECT `id_htl_amenity` FROM `'._DB_PREFIX_.'htl_amenity`
-            WHERE `parent_amenity_id` = '.(int)$idCategory.' OR `id_htl_amenity` = '.(int)$idCategory
+            WHERE `id_parent` = '.(int)$idCategory.' OR `id_htl_amenity` = '.(int)$idCategory
         );
 
         if ($rows) {
@@ -260,7 +260,7 @@ class HotelAmenities extends ObjectModel
     }
 
     /**
-     * Return all amenity categories (parent_amenity_id = 0), ordered by position.
+     * Return all amenity categories (id_parent = 0), ordered by position.
      *
      * @param int $idLang
      * @return array
@@ -276,8 +276,31 @@ class HotelAmenities extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
                 ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE ha.`parent_amenity_id` = 0
+            WHERE ha.`id_parent` = 0
             ORDER BY ha.`position` ASC'
+        ) ?: array();
+    }
+
+    /**
+     * Return all active child amenities (id_parent > 0).
+     *
+     * @param int $idLang
+     * @return array
+     */
+    public static function getAmenities($idLang = 0): array
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT ha.`id_htl_amenity`, hal.`name`
+            FROM `'._DB_PREFIX_.'htl_amenity` ha
+            LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
+                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+            WHERE ha.`id_parent` > 0
+                AND ha.`active` = 1
+            ORDER BY hal.`name` ASC'
         ) ?: array();
     }
 

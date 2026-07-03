@@ -43,31 +43,17 @@ class HotelRoomTypeAmenities extends ObjectModel
     );
 
     /**
-     * @param int $idProduct
+     * @param int  $idProduct
+     * @param bool $featuredOnly true = is_featured=1 only; false = all
      * @return array
      */
-    public static function getAmenityIds($idProduct): array
+    public static function getAmenityIds($idProduct, bool $featuredOnly = false): array
     {
         $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
             'SELECT `amenity_id`
             FROM `'._DB_PREFIX_.'htl_room_type_amenity`
-            WHERE `id_product` = '.(int)$idProduct
-        );
-
-        return $rows ? array_map('intval', array_column($rows, 'amenity_id')) : array();
-    }
-
-    /**
-     * @param int $idProduct
-     * @return array amenity IDs where is_featured = 1
-     */
-    public static function getFeaturedAmenityIds($idProduct): array
-    {
-        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT `amenity_id`
-            FROM `'._DB_PREFIX_.'htl_room_type_amenity`
-            WHERE `id_product` = '.(int)$idProduct.'
-                AND `is_featured` = 1'
+            WHERE `id_product` = '.(int)$idProduct.
+            ($featuredOnly ? ' AND `is_featured` = 1' : '')
         );
 
         return $rows ? array_map('intval', array_column($rows, 'amenity_id')) : array();
@@ -85,7 +71,7 @@ class HotelRoomTypeAmenities extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
-        $filter = $featuredOnly ? 'AND hrta.`is_featured` = 1' : 'AND ha.`parent_amenity_id` > 0';
+        $filter = $featuredOnly ? 'AND hrta.`is_featured` = 1' : 'AND ha.`id_parent` > 0';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
             'SELECT ha.`id_htl_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
@@ -102,6 +88,15 @@ class HotelRoomTypeAmenities extends ObjectModel
     }
 
     /**
+     * @param int $idProduct
+     * @return bool
+     */
+    public static function deleteByProduct($idProduct): bool
+    {
+        return (bool)Db::getInstance()->delete('htl_room_type_amenity', '`id_product` = '.(int)$idProduct);
+    }
+
+    /**
      * Delete existing assignments then save new ones for a room type.
      *
      * @param int   $idProduct
@@ -111,16 +106,16 @@ class HotelRoomTypeAmenities extends ObjectModel
      */
     public function saveRoomTypeAmenities($idProduct, array $amenityIds, array $featuredIds = array()): bool
     {
-        Db::getInstance()->delete('htl_room_type_amenity', '`id_product` = '.(int)$idProduct);
+        static::deleteByProduct($idProduct);
 
         $featuredSet = array_flip(array_map('intval', $featuredIds));
 
         foreach (array_unique(array_filter(array_map('intval', $amenityIds))) as $amenityId) {
-            $obj = new self();
-            $obj->id_product  = (int)$idProduct;
-            $obj->amenity_id  = (int)$amenityId;
-            $obj->is_featured = isset($featuredSet[$amenityId]) ? 1 : 0;
-            if (!$obj->save()) {
+            $objHotelRoomTypeAmenities = new self();
+            $objHotelRoomTypeAmenities->id_product  = (int)$idProduct;
+            $objHotelRoomTypeAmenities->amenity_id  = (int)$amenityId;
+            $objHotelRoomTypeAmenities->is_featured = isset($featuredSet[$amenityId]) ? 1 : 0;
+            if (!$objHotelRoomTypeAmenities->save()) {
                 return false;
             }
         }

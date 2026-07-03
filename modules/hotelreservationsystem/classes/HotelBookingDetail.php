@@ -1706,19 +1706,9 @@ class HotelBookingDetail extends ObjectModel
                         $context->language->id,
                         true
                     );
-                    // amenity category filter
                     if (!empty($amenities) && $amenities) {
                         $roomAmenityIds = HotelRoomTypeAmenities::getAmenityIds($value['id_product']);
-                        $allMatch = true;
-                        $objHotelAmenities = new HotelAmenities();
-                        foreach ($amenities as $categoryId) {
-                            $childIds = array_column($objHotelAmenities->getChildAmenitiesByParentAmenityId((int)$categoryId), 'id_htl_amenity');
-                            if (!array_intersect($roomAmenityIds, $childIds)) {
-                                $allMatch = false;
-                                break;
-                            }
-                        }
-                        if (!$allMatch) {
+                        if (array_diff($amenities, $roomAmenityIds)) {
                             unset($bookingData['rm_data'][$key]);
                             continue;
                         }

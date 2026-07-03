@@ -179,7 +179,7 @@ class wkhotelfilterblock extends Module
                     $this->context->controller->addJS($this->_path.'/views/js/wkhotelfilterblock.js');
                     $this->context->controller->addCSS($this->_path.'/views/css/wkhotelfilterblock.css');
                     $id_lang = $this->context->language->id;
-                    $all_amenities = HotelAmenities::getCategories($id_lang);
+                    $all_amenities = HotelAmenities::getAmenities($id_lang);
 
                     $max_adult = HotelRoomType::getMaxAdults($id_hotel);
                     $max_child = HotelRoomType::getMaxChild($id_hotel);

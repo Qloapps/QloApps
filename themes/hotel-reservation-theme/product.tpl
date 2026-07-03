@@ -263,12 +263,12 @@
 														{/if}
 													{/block}
 													{block name='product_info_tab_room_features'}
-														{if isset($room_dynamic_features) && $room_dynamic_features}
+														{if isset($room_type_features) && $room_type_features}
 															<div class="info_margin_div">
 																{assign var="current_feature_name" value=""}
 																{assign var="current_feature_values" value=""}
 																{assign var="current_feature_id" value=0}
-																{foreach from=$room_dynamic_features item=feature}
+																{foreach from=$room_type_features item=feature}
 																	{if $feature.name != $current_feature_name}
 																		{if $current_feature_name != ""}
 																			<div class="room_feature_group">

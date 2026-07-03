@@ -437,8 +437,8 @@ class AdminSearchControllerCore extends AdminController
                     $amenities = array();
                     foreach ($hotelAmenities as $key => $hotelAmenity) {
                         $amenities[$hotelAmenity['id_htl_amenity']]['name'] = $hotelAmenity['name'];
-                        if ($hotelAmenity['parent_amenity_id']) {
-                            $amenities[$hotelAmenity['id_htl_amenity']]['id'] = $hotelAmenity['parent_amenity_id'];
+                        if ($hotelAmenity['id_parent']) {
+                            $amenities[$hotelAmenity['id_htl_amenity']]['id'] = $hotelAmenity['id_parent'];
                         } else {
                             $amenities[$hotelAmenity['id_htl_amenity']]['id'] = $hotelAmenity['id_htl_amenity'];
                         }

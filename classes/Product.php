@@ -1080,6 +1080,7 @@ class ProductCore extends ObjectModel
             !GroupReduction::deleteProductReduction($this->id) ||
             !$this->deleteCategories(true) ||
             !$this->deleteProductFeatures() ||
+            !HotelRoomTypeAmenities::deleteByProduct((int)$this->id) ||
             !$this->deleteTags() ||
             !$this->deleteAttributesImpacts() ||
             !$this->deleteAttachments(false) ||

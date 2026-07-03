@@ -36,7 +36,6 @@
 				<i class="icon-plus-sign"></i> {l s='Add a new feature'} <i class="icon-external-link-sign"></i>
 			</a>
 		</p>
-		{l s='Select one or more values for each room feature using the tree below.'}
 	</div>
 		<div class="form-group">
 			<label for="room-type-features-tree" class="control-label col-sm-3">

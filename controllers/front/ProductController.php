@@ -439,7 +439,7 @@ class ProductControllerCore extends FrontController
                             'hotel_description' => $hotel_info_by_id['description'],
                             'hotel_policies' => $hotel_policies,
                             'hotel_features' => $htl_features,
-                            'room_dynamic_features' => $roomFeatures,
+                            'room_type_features' => $roomFeatures,
                             'room_dynamic_amenities' => $roomAmenities,
                             'hotel_dynamic_amenities' => $hotelAmenities,
                             'amenity_img_dir' => _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_amenities/',

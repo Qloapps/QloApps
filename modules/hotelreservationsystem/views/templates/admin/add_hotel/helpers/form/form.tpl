@@ -616,7 +616,6 @@
 								<i class="icon-plus-sign"></i> {l s='Manage amenities'} <i class="icon-external-link-sign"></i>
 							</a>
 						</p>
-						{l s='Select the amenities available for this hotel using the tree below.'}
 					</div>
 					{if isset($hotel_amenity_tree)}
 						<div class="form-group">
@@ -638,64 +637,9 @@
 							</div>
 						</div>
 
-						{if isset($hotel_featured_amenity_ids)}
 						<script type="text/javascript">
-						(function ($) {
-							var featuredIds = {$hotel_featured_amenity_ids|json_encode};
-							var $select = $('#htl_featured_amenities');
-							var chosenReady = false;
-
-							function syncFeaturedSelect() {
-								var existing = {};
-								$select.find('option').each(function () {
-									existing[$(this).val()] = true;
-								});
-
-								$('input[name="id_amenities[]"]').each(function () {
-									var $cb = $(this);
-									var id = $cb.val();
-									var name = $cb.siblings('label.tree-toggler').text().trim();
-									if ($cb.is(':checked')) {
-										if (!existing[id]) {
-											var selected = featuredIds.indexOf(parseInt(id)) !== -1;
-											$select.append(
-												$('<option></option>').val(id).text(name).prop('selected', selected)
-											);
-										}
-									} else {
-										$select.find('option[value="' + id + '"]').remove();
-									}
-								});
-
-								if (chosenReady) {
-									$select.trigger('chosen:updated');
-								}
-							}
-
-							$(document).on('click', '#hotel-amenities-tree :input[type="checkbox"]', function () {
-								setTimeout(syncFeaturedSelect, 0);
-							});
-
-							$(document).on('click', '#check-all-hotel-amenities-tree, #uncheck-all-hotel-amenities-tree', function () {
-								setTimeout(syncFeaturedSelect, 0);
-							});
-
-							$('a[href="#hotel-features"]').on('shown.bs.tab', function () {
-								syncFeaturedSelect();
-								if (!chosenReady) {
-									$select.chosen({ disable_search_threshold: 5, search_contains: true });
-									chosenReady = true;
-								} else {
-									$select.trigger('chosen:updated');
-								}
-							});
-
-							$(document).ready(function () {
-								syncFeaturedSelect();
-							});
-						}(jQuery));
+						var htlFeaturedAmenityIds = {if isset($hotel_featured_amenity_ids)}{$hotel_featured_amenity_ids|json_encode}{else}[]{/if};
 						</script>
-						{/if}
 					{elseif isset($hotel_info.id) && $hotel_info.id}
 						<div class="alert alert-warning">
 							{l s='No amenities created yet.' mod='hotelreservationsystem'} {l s='You can create amenities by visiting ' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminHotelAmenities')}">{l s='manage hotel amenities.' mod='hotelreservationsystem'}</a>

@@ -31,7 +31,6 @@
 				<i class="icon-plus-sign"></i> {l s='Manage amenities'} <i class="icon-external-link-sign"></i>
 			</a>
 		</p>
-		{l s='Select the amenities available for this room type using the tree below.'}
 	</div>
 
 	{if isset($room_type_amenities_tree) && $room_type_amenities_tree}
@@ -70,23 +69,22 @@
 	</div>
 </div>
 
-{if isset($featured_amenity_ids)}
 <script type="text/javascript">
 (function ($) {
-	var featuredIds = {$featured_amenity_ids|json_encode};
+	var featuredIds = {if isset($featured_amenity_ids)}{$featured_amenity_ids|json_encode}{else}[]{/if};
 	var chosenReady = false;
 
-	function syncFeaturedSelect() {
+	function syncAmenitiesToFeatured() {
 		var $select = $('#rt_featured_amenities');
 		var existing = {};
 		$select.find('option').each(function () {
 			existing[$(this).val()] = true;
 		});
 		$('input[name="room_type_amenities[]"]').each(function () {
-			var $cb = $(this);
-			var id = $cb.val();
-			var name = $cb.siblings('label.tree-toggler').text().trim();
-			if ($cb.is(':checked')) {
+			var $checkbox = $(this);
+			var id = $checkbox.val();
+			var name = $checkbox.siblings('label.tree-toggler').text().trim();
+			if ($checkbox.is(':checked')) {
 				if (!existing[id]) {
 					var selected = featuredIds.indexOf(parseInt(id)) !== -1;
 					$select.append($('<option></option>').val(id).text(name).prop('selected', selected));
@@ -101,15 +99,15 @@
 	}
 
 	$(document).on('click', '#room-type-amenities-tree :input[type="checkbox"]', function () {
-		setTimeout(syncFeaturedSelect, 0);
+		setTimeout(syncAmenitiesToFeatured, 0);
 	});
 	$(document).on('click', '#check-all-room-type-amenities-tree, #uncheck-all-room-type-amenities-tree', function () {
-		setTimeout(syncFeaturedSelect, 0);
+		setTimeout(syncAmenitiesToFeatured, 0);
 	});
 
 	function initChosen() {
 		var $select = $('#rt_featured_amenities');
-		syncFeaturedSelect();
+		syncAmenitiesToFeatured();
 		$select.chosen({ disable_search_threshold: 5, search_contains: true });
 		chosenReady = true;
 		$select.trigger('chosen:updated');
@@ -123,5 +121,4 @@
 	}
 }(jQuery));
 </script>
-{/if}
 {/if}
