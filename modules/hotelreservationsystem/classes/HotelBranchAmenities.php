@@ -32,7 +32,7 @@ class HotelBranchAmenities extends ObjectModel
 
     public static $definition = array(
         'table'   => 'htl_branch_amenity',
-        'primary' => 'id_htl_branch_amenity',
+        'primary' => 'id_branch_amenity',
         'fields'  => array(
             'id_hotel'    => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'amenity_id'  => array('type' => self::TYPE_INT),
@@ -48,7 +48,7 @@ class HotelBranchAmenities extends ObjectModel
      * @param bool $featuredOnly true = is_featured=1 only; false = all active child amenities
      * @return array
      */
-    public static function getAmenities($idHotel, $idLang = 0, $featuredOnly = false): array
+    public static function getAmenities($idHotel, $idLang = 0, $featuredOnly = false)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -57,12 +57,12 @@ class HotelBranchAmenities extends ObjectModel
         $filter = $featuredOnly ? 'AND hba.`is_featured` = 1' : 'AND ha.`id_parent` > 0';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT ha.`id_htl_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
+            'SELECT ha.`id_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
             FROM `'._DB_PREFIX_.'htl_branch_amenity` hba
             INNER JOIN `'._DB_PREFIX_.'htl_amenity` ha
-                ON (ha.`id_htl_amenity` = hba.`amenity_id`)
+                ON (ha.`id_amenity` = hba.`amenity_id`)
             INNER JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                ON (hal.`id_htl_amenity` = hba.`amenity_id` AND hal.`id_lang` = '.(int)$idLang.')
+                ON (hal.`id_amenity` = hba.`amenity_id` AND hal.`id_lang` = '.(int)$idLang.')
             WHERE hba.`id_hotel` = '.(int)$idHotel.'
                 AND ha.`active` = 1
                 '.$filter.'
@@ -71,19 +71,49 @@ class HotelBranchAmenities extends ObjectModel
     }
 
     /**
+     * Prepare amenities tree data for a hotel form, with selection state.
+     *
      * @param int $idHotel
-     * @return array amenity IDs where is_featured = 1
+     * @param int $idLang defaults to current context language
+     * @return array
      */
-    public static function getFeaturedAmenityIds($idHotel): array
+    public static function getBranchAmenitiesData($idHotel, $idLang = 0)
     {
-        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT `amenity_id`
-            FROM `'._DB_PREFIX_.'htl_branch_amenity`
-            WHERE `id_hotel` = '.(int)$idHotel.'
-                AND `is_featured` = 1'
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $objHotelAmenities = new HotelAmenities();
+        $amenities = $objHotelAmenities->hotelBranchSelectedAmenitiesArray(
+            array_column(self::getAmenities($idHotel), 'id'),
+            $idLang
         );
 
-        return $rows ? array_map('intval', array_column($rows, 'amenity_id')) : array();
+        if (!$amenities) {
+            return array();
+        }
+
+        foreach ($amenities as $idAmenity => &$amenity) {
+            $amenity['value'] = $idAmenity;
+            $amenity['input_name'] = 'id_amenity_parents';
+
+            $selectedChildAmenities = 0;
+            if (!empty($amenity['children'])) {
+                foreach ($amenity['children'] as &$childAmenity) {
+                    $childAmenity['value'] = $childAmenity['id'];
+                    $childAmenity['input_name'] = 'id_amenities';
+                    if (!empty($childAmenity['selected'])) {
+                        $selectedChildAmenities++;
+                    }
+                }
+
+                if ($selectedChildAmenities === count($amenity['children'])) {
+                    $amenity['selected'] = true;
+                }
+            }
+        }
+
+        return $amenities;
     }
 
     /**
@@ -94,7 +124,7 @@ class HotelBranchAmenities extends ObjectModel
      * @param array $featuredIds amenity IDs that should be marked is_featured=1
      * @return bool
      */
-    public function saveBranchAmenities($idHotel, array $amenityIds, array $featuredIds = array()): bool
+    public function saveBranchAmenities($idHotel, array $amenityIds, array $featuredIds = array())
     {
         Db::getInstance()->delete('htl_branch_amenity', '`id_hotel` = '.(int)$idHotel);
 

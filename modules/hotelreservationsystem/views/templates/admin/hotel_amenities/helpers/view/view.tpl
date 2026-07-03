@@ -80,7 +80,7 @@
 												<td>{$amenity.name|escape:'htmlall':'UTF-8'}</td>
 												<td class="text-center">
 													<a class="list-action-enable{if $amenity.active} action-enabled{else} action-disabled{/if}"
-													   href="{$admin_link}&amp;id_htl_amenity={$amenity.id|intval}&amp;statushtl_amenity&amp;token={$token|escape:'htmlall':'UTF-8'}"
+													   href="{$admin_link}&amp;id_amenity={$amenity.id|intval}&amp;statushtl_amenity&amp;token={$token|escape:'htmlall':'UTF-8'}"
 													   title="{if $amenity.active}{l s='Enabled' mod='hotelreservationsystem'}{else}{l s='Disabled' mod='hotelreservationsystem'}{/if}">
 														<i class="icon-check{if !$amenity.active} hidden{/if}"></i>
 														<i class="icon-remove{if $amenity.active} hidden{/if}"></i>

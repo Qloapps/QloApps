@@ -31,7 +31,7 @@ class AdminHotelAmenitiesController extends ModuleAdminController
         $this->bootstrap   = true;
         $this->table       = 'htl_amenity';
         $this->className   = 'HotelAmenities';
-        $this->identifier  = 'id_htl_amenity';
+        $this->identifier  = 'id_amenity';
         $this->toolbar_title = $this->l('Manage Amenities');
 
         parent::__construct();

@@ -436,11 +436,11 @@ class AdminSearchControllerCore extends AdminController
                 if ($hotelAmenities = $objHotelAmenities->searchByName($this->query, $this->context->language->id)) {
                     $amenities = array();
                     foreach ($hotelAmenities as $key => $hotelAmenity) {
-                        $amenities[$hotelAmenity['id_htl_amenity']]['name'] = $hotelAmenity['name'];
+                        $amenities[$hotelAmenity['id_amenity']]['name'] = $hotelAmenity['name'];
                         if ($hotelAmenity['id_parent']) {
-                            $amenities[$hotelAmenity['id_htl_amenity']]['id'] = $hotelAmenity['id_parent'];
+                            $amenities[$hotelAmenity['id_amenity']]['id'] = $hotelAmenity['id_parent'];
                         } else {
-                            $amenities[$hotelAmenity['id_htl_amenity']]['id'] = $hotelAmenity['id_htl_amenity'];
+                            $amenities[$hotelAmenity['id_amenity']]['id'] = $hotelAmenity['id_amenity'];
                         }
                     }
 
@@ -936,7 +936,7 @@ class AdminSearchControllerCore extends AdminController
                 $helper = new HelperList();
                 $helper->shopLinkType = '';
                 $helper->simple_header = true;
-                $helper->identifier = 'id_htl_amenity';
+                $helper->identifier = 'id_amenity';
                 $helper->actions = array('edit', 'view');
                 $helper->show_toolbar = false;
                 $helper->table = 'htl_amenity';

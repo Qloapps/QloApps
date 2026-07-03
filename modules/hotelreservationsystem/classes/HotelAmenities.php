@@ -35,7 +35,7 @@ class HotelAmenities extends ObjectModel
 
     public static $definition = array(
         'table'     => 'htl_amenity',
-        'primary'   => 'id_htl_amenity',
+        'primary'   => 'id_amenity',
         'multilang' => true,
         'fields'    => array(
             'id_parent' => array('type' => self::TYPE_INT, 'required' => true),
@@ -94,37 +94,37 @@ class HotelAmenities extends ObjectModel
 
         $result = array();
         $parents = Db::getInstance()->executeS(
-            'SELECT ha.`id_htl_amenity`, ha.`position`, hal.`name`
+            'SELECT ha.`id_amenity`, ha.`position`, hal.`name`
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+                ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
             WHERE ha.`id_parent` = 0
             ORDER BY ha.`position` ASC'
         );
 
         if ($parents) {
             foreach ($parents as $parent) {
-                $result[$parent['id_htl_amenity']] = array(
-                    'id'       => $parent['id_htl_amenity'],
+                $result[$parent['id_amenity']] = array(
+                    'id'       => $parent['id_amenity'],
                     'name'     => $parent['name'],
                     'position' => $parent['position'],
                     'children' => array(),
                 );
 
                 $children = Db::getInstance()->executeS(
-                    'SELECT ha.`id_htl_amenity`, ha.`active`, ha.`logo_type`, ha.`logo`, hal.`name`
+                    'SELECT ha.`id_amenity`, ha.`active`, ha.`logo_type`, ha.`logo`, hal.`name`
                     FROM `'._DB_PREFIX_.'htl_amenity` ha
                     LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                        ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-                    WHERE ha.`id_parent` = '.(int)$parent['id_htl_amenity']
+                        ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+                    WHERE ha.`id_parent` = '.(int)$parent['id_amenity']
                 );
 
                 if ($children) {
-                    // normalize: rename id_htl_amenity → id for template compatibility
+                    // normalize: rename id_amenity → id for template compatibility
                     foreach ($children as &$child) {
-                        $child['id'] = $child['id_htl_amenity'];
+                        $child['id'] = $child['id_amenity'];
                     }
-                    $result[$parent['id_htl_amenity']]['children'] = $children;
+                    $result[$parent['id_amenity']]['children'] = $children;
                 }
             }
         }
@@ -135,11 +135,11 @@ class HotelAmenities extends ObjectModel
     /**
      * Returns all amenity categories with children, marking which are selected for a hotel/room type.
      *
-     * @param array $branchAmenities rows from htl_branch_amenity for a hotel
+     * @param array $selectedIds flat array of selected amenity IDs
      * @param int   $idLang
      * @return array|false
      */
-    public function hotelBranchSelectedAmenitiesArray($branchAmenities, $idLang = 0)
+    public function hotelBranchSelectedAmenitiesArray($selectedIds, $idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -147,38 +147,29 @@ class HotelAmenities extends ObjectModel
 
         $result = array();
         $parents = Db::getInstance()->executeS(
-            'SELECT ha.`id_htl_amenity`, hal.`name`
+            'SELECT ha.`id_amenity`, hal.`name`
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+                ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
             WHERE ha.`id_parent` = 0'
         );
 
         if ($parents) {
             foreach ($parents as $parent) {
-                $result[$parent['id_htl_amenity']]['name'] = $parent['name'];
+                $result[$parent['id_amenity']]['name'] = $parent['name'];
                 $children = Db::getInstance()->executeS(
-                    'SELECT ha.`id_htl_amenity`, hal.`name`
+                    'SELECT ha.`id_amenity`, hal.`name`
                     FROM `'._DB_PREFIX_.'htl_amenity` ha
                     LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                        ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-                    WHERE ha.`id_parent` = '.(int)$parent['id_htl_amenity']
+                        ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+                    WHERE ha.`id_parent` = '.(int)$parent['id_amenity']
                 );
 
                 if ($children) {
                     foreach ($children as $child) {
-                        $selected = 0;
-                        if ($branchAmenities) {
-                            foreach ($branchAmenities as $row) {
-                                if ($child['id_htl_amenity'] == $row['amenity_id']) {
-                                    $selected = 1;
-                                    break;
-                                }
-                            }
-                        }
-                        $child['id']       = $child['id_htl_amenity'];
-                        $child['selected'] = $selected;
-                        $result[$parent['id_htl_amenity']]['children'][] = $child;
+                        $child['id']       = $child['id_amenity'];
+                        $child['selected'] = in_array($child['id_amenity'], $selectedIds) ? 1 : 0;
+                        $result[$parent['id_amenity']]['children'][] = $child;
                     }
                 }
             }
@@ -198,11 +189,11 @@ class HotelAmenities extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
         return Db::getInstance()->getRow(
-            'SELECT ha.`id_htl_amenity`, hal.`name`
+            'SELECT ha.`id_amenity`, hal.`name`
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE ha.`id_htl_amenity` = '.(int)$id
+                ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+            WHERE ha.`id_amenity` = '.(int)$id
         );
     }
 
@@ -213,7 +204,7 @@ class HotelAmenities extends ObjectModel
     public function getChildAmenitiesByParentAmenityId($parentId)
     {
         return Db::getInstance()->executeS(
-            'SELECT `id_htl_amenity` FROM `'._DB_PREFIX_.'htl_amenity` WHERE `id_parent` = '.(int)$parentId
+            'SELECT `id_amenity` FROM `'._DB_PREFIX_.'htl_amenity` WHERE `id_parent` = '.(int)$parentId
         );
     }
 
@@ -226,13 +217,13 @@ class HotelAmenities extends ObjectModel
     public function deleteCategory($idCategory)
     {
         $rows = Db::getInstance()->executeS(
-            'SELECT `id_htl_amenity` FROM `'._DB_PREFIX_.'htl_amenity`
-            WHERE `id_parent` = '.(int)$idCategory.' OR `id_htl_amenity` = '.(int)$idCategory
+            'SELECT `id_amenity` FROM `'._DB_PREFIX_.'htl_amenity`
+            WHERE `id_parent` = '.(int)$idCategory.' OR `id_amenity` = '.(int)$idCategory
         );
 
         if ($rows) {
             foreach ($rows as $row) {
-                $objHotelAmenities = new HotelAmenities((int)$row['id_htl_amenity']);
+                $objHotelAmenities = new HotelAmenities((int)$row['id_amenity']);
                 $objHotelAmenities->delete();
             }
         }
@@ -253,7 +244,7 @@ class HotelAmenities extends ObjectModel
 
         return Db::getInstance()->executeS(
             'SELECT ha.*, hal.* FROM `'._DB_PREFIX_.'htl_amenity` ha
-            LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal ON hal.`id_htl_amenity` = ha.`id_htl_amenity`
+            LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal ON hal.`id_amenity` = ha.`id_amenity`
             WHERE hal.`name` LIKE \'%'.pSQL($query).'%\'
             AND hal.`id_lang` = '.(int)$idLang
         );
@@ -265,17 +256,17 @@ class HotelAmenities extends ObjectModel
      * @param int $idLang
      * @return array
      */
-    public static function getCategories($idLang = 0): array
+    public static function getCategories($idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
 
         return Db::getInstance()->executeS(
-            'SELECT ha.`id_htl_amenity`, hal.`name`
+            'SELECT ha.`id_amenity`, hal.`name`
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+                ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
             WHERE ha.`id_parent` = 0
             ORDER BY ha.`position` ASC'
         ) ?: array();
@@ -287,17 +278,17 @@ class HotelAmenities extends ObjectModel
      * @param int $idLang
      * @return array
      */
-    public static function getAmenities($idLang = 0): array
+    public static function getAmenities($idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
 
         return Db::getInstance()->executeS(
-            'SELECT ha.`id_htl_amenity`, hal.`name`
+            'SELECT ha.`id_amenity`, hal.`name`
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                ON (hal.`id_htl_amenity` = ha.`id_htl_amenity` AND hal.`id_lang` = '.(int)$idLang.')
+                ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
             WHERE ha.`id_parent` > 0
                 AND ha.`active` = 1
             ORDER BY hal.`name` ASC'

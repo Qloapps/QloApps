@@ -176,37 +176,15 @@ class AdminAddHotelController extends ModuleAdminController
             }
 
             $smartyVars['order_restrict_date_info'] = HotelOrderRestrictDate::getDataByHotelId($idHotel);
-            $objHotelAmenities = new HotelAmenities();
-            $hotelAmenities = $this->object->getAmenitiesOfHotelByHotelId($this->object->id);
-            if ($amenities = $objHotelAmenities->hotelBranchSelectedAmenitiesArray($hotelAmenities)) {
-                foreach ($amenities as $idAmenity => $amenity) {
-                    $amenities[$idAmenity]['value'] = $idAmenity;
-                    $amenities[$idAmenity]['input_name'] = 'id_amenity_parents';
-                    if (isset($amenity['children']) && $amenity['children']) {
-                        $selectedChildAmenities = 0;
-                        foreach ($amenity['children'] as $childKey => $childAmenity) {
-                            $amenities[$idAmenity]['children'][$childKey]['value'] = $childAmenity['id'];
-                            $amenities[$idAmenity]['children'][$childKey]['input_name'] = 'id_amenities';
-                            if (isset($childAmenity['selected']) && $childAmenity['selected']) {
-                                $selectedChildAmenities++;
-                            }
-                        }
-
-                        if ($selectedChildAmenities == count($amenity['children'])) {
-                            $amenities[$idAmenity]['selected'] = true;
-                        }
-                    }
-                }
-
+            if ($amenities = HotelBranchAmenities::getBranchAmenitiesData((int)$idHotel)) {
                 $tree = new HelperTree('hotel-amenities-tree', $amenities);
                 $tree->setShowCollapseExpandButton(true)
                     ->setUseCheckBox(true)
                     ->setAutoSelectChildren(true)
                     ->setUseBulkActions(true)
                     ->setUseSearch(true);
-                $treeContent = $tree->render();
-                $smartyVars['hotel_amenity_tree'] = $treeContent;
-                $smartyVars['hotel_featured_amenity_ids'] = HotelBranchAmenities::getFeaturedAmenityIds((int)$idHotel);
+                $smartyVars['hotel_amenity_tree'] = $tree->render();
+                $smartyVars['hotel_featured_amenity_ids'] = array_column(HotelBranchAmenities::getAmenities((int)$idHotel, 0, true), 'id');
             }
 
             $smartyVars['rewrite_url'] = [];

@@ -6871,4 +6871,55 @@ class ProductCore extends ObjectModel
 
         return $price * (int)$quantity;
     }
+
+    /**
+     * Prepare grouped core features and values for a room type, with selection state.
+     *
+     * @param int $idProduct
+     * @param int $idLang defaults to current context language
+     * @return array
+     */
+    public static function getRoomTypeFeatureData($idProduct, $idLang = 0)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $product = new self((int) $idProduct);
+        $features = Feature::getFeatures(
+            $idLang,
+            (Shop::isFeatureActive() && Shop::getContext() == Shop::CONTEXT_SHOP)
+        );
+        $selectedFeatureValues = array();
+        foreach ($product->getFeatures() as $productFeature) {
+            $selectedFeatureValues[(int) $productFeature['id_feature']][] = (int) $productFeature['id_feature_value'];
+        }
+
+        foreach ($features as &$feature) {
+            $featureValues = FeatureValue::getFeatureValuesWithLang(
+                $idLang,
+                (int) $feature['id_feature']
+            );
+            $feature['value'] = (int) $feature['id_feature'];
+            $feature['input_name'] = 'feature_value_parents';
+            $feature['children'] = array();
+            $selectedValues = isset($selectedFeatureValues[(int) $feature['id_feature']])
+                ? $selectedFeatureValues[(int) $feature['id_feature']]
+                : array();
+
+            foreach ($featureValues as $featureValue) {
+                $featureValue['name'] = $featureValue['value'];
+                $featureValue['value'] = (int) $featureValue['id_feature_value'];
+                $featureValue['input_name'] = 'feature_values['.(int) $feature['id_feature'].']';
+                $featureValue['selected'] = in_array((int) $featureValue['id_feature_value'], $selectedValues);
+                $feature['children'][] = $featureValue;
+            }
+
+            if ($feature['children'] && count($selectedValues) === count($feature['children'])) {
+                $feature['selected'] = true;
+            }
+        }
+
+        return $features;
+    }
 }

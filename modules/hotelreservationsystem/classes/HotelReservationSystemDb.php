@@ -92,7 +92,7 @@ class HotelReservationSystemDb
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_amenity` (
-                `id_htl_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `id_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_parent` int(10) unsigned NOT NULL,
                 `position` int(10) unsigned NOT NULL,
                 `active` int(2) NOT NULL DEFAULT '0',
@@ -100,39 +100,39 @@ class HotelReservationSystemDb
                 `logo` varchar(255) NOT NULL DEFAULT '',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id_htl_amenity`)
+                PRIMARY KEY (`id_amenity`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_amenity_lang` (
-                `id_htl_amenity` int(10) unsigned NOT NULL,
+                `id_amenity` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
                 `name` varchar(255) NOT NULL,
-                PRIMARY KEY (`id_htl_amenity`, `id_lang`)
+                PRIMARY KEY (`id_amenity`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_branch_amenity` (
-                `id_htl_branch_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `id_branch_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_hotel` int(10) unsigned NOT NULL,
                 `amenity_id` int(10) unsigned NOT NULL,
                 `is_featured` tinyint(1) NOT NULL DEFAULT '0',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id_htl_branch_amenity`),
+                PRIMARY KEY (`id_branch_amenity`),
                 CONSTRAINT `fk_htl_branch_amenity_amenity` FOREIGN KEY (`amenity_id`)
-                    REFERENCES `"._DB_PREFIX_."htl_amenity` (`id_htl_amenity`) ON DELETE CASCADE
+                    REFERENCES `"._DB_PREFIX_."htl_amenity` (`id_amenity`) ON DELETE CASCADE
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_amenity` (
-                `id_htl_room_type_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `id_room_type_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_product` int(10) unsigned NOT NULL,
                 `amenity_id` int(10) unsigned NOT NULL,
                 `is_featured` tinyint(1) NOT NULL DEFAULT '0',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id_htl_room_type_amenity`),
+                PRIMARY KEY (`id_room_type_amenity`),
                 KEY `id_product` (`id_product`),
                 CONSTRAINT `fk_htl_room_type_amenity_amenity` FOREIGN KEY (`amenity_id`)
-                    REFERENCES `"._DB_PREFIX_."htl_amenity` (`id_htl_amenity`) ON DELETE CASCADE
+                    REFERENCES `"._DB_PREFIX_."htl_amenity` (`id_amenity`) ON DELETE CASCADE
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_cart_booking_data` (

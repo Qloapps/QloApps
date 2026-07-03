@@ -1707,7 +1707,7 @@ class HotelBookingDetail extends ObjectModel
                         true
                     );
                     if (!empty($amenities) && $amenities) {
-                        $roomAmenityIds = HotelRoomTypeAmenities::getAmenityIds($value['id_product']);
+                        $roomAmenityIds = array_column(HotelRoomTypeAmenities::getAmenities($value['id_product']), 'id');
                         if (array_diff($amenities, $roomAmenityIds)) {
                             unset($bookingData['rm_data'][$key]);
                             continue;
