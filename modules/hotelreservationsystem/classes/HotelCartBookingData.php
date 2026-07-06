@@ -1331,7 +1331,7 @@ class HotelCartBookingData extends ObjectModel
                 );
 
                 $cart_detail_data[$key]['amt_with_qty'] = $roomTypeDateRangePrice['total_price_tax_excl'];
-                $cart_detail_data[$key]['connected_rooms'] = HotelConnectedRoom::getConnectedRooms($obj_htl_room_info->id, Context::getContext()->language->id);
+                $cart_detail_data[$key]['connected_rooms'] = HotelConnectedRoom::getConnectedRooms((int) $obj_htl_room_info->id, null, null, Context::getContext()->language->id);
             }
         }
         if ($cart_detail_data) {

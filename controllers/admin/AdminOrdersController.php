@@ -3221,7 +3221,9 @@ class AdminOrdersControllerCore extends AdminController
             return;
         }
 
-        $this->content .= $this->renderKpis();
+        if ($this->tabAccess['kpi'] === 1) {
+            $this->content .= $this->renderKpis();
+        }
 
         $customer = new Customer($order->id_customer);
         $carrier = new Carrier($order->id_carrier);
@@ -3581,7 +3583,7 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
                 $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
-                $order_detail_data[$key]['connected_rooms'] = HotelConnectedRoom::getConnectedRooms((int) $value['id_room'], (int) Context::getContext()->language->id);
+                $order_detail_data[$key]['connected_rooms'] = HotelConnectedRoom::getConnectedRooms($value['id_room'], null, null, (int) Context::getContext()->language->id);
 
                 if (isset($value['refund_info'])
                     && $value['refund_info']['refunded']

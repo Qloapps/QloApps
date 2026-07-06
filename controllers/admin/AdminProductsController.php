@@ -5729,7 +5729,7 @@ class AdminProductsControllerCore extends AdminController
         $idHotel = (int) $objRoom->id_hotel;
 
         $this->context->smarty->assign(array(
-            'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($roomId, $this->context->language->id),
+            'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($roomId, null, null, $this->context->language->id),
             'htl_not_connected_rooms' => HotelConnectedRoom::getNotConnectedRooms($roomId, $this->context->language->id),
             'main_room_id' => $roomId,
             'current_roomtype' => $idProduct,
@@ -5770,7 +5770,7 @@ class AdminProductsControllerCore extends AdminController
             $connection->id_room_connected = $connectedRoomId;
             if ($connection->add()) {
                 $this->context->smarty->assign(array(
-                    'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($roomId, $this->context->language->id),
+                    'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($roomId, null, null, $this->context->language->id),
                     'htl_not_connected_rooms' => HotelConnectedRoom::getNotConnectedRooms($roomId, $this->context->language->id),
                     'main_room_id' => $roomId,
                     'current_roomtype' => $idProduct,
@@ -5792,7 +5792,7 @@ class AdminProductsControllerCore extends AdminController
             $objHotelConnectedRoom = new HotelConnectedRoom($connectedId);
             if ($objHotelConnectedRoom->delete()) {
                 $this->context->smarty->assign(array(
-                    'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($roomId, $this->context->language->id),
+                    'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($roomId, null, null, $this->context->language->id),
                     'htl_not_connected_rooms' => HotelConnectedRoom::getNotConnectedRooms($roomId, $this->context->language->id),
                     'main_room_id' => $roomId,
                     'current_roomtype' => $idProduct,

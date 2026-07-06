@@ -43,56 +43,71 @@ class HotelConnectedRoom extends ObjectModel
         ),
     );
 
-    public static function getConnectedRooms($idRoom = null, $idLang = null)
+    public static function getConnectedRooms($idRoom = null, $idRoomType = null, $idHotel = null, $idLang = null)
     {
         $idLang = $idLang ? (int) $idLang : (int) Context::getContext()->language->id;
-
-        if ($idRoom === null) {
-            $sql = 'SELECT
-                    hcr.id_connected_room,
-                    hcr.id_room,
-                    hcr.id_room_connected,
-                    conn_pl.name AS room_type_name,
-                    connected_room.room_num AS connected_room_name
-                FROM `' . _DB_PREFIX_ . 'htl_connected_room` hcr
-                INNER JOIN `' . _DB_PREFIX_ . 'htl_room_information` connected_room
-                    ON connected_room.id = hcr.id_room_connected
-                LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` conn_pl
-                    ON (conn_pl.id_product = connected_room.id_product AND conn_pl.id_lang = ' . $idLang . ')
-                ORDER BY hcr.id_room, connected_room.room_num';
-
-            $results = Db::getInstance()->executeS($sql);
-            if ($results === false) {
-                return [];
-            }
-            $map = [];
-            foreach ($results as $row) {
-                $map[(int) $row['id_room']][] = $row;
-            }
-            return $map;
-        }
-
-        $idRoom = (int) $idRoom;
-        if ($idRoom <= 0) {
-            return array();
-        }
 
         $sql = 'SELECT
                 hcr.id_connected_room,
                 hcr.id_room,
-                hcr.id_room_connected,
+                base_room.room_num AS room_name,
+                connected_room.id AS id_room_connected,
+                connected_room.id_product AS id_room_type,
                 conn_pl.name AS room_type_name,
                 connected_room.room_num AS connected_room_name
             FROM `' . _DB_PREFIX_ . 'htl_connected_room` hcr
             INNER JOIN `' . _DB_PREFIX_ . 'htl_room_information` connected_room
                 ON connected_room.id = hcr.id_room_connected
+            INNER JOIN `' . _DB_PREFIX_ . 'htl_room_information` base_room
+                ON base_room.id = hcr.id_room
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` conn_pl
                 ON (conn_pl.id_product = connected_room.id_product AND conn_pl.id_lang = ' . $idLang . ')
-            WHERE hcr.id_room = ' . $idRoom . '
-            ORDER BY connected_room.room_num';
+            WHERE 1';
+
+        if ($idRoom !== null) {
+            $sql .= ' AND hcr.id_room = ' . $idRoom;
+        }
+        if ($idRoomType !== null) {
+            $sql .= ' AND base_room.id_product = ' . (int) $idRoomType;
+        }
+        if ($idHotel !== null) {
+            $sql .= ' AND base_room.id_hotel = ' . (int) $idHotel;
+        }
+
+        $sql .= ' ORDER BY hcr.id_room, connected_room.id_product, connected_room.room_num';
 
         $results = Db::getInstance()->executeS($sql);
-        return ($results === false) ? array() : $results;
+        if ($results === false) {
+            return array();
+        }
+
+        $connectedRooms = array();
+        foreach ($results as $row) {
+            $roomId = (int) $row['id_room'];
+            $roomTypeId = (int) $row['id_room_type'];
+
+            if (!isset($connectedRooms[$roomId])) {
+                $connectedRooms[$roomId] = array(
+                    'name' => $row['room_name'],
+                    'connected_room_types' => array(),
+                );
+            }
+
+            if (!isset($connectedRooms[$roomId]['connected_room_types'][$roomTypeId])) {
+                $connectedRooms[$roomId]['connected_room_types'][$roomTypeId] = array(
+                    'room_type_name' => $row['room_type_name'],
+                    'connected_rooms' => array(),
+                );
+            }
+
+            $connectedRooms[$roomId]['connected_room_types'][$roomTypeId]['connected_rooms'][] = array(
+                'id_connected_room' => (int) $row['id_connected_room'],
+                'id_room' => (int) $row['id_room_connected'],
+                'name' => $row['connected_room_name'],
+            );
+        }
+
+        return $connectedRooms;
     }
 
     public static function getNotConnectedRooms($idRoom, $idLang = null)
@@ -103,24 +118,21 @@ class HotelConnectedRoom extends ObjectModel
         }
         $idLang = $idLang ? (int) $idLang : (int) Context::getContext()->language->id;
 
-        $hotelId = (int) (new HotelRoomInformation($idRoom))->id_hotel;
-
         $sql = 'SELECT hri.id AS id_room, hri.id_product AS id_room_type, pl.name AS room_type_name, hri.room_num AS room_name
             FROM `' . _DB_PREFIX_ . 'htl_room_information` hri
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
                 ON (pl.id_product = hri.id_product AND pl.id_lang = ' . $idLang . ')
             WHERE hri.id != ' . $idRoom . '
-            AND hri.id_hotel = ' . $hotelId;
-        $sql .= ' AND NOT EXISTS (
+            AND hri.id_hotel = (
+                SELECT id_hotel FROM `' . _DB_PREFIX_ . 'htl_room_information` WHERE id = ' . $idRoom . '
+            )
+            AND NOT EXISTS (
                 SELECT 1 FROM `' . _DB_PREFIX_ . 'htl_connected_room` cr
                 WHERE cr.id_room = ' . $idRoom . ' AND cr.id_room_connected = hri.id
             )
             ORDER BY pl.name ASC, hri.room_num ASC';
 
         $results = Db::getInstance()->executeS($sql);
-        if ($results === false) {
-            return array();
-        }
 
         $grouped = array();
         foreach ($results as $row) {

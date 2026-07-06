@@ -21,7 +21,7 @@
 *}
 {if isset($htl_connected_rooms) && $htl_connected_rooms|@count > 0}
     <span class="connected-room-tooltip-trigger"
-        data-connected-details='{json_encode($htl_connected_rooms)|escape:'html':'UTF-8'}'>
+        data-connected-details='{json_encode($htl_connected_rooms.connected_room_types)|escape:'html':'UTF-8'}'>
         <i class="icon-random" style="color: #008abd; cursor: pointer;"></i>
     </span>
 {/if}
@@ -41,22 +41,21 @@
                             items: '.connected-room-tooltip-trigger',
                             content: function() {
                                 var details = $(this).data('connected-details');
-                                if (!details || details.length === 0) {
+                                if (!details || $.isEmptyObject(details)) {
                                     return "{/literal}{l s='No rooms connected' js=1}{literal}";
                                 }
                                 var html = '<div class="tooltip_cont">';
                                 html += '<div class="tip_header"><div class="tip_date">{/literal}{l s="Connected Rooms" js=1}{literal}</div></div>';
-                                html += '<div class="tip-body connected-tip-body">';
-                                var grouped = {};
-                                for (var i = 0; i < details.length; i++) {
-                                    var type = details[i].room_type_name;
-                                    if (!grouped[type]) { grouped[type] = []; }
-                                    grouped[type].push(details[i].connected_room_name);
-                                }
-                                for (var type in grouped) {
+                                html += '<div class="tip-body tip-body-grid">';
+                                for (var typeId in details) {
+                                    var group = details[typeId];
+                                    var names = [];
+                                    for (var i = 0; i < group.connected_rooms.length; i++) {
+                                        names.push(group.connected_rooms[i].name);
+                                    }
                                     html += '<div>';
-                                    html += '<div class="tip_element_head">' + type + '</div>';
-                                    html += '<div class="tip_element_value">' + grouped[type].join(', ') + '</div>';
+                                    html += '<div class="tip_element_head">' + group.room_type_name + '</div>';
+                                    html += '<div class="tip_element_value">' + names.join(', ') + '</div>';
                                     html += '</div>';
                                 }
                                 html += '</div></div>';

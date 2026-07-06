@@ -26,7 +26,6 @@
         border-radius: 3px;
     }
 
-
     #connectedRoomModal .modal-title .disable_dates_title {
         display: inline-block;
         font-weight: 600;
@@ -51,49 +50,48 @@
 </style>
 <div class="modal-body">
     <input type="hidden" id="connected_room_main_id" name="main_room_id" value="{$main_room_id|intval}">
+    {assign var="connected_room_types" value=[]}
+    {if isset($htl_connected_rooms[$main_room_id].connected_room_types)}
+        {assign var="connected_room_types" value=$htl_connected_rooms[$main_room_id].connected_room_types}
+    {/if}
     <!-- connectedrooms list -->
     <div class="">
         <div class="">
             <div id="connected_rooms_list">
                 <div id="connected_rooms_table_wrapper"
-                    class="{if !isset($htl_connected_rooms) || $htl_connected_rooms|count == 0}hide{/if}">
+                    class="{if $connected_room_types|@count == 0}hide{/if}">
                     <table class="table table-bordered table-striped connected-rooms-table">
-                        <colgroup>
-                            <col style="width: 35%;">
-                            <col style="width: 45%;">
-                            <col style="width: 120px;">
-                        </colgroup>
                         <thead>
                             <tr>
                                 <th>{l s='Room Type'}</th>
                                 <th>{l s='Connected Room'}</th>
-                                <th width="120" class="text-center">
+                                <th class="text-center">
                                     {l s='Action'}
                                 </th>
                             </tr>
                         </thead>
                         <tbody id="connected_rooms_tbody">
-                            {if isset($htl_connected_rooms) && $htl_connected_rooms|count > 0}
-                                {foreach from=$htl_connected_rooms item=room}
+                            {foreach from=$connected_room_types item=typeGroup}
+                                {foreach from=$typeGroup.connected_rooms item=room}
                                     <tr class="connected-room-row">
-                                        <td>{$room.room_type_name|escape:'html':'UTF-8'}</td>
-                                        <td>{$room.connected_room_name|escape:'html':'UTF-8'}</td>
+                                        <td>{$typeGroup.room_type_name|escape:'html':'UTF-8'}</td>
+                                        <td>{$room.name|escape:'html':'UTF-8'}</td>
                                         <td class="text-center">
                                             <a href="javascript:void(0);"
                                                 class="delete-connected-room btn btn-default"
                                                 data-connected-id="{$room.id_connected_room|intval}"
-                                                data-connected-room-id="{$room.id_room_connected|intval}"
+                                                data-connected-room-id="{$room.id_room|intval}"
                                                 title="{l s='Remove'}">
                                                 <i class="icon-trash"></i>
                                             </a>
                                         </td>
                                     </tr>
                                 {/foreach}
-                            {/if}
+                            {/foreach}
                         </tbody>
                     </table>
                 </div>
-                <div class="list-empty {if isset($htl_connected_rooms) && $htl_connected_rooms|count > 0}hide{/if}"
+                <div class="list-empty {if $connected_room_types|@count > 0}hide{/if}"
                     id="connected_rooms_empty_state">
                     <div class="list-empty-msg">
                         <i class="icon-warning-sign list-empty-icon"></i>
