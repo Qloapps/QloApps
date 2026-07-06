@@ -178,7 +178,7 @@ class AdminFooterPaymentBlockSettingController extends ModuleAdminController
             $this->errors[] = Tools::displayError('Payment\'s Name is a required field.');
         }
         if (isset($_FILES['payment_image']['tmp_name']) && $_FILES['payment_image']['tmp_name']) {
-            if ($error = ImageManager::validateUpload($_FILES['payment_image'], Tools::getMaxUploadSize())) {
+            if ($error = ImageManager::validateUpload($_FILES['payment_image'], Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                 $this->errors[] = $error;
             }
         } elseif (!$idPaymentBlock) {

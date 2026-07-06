@@ -209,7 +209,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                     // 'col' => 6,
                     'hint' => sprintf(
                         $this->l('Maximum image size: %1s'),
-                        Tools::formatBytes(Tools::getMaxUploadSize())
+                        Tools::formatBytes(Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))
                     ),
                     'desc' => $this->l('Recommended resolution: 720 x 360 pixels.'),
                 ),
@@ -253,7 +253,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         if (!(Tools::getValue("id_interior_image") && !$file['size'])) {
             if (!$file['size']) {
                 $this->errors[] = $this->l('Hotel Interior Image Required.');
-            } elseif ($error = ImageManager::validateUpload($file, Tools::getMaxUploadSize())) {
+            } elseif ($error = ImageManager::validateUpload($file, Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                 $this->errors[] = $error;
             }
         }
@@ -391,7 +391,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         Media::addJsDef(
             array(
                 'filesizeError' => $this->l('File exceeds maximum size.', null, true),
-                'maxSizeAllowed' => Tools::getMaxUploadSize(),
+                'maxSizeAllowed' => Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)),
             )
         );
         $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/WkAboutHotelBlockAdmin.js');

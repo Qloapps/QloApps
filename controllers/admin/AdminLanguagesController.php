@@ -460,7 +460,7 @@ class AdminLanguagesControllerCore extends AdminController
     public function copyNoPictureImage($language)
     {
         if (isset($_FILES['no_picture']) && $_FILES['no_picture']['error'] === 0) {
-            if ($error = ImageManager::validateUpload($_FILES['no_picture'], Tools::getMaxUploadSize())) {
+            if ($error = ImageManager::validateUpload($_FILES['no_picture'], Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                 $this->errors[] = $error;
             } else {
                 if (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES['no_picture']['tmp_name'], $tmp_name)) {

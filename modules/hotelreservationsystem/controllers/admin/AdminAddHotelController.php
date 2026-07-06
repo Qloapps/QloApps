@@ -889,7 +889,7 @@ class AdminAddHotelController extends ModuleAdminController
         if ($idHotel) {
             $invalidImg = ImageManager::validateUpload(
                 $_FILES['hotel_image'],
-                Tools::getMaxUploadSize()
+                Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024))
             );
             if (!$invalidImg) {
                 // Add Hotel images
@@ -998,7 +998,7 @@ class AdminAddHotelController extends ModuleAdminController
         Media::addJsDef(
             array(
                 'filesizeError' => $this->l('File exceeds maximum size.', null, true),
-                'maxSizeAllowed' => Tools::getMaxUploadSize(),
+                'maxSizeAllowed' => Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)),
                 'sortRowsUrl' => $this->context->link->getAdminLink('AdminAddHotel'),
                 'primaryHotelId' => Configuration::get('WK_PRIMARY_HOTEL'),
                 'disableHotelMsg' => $this->l('Primary hotel for website will be updated to first available active hotel.', null, true),
