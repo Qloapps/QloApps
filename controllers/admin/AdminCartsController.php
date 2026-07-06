@@ -1129,7 +1129,7 @@ class AdminCartsControllerCore extends AdminController
                 if ($bookingInfo['id'] == $idBookingData) {
                     $amtWithQty = $bookingInfo['amt_with_qty'];
                     $bookingInfo['amt_with_qty'] = Tools::displayPrice($amtWithQty);
-                    $bookingInfo['total_price'] = Tools::displayPrice($amtWithQty + $bookingInfo['demand_price']);
+                    $bookingInfo['total_price'] = Tools::displayPrice($amtWithQty + $bookingInfo['demand_price'] + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
                     $response = array(
                         'curr_booking_info' => $bookingInfo,
                         'cart_info' => $this->ajaxReturnVars(),
