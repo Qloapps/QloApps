@@ -180,6 +180,35 @@ class QloCronTaskManager extends Module
         }
     }
 
+    public function hookDashboardZoneThree($params)
+    {
+        if ($this->isCrontabConfigured() !== false) {
+            return '';
+        }
+
+        $this->context->smarty->assign(array(
+            'qctmConfigureLink' => $this->context->link->getAdminLink('AdminModules') . '&configure=' . $this->name,
+        ));
+
+        return $this->display(__FILE__, 'views/templates/admin/dashboard/qctm_cron_not_configured.tpl');
+    }
+
+    public function isCrontabConfigured()
+    {
+        if (!function_exists('shell_exec')) {
+            return null;
+        }
+
+        $disabled = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+        if (in_array('shell_exec', $disabled, true)) {
+            return null;
+        }
+
+        $output = @shell_exec('crontab -l 2>/dev/null');
+
+        return strpos((string) $output, 'qlocrontaskmanager/cron.php') !== false;
+    }
+
     public function hookActionModuleUninstallBefore($params)
     {
         if (!isset($params['object']) || !($params['object'] instanceof Module) || $params['object']->id == $this->id) {
@@ -227,6 +256,7 @@ class QloCronTaskManager extends Module
             array(
                 'actionModuleInstallAfter',
                 'actionModuleUninstallBefore',
+                'dashboardZoneThree',
             )
         );
     }
