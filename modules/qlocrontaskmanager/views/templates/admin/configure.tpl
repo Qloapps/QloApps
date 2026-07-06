@@ -29,7 +29,9 @@
             {l s='Add the following cron entry to your server. This single command will manage all module cron tasks automatically.' mod='qlocrontaskmanager'}
         </div>
         <div class="form-group">
-            <label class="control-label col-lg-3"></label>
+            <label class="control-label col-lg-3" data-original-title="Cron Command" data-placement="top" data-toggle="tooltip">
+                Cron Command
+            </label>
             <div class="col-lg-8">
                 <div class="input-group">
                     <input type="text"

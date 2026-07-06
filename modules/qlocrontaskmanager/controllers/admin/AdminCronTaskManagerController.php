@@ -178,11 +178,7 @@ class AdminCronTaskManagerController extends ModuleAdminController
 
         $isValidExpression = \Cron\CronExpression::isValidExpression($cronExpression);
         if ($isValidExpression) {
-            try {
-                $readable = $this->l('Runs ') . \Lorisleiva\CronTranslator\CronTranslator::translate($cronExpression);
-            } catch (\Exception $e) {
-                $readable = '';
-            }
+            $readable = $this->l('Runs ') . QctmCronExpressionTranslator::translate($cronExpression);
         } else {
             $readable = $this->l('Invalid cron expression.');
         }
@@ -275,12 +271,8 @@ class AdminCronTaskManagerController extends ModuleAdminController
 
         if (\Cron\CronExpression::isValidExpression($expression)) {
             $result['valid'] = true;
-            try {
-                $result['readable'] = $this->l('Runs ') . \Lorisleiva\CronTranslator\CronTranslator::translate($expression);
-            } catch (\Exception $e) {
-                $result['readable'] = $this->l('Invalid cron expression');
-            }
-        }        
+            $result['readable'] = $this->l('Runs ') . QctmCronExpressionTranslator::translate($expression);
+        }
 
         die(Tools::jsonEncode($result));
     }
@@ -397,11 +389,9 @@ class AdminCronTaskManagerController extends ModuleAdminController
 
     public function getCronWithReadable($cronExpression, $row)
     {
-        try {
-            $readable = \Lorisleiva\CronTranslator\CronTranslator::translate($cronExpression);
-        } catch (\Exception $e) {
-            $readable = $cronExpression;
-        }
+        $readable = \Cron\CronExpression::isValidExpression($cronExpression)
+            ? QctmCronExpressionTranslator::translate($cronExpression)
+            : $cronExpression;
 
         return '<code>' . htmlspecialchars($cronExpression) . '</code>'
             . '<br><small class="text-muted">' . htmlspecialchars($readable) . '</small>';

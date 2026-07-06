@@ -66,65 +66,6 @@
                 }
             ],
             "install-path": "../dragonmantank/cron-expression"
-        },
-        {
-            "name": "lorisleiva/cron-translator",
-            "version": "v0.3.2",
-            "version_normalized": "0.3.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/lorisleiva/cron-translator.git",
-                "reference": "d49dd7732197c2e967a66968c9323c81826c86e5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/lorisleiva/cron-translator/zipball/d49dd7732197c2e967a66968c9323c81826c86e5",
-                "reference": "d49dd7732197c2e967a66968c9323c81826c86e5",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.4 || ^8.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^8.5.21 || ^9.5"
-            },
-            "time": "2022-06-16T07:37:33+00:00",
-            "type": "library",
-            "installation-source": "dist",
-            "autoload": {
-                "psr-4": {
-                    "Lorisleiva\\CronTranslator\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Loris LEIVA",
-                    "email": "loris.leiva@gmail.com",
-                    "homepage": "https://lorisleiva.com"
-                }
-            ],
-            "description": "Makes CRON expressions human-readable",
-            "homepage": "https://github.com/lorisleiva/cron-translator",
-            "keywords": [
-                "cron",
-                "expression",
-                "human"
-            ],
-            "support": {
-                "issues": "https://github.com/lorisleiva/cron-translator/issues",
-                "source": "https://github.com/lorisleiva/cron-translator/tree/v0.3.2"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/lorisleiva",
-                    "type": "github"
-                }
-            ],
-            "install-path": "../lorisleiva/cron-translator"
         }
     ],
     "dev": true,

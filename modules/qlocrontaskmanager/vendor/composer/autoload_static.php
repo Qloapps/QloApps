@@ -7,10 +7,6 @@ namespace Composer\Autoload;
 class ComposerStaticInitc2f08a32af23ee5d749fb28358c620b3
 {
     public static $prefixLengthsPsr4 = array (
-        'L' => 
-        array (
-            'Lorisleiva\\CronTranslator\\' => 26,
-        ),
         'C' => 
         array (
             'Cron\\' => 5,
@@ -18,10 +14,6 @@ class ComposerStaticInitc2f08a32af23ee5d749fb28358c620b3
     );
 
     public static $prefixDirsPsr4 = array (
-        'Lorisleiva\\CronTranslator\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/lorisleiva/cron-translator/src',
-        ),
         'Cron\\' => 
         array (
             0 => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron',

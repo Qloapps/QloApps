@@ -3,7 +3,7 @@
         'name' => 'qloapps/qlocrontaskmanager',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => 'e05c7ad488aaf4098ed194c7ddf0024160987974',
+        'reference' => 'f7d1d629ca72fc5ffd3349dea2877013367cea81',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -19,15 +19,6 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'lorisleiva/cron-translator' => array(
-            'pretty_version' => 'v0.3.2',
-            'version' => '0.3.2.0',
-            'reference' => 'd49dd7732197c2e967a66968c9323c81826c86e5',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../lorisleiva/cron-translator',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
         'mtdowling/cron-expression' => array(
             'dev_requirement' => false,
             'replaced' => array(
@@ -37,7 +28,7 @@
         'qloapps/qlocrontaskmanager' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => 'e05c7ad488aaf4098ed194c7ddf0024160987974',
+            'reference' => 'f7d1d629ca72fc5ffd3349dea2877013367cea81',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

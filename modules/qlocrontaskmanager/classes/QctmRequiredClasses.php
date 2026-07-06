@@ -24,4 +24,5 @@
 require_once _PS_MODULE_DIR_.'qlocrontaskmanager/classes/QctmCronTaskManagerDb.php';
 require_once _PS_MODULE_DIR_.'qlocrontaskmanager/classes/QctmCronTask.php';
 require_once _PS_MODULE_DIR_.'qlocrontaskmanager/classes/QctmCronTaskLog.php';
+require_once _PS_MODULE_DIR_.'qlocrontaskmanager/classes/QctmCronExpressionTranslator.php';
 require_once _PS_MODULE_DIR_.'qlocrontaskmanager/vendor/autoload.php';
