@@ -215,12 +215,20 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         }
 
         if ($mediaType === HotelHeaderImage::MEDIA_TYPE_VIDEO) {
+            $imagesToDrop = array();
+            if ($previousMediaType === HotelHeaderImage::MEDIA_TYPE_IMAGE) {
+                $imagesToDrop = HotelHeaderImage::getItems(null);
+                array_shift($imagesToDrop);
+            }
+            if ($imagesToDrop && Tools::getValue('confirm_delete_images') !== '1') {
+                $this->errors[] = $this->l('Switching to Video will delete all images except the first one. Please confirm this action.');
+                return;
+            }
+
             $this->processSaveVideo();
 
-            if (!count($this->errors) && $previousMediaType === HotelHeaderImage::MEDIA_TYPE_IMAGE) {
-                $allImages = HotelHeaderImage::getItems(null);
-                array_shift($allImages);
-                foreach ($allImages as $imgData) {
+            if (!count($this->errors)) {
+                foreach ($imagesToDrop as $imgData) {
                     $obj = new HotelHeaderImage((int)$imgData['id_header_image']);
                     if (Validate::isLoadedObject($obj)) {
                         $obj->delete();

@@ -693,14 +693,6 @@ body.adminhotelroomsbooking .ui-tooltip {
     animation: wkSlideInLeft 0.22s ease forwards;
 }
 
-#qlo-img-form-panel .panel {
-    border-left: 3px solid #5cb85c;
-}
-
-#qlo-img-form-panel .panel-heading {
-    background-color: #f0fff0;
-}
-
 .qlo-img-thumb {
     width: 120px;
     height: 75px;

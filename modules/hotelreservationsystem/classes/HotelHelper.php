@@ -1062,6 +1062,8 @@ class HotelHelper
         Configuration::updateValue('QLO_HEADER_SLIDER_AUTO_PLAY', 1);
         Configuration::updateValue('QLO_HEADER_SLIDER_INTERVAL', 5000);
         Configuration::updateValue('QLO_HEADER_SLIDER_ANIM_TYPE', HotelHeaderImage::ANIM_TYPE_SLIDE);
+        Configuration::updateValue('QLO_HOTEL_NAME_ENABLE', 0);
+        Configuration::updateValue('QLO_HEADER_CONTENT_ALIGN', HotelHeaderImage::CONTENT_ALIGN_CENTER);
         Configuration::updateValue('QLO_HEADER_VIDEO_SOURCE_TYPE', '');
         Configuration::updateValue('QLO_HEADER_VIDEO_NAME', '');
         HotelHeaderImage::createMediaDirectory();

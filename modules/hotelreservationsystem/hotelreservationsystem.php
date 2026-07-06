@@ -663,6 +663,7 @@ class HotelReservationSystem extends Module
             'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST',
             'QLO_HEADER_MEDIA_TYPE',
             'QLO_HOTEL_NAME_ENABLE',
+            'QLO_HEADER_CONTENT_ALIGN',
             'QLO_HEADER_VIDEO_SOURCE_TYPE',
             'QLO_HEADER_VIDEO_NAME',
             'QLO_HEADER_SLIDER_NAV_TYPE',
