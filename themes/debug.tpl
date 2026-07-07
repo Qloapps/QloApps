@@ -103,6 +103,10 @@
                 font-style: italic;
             }
 
+            .template-name {
+                color: brown;
+            }
+
             #table_assigned_vars th {
                 color: blue;
             }
@@ -123,7 +127,7 @@
         <h2>included templates &amp; config files (load time in seconds)</h2>
         <div>
             {foreach $template_data as $template}
-                <font color="brown">{$template.name}</font>
+                <span class="template-name">{$template.name}</span>
                 <span class="exectime">
    (compile {$template['compile_time']|string_format:"%.5f"}) (render {$template['render_time']|string_format:"%.5f"}) (cache {$template['cache_time']|string_format:"%.5f"}
                     )
