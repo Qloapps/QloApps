@@ -393,12 +393,12 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $output = implode('<br>', $datesDisplay);
-        $totalRooms = array_sum(array_column($formatted, 'count'));
+        $uniqueStayPeriods = count($formatted);
 
-        if ($totalRooms > 1) {
+        if ($uniqueStayPeriods > 1) {
             $output .= ' <span class="qlo-stay-period-badge qlo-stay-period-tip" data-stay-tip="'
                 .htmlspecialchars(json_encode($formatted)).'">+'
-                .($totalRooms - 1).'</span>';
+                .($uniqueStayPeriods - 1).'</span>';
         }
         return $output;
     }
