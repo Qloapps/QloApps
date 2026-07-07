@@ -224,6 +224,9 @@ class AdminAddHotelController extends ModuleAdminController
         } else {
             $idCountry = Tools::getValue('hotel_country');
         }
+
+        $smartyVars['hotelImageCategories'] = HotelImageCategory::getImageCategories((int) $this->context->language->id);
+
         // manage state option
         $stateOptions = null;
         if ($idCountry) {
@@ -831,10 +834,12 @@ class AdminAddHotelController extends ModuleAdminController
                 $conf = 4;
             }
 
+            $tabParam = Tools::getValue('htl_active_tab') ? '&htl_active_tab='.urlencode(Tools::getValue('htl_active_tab')) : '';
+
             if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
-                Tools::redirectAdmin(self::$currentIndex.'&id='.(int) $newIdHotel.'&update'.$this->table.'&conf='.$conf.'&token='.$this->token                );
+                Tools::redirectAdmin(self::$currentIndex.'&id='.(int) $newIdHotel.'&update'.$this->table.'&conf='.$conf.'&token='.$this->token.$tabParam);
             } else {
-                Tools::redirectAdmin(self::$currentIndex.'&conf='.$conf.'&token='.$this->token);
+                Tools::redirectAdmin(self::$currentIndex.'&conf='.$conf.'&token='.$this->token.$tabParam);
             }
         }
 
@@ -886,7 +891,15 @@ class AdminAddHotelController extends ModuleAdminController
     {
         $response = array('success' => false);
         $idHotel = Tools::getValue('id_hotel');
+        $idHtlImageCategory = (int) Tools::getValue('id_htl_image_category');
         if ($idHotel) {
+            if ($idHtlImageCategory) {
+                if (!Validate::isLoadedObject(new HotelImageCategory($idHtlImageCategory))) {
+                    $response['errors'][] = $this->l('Selected image category is invalid.');
+                    $this->ajaxDie(json_encode($response));
+                }
+            }
+
             $invalidImg = ImageManager::validateUpload(
                 $_FILES['hotel_image'],
                 Tools::getMaxUploadSize()
@@ -894,11 +907,15 @@ class AdminAddHotelController extends ModuleAdminController
             if (!$invalidImg) {
                 // Add Hotel images
                 $objHotelImage = new HotelImage();
-                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'], $idHotel);
+                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'],$idHotel,$idHtlImageCategory);
                 if ($imageDetail) {
                     $response['success'] = true;
                     $imageDetail['image_link'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'],ImageType::getFormatedName('large')));
                     $imageDetail['image_link_small'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'], ImageType::getFormatedName('small')));
+                    $imageDetail['id_htl_image_category'] = $idHtlImageCategory;
+                    if (!isset($imageDetail['category_name'])) {
+                        $imageDetail['category_name'] = HotelImageCategory::getCategoryName($idHtlImageCategory);
+                    }
                     $response['data']['image_info'] = $imageDetail;
                     // get image row
                     $this->context->smarty->assign(array(

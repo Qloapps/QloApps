@@ -30,6 +30,7 @@
 	</div>
 
 	<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
+		<input type="hidden" id="htl_active_tab" name="htl_active_tab" value="">
 		{if isset($edit)}
 			{assign var=hook_arg_id_hotel value=$hotel_info.id}
 		{else}
@@ -438,11 +439,90 @@
 
 					{if isset($hotel_info.id) && $hotel_info.id}
 						<div class="form-group row">
-							<label for="hotel_images" class="col-sm-3 control-label padding-top-0">
-								{l s='Upload images' mod='hotelreservationsystem'}&nbsp;:&nbsp;&nbsp;
-							</label>
-							<div class="col-sm-5">
-								<input class="form-control-static" type="file" accept="image/gif, image/jpg, image/jpeg, image/png" id="hotel_images" name="hotel_images[]" multiple>
+							{* <label for="hotel_images" class="col-sm-1 control-label">
+								{l s='Upload images' mod='hotelreservationsystem'}
+							</label> *}
+							<div class="col-sm-12">
+								<div class="panel panel-default" style="margin-bottom:0;">
+									<div class="panel-body" style="padding-bottom:10px;">
+										<div class="row">
+											<div class="col-sm-5">
+												<label class="control-label" for="hotel_images-selectbutton">{l s='Select images' mod='hotelreservationsystem'}</label>
+												<input type="file" class="hide" accept="image/gif, image/jpg, image/jpeg, image/png" id="hotel_images" name="hotel_images[]" multiple>
+												<div class="dummyfile input-group">
+													<span class="input-group-addon"><i class="icon-file"></i></span>
+													<input id="hotel_images-name" type="text" name="filename" readonly>
+													<span class="input-group-btn">
+														<button id="hotel_images-selectbutton" type="button" name="submitAddAttachments" class="btn btn-default">
+															<i class="icon-folder-open"></i> {l s='Add files' mod='hotelreservationsystem'}
+														</button>
+													</span>
+												</div>
+												<p class="help-block" style="margin-bottom:0;">{l s='You can select multiple images.' mod='hotelreservationsystem'}</p>
+												<script type="text/javascript">
+													$(document).ready(function() {
+														$('#hotel_images-selectbutton').click(function(e) {
+															$('#hotel_images').trigger('click');
+														});
+
+														$('#hotel_images-name').click(function(e) {
+															$('#hotel_images').trigger('click');
+														});
+
+														$('#hotel_images-name').on('dragenter', function(e) {
+															e.stopPropagation();
+															e.preventDefault();
+														});
+
+														$('#hotel_images-name').on('dragover', function(e) {
+															e.stopPropagation();
+															e.preventDefault();
+														});
+
+														$('#hotel_images-name').on('drop', function(e) {
+															e.preventDefault();
+															var files = e.originalEvent.dataTransfer.files;
+															$('#hotel_images')[0].files = files;
+															$(this).val(files[0].name);
+														});
+
+														$('#hotel_images').change(function(e) {
+															if ($(this)[0].files !== undefined) {
+																var files = $(this)[0].files;
+																var name = '';
+																$.each(files, function(index, value) {
+																	name += value.name+', ';
+																});
+																$('#hotel_images-name').val(name.slice(0, -2));
+															} else {
+																var name = $(this).val().split(/[\\/]/);
+																$('#hotel_images-name').val(name[name.length-1]);
+															}
+														});
+													});
+												</script>
+											</div>
+											<div class="col-sm-4">
+												<label class="control-label" for="id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+												<select class="form-control" id="id_htl_image_category" name="id_htl_image_category">
+													<option value="0">{l s='Select category (optional)' mod='hotelreservationsystem'}</option>
+													{if isset($hotelImageCategories) && $hotelImageCategories}
+														{foreach from=$hotelImageCategories item=hotelImageCategory}
+															<option value="{$hotelImageCategory.id_htl_image_category|intval}">{$hotelImageCategory.name|escape:'html':'UTF-8'}</option>
+														{/foreach}
+													{/if}
+												</select>
+												<p class="help-block" style="margin-bottom:2px;">{l s='If not selected, image will be uncategorized.' mod='hotelreservationsystem'} &mdash; <a href="{$link->getAdminLink('AdminHotelImageCategory')|escape:'html':'UTF-8'}&amp;addhtl_image_category" target="_blank" style="white-space:nowrap;">{l s='Create image category' mod='hotelreservationsystem'} <i class="icon-external-link" style="font-size:11px;"></i></a></p>
+											</div>
+											<div class="col-sm-3">
+												<label class="control-label">&nbsp;</label>
+												<button class="btn btn-primary btn-block" id="upload_hotel_images_btn" type="button">
+													<i class="icon-upload"></i> {l s='Upload' mod='hotelreservationsystem'}
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 						<hr>
@@ -651,10 +731,11 @@
 	</form>
 </div>
 
-{strip}
-	{addJsDef adminHotelCtrlUrl = $link->getAdminlink('AdminAddHotel')}
-		{addJsDefL name=imgUploadSuccessMsg}{l s='Image Successfully Uploaded' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+	{strip}
+		{addJsDef adminHotelCtrlUrl = $link->getAdminlink('AdminAddHotel')}
+			{addJsDefL name=imgUploadSuccessMsg}{l s='Image Successfully Uploaded' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+		{addJsDefL name=imgSelectErrorMsg}{l s='Please select at least one image before uploading.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+		{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 
 	{addJsDefL name=coverImgSuccessMsg}{l s='Cover image changed successfully' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=coverImgErrorMsg}{l s='Error while changing cover image' js=1 mod='hotelreservationsystem'}{/addJsDefL}
@@ -704,6 +785,17 @@
 		// Trigger autosize width recalculation when language is switched
 		$(document).on('wk.lang.changed', function(e, idLang) {
 			$(window).trigger('resize.autosize');
+		});
+
+		// Restore active tab from controller redirect param
+		var _htlActiveTab = '{if !empty($smarty.get.htl_active_tab)}{$smarty.get.htl_active_tab|escape:'javascript':'UTF-8'}{/if}';
+		if (_htlActiveTab && $('a[href="' + _htlActiveTab + '"]').length) {
+			$('a[href="' + _htlActiveTab + '"]').tab('show');
+		}
+
+		// Keep hidden input in sync so active tab survives form submission
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+			$('#htl_active_tab').val($(e.target).attr('href'));
 		});
 	});
 	$(".textarea-autosize").autosize();
