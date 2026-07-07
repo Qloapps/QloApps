@@ -237,44 +237,30 @@
         {l s='Showing room status as of the filter start date.' mod='qlohotelreports'}
     </div>
 
-    {if $rooms}
-    {assign var="cnt_total" value=0}
-    {assign var="cnt_available" value=0}
-    {assign var="cnt_occupied" value=0}
-    {assign var="cnt_ooo" value=0}
-    {foreach $rooms as $room}
-        {assign var="cnt_total" value=$cnt_total+1}
-        {if $room.id_order}
-            {assign var="cnt_occupied" value=$cnt_occupied+1}
-        {elseif isset($room_statuses[$room.id_status])}
-            {assign var="cnt_ooo" value=$cnt_ooo+1}
-        {else}
-            {assign var="cnt_available" value=$cnt_available+1}
-        {/if}
-    {/foreach}
+    {if $kpi_total}
     <div class="row qlo-kpi-row">
         <div class="col-md-3 col-sm-6">
             <div class="qlo-kpi-card">
                 <div class="qlo-kpi-label">{l s='Total Rooms' mod='qlohotelreports'}</div>
-                <div class="qlo-kpi-value">{$cnt_total|intval}</div>
+                <div class="qlo-kpi-value">{$kpi_total|intval}</div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="qlo-kpi-card qlo-kpi-card--success">
                 <div class="qlo-kpi-label">{l s='Available' mod='qlohotelreports'}</div>
-                <div class="qlo-kpi-value">{$cnt_available|intval}</div>
+                <div class="qlo-kpi-value">{$kpi_available|intval}</div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="qlo-kpi-card qlo-kpi-card--danger">
                 <div class="qlo-kpi-label">{l s='Occupied' mod='qlohotelreports'}</div>
-                <div class="qlo-kpi-value">{$cnt_occupied|intval}</div>
+                <div class="qlo-kpi-value">{$kpi_occupied|intval}</div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="qlo-kpi-card qlo-kpi-card--warning">
                 <div class="qlo-kpi-label">{l s='Out of Order' mod='qlohotelreports'}</div>
-                <div class="qlo-kpi-value">{$cnt_ooo|intval}</div>
+                <div class="qlo-kpi-value">{$kpi_out_of_order|intval}</div>
             </div>
         </div>
     </div>
@@ -290,7 +276,7 @@
                     <th>{l s='Room Type' mod='qlohotelreports'}</th>
                     <th>{l s='Floor' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Status' mod='qlohotelreports'}</th>
-                    <th class="text-center">{l s='Housekeeping Status' mod='qlohotelreports'}</th>
+                    {if $show_housekeeping}<th class="text-center">{l s='Housekeeping Status' mod='qlohotelreports'}</th>{/if}
                     <th>{l s='Current Guest' mod='qlohotelreports'}</th>
                     <th>{l s='Check-out Date' mod='qlohotelreports'}</th>
                 </tr>
@@ -311,14 +297,24 @@
                                 <span class="label label-success">{l s='Vacant' mod='qlohotelreports'}</span>
                             {/if}
                         </td>
-                        <td class="text-center">&mdash;</td>
+                        {if $show_housekeeping}
+                        <td class="text-center">
+                            {assign var="hk_id" value=$room.id_housekeeping_status|intval}
+                            {if isset($housekeeping_statuses[$hk_id])}
+                                {assign var="hk" value=$housekeeping_statuses[$hk_id]}
+                                <span class="qlo-hk-badge" style="background-color:{$hk.bg_color|escape:'html':'UTF-8'};color:{$hk.text_color|escape:'html':'UTF-8'}">{$hk.name|escape:'html':'UTF-8'}</span>
+                            {else}
+                                &mdash;
+                            {/if}
+                        </td>
+                        {/if}
                         <td>{if $room.guest_name}{$room.guest_name|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
                         <td>{if $room.date_to}{$room.date_to|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
                     </tr>
                     {/foreach}
                 {else}
                     <tr>
-                        <td class="list-empty" colspan="7">
+                        <td class="list-empty" colspan="{if $show_housekeeping}7{else}6{/if}">
                             <div class="list-empty-msg">
                                 <i class="icon-warning-sign list-empty-icon"></i>
                                 {l s='No rooms found.' mod='qlohotelreports'}
@@ -331,6 +327,46 @@
     </div>
     </div>
     </div>
+
+    {if $rooms_total_pages > 1}
+    <div class="row qlo-pagination-wrap">
+        <div class="col-lg-12 text-center">
+            <ul class="pagination pagination-sm">
+                <li {if $rooms_page <= 1}class="disabled"{/if}>
+                    <a href="{$rooms_page_base_url|escape:'html':'UTF-8'}1"><i class="icon-double-angle-left"></i></a>
+                </li>
+                <li {if $rooms_page <= 1}class="disabled"{/if}>
+                    <a href="{$rooms_page_base_url|escape:'html':'UTF-8'}{if $rooms_page > 1}{$rooms_page-1}{else}1{/if}"><i class="icon-angle-left"></i></a>
+                </li>
+                {assign var="p" value=0}
+                {while $p++ < $rooms_total_pages}
+                    {if $p < $rooms_page-2}
+                        <li class="disabled"><a href="#">&hellip;</a></li>
+                        {assign var="p" value=$rooms_page-3}
+                    {elseif $p > $rooms_page+2}
+                        <li class="disabled"><a href="#">&hellip;</a></li>
+                        {assign var="p" value=$rooms_total_pages}
+                    {else}
+                        <li {if $p == $rooms_page}class="active"{/if}>
+                            <a href="{$rooms_page_base_url|escape:'html':'UTF-8'}{$p|intval}">{$p|intval}</a>
+                        </li>
+                    {/if}
+                {/while}
+                <li {if $rooms_page >= $rooms_total_pages}class="disabled"{/if}>
+                    <a href="{$rooms_page_base_url|escape:'html':'UTF-8'}{if $rooms_page < $rooms_total_pages}{$rooms_page+1}{else}{$rooms_total_pages}{/if}"><i class="icon-angle-right"></i></a>
+                </li>
+                <li {if $rooms_page >= $rooms_total_pages}class="disabled"{/if}>
+                    <a href="{$rooms_page_base_url|escape:'html':'UTF-8'}{$rooms_total_pages|intval}"><i class="icon-double-angle-right"></i></a>
+                </li>
+            </ul>
+            <p class="text-muted small">
+                {l s='Showing' mod='qlohotelreports'}
+                {$rooms_offset_start|intval}–{$rooms_offset_end|intval}
+                {l s='of' mod='qlohotelreports'} {$rooms_total|intval} {l s='rooms' mod='qlohotelreports'}
+            </p>
+        </div>
+    </div>
+    {/if}
 
 {* ═══════════════════════════════════════════════════════════════════════════
    ROOM TYPE PERFORMANCE

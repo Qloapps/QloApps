@@ -656,16 +656,53 @@ class QloHotelReports extends Module
                     'availability_rows' => $availabilityRows,
                 ));
             } elseif ($report === 'room-status') {
-                $rooms = HotelRoomInformation::getRoomStatusForReports(array(
-                    'date_from'  => $dateFrom,
-                    'date_to'    => $dateTo,
-                    'id_hotel'   => $idHotel ?: false,
-                    'id_product' => $idProduct,
-                    'floor'      => $floor,
-                    'id_lang'    => $idLang,
+                $showHousekeeping = Module::isInstalled('qlohousekeeping') && Module::isEnabled('qlohousekeeping');
+                $housekeepingStatuses = array();
+                if ($showHousekeeping) {
+                    $hkStatus = new QhkHouseKeepingTaskStatus();
+                    $housekeepingStatuses = $hkStatus->getHousekeepingTaskStatusList(false, $idLang);
+                }
+
+                $perPage  = 10;
+                $page     = max(1, (int) Tools::getValue('rooms_page', 1));
+                $allRooms = HotelRoomInformation::getRoomStatusForReports(array(
+                    'date_from'              => $dateFrom,
+                    'date_to'                => $dateTo,
+                    'id_hotel'               => $idHotel ?: false,
+                    'id_product'             => $idProduct,
+                    'floor'                  => $floor,
+                    'id_lang'                => $idLang,
+                    'housekeeping_installed' => $showHousekeeping,
                 ));
+                $roomsTotal      = count($allRooms);
+                $roomsTotalPages = max(1, (int) ceil($roomsTotal / $perPage));
+                $page            = min($page, $roomsTotalPages);
+                $kpiOccupied     = 0;
+                $kpiOutOfOrder          = 0;
+                foreach ($allRooms as $room) {
+                    if ($room['id_order']) {
+                        $kpiOccupied++;
+                    } elseif (in_array((int) $room['id_status'], array(
+                        HotelRoomInformation::STATUS_INACTIVE,
+                        HotelRoomInformation::STATUS_TEMPORARY_INACTIVE,
+                    ))) {
+                        $kpiOutOfOrder++;
+                    }
+                }
                 $this->context->smarty->assign(array(
-                    'rooms' => $rooms,
+                    'rooms'                => array_slice($allRooms, ($page - 1) * $perPage, $perPage),
+                    'rooms_page'           => $page,
+                    'rooms_total_pages'    => $roomsTotalPages,
+                    'rooms_total'          => $roomsTotal,
+                    'rooms_page_base_url'  => $filterBaseUrl . ($floor ? '&floor=' . urlencode($floor) : '') . '&rooms_page=',
+                    'rooms_offset_start'   => $roomsTotal ? ($page - 1) * $perPage + 1 : 0,
+                    'rooms_offset_end'     => min($page * $perPage, $roomsTotal),
+                    'kpi_total'            => $roomsTotal,
+                    'kpi_occupied'         => $kpiOccupied,
+                    'kpi_available'        => $roomsTotal - $kpiOccupied - $kpiOutOfOrder,
+                    'kpi_out_of_order'             => $kpiOutOfOrder,
+                    'show_housekeeping'    => $showHousekeeping,
+                    'housekeeping_statuses' => $housekeepingStatuses,
                 ));
             } elseif ($report === 'room-perf') {
                 $roomTypePerformanceRows = HotelRoomType::getRoomTypePerformance(array(

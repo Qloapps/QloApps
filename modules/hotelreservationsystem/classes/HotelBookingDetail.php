@@ -4589,8 +4589,15 @@ class HotelBookingDetail extends ObjectModel
 
         $extraSelect = $detailedInfo
             ? ', orr.`question` AS cancellation_reason, orr.`refunded_amount`, orr.`payment_mode` AS refund_method,
-               orr.`date_add` AS cancellation_date, hbd.`date_add` AS booking_date,
-               orsl.`name` AS refund_status, hbd.`total_price_tax_incl`, o.`id_currency`'
+               orr.`date_add` AS cancellation_date, orr.`date_upd` AS processed_date,
+               hbd.`date_add` AS booking_date,
+               orsl.`name` AS refund_status, hbd.`total_price_tax_incl`, o.`id_currency`,
+               (SELECT CONCAT(e.`firstname`, " ", e.`lastname`)
+                    FROM `'._DB_PREFIX_.'order_history` oh
+                    INNER JOIN `'._DB_PREFIX_.'employee` e ON (e.`id_employee` = oh.`id_employee`)
+                    WHERE oh.`id_order` = hbd.`id_order` AND oh.`id_employee` > 0
+                        AND oh.`id_order_state` = 5
+                    ORDER BY oh.`date_add` DESC LIMIT 1) AS processed_by'
             : '';
 
         return Db::getInstance()->executeS(

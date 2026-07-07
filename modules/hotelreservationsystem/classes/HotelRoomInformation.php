@@ -726,12 +726,13 @@ class HotelRoomInformation extends ObjectModel
      */
     public static function getRoomStatusForReports(array $params)
     {
-        $dateFrom  = pSQL($params['date_from']);
-        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
-        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
-        $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
-        $floor     = isset($params['floor'])      ? pSQL($params['floor'])      : '';
+        $dateFrom              = pSQL($params['date_from']);
+        $dateTo                = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel               = isset($params['id_hotel'])               ? $params['id_hotel']                : false;
+        $idProduct             = isset($params['id_product'])             ? (int) $params['id_product']        : 0;
+        $idLang                = isset($params['id_lang'])                ? (int) $params['id_lang']           : 0;
+        $floor                 = isset($params['floor'])                  ? pSQL($params['floor'])             : '';
+        $housekeepingInstalled = !empty($params['housekeeping_installed']);
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
@@ -745,7 +746,8 @@ class HotelRoomInformation extends ObjectModel
             pl.`name` AS room_type_name, hbil.`hotel_name`,
             bkgs.`id_order`, bkgs.`date_from`, bkgs.`date_to`,
             bkgs.`id_status` AS booking_status,
-            CONCAT(c.`firstname`, " ", c.`lastname`) AS guest_name
+            CONCAT(c.`firstname`, " ", c.`lastname`) AS guest_name'
+            .($housekeepingInstalled ? ', hri.`id_housekeeping_status`' : '').'
             FROM `'._DB_PREFIX_.'htl_room_information` hri
             INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
             INNER JOIN `'._DB_PREFIX_.'product_lang` pl

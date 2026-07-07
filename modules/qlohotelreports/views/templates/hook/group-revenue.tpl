@@ -245,8 +245,8 @@
                                 <td class="text-right">{$refund.currency_sign|escape:'html':'UTF-8'}{$refund.refunded_amount|string_format:"%.2f"}</td>
                                 <td>{if $refund.refund_method}{$refund.refund_method|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $refund.refund_status}{$refund.refund_status|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
-                                <td><span class="text-muted">—</span></td>
-                                <td><span class="text-muted">—</span></td>
+                                <td>{if $refund.processed_date}{$refund.processed_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
+                                <td>{if $refund.processed_by}{$refund.processed_by|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $refund.cancellation_reason}{$refund.cancellation_reason|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td><span class="text-muted">—</span></td>
                             </tr>
@@ -405,7 +405,7 @@
         </div>
 
         {if $tax_by_name}
-        <h4 class="qlo-section-heading" style="margin-top:20px">{l s='Tax Summary by Type' mod='qlohotelreports'}</h4>
+        <h4 class="qlo-section-heading">{l s='Tax Summary by Type' mod='qlohotelreports'}</h4>
         <div class="row">
         <div class="col-lg-12">
         <div class="table-responsive">

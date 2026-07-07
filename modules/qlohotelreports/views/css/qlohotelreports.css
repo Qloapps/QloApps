@@ -142,3 +142,19 @@ form.list_action_wrapper .list_filters label {
 .export-csv {
     margin-top: 10px;
 }
+
+/* Housekeeping status badge */
+.qlo-hk-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+
+/* Pagination row below room-status table */
+.qlo-pagination-wrap {
+    margin-top: 10px;
+}
+
+.qlo-pagination-wrap .pagination {
+    margin-bottom: 5px;
+}

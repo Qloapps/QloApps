@@ -251,11 +251,9 @@
                         <td class="text-center">{if $outOfOrderRow.disabled_days}{$outOfOrderRow.disabled_days|intval}{else}&mdash;{/if}</td>
                         <td class="text-center">
                             {if !$outOfOrderRow.disabled_from}
-                                <span class="label label-default">{l s='Permanent' mod='qlohotelreports'}</span>
-                            {elseif $outOfOrderRow.disabled_to >= $today}
-                                <span class="label label-danger">{l s='Active' mod='qlohotelreports'}</span>
+                                <span class="label label-success">{l s='Active' mod='qlohotelreports'}</span>
                             {else}
-                                <span class="label label-success">{l s='Resolved' mod='qlohotelreports'}</span>
+                                <span class="label label-danger">{l s='Inactive' mod='qlohotelreports'}</span>
                             {/if}
                         </td>
                         <td>&mdash;</td>
