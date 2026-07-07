@@ -488,13 +488,17 @@ class ProductControllerCore extends FrontController
                     $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
                     $this->assignRoomServiceProductVars();
 
+                    $priceCalcDateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $hotel_id);
+                    $priceCalcDateFrom = $priceCalcDateRange['date_from'];
+                    $priceCalcDateTo = $priceCalcDateRange['date_to'];
+                    
                     // product price after imposing feature prices...
                     if ($useTax) {
                         $priceProduct = Product::getPriceStatic($this->product->id, true);
-                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, true, 0, 0, 0, 0, 1, 1, $occupancy_value);
+                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $priceCalcDateFrom, $priceCalcDateTo, true, 0, 0, 0, 0, 1, 1, $occupancy_value);
                     } else {
                         $priceProduct = Product::getPriceStatic($this->product->id, false);
-                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, false, 0, 0, 0, 0, 1, 1, $occupancy_value);
+                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $priceCalcDateFrom, $priceCalcDateTo, false, 0, 0, 0, 0, 1, 1, $occupancy_value);
                     }
                     $productPriceWithoutReduction = $this->product->getPriceWithoutReduct(!$useTax);
                     $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
@@ -652,6 +656,10 @@ class ProductControllerCore extends FrontController
 
         $roomType = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
         $idHotel = $roomType['id_hotel'];
+        $dateRange = HotelHelper::validateCheckInCheckOutDate($dateFrom, $dateTo, $idHotel);
+        $dateFrom = $dateRange['date_from'];
+        $dateTo = $dateRange['date_to'];
+
         $hotel = $objHotel->hotelBranchesInfo(false, 2, 1, $idHotel);
         $hotelLocation = $hotel['city'].', '.(isset($hotel['state_name']) ? ' '.$hotel['state_name'].', ' : '').
         ' '.$hotel['country_name'];

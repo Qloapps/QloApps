@@ -278,9 +278,10 @@ class HotelBookingDetail extends ObjectModel
         extract($this->getBookingDataParams($params));
 
         if ($date_from && $date_to && $hotel_id) {
-            $date_from = date('Y-m-d H:i:s', strtotime($date_from));
+            $dateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $hotel_id);
+            $date_from = $dateRange['date_from'];
             $stayStartDate = date('Y-m-d', strtotime($date_from));
-            $date_to = date('Y-m-d H:i:s', strtotime($date_to));
+            $date_to = $dateRange['date_to'];
 
             $objRoomType = new HotelRoomType();
             $lengthOfStay = HotelHelper::getNumberOfDays($date_from, $date_to);
@@ -1697,6 +1698,12 @@ class HotelBookingDetail extends ObjectModel
 
         extract($this->getBookingDataParams($bookingParams));
 
+        if ($date_from && $date_to && $hotel_id) {
+            $dateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $hotel_id);
+            $date_from = $dateRange['date_from'];
+            $date_to = $dateRange['date_to'];
+        }
+
         if (!$only_search_data) {
             if (!empty($bookingData)) {
                 foreach ($bookingData['rm_data'] as $key => $value) {
@@ -2619,6 +2626,10 @@ class HotelBookingDetail extends ObjectModel
     ) {
         $objHotelBookingDetail = new self((int) $idHotelBookingDetail);
         if (Validate::isLoadedObject($objHotelBookingDetail)) {
+            $dateRange = HotelHelper::validateCheckInCheckOutDate($newDateFrom, $newDateTo, (int) $objHotelBookingDetail->id_hotel);
+            $newDateFrom = $dateRange['date_from'];
+            $newDateTo = $dateRange['date_to'];
+
             // retrieve HotelCartBookingData row
             $idHotelCartBookingData = Db::getInstance()->getValue(
                 'SELECT `id`

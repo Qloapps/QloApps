@@ -2749,8 +2749,10 @@ class HotelHelper
         return (int)floor(($endTime - $startTime) / 3600);
     }
 
-    public static function formatBookingDateRange($dateFrom, $dateTo, $idHotel = 0)
+    public static function validateCheckInCheckOutDate($dateFrom, $dateTo, $idHotel = 0)
     {
+        static $hotelCheckInOutTimesCache = array();
+
         $result = array(
             'date_from' => $dateFrom,
             'date_to' => $dateTo,
@@ -2769,17 +2771,23 @@ class HotelHelper
         $hasDateFromTime = self::hasNonZeroTime($dateFrom);
         $hasDateToTime = self::hasNonZeroTime($dateTo);
         if (!$hasDateFromTime && !$hasDateToTime && $idHotel) {
-            $checkInTime = '12:00:00';
-            $checkOutTime = '11:00:00';
-            if (Validate::isLoadedObject($objHotel = new HotelBranchInformation((int)$idHotel))) {
-                if ($objHotel->check_in && ($ts = strtotime($objHotel->check_in)) !== false) {
-                    $checkInTime = date('H:i:s', $ts);
+            if (!isset($hotelCheckInOutTimesCache[$idHotel])) {
+                $checkInTime = '12:00:00';
+                $checkOutTime = '11:00:00';
+                if (Validate::isLoadedObject($objHotel = new HotelBranchInformation((int)$idHotel))) {
+                    if ($objHotel->check_in && ($ts = strtotime($objHotel->check_in)) !== false) {
+                        $checkInTime = date('H:i:s', $ts);
+                    }
+
+                    if ($objHotel->check_out && ($ts = strtotime($objHotel->check_out)) !== false) {
+                        $checkOutTime = date('H:i:s', $ts);
+                    }
                 }
 
-                if ($objHotel->check_out && ($ts = strtotime($objHotel->check_out)) !== false) {
-                    $checkOutTime = date('H:i:s', $ts);
-                }
+                $hotelCheckInOutTimesCache[$idHotel] = array($checkInTime, $checkOutTime);
             }
+
+            list($checkInTime, $checkOutTime) = $hotelCheckInOutTimesCache[$idHotel];
 
             $result['date_from'] = date('Y-m-d', $dateFromTimestamp).' '.$checkInTime;
             $result['date_to'] = date('Y-m-d', $dateToTimestamp).' '.$checkOutTime;

@@ -5935,6 +5935,11 @@ class AdminOrdersControllerCore extends AdminController
         $id_room = trim(Tools::getValue('id_room'));
         $id_product = trim(Tools::getValue('id_product'));
         $room_unit_price = trim(Tools::getValue('room_unit_price'));
+
+        $newDateRange = HotelHelper::validateCheckInCheckOutDate($new_date_from, $new_date_to, (int) $id_hotel);
+        $new_date_from = $newDateRange['date_from'];
+        $new_date_to = $newDateRange['date_to'];
+
         $product_quantity = (int) HotelHelper::getNumberOfDays($new_date_from, $new_date_to);
         $old_product_quantity =  (int) HotelHelper::getNumberOfDays($old_date_from, $old_date_to);
         $qty_diff = $product_quantity - $old_product_quantity;
