@@ -90,17 +90,14 @@ class HotelRoomTypeDemandPrice extends ObjectModel
                         $useTax
                     );
                 }
+                $numDays = 1;
                 if ($objGlobalDemand->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
                     if ($dateFrom && $dateTo) {
-                        $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
-                        if ($numDays > 1) {
-                            $price *= $numDays;
-                        }
+                        $numDays = max(1, HotelHelper::getNumberOfDays($dateFrom, $dateTo));
                     }
                 }
 
-                // Rounding as per configurations
-                $totalDemandsPrice += Tools::processPriceRounding($price);
+                $totalDemandsPrice += $price * $numDays;
             }
         }
 

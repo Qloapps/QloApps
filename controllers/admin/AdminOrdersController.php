@@ -5167,8 +5167,8 @@ class AdminOrdersControllerCore extends AdminController
                 $carrier = new Carrier((int)$order->id_carrier);
                 $tax_calculator = $carrier->getTaxCalculator($invoice_address);
 
-                $order_invoice->total_paid_tax_excl = Tools::ps_round((float)$cart->getOrderTotal(false, $total_method), 2);
-                $order_invoice->total_paid_tax_incl = Tools::ps_round((float)$cart->getOrderTotal($use_taxes, $total_method), 2);
+                $order_invoice->total_paid_tax_excl = Tools::ps_round((float)$cart->getOrderTotal(false, $total_method), _PS_PRICE_COMPUTE_PRECISION_);
+                $order_invoice->total_paid_tax_incl = Tools::ps_round((float)$cart->getOrderTotal($use_taxes, $total_method), _PS_PRICE_COMPUTE_PRECISION_);
                 $order_invoice->total_products = (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_products_wt = (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_shipping_tax_excl = (float)$cart->getTotalShippingCost(null, false);
@@ -5405,7 +5405,8 @@ class AdminOrdersControllerCore extends AdminController
                     $this->context->cart->id,
                     $this->context->cookie->id_guest,
                     $objCartBookingData->id_room,
-                    0
+                    0,
+                    1
                 );
                 $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
                 $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
@@ -5725,8 +5726,8 @@ class AdminOrdersControllerCore extends AdminController
                             $invoice_address = new Address((int) $objOrder->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $objOrder->id_shop)});
                             $carrier = new Carrier((int)$objOrder->id_carrier);
                             $tax_calculator = $carrier->getTaxCalculator($invoice_address);
-                            $objOrderInvoice->total_paid_tax_excl = Tools::ps_round((float)$objCart->getOrderTotal(false, $totalMethod), 2);
-                            $objOrderInvoice->total_paid_tax_incl = Tools::ps_round((float)$objCart->getOrderTotal($useTaxes, $totalMethod), 2);
+                            $objOrderInvoice->total_paid_tax_excl = Tools::ps_round((float)$objCart->getOrderTotal(false, $totalMethod), _PS_PRICE_COMPUTE_PRECISION_);
+                            $objOrderInvoice->total_paid_tax_incl = Tools::ps_round((float)$objCart->getOrderTotal($useTaxes, $totalMethod), _PS_PRICE_COMPUTE_PRECISION_);
                             $objOrderInvoice->total_products = (float)$objCart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                             $objOrderInvoice->total_products_wt = (float)$objCart->getOrderTotal($useTaxes, Cart::ONLY_PRODUCTS);
                             $objOrderInvoice->total_shipping_tax_excl = (float)$objCart->getTotalShippingCost(null, false);
@@ -5983,7 +5984,8 @@ class AdminOrdersControllerCore extends AdminController
                 $cart->id,
                 $cart->id_guest,
                 $id_room,
-                0
+                0,
+                1
             );
 
             $totalRoomPriceAfterTE = (float) $roomTotalPrice['total_price_tax_excl'];
@@ -8525,7 +8527,7 @@ class AdminOrdersControllerCore extends AdminController
                                         $objBookingDetail->date_to
                                     );
                                 }
-                                $objBookingDemand->total_price_tax_excl = $totalPriceTaxIncl = Tools::processPriceRounding(
+                                $objBookingDemand->total_price_tax_excl = $totalPriceTaxExcl = Tools::processPriceRounding(
                                     ($objBookingDemand->unit_price_tax_excl * $numDays),
                                     1,
                                     $order->round_type,
@@ -8625,7 +8627,7 @@ class AdminOrdersControllerCore extends AdminController
                             $order->round_type,
                             $order->round_mode
                         );
-                        $objBookingDemand->total_price_tax_excl = Tools::processPriceRounding(
+                        $objBookingDemand->total_price_tax_incl = Tools::processPriceRounding(
                             ($objBookingDemand->unit_price_tax_incl * $numDays),
                             1,
                             $order->round_type,
@@ -8931,7 +8933,8 @@ class AdminOrdersControllerCore extends AdminController
                         0,
                         0,
                         0,
-                        0
+                        0,
+                        1
                     );
                     if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
                         $result['has_price_changes'] = 1;
