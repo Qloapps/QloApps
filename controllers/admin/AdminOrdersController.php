@@ -5868,7 +5868,7 @@ class AdminOrdersControllerCore extends AdminController
                     $psOsPartialPaymentAccepted = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                     $psOSPaymentComplete = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
 
-                    if ($currentOrderState->id == $psOSPaymentComplete && $objOrder->total_paid_real == 0) {
+                    if ($objOrder->total_paid_real == 0) {
                         $targetState = Configuration::get('PS_OS_AWAITING_PAYMENT');
                     } elseif ($currentOrderState->id != $psOsPartialPaymentAccepted) {
                         $targetState = $psOsPartialPaymentAccepted;
