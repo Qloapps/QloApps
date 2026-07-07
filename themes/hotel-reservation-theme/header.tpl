@@ -87,7 +87,62 @@
 		{/if}
 		<div id="page" style="{if $page_name == 'index'}height: 100%;{/if}">
 			<div class="header-container" style="{if $page_name == 'index'}height: 100%;{/if}">
-				<header id="header" style='{if $page_name == "index"}background-image:url("{$link->getMediaLink("`$smarty.const._PS_IMG_`{Configuration::get('WK_HOTEL_HEADER_IMAGE')}")}"); height: 100%;{else}background-color:#252525;{/if}' >
+				<header id="header" style='{if $page_name == "index"}height: 100%;{else}background-color:#252525;{/if}'>
+					{if $page_name == "index" && $headerMediaItems}
+						{if $QLO_HEADER_MEDIA_TYPE == $QLO_HEADER_MEDIA_TYPE_IMAGE}
+							{if $headerMediaItems|@count == 1}
+								{assign var='singleImg' value=$headerMediaItems[0]}
+								<div class="header-media-layer" style="background-image:url('{$link->getMediaLink("`$smarty.const._PS_IMG_`hotel_header_media/{$singleImg.name}")}')">
+								</div>
+							{else}
+								<div class="header-media-layer header-media-slider">
+									<div class="owl-carousel header-img-carousel"
+										data-auto-play="{if isset($headerSliderConfig.auto_play)}{$headerSliderConfig.auto_play|intval}{else}1{/if}"
+										data-interval="{if isset($headerSliderConfig.interval) && $headerSliderConfig.interval > 0}{$headerSliderConfig.interval|intval}{else}5000{/if}"
+										data-nav-type="{if isset($headerSliderConfig.nav_type)}{$headerSliderConfig.nav_type|intval}{else}{$WK_HEADER_NAV_TYPE_DOTS}{/if}"
+										data-anim-type="{if isset($headerSliderConfig.anim_type)}{$headerSliderConfig.anim_type|intval}{else}{$QLO_HEADER_ANIM_TYPE_SLIDE|intval}{/if}"
+										>
+										{foreach from=$headerMediaItems item=imgItem}
+											<div class="header-slide-img"
+												style="background-image:url('{$link->getMediaLink("`$smarty.const._PS_IMG_`hotel_header_media/{$imgItem.name}")}')"
+												data-tagline="{$imgItem.tag_line|escape:'html':'UTF-8'}"
+												data-tl-color="{$imgItem.tag_line_color|default:'#ffffff'|escape:'html':'UTF-8'}"
+												data-tl-font-size="{$imgItem.tag_line_font_size|default:16|intval}"
+												data-tl-font-weight="{$imgItem.tag_line_font_weight|default:'400'|escape:'html':'UTF-8'}">
+											</div>
+										{/foreach}
+									</div>
+								</div>
+								<div id="wk-header-owl-dots" class="header-ext-dots"></div>
+								{if isset($headerSliderConfig.nav_type) && $headerSliderConfig.nav_type != $WK_HEADER_NAV_TYPE_DOTS && $headerMediaItems|@count > 1}
+									<div class="header-media-nav-wrapper">
+										<button class="header-media-btn js-header-media-prev" aria-label="Previous"><i class="icon-angle-left"></i></button>
+										<button class="header-media-btn js-header-media-next" aria-label="Next"><i class="icon-angle-right"></i></button>
+									</div>
+								{/if}
+							{/if}
+
+						{elseif $QLO_HEADER_MEDIA_TYPE == $QLO_HEADER_MEDIA_TYPE_VIDEO}
+							{assign var='singleVid' value=$headerMediaItems[0]}
+							<div class="header-media-layer header-video-layer">
+								<video class="header-bg-video"
+									style="width: 100%;object-fit: cover;"
+									autoplay
+									loop
+									muted
+									preload="auto"
+									playsinline>
+									{if $singleVid.source_type == 'url' || $singleVid.name|substr:0:4 == 'http' || $singleVid.name|substr:0:2 == '//'}
+										<source src="{$singleVid.name|escape:'html':'UTF-8'}"
+												type="{if isset($singleVid.mime_type)}{$singleVid.mime_type|escape:'html':'UTF-8'}{else}video/mp4{/if}">
+									{else}
+										<source src="{$link->getMediaLink("`$smarty.const._PS_IMG_`hotel_header_media/{$singleVid.name}")}"
+												type="{if isset($singleVid.mime_type)}{$singleVid.mime_type|escape:'html':'UTF-8'}{else}video/mp4{/if}">
+									{/if}
+								</video>
+							</div>
+						{/if}
+					{/if}
 					<div class="banner">
 						<div class="container">
 							<div class="row">
