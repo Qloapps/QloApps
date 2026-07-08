@@ -49,6 +49,7 @@ class ProductControllerCore extends FrontController
             $this->addJS(array(
                 _THEME_JS_DIR_.'tools.js',  // retro compat themes 1.5
                 _THEME_JS_DIR_.'product.js',
+                _THEME_JS_DIR_.'room-type-service-products.js',
             ));
         } else {
             $this->addJqueryPlugin(array('scrollTo', 'serialScroll'));
