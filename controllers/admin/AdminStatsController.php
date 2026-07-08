@@ -1438,7 +1438,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
         // Unavailable are:
         // - inactive rooms (unavailable for all nights in the range)
-        // - temporarily inactive rooms for overlapping disabled date ranges (night-wise)
+        // - active rooms for overlapping disabled date ranges (night-wise)
         $countInactiveRooms = (int)Db::getInstance()->getValue(
             'SELECT IFNULL(COUNT(hri.`id`), 0)
             FROM `'._DB_PREFIX_.'htl_room_information` hri
@@ -1499,7 +1499,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 ON (hrdd.`id_room` = hri.`id`)
             LEFT JOIN `'._DB_PREFIX_.'product` p
                 ON (p.`id_product` = hri.`id_product`)
-            WHERE hri.`id_status` = '.(int)HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+            WHERE hri.`id_status` = '.(int)HotelRoomInformation::STATUS_ACTIVE.'
             AND hrdd.`date_from` < "'.pSQL($dateTo).'"
             AND hrdd.`date_to` > "'.pSQL($dateFrom).'"
             AND p.`active` = 1
@@ -1536,7 +1536,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 ON (hri.`id` = hbd.`id_room`)
             LEFT JOIN `'._DB_PREFIX_.'product` p
                 ON (p.`id_product` = hri.`id_product`)
-            WHERE hri.`id_status` = '.(int)HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+            WHERE hri.`id_status` = '.(int)HotelRoomInformation::STATUS_ACTIVE.'
             AND p.`active` = 1
             AND p.`booking_product` = 1
             AND hbd.`is_refunded` = 0
@@ -2044,7 +2044,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         ON (hrdd.`id_room` = hri.`id`)
                         LEFT JOIN `'._DB_PREFIX_.'product` p
                         ON (p.`id_product` = hri.`id_product`)
-                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_ACTIVE.'
                         AND ("'.pSQL($discreteDate['date_from']).'" >= hrdd.`date_from` AND "'.pSQL($discreteDate['date_from']).'" < hrdd.`date_to`)
                         AND p.`active` = 1'.
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
@@ -2125,7 +2125,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         ON (hrdd.`id_room` = hri.`id`)
                         LEFT JOIN `'._DB_PREFIX_.'product` p
                         ON (p.`id_product` = hri.`id_product`)
-                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_ACTIVE.'
                         AND ("'.pSQL($discreteDate['date_from']).'" >= hrdd.`date_from` AND "'.pSQL($discreteDate['date_from']).'" < hrdd.`date_to`)
                         AND p.`active` = 1'.
                         (!is_null($showAtFront) ? ' AND p.`show_at_front` = '.(int) $showAtFront : '').
@@ -2189,7 +2189,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         ON (hrdd.`id_room` = hri.`id`)
                         LEFT JOIN `'._DB_PREFIX_.'product` p
                         ON (p.`id_product` = hri.`id_product`)
-                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_ACTIVE.'
                         AND ("'.pSQL($discreteDate['date_from']).'" >= hrdd.`date_from` AND "'.pSQL($discreteDate['date_from']).'" < hrdd.`date_to`)
                         AND p.`active` = 1'.
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
