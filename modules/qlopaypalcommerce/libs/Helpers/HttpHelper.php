@@ -30,10 +30,6 @@ class HttpHelper {
 		$this->_initCurl();
 	}
 
-	public function __destruct()
-    {
-    }
-
 	private function _initCurl() {
 		if(!function_exists('curl_version')) {
 			trigger_error("Curl not available", E_USER_ERROR);
