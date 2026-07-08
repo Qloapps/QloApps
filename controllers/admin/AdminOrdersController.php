@@ -391,12 +391,15 @@ class AdminOrdersControllerCore extends AdminController
                     );
                 }
 
-                $this->page_header_toolbar_btn['print'] = array(
-                    'short' => $this->l('Print'),
-                    'href' => 'javascript:window.print()',
-                    'desc' => $this->l('Print order'),
-                    'class' => 'icon-print',
-                );
+                if (HotelBookingDetail::getIdHotelByIdOrder($order->id, false) && !$this->lite_display) {
+                    $this->page_header_toolbar_btn['booking_voucher'] = array(
+                        'short' => $this->l('Booking Voucher'),
+                        'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateBookingVoucherPDF&id_order='.$order->id,
+                        'desc' => $this->l('View booking voucher'),
+                        'class' => 'icon-file-text',
+                        'target' => true,
+                    );
+                }
 
                 if ($this->tabAccess['edit'] === 1) {
                     if (((int) $order->isReturnable())
@@ -467,7 +470,9 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 $paymentTypes = array();
-                foreach ($this->getPaymentsTypes() as $paymentType) {
+                $objOrder = new Order();
+                
+                foreach ($objOrder->getPaymentsTypes() as $paymentType) {
                     if ($paymentType['value'] != OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT) {
                         $paymentTypes[] = $paymentType;
                     }
@@ -682,7 +687,7 @@ class AdminOrdersControllerCore extends AdminController
                     'order' => $objOrder,
                     'currencies' => $currencies,
                     'payment_methods' => $payment_methods,
-                    'payment_types' => $this->getPaymentsTypes(),
+                    'payment_types' => $objOrder->getPaymentsTypes(),
                     'invoices_collection' => $objOrder->getInvoicesCollection(),
                     'current_id_lang' => $this->context->language->id,
                 )
@@ -3213,8 +3218,9 @@ class AdminOrdersControllerCore extends AdminController
         if (!Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
             return;
         }
-
-        $this->content .= $this->renderKpis();
+        if ($this->tabAccess['kpi'] === 1) {
+            $this->content .= $this->renderKpis();
+        }
 
         $customer = new Customer($order->id_customer);
         $carrier = new Carrier($order->id_carrier);
@@ -3763,8 +3769,9 @@ class AdminOrdersControllerCore extends AdminController
             'invoices_collection' => $order->getInvoicesCollection(),
             'not_paid_invoices_collection' => $order->getNotPaidInvoicesCollection(),
             'payment_methods' => $payment_methods,
-            'payment_types' => $this->getPaymentsTypes(),
+            'payment_types' => $order->getPaymentsTypes(),
             'invoice_management_active' => Configuration::get('PS_INVOICE', null, null, $order->id_shop),
+            'receipt_management_active' => Configuration::get('PS_PAYMENT_RECEIPTS', null, null, $order->id_shop),
             'display_warehouse' => (int)Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT'),
             'HOOK_CONTENT_ORDER' => Hook::exec(
                 'displayAdminOrderContentOrder',
@@ -7273,26 +7280,6 @@ class AdminOrdersControllerCore extends AdminController
         return $products;
     }
 
-    protected function getPaymentsTypes()
-    {
-        return array(
-            OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL => array(
-                'key' => 'PAYMENT_TYPE_PAY_AT_HOTEL',
-                'value' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
-                'name' => $this->l('Pay at hotel')
-            ),
-            OrderPayment::PAYMENT_TYPE_ONLINE => array(
-                'key' => 'PAYMENT_TYPE_ONLINE',
-                'value' => OrderPayment::PAYMENT_TYPE_ONLINE,
-                'name' => $this->l('Online')
-            ),
-            OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT => array(
-                'key' => 'PAYMENT_TYPE_REMOTE_PAYMENT',
-                'value' => OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT,
-                'name' => $this->l('Remote payment')
-            ),
-        );
-    }
 
     /**
      * @param OrderInvoice $order_invoice

@@ -391,10 +391,6 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = $this->l('Check Out time must be before Check In time.');
         }
 
-        if (!$rating) {
-            $this->errors[] = $this->l('Rating is required field.');
-        }
-
         if (!$address = trim($address)) {
             $this->errors[] = $this->l('Address is required field.');
         }
