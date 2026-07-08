@@ -2707,11 +2707,11 @@ class HotelHelper
             return 0;
         }
 
-        $hasDateFromTime = self::hasNonZeroTime($dateFrom);
-        $hasDateToTime = self::hasNonZeroTime($dateTo);
+        $hasDateFromTime = self::hasTimeComponent($dateFrom);
+        $hasDateToTime = self::hasTimeComponent($dateTo);
         if ($hasDateFromTime && $hasDateToTime) {
             if ($startDate->format('Y-m-d') != $endDate->format('Y-m-d')) {
-                $hoursPerDay = self::getHourlyDurationInDay($startDate, $endDate);
+                $hoursPerDay = self::getTimeDifferenceInHours($startDate, $endDate);
                 if ($hoursPerDay > 0) {
                     $totalDays = (int)$startDate->diff($endDate)->format('%a') + 1;
                     $daysDifference = (int)($totalDays * $hoursPerDay);
@@ -2737,7 +2737,7 @@ class HotelHelper
         return (int)$daysDifference;
     }
 
-    protected static function getHourlyDurationInDay(DateTime $startDate, DateTime $endDate)
+    protected static function getTimeDifferenceInHours(DateTime $startDate, DateTime $endDate)
     {
         $startTime = strtotime($startDate->format('H:i:s'));
         $endTime = strtotime($endDate->format('H:i:s'));
@@ -2768,8 +2768,8 @@ class HotelHelper
             return $result;
         }
 
-        $hasDateFromTime = self::hasNonZeroTime($dateFrom);
-        $hasDateToTime = self::hasNonZeroTime($dateTo);
+        $hasDateFromTime = self::hasTimeComponent($dateFrom);
+        $hasDateToTime = self::hasTimeComponent($dateTo);
         if (!$hasDateFromTime && !$hasDateToTime && $idHotel) {
             if (!isset($hotelCheckInOutTimesCache[$idHotel])) {
                 $checkInTime = '12:00:00';
@@ -2799,7 +2799,7 @@ class HotelHelper
         return $result;
     }
 
-    protected static function hasNonZeroTime($value)
+    protected static function hasTimeComponent($value)
     {
         if (!preg_match('/\s([0-9]{1,2}):([0-9]{2})(:([0-9]{2}))?$/', trim($value), $matches)) {
             return false;

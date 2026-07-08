@@ -375,6 +375,10 @@ class ProductControllerCore extends FrontController
                         $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
                         $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
                     }
+                    
+                    $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $hotel_id);
+                    $date_from = $bookingDateRange['date_from'];
+                    $date_to = $bookingDateRange['date_to'];
 
                     $hotel_branch_obj = new HotelBranchInformation($hotel_id);
                     /*Max date of ordering for order restrict*/
@@ -488,17 +492,13 @@ class ProductControllerCore extends FrontController
                     $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
                     $this->assignRoomServiceProductVars();
 
-                    $priceCalcDateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $hotel_id);
-                    $priceCalcDateFrom = $priceCalcDateRange['date_from'];
-                    $priceCalcDateTo = $priceCalcDateRange['date_to'];
-                    
                     // product price after imposing feature prices...
                     if ($useTax) {
                         $priceProduct = Product::getPriceStatic($this->product->id, true);
-                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $priceCalcDateFrom, $priceCalcDateTo, true, 0, 0, 0, 0, 1, 1, $occupancy_value);
+                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, true, 0, 0, 0, 0, 1, 1, $occupancy_value);
                     } else {
                         $priceProduct = Product::getPriceStatic($this->product->id, false);
-                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $priceCalcDateFrom, $priceCalcDateTo, false, 0, 0, 0, 0, 1, 1, $occupancy_value);
+                        $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, false, 0, 0, 0, 0, 1, 1, $occupancy_value);
                     }
                     $productPriceWithoutReduction = $this->product->getPriceWithoutReduct(!$useTax);
                     $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
@@ -656,10 +656,6 @@ class ProductControllerCore extends FrontController
 
         $roomType = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProduct);
         $idHotel = $roomType['id_hotel'];
-        $dateRange = HotelHelper::validateCheckInCheckOutDate($dateFrom, $dateTo, $idHotel);
-        $dateFrom = $dateRange['date_from'];
-        $dateTo = $dateRange['date_to'];
-
         $hotel = $objHotel->hotelBranchesInfo(false, 2, 1, $idHotel);
         $hotelLocation = $hotel['city'].', '.(isset($hotel['state_name']) ? ' '.$hotel['state_name'].', ' : '').
         ' '.$hotel['country_name'];
@@ -1469,8 +1465,13 @@ class ProductControllerCore extends FrontController
             }
             $roomTypeDemands = Tools::getValue('room_type_demands');
             $roomServiceProducts = Tools::getValue('room_service_products');
-            $dateFrom = date('Y-m-d H:i:s', strtotime($dateFrom));
-            $dateTo = date('Y-m-d H:i:s', strtotime($dateTo));
+
+            $roomTypeInfo = (new HotelRoomType())->getRoomTypeInfoByIdProduct($idProduct);
+            $idHotel = $roomTypeInfo ? $roomTypeInfo['id_hotel'] : 0;
+
+            $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($dateFrom, $dateTo, $idHotel);
+            $dateFrom = $bookingDateRange['date_from'];
+            $dateTo = $bookingDateRange['date_to'];
             $this->assignRoomServiceProductVars();
             if ($this->assignBookingFormVars(
                 $idProduct,

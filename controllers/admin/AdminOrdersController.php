@@ -6961,11 +6961,12 @@ class AdminOrdersControllerCore extends AdminController
         $product_price_tax_incl = str_replace(',', '.', Tools::getValue('product_price_tax_incl'));
         $product_price_tax_excl = str_replace(',', '.', Tools::getValue('product_price_tax_excl'));
         $product_informations = $_POST['edit_product'];
-        $new_date_from = trim(date('Y-m-d H:i:s', strtotime($product_informations['date_from'])));
-        $new_date_to = trim(date('Y-m-d H:i:s', strtotime($product_informations['date_to'])));
+        $id_hotel = trim(Tools::getValue('id_hotel'));
+        $newDateRange = HotelHelper::validateCheckInCheckOutDate($product_informations['date_from'], $product_informations['date_to'], (int) $id_hotel);
+        $new_date_from = trim($newDateRange['date_from']);
+        $new_date_to = trim($newDateRange['date_to']);
         $old_date_from = date('Y-m-d H:i:s', strtotime(trim(Tools::getValue('date_from'))));
         $old_date_to = date('Y-m-d H:i:s', strtotime(trim(Tools::getValue('date_to'))));
-        $id_hotel = trim(Tools::getValue('id_hotel'));
         $id_room = trim(Tools::getValue('id_room'));
         $id_product = trim(Tools::getValue('id_product'));
         $room_unit_price = trim(Tools::getValue('room_unit_price'));
