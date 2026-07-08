@@ -195,7 +195,7 @@ class StatsBestProducts extends ModuleGrid
                 SELECT hri.`id_product`, DATEDIFF("'.pSQL($date_to).'", "'.pSQL($date_from).'") AS max_room_nights,
                 CASE
                     WHEN hri.`id_status` = '.(int) HotelRoomInformation::STATUS_INACTIVE.' THEN DATEDIFF("'.pSQL($date_to).'", "'.pSQL($date_from).'")
-                    WHEN hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.' THEN IF(hrdd.`date_to` > "'.pSQL($date_from).'" AND hrdd.`date_from` < "'.pSQL($date_to).'", SUM(ABS(DATEDIFF(LEAST(hrdd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hrdd.`date_from`, "'.pSQL($date_from).'")))), 0)
+                    WHEN hri.`id_status` = '.(int) HotelRoomInformation::STATUS_ACTIVE.' THEN IF(hrdd.`date_to` > "'.pSQL($date_from).'" AND hrdd.`date_from` < "'.pSQL($date_to).'", SUM(ABS(DATEDIFF(LEAST(hrdd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hrdd.`date_from`, "'.pSQL($date_from).'")))), 0)
                     ELSE 0
                 END AS disabled_room_nights
                 FROM `'._DB_PREFIX_.'htl_room_information` hri

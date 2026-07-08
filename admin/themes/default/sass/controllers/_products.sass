@@ -141,3 +141,275 @@
         border-radius: 6px
     .tooltip_action_block
         min-width: unset
+
+// Hotel Room Cards Layout (Rooms tab, Catalog > Room Types > Edit > Rooms)
+.room-wrapper
+    margin-top: 10px
+.rooms-list-search
+    display: flex
+    align-items: center
+    margin-bottom: 10px
+    #rooms-search-input
+        max-width: 260px
+    .rooms-search-count
+        color: #555555
+        font-size: 12px
+        white-space: nowrap
+        margin-left: 10px
+.rooms-footer-row
+    display: flex
+    align-items: center
+    justify-content: space-between
+    flex-wrap: wrap
+    margin-top: 10px
+.rooms-footer-left
+    display: flex
+    align-items: center
+    gap: 10px
+.rooms-footer-right
+    display: flex
+    align-items: center
+    gap: 10px
+    .pagination
+        margin: 0
+.rooms-list-body
+    margin-bottom: 10px
+    border: 1px solid #F2F2F2
+.room-card
+    background: #FFFFFF
+    border-bottom: 1px solid #EAEDEF
+    transition: box-shadow 0.15s ease
+    &:hover
+        box-shadow: 0 1px 5px rgba(0,0,0,0.08)
+.card-row
+    display: flex
+    align-items: stretch
+    flex-wrap: nowrap
+    padding: 12px 0px
+.room-selection
+    width: 34px
+    flex-shrink: 0
+    display: flex
+    align-items: flex-start
+    padding: 18px 0 0 12px
+.room-cell-grid
+    display: flex
+    flex: 1
+    flex-wrap: wrap
+    align-items: stretch
+.room-field-col
+    flex: 1
+    min-width: 130px
+    display: flex
+    flex-direction: column
+    &:last-child
+        border-right: none
+.padding-20
+    padding: 10px 1px 6px 16px
+
+.hook-column
+    min-height: 36px
+.room-field-label
+    display: block
+    color: #555555
+    margin-bottom: 5px
+    font-weight: 400
+    font-size: 12px
+    line-height: 100%
+    letter-spacing: 0px
+.room-field-value
+    font-weight: 600
+    font-size: 12px
+    line-height: 24px
+    letter-spacing: 0px
+    color: #555555
+// Status badge colors
+.room-status-badge
+    display: inline-block
+    font-size: 12px
+    font-weight: 700
+    letter-spacing: 0.3px
+    &.status-active
+        color: #00a65a
+    &.status-inactive
+        color: #EF4444
+.col-action
+    width: 130px
+    flex-shrink: 0
+    padding: 14px 10px
+.dates-wrap
+    display: flex
+    align-items: center
+    gap: 6px
+    padding: 2px 0
+    .deactiveDatesModal
+        font-weight: 600
+        font-size: 12px
+        line-height: 24px
+        background: none
+        border: none
+        box-shadow: none
+        padding: 0
+        color: #00AFF0
+        &:hover
+            background: none
+            border-color: transparent
+            color: #0090c8
+            text-decoration: underline
+    .btn-sm
+        padding: 3px 8px
+        font-size: 12px
+.dates-info-icon
+    color: #5bc0de
+    cursor: pointer
+    font-size: 15px
+.col-action .btn-group .btn-sm
+    padding: 3px 8px
+    font-size: 12px
+@media (max-width: 992px)
+    .card-row
+        flex-wrap: wrap
+    .room-cell-grid
+        flex-direction: column
+    .room-field-col
+        min-width: 100%
+        border-right: none
+        border-bottom: 1px solid #F0F0F0
+    .col-action
+        width: 100%
+        border-left: none
+        border-top: 1px solid #F0F0F0
+        padding: 10px
+
+.modal-right
+    .modal-dialog.modal-dialog-right
+        position: fixed
+        right: 0
+        top: 0
+        bottom: 0
+        margin: 0
+        width: 520px
+        max-width: 100%
+        height: 100%
+        transform: translateX(100%)
+        transition: transform 0.25s ease-out
+    &.in .modal-dialog.modal-dialog-right
+        transform: translateX(0)
+    .modal-content
+        height: 100%
+        border-radius: 0
+        border: none
+        box-shadow: -4px 0 20px rgba(0,0,0,0.12)
+        display: flex
+        flex-direction: column
+    .modal-header
+        display: flex
+        align-items: center
+        justify-content: space-between
+        height: 64px
+        padding: 0 20px
+        border-bottom: 1px solid #F2F2F2
+        flex-shrink: 0
+        .close
+            margin: 0
+            float: none
+            order: 2
+            font-size: 22px
+            font-weight: 400
+            color: #333333
+            opacity: 1
+            &:hover
+                color: #000
+                opacity: 1
+    .modal-title
+        order: 1
+        margin: 0
+        font-size: 20px
+        font-weight: 700
+        line-height: 24px
+        color: #333333
+    .modal-body
+        flex: 1
+        overflow-y: auto
+        padding: 20px
+    .modal-backdrop
+        background: rgba(0,0,0,0.3)
+    label.required
+        &:before
+            content: none
+        &:after
+            content: "*"
+            color: red
+            font-size: 14px
+            position: relative
+            line-height: 12px
+.rm-form.form-horizontal
+    margin: 0
+.room-edit-group
+    margin-bottom: 16px
+    &:last-child
+        margin-bottom: 0
+.room-edit-label
+    font-weight: 400
+    font-size: 14px
+    line-height: 17px
+    letter-spacing: 0px
+    color: #555555
+    text-align: left!important
+.room-edit-group
+    .form-control, select.form-control
+        background: #F5F8F9
+        border: 1px solid #C7D6DB
+        border-radius: 3px
+        font-size: 12px
+        line-height: 16px
+        color: #555555
+        height: auto
+        padding: 7px 8px
+    .form-control-static
+        background: #F5F8F9
+        border: 1px solid #C7D6DB
+        border-radius: 3px
+        font-size: 12px
+        line-height: 16px
+        color: #555555
+        padding: 7px 8px
+        margin: 0
+    textarea.form-control
+        height: auto
+    .form-control:focus
+        border-color: #00AFF0
+        box-shadow: 0 0 0 2px rgba(0,175,240,0.15)
+.modal-footer-right
+    border-top: 1px solid #F2F2F2
+    padding: 12px 20px
+    display: flex
+    justify-content: flex-end
+    gap: 8px
+    flex-shrink: 0
+    .btn
+        display: flex
+        flex-direction: column
+        align-items: center
+        justify-content: center
+        gap: 4px
+        min-width: 60px
+        height: 56px
+        background: #FFFFFF
+        border: 1px solid #DEDEDE
+        border-radius: 3px
+        font-size: 12px
+        color: #363A41
+.open-edit-disable-dates
+    background: #FFFFFF
+    border: 1px solid #00AFF0
+    border-radius: 2px
+    color: #363A41
+    &:hover
+        background: #FFFFFF
+        border-color: #00AFF0
+        color: #363A41
+        i
+            color: #00AFF0
+    i
+        color: #00AFF0

@@ -233,11 +233,11 @@ class AdminImportControllerCore extends AdminController
                     'floor' => array('label' => $this->l('Floor')),
                     'id_product' => array('label' => $this->l('Room Type ID *')),
                     'id_status' => array(
-                        'label' => $this->l('Room status (1/2/3)'),
-                        'help' => $this->l('1 = Active, 2 = Inactive, 3 = Temporarily Inactive')),
+                        'label' => $this->l('Room status (1/2)'),
+                        'help' => $this->l('1 = Active, 2 = Inactive')),
                     'comment' => array('label' => $this->l('Extra Information')),
-                    'dates' => array('label' => $this->l('Inactive date ranges and Reason(yyyy-mm-dd)'),
-                        'help' => $this->l('If Temporarily Inactive (date_from:date_to:reason, date_from:date_to:reason,...)')
+                    'dates' => array('label' => $this->l('Disable date ranges and Reason(yyyy-mm-dd)'),
+                        'help' => $this->l('date_from:date_to:reason, date_from:date_to:reason,...')
                     ),
                 );
             break;
@@ -2015,46 +2015,31 @@ class AdminImportControllerCore extends AdminController
             $lang_field_error = $objHotelRoomInfo->validateFieldsLang(UNFRIENDLY_ERROR, true);
             $res = false;
             if ($this->checkRequiredFields($info, 'room_num')) {
-                if ($objHotelRoomInfo->id_status == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE
-                    && (!isset($objHotelRoomInfo->dates) || !$objHotelRoomInfo->dates)
-                ) {
-                    $this->errors[] = sprintf(
-                        Tools::displayError('%1$s (ID: %2$s) cannot be saved due to missing disable dates.'),
-                        (isset($info['room_num']) && !empty($info['room_num']))? Tools::safeOutput($info['room_num']) : 'No Name',
-                        (isset($info['id']) && !empty($info['id']))? Tools::safeOutput($info['id']) : 'No ID'
-                    );
-                } else if (Validate::isLoadedObject($objProduct = new Product((int) $info['id_product']))
+                if (Validate::isLoadedObject($objProduct = new Product((int) $info['id_product']))
                     && Product::isBookingProduct($objProduct->id)
                 ) {
                     if ($field_error === true && $lang_field_error === true) {
                         if ($res = $objHotelRoomInfo->add()) {
                             if ($idRoom = $objHotelRoomInfo->id) {
-                                if ($objHotelRoomInfo->id_status == HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
-                                    $objHotelRoomDisableDates = new HotelRoomDisableDates();
-                                    if (isset($objHotelRoomInfo->dates)
-                                        && $objHotelRoomInfo->dates
-                                    ) {
-                                        foreach ($objHotelRoomInfo->dates as $disableDate) {
-                                            $datesData = explode(':', $disableDate);
-                                            $reason = '';
-                                            if(isset($datesData[2])) {
-                                                $reason = $datesData[2];
-                                            }
-
-                                            if (isset($datesData[0]) && isset($datesData[1])
-                                                && strtotime($datesData[1]) > strtotime($datesData[0])
-                                            ) {
-                                                $objHotelRoomDisableDates = new HotelRoomDisableDates();
-                                                $objHotelRoomDisableDates->id_room_type = $objHotelRoomInfo->id_product;
-                                                $objHotelRoomDisableDates->id_room = $idRoom;
-                                                $objHotelRoomDisableDates->date_from = date('Y-m-d', strtotime($datesData[0]));
-                                                $objHotelRoomDisableDates->date_to = date('Y-m-d', strtotime($datesData[1]));
-                                                $objHotelRoomDisableDates->reason = $reason;
-                                                $objHotelRoomDisableDates->add();
-                                            }
+                                if (isset($objHotelRoomInfo->dates) && $objHotelRoomInfo->dates) {
+                                    foreach ($objHotelRoomInfo->dates as $disableDate) {
+                                        $datesData = explode(':', $disableDate);
+                                        $reason = '';
+                                        if(isset($datesData[2])) {
+                                            $reason = $datesData[2];
                                         }
-                                    } else {
-                                        $this->warnings[] = Tools::displayError('Please set date from and date to incase of temporary inactive status.');
+
+                                        if (isset($datesData[0]) && isset($datesData[1])
+                                            && strtotime($datesData[1]) > strtotime($datesData[0])
+                                        ) {
+                                            $objHotelRoomDisableDates = new HotelRoomDisableDates();
+                                            $objHotelRoomDisableDates->id_room_type = $objHotelRoomInfo->id_product;
+                                            $objHotelRoomDisableDates->id_room = $idRoom;
+                                            $objHotelRoomDisableDates->date_from = date('Y-m-d', strtotime($datesData[0]));
+                                            $objHotelRoomDisableDates->date_to = date('Y-m-d', strtotime($datesData[1]));
+                                            $objHotelRoomDisableDates->reason = $reason;
+                                            $objHotelRoomDisableDates->add();
+                                        }
                                     }
                                 }
                             }

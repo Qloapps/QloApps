@@ -159,23 +159,21 @@ class HotelRoomType extends ObjectModel
             $objHRInformation->comment = $room['comment'];
             if ($objHRInformation->save()) {
                 $idRoom = $objHRInformation->id;
-                if ((int)$room['id_status'] === (int)HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
-                    $disableDates = Db::getInstance()->executeS(
-                        'SELECT * FROM `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
-                        WHERE hrdd.`id_room` = '.(int)$room['id']
-                    );
+                $disableDates = Db::getInstance()->executeS(
+                    'SELECT * FROM `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
+                    WHERE hrdd.`id_room` = '.(int)$room['id']
+                );
 
-                    if (is_array($disableDates) && count($disableDates)) {
-                        foreach ($disableDates as $disableDate) {
-                            $objHRDisableDates = new HotelRoomDisableDates();
-                            $objHRDisableDates->id_room_type = $idHotelRoomTypeNew;
-                            $objHRDisableDates->id_room = $idRoom;
-                            $objHRDisableDates->date_from = $disableDate['date_from'];
-                            $objHRDisableDates->date_to = $disableDate['date_to'];
-                            $objHRDisableDates->reason = $disableDate['reason'];
-                            if (!$objHRDisableDates->save()) {
-                                return false;
-                            }
+                if (is_array($disableDates) && count($disableDates)) {
+                    foreach ($disableDates as $disableDate) {
+                        $objHRDisableDates = new HotelRoomDisableDates();
+                        $objHRDisableDates->id_room_type = $idHotelRoomTypeNew;
+                        $objHRDisableDates->id_room = $idRoom;
+                        $objHRDisableDates->date_from = $disableDate['date_from'];
+                        $objHRDisableDates->date_to = $disableDate['date_to'];
+                        $objHRDisableDates->reason = $disableDate['reason'];
+                        if (!$objHRDisableDates->save()) {
+                            return false;
                         }
                     }
                 }
