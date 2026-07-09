@@ -161,6 +161,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $occupancy = array();
             }
 
+            $booking_date_range = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $id_hotel);
+            $date_from = $booking_date_range['date_from'];
+            $date_to = $booking_date_range['date_to'];
+
             $this->id_cart = (int) $this->context->cart->id;
             $this->id_guest = (int) $this->context->cookie->id_guest;
             $this->id_hotel = $id_hotel;

@@ -2770,7 +2770,7 @@ class HotelHelper
 
         $hasDateFromTime = self::hasTimeComponent($dateFrom);
         $hasDateToTime = self::hasTimeComponent($dateTo);
-        if (!$hasDateFromTime && !$hasDateToTime && $idHotel) {
+        if (!$hasDateFromTime || !$hasDateToTime && $idHotel) {
             if (!isset($hotelCheckInOutTimesCache[$idHotel])) {
                 $checkInTime = '12:00:00';
                 $checkOutTime = '11:00:00';
