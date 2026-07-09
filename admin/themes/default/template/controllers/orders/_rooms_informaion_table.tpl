@@ -27,21 +27,22 @@
                 <table class="table" id="customer_cart_details">
                     <thead>
                         <tr>
-                            <th><span class="title_box">{l s='Room No.'}</span></th>
-                            <th><span class="title_box">{l s='Image'}</th>
-                            <th><span class="title_box">{l s='Room Type'}</span></th>
-                            <th><span class="title_box">{l s='Duration'}</span></th>
-                            <th class="fixed-width-lg"><span class="title_box">{l s='Occupancy'}</span></th>
-                            <th><span class="title_box">{l s='Room Price (Tax excl.)'}</span></th>
-                            <th><span class="title_box">{l s='Extra Services/Fee (Tax excl.)'}</span></th>
-                            <th><span class="title_box">{l s='Total Tax'}</span></th>
-                            <th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Room name'}">{l s='Room'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Room image'}">{l s='Image'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Booking check-in and check-out dates'}">{l s='Duration'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Number of adults and children'}">{l s='Occupancy'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Guest check-in and check-out date/time'}">{l s='Check-in/Check-out'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Manual or automatic room allotment'}">{l s='Allotment'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Room Price (Tax excl.)'}">{l s='Room Price (TE)'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Extra Services/Fee (Tax excl.)'}">{l s='Services (TE)'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Total tax applied on this room booking'}">{l s='Total Tax'}</span></th>
+                            <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Total Price (Tax incl.)'}">{l s='Total Price (TI)'}</span></th>
                             {if (isset($refundReqBookings) && $refundReqBookings)}
-                                <th><span class="title_box">{l s='Refund/Cancel Status'}</span></th>
-                                <th><span class="title_box">{l s='Refunded amount'}</span></th>
+                                <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Refund or cancellation status of this room booking'}">{l s='Refund/Cancel'}</span></th>
+                                <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Amount refunded for this room booking'}">{l s='Refunded amount'}</span></th>
                             {/if}
                             {if ($can_edit && !$order->hasBeenDelivered())}
-                            <th class="fixed-width-md"><span class="title_box">{l s='Actions'}</th>
+                            <th class="fixed-width-md center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Room Actions'}">{l s='Actions'}</span></th>
                             {/if}
                         </tr>
                     </thead>
