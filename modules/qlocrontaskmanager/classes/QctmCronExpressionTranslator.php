@@ -27,32 +27,6 @@ if (!defined('_PS_VERSION_')) {
 
 class QctmCronExpressionTranslator
 {
-    const WEEKDAYS = array(
-        0 => 'Sunday',
-        1 => 'Monday',
-        2 => 'Tuesday',
-        3 => 'Wednesday',
-        4 => 'Thursday',
-        5 => 'Friday',
-        6 => 'Saturday',
-        7 => 'Sunday',
-    );
-
-    const MONTHS = array(
-        1 => 'January',
-        2 => 'February',
-        3 => 'March',
-        4 => 'April',
-        5 => 'May',
-        6 => 'June',
-        7 => 'July',
-        8 => 'August',
-        9 => 'September',
-        10 => 'October',
-        11 => 'November',
-        12 => 'December',
-    );
-
     protected $module;
 
     public function __construct()
@@ -271,16 +245,38 @@ class QctmCronExpressionTranslator
 
     public function weekdayName($weekday)
     {
-        return ($this->isNumeric($weekday) && isset(self::WEEKDAYS[(int) $weekday]))
-            ? $this->module->l(self::WEEKDAYS[(int) $weekday])
-            : $weekday;
+        $weekdays = array(
+            0 => $this->module->l('Sunday'),
+            1 => $this->module->l('Monday'),
+            2 => $this->module->l('Tuesday'),
+            3 => $this->module->l('Wednesday'),
+            4 => $this->module->l('Thursday'),
+            5 => $this->module->l('Friday'),
+            6 => $this->module->l('Saturday'),
+            7 => $this->module->l('Sunday'),
+        );
+
+        return ($this->isNumeric($weekday) && isset($weekdays[(int) $weekday])) ? $weekdays[(int) $weekday] : $weekday;
     }
 
     public function monthName($month)
     {
-        return ($this->isNumeric($month) && isset(self::MONTHS[(int) $month]))
-            ? $this->module->l(self::MONTHS[(int) $month])
-            : $month;
+        $months = array(
+            1 => $this->module->l('January'),
+            2 => $this->module->l('February'),
+            3 => $this->module->l('March'),
+            4 => $this->module->l('April'),
+            5 => $this->module->l('May'),
+            6 => $this->module->l('June'),
+            7 => $this->module->l('July'),
+            8 => $this->module->l('August'),
+            9 => $this->module->l('September'),
+            10 => $this->module->l('October'),
+            11 => $this->module->l('November'),
+            12 => $this->module->l('December'),
+        );
+
+        return ($this->isNumeric($month) && isset($months[(int) $month])) ? $months[(int) $month] : $month;
     }
 
     public function hourLabel($hour, $minute = null)
