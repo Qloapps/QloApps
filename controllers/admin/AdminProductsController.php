@@ -5509,7 +5509,9 @@ class AdminProductsControllerCore extends AdminController
                 if (empty($this->errors)) {
                     foreach ($roomsInfo as $roomInfo) {
                         $objHotelRoomInfo = new HotelRoomInformation($roomInfo['id']);
-                        $objHotelRoomInfo->id_status = $roomInfo['id_status'];
+                        if (!empty($roomInfo['id_status'])) {
+                            $objHotelRoomInfo->id_status = $roomInfo['id_status'];
+                        }
                         if (isset($roomInfo['floor']) && $roomInfo['floor'] != '') {
                             $objHotelRoomInfo->floor = $roomInfo['floor'];
                         }

@@ -366,6 +366,7 @@
                     </label>
                     <div class="col-lg-6">
                         <select class="form-control bulk_update_room_status" name="bulk_update_room_status">
+                            <option value="0">{l s='Select Status'}</option>
                             {foreach from=$rm_status item=room_stauts}
                                 <option value="{$room_stauts['id']}">{$room_stauts['status']|escape:'htmlall':'UTF-8'}</option>
                             {/foreach}
@@ -1096,7 +1097,7 @@
         $('#bulkUpdateRoomModal').on('show.bs.modal', function(e){
             if (!$(e.relatedTarget).attr('disabled')) {
                 $('#bulkUpdateRoomModal table tbody').html('');
-                $('.bulk_update_room_status').val(rm_status.STATUS_ACTIVE.id).closest('.modal-body').find('.rooms-disable-dates').parent().hide();
+                $('.bulk_update_room_status').val('0').closest('.modal-body').find('.rooms-disable-dates').parent().hide();
                 $('[name="bulk_update_room_comment"]').val('');
                 $('[name="bulk_update_room_floor"]').val('');
                 $('#page-loader').show();
