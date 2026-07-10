@@ -80,6 +80,9 @@ class AdminCustomersControllerCore extends AdminController
         $this->_join = 'LEFT JOIN '._DB_PREFIX_.'gender_lang gl ON (a.id_gender = gl.id_gender AND gl.id_lang = '.(int)$this->context->language->id.')';
         $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'group_lang grl ON (a.id_default_group = grl.id_group AND grl.id_lang = '.(int)$this->context->language->id.')';
         $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'orders o ON (a.id_customer = o.id_customer)';
+        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'address ad ON (ad.id_customer = a.id_customer AND ad.deleted = 0)';
+        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'state adstate ON (adstate.id_state = ad.id_state)';
+        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'country_lang adcountry ON (adcountry.id_country = ad.id_country AND adcountry.id_lang = '.(int)$this->context->language->id.')';
         $this->_group = 'GROUP BY a.`id_customer`';
 
         $this->fields_list = array(
@@ -150,6 +153,90 @@ class AdminCustomersControllerCore extends AdminController
                 'optional' => true,
                 'visible_default' => false,
             ),
+            'address_alias' => array(
+                'title' => $this->l('Address alias'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address_company' => array(
+                'title' => $this->l('Company'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address_vat_number' => array(
+                'title' => $this->l('VAT number'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address1' => array(
+                'title' => $this->l('Address'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address2' => array(
+                'title' => $this->l('Address (2)'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address_city' => array(
+                'title' => $this->l('City'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address_state' => array(
+                'title' => $this->l('State'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address_postcode' => array(
+                'title' => $this->l('Zip/Postal Code'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address_country' => array(
+                'title' => $this->l('Country'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address_phone' => array(
+                'title' => $this->l('Home phone'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address_phone_mobile' => array(
+                'title' => $this->l('Mobile phone'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
+            'address_dni' => array(
+                'title' => $this->l('Identification Number'),
+                'optional' => true,
+                'visible_default' => false,
+                'havingFilter' => true,
+                'orderby' => false,
+            ),
             'active' => array(
                 'title' => $this->l('Enabled'),
                 'align' => 'text-center',
@@ -189,6 +276,7 @@ class AdminCustomersControllerCore extends AdminController
                 'title' => $this->l('Banned'),
                 'type' => 'bool',
                 'displayed' => false,
+                'filter_key' => 'a!deleted',
                 'callback' => 'getCustomerStatusLabel',
             ),
             'order_date' => array(
@@ -211,7 +299,11 @@ class AdminCustomersControllerCore extends AdminController
             WHERE g.id_customer = a.id_customer
             ORDER BY c.date_add DESC
             LIMIT 1
-        ) as connect';
+        ) as connect,
+        ad.alias as address_alias, ad.company as address_company, ad.vat_number as address_vat_number,
+        ad.address1, ad.address2, ad.city as address_city, adstate.name as address_state,
+        ad.postcode as address_postcode, adcountry.name as address_country, ad.phone as address_phone,
+        ad.phone_mobile as address_phone_mobile, ad.dni as address_dni';
 
         // Check if we can add a customer
         if (Shop::isFeatureActive() && (Shop::getContext() == Shop::CONTEXT_ALL || Shop::getContext() == Shop::CONTEXT_GROUP)) {
