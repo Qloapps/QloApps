@@ -23,22 +23,22 @@
 $(document).ready(function () {
     var closeTimer = null;
 
-    function buildTooltip(periods) {
-        var $tpl  = $('#stay-period-tpl .qlo-tooltip-cont').clone();
-        var $body = $tpl.find('.qlo-tip-body').empty();
+    function stayPeriodTooltip(periods) {
+        var $stayPeriodCont = $('#qlo-stay-period-tooltip .qlo-stay-period-cont').clone();
+        var $stayPeriodBody = $stayPeriodCont.find('.qlo-stay-period-body').empty();
 
-        $body.append(
+        $stayPeriodBody.append(
             $('<div class="qlo-stay-period qlo-stay-period-header">').append(
-                $('<span class="qlo-tip-element-head">').text($('#stay-period-tpl').data('label-dates')),
-                $('<span class="qlo-tip-element-value">').text($('#stay-period-tpl').data('label-rooms'))
+                $('<span class="qlo-stay-period-element-head">').text($('#qlo-stay-period-tooltip').data('label-dates')),
+                $('<span class="qlo-stay-period-element-value">').text($('#qlo-stay-period-tooltip').data('label-rooms'))
             )
         );
 
         $.each(periods, function (_, p) {
-            $body.append(
+            $stayPeriodBody.append(
                 $('<div class="qlo-stay-period">').append(
-                    $('<span class="qlo-tip-element-head">').text(p.from + ' – ' + p.to),
-                    $('<span class="qlo-tip-element-value">').text(p.count)
+                    $('<span class="qlo-stay-period-element-head">').text(p.from + ' – ' + p.to),
+                    $('<span class="qlo-stay-period-element-value">').text(p.count)
                 )
             );
         });
@@ -46,7 +46,7 @@ $(document).ready(function () {
             'class': 'ui-tooltip ui-widget ui-corner-all ui-widget-content qlo-stay-period-tooltip',
             'role' : 'tooltip'
         }).append(
-            $('<div class="ui-tooltip-content">').append($tpl)
+            $('<div class="ui-tooltip-content">').append($stayPeriodCont)
         );
     }
 
@@ -71,7 +71,7 @@ $(document).ready(function () {
         $('.qlo-stay-period-tooltip').stop(true).remove();
 
         var $icon = $(this);
-        var $tip  = buildTooltip(periods).appendTo('body').hide().fadeIn(200);
+        var $tip  = stayPeriodTooltip(periods).appendTo('body').hide().fadeIn(200);
 
         var iconOffset = $icon.offset();
         $tip.css({

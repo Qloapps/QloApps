@@ -374,33 +374,34 @@ class AdminOrdersControllerCore extends AdminController
         if (empty($value)) {
             return '--';
         }
-        $formatted = array();
-        foreach (explode('::', $value) as $chunk) {
-            $countParts = explode('~', $chunk);
-            $dateParts  = explode('|', $countParts[0]);
-            if (count($dateParts) === 2) {
-                $formatted[] = array(
-                    'from'  => Tools::displayDate(trim($dateParts[0])),
-                    'to'    => Tools::displayDate(trim($dateParts[1])),
-                    'count' => isset($countParts[1]) ? (int)$countParts[1] : 1,
+
+        $stayPeriods = array();
+        foreach (explode('::', $value) as $stays) {
+            $countStays = explode('~', $stays);
+            $stayDates  = explode('|', $countStays[0]);
+            if (count($stayDates) === 2) {
+                $stayPeriods[] = array(
+                    'from'  => Tools::displayDate(trim($stayDates[0])),
+                    'to'    => Tools::displayDate(trim($stayDates[1])),
+                    'count' => isset($countStays[1]) ? (int)$countStays[1] : 1,
                 );
             }
         }
 
         $datesDisplay = array();
-        foreach (array_slice($formatted, 0, 1) as $entry) {
-            $datesDisplay[] = $entry['from'].' - '.$entry['to'];
+        foreach (array_slice($stayPeriods, 0, 1) as $stayPeriod) {
+            $datesDisplay[] = $stayPeriod['from'].' - '.$stayPeriod['to'];
         }
 
-        $output = implode('<br>', $datesDisplay);
-        $uniqueStayPeriods = count($formatted);
+        $stayPeriodHtml = implode('<br>', $datesDisplay);
+        $uniqueStayPeriods = count($stayPeriods);
 
         if ($uniqueStayPeriods > 1) {
-            $output .= ' <span class="qlo-stay-period-badge qlo-stay-period-tip" data-stay-tip="'
-                .htmlspecialchars(json_encode($formatted)).'">+'
+            $stayPeriodHtml .= ' <span class="qlo-stay-period-badge qlo-stay-period-tip" data-stay-tip="'
+                .htmlspecialchars(json_encode($stayPeriods)).'">+'
                 .($uniqueStayPeriods - 1).'</span>';
         }
-        return $output;
+        return $stayPeriodHtml;
     }
 
     public function initPageHeaderToolbar()

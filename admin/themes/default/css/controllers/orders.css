@@ -22,15 +22,13 @@
 
 .qlo-stay-period-tooltip {
     border: none;
-    box-shadow: 0 0 5px #aaa;
-    -webkit-box-shadow: 0 0 5px #aaa;
     padding-bottom: 10px;
     min-width: 260px;
 }
-.qlo-stay-period-tooltip .qlo-tip-date {
+.qlo-stay-period-tooltip .qlo-stay-period-date {
     font-weight: bold;
 }
-.qlo-stay-period-tooltip .qlo-tip-body {
+.qlo-stay-period-tooltip .qlo-stay-period-body {
     display: table;
     width: 100%;
     margin-top: 6px;
@@ -38,16 +36,16 @@
 .qlo-stay-period-tooltip .qlo-stay-period {
     display: table-row;
 }
-.qlo-stay-period-tooltip .qlo-tip-element-head,
-.qlo-stay-period-tooltip .qlo-tip-element-value {
+.qlo-stay-period-tooltip .qlo-stay-period-element-head,
+.qlo-stay-period-tooltip .qlo-stay-period-element-value {
     display: table-cell;
     padding: 3px 6px;
 }
-.qlo-stay-period-tooltip .qlo-tip-element-value {
+.qlo-stay-period-tooltip .qlo-stay-period-element-value {
     text-align: right;
 }
-.qlo-stay-period-tooltip .qlo-stay-period-header .qlo-tip-element-head,
-.qlo-stay-period-tooltip .qlo-stay-period-header .qlo-tip-element-value {
+.qlo-stay-period-tooltip .qlo-stay-period-header .qlo-stay-period-element-head,
+.qlo-stay-period-tooltip .qlo-stay-period-header .qlo-stay-period-element-value {
     border-bottom: 1px solid #ddd;
     padding-bottom: 5px;
 }

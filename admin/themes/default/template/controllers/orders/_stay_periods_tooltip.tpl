@@ -20,14 +20,14 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div id="stay-period-tpl"
+<div id="qlo-stay-period-tooltip"
      style="display:none;"
      data-label-dates="{l s='Dates'}"
      data-label-rooms="{l s='Rooms'}">
-    <div class="qlo-tooltip-cont">
-        <div class="qlo-tip-header">
-            <div class="qlo-tip-date">{l s='Stay Periods'}</div>
+    <div class="qlo-stay-period-cont">
+        <div class="qlo-stay-period-header">
+            <div class="qlo-stay-period-date">{l s='Stay Periods'}</div>
         </div>
-        <div class="qlo-tip-body"></div>
+        <div class="qlo-stay-period-body"></div>
     </div>
 </div>
