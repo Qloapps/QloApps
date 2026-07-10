@@ -2010,7 +2010,9 @@ class AdminControllerCore extends Controller
         }
 
         if ($conf = Tools::getValue('conf')) {
-            $this->context->smarty->assign('conf', $this->json ? json_encode($this->_conf[(int)$conf]) : $this->_conf[(int)$conf]);
+            if (isset($this->_conf[$conf])) {
+                $this->context->smarty->assign('conf', $this->json ? json_encode($this->_conf[(int)$conf]) : $this->_conf[(int)$conf]);
+            }
         }
 
         foreach (array('errors', 'warnings', 'informations', 'confirmations') as $type) {

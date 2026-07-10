@@ -577,6 +577,17 @@ class HotelReservationSystemDb
             SELECT 6, `id_lang`, 'Landing Page Header Media', 'Configure and manage header images or videos displayed on the home page.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_connected_room` (
+                `id_connected_room` int(11) NOT NULL AUTO_INCREMENT,
+                `id_room` int(11) NOT NULL,
+                `id_room_connected` int(11) NOT NULL,
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_connected_room`),
+                UNIQUE KEY `uniq_room_connection` (`id_room`, `id_room_connected`),
+                KEY `idx_id_room` (`id_room`),
+                KEY `idx_id_room_connected` (`id_room_connected`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
         );
     }
 
@@ -642,7 +653,8 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_settings_link`,
             `'._DB_PREFIX_.'htl_settings_link_lang`,
             `'._DB_PREFIX_.'htl_header_image`,
-            `'._DB_PREFIX_.'htl_header_image_lang`'
+            `'._DB_PREFIX_.'htl_header_image_lang`,
+            `'._DB_PREFIX_.'htl_connected_room`'
         );
     }
 }
