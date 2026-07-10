@@ -40,6 +40,7 @@
                             <div class="image-input-btn">
                                 <img class="img-camera-plus">
                             </div>
+                            <p class="hint">{l s='Allowed formats are: .jpg, .jpeg, .png' mod='qlohotelreview'}</p>
 
                             <div class="previews-wrap"></div>
                         </div>
