@@ -131,37 +131,34 @@ class HotelAmenities extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
-        $result = array();
-        $parents = Db::getInstance()->executeS(
-            'SELECT ha.`id_amenity`, hal.`name`
+        $rows = Db::getInstance()->executeS(
+            'SELECT ha.`id_amenity`, ha.`id_parent`, hal.`name`
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
                 ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE ha.`id_parent` = 0'
+            ORDER BY ha.`id_parent` ASC'
         );
 
-        if ($parents) {
-            foreach ($parents as $parent) {
-                $result[$parent['id_amenity']]['name'] = $parent['name'];
-                $children = Db::getInstance()->executeS(
-                    'SELECT ha.`id_amenity`, hal.`name`
-                    FROM `'._DB_PREFIX_.'htl_amenity` ha
-                    LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                        ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-                    WHERE ha.`id_parent` = '.(int)$parent['id_amenity']
-                );
+        if (!$rows) {
+            return array();
+        }
 
-                if ($children) {
-                    foreach ($children as $child) {
-                        $child['id']       = $child['id_amenity'];
-                        $child['selected'] = in_array($child['id_amenity'], $selectedIds) ? 1 : 0;
-                        $result[$parent['id_amenity']]['children'][] = $child;
-                    }
-                }
+        $result = array();
+
+        foreach ($rows as $row) {
+            if ($row['id_parent'] == 0) {
+                $result[$row['id_amenity']]['name'] = $row['name'];
+            } else {
+                $result[$row['id_parent']]['children'][] = array(
+                    'id_amenity' => $row['id_amenity'],
+                    'id'         => $row['id_amenity'],
+                    'name'       => $row['name'],
+                    'selected'   => in_array($row['id_amenity'], $selectedIds) ? 1 : 0,
+                );
             }
         }
 
-        return $result;
+        return $result ?: false;
     }
 
     /**

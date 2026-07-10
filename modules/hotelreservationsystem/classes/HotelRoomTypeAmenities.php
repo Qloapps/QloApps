@@ -54,7 +54,7 @@ class HotelRoomTypeAmenities extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
-        $filter = $featuredOnly ? 'AND hrta.`is_featured` = 1' : 'AND ha.`id_parent` > 0';
+        $filter = $featuredOnly ? 'AND hrta.`is_featured` = 1' : '';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
             'SELECT ha.`id_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`, hrta.`is_featured`
@@ -65,6 +65,7 @@ class HotelRoomTypeAmenities extends ObjectModel
                 ON (hal.`id_amenity` = hrta.`amenity_id` AND hal.`id_lang` = '.(int)$idLang.')
             WHERE hrta.`id_product` = '.(int)$idProduct.'
                 AND ha.`active` = 1
+                AND ha.`id_parent` > 0
                 '.$filter.'
             ORDER BY ha.`position` ASC, hal.`name` ASC'
         ) ?: array();

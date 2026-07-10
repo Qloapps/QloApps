@@ -54,7 +54,7 @@ class HotelBranchAmenities extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
-        $filter = $featuredOnly ? 'AND hba.`is_featured` = 1' : 'AND ha.`id_parent` > 0';
+        $filter = $featuredOnly ? 'AND hba.`is_featured` = 1' : '';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
             'SELECT ha.`id_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
@@ -65,6 +65,7 @@ class HotelBranchAmenities extends ObjectModel
                 ON (hal.`id_amenity` = hba.`amenity_id` AND hal.`id_lang` = '.(int)$idLang.')
             WHERE hba.`id_hotel` = '.(int)$idHotel.'
                 AND ha.`active` = 1
+                AND ha.`id_parent` > 0
                 '.$filter.'
             ORDER BY ha.`position` ASC, hal.`name` ASC'
         ) ?: array();
@@ -135,7 +136,9 @@ class HotelBranchAmenities extends ObjectModel
             $objHotelBranchAmenities->id_hotel    = (int)$idHotel;
             $objHotelBranchAmenities->amenity_id  = (int)$amenityId;
             $objHotelBranchAmenities->is_featured = isset($featuredSet[$amenityId]) ? 1 : 0;
-            $objHotelBranchAmenities->save();
+            if (!$objHotelBranchAmenities->save()) {
+                return false;
+            }
         }
 
         return true;
