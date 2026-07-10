@@ -53,6 +53,15 @@
 			color: white
 
 a.link-social
+	i
+		font-size: 14px
+		width: 24px
+		height: 24px
+		display: inline-block
+		line-height: 24px !important
+		text-align: center
+		@include margin(0, 4px, 0, 0)
+		@include border-radius(30px)
 	.sprite-social
 		display: inline-block
 		width: 24px
@@ -63,6 +72,31 @@ a.link-social
 		background-size: 240px 48px
 	&:hover
 		text-decoration: none
+
+.link-twitter i
+	color: white
+	background-color: #7CCEEF
+	&:hover
+		color: #7CCEEF
+		background-color: white
+.link-facebook i
+	color: white
+	background-color: #557DBB
+	&:hover
+		color: #557DBB
+		background-color: white
+.link-github i
+	color: black
+	background-color: white
+	&:hover
+		color: white
+		background-color: black
+.link-google i
+	color: white
+	background-color: #E6644E
+	&:hover
+		color: #E6644E
+		background-color: white
 
 .sprite-x
 	background-position: 0 -24px
