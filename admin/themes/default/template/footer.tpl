@@ -36,17 +36,17 @@
 
 	<div class="col-sm-2 hidden-xs">
 		<div class="social-networks">
-			<a class="link-social link-twitter _blank" href="https://twitter.com/qloapps" title="Twitter">
-				<i class="icon-twitter"></i>
+			<a class="link-social _blank" href="https://twitter.com/qloapps" title="Twitter">
+				<span class="sprite-social sprite-x"></span>
 			</a>
-			<a class="link-social link-facebook _blank" href="https://www.facebook.com/qloapps" title="Facebook">
-				<i class="icon-facebook"></i>
+			<a class="link-social _blank" href="https://www.facebook.com/qloapps" title="Facebook">
+				<span class="sprite-social sprite-facebook"></span>
 			</a>
-			<a class="link-social link-github _blank" href="https://github.com/webkul/hotelcommerce" title="Github">
-				<i class="icon-github"></i>
+			<a class="link-social _blank" href="https://github.com/webkul/hotelcommerce" title="Github">
+				<span class="sprite-social sprite-github"></span>
 			</a>
-			<a class="link-social link-google _blank" href="https://plus.google.com/110221570427070809661" title="Google">
-				<i class="icon-google-plus"></i>
+			<a class="link-social _blank" href="https://plus.google.com/110221570427070809661" title="Google">
+				<span class="sprite-social sprite-google-plus"></span>
 			</a>
 		</div>
 	</div>

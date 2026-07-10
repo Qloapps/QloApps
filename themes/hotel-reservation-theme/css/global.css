@@ -7477,39 +7477,37 @@ div.star a:hover {
             border-radius: 50%;
             height: 43px;
             width: 43px;
-            display: inline-block;
-            color: #868686;/*by webkul*/
-            font-size: 17px; }
-            /* @media (min-width: 768px) and (max-width: 991px) {
-              .footer-container #footer #social_block ul li a {
-                font-size: 20px; } } */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #868686;/*by webkul*/ }
             .footer-container #footer #social_block ul li a span {
               display: none; }
             .footer-container #footer #social_block ul li a:before {
+              content: "";
               display: inline-block;
-              font-family: "FontAwesome";
-              vertical-align: -11px;
-              font-weight: normal;
-              -webkit-font-smoothing: antialiased;
-              -moz-osx-font-smoothing: grayscale; }
+              width: 18px;
+              height: 18px;
+              background-image: url(../img/social-sprite.png);
+              background-repeat: no-repeat; }
             .footer-container #footer #social_block ul li a:hover {
               color: #fff; }
           .footer-container #footer #social_block ul li.facebook a:before {
-            content: "\f09a"; }
+            background-position: -54px 0; }
           .footer-container #footer #social_block ul li.twitter a:before {
-            content: "\f099"; }
+            background-position: 0 0; }
           .footer-container #footer #social_block ul li.rss a:before {
-            content: "\f09e"; }
+            background-position: -108px 0; }
           .footer-container #footer #social_block ul li.youtube a:before {
-            content: "\f167"; }
+            background-position: -72px 0; }
           .footer-container #footer #social_block ul li.google-plus a:before {
-            content: "\f0d5"; }
+            background-position: -18px 0; }
           .footer-container #footer #social_block ul li.pinterest a:before {
-            content: "\f0d2"; }
+            background-position: -90px 0; }
           .footer-container #footer #social_block ul li.vimeo a:before {
-            content: "\f194"; }
+            background-position: -126px 0; }
           .footer-container #footer #social_block ul li.instagram a:before {
-            content: "\f16d"; }
+            background-position: -144px 0; }
       .footer-container #footer #social_block h4 {
         float: right;
         margin-bottom: 0;
