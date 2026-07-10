@@ -45,7 +45,7 @@ $(document).ready(function() {
 
             },
             eventContent: function(info) {
-                if (info.event.classNames.indexOf('search-result-event') !== -1) {
+                if (!info.event.extendedProps.is_notification) {
                     return { html: '<div class="fc-event-title">' + info.event.title.replace(/^(\S+)/, '<strong>$1</strong>') + '</div>' };
                 }
             },
@@ -92,6 +92,7 @@ $(document).ready(function() {
                             // suppress cell tooltip when hovering the search result bar
                             if ($(event.originalEvent.target).closest('.search-result-event').length) {
                                 ui.tooltip.remove();
+                                $(this).removeData('ui-tooltip-id').removeAttr('aria-describedby');
                                 return false;
                             }
 
@@ -118,6 +119,7 @@ $(document).ready(function() {
                     }
                 });
             } else {
+                $(info.el).addClass('search-result-event');
                 $(info.el).tooltip({
                     content: function()
                     {

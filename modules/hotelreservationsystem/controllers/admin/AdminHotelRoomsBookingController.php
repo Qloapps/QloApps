@@ -31,6 +31,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     protected $date_to;
     protected $booking_product;
     protected $occupancy;
+    protected $eventColors;
+
     public function __construct()
     {
         $this->table = 'htl_booking_detail';
@@ -43,6 +45,13 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         $this->_conf[52] = $this->l('Room in the booking is successfully reallocated');
         $this->_conf[53] = $this->l('Room in the booking is successfully swapped');
+
+        $this->eventColors = array(
+            'available' => array('event' => '#7EC77B', 'cell' => '#D9EFD8'),
+            'partially_available' => array('event' => '#FFC224', 'cell' => '#FFF3CD'),
+            'booked' => array('event' => '#00AFF0', 'cell' => '#C3E1FB'),
+            'unavailable' => array('event' => '#FF3838', 'cell' => '#FFC4C4'),
+        );
     }
 
     public function init()
@@ -559,13 +568,13 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $eventData['date_format'] = Tools::displayDate($cal_date_from);
             $stats = $eventData['stats'];
             if ($stats['num_avail'] > 0) {
-                $cellBgColor = '#D9EFD8';
+                $cellBgColor = $this->eventColors['available']['cell'];
             } elseif ($stats['num_part_avai'] > 0) {
-                $cellBgColor = '#FFF3CD';
+                $cellBgColor = $this->eventColors['partially_available']['cell'];
             } elseif ($stats['num_booked'] == $stats['total_rooms'] && $stats['total_rooms'] != 0) {
-                $cellBgColor = '#C3E1FB';
+                $cellBgColor = $this->eventColors['booked']['cell'];
             } else {
-                $cellBgColor = '#FFC4C4';
+                $cellBgColor = $this->eventColors['unavailable']['cell'];
             }
             $events[strtotime($bookingParams['date_from'])] = array(
                 'is_notification' => 1,
@@ -581,16 +590,16 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $bookingParams['date_to'] = $searchDateTo;
         if ($bookingData = $objBookingDetail->getBookingData($bookingParams)) {
             if ($bookingData['stats']['num_avail']) {
-                $eventColor = '#7EC77B';
+                $eventColor = $this->eventColors['available']['event'];
                 $title = sprintf($this->l('%s Available Rooms'), $bookingData['stats']['num_avail']);
             } elseif ($bookingData['stats']['num_part_avai']) {
-                $eventColor = '#FFC224';
+                $eventColor = $this->eventColors['partially_available']['event'];
                 $title = sprintf($this->l('%s Partially Available Rooms'), $bookingData['stats']['num_part_avai']);
             } elseif ($bookingData['stats']['num_booked'] == $bookingData['stats']['total_rooms'] && $bookingData['stats']['total_rooms'] != 0 && $bookingData['stats']['num_unavail'] == 0) {
-                $eventColor = '#00AFF0';
+                $eventColor = $this->eventColors['booked']['event'];
                 $title = sprintf($this->l('%s Available Rooms'), $bookingData['stats']['num_avail']);
             } else {
-                $eventColor = '#FF3838';
+                $eventColor = $this->eventColors['unavailable']['event'];
                 $title = sprintf($this->l('%s Available Rooms'), $bookingData['stats']['num_avail']);
             }
             $bookingData['date_from_format'] = Tools::displayDate($searchDateFrom);
@@ -600,7 +609,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 'title' => $title,
                 'start' => date('Y-m-d', strtotime($searchDateFrom)),
                 'end' => date('Y-m-d', strtotime($searchDateTo)),
-                'classNames' => array('search-result-event'),
                 'data' => $bookingData
             );
         }

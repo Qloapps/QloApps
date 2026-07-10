@@ -549,15 +549,20 @@ p.room_cat_data
 
 
 /* book now full calender */
-.fc .fc-daygrid-day.fc-day-today {
-    background-color: #E3E7F3 !important;
-}
 .fc-daygrid-day-top {
     justify-content: space-between;}
     .fc a.fc-daygrid-day-number {
         color: #333;
         font-size: 14px;
         text-decoration: none;}
+    .fc .fc-daygrid-day.fc-day-today a.fc-daygrid-day-number {
+        background-color: #FC3D39;
+        color: #FFFFFF;
+        line-height: 1;
+        border-radius: 50%;
+        padding: 4px;
+        margin: 2px 2px 0px 0px;
+    }
     .fc-daygrid-day-top .day-info {
 
         font-size: 15px;
