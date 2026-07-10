@@ -31,7 +31,7 @@
             <span class="overbooked_room">{l s='overbooked'}</span>
         {/if}
     </td>
-	<td class="center"><img src="{$data.image_link}" title="{l s='Room image'}"></td>
+	<td class="center"><img class="img-thumbnail" src="{$data.image_link}" title="{l s='Room image'}"></td>
 	<td class="center">
 		{assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
 		<p>{dateFormat date=$data.date_from full=$is_full_date}</p>
@@ -108,29 +108,29 @@
 	</td>
 	{if (isset($refundReqBookings) && $refundReqBookings)}
 		<td class="center">
-            {if $data.id|in_array:$refundReqBookings}
-			    {if $data.is_cancelled}
-				    <span class="badge badge-danger">{l s='Cancelled'}</span>
-			    {elseif isset($data.refund_info) && (!$data.refund_info.refunded || $data.refund_info.id_customization)}
-				    <span class="badge" style="background-color:{$data.refund_info.color|escape:'html':'UTF-8'}">{$data.refund_info.name|escape:'html':'UTF-8'}</span>
-                {else}
-	    			<span>--</span>
-                {/if}
-			{else}
-                <span>--</span>
-            {/if}
-		</td>
-		<td class="center">
-			{if $data.is_refunded && isset($data.refund_info) && $data.refund_info}
-				{convertPriceWithCurrency price=$data.refund_info.refunded_amount currency=$currency->id}
-            {else}
-				--
-			{/if}
+			<p>
+	            {if $data.id|in_array:$refundReqBookings}
+				    {if $data.is_cancelled}
+					    <span class="badge badge-danger">{l s='Cancelled'}</span>
+				    {elseif isset($data.refund_info) && (!$data.refund_info.refunded || $data.refund_info.id_customization)}
+					    <span class="badge" style="background-color:{$data.refund_info.color|escape:'html':'UTF-8'}">{$data.refund_info.name|escape:'html':'UTF-8'}</span>
+	                {else}
+		    			<span>--</span>
+	                {/if}
+				{else}
+	                <span>--</span>
+	            {/if}
+			</p>
+			<p class="badge badge-success refunded_amount">
+				{if $data.is_refunded && isset($data.refund_info) && $data.refund_info}
+					{convertPriceWithCurrency price=$data.refund_info.refunded_amount currency=$currency->id}
+				{/if}
+			</p>
 		</td>
 	{/if}
 	{if ($can_edit && !$order->hasBeenDelivered())}
 		<td class="product_action center">
-            <div class="btn-group">
+            <div class="btn-group pull-right">
                 {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_cancelled}
                     <button href="#" class="btn btn-default delete_room_line">
                         <i class="icon-trash"></i>
@@ -145,12 +145,6 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        <li>
-                            <a href="#" class="room_reallocate_swap" id="reallocate_room_{$data['id']}" data-room_type_name="{$data['room_type_name']}" data-toggle="modal" data-target="#mySwappigModal" data-id_htl_booking="{$data['id']}" data-id_order="{$data['id_order']}" data-room_num='{$data.room_num}' data-id_room_type='{$data.id_product}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_realloc_room_types='{$data.avail_room_types_to_realloc|@json_encode}' data-allotment_type='{$data.booking_type}' data-allotment_type_label='{if $data.booking_type == $ALLOTMENT_MANUAL}{l s='Manual'}{else}{l s='Auto'}{/if}' data-comment='{$data.comment}'>
-                                <i class="icon-refresh"></i>
-                                {l s='Reallocate/Swap Room'}
-                            </a>
-                        </li>
                         {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                         {else}
                             <li>
@@ -163,8 +157,14 @@
                         <li>
                             <a href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
                                 <i class="icon-file-text"></i>
-                                {l s='Upload Docs'}
+                                {l s='Upload Documents'}
                                 <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="room_reallocate_swap" id="reallocate_room_{$data['id']}" data-room_type_name="{$data['room_type_name']}" data-toggle="modal" data-target="#mySwappigModal" data-id_htl_booking="{$data['id']}" data-id_order="{$data['id_order']}" data-room_num='{$data.room_num}' data-id_room_type='{$data.id_product}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_realloc_room_types='{$data.avail_room_types_to_realloc|@json_encode}' data-allotment_type='{$data.booking_type}' data-allotment_type_label='{if $data.booking_type == $ALLOTMENT_MANUAL}{l s='Manual'}{else}{l s='Auto'}{/if}' data-comment='{$data.comment}'>
+                                <i class="icon-refresh"></i>
+                                {l s='Reallocate/Swap Room'}
                             </a>
                         </li>
                         <li>
