@@ -6879,7 +6879,7 @@ class ProductCore extends ObjectModel
      * @param int $idLang defaults to current context language
      * @return array
      */
-    public static function getRoomTypeFeatureData($idProduct, $idLang = 0)
+    public static function getRoomTypeFeatureTreeData($idProduct, $idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;

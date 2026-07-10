@@ -69,63 +69,49 @@ class HotelAmenities extends ObjectModel
     }
 
     /**
-     * Returns true if at least one amenity item (child) exists in any category.
-     *
-     * @return bool
-     */
-    public static function hasAmenityItems()
-    {
-        return (bool) Db::getInstance()->getValue(
-            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'htl_amenity` WHERE `id_parent` != 0'
-        );
-    }
-
-    /**
      * Return all categories (id_parent = 0) with their child amenities.
      *
      * @param int $idLang
      * @return array|false
      */
-    public function getAllAmenitiesTree($idLang = 0)
+    public function getAmenitiesTree($idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
 
-        $result = array();
-        $parents = Db::getInstance()->executeS(
-            'SELECT ha.`id_amenity`, ha.`position`, hal.`name`
+        $rows = Db::getInstance()->executeS(
+            'SELECT ha.`id_amenity`, ha.`id_parent`, ha.`position`, ha.`active`, ha.`logo_type`, ha.`logo`, hal.`name`
             FROM `'._DB_PREFIX_.'htl_amenity` ha
             LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
                 ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-            WHERE ha.`id_parent` = 0
-            ORDER BY ha.`position` ASC'
+            ORDER BY ha.`id_parent` ASC, ha.`position` ASC'
         );
 
-        if ($parents) {
-            foreach ($parents as $parent) {
-                $result[$parent['id_amenity']] = array(
-                    'id'       => $parent['id_amenity'],
-                    'name'     => $parent['name'],
-                    'position' => $parent['position'],
+        if (!$rows) {
+            return false;
+        }
+
+        $result = array();
+        $amenitiesByCategory = array();
+
+        foreach ($rows as $row) {
+            if ($row['id_parent'] == 0) {
+                $result[$row['id_amenity']] = array(
+                    'id'       => $row['id_amenity'],
+                    'name'     => $row['name'],
+                    'position' => $row['position'],
                     'children' => array(),
                 );
+            } else {
+                $row['id'] = $row['id_amenity'];
+                $amenitiesByCategory[$row['id_parent']][] = $row;
+            }
+        }
 
-                $children = Db::getInstance()->executeS(
-                    'SELECT ha.`id_amenity`, ha.`active`, ha.`logo_type`, ha.`logo`, hal.`name`
-                    FROM `'._DB_PREFIX_.'htl_amenity` ha
-                    LEFT JOIN `'._DB_PREFIX_.'htl_amenity_lang` hal
-                        ON (hal.`id_amenity` = ha.`id_amenity` AND hal.`id_lang` = '.(int)$idLang.')
-                    WHERE ha.`id_parent` = '.(int)$parent['id_amenity']
-                );
-
-                if ($children) {
-                    // normalize: rename id_amenity → id for template compatibility
-                    foreach ($children as &$child) {
-                        $child['id'] = $child['id_amenity'];
-                    }
-                    $result[$parent['id_amenity']]['children'] = $children;
-                }
+        foreach ($amenitiesByCategory as $categoryId => $amenities) {
+            if (isset($result[$categoryId])) {
+                $result[$categoryId]['children'] = $amenities;
             }
         }
 
@@ -139,7 +125,7 @@ class HotelAmenities extends ObjectModel
      * @param int   $idLang
      * @return array|false
      */
-    public function hotelBranchSelectedAmenitiesArray($selectedIds, $idLang = 0)
+    public function hotelBranchSelectedAmenities($selectedIds, $idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -175,7 +161,7 @@ class HotelAmenities extends ObjectModel
             }
         }
 
-        return $result ?: false;
+        return $result;
     }
 
     /**

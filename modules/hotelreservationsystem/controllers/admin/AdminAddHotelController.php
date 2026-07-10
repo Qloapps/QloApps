@@ -176,7 +176,7 @@ class AdminAddHotelController extends ModuleAdminController
             }
 
             $smartyVars['order_restrict_date_info'] = HotelOrderRestrictDate::getDataByHotelId($idHotel);
-            if ($amenities = HotelBranchAmenities::getBranchAmenitiesData((int)$idHotel)) {
+            if ($amenities = HotelBranchAmenities::getBranchAmenitiesTreeData((int)$idHotel)) {
                 $tree = new HelperTree('hotel-amenities-tree', $amenities);
                 $tree->setShowCollapseExpandButton(true)
                     ->setUseCheckBox(true)
@@ -478,7 +478,7 @@ class AdminAddHotelController extends ModuleAdminController
         }
 
         $amenityCategories = HotelAmenities::getCategories();
-        if ($amenityCategories && !HotelAmenities::hasAmenityItems()) {
+        if ($amenityCategories && !HotelAmenities::getAmenities()) {
             $this->errors[] = $this->l('No amenities have been created. Please add amenities to at least one category before assigning them.');
         }
 

@@ -83,7 +83,7 @@ class AdminHotelAmenitiesController extends ModuleAdminController
     {
         $objHotelAmenities = new HotelAmenities();
         $this->context->smarty->assign(array(
-            'amenities_tree' => $objHotelAmenities->getAllAmenitiesTree(),
+            'amenities_tree' => $objHotelAmenities->getAmenitiesTree(),
             'img_base_url'   => $this->module->getPathUri().self::IMG_DIR,
             'current_index'  => self::$currentIndex,
             'token'          => $this->token,

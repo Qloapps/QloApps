@@ -77,14 +77,14 @@ class HotelBranchAmenities extends ObjectModel
      * @param int $idLang defaults to current context language
      * @return array
      */
-    public static function getBranchAmenitiesData($idHotel, $idLang = 0)
+    public static function getBranchAmenitiesTreeData($idHotel, $idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
 
         $objHotelAmenities = new HotelAmenities();
-        $amenities = $objHotelAmenities->hotelBranchSelectedAmenitiesArray(
+        $amenities = $objHotelAmenities->hotelBranchSelectedAmenities(
             array_column(self::getAmenities($idHotel), 'id'),
             $idLang
         );

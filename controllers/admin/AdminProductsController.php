@@ -1139,7 +1139,7 @@ class AdminProductsControllerCore extends AdminController
         }
 
         if (Validate::isLoadedObject($product = new Product((int)Tools::getValue('id_product')))) {
-            if (!$this->saveRoomTypeFeatureAssignments($product)) {
+            if (!$this->saveRoomTypeFeatures($product)) {
                 $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
             }
         } else {
@@ -1154,7 +1154,7 @@ class AdminProductsControllerCore extends AdminController
      *
      * @return bool
      */
-    protected function saveRoomTypeFeatureAssignments(Product $product)
+    protected function saveRoomTypeFeatures(Product $product)
     {
         $product->deleteFeatures();
 
@@ -1939,7 +1939,7 @@ class AdminProductsControllerCore extends AdminController
             $this->assignRoomType($this->object);
             if ($this->isTabSubmitted('Amenities')) {
                 $categories = HotelAmenities::getCategories();
-                if ($categories && !HotelAmenities::hasAmenityItems()) {
+                if ($categories && !HotelAmenities::getAmenities()) {
                     $this->errors[] = Tools::displayError('No amenities have been created. Please add amenities to at least one category before assigning them.');
                     return false;
                 }
@@ -1950,7 +1950,7 @@ class AdminProductsControllerCore extends AdminController
                     return false;
                 }
             }
-            if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatureAssignments($this->object)) {
+            if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatures($this->object)) {
                 $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
                 return false;
             }
@@ -2204,7 +2204,7 @@ class AdminProductsControllerCore extends AdminController
                             return false;
                         }
                     }
-                    if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatureAssignments($object)) {
+                    if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatures($object)) {
                         $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
                         return false;
                     }
@@ -4865,7 +4865,7 @@ class AdminProductsControllerCore extends AdminController
         } else {
             if ($obj->id) {
                 if ($this->product_exists_in_shop) {
-                    $features = Product::getRoomTypeFeatureData($obj->id);
+                    $features = Product::getRoomTypeFeatureTreeData($obj->id);
                     if ($features) {
                         $tree = new HelperTree('room-type-features-tree', $features);
                         $tree->setShowCollapseExpandButton(true)
@@ -4911,7 +4911,7 @@ class AdminProductsControllerCore extends AdminController
         
         if ($obj->id) {
             if ($this->product_exists_in_shop) {
-                $roomTypeAmenities = HotelRoomTypeAmenities::getRoomTypeAmenitiesData((int) $obj->id);
+                $roomTypeAmenities = HotelRoomTypeAmenities::getRoomTypeAmenitiesTreeData((int) $obj->id);
                 if ($roomTypeAmenities) {
                     $tree = new HelperTree('room-type-amenities-tree', $roomTypeAmenities);
                     $tree->setShowCollapseExpandButton(true)

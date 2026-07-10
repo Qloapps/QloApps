@@ -97,8 +97,8 @@ class AdminFeaturesControllerCore extends AdminController
      */
     public function renderList()
     {
-        $this->addRowAction('edit');
         $this->addRowAction('view');
+        $this->addRowAction('edit');
         $this->addRowAction('delete');
 
         return parent::renderList();
