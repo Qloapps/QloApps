@@ -176,8 +176,18 @@ class AdminAdminPreferencesControllerCore extends AdminController
             return;
         }
 
+        if (Tools::getIsset('PS_LIMIT_UPLOAD_IMAGE_VALUE') && !Validate::isUnsignedInt(Tools::getValue('PS_LIMIT_UPLOAD_IMAGE_VALUE'))) {
+            $this->errors[] = Tools::displayError('The upload limit must be a whole number, with no letters or symbols.');
+            return;
+        }
+
         if (Tools::getValue('PS_LIMIT_UPLOAD_IMAGE_VALUE') > $max_size) {
             $this->errors[] = Tools::displayError('The limit chosen is larger than the server\'s maximum upload limit. Please increase the limits of your server.');
+            return;
+        }
+
+        if (Tools::getIsset('PS_LIMIT_UPLOAD_IMAGE_VALUE') && !Tools::getValue('PS_LIMIT_UPLOAD_IMAGE_VALUE')) {
+            $this->errors[] = Tools::displayError('The upload limit must be greater than 0.');
             return;
         }
 
@@ -185,9 +195,9 @@ class AdminAdminPreferencesControllerCore extends AdminController
         //     $_POST['PS_LIMIT_UPLOAD_FILE_VALUE'] = 1;
         // }
 
-        if (Tools::getIsset('PS_LIMIT_UPLOAD_IMAGE_VALUE') && !Tools::getValue('PS_LIMIT_UPLOAD_IMAGE_VALUE')) {
-            $_POST['PS_LIMIT_UPLOAD_IMAGE_VALUE'] = 1;
-        }
+        // if (Tools::getIsset('PS_LIMIT_UPLOAD_IMAGE_VALUE') && !Tools::getValue('PS_LIMIT_UPLOAD_IMAGE_VALUE')) {
+        //     $_POST['PS_LIMIT_UPLOAD_IMAGE_VALUE'] = 1;
+        // }
 
         parent::postProcess();
     }
