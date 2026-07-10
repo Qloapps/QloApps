@@ -20,14 +20,15 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<tr class="{if $image.cover == 1}cover-image-tr{/if}">
+<tr class="{if $image.cover == 1}cover-image-tr{/if}" data-id-image="{$image.id|escape:'html':'UTF-8'}">
+    <td class="row-selector text-center"><input type="checkbox" class="noborder hotel-image-checkbox" value="{$image.id|escape:'html':'UTF-8'}"></td>
     <td class="text-center">{$image.id|escape:'html':'UTF-8'}</td>
     <td class="text-center">
         <a class="htl-img-preview" href="{$image.image_link|escape:'html':'UTF-8'}">
             <img class="img-thumbnail" width="100" src="{$image.image_link_small|escape:'html':'UTF-8'}"/>
         </a>
     </td>
-    <td class="text-center">
+    <td class="text-center hotel-image-category-cell">
         {if isset($image.category_name) && $image.category_name}
             {$image.category_name|escape:'html':'UTF-8'}
         {else}
@@ -44,6 +45,7 @@
         </a>
     </td>
     <td class="text-center">
+        <button type="button" class="btn btn-default edit-hotel-image" data-id-hotel="{$hotel_info.id|escape:'html':'UTF-8'}" data-id-image="{$image.id|escape:'html':'UTF-8'}" data-id-htl-image-category="{if isset($image.id_htl_image_category)}{$image.id_htl_image_category|intval}{else}0{/if}" data-is-cover="{if $image.cover == 1}1{else}0{/if}"><i class="icon-pencil"></i></button>
         <button type="button" class="btn btn-default delete-hotel-image" data-id-hotel="{$hotel_info.id|escape:'html':'UTF-8'}" data-is-cover="{if $image.cover == 1}1{else}0{/if}" data-id-image="{$image.id|escape:'html':'UTF-8'}"><i class="icon-trash"></i></button>
     </td>
 </tr>

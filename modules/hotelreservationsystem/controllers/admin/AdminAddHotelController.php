@@ -887,50 +887,34 @@ class AdminAddHotelController extends ModuleAdminController
         $this->ajaxDie(json_encode($response));
     }
 
-    public function ajaxProcessUploadHotelImages()
+    public function ajaxProcessUploadHotelImage()
     {
-        $response = array('success' => false);
-        $idHotel = Tools::getValue('id_hotel');
+        $response = array('success' => false, 'errors' => array());
+        $idHotel = (int) Tools::getValue('id_hotel');
         $idHtlImageCategory = (int) Tools::getValue('id_htl_image_category');
-        if ($idHotel) {
-            if ($idHtlImageCategory) {
-                if (!Validate::isLoadedObject(new HotelImageCategory($idHtlImageCategory))) {
-                    $response['errors'][] = $this->l('Selected image category is invalid.');
-                    $this->ajaxDie(json_encode($response));
-                }
-            }
+        $file = isset($_FILES['hotel_image']) ? $_FILES['hotel_image'] : null;
 
-            $invalidImg = ImageManager::validateUpload(
-                $_FILES['hotel_image'],
-                Tools::getMaxUploadSize()
-            );
-            if (!$invalidImg) {
-                // Add Hotel images
-                $objHotelImage = new HotelImage();
-                $imageDetail = $objHotelImage->uploadHotelImages($_FILES['hotel_image'],$idHotel,$idHtlImageCategory);
-                if ($imageDetail) {
-                    $response['success'] = true;
-                    $imageDetail['image_link'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'],ImageType::getFormatedName('large')));
-                    $imageDetail['image_link_small'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'], ImageType::getFormatedName('small')));
-                    $imageDetail['id_htl_image_category'] = $idHtlImageCategory;
-                    if (!isset($imageDetail['category_name'])) {
-                        $imageDetail['category_name'] = HotelImageCategory::getCategoryName($idHtlImageCategory);
-                    }
-                    $response['data']['image_info'] = $imageDetail;
-                    // get image row
-                    $this->context->smarty->assign(array(
-                        'image' => $imageDetail,
-                        'hotel_info' => array('id' => $idHotel)
-                    ));
-                    $response['data']['image_row'] = $this->context->smarty->fetch(
-                        _PS_MODULE_DIR_.$this->module->name.
-                        '/views/templates/admin/add_hotel/_partials/htl-images-list-row.tpl'
-                    );
+        if ($idHotel) {
+            if ($file && $file['size']) {
+                if ($idHtlImageCategory && !Validate::isLoadedObject(new HotelImageCategory($idHtlImageCategory))) {
+                    $response['errors'][] = $this->l('Selected image category is invalid.');
+                } elseif ($error = ImageManager::validateUpload($file, Tools::getMaxUploadSize())) {
+                    $response['errors'][] = $error;
                 } else {
-                    $response['errors'][] = $this->l('Unable to uploade image. Please try again');
+                    $objHotelImage = new HotelImage();
+                    $imageDetail = $objHotelImage->uploadHotelImages($file, $idHotel, $idHtlImageCategory);
+                    if ($imageDetail) {
+                        $imageDetail['image_link'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'], ImageType::getFormatedName('large')));
+                        $imageDetail['image_link_small'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'], ImageType::getFormatedName('small')));
+
+                        $response['success'] = true;
+                        $response['image_row'] = $this->renderHotelImageRow($imageDetail, $idHotel);
+                    } else {
+                        $response['errors'][] = $this->l('Unable to upload image. Please try again');
+                    }
                 }
             } else {
-                $response['errors'][] = $_FILES['hotel_image']['name'].': '.$invalidImg;
+                $response['errors'][] = $this->l('No file received.');
             }
         } else {
             $response['errors'][] = $this->l('Hotel info not found. Please try reloading the page');
@@ -945,17 +929,145 @@ class AdminAddHotelController extends ModuleAdminController
         if ($idImage) {
             $idHotel = Tools::getValue('id_hotel');
             if ($coverImg = HotelImage::getCover($idHotel)) {
-                $objHtlImage = new HotelImage((int) $coverImg['id']);
-                $objHtlImage->cover = 0;
-                $objHtlImage->save();
+                $objOldCover = new HotelImage((int) $coverImg['id']);
+                $objOldCover->cover = 0;
+                $objOldCover->save();
             }
 
             $objHtlImage = new HotelImage((int) $idImage);
             $objHtlImage->cover = 1;
-            if ($objHtlImage->update()) {
-                $response['status'] = true;
+            $objHtlImage->update();
+
+            $response['status'] = true;
+        }
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessEditHotelImage()
+    {
+        $response = array('status' => false);
+        $idImage = (int) Tools::getValue('id_image');
+        $idHotel = (int) Tools::getValue('id_hotel');
+        $idHtlImageCategory = (int) Tools::getValue('id_htl_image_category');
+        $setCover = (bool) Tools::getValue('cover');
+
+        if ($idImage && $idHotel && Validate::isLoadedObject($objHtlImage = new HotelImage($idImage))) {
+            if ($idHtlImageCategory && !Validate::isLoadedObject(new HotelImageCategory($idHtlImageCategory))) {
+                $response['errors'][] = $this->l('Selected image category is invalid.');
+                $this->ajaxDie(json_encode($response));
+            }
+
+            $otherImage = null;
+            if (!$setCover && $objHtlImage->cover) {
+                foreach ($objHtlImage->getImagesByHotelId($idHotel) as $image) {
+                    if ((int) $image['id'] !== $idImage) {
+                        $otherImage = $image;
+                        break;
+                    }
+                }
+                if (!$otherImage) {
+                    $response['errors'][] = $this->l('At least one image must remain marked as cover. Add another image before removing this one.');
+                    $this->ajaxDie(json_encode($response));
+                }
+            }
+
+            HotelImage::updateImageCategory($idImage, $idHtlImageCategory ?: null);
+
+            $oldCoverId = null;
+            if ($setCover && !$objHtlImage->cover) {
+                if ($coverImg = HotelImage::getCover($idHotel)) {
+                    $oldCoverId = (int) $coverImg['id'];
+                    $objOldCover = new HotelImage($oldCoverId);
+                    $objOldCover->cover = 0;
+                    $objOldCover->save();
+                }
+
+                $objHtlImage->cover = 1;
+                $objHtlImage->update();
+            } elseif ($otherImage) {
+                $objHtlImage->cover = 0;
+                $objHtlImage->save();
+
+                $objNewCover = new HotelImage($otherImage['id']);
+                $objNewCover->cover = 1;
+                $objNewCover->save();
+                $oldCoverId = (int) $objNewCover->id;
+            }
+
+            $response['status'] = true;
+            $response['image_row'] = $this->renderHotelImageRow($this->getHotelImageRowData(new HotelImage($idImage)), $idHotel);
+
+            if ($oldCoverId) {
+                $response['old_cover_id'] = $oldCoverId;
+                $response['old_cover_row'] = $this->renderHotelImageRow(
+                    $this->getHotelImageRowData(new HotelImage($oldCoverId)),
+                    $idHotel
+                );
+            }
+        } else {
+            $response['errors'][] = $this->l('Image not found.');
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
+    private function getHotelImageRowData($objHtlImage)
+    {
+        $rowData = array(
+            'id' => $objHtlImage->id,
+            'cover' => $objHtlImage->cover,
+            'id_htl_image_category' => 0,
+            'category_name' => '',
+            'image_link' => $this->context->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id, ImageType::getFormatedName('large'))),
+            'image_link_small' => $this->context->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id, ImageType::getFormatedName('small'))),
+        );
+
+        foreach ($objHtlImage->getImagesByHotelId($objHtlImage->id_hotel) as $image) {
+            if ((int) $image['id'] === (int) $objHtlImage->id) {
+                $rowData['id_htl_image_category'] = (int) $image['id_htl_image_category'];
+                $rowData['category_name'] = $image['category_name'];
+                break;
             }
         }
+
+        return $rowData;
+    }
+
+    private function renderHotelImageRow($imageData, $idHotel)
+    {
+        $this->context->smarty->assign(array(
+            'image' => $imageData,
+            'hotel_info' => array('id' => $idHotel),
+        ));
+
+        return $this->context->smarty->fetch(_PS_MODULE_DIR_.$this->module->name.'/views/templates/admin/add_hotel/_partials/htl-images-list-row.tpl');
+    }
+
+    public function ajaxProcessBulkUpdateHotelImageCategory()
+    {
+        $response = array('status' => false, 'errors' => array());
+        $idHotel = (int) Tools::getValue('id_hotel');
+        $idHtlImageCategory = (int) Tools::getValue('id_htl_image_category');
+        $imageIds = array_filter(array_map('intval', (array) Tools::getValue('image_ids', array())));
+
+        if ($idHotel && $imageIds) {
+            if ($idHtlImageCategory && !Validate::isLoadedObject(new HotelImageCategory($idHtlImageCategory))) {
+                $response['errors'][] = $this->l('Selected image category is invalid.');
+            } else {
+                foreach ($imageIds as $idImage) {
+                    if (Validate::isLoadedObject(new HotelImage($idImage))) {
+                        HotelImage::updateImageCategory($idImage, $idHtlImageCategory ?: null);
+                    }
+                }
+
+                $response['status'] = true;
+                $response['image_ids'] = $imageIds;
+                $response['category_name'] = $idHtlImageCategory ? HotelImageCategory::getCategoryName($idHtlImageCategory) : '';
+            }
+        } else {
+            $response['errors'][] = $this->l('No images selected.');
+        }
+
         $this->ajaxDie(json_encode($response));
     }
 
@@ -969,9 +1081,12 @@ class AdminAddHotelController extends ModuleAdminController
                         if (!HotelImage::getCover($idHotel)) {
                             $images = $objHtlImage->getImagesByHotelId($idHotel);
                             if ($images) {
-                                $objHtlImage = new HotelImage($images[0]['id']);
-                                $objHtlImage->cover = 1;
-                                $objHtlImage->save();
+                                $objNewCover = new HotelImage($images[0]['id']);
+                                $objNewCover->cover = 1;
+                                $objNewCover->save();
+
+                                $response['new_cover_id'] = (int) $objNewCover->id;
+                                $response['new_cover_row'] = $this->renderHotelImageRow($this->getHotelImageRowData($objNewCover), $idHotel);
                             }
                         }
                         $response['status'] = true;
@@ -979,6 +1094,43 @@ class AdminAddHotelController extends ModuleAdminController
                 }
             }
         }
+        $this->ajaxDie(json_encode($response));
+    }
+
+    public function ajaxProcessBulkDeleteHotelImage()
+    {
+        $response = array('status' => false, 'errors' => array());
+        $idHotel = (int) Tools::getValue('id_hotel');
+        $imageIds = array_filter(array_map('intval', (array) Tools::getValue('image_ids', array())));
+
+        if (!$idHotel || !$imageIds) {
+            $response['errors'][] = $this->l('No images selected.');
+            $this->ajaxDie(json_encode($response));
+        }
+
+        $deletedIds = array();
+        foreach ($imageIds as $idImage) {
+            $objHtlImage = new HotelImage($idImage);
+            if (Validate::isLoadedObject($objHtlImage) && $objHtlImage->delete()) {
+                $deletedIds[] = $idImage;
+            }
+        }
+
+        if (!HotelImage::getCover($idHotel)) {
+            $objHelper = new HotelImage();
+            $images = $objHelper->getImagesByHotelId($idHotel);
+            if ($images) {
+                $objNewCover = new HotelImage($images[0]['id']);
+                $objNewCover->cover = 1;
+                $objNewCover->save();
+
+                $response['new_cover_id'] = (int) $objNewCover->id;
+                $response['new_cover_row'] = $this->renderHotelImageRow($this->getHotelImageRowData($objNewCover), $idHotel);
+            }
+        }
+
+        $response['status'] = true;
+        $response['deleted_ids'] = $deletedIds;
         $this->ajaxDie(json_encode($response));
     }
 

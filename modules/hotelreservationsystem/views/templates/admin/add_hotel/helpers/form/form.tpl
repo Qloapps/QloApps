@@ -438,72 +438,38 @@
 					{hook h='displayAdminAddHotelFormImagesTabBefore' id_hotel=$hook_arg_id_hotel}
 
 					{if isset($hotel_info.id) && $hotel_info.id}
-						<div class="form-group row">
-							{* <label for="hotel_images" class="col-sm-1 control-label">
-								{l s='Upload images' mod='hotelreservationsystem'}
-							</label> *}
+						<div class="panel-heading" id="hotel-images-heading">
+							<i class="icon-image"></i> {l s='Hotel Images' mod='hotelreservationsystem'}
+							<span class="badge">{if isset($hotelImages) && $hotelImages}{$hotelImages|@count}{else}0{/if}</span>
+							<button type="button" class="btn btn-primary pull-right" id="open-add-hotel-images-modal">
+								<i class="icon-plus"></i> {l s='Add Images' mod='hotelreservationsystem'}
+							</button>
+						</div>
+						<div class="row">
 							<div class="col-sm-12">
-								<div class="panel panel-default" style="margin-bottom:0;">
-									<div class="panel-body" style="padding-bottom:10px;">
-										<div class="row">
-											<div class="col-sm-5">
-												<label class="control-label" for="hotel_images-selectbutton">{l s='Select images' mod='hotelreservationsystem'}</label>
-												<input type="file" class="hide" accept="image/gif, image/jpg, image/jpeg, image/png" id="hotel_images" name="hotel_images[]" multiple>
-												<div class="dummyfile input-group">
-													<span class="input-group-addon"><i class="icon-file"></i></span>
-													<input id="hotel_images-name" type="text" name="filename" readonly>
-													<span class="input-group-btn">
-														<button id="hotel_images-selectbutton" type="button" name="submitAddAttachments" class="btn btn-default">
-															<i class="icon-folder-open"></i> {l s='Add files' mod='hotelreservationsystem'}
-														</button>
-													</span>
-												</div>
-												<p class="help-block" style="margin-bottom:0;">{l s='You can select multiple images.' mod='hotelreservationsystem'}</p>
-												<script type="text/javascript">
-													$(document).ready(function() {
-														$('#hotel_images-selectbutton').click(function(e) {
-															$('#hotel_images').trigger('click');
-														});
+								{include file="../../_partials/htl-images-list.tpl"}
+							</div>
+						</div>
 
-														$('#hotel_images-name').click(function(e) {
-															$('#hotel_images').trigger('click');
-														});
-
-														$('#hotel_images-name').on('dragenter', function(e) {
-															e.stopPropagation();
-															e.preventDefault();
-														});
-
-														$('#hotel_images-name').on('dragover', function(e) {
-															e.stopPropagation();
-															e.preventDefault();
-														});
-
-														$('#hotel_images-name').on('drop', function(e) {
-															e.preventDefault();
-															var files = e.originalEvent.dataTransfer.files;
-															$('#hotel_images')[0].files = files;
-															$(this).val(files[0].name);
-														});
-
-														$('#hotel_images').change(function(e) {
-															if ($(this)[0].files !== undefined) {
-																var files = $(this)[0].files;
-																var name = '';
-																$.each(files, function(index, value) {
-																	name += value.name+', ';
-																});
-																$('#hotel_images-name').val(name.slice(0, -2));
-															} else {
-																var name = $(this).val().split(/[\\/]/);
-																$('#hotel_images-name').val(name[name.length-1]);
-															}
-														});
-													});
-												</script>
+						<div class="modal fade" id="addHotelImagesModal" tabindex="-1" role="dialog">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
+										<h4 class="modal-title"><i class="icon-image"></i> {l s='Add Images' mod='hotelreservationsystem'}</h4>
+									</div>
+									<div class="modal-body">
+										<div class="form-group">
+											<label class="control-label col-lg-3">{l s='Select images' mod='hotelreservationsystem'}</label>
+											<div class="col-lg-9">
+												<input type="file" id="hotel-images-file-input" class="hide" accept="image/gif, image/jpg, image/jpeg, image/png" multiple>
+												<button type="button" class="btn btn-default" id="hotel-images-file-add-btn"><i class="icon-folder-open"></i> {l s='Add files...' mod='hotelreservationsystem'}</button>
+												<ul class="list-unstyled" id="hotel-images-files-list" style="display:none;"></ul>
 											</div>
-											<div class="col-sm-4">
-												<label class="control-label" for="id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+										</div>
+										<div class="form-group">
+											<label class="control-label col-lg-3" for="id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+											<div class="col-lg-9">
 												<select class="form-control" id="id_htl_image_category" name="id_htl_image_category">
 													<option value="0">{l s='Select category (optional)' mod='hotelreservationsystem'}</option>
 													{if isset($hotelImageCategories) && $hotelImageCategories}
@@ -514,23 +480,107 @@
 												</select>
 												<p class="help-block" style="margin-bottom:2px;">{l s='If not selected, image will be uncategorized.' mod='hotelreservationsystem'} &mdash; <a href="{$link->getAdminLink('AdminHotelImageCategory')|escape:'html':'UTF-8'}&amp;addhtl_image_category" target="_blank" style="white-space:nowrap;">{l s='Create image category' mod='hotelreservationsystem'} <i class="icon-external-link" style="font-size:11px;"></i></a></p>
 											</div>
-											<div class="col-sm-3">
-												<label class="control-label">&nbsp;</label>
-												<button class="btn btn-primary btn-block" id="upload_hotel_images_btn" type="button">
-													<i class="icon-upload"></i> {l s='Upload' mod='hotelreservationsystem'}
-												</button>
-											</div>
 										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primary" id="hotel-images-upload-btn"><i class="icon-upload"></i> {l s='Upload' mod='hotelreservationsystem'}</button>
 									</div>
 								</div>
 							</div>
 						</div>
-						<hr>
-						{* Image table *}
-						<h4><i class="icon-image"></i> <span>{l s='Hotel Images' mod='hotelreservationsystem'}</span></h4>
-						<div class="row">
-							<div class="col-sm-12">
-								{include file="../../_partials/htl-images-list.tpl"}
+
+						<div class="modal fade" id="confirmDeleteHotelImageModal" tabindex="-1" role="dialog">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
+										<h4 class="modal-title"><i class="icon-exclamation-triangle"></i> {l s='Confirm Delete' mod='hotelreservationsystem'}</h4>
+									</div>
+									<div class="modal-body">
+										<p>{l s='Are you sure you want to delete the selected image(s)? This cannot be undone.' mod='hotelreservationsystem'}</p>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-default" data-dismiss="modal">{l s='Close' mod='hotelreservationsystem'}</button>
+										<button type="button" class="btn btn-primary" id="confirm-delete-hotel-image-btn">{l s='Delete' mod='hotelreservationsystem'}</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="modal fade" id="editHotelImageModal" tabindex="-1" role="dialog">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
+										<h4 class="modal-title"><i class="icon-image"></i> {l s='Edit Image' mod='hotelreservationsystem'}</h4>
+									</div>
+									<div class="modal-body">
+										<input type="hidden" id="edit_hotel_image_id">
+										<div class="form-group">
+											<label class="control-label col-lg-3" for="edit_id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+											<div class="col-lg-9">
+												<select class="form-control" id="edit_id_htl_image_category">
+													<option value="0">{l s='Select category (optional)' mod='hotelreservationsystem'}</option>
+													{if isset($hotelImageCategories) && $hotelImageCategories}
+														{foreach from=$hotelImageCategories item=hotelImageCategory}
+															<option value="{$hotelImageCategory.id_htl_image_category|intval}">{$hotelImageCategory.name|escape:'html':'UTF-8'}</option>
+														{/foreach}
+													{/if}
+												</select>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="control-label col-lg-3">{l s='Cover image' mod='hotelreservationsystem'}</label>
+											<div class="col-lg-9">
+												<span class="switch prestashop-switch fixed-width-lg">
+													<input type="radio" id="edit_hotel_image_cover_on" name="edit_hotel_image_cover" value="1">
+													<label for="edit_hotel_image_cover_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+													<input type="radio" id="edit_hotel_image_cover_off" name="edit_hotel_image_cover" value="0">
+													<label for="edit_hotel_image_cover_off">{l s='No' mod='hotelreservationsystem'}</label>
+													<a class="slide-button btn"></a>
+												</span>
+												<p class="help-block">{l s='Setting this to Yes will make this the cover image, replacing the current one.' mod='hotelreservationsystem'}</p>
+											</div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primary" id="save-edit-hotel-image-btn">
+											<i class="icon-save"></i> {l s='Save' mod='hotelreservationsystem'}
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="modal fade" id="bulkUpdateHotelImageCategoryModal" tabindex="-1" role="dialog">
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-header">
+										<button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
+										<h4 class="modal-title"><i class="icon-tags"></i> {l s='Update selection' mod='hotelreservationsystem'}</h4>
+									</div>
+									<div class="modal-body">
+										<div class="form-group">
+											<label class="control-label col-lg-3" for="bulk_id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+											<div class="col-lg-9">
+												<select class="form-control" id="bulk_id_htl_image_category">
+													<option value="0">{l s='Select category (optional)' mod='hotelreservationsystem'}</option>
+													{if isset($hotelImageCategories) && $hotelImageCategories}
+														{foreach from=$hotelImageCategories item=hotelImageCategory}
+															<option value="{$hotelImageCategory.id_htl_image_category|intval}">{$hotelImageCategory.name|escape:'html':'UTF-8'}</option>
+														{/foreach}
+													{/if}
+												</select>
+												<p class="help-block">{l s='If not selected, selected images will be uncategorized.' mod='hotelreservationsystem'}</p>
+											</div>
+										</div>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-primary" id="save-bulk-hotel-image-category-btn">
+											<i class="icon-save"></i> {l s='Save' mod='hotelreservationsystem'}
+										</button>
+									</div>
+								</div>
 							</div>
 						</div>
 					{else}
@@ -733,9 +783,12 @@
 
 	{strip}
 		{addJsDef adminHotelCtrlUrl = $link->getAdminlink('AdminAddHotel')}
+			{addJsDefL name=imgSelectErrorMsg}{l s='Please select at least one image before uploading.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+			{addJsDefL name=bulkUpdateSelectErrorMsg}{l s='Please select at least one image to update.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+			{addJsDefL name=bulkDeleteSelectErrorMsg}{l s='Please select at least one image to delete.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 			{addJsDefL name=imgUploadSuccessMsg}{l s='Image Successfully Uploaded' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-		{addJsDefL name=imgSelectErrorMsg}{l s='Please select at least one image before uploading.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-		{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+			{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+			{addJsDefL name=imgUpdateSuccessMsg}{l s='Image updated successfully.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 
 	{addJsDefL name=coverImgSuccessMsg}{l s='Cover image changed successfully' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=coverImgErrorMsg}{l s='Error while changing cover image' js=1 mod='hotelreservationsystem'}{/addJsDefL}
@@ -746,8 +799,6 @@
 	{addJsDef enabledDisplayMap = $enabledDisplayMap}
 	{addJsDef defaultCountry = $defaultCountry}
 	{addJsDef statebycountryurl = $link->getAdminLink('AdminAddHotel')}
-	{addJsDefL name=htlImgDeleteSuccessMsg}{l s='Image removed successfully.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=htlImgDeleteErrMsg}{l s='Some error occurred while deleting hotel image.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 {/strip}
 
 {block name=script}
