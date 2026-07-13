@@ -82,8 +82,13 @@ class AdminHotelHeaderImageController extends ModuleAdminController
 
         $videoItem     = HotelHeaderImage::getVideoConfig();
         $videoMimeType = 'video/mp4';
-        if ($videoItem && $videoItem['source_type'] === 'upload') {
-            $ext = strtolower(pathinfo($videoItem['name'], PATHINFO_EXTENSION));
+        if ($videoItem) {
+            if ($videoItem['source_type'] === 'upload') {
+                $ext = strtolower(pathinfo($videoItem['name'], PATHINFO_EXTENSION));
+            } else {
+                $urlPath = parse_url($videoItem['name'], PHP_URL_PATH);
+                $ext = strtolower(pathinfo($urlPath ?: '', PATHINFO_EXTENSION));
+            }
             $mimeMap = array('mp4' => 'video/mp4', 'webm' => 'video/webm', 'ogg' => 'video/ogg');
             $videoMimeType = isset($mimeMap[$ext]) ? $mimeMap[$ext] : 'video/mp4';
         }
@@ -108,7 +113,6 @@ class AdminHotelHeaderImageController extends ModuleAdminController
                 'editLabel'           => $this->l('Edit'),
                 'deleteImageLabel'    => $this->l('Delete this image'),
                 'fileTooLarge'        => $this->l('File exceeds the maximum allowed upload size.'),
-                'switchToVideoConfirm'=> $this->l('Switching to Video will delete all images except the first one. Continue?'),
             ),
         ));
 
@@ -152,7 +156,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $activeToDelete = array_intersect(array_map('intval', (array)$ids), array_map('intval', $activeIds));
 
         if (count($activeIds) - count($activeToDelete) < 1) {
-            $this->errors[] = $this->l('At least one active image must remain. Please enable another image before deleting the current active image.');
+            $this->errors[] = $this->l('At least one active image is required.');
             return;
         }
 
@@ -167,7 +171,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $activeToDisable = array_intersect(array_map('intval', (array)$ids), array_map('intval', $activeIds));
 
         if (count($activeIds) - count($activeToDisable) < 1) {
-            $this->errors[] = $this->l('At least one active image must remain. Please enable another image before disabling the current active image.');
+            $this->errors[] = $this->l('At least one image must remain active.');
             return;
         }
 
@@ -360,6 +364,15 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         foreach (Language::getLanguages(false) as $lang) {
             $tagLineByLang[$lang['id_lang']] = trim(Tools::getValue('tag_line_'.$lang['id_lang'], ''));
         }
+        foreach ($tagLineByLang as $tagLineValue) {
+            if (!Validate::isGenericName($tagLineValue)) {
+                if (file_exists($destPath)) {
+                    unlink($destPath);
+                }
+                $response['errors'][] = $this->l('Invalid tag line. Characters < > = { } are not allowed.');
+                $this->ajaxDie(json_encode($response));
+            }
+        }
 
         $tagLineColor  = Tools::getValue('tag_line_color', '#ffffff');
         if (!preg_match('/^#[0-9a-fA-F]{6}$/', $tagLineColor)) {
@@ -430,7 +443,15 @@ class AdminHotelHeaderImageController extends ModuleAdminController
 
         $activeVal = Tools::getValue('active');
         if ($activeVal !== false) {
-            $objImage->active = (int)(bool)$activeVal;
+            $newActive = (int)(bool)$activeVal;
+            if ($newActive === 0 && (int)$objImage->active === 1) {
+                $activeImages = HotelHeaderImage::getItems(1);
+                if (is_array($activeImages) && count($activeImages) <= 1) {
+                    $response['errors'][] = $this->l('At least one image must remain active.');
+                    $this->ajaxDie(json_encode($response));
+                }
+            }
+            $objImage->active = $newActive;
         }
 
         $tagLineColor = Tools::getValue('tag_line_color', $objImage->tag_line_color);
@@ -489,7 +510,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         if ($objImage->active) {
             $activeImages = HotelHeaderImage::getItems(1);
             if (is_array($activeImages) && count($activeImages) <= 1) {
-                $response['errors'][] = $this->l('At least one image must remain active. Enable another image before deleting this one.');
+                $response['errors'][] = $this->l('At least one active image is required');
                 $this->ajaxDie(json_encode($response));
             }
         }
@@ -599,6 +620,12 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $tagLineByLang = array();
         foreach ($languages as $lang) {
             $tagLineByLang[$lang['id_lang']] = trim(Tools::getValue('tag_line_'.$lang['id_lang'], ''));
+        }
+        foreach ($tagLineByLang as $tagLineValue) {
+            if (!Validate::isGenericName($tagLineValue)) {
+                $response['errors'][] = $this->l('Invalid tag line. Characters < > = { } are not allowed.');
+                $this->ajaxDie(json_encode($response));
+            }
         }
 
         $ids = Db::getInstance()->executeS(

@@ -710,6 +710,9 @@ p.room_cat_data
     background: #f9f9f9;
     font-size: 13px;
 }
+.qlo-files-list li:first-child {
+    margin-top: 5px;
+}
 .qlo-files-list li:last-child {
     margin-bottom: 0;
 }
