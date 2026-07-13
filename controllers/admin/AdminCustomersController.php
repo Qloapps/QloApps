@@ -153,11 +153,11 @@ class AdminCustomersControllerCore extends AdminController
                 'optional' => true,
                 'visible_default' => false,
             ),
-            'address_alias' => array(
+            'alias' => array(
                 'title' => $this->l('Address alias'),
                 'optional' => true,
                 'visible_default' => false,
-                'havingFilter' => true,
+                'search' => false,
                 'orderby' => false,
             ),
             'address_company' => array(
@@ -167,7 +167,7 @@ class AdminCustomersControllerCore extends AdminController
                 'havingFilter' => true,
                 'orderby' => false,
             ),
-            'address_vat_number' => array(
+            'vat_number' => array(
                 'title' => $this->l('VAT number'),
                 'optional' => true,
                 'visible_default' => false,
@@ -178,38 +178,38 @@ class AdminCustomersControllerCore extends AdminController
                 'title' => $this->l('Address'),
                 'optional' => true,
                 'visible_default' => false,
-                'havingFilter' => true,
+                'search' => false,
                 'orderby' => false,
             ),
             'address2' => array(
                 'title' => $this->l('Address (2)'),
                 'optional' => true,
                 'visible_default' => false,
-                'havingFilter' => true,
+                'search' => false,
                 'orderby' => false,
             ),
-            'address_city' => array(
+            'city' => array(
                 'title' => $this->l('City'),
                 'optional' => true,
                 'visible_default' => false,
                 'havingFilter' => true,
                 'orderby' => false,
             ),
-            'address_state' => array(
+            'state' => array(
                 'title' => $this->l('State'),
                 'optional' => true,
                 'visible_default' => false,
                 'havingFilter' => true,
                 'orderby' => false,
             ),
-            'address_postcode' => array(
+            'postcode' => array(
                 'title' => $this->l('Zip/Postal Code'),
                 'optional' => true,
                 'visible_default' => false,
                 'havingFilter' => true,
                 'orderby' => false,
             ),
-            'address_country' => array(
+            'country' => array(
                 'title' => $this->l('Country'),
                 'optional' => true,
                 'visible_default' => false,
@@ -223,18 +223,18 @@ class AdminCustomersControllerCore extends AdminController
                 'havingFilter' => true,
                 'orderby' => false,
             ),
-            'address_phone_mobile' => array(
+            'phone_mobile' => array(
                 'title' => $this->l('Mobile phone'),
                 'optional' => true,
                 'visible_default' => false,
                 'havingFilter' => true,
                 'orderby' => false,
             ),
-            'address_dni' => array(
+            'dni' => array(
                 'title' => $this->l('Identification Number'),
                 'optional' => true,
                 'visible_default' => false,
-                'havingFilter' => true,
+                'search' => false,
                 'orderby' => false,
             ),
             'active' => array(
@@ -300,10 +300,10 @@ class AdminCustomersControllerCore extends AdminController
             ORDER BY c.date_add DESC
             LIMIT 1
         ) as connect,
-        ad.alias as address_alias, ad.company as address_company, ad.vat_number as address_vat_number,
-        ad.address1, ad.address2, ad.city as address_city, adstate.name as address_state,
-        ad.postcode as address_postcode, adcountry.name as address_country, ad.phone as address_phone,
-        ad.phone_mobile as address_phone_mobile, ad.dni as address_dni';
+        ad.alias, ad.company as address_company, ad.vat_number,
+        ad.address1, ad.address2, ad.city, adstate.name as state,
+        ad.postcode, adcountry.name as country, ad.phone as address_phone,
+        ad.phone_mobile, ad.dni';
 
         // Check if we can add a customer
         if (Shop::isFeatureActive() && (Shop::getContext() == Shop::CONTEXT_ALL || Shop::getContext() == Shop::CONTEXT_GROUP)) {
