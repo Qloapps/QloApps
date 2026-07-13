@@ -30,8 +30,11 @@
         {if $data.is_back_order}
             <span class="overbooked_room">{l s='overbooked'}</span>
         {/if}
+		{if isset($data['connected_rooms'][$data.id_room])}
+			{include file="controllers/products/connected-rooms.tpl" htl_connected_rooms=$data['connected_rooms'][$data.id_room]}
+		{/if}
     </td>
-	<td class="center"><img class="img-thumbnail" src="{$data.image_link}" title="{l s='Room image'}"></td>
+	<td class="center"><img width="80px" src="{$data.image_link}" title="{l s='Room image'}"></td>
 	<td class="center">
 		{assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
 		<p>{dateFormat date=$data.date_from full=$is_full_date}</p>
@@ -121,11 +124,11 @@
 	                <span>--</span>
 	            {/if}
 			</p>
-			<p class="badge badge-success refunded_amount">
 				{if $data.is_refunded && isset($data.refund_info) && $data.refund_info}
-					{convertPriceWithCurrency price=$data.refund_info.refunded_amount currency=$currency->id}
+					<p class="badge badge-success refunded_amount">
+						{convertPriceWithCurrency price=$data.refund_info.refunded_amount currency=$currency->id}
+					</p>
 				{/if}
-			</p>
 		</td>
 	{/if}
 	{if ($can_edit && !$order->hasBeenDelivered())}
@@ -157,7 +160,7 @@
                         <li>
                             <a href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
                                 <i class="icon-file-text"></i>
-                                {l s='Upload Documents'}
+                                {l s='Documents'}
                                 <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span>
                             </a>
                         </li>
