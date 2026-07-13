@@ -149,6 +149,16 @@
                             </div>
 
                             <div class="detail-row">
+                                <div class=" title">{l s='Booking Voucher'}</div>
+                                <div class=" value payment-method">
+                                    <span class="icon-pdf"></span>
+                                    <a target="_blank" href="{$link->getPageLink('pdf-booking-voucher', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download booking voucher.'}">
+                                        <span>{l s='Booking Voucher'}</span>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="detail-row">
                                 <div class="pull-left title">{l s='Status'}</div>
                                 <div class="pull-right value status">
                                     {if isset($order_history[0]) && $order_history[0]}
@@ -644,6 +654,16 @@
                                     {else}
                                         {$order->payment|escape:'html':'UTF-8'}
                                     {/if}
+                                </div>
+                            </div>
+
+                            <div class="detail-row">
+                                <div class=" title">{l s='Booking Voucher'}</div>
+                                <div class=" value payment-method">
+                                    <span class="icon-pdf"></span>
+                                    <a target="_blank" href="{$link->getPageLink('pdf-booking-voucher', true)}?id_order={$order->id|intval}{if $is_guest}&amp;secure_key={$order->secure_key|escape:'html':'UTF-8'}{/if}" title="{l s='Click here to download booking voucher.'}">
+                                        <span>{l s='Booking Voucher'}</span>
+                                    </a>
                                 </div>
                             </div>
 

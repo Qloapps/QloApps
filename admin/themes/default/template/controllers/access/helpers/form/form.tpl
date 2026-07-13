@@ -107,6 +107,47 @@
 			}
 			perfect_access_js_gestion(this, perm, id_tab, tabsize, tabnumber, table);
 
+			if (perm == 'kpi') {
+				$(table + ' .kpi.' + id_tab).prop('checked', !!enabled);
+			}
+
+			$(table + ' tr.kpi-row').each(function() {
+				var kpiTabId = $(this).data('kpi-parent');
+				var kpiProfile = $(this).data('kpi-profile');
+				var $kpiInputs = $(this).find('input.ajaxPower.kpi');
+				if (!$kpiInputs.length || $kpiInputs.first().data('kpi-editable') != 1) { return; }
+				// For perm=view, read state directly from action — jQuery 1.11 .attr() doesn't update .prop()
+				var parentEnabled = (perm == 'view' && (id_tab == kpiTabId ||  id_tab == -1))
+					? !!enabled
+					: $(table + ' input.view.' + kpiTabId).first().is(':checked');
+				if (!parentEnabled) {
+					$kpiInputs.prop('checked', false).prop('disabled', true);
+				} else {
+					$kpiInputs.prop('disabled', false);
+					if (perm == 'all' && (id_tab == -1 || id_tab == kpiTabId)) {
+						$kpiInputs.prop('checked', !!enabled).first().trigger('change');
+					}
+					if (perm == 'view' && (id_tab == kpiTabId || id_tab == -1) && !!enabled) {
+						$kpiInputs.prop('checked', true);
+						$.ajax({
+							url: "{$link->getAdminLink('AdminAccess')|addslashes}",
+							cache: false,
+							data: {
+								ajaxMode: '1',
+								id_tab: kpiTabId,
+								id_profile: kpiProfile,
+								perm: 'kpi',
+								enabled: 1,
+								submitAddAccess: '1',
+								action: 'updateAccess',
+								ajax: '1',
+								token: '{getAdminToken tab='AdminAccess'}'
+							}
+						});
+					}
+				}
+			});
+
 			$.ajax({
 				url: "{$link->getAdminLink('AdminAccess')|addslashes}",
 				cache: false,
@@ -349,6 +390,32 @@
 													<input type="checkbox"{if $access_edit == 1} data-rel="{$access[$tab.id_tab]['id_tab']}||{$profile.id_profile}||all||{$tabsize}||{count($tabs)}" class="ajaxPower all {$access[$tab.id_tab]['id_tab']}"{else} class="all {$access[$tab.id_tab]['id_tab']}" disabled="disabled"{/if}{if $result_accesses == 4} checked="checked"{/if}/>
 												</td>
 											</tr>
+											{if !empty($tab.has_kpi)}
+												<tr class="kpi-row kpi-level-1 child-kpi-{$tab.id_tab}" data-kpi-parent="{$tab.id_tab}" data-kpi-profile="{$profile.id_profile}">
+													<td>&nbsp; &raquo; {l s='KPI'}</td>
+													<td>
+														<input type="checkbox"
+															class="ajaxPower kpi {$tab.id_tab}"
+															data-rel="{$tab.id_tab}||{$profile.id_profile}||kpi||{$tabsize}||{count($tabs)}"
+															data-kpi-editable="{if $access_edit == 1}1{else}0{/if}"
+															{if $access_edit != 1 || $access[$tab.id_tab].view != 1}disabled="disabled"{/if}
+															{if isset($access[$tab.id_tab].kpi) && $access[$tab.id_tab].kpi == 1 && $access[$tab.id_tab].view == 1}checked="checked"{/if}
+														/>
+													</td>
+													<td><input type="checkbox" disabled="disabled"/></td>
+													<td><input type="checkbox" disabled="disabled"/></td>
+													<td><input type="checkbox" disabled="disabled"/></td>
+													<td>
+														<input type="checkbox"
+															class="ajaxPower kpi {$tab.id_tab}"
+															data-rel="{$tab.id_tab}||{$profile.id_profile}||kpi||{$tabsize}||{count($tabs)}"
+															data-kpi-editable="{if $access_edit == 1}1{else}0{/if}"
+															{if $access_edit != 1 || $access[$tab.id_tab].view != 1}disabled="disabled"{/if}
+															{if isset($access[$tab.id_tab].kpi) && $access[$tab.id_tab].kpi == 1 && $access[$tab.id_tab].view == 1}checked="checked"{/if}
+														/>
+													</td>
+												</tr>
+											{/if}
 											{foreach $tabs AS $child}
 												{if $child.id_parent === $tab.id_tab}
 													{if isset($access[$child.id_tab])}
@@ -372,6 +439,32 @@
 																<input type="checkbox"{if $access_edit == 1} data-rel="{$access[$child.id_tab]['id_tab']}||{$profile.id_profile}||all||{$tabsize}||{count($tabs)}" class="ajaxPower all {$access[$child.id_tab]['id_tab']}"{else} class="all {$access[$child.id_tab]['id_tab']}" disabled="disabled"{/if}{if $result_accesses == 4} checked="checked"{/if}/>
 															</td>
 														</tr>
+														{if !empty($child.has_kpi)}
+															<tr class="kpi-row kpi-level-2 child-kpi-{$child.id_tab}" data-kpi-parent="{$child.id_tab}" data-kpi-profile="{$profile.id_profile}">
+																<td>&nbsp; &raquo; {l s='KPI'}</td>
+																<td>
+																	<input type="checkbox"
+																		class="ajaxPower kpi {$child.id_tab}"
+																		data-rel="{$child.id_tab}||{$profile.id_profile}||kpi||{$tabsize}||{count($tabs)}"
+																		data-kpi-editable="{if $access_edit == 1}1{else}0{/if}"
+																		{if $access_edit != 1 || $access[$child.id_tab].view != 1}disabled="disabled"{/if}
+																		{if isset($access[$child.id_tab].kpi) && $access[$child.id_tab].kpi == 1 && $access[$child.id_tab].view == 1}checked="checked"{/if}
+																	/>
+																</td>
+																<td><input type="checkbox" disabled="disabled"/></td>
+																<td><input type="checkbox" disabled="disabled"/></td>
+																<td><input type="checkbox" disabled="disabled"/></td>
+																<td>
+																	<input type="checkbox"
+																		class="ajaxPower kpi {$child.id_tab}"
+																		data-rel="{$child.id_tab}||{$profile.id_profile}||kpi||{$tabsize}||{count($tabs)}"
+																		data-kpi-editable="{if $access_edit == 1}1{else}0{/if}"
+																		{if $access_edit != 1 || $access[$child.id_tab].view != 1}disabled="disabled"{/if}
+																		{if isset($access[$child.id_tab].kpi) && $access[$child.id_tab].kpi == 1 && $access[$child.id_tab].view == 1}checked="checked"{/if}
+																	/>
+																</td>
+															</tr>
+														{/if}
 													{/if}
 												{/if}
 											{/foreach}

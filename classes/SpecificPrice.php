@@ -367,12 +367,12 @@ class SpecificPriceCore extends ObjectModel
                 `id_shop` '.self::formatIntInQuery(0, $id_shop).' AND
                 `id_currency` '.self::formatIntInQuery(0, $id_currency).' AND
                 `id_country` '.self::formatIntInQuery(0, $id_country).
-                ' AND `id_htl_cart_booking`='.(int)$id_htl_cart_booking.' '.
+                ' AND `id_htl_cart_booking` '.self::formatIntInQuery(0, $id_htl_cart_booking).' '.
                 (Group::isFeatureActive() ? ' AND `id_group` '.self::formatIntInQuery(0, $id_group) : '').' '.$query_extra.'
 				AND IF(`from_quantity` > 1, `from_quantity`, 0) <= ';
 
             $query .= (Configuration::get('PS_QTY_DISCOUNT_ON_COMBINATION') || !$id_cart || !$real_quantity) ? (int)$quantity : max(1, (int)$real_quantity);
-            $query .= ' ORDER BY `id_product_attribute` DESC, `from_quantity` DESC, `score` DESC, `to` DESC, `from` DESC';
+            $query .= ' ORDER BY `id_htl_cart_booking` DESC, `id_product_attribute` DESC, `from_quantity` DESC, `score` DESC, `to` DESC, `from` DESC';
 
             SpecificPrice::$_specificPriceCache[$key] = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow($query);
         }
