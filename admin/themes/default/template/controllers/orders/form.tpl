@@ -760,7 +760,6 @@
 		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
-		$('#payment_amount').val(jsonSummary.summary.total_price);
 		if (jsonSummary.summary.is_advance_payment_active) {
 			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
 			$('#advance_payment_amount_block').show();
@@ -770,9 +769,10 @@
 
 		// toggle payment fields
 		if (jsonSummary.summary.total_price == 0) { // if free order
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount_input_field_group, #payment_amount_static_group, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
 		} else {
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+			$(parseInt($('input[name="is_full_payment"]:checked').val()) ? '#payment_amount_static_group' : '#payment_amount_input_field_group').show(200);
 		}
 	}
 
@@ -1289,7 +1289,6 @@
 		}
 		$('#order_message').val(jsonSummary.order_message);
 		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
-		$('#payment_amount').val(jsonSummary.summary.total_price);
 		if (jsonSummary.summary.is_advance_payment_active) {
 			$('#advance_payment_amount').html(formatCurrency(parseFloat(jsonSummary.summary.advance_payment_amount_with_tax), currency_format, currency_sign, currency_blank));
 			$('#advance_payment_amount_block').show();
@@ -1299,9 +1298,10 @@
 
 		// toggle payment fields
 		if (jsonSummary.summary.total_price == 0) { // if free order
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount_input_field_group, #payment_amount_static_group, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
 		} else {
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
+			$(parseInt($('input[name="is_full_payment"]:checked').val()) ? '#payment_amount_static_group' : '#payment_amount_input_field_group').show(200);
 		}
 
 		resetBind();
@@ -1714,10 +1714,14 @@
 		$(document).on('change', 'input[name="is_full_payment"]', function() {
 			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
 				$('#payment_amount').attr('disabled', true);
+				$('#payment_amount_input_field_group').hide(200);
+				$('#payment_amount_static_group').show(200);
 
 				$('#payment_type, #payment_transaction_id').closest('.form-group').show(200);
 			} else {
-				$('#payment_amount').attr('disabled', false);
+				$('#payment_amount').val({$order_total|floatval}).attr('disabled', false);
+				$('#payment_amount_static_group').hide(200);
+				$('#payment_amount_input_field_group').show(200);
 
 				managePaymentOptions();
 			}
@@ -2390,17 +2394,23 @@
                             <p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
                         </div>
                     </div>
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                    <div class="form-group" id="payment_amount_input_field_group" {if $order_total <= 0 || $is_full_payment}style="display: none;"{/if}>
                         <label class="control-label required col-lg-3">{l s='Payment amount'}</label>
                         <div class="col-lg-9">
                             <div class="input-group fixed-width-xxl">
                                 <span class="input-group-addon">{$currency->sign}</span>
-                                <input type="text" name="payment_amount" id="payment_amount" value="{if isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{elseif $is_full_payment}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
+                                <input type="text" name="payment_amount" id="payment_amount" value="{if !$is_full_payment && isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{else}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
                             </div>
                             <p class="help-block" id="advance_payment_amount_block" {if isset($is_advance_payment_active) && $is_advance_payment_active}style="display: block;"{else}style="display: none;"{/if}>
                                 <span>{l s='Advance payment amount: '}</span>
                                 <span id="advance_payment_amount">{displayPrice price=$advance_payment_amount_with_tax currency=$currency->id}</span>
                             </p>
+                        </div>
+                    </div>
+                    <div class="form-group" id="payment_amount_static_group" {if $order_total <= 0 || !$is_full_payment}style="display: none;"{/if}>
+                        <label class="control-label col-lg-3">{l s='Payment amount'}</label>
+                        <div class="col-lg-9">
+                            <p class="form-control-static text-muted" id="payment_amount_static_display">{displayPrice price=$order_total currency=$currency->id}</p>
                         </div>
                     </div>
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
