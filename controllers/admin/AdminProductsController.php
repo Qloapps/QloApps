@@ -3809,7 +3809,6 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
-<<<<<<< HEAD
         if (empty($this->errors) && $idRoom && $idStatus == HotelRoomInformation::STATUS_INACTIVE) {
             $objHotelRoomInformation = new HotelRoomInformation();
             if (count($objHotelRoomInformation->getFutureBookings($idRoom))) {
@@ -3828,8 +3827,6 @@ class AdminProductsControllerCore extends AdminController
             )));
         }
 
-=======
->>>>>>> 0888e3a4e9c2715badcd4458e36d201ff6fb64da
         if (empty($this->errors)) {
             $objRoom->room_num  = $roomNum;
             $objRoom->floor     = $floor;
