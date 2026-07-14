@@ -3809,6 +3809,7 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
+<<<<<<< HEAD
         if (empty($this->errors) && $idRoom && $idStatus == HotelRoomInformation::STATUS_INACTIVE) {
             $objHotelRoomInformation = new HotelRoomInformation();
             if (count($objHotelRoomInformation->getFutureBookings($idRoom))) {
@@ -3827,6 +3828,8 @@ class AdminProductsControllerCore extends AdminController
             )));
         }
 
+=======
+>>>>>>> 0888e3a4e9c2715badcd4458e36d201ff6fb64da
         if (empty($this->errors)) {
             $objRoom->room_num  = $roomNum;
             $objRoom->floor     = $floor;
@@ -3834,12 +3837,9 @@ class AdminProductsControllerCore extends AdminController
             $objRoom->comment   = $comment;
 
             if ($objRoom->save()) {
-                $response['success'] = true;
                 $response['href'] = self::$currentIndex
                     . '&update' . $this->table
                     . '&id_product=' . (int) $idProduct
-                    . '&token=' . $this->token
-                    . '&conf=4&key_tab=Configuration';
             } else {
                 $this->errors[] = $this->l('Unable to save room. Please try again.');
             }
