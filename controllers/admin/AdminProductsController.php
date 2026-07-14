@@ -3693,27 +3693,9 @@ class AdminProductsControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('Please select a hotel.');
                 }
 
+                // Individual rooms are validated and saved via ajaxProcessSaveRoom() the
+                // moment they're added/edited in the room popup — nothing left to save here.
                 $this->validateConfigurationPostData();
-                if (!count($this->errors)) {
-                    $roomsInfo = Tools::getValue('rooms_info');
-                    if (is_array($roomsInfo) && count($roomsInfo)) {
-                        foreach ($roomsInfo as $roomInfo) {
-                            $objHotelRoomInfo = null;
-                            if (isset($roomInfo['id']) && $roomInfo['id']) {
-                                $objHotelRoomInfo = new HotelRoomInformation($roomInfo['id']);
-                            } else {
-                                $objHotelRoomInfo = new HotelRoomInformation();
-                            }
-                            $objHotelRoomInfo->id_product = $id_product;
-                            $objHotelRoomInfo->id_hotel = $id_hotel;
-                            $objHotelRoomInfo->room_num = trim($roomInfo['room_num']);
-                            $objHotelRoomInfo->id_status = $roomInfo['id_status'];
-                            $objHotelRoomInfo->floor = trim($roomInfo['floor']);
-                            $objHotelRoomInfo->comment = trim($roomInfo['comment']);
-                            $objHotelRoomInfo->save();
-                        }
-                    }
-                }
             }
         } else {
             $this->errors[] = Tools::displayError('You do not have the permission for this action.');
@@ -3722,36 +3704,9 @@ class AdminProductsControllerCore extends AdminController
 
     public function validateConfigurationPostData()
     {
-        $roomsInfo = Tools::getValue('rooms_info');
-        if (is_array($roomsInfo) && count($roomsInfo)) {
-            foreach ($roomsInfo as $key => $roomInfo) {
-                if (!trim($roomInfo['room_num'])) {
-                    unset($_POST['rooms_info'][$key]);
-                }
-            }
-        }
-
-        $roomsInfo = Tools::getValue('rooms_info'); // since $_POST['rooms_info'] has changed
-        if (is_array($roomsInfo) && count($roomsInfo)) {
-            foreach ($roomsInfo as $key => $roomInfo) {
-                $roomIndex = $key + 1;
-
-                if ($roomInfo['room_num'] && !Validate::isGenericName($roomInfo['room_num'])) {
-                    $this->errors[] = sprintf(Tools::displayError('Invalid room number for room %s.'), $roomIndex);
-                }
-
-                if ($roomInfo['floor'] && !Validate::isGenericName($roomInfo['floor'])) {
-                    $this->errors[] = sprintf(Tools::displayError('Invalid floor for room %s.'), $roomIndex);
-                }
-                if ($roomInfo['id_status'] == HotelRoomInformation::STATUS_INACTIVE) {
-                    $objHotelRoomInformation = new HotelRoomInformation();
-                    if (count($objHotelRoomInformation->getFutureBookings($roomInfo['id']))) {
-                        $this->errors[] = sprintf(Tools::displayError('Cannot change room %s status to inactive as it already has some bookings, Please check the bookings and move those bookings to another room if you want make this room inactive'), $roomInfo['room_num']);
-                    }
-                }
-                Hook::exec('actionValidateRoomInformation', array('room_information' => $roomInfo));
-            }
-        } else {
+        $idProduct = (int) Tools::getValue('id_product');
+        $objHotelRoomInformation = new HotelRoomInformation();
+        if (!$objHotelRoomInformation->getHotelRoomInfoByProductId($idProduct)) {
             $this->errors[] = Tools::displayError('Please add at least one room.');
         }
     }
@@ -3829,6 +3784,9 @@ class AdminProductsControllerCore extends AdminController
         if ($floor && !Validate::isGenericName($floor)) {
             $this->errors[] = $this->l('Invalid floor value.');
         }
+        if ($comment && !Validate::isGenericName($comment)) {
+            $this->errors[] = $this->l('Invalid remark.');
+        }
 
         if (empty($this->errors)) {
             if ($idRoom) {
@@ -3849,6 +3807,24 @@ class AdminProductsControllerCore extends AdminController
                     $objRoom->id_hotel   = $roomTypeInfo['id_hotel'];
                 }
             }
+        }
+
+        if (empty($this->errors) && $idRoom && $idStatus == HotelRoomInformation::STATUS_INACTIVE) {
+            $objHotelRoomInformation = new HotelRoomInformation();
+            if (count($objHotelRoomInformation->getFutureBookings($idRoom))) {
+                $this->errors[] = sprintf(
+                    $this->l('Cannot change room %s status to inactive as it already has some bookings, please check the bookings and move those bookings to another room if you want to make this room inactive.'),
+                    $roomNum
+                );
+            }
+        }
+
+        if (empty($this->errors)) {
+            Hook::exec('actionValidateRoomInformation', array('room_information' => array(
+                'id'        => $idRoom,
+                'id_status' => $idStatus,
+                'room_num'  => $roomNum,
+            )));
         }
 
         if (empty($this->errors)) {

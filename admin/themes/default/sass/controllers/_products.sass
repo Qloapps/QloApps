@@ -198,7 +198,8 @@
     flex-wrap: wrap
     align-items: stretch
 .room-field-col
-    flex: 1
+    flex: 0 0 16.6667%
+    max-width: 16.6667%
     min-width: 130px
     display: flex
     flex-direction: column
@@ -233,10 +234,6 @@
         color: #00a65a
     &.status-inactive
         color: #EF4444
-.col-action
-    width: 130px
-    flex-shrink: 0
-    padding: 14px 10px
 .dates-wrap
     display: flex
     align-items: center
@@ -246,40 +243,35 @@
         font-weight: 600
         font-size: 12px
         line-height: 24px
+        padding: 3px 8px
         background: none
         border: none
         box-shadow: none
-        padding: 0
         color: #00AFF0
         &:hover
             background: none
             border-color: transparent
             color: #0090c8
             text-decoration: underline
-    .btn-sm
-        padding: 3px 8px
-        font-size: 12px
-.dates-info-icon
-    color: #5bc0de
-    cursor: pointer
-    font-size: 15px
 .col-action .btn-group .btn-sm
     padding: 3px 8px
     font-size: 12px
-@media (max-width: 992px)
-    .card-row
-        flex-wrap: wrap
-    .room-cell-grid
-        flex-direction: column
+// Responsive column count: 6 per row by default (lg, >=1200px), stepping down
+// to 5 (md), 4 (sm), then a full single-column stack below 768px (xs).
+@media (max-width: 1199px)
     .room-field-col
-        min-width: 100%
+        flex: 0 0 20%
+        max-width: 20%
+@media (max-width: 991px)
+    .room-field-col
+        flex: 0 0 25%
+        max-width: 25%
+@media (max-width: 767px)
+    .room-field-col
+        flex: 0 0 100%
+        max-width: 100%
         border-right: none
         border-bottom: 1px solid #F0F0F0
-    .col-action
-        width: 100%
-        border-left: none
-        border-top: 1px solid #F0F0F0
-        padding: 10px
 
 .modal-right
     .modal-dialog.modal-dialog-right
@@ -314,26 +306,14 @@
             margin: 0
             float: none
             order: 2
-            font-size: 22px
-            font-weight: 400
-            color: #333333
-            opacity: 1
-            &:hover
-                color: #000
-                opacity: 1
     .modal-title
         order: 1
-        margin: 0
-        font-size: 20px
-        font-weight: 700
-        line-height: 24px
-        color: #333333
     .modal-body
         flex: 1
         overflow-y: auto
         padding: 20px
-    .modal-backdrop
-        background: rgba(0,0,0,0.3)
+    .modal-footer
+        flex-shrink: 0
     label.required
         &:before
             content: none
@@ -380,26 +360,6 @@
     .form-control:focus
         border-color: #00AFF0
         box-shadow: 0 0 0 2px rgba(0,175,240,0.15)
-.modal-footer-right
-    border-top: 1px solid #F2F2F2
-    padding: 12px 20px
-    display: flex
-    justify-content: flex-end
-    gap: 8px
-    flex-shrink: 0
-    .btn
-        display: flex
-        flex-direction: column
-        align-items: center
-        justify-content: center
-        gap: 4px
-        min-width: 60px
-        height: 56px
-        background: #FFFFFF
-        border: 1px solid #DEDEDE
-        border-radius: 3px
-        font-size: 12px
-        color: #363A41
 .open-edit-disable-dates
     background: #FFFFFF
     border: 1px solid #00AFF0
