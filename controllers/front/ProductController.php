@@ -126,7 +126,7 @@ class ProductControllerCore extends FrontController
         $objHotelRoomType = new HotelRoomType();
         if ($hotelRoomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($this->product->id)) {
             $idHotel = (int) $hotelRoomInfo['id_hotel'];
-
+            
             // If the hotel this room type belongs to is disabled, redirect to home page
             if (!(new HotelBranchInformation())->hotelBranchesInfo(false, 1, 0, $idHotel)) {
                 Tools::redirect($this->context->link->getPageLink('index'));
@@ -381,10 +381,6 @@ class ProductControllerCore extends FrontController
                         $los = $objHotelRoomTypeRestrictionDateRange->getRoomTypeLengthOfStay($this->product->id, $date_from);
                         $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
                     }
-                    
-                    $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $hotel_id);
-                    $date_from = $bookingDateRange['date_from'];
-                    $date_to = $bookingDateRange['date_to'];
 
                     $hotel_branch_obj = new HotelBranchInformation($hotel_id);
                     /*Max date of ordering for order restrict*/
@@ -1471,13 +1467,8 @@ class ProductControllerCore extends FrontController
             }
             $roomTypeDemands = Tools::getValue('room_type_demands');
             $roomServiceProducts = Tools::getValue('room_service_products');
-
-            $roomTypeInfo = (new HotelRoomType())->getRoomTypeInfoByIdProduct($idProduct);
-            $idHotel = $roomTypeInfo ? $roomTypeInfo['id_hotel'] : 0;
-
-            $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($dateFrom, $dateTo, $idHotel);
-            $dateFrom = $bookingDateRange['date_from'];
-            $dateTo = $bookingDateRange['date_to'];
+            $dateFrom = date('Y-m-d H:i:s', strtotime($dateFrom));
+            $dateTo = date('Y-m-d H:i:s', strtotime($dateTo));
             $this->assignRoomServiceProductVars();
             if ($this->assignBookingFormVars(
                 $idProduct,

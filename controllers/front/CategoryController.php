@@ -101,12 +101,12 @@ class CategoryControllerCore extends FrontController
         $dateFrom = Tools::getValue('date_from');
         $dateTo = Tools::getValue('date_to');
         $idHotel = HotelBranchInformation::getHotelIdByIdCategory($id_category);
-
+        
         // If this category belongs to a hotel but that hotel is disabled, redirect to home page
         if ($idHotel && !(new HotelBranchInformation())->hotelBranchInfoByCategoryId($id_category)) {
             Tools::redirect($this->context->link->getPageLink('index'));
         }
-
+        
         if (!HotelHelper::validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)) {
             Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
@@ -192,10 +192,6 @@ class CategoryControllerCore extends FrontController
                     }
                 }
             }
-
-            $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $id_hotel);
-            $date_from = $bookingDateRange['date_from'];
-            $date_to = $bookingDateRange['date_to'];
 
             $objBookingDetail = new HotelBookingDetail();
             $bookingParams = array(
