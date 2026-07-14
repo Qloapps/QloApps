@@ -113,7 +113,7 @@ class HotelRoomTypeGlobalDemandAdvanceOption extends ObjectModel
         $sql = 'SELECT * FROM `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option`
         WHERE `id_global_demand` = '.(int)$idGlobalDemand;
         if (count($skipIds)) {
-            $sql .= ' AND `id_option` NOT IN ('.pSQL(implode(',', $skipIds)).')' ;
+            $sql .= ' AND `id_option` NOT IN ('.implode(',', array_map('intval', $skipIds)).')' ;
         }
         if ($advOptions = Db::getInstance()->executeS($sql)) {
             foreach ($advOptions as &$option) {
