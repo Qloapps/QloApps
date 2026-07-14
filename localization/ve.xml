@@ -1,28 +1,66 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Venezuela" version="1.0">
 	<currencies>
-		<currency name="Bolívar fuerte" iso_code="VEF" iso_code_num="937" sign="Bs" blank="1" conversion_rate="5.84819" format="2" decimals="1" />
+		<currency name="Bolívar fuerte" iso_code="VEF" iso_code_num="937" sign="Bs" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
+		<language iso_code="ve" />
 		<language iso_code="es" />
 	</languages>
 	<taxes>
-		<tax id="1" name="IVA VE 12%" rate="12" />
-		<tax id="2" name="IVA VE 11%" rate="11" />
-		
-		<taxRulesGroup name="VE Standard Rate (12%)">
+		<tax id="1" name="IVA VE 15%" rate="15" />
+		<tax id="2" name="IVA VE 12%" rate="12" />
+		<tax id="3" name="IVA VE 8%" rate="8" />
+		<tax id="4" name="IVA VE 0%" rate="0" />
+
+		<taxRulesGroup name="VE Higher Rate (15%)">
 			<taxRule iso_code_country="ve" id_tax="1" />
 		</taxRulesGroup>
-		
-		<taxRulesGroup name="VE Reduced Rate (11%)">
+
+		<taxRulesGroup name="VE Standard Rate (12%)">
 			<taxRule iso_code_country="ve" id_tax="2" />
 		</taxRulesGroup>
-	</taxes>
+
+		<taxRulesGroup name="VE Reduced Rate (8%)">
+			<taxRule iso_code_country="ve" id_tax="3" />
+		</taxRulesGroup>
+
+		<taxRulesGroup name="VE Zero Rate (0%)">
+			<taxRule iso_code_country="ve" id_tax="4" />
+		</taxRulesGroup>
+  </taxes>
+	<states>
+		<state name="Amazonas" iso_code="Z" country="VE" zone="South America" />
+		<state name="Anzoátegui" iso_code="B" country="VE" zone="South America" />
+		<state name="Apure" iso_code="C" country="VE" zone="South America" />
+		<state name="Aragua" iso_code="D" country="VE" zone="South America" />
+		<state name="Barinas" iso_code="E" country="VE" zone="South America" />
+		<state name="Bolívar" iso_code="F" country="VE" zone="South America" />
+		<state name="Carabobo" iso_code="G" country="VE" zone="South America" />
+		<state name="Cojedes" iso_code="H" country="VE" zone="South America" />
+		<state name="Delta Amacuro" iso_code="Y" country="VE" zone="South America" />
+		<state name="Dependencias Federales" iso_code="W" country="VE" zone="South America" />
+		<state name="Distrito Capital" iso_code="A" country="VE" zone="South America" />
+		<state name="Falcón" iso_code="I" country="VE" zone="South America" />
+		<state name="Guárico" iso_code="J" country="VE" zone="South America" />
+		<state name="La Guaira" iso_code="X" country="VE" zone="South America" />
+		<state name="Lara" iso_code="K" country="VE" zone="South America" />
+		<state name="Mérida" iso_code="L" country="VE" zone="South America" />
+		<state name="Miranda" iso_code="M" country="VE" zone="South America" />
+		<state name="Monagas" iso_code="N" country="VE" zone="South America" />
+		<state name="Nueva Esparta" iso_code="O" country="VE" zone="South America" />
+		<state name="Portuguesa" iso_code="P" country="VE" zone="South America" />
+		<state name="Sucre" iso_code="R" country="VE" zone="South America" />
+		<state name="Táchira" iso_code="S" country="VE" zone="South America" />
+		<state name="Trujillo" iso_code="T" country="VE" zone="South America" />
+		<state name="Yaracuy" iso_code="U" country="VE" zone="South America" />
+		<state name="Zulia" iso_code="V" country="VE" zone="South America" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />
-		<unit type="short_distance" value="in" />
-		<unit type="base_distance" value="ft" />
-		<unit type="long_distance" value="mi" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
 	</units>
 </localizationPack>
