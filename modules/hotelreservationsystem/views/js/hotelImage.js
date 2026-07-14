@@ -43,12 +43,6 @@ $(document).ready(function () {
         }, 0);
     }
 
-    function updateBadge(delta)
-    {
-        var $badge = $('#hotel-images-heading .badge');
-        $badge.text(Math.max(0, parseInt($badge.text(), 10) + delta));
-    }
-
     function getCheckedImageIds()
     {
         return $('.hotel-image-checkbox:checked').map(function () {
@@ -68,7 +62,7 @@ $(document).ready(function () {
         if (fileInput) {
             fileInput.value = '';
         }
-        renderHotelImagesFileList(null);
+        $('#hotel-images-file-name').val('');
         openModalWithLoader('#addHotelImagesModal');
     });
 
@@ -76,55 +70,16 @@ $(document).ready(function () {
         $('#hotel-images-file-input').trigger('click');
     });
 
-    $(document).on('change', '#hotel-images-file-input', function () {
-        renderHotelImagesFileList(this.files);
+    $('#hotel-images-file-name').on('click', function () {
+        $('#hotel-images-file-input').trigger('click');
     });
 
-    $(document).on('click', '.hotel-images-remove-file', function () {
-        var removeIdx = parseInt($(this).data('index'), 10);
-        var fileInput = document.getElementById('hotel-images-file-input');
-        if (!fileInput || !fileInput.files) {
-            return;
-        }
-        try {
-            var dt = new DataTransfer();
-            for (var i = 0; i < fileInput.files.length; i++) {
-                if (i !== removeIdx) {
-                    dt.items.add(fileInput.files[i]);
-                }
-            }
-            fileInput.files = dt.files;
-        } catch (e) {
-            // ponytail: DataTransfer unsupported in this browser, list just won't reflect the removal
-        }
-        renderHotelImagesFileList(fileInput.files);
+    $('#hotel-images-file-input').on('change', function () {
+        var fileNames = Array.prototype.map.call(this.files, function (file) {
+            return file.name;
+        });
+        $('#hotel-images-file-name').val(fileNames.join(', '));
     });
-
-    function renderHotelImagesFileList(files)
-    {
-        var $list = $('#hotel-images-files-list').empty();
-        if (!files || !files.length) {
-            $list.hide();
-            return;
-        }
-        $list.show();
-        for (var i = 0; i < files.length; i++) {
-            (function (idx, file) {
-                var size = file.size < 1048576
-                    ? (file.size / 1024).toFixed(1) + ' KB'
-                    : (file.size / 1048576).toFixed(1) + ' MB';
-                $list.append(
-                    $('<li class="hotel-images-file-row"/>')
-                        .append($('<span/>').text(file.name + ' (' + size + ')'))
-                        .append(
-                            $('<button type="button" class="btn btn-default btn-xs hotel-images-remove-file"/>')
-                                .attr('data-index', idx)
-                                .html('<i class="icon-trash"></i>')
-                        )
-                );
-            })(i, files[i]);
-        }
-    }
 
     $('#hotel-images-upload-btn').on('click', function () {
         var fileInput = document.getElementById('hotel-images-file-input');
@@ -172,7 +127,6 @@ $(document).ready(function () {
                     if (resp && resp.success) {
                         $('.list-empty-tr').hide();
                         $('#hotel-image-table tbody').append(resp.image_row);
-                        updateBadge(1);
                         initHotelImagePreview();
                         showSuccessMessage(imgUploadSuccessMsg);
                     } else {
@@ -196,6 +150,7 @@ $(document).ready(function () {
         var isCover = $(this).attr('data-is-cover');
         var triggerElement = $(this);
         if (isCover == 0) {
+            $('#page-loader').show();
             $.ajax({
                 type:'POST',
                 url: adminHotelCtrlUrl,
@@ -208,13 +163,11 @@ $(document).ready(function () {
                 },
                 success: function(result) {
                     if (result.status) {
-                        // remover cover image identifier from old cover image
                         var oldCoverImageTr = $("#hotel-image-table tbody tr.cover-image-tr");
                         oldCoverImageTr.removeClass("cover-image-tr").find("td.cover-image-td").removeClass("cover-image-td").find("a.changer-cover-image").removeClass("text-success").addClass("text-danger").attr("data-is-cover", "0").find("i.icon-check").removeClass("icon-check").addClass("icon-times");
                         oldCoverImageTr.find("td button.delete-hotel-image").attr("data-is-cover", "0");
                         oldCoverImageTr.find("td button.edit-hotel-image").attr("data-is-cover", "0");
 
-                        // Add classes in new covre image elements
                         triggerElement.removeClass("text-danger").addClass("text-success").attr("data-is-cover", "1").find("i.icon-times").removeClass("icon-times").addClass("icon-check");
                         triggerElement.parent().addClass("cover-image-td").parent().addClass("cover-image-tr").find("td button.delete-hotel-image").attr("data-is-cover", "1");
                         triggerElement.parent().parent().find("td button.edit-hotel-image").attr("data-is-cover", "1");
@@ -227,6 +180,8 @@ $(document).ready(function () {
                 error: function(data){
    					showErrorMessage(coverImgErrorMsg);
                 }
+            }).always(function () {
+                $('#page-loader').hide();
             });
         }
     });
@@ -401,7 +356,6 @@ $(document).ready(function () {
                             initHotelImagePreview();
                         }
                         showEmptyRowIfNoImagesLeft();
-                        updateBadge(-result.deleted_ids.length);
                         $('.hotel-image-checkbox').prop('checked', false);
                         showSuccessMessage(deleteImgSuccessMsg);
                     } else {
@@ -426,6 +380,7 @@ $(document).ready(function () {
         var idImage = triggerElement.attr('data-id-image');
 
         if (parseInt(idHotel) && parseInt(idImage)) {
+            $('#page-loader').show();
             $.ajax({
                 type:'POST',
                 url: adminHotelCtrlUrl,
@@ -446,7 +401,6 @@ $(document).ready(function () {
                         }
 
                         showEmptyRowIfNoImagesLeft();
-                        updateBadge(-1);
 
                         showSuccessMessage(deleteImgSuccessMsg);
                     } else {
@@ -456,6 +410,8 @@ $(document).ready(function () {
                 error: function(data){
                     showErrorMessage(deleteImgErrorMsg);
                 }
+            }).always(function () {
+                $('#page-loader').hide();
             });
         } else {
             showErrorMessage(deleteImgErrorMsg);

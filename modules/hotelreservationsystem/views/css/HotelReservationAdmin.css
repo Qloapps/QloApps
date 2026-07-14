@@ -635,22 +635,3 @@ body.adminhotelroomsbooking .ui-tooltip {
 .error-border {
     outline: rgb(210, 124, 130) solid 1px;
     border-radius: 2px;}
-#hotel-images-files-list {
-    margin-top: 10px;}
-#hotel-images-files-list .hotel-images-file-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-    border-bottom: 1px solid #eee;}
-#hotel-images-files-list .hotel-images-file-row:last-child {
-    border-bottom: none;}
-#hotel-images-files-list .hotel-images-file-row > span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    padding-right: 10px;}
-#hotel-images-files-list .hotel-images-file-row > button {
-    flex-shrink: 0;}
-#hotel-images-heading #open-add-hotel-images-modal {
-    margin-top: 1.5px;}

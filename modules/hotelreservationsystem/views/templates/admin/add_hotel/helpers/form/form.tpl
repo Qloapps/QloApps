@@ -438,15 +438,14 @@
 					{hook h='displayAdminAddHotelFormImagesTabBefore' id_hotel=$hook_arg_id_hotel}
 
 					{if isset($hotel_info.id) && $hotel_info.id}
-						<div class="panel-heading" id="hotel-images-heading">
-							<i class="icon-image"></i> {l s='Hotel Images' mod='hotelreservationsystem'}
-							<span class="badge">{if isset($hotelImages) && $hotelImages}{$hotelImages|@count}{else}0{/if}</span>
-							<button type="button" class="btn btn-primary pull-right" id="open-add-hotel-images-modal">
-								<i class="icon-plus"></i> {l s='Add Images' mod='hotelreservationsystem'}
-							</button>
-						</div>
 						<div class="row">
 							<div class="col-sm-12">
+								<button type="button" class="btn btn-primary pull-right" id="open-add-hotel-images-modal">
+									<i class="icon-plus-sign"></i> {l s='Add file' mod='hotelreservationsystem'}
+								</button>
+							</div>
+							<div class="col-sm-12">
+								<hr>
 								{include file="../../_partials/htl-images-list.tpl"}
 							</div>
 						</div>
@@ -460,18 +459,25 @@
 									</div>
 									<div class="modal-body">
 										<div class="form-group">
-											<label class="control-label col-lg-3">{l s='Select images' mod='hotelreservationsystem'}</label>
+											<label class="control-label col-lg-3">{l s='Images' mod='hotelreservationsystem'}</label>
 											<div class="col-lg-9">
 												<input type="file" id="hotel-images-file-input" class="hide" accept="image/gif, image/jpg, image/jpeg, image/png" multiple>
-												<button type="button" class="btn btn-default" id="hotel-images-file-add-btn"><i class="icon-folder-open"></i> {l s='Add files...' mod='hotelreservationsystem'}</button>
-												<ul class="list-unstyled" id="hotel-images-files-list" style="display:none;"></ul>
+												<div class="dummyfile input-group">
+													<span class="input-group-addon"><i class="icon-file"></i></span>
+													<input id="hotel-images-file-name" type="text" readonly>
+													<span class="input-group-btn">
+														<button type="button" id="hotel-images-file-add-btn" class="btn btn-default">
+															<i class="icon-folder-open"></i> {l s='Add file' mod='hotelreservationsystem'}
+														</button>
+													</span>
+												</div>
 											</div>
 										</div>
 										<div class="form-group">
-											<label class="control-label col-lg-3" for="id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+											<label class="control-label col-lg-3" for="id_htl_image_category">{l s='Category' mod='hotelreservationsystem'}</label>
 											<div class="col-lg-9">
 												<select class="form-control" id="id_htl_image_category" name="id_htl_image_category">
-													<option value="0">{l s='Select category (optional)' mod='hotelreservationsystem'}</option>
+													<option value="0">{l s='Select category' mod='hotelreservationsystem'}</option>
 													{if isset($hotelImageCategories) && $hotelImageCategories}
 														{foreach from=$hotelImageCategories item=hotelImageCategory}
 															<option value="{$hotelImageCategory.id_htl_image_category|intval}">{$hotelImageCategory.name|escape:'html':'UTF-8'}</option>
@@ -517,10 +523,10 @@
 									<div class="modal-body">
 										<input type="hidden" id="edit_hotel_image_id">
 										<div class="form-group">
-											<label class="control-label col-lg-3" for="edit_id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+											<label class="control-label col-lg-3" for="edit_id_htl_image_category">{l s='Category' mod='hotelreservationsystem'}</label>
 											<div class="col-lg-9">
 												<select class="form-control" id="edit_id_htl_image_category">
-													<option value="0">{l s='Select category (optional)' mod='hotelreservationsystem'}</option>
+													<option value="0">{l s='Select category' mod='hotelreservationsystem'}</option>
 													{if isset($hotelImageCategories) && $hotelImageCategories}
 														{foreach from=$hotelImageCategories item=hotelImageCategory}
 															<option value="{$hotelImageCategory.id_htl_image_category|intval}">{$hotelImageCategory.name|escape:'html':'UTF-8'}</option>
@@ -557,14 +563,14 @@
 								<div class="modal-content">
 									<div class="modal-header">
 										<button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
-										<h4 class="modal-title"><i class="icon-tags"></i> {l s='Update selection' mod='hotelreservationsystem'}</h4>
+										<h4 class="modal-title"><i class="icon-edit"></i> {l s='Bulk Update selection' mod='hotelreservationsystem'}</h4>
 									</div>
 									<div class="modal-body">
 										<div class="form-group">
-											<label class="control-label col-lg-3" for="bulk_id_htl_image_category">{l s='Image category' mod='hotelreservationsystem'}</label>
+											<label class="control-label col-lg-3" for="bulk_id_htl_image_category">{l s='Category' mod='hotelreservationsystem'}</label>
 											<div class="col-lg-9">
 												<select class="form-control" id="bulk_id_htl_image_category">
-													<option value="0">{l s='Select category (optional)' mod='hotelreservationsystem'}</option>
+													<option value="0">{l s='Select category' mod='hotelreservationsystem'}</option>
 													{if isset($hotelImageCategories) && $hotelImageCategories}
 														{foreach from=$hotelImageCategories item=hotelImageCategory}
 															<option value="{$hotelImageCategory.id_htl_image_category|intval}">{$hotelImageCategory.name|escape:'html':'UTF-8'}</option>
