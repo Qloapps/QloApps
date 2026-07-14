@@ -5594,6 +5594,8 @@ class AdminProductsControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('Number of rooms is required.');
                 } else if (!Validate::isUnsignedInt($roomQuantity) || $roomQuantity < 1) {
                     $this->errors[] = Tools::displayError('Invalid value for number of rooms.');
+                } else if ($roomQuantity > 50) {
+                    $this->errors[] = Tools::displayError('You cannot create more than 50 rooms at a time.');
                 }
 
                 if (trim($comment = Tools::getValue('room_comment'))) {
@@ -5623,16 +5625,18 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if (empty($this->errors)) {
-                    if (!$prefix) {
+                    if ($prefix) {
+                        $roomsInfo['prefix'] = $prefix;
+                    } elseif (!(int) $roomNumber) {
                         $roomsInfo['prefix'] = $objProduct->name[0].'R';
                     } else {
-                        $roomsInfo['prefix'] = $prefix;
+                        $roomsInfo['prefix'] = '';
                     }
 
                     for ($i = 0; $i < $roomQuantity; $i++) {
                         $roomNum = $roomsInfo['prefix'];
                         if ((int) $roomNumber) {
-                            $roomNum .= '-'.($roomNumber + $i);
+                            $roomNum .= ($roomsInfo['prefix'] !== '' ? '-' : '').($roomNumber + $i);
                         }
 
                         $objHotelRoomInfo = new HotelRoomInformation();
