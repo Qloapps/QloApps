@@ -3834,9 +3834,12 @@ class AdminProductsControllerCore extends AdminController
             $objRoom->comment   = $comment;
 
             if ($objRoom->save()) {
+                $response['success'] = true;
                 $response['href'] = self::$currentIndex
                     . '&update' . $this->table
                     . '&id_product=' . (int) $idProduct
+                    . '&token=' . $this->token
+                    . '&conf=4&key_tab=Configuration';
             } else {
                 $this->errors[] = $this->l('Unable to save room. Please try again.');
             }
