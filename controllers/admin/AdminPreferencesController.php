@@ -195,6 +195,19 @@ class AdminPreferencesControllerCore extends AdminController
                     'class' => 'fixed-width-xl',
                     'desc' => sprintf($this->l('If set to 0, the maximum limit will be %d characters.'), Configuration::PS_SHORT_DESC_LIMIT)
                 ),
+                'PS_EXPORT_FIELDS_TYPE' => array(
+                    'title' => $this->l('CSV export fields'),
+                    'desc' => $this->l('Choose whether list CSV exports include all fields, or only the fields currently checked in the "Available Fields" selector of the list being exported.'),
+                    'validation' => 'isInt',
+                    'cast' => 'intval',
+                    'type' => 'select',
+                    'list' => array(
+                        array('id' => CSV::QLO_EXPORT_FIELDS_ALL, 'name' => $this->l('All Fields')),
+                        array('id' => CSV::QLO_EXPORT_FIELDS_SELECTED, 'name' => $this->l('Selected Fields')),
+                    ),
+                    'identifier' => 'id',
+                    'defaultValue' => CSV::QLO_EXPORT_FIELDS_ALL,
+                ),
                 // 'PS_DISPLAY_SUPPLIERS' => array(
                 //     'title' => $this->l('Display suppliers and manufacturers'),
                 //     'desc' => $this->l('Enable suppliers and manufacturers pages on your front office even when their respective modules are disabled.'),

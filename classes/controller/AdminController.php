@@ -1216,6 +1216,20 @@ class AdminControllerCore extends Controller
             return;
         }
 
+        if ((int)Configuration::get('PS_EXPORT_FIELDS_TYPE') === CSV::QLO_EXPORT_FIELDS_SELECTED) {
+            $list_visibility = json_decode($this->context->cookie->{'list_visibility_'.$this->context->controller->controller_name});
+            foreach ($this->fields_list as $key => $field) {
+                if (!isset($field['optional']) || !$field['optional']) {
+                    continue;
+                }
+                $is_selected = (!is_array($list_visibility) && isset($field['visible_default']) && $field['visible_default'])
+                    || ($list_visibility && in_array($key, $list_visibility));
+                if (!$is_selected) {
+                    unset($this->fields_list[$key]);
+                }
+            }
+        }
+
         header('Content-type: text/csv');
         header('Content-Type: application/force-download; charset=UTF-8');
         header('Cache-Control: no-store, no-cache');

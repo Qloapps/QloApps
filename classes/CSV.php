@@ -31,6 +31,9 @@
  */
 class CSVCore
 {
+    const QLO_EXPORT_FIELDS_ALL = 0;
+    const QLO_EXPORT_FIELDS_SELECTED = 1;
+
     public $filename;
     public $collection;
     public $delimiter;
