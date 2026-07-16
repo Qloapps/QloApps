@@ -149,17 +149,17 @@
                                 <td class="text-right">{$reservation.nights|intval}</td>
                                 <td class="text-right">{$reservation.adults|intval}</td>
                                 <td class="text-right">{$reservation.children|intval}</td>
-                                <td class="text-right">{$reservation.currency_sign|escape:'html':'UTF-8'}{$reservation.unit_price_tax_excl|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$reservation.unit_price_tax_excl currency=$reservation.id_currency}</td>
                                 <td>
                                     {if isset($booking_sources[$reservation.booking_type])}{$booking_sources[$reservation.booking_type]|escape:'html':'UTF-8'}{else}{l s='Other' mod='qlohotelreports'}{/if}
                                 </td>
                                 <td>
                                     {if isset($booking_statuses[$reservation.id_status])}{$booking_statuses[$reservation.id_status]|escape:'html':'UTF-8'}{else}{$reservation.id_status|intval}{/if}
                                 </td>
-                                <td class="text-right">{$reservation.currency_sign|escape:'html':'UTF-8'}{$reservation.total_price_tax_excl|string_format:"%.2f"}</td>
-                                <td class="text-right">{$reservation.currency_sign|escape:'html':'UTF-8'}{$reservation.tax_amount|string_format:"%.2f"}</td>
-                                <td class="text-right">{$reservation.currency_sign|escape:'html':'UTF-8'}{$reservation.total_price_tax_incl|string_format:"%.2f"}</td>
-                                <td class="text-right">{$reservation.currency_sign|escape:'html':'UTF-8'}{if $reservation.balance_due > 0}{$reservation.balance_due|string_format:"%.2f"}{else}0.00{/if}</td>
+                                <td class="text-right">{displayPrice price=$reservation.total_price_tax_excl currency=$reservation.id_currency}</td>
+                                <td class="text-right">{displayPrice price=$reservation.tax_amount currency=$reservation.id_currency}</td>
+                                <td class="text-right">{displayPrice price=$reservation.total_price_tax_incl currency=$reservation.id_currency}</td>
+                                <td class="text-right">{displayPrice price=$reservation.balance_due currency=$reservation.id_currency}</td>
                                 <td>
                                     {if $reservation.order_paid <= 0}{l s='Pending' mod='qlohotelreports'}
                                     {elseif $reservation.balance_due > 0}{l s='Partial' mod='qlohotelreports'}
@@ -189,10 +189,10 @@
                         <td class="text-right"><strong>{$reservation_totals.children}</strong></td>
                         <td></td>
                         <td colspan="2"></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$reservation_totals.total_price_tax_excl|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$reservation_totals.tax_amount|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$reservation_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$reservation_totals.balance_due|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$reservation_totals.total_price_tax_excl currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$reservation_totals.tax_amount currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$reservation_totals.total_price_tax_incl currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$reservation_totals.balance_due currency=$id_currency}</strong></td>
                         <td colspan="3"></td>
                     </tr>
                 </tfoot>
@@ -236,7 +236,7 @@
                                 <td>{if $cancellation.cancellation_date}{$cancellation.cancellation_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $cancellation.cancellation_reason}{$cancellation.cancellation_reason|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td><span class="text-muted">—</span></td>
-                                <td class="text-right">{$cancellation.currency_sign|escape:'html':'UTF-8'}{$cancellation.refunded_amount|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$cancellation.refunded_amount currency=$cancellation.id_currency}</td>
                                 <td>{if $cancellation.refund_status}{$cancellation.refund_status|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $cancellation.booking_date}{$cancellation.booking_date|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                             </tr>
@@ -256,7 +256,7 @@
                 <tfoot>
                     <tr class="qlo-report-totals">
                         <td colspan="8"><strong>{l s='Totals' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right"><strong>{$total_refunded|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$total_refunded currency=$id_currency}</strong></td>
                         <td colspan="2"></td>
                     </tr>
                 </tfoot>
@@ -293,7 +293,7 @@
                                 <td>{$noShow.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$noShow.room_num|escape:'html':'UTF-8'}</td>
                                 <td>{$noShow.actual_checkin|escape:'html':'UTF-8'}</td>
-                                <td class="text-right">{$noShow.currency_sign|escape:'html':'UTF-8'}{$noShow.total_price_tax_incl|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$noShow.total_price_tax_incl currency=$noShow.id_currency}</td>
                                 <td class="text-right"><span class="text-muted">—</span></td>
                             </tr>
                         {/foreach}
@@ -312,7 +312,7 @@
                 <tfoot>
                     <tr class="qlo-report-totals">
                         <td colspan="5"><strong>{l s='Totals' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$no_show_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$no_show_totals.total_price_tax_incl currency=$id_currency}</strong></td>
                         <td></td>
                     </tr>
                 </tfoot>
@@ -358,7 +358,7 @@
                                 <td class="text-right">{$arrival.los|intval}</td>
                                 <td class="text-right">{$arrival.adults|intval}</td>
                                 <td class="text-right">{$arrival.children|intval}</td>
-                                <td class="text-right">{$arrival.currency_sign|escape:'html':'UTF-8'}{$arrival.total_price_tax_incl|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$arrival.total_price_tax_incl currency=$arrival.id_currency}</td>
                             </tr>
                         {/foreach}
                     {else}
@@ -379,7 +379,7 @@
                         <td class="text-right"><strong>{$arrival_totals.los}</strong></td>
                         <td class="text-right"><strong>{$arrival_totals.adults}</strong></td>
                         <td class="text-right"><strong>{$arrival_totals.children}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$arrival_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$arrival_totals.total_price_tax_incl currency=$id_currency}</strong></td>
                     </tr>
                 </tfoot>
                 {/if}
@@ -424,7 +424,7 @@
                                 <td class="text-right">{$departure.los|intval}</td>
                                 <td class="text-right">{$departure.adults|intval}</td>
                                 <td class="text-right">{$departure.children|intval}</td>
-                                <td class="text-right">{$departure.currency_sign|escape:'html':'UTF-8'}{$departure.total_price_tax_incl|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$departure.total_price_tax_incl currency=$departure.id_currency}</td>
                             </tr>
                         {/foreach}
                     {else}
@@ -445,7 +445,7 @@
                         <td class="text-right"><strong>{$departure_totals.los}</strong></td>
                         <td class="text-right"><strong>{$departure_totals.adults}</strong></td>
                         <td class="text-right"><strong>{$departure_totals.children}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$departure_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$departure_totals.total_price_tax_incl currency=$id_currency}</strong></td>
                     </tr>
                 </tfoot>
                 {/if}
@@ -493,7 +493,7 @@
                                 <td class="text-right">{$inHouseGuest.los|intval}</td>
                                 <td class="text-right">{$inHouseGuest.adults|intval}</td>
                                 <td class="text-right">{$inHouseGuest.children|intval}</td>
-                                <td class="text-right">{$inHouseGuest.currency_sign|escape:'html':'UTF-8'}{$inHouseGuest.total_price_tax_incl|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$inHouseGuest.total_price_tax_incl currency=$inHouseGuest.id_currency}</td>
                             </tr>
                         {/foreach}
                     {else}
@@ -514,7 +514,7 @@
                         <td class="text-right"><strong>{$in_house_totals.los}</strong></td>
                         <td class="text-right"><strong>{$in_house_totals.adults}</strong></td>
                         <td class="text-right"><strong>{$in_house_totals.children}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$in_house_totals.total_price_tax_incl|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$in_house_totals.total_price_tax_incl currency=$id_currency}</strong></td>
                     </tr>
                 </tfoot>
                 {/if}

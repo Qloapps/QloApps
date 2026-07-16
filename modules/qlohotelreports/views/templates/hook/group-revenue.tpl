@@ -165,15 +165,15 @@
                                 <td>{$revenueRow.date|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$revenueRow.rooms_sold|intval}</td>
                                 <td class="text-right">{$revenueRow.bookings|intval}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.room_revenue|string_format:"%.2f"}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.service_revenue|string_format:"%.2f"}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.discounts|string_format:"%.2f"}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.tax_amount|string_format:"%.2f"}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}0.00</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.total_collection|string_format:"%.2f"}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.net_revenue|string_format:"%.2f"}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.adr|string_format:"%.2f"}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$revenueRow.revpar|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$revenueRow.room_revenue currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=$revenueRow.service_revenue currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=$revenueRow.discounts currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=$revenueRow.tax_amount currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=0 currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=$revenueRow.total_collection currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=$revenueRow.net_revenue currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=$revenueRow.adr currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=$revenueRow.revpar currency=$id_currency}</td>
                                 <td class="text-right">{$revenueRow.occupancy_pct|string_format:"%.1f"}%</td>
                             </tr>
                         {/foreach}
@@ -194,13 +194,13 @@
                         <td><strong>{l s='Total' mod='qlohotelreports'}</strong></td>
                         <td class="text-right"><strong>{$revenue_totals.rooms_sold}</strong></td>
                         <td class="text-right"><strong>{$revenue_totals.bookings}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.room_revenue|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.service_revenue|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.discounts|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.tax_amount|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}0.00</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.total_collection|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$revenue_totals.net_revenue|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$revenue_totals.room_revenue currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$revenue_totals.service_revenue currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$revenue_totals.discounts currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$revenue_totals.tax_amount currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=0 currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$revenue_totals.total_collection currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$revenue_totals.net_revenue currency=$id_currency}</strong></td>
                         <td colspan="3"></td>
                     </tr>
                 </tfoot>
@@ -241,8 +241,8 @@
                                 <td>{$refund.id_order_return|intval}</td>
                                 <td>{$refund.id_order|intval}</td>
                                 <td>{$refund.customer_name|escape:'html':'UTF-8'}</td>
-                                <td class="text-right">{$refund.currency_sign|escape:'html':'UTF-8'}{$refund.total_price_tax_incl|string_format:"%.2f"}</td>
-                                <td class="text-right">{$refund.currency_sign|escape:'html':'UTF-8'}{$refund.refunded_amount|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$refund.total_price_tax_incl currency=$refund.id_currency}</td>
+                                <td class="text-right">{displayPrice price=$refund.refunded_amount currency=$refund.id_currency}</td>
                                 <td>{if $refund.refund_method}{$refund.refund_method|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $refund.refund_status}{$refund.refund_status|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $refund.processed_date}{$refund.processed_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
@@ -266,7 +266,7 @@
                 <tfoot>
                     <tr class="qlo-report-totals">
                         <td colspan="5"><strong>{l s='Total Refunded' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right"><strong>{$total_refunded|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$total_refunded currency=$id_currency}</strong></td>
                         <td colspan="6"></td>
                     </tr>
                 </tfoot>
@@ -311,7 +311,7 @@
                                 <td>
                                     {if isset($payment_types[$payment.payment_type])}{$payment_types[$payment.payment_type]|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}
                                 </td>
-                                <td class="text-right">{if $payment.currency_sign}{$payment.currency_sign|escape:'html':'UTF-8'}{else}{$currency_sign|escape:'html':'UTF-8'}{/if}{$payment.amount|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$payment.amount currency=$payment.id_currency}</td>
                                 <td>{l s='Success' mod='qlohotelreports'}</td>
                                 <td>{if $payment.transaction_id}{$payment.transaction_id|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td><span class="text-muted">—</span></td>
@@ -332,7 +332,7 @@
                 <tfoot>
                     <tr class="qlo-report-totals">
                         <td colspan="7"><strong>{l s='Total Collected' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$total_payments|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$total_payments currency=$id_currency}</strong></td>
                         <td colspan="3"></td>
                     </tr>
                 </tfoot>
@@ -371,10 +371,10 @@
                                 <td>{$taxRow.customer_name|escape:'html':'UTF-8'}</td>
                                 <td>{if $taxRow.revenue_source == 'service'}{l s='Service Charge' mod='qlohotelreports'}{else}{l s='Room Charge' mod='qlohotelreports'}{/if}</td>
                                 <td>{$taxRow.room_type_name|escape:'html':'UTF-8'}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$taxRow.taxable_amount|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$taxRow.taxable_amount currency=$id_currency}</td>
                                 <td>{if $taxRow.tax_name}{$taxRow.tax_name|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td class="text-right">{$taxRow.tax_rate|string_format:"%.2f"}%</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$taxRow.tax_amount|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$taxRow.tax_amount currency=$id_currency}</td>
                             </tr>
                         {/foreach}
                     {else}
@@ -392,10 +392,10 @@
                 <tfoot>
                     <tr class="qlo-report-totals">
                         <td colspan="5"><strong>{l s='Totals' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tax_totals.taxable_amount|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$tax_totals.taxable_amount currency=$id_currency}</strong></td>
                         <td></td>
                         <td></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tax_totals.tax_amount|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$tax_totals.tax_amount currency=$id_currency}</strong></td>
                     </tr>
                 </tfoot>
                 {/if}
@@ -423,16 +423,16 @@
                     <tr>
                         <td>{$taxSummary.tax_name|escape:'html':'UTF-8'}</td>
                         <td class="text-right">{$taxSummary.tax_rate|string_format:"%.2f"}%</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$taxSummary.taxable_amount|string_format:"%.2f"}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$taxSummary.tax_amount|string_format:"%.2f"}</td>
+                        <td class="text-right">{displayPrice price=$taxSummary.taxable_amount currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$taxSummary.tax_amount currency=$id_currency}</td>
                     </tr>
                     {/foreach}
                 </tbody>
                 <tfoot>
                     <tr class="qlo-report-totals">
                         <td colspan="2"><strong>{l s='Grand Total' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tax_totals.taxable_amount|string_format:"%.2f"}</strong></td>
-                        <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tax_totals.tax_amount|string_format:"%.2f"}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$tax_totals.taxable_amount currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$tax_totals.tax_amount currency=$id_currency}</strong></td>
                     </tr>
                 </tfoot>
             </table>
@@ -478,9 +478,9 @@
                                 <td>{$outstandingRow.room_num|escape:'html':'UTF-8'}</td>
                                 <td>{$outstandingRow.date_from|escape:'html':'UTF-8'}</td>
                                 <td>{$outstandingRow.date_to|escape:'html':'UTF-8'}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$outstandingRow.total_charges|string_format:"%.2f"}</td>
-                                <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$outstandingRow.total_paid|string_format:"%.2f"}</td>
-                                <td class="text-right qlo-text-danger">{$currency_sign|escape:'html':'UTF-8'}{$outstandingRow.balance_due|string_format:"%.2f"}</td>
+                                <td class="text-right">{displayPrice price=$outstandingRow.total_charges currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=$outstandingRow.total_paid currency=$id_currency}</td>
+                                <td class="text-right qlo-text-danger">{displayPrice price=$outstandingRow.balance_due currency=$id_currency}</td>
                                 <td class="text-center">{$outstandingRow.days_overdue|intval}</td>
                                 <td>{if $outstandingRow.last_payment_date}{$outstandingRow.last_payment_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>
@@ -503,7 +503,7 @@
                 <tfoot>
                     <tr class="qlo-report-totals">
                         <td colspan="10"><strong>{l s='Total Outstanding' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right qlo-text-danger"><strong>{$currency_sign|escape:'html':'UTF-8'}{$total_outstanding|string_format:"%.2f"}</strong></td>
+                        <td class="text-right qlo-text-danger"><strong>{displayPrice price=$total_outstanding currency=$id_currency}</strong></td>
                         <td colspan="3"></td>
                     </tr>
                 </tfoot>

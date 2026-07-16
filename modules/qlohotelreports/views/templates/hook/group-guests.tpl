@@ -128,10 +128,10 @@
                         <td>{$serviceRow.service_name|escape:'html':'UTF-8'}</td>
                         <td>{if $serviceRow.service_category}{$serviceRow.service_category|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
                         <td class="text-center">{$serviceRow.quantity|intval}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$serviceRow.unit_price|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$serviceRow.total_price_tax_excl|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$serviceRow.tax_amount|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$serviceRow.total_price_tax_incl|string_format:'%.2f'}</td>
+                        <td class="text-right">{displayPrice price=$serviceRow.unit_price currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$serviceRow.total_price_tax_excl currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$serviceRow.tax_amount currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$serviceRow.total_price_tax_incl currency=$id_currency}</td>
                     </tr>
                     {/foreach}
                 {else}
@@ -149,9 +149,9 @@
             <tfoot class="qlo-report-totals">
                 <tr>
                     <td colspan="8"><strong>{l s='Total' mod='qlohotelreports'}</strong></td>
-                    <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$service_totals.total_excl|string_format:'%.2f'}</strong></td>
-                    <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$service_totals.total_tax|string_format:'%.2f'}</strong></td>
-                    <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$service_totals.total_incl|string_format:'%.2f'}</strong></td>
+                    <td class="text-right"><strong>{displayPrice price=$service_totals.total_excl currency=$id_currency}</strong></td>
+                    <td class="text-right"><strong>{displayPrice price=$service_totals.total_tax currency=$id_currency}</strong></td>
+                    <td class="text-right"><strong>{displayPrice price=$service_totals.total_incl currency=$id_currency}</strong></td>
                 </tr>
             </tfoot>
             {/if}
@@ -209,8 +209,8 @@
                         <td class="text-center">{$guest.total_stays|intval}</td>
                         <td class="text-center">{$guest.total_nights|intval}</td>
                         <td>{if $guest.last_stay}{$guest.last_stay|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$guest.lifetime_revenue|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$guest.avg_spend_per_stay|string_format:'%.2f'}</td>
+                        <td class="text-right">{displayPrice price=$guest.lifetime_revenue currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$guest.avg_spend_per_stay currency=$id_currency}</td>
                     </tr>
                     {/foreach}
                 {else}

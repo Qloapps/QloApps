@@ -114,9 +114,9 @@
                         <td class="text-center">{$dailySummaryRow.total_rooms|intval}</td>
                         <td class="text-center">{$dailySummaryRow.rooms_sold|intval}</td>
                         <td class="text-center">{$dailySummaryRow.occupancy|string_format:'%.1f'}%</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$dailySummaryRow.adr|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$dailySummaryRow.revpar|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$dailySummaryRow.revenue|string_format:'%.2f'}</td>
+                        <td class="text-right">{displayPrice price=$dailySummaryRow.adr currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$dailySummaryRow.revpar currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$dailySummaryRow.revenue currency=$id_currency}</td>
                         <td class="text-center">{$dailySummaryRow.arrivals|intval}</td>
                         <td class="text-center">{$dailySummaryRow.departures|intval}</td>
                         <td class="text-center">{$dailySummaryRow.inhouse_guests|intval}</td>
@@ -176,17 +176,17 @@
                         <td class="text-center">{$hotelRow.total_rooms|intval}</td>
                         <td class="text-center">{$hotelRow.rooms_sold|intval}</td>
                         <td class="text-center">{$hotelRow.occupancy|string_format:'%.1f'}%</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$hotelRow.room_revenue|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$hotelRow.extra_service_rev|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$hotelRow.gross_revenue|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$hotelRow.adr|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$hotelRow.revpar|string_format:'%.2f'}</td>
+                        <td class="text-right">{displayPrice price=$hotelRow.room_revenue currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$hotelRow.extra_service_rev currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$hotelRow.gross_revenue currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$hotelRow.adr currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$hotelRow.revpar currency=$id_currency}</td>
                         <td class="text-center">{$hotelRow.bookings|intval}</td>
                         <td class="text-center">{$hotelRow.cancellations|intval}</td>
                         <td class="text-center">{$hotelRow.cancel_rate_pct|string_format:'%.1f'}%</td>
                         <td class="text-center">{$hotelRow.no_shows|intval}</td>
                         <td class="text-center">{$hotelRow.avg_los|string_format:'%.1f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$hotelRow.outstanding_balance|string_format:'%.2f'}</td>
+                        <td class="text-right">{displayPrice price=$hotelRow.outstanding_balance currency=$id_currency}</td>
                     </tr>
                     {/foreach}
                 {else}

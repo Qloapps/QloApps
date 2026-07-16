@@ -151,8 +151,7 @@ class QloHotelReports extends Module
             'date_to'        => $dateTo,
             'hotels'         => $hotels,
             'id_hotel'       => $idHotel,
-            'currency_sign'  => $currency->sign,
-            'currency_iso'   => $currency->iso_code,
+            'id_currency'    => $currency->id,
             'group_tpl_path' => _PS_MODULE_DIR_ . $this->name . '/views/templates/hook/'
                 . self::$reports[$report]['tpl'],
         ));
@@ -207,7 +206,7 @@ class QloHotelReports extends Module
                     'booking_type'     => $bookingType,
                     'id_order_state' => $idOrderState,
                 ));
-                $this->attachCurrencyToRows($reservations, $currencyMap, $currency->sign, $currency->iso_code);
+                $this->attachCurrencyToRows($reservations, $currencyMap, $currency->iso_code);
 
                 $totals = array('nights' => 0, 'adults' => 0, 'children' => 0,
                     'total_price_tax_excl' => 0.0, 'tax_amount' => 0.0,
@@ -243,7 +242,7 @@ class QloHotelReports extends Module
                     'id_product'    => $idProduct,
                     'detailed_info' => true,
                 ));
-                $this->attachCurrencyToRows($cancellations, $currencyMap, $currency->sign, $currency->iso_code);
+                $this->attachCurrencyToRows($cancellations, $currencyMap, $currency->iso_code);
 
                 $totalRefunded = 0.0;
                 foreach ($cancellations as $row) {
@@ -262,7 +261,7 @@ class QloHotelReports extends Module
                     'id_product' => $idProduct,
                     'id_status'  => HotelBookingDetail::STATUS_ALLOTED,
                 ));
-                $this->attachCurrencyToRows($noShows, $currencyMap, $currency->sign, $currency->iso_code);
+                $this->attachCurrencyToRows($noShows, $currencyMap, $currency->iso_code);
 
                 $noShowTotals = array('los' => 0, 'adults' => 0, 'children' => 0, 'total_price_tax_incl' => 0.0);
                 foreach ($noShows as $row) {
@@ -285,7 +284,7 @@ class QloHotelReports extends Module
                     'id_hotel'   => $idHotel ?: false,
                     'id_product' => $idProduct,
                 ));
-                $this->attachCurrencyToRows($arrivals, $currencyMap, $currency->sign, $currency->iso_code);
+                $this->attachCurrencyToRows($arrivals, $currencyMap, $currency->iso_code);
 
                 $arrivalTotals = array('adults' => 0, 'children' => 0, 'los' => 0, 'total_price_tax_incl' => 0.0);
                 foreach ($arrivals as $row) {
@@ -308,7 +307,7 @@ class QloHotelReports extends Module
                     'id_hotel'   => $idHotel ?: false,
                     'id_product' => $idProduct,
                 ));
-                $this->attachCurrencyToRows($departures, $currencyMap, $currency->sign, $currency->iso_code);
+                $this->attachCurrencyToRows($departures, $currencyMap, $currency->iso_code);
 
                 $departureTotals = array('adults' => 0, 'children' => 0, 'los' => 0, 'total_price_tax_incl' => 0.0);
                 foreach ($departures as $row) {
@@ -331,7 +330,7 @@ class QloHotelReports extends Module
                     'id_hotel'   => $idHotel ?: false,
                     'id_product' => $idProduct,
                 ));
-                $this->attachCurrencyToRows($inHouse, $currencyMap, $currency->sign, $currency->iso_code);
+                $this->attachCurrencyToRows($inHouse, $currencyMap, $currency->iso_code);
 
                 $inHouseTotals = array('adults' => 0, 'children' => 0, 'los' => 0, 'total_price_tax_incl' => 0.0);
                 foreach ($inHouse as $row) {
@@ -488,7 +487,7 @@ class QloHotelReports extends Module
                     'detailed_info' => true,
                 ));
                 $revCurrencyMap = $this->currencySignMap();
-                $this->attachCurrencyToRows($refunds, $revCurrencyMap, $currency->sign, $currency->iso_code);
+                $this->attachCurrencyToRows($refunds, $revCurrencyMap, $currency->iso_code);
                 $totalRefunded = 0.0;
                 foreach ($refunds as $row) {
                     $totalRefunded += (float) $row['refunded_amount'];
@@ -961,8 +960,8 @@ class QloHotelReports extends Module
     }
 
     /**
-     * Return array of currency data indexed by id_currency.
-     * Loaded once; used to attach currency_sign/currency_iso per booking row.
+     * Return array of currency iso_code indexed by id_currency.
+     * Loaded once; used to attach currency_iso per booking row for CSV exports.
      */
     private function currencySignMap()
     {
@@ -970,7 +969,6 @@ class QloHotelReports extends Module
         $rows = Currency::getCurrencies(false, false, true);
         foreach ($rows as $row) {
             $map[(int) $row['id_currency']] = array(
-                'sign'     => $row['sign'],
                 'iso_code' => $row['iso_code'],
             );
         }
@@ -978,15 +976,14 @@ class QloHotelReports extends Module
     }
 
     /**
-     * Attach currency_sign and currency_iso to each row using id_currency field.
-     * Falls back to the default store currency when id_currency is not in the map.
+     * Attach currency_iso to each row using id_currency field.
+     * Falls back to the default store currency iso_code when id_currency is not in the map.
      */
-    private function attachCurrencyToRows(array &$rows, array $currencyMap, $defaultSign, $defaultIso)
+    private function attachCurrencyToRows(array &$rows, array $currencyMap, $defaultIso)
     {
         foreach ($rows as &$row) {
             $idCur = (int) $row['id_currency'];
-            $row['currency_sign'] = isset($currencyMap[$idCur]) ? $currencyMap[$idCur]['sign']     : $defaultSign;
-            $row['currency_iso']  = isset($currencyMap[$idCur]) ? $currencyMap[$idCur]['iso_code'] : $defaultIso;
+            $row['currency_iso'] = isset($currencyMap[$idCur]) ? $currencyMap[$idCur]['iso_code'] : $defaultIso;
         }
         unset($row);
     }
@@ -1009,7 +1006,7 @@ class QloHotelReports extends Module
                 'id_product' => $idProduct,
                 'id_status'  => HotelBookingDetail::STATUS_ALLOTED,
             ));
-            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->sign, $defaultCurrency->iso_code);
+            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->iso_code);
             header('Content-Disposition: attachment; filename="no-show-report-'.$dateFrom.'-to-'.$dateTo.'.csv"');
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
@@ -1022,7 +1019,7 @@ class QloHotelReports extends Module
                 fputcsv($out, array(
                     $row['id_order'], $row['customer_name'],
                     $row['room_type_name'], $row['room_num'], $row['actual_checkin'],
-                    number_format((float) $row['total_price_tax_incl'], 2, '.', ''),
+                    number_format((float) $row['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     '',
                     $row['currency_iso'],
                 ));
@@ -1049,7 +1046,7 @@ class QloHotelReports extends Module
                 ));
                 $filename = 'departures-report-'.$dateFrom.'-to-'.$dateTo.'.csv';
             }
-            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->sign, $defaultCurrency->iso_code);
+            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->iso_code);
             header('Content-Disposition: attachment; filename="'.$filename.'"');
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
@@ -1086,7 +1083,7 @@ class QloHotelReports extends Module
                 'id_hotel'   => $idHotel ?: false,
                 'id_product' => $idProduct,
             ));
-            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->sign, $defaultCurrency->iso_code);
+            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->iso_code);
             header('Content-Disposition: attachment; filename="in-house-report-'.date('Y-m-d').'.csv"');
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
@@ -1116,7 +1113,7 @@ class QloHotelReports extends Module
                 'id_product'    => (int) Tools::getValue('id_product', 0),
                 'detailed_info' => true,
             ));
-            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->sign, $defaultCurrency->iso_code);
+            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->iso_code);
             header('Content-Disposition: attachment; filename="cancellation-report-'.$dateFrom.'-to-'.$dateTo.'.csv"');
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
@@ -1144,7 +1141,7 @@ class QloHotelReports extends Module
                     isset($row['cancellation_date']) ? $row['cancellation_date'] : '',
                     isset($row['cancellation_reason']) ? $row['cancellation_reason'] : '',
                     '',
-                    isset($row['refunded_amount']) ? number_format((float) $row['refunded_amount'], 2, '.', '') : '0.00',
+                    isset($row['refunded_amount']) ? number_format((float) $row['refunded_amount'], _PS_PRICE_DISPLAY_PRECISION_, '.', '') : '0.00',
                     isset($row['refund_status']) ? $row['refund_status'] : '',
                     isset($row['booking_date']) ? $row['booking_date'] : '',
                     $row['currency_iso'],
@@ -1164,7 +1161,7 @@ class QloHotelReports extends Module
                 'booking_type'     => $bookingType,
                 'id_order_state' => $idOrderState,
             ));
-            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->sign, $defaultCurrency->iso_code);
+            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->iso_code);
 
             $statusLabels = array(
                 HotelBookingDetail::STATUS_ALLOTED     => $this->l('Allotted'),
@@ -1222,13 +1219,13 @@ class QloHotelReports extends Module
                     $row['nights'],
                     $row['adults'],
                     $row['children'],
-                    number_format((float) $row['unit_price_tax_excl'], 2, '.', ''),
+                    number_format((float) $row['unit_price_tax_excl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     isset($sourceLabels[$row['booking_type']]) ? $sourceLabels[$row['booking_type']] : $row['booking_type'],
                     isset($statusLabels[$row['id_status']]) ? $statusLabels[$row['id_status']] : $row['id_status'],
-                    number_format((float) $row['total_price_tax_excl'], 2, '.', ''),
-                    number_format((float) $row['tax_amount'], 2, '.', ''),
-                    number_format((float) $row['total_price_tax_incl'], 2, '.', ''),
-                    number_format($balanceDue, 2, '.', ''),
+                    number_format((float) $row['total_price_tax_excl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['tax_amount'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($balanceDue, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $paymentStatus,
                     isset($row['created_by']) ? $row['created_by'] : '',
                     isset($row['date_add']) ? $row['date_add'] : '',
@@ -1280,7 +1277,7 @@ class QloHotelReports extends Module
                     $row['customer_name'],
                     $row['payment_method'],
                     isset($row['payment_type']) ? $row['payment_type'] : '',
-                    number_format((float) $row['amount'] / $rate, 2, '.', ''),
+                    number_format((float) $row['amount'] / $rate, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $currencyIso,
                     isset($row['transaction_id']) ? $row['transaction_id'] : '',
                     $this->l('Success'),
@@ -1312,8 +1309,8 @@ class QloHotelReports extends Module
                     isset($row['cancellation_date']) ? $row['cancellation_date'] : '',
                     $row['date_from'],
                     $row['date_to'],
-                    number_format((float) $row['total_price_tax_incl'], 2, '.', ''),
-                    number_format((float) $row['refunded_amount'], 2, '.', ''),
+                    number_format((float) $row['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['refunded_amount'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     isset($row['refund_status']) ? $row['refund_status'] : '',
                     isset($row['cancellation_reason']) ? $row['cancellation_reason'] : '',
                     $currencyIso,
@@ -1354,10 +1351,10 @@ class QloHotelReports extends Module
                     $row['customer_name'],
                     $serviceLabel,
                     $row['room_type_name'],
-                    number_format((float) $row['taxable_amount'], 2, '.', ''),
+                    number_format((float) $row['taxable_amount'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     isset($row['tax_name']) ? $row['tax_name'] : '',
                     number_format((float) $row['tax_rate'], 2, '.', ''),
-                    number_format((float) $row['tax_amount'], 2, '.', ''),
+                    number_format((float) $row['tax_amount'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $currencyIso,
                 ));
             }
@@ -1393,9 +1390,9 @@ class QloHotelReports extends Module
                     $row['room_num'],
                     $row['date_from'],
                     $row['date_to'],
-                    number_format((float) $row['total_charges'], 2, '.', ''),
-                    number_format((float) $row['total_paid'], 2, '.', ''),
-                    number_format((float) $row['balance_due'], 2, '.', ''),
+                    number_format((float) $row['total_charges'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['total_paid'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['balance_due'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     (int) $row['days_overdue'],
                     isset($row['last_payment_date']) ? $row['last_payment_date'] : '',
                     $statusLabel,
@@ -1446,15 +1443,15 @@ class QloHotelReports extends Module
                     "\t" . date('Y-m-d', $ts),
                     $roomsSold,
                     isset($dailyBookings[$ts]) ? (int) $dailyBookings[$ts] : 0,
-                    number_format($roomRevExcl, 2, '.', ''),
-                    number_format($svcRev, 2, '.', ''),
-                    number_format($disc, 2, '.', ''),
-                    number_format($taxAmt, 2, '.', ''),
+                    number_format($roomRevExcl, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($svcRev, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($disc, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($taxAmt, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     '0.00',
-                    number_format($collection, 2, '.', ''),
-                    number_format($netRevenue, 2, '.', ''),
-                    number_format($adr, 2, '.', ''),
-                    number_format($revpar, 2, '.', ''),
+                    number_format($collection, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($netRevenue, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($adr, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($revpar, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     number_format($occupancy, 1, '.', '').'%',
                     $currencyIso,
                 ));
@@ -1573,11 +1570,11 @@ class QloHotelReports extends Module
                     (int) $row['total_nights_available'],
                     (int) $row['room_nights'],
                     number_format((float) $row['occupancy_pct'], 1, '.', '').'%',
-                    number_format((float) $row['room_revenue'], 2, '.', ''),
-                    number_format((float) $row['tax_amount'], 2, '.', ''),
-                    number_format((float) $row['total_revenue'], 2, '.', ''),
-                    number_format((float) $row['adr'], 2, '.', ''),
-                    number_format((float) $row['revpar'], 2, '.', ''),
+                    number_format((float) $row['room_revenue'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['tax_amount'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['total_revenue'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['adr'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['revpar'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     (int) $row['cancel_count'],
                     (int) $row['no_show_count'],
                     number_format((float) $row['avg_los'], 1, '.', ''),
@@ -1625,9 +1622,9 @@ class QloHotelReports extends Module
                     $outOfOrder,
                     '—',
                     number_format($occupancyPct, 1, '.', '').'%',
-                    number_format($adr, 2, '.', ''),
-                    number_format($revpar, 2, '.', ''),
-                    number_format($revenue, 2, '.', ''),
+                    number_format($adr, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($revpar, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($revenue, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $currencyIso,
                 ));
             }
@@ -1680,10 +1677,10 @@ class QloHotelReports extends Module
                     $row['service_name'],
                     isset($row['service_category']) ? $row['service_category'] : '',
                     (int) $row['quantity'],
-                    number_format((float) $row['unit_price'], 2, '.', ''),
-                    number_format((float) $row['total_price_tax_excl'], 2, '.', ''),
-                    number_format((float) $row['tax_amount'], 2, '.', ''),
-                    number_format((float) $row['total_price_tax_incl'], 2, '.', ''),
+                    number_format((float) $row['unit_price'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['total_price_tax_excl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['tax_amount'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $currencyIso,
                 ));
             }
@@ -1735,8 +1732,8 @@ class QloHotelReports extends Module
                     (int) $g['total_stays'],
                     (int) $g['total_nights'],
                     isset($g['last_stay']) ? $g['last_stay'] : '',
-                    number_format((float) $g['lifetime_revenue'], 2, '.', ''),
-                    number_format((float) $g['avg_spend_per_stay'], 2, '.', ''),
+                    number_format((float) $g['lifetime_revenue'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $g['avg_spend_per_stay'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $currencyIso,
                 ));
             }
@@ -1795,15 +1792,15 @@ class QloHotelReports extends Module
                     $row['channel_label'],
                     $bookings,
                     $roomNights,
-                    number_format($revExcl, 2, '.', ''),
-                    number_format($discAmt, 2, '.', ''),
+                    number_format($revExcl, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($discAmt, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     '0.00',
-                    number_format($taxAmt, 2, '.', ''),
-                    number_format($revIncl, 2, '.', ''),
-                    number_format($netRev, 2, '.', ''),
+                    number_format($taxAmt, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($revIncl, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($netRev, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $cancels,
                     number_format($cancelRate, 1, '.', '').'%',
-                    number_format($adr, 2, '.', ''),
+                    number_format($adr, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     number_format($contrib, 1, '.', '').'%',
                     $currencyIso,
                 ));
@@ -1822,8 +1819,8 @@ class QloHotelReports extends Module
                 fputcsv($out, array(
                     $row['payment_method'], $row['module'],
                     $row['bookings'],
-                    number_format((float) $row['revenue_excl'], 2),
-                    number_format((float) $row['revenue_incl'], 2),
+                    number_format((float) $row['revenue_excl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) $row['revenue_incl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $currencyIso,
                 ));
             }
@@ -1882,9 +1879,9 @@ class QloHotelReports extends Module
                     $totalRoomsProp,
                     $roomsSold,
                     number_format($occupancy, 1, '.', '').'%',
-                    number_format(isset($adrByDay[$ts])       ? (float) $adrByDay[$ts]     : 0.0, 2, '.', ''),
-                    number_format(isset($revparByDay[$ts])    ? (float) $revparByDay[$ts]  : 0.0, 2, '.', ''),
-                    number_format(isset($revenueByDay[$ts])   ? (float) $revenueByDay[$ts] : 0.0, 2, '.', ''),
+                    number_format(isset($adrByDay[$ts])       ? (float) $adrByDay[$ts]     : 0.0, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format(isset($revparByDay[$ts])    ? (float) $revparByDay[$ts]  : 0.0, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format(isset($revenueByDay[$ts])   ? (float) $revenueByDay[$ts] : 0.0, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     isset($arrivalsByDay[$ts])   ? (int) $arrivalsByDay[$ts]   : 0,
                     isset($departuresByDay[$ts]) ? (int) $departuresByDay[$ts] : 0,
                     isset($checkedInByDay[$ts])  ? (int) $checkedInByDay[$ts]  : 0,
@@ -1929,17 +1926,17 @@ class QloHotelReports extends Module
                     $totalRoomsH,
                     $roomNights,
                     number_format($occupancy, 1, '.', '').'%',
-                    number_format($roomRevenue, 2, '.', ''),
-                    number_format($extraRev, 2, '.', ''),
-                    number_format($grossRevenue, 2, '.', ''),
-                    number_format((float) HotelBookingDetail::getAverageDailyRate($hotelParams), 2, '.', ''),
-                    number_format((float) HotelBookingDetail::getRevPAR($hotelParams), 2, '.', ''),
+                    number_format($roomRevenue, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($extraRev, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format($grossRevenue, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) HotelBookingDetail::getAverageDailyRate($hotelParams), _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+                    number_format((float) HotelBookingDetail::getRevPAR($hotelParams), _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $bookings,
                     $cancels,
                     number_format($cancelRate, 1, '.', '').'%',
                     $noShows,
                     number_format($avgLos, 1, '.', ''),
-                    number_format((float) $outstanding, 2, '.', ''),
+                    number_format((float) $outstanding, _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
                     $currencyIso,
                 ));
             }

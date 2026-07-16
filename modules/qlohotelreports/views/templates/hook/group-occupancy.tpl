@@ -118,9 +118,9 @@
                         <td class="text-center">{$occupancyRow.out_of_order|intval}</td>
                         <td class="text-center">&mdash;</td>
                         <td class="text-center">{$occupancyRow.occupancy_pct|string_format:'%.1f'}%</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$occupancyRow.adr|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$occupancyRow.revpar|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$occupancyRow.total_room_revenue|string_format:'%.2f'}</td>
+                        <td class="text-right">{displayPrice price=$occupancyRow.adr currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$occupancyRow.revpar currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$occupancyRow.total_room_revenue currency=$id_currency}</td>
                     </tr>
                     {/foreach}
                 {else}
@@ -405,11 +405,11 @@
                         <td class="text-center">{$perfRow.total_nights_available|intval}</td>
                         <td class="text-center">{$perfRow.room_nights|intval}</td>
                         <td class="text-center">{$perfRow.occupancy_pct|string_format:'%.1f'}%</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$perfRow.room_revenue|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$perfRow.tax_amount|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$perfRow.total_revenue|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$perfRow.adr|string_format:'%.2f'}</td>
-                        <td class="text-right">{$currency_sign|escape:'html':'UTF-8'}{$perfRow.revpar|string_format:'%.2f'}</td>
+                        <td class="text-right">{displayPrice price=$perfRow.room_revenue currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$perfRow.tax_amount currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$perfRow.total_revenue currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$perfRow.adr currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$perfRow.revpar currency=$id_currency}</td>
                         <td class="text-center">{$perfRow.cancel_count|intval}</td>
                         <td class="text-center">{$perfRow.no_show_count|intval}</td>
                         <td class="text-center">{$perfRow.avg_los|string_format:'%.1f'}</td>
@@ -452,9 +452,9 @@
                     <td class="text-center"><strong>{$tot_nights_avail|intval}</strong></td>
                     <td class="text-center"><strong>{$tot_nights_sold|intval}</strong></td>
                     <td class="text-center">&mdash;</td>
-                    <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tot_price_excl|string_format:'%.2f'}</strong></td>
-                    <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tot_tax|string_format:'%.2f'}</strong></td>
-                    <td class="text-right"><strong>{$currency_sign|escape:'html':'UTF-8'}{$tot_total_rev|string_format:'%.2f'}</strong></td>
+                    <td class="text-right"><strong>{displayPrice price=$tot_price_excl currency=$id_currency}</strong></td>
+                    <td class="text-right"><strong>{displayPrice price=$tot_tax currency=$id_currency}</strong></td>
+                    <td class="text-right"><strong>{displayPrice price=$tot_total_rev currency=$id_currency}</strong></td>
                     <td class="text-right">&mdash;</td>
                     <td class="text-right">&mdash;</td>
                     <td class="text-center"><strong>{$tot_cancels|intval}</strong></td>
