@@ -40,15 +40,15 @@ $(document).ready(function(){
                 date_to: dateTo,
                 id_product: idProduct,
                 id_order: idOrder,
-                action: 'getRoomTypeBookingDemands',
-                method: 'getRoomTypeBookingDemands',
+                action: 'getRoomTypeBookingServices',
+                method: 'getRoomTypeBookingServices',
                 ajax: true,
                 token: static_token
             },
             success: function(result) {
-                if (result.extra_demands) {
+                if (result.extra_services) {
                     $('#rooms_extra_services').html('');
-                    $('#rooms_extra_services').append(result.extra_demands);
+                    $('#rooms_extra_services').append(result.extra_services);
                 }
                 $.fancybox({
                     href: "#rooms_extra_services",

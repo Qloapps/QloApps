@@ -161,7 +161,6 @@ class AdminImportControllerCore extends AdminController
                 $this->required_fields = array('id_hotel', 'name');
 
                 self::$validators['image'] = array('AdminImportController', 'split');
-                self::$validators['id_additional_facilities'] = array('AdminImportController', 'split');
                 self::$validators['id_service_products'] = array('AdminImportController', 'split');
                 self::$validators['id_features'] = array('AdminImportController', 'split');
                 $this->available_fields = array(
@@ -194,7 +193,6 @@ class AdminImportControllerCore extends AdminController
                     'max_children' => array('label' => $this->l('Maximum children')),
                     'max_room_occupancy' => array('label' => $this->l('Maximum room occupancy')),
                     'show_at_front' => array('label' => $this->l('Show at front (0/1)')),
-                    'id_additional_facilities' => array('label' => $this->l('Additional facilities IDs (x,y,z...)')),
                     'id_service_products' => array('label' => $this->l('Service products IDs (x, y, z...)')),
                     'id_features' => array('label' => $this->l('Feature IDs (x, y, z...)')),
                     'description_short' => array('label' => $this->l('Short description')),
@@ -285,7 +283,6 @@ class AdminImportControllerCore extends AdminController
             case $this->entities[$this->l('Bookings')]:
                 $this->required_fields = array('id_customer', 'duration_dates', 'num_rooms', 'id_product');
                 self::$validators['duration_dates'] = array('AdminImportController', 'split');
-                self::$validators['id_additional_facilities'] = array('AdminImportController', 'split');
                 self::$validators['id_service_products'] = array('AdminImportController', 'split');
 
                 $this->available_fields = array(
@@ -311,10 +308,6 @@ class AdminImportControllerCore extends AdminController
                     'id_service_products' => array(
                         'label' => $this->l('Service Product IDs (x:n, y:n, z:n,..)'),
                         'help' => $this->l('id_service_product:quantity')
-                    ),
-                    'id_additional_facilities' => array(
-                        'label' => $this->l('Additional Facilities IDs (x:a, y:b, z:c,...)'),
-                        'help' => $this->l('id_additional_facility:id_option')
                     ),
                 );
             break;
@@ -1746,18 +1739,6 @@ class AdminImportControllerCore extends AdminController
                         }
 
                         $objHotelAdvancePayment->save();
-                        if (isset($product->id_additional_facilities) && $product->id_additional_facilities) {
-                            $objRoomTypeDemand = new HotelRoomTypeDemand();
-                            $objRoomTypeDemand->deleteRoomTypeDemands($product->id);
-                            foreach ($product->id_additional_facilities as $idGlobalDemand) {
-                                if (Validate::isLoadedObject(new HotelRoomTypeGlobalDemand((int) $idGlobalDemand))) {
-                                    $objRoomTypeDemand = new HotelRoomTypeDemand();
-                                    $objRoomTypeDemand->id_product = $product->id;
-                                    $objRoomTypeDemand->id_global_demand = $idGlobalDemand;
-                                    $objRoomTypeDemand->save();
-                                }
-                            }
-                        }
 
                         //delete existing images if "delete_existing_images" is set to 1
                         if (isset($product->delete_existing_images)) {
@@ -2558,7 +2539,6 @@ class AdminImportControllerCore extends AdminController
                             }
 
                             $serviceProducts = array();
-                            $globalDemands = array();
                             if (isset($orderProduct['id_service_products']) && count($orderProduct['id_service_products'])) {
                                 foreach ($orderProduct['id_service_products'] as $serviceProdKey =>  $serviceProd) {
                                     $serviceProd = explode(':', $serviceProd);
@@ -2579,28 +2559,6 @@ class AdminImportControllerCore extends AdminController
                                 }
                             }
 
-                            if (isset($orderProduct['id_additional_facilities']) && count($orderProduct['id_additional_facilities'])) {
-                                foreach ($orderProduct['id_additional_facilities'] as $globalDemandKey =>  $globalDemand) {
-                                    $globalDemand = explode(':', $globalDemand);
-                                    $objGlobalDemand = new HotelRoomTypeGlobalDemand($globalDemand[0], $this->context->language->id);
-                                    if (Validate::isLoadedObject($objGlobalDemand)) {
-                                        $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
-                                        // incase no option is provided or if the provided id is not valid or the id is not connected to the diffrent option, we will set the first option as default.
-                                        if ((!isset($globalDemand[1])
-                                            || !Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($globalDemand[1])
-                                            || $objAdvOption->id_global_demand != $globalDemand[0]))
-                                            && ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($objGlobalDemand->id))
-                                        ) {
-                                            $globalDemand[1] = $advOptions[0]['id'];
-                                        }
-
-                                        $globalDemands[$globalDemandKey]['id_global_demand'] = $globalDemand[0];
-                                        $globalDemands[$globalDemandKey]['id_option'] = isset($globalDemand[1]) ? $globalDemand[1] : 0;
-                                    }
-                                }
-                            }
-
-                            $globalDemands = json_encode($globalDemands);
                             $objCartBooking->updateCartBooking(
                                 $orderProduct['id_product'],
                                 $occupancy,
@@ -2609,7 +2567,6 @@ class AdminImportControllerCore extends AdminController
                                 0,
                                 date('Y-m-d', strtotime($dateFrom)),
                                 date('Y-m-d', strtotime($dateTo)),
-                                $globalDemands,
                                 $serviceProducts,
                                 $this->context->cart->id,
                                 $this->context->cart->id_guest
@@ -3364,12 +3321,6 @@ class AdminImportControllerCore extends AdminController
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_feature_pricing`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_feature_pricing_group`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_global_demand`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_global_demand_lang`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option_lang`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_demand_price`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_demand`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product_price`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'service_product_cart_detail`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_restriction_date_range`');
@@ -3472,8 +3423,6 @@ class AdminImportControllerCore extends AdminController
                     'referrer_cache',
                     'htl_cart_booking_data',
                     'htl_booking_detail',
-                    'htl_booking_demands',
-                    'htl_booking_demands_tax',
                     'service_product_order_detail',
                     'service_product_cart_detail',
                 );

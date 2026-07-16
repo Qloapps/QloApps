@@ -130,13 +130,13 @@
 									</div>
 								</td>
 								<td>
-                                    {displayPrice price=($data.demand_price + $data.additional_service_price + $data.additional_services_auto_add_price)|escape:'html':'UTF-8'}
+                                    {displayPrice price=($data.additional_service_price + $data.additional_services_auto_add_price)|escape:'html':'UTF-8'}
 								</td>
 								{* <td class="cart_line_total_rooms_price" id="cart_detail_data_price_{$data.id|escape:'html':'UTF-8'}">
 									{displayPrice price=$data.amt_with_qty}</td> *}
 								<td class="cart_line_total_price">
-									{if (isset($data.extra_demands) && $data.extra_demands) || (isset($data.additional_service) && $data.additional_service) || (isset($data.selected_services) && $data.selected_services)}
-										{displayPrice price=($data.amt_with_qty + $data.additional_services_auto_add_price + $data.demand_price +  $data.additional_service_price)|escape:'html':'UTF-8'}
+									{if isset($data.additional_service) && $data.additional_service}
+										{displayPrice price=($data.amt_with_qty + $data.additional_services_auto_add_price +  $data.additional_service_price)|escape:'html':'UTF-8'}
 									{else}
 										{displayPrice price=$data.amt_with_qty|escape:'html':'UTF-8'}
 									{/if}
@@ -146,7 +146,7 @@
 										<i class="icon-trash"></i>&nbsp;{l s='Delete'}
 									</button>
                                     <br />
-                                    <a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_demands btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
+                                    <a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_services btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
                                         <i class="icon-pencil"></i>&nbsp;{l s='Services'}
                                     </a>
 								</td>
@@ -161,31 +161,22 @@
 </div>
 
 {* Modal for extra demands *}
-{* <div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_demands">
+{* <div class="modal" tabindex="-1" role="dialog" id="rooms_type_extra_services">
 
 </div> *}
 
 {strip}
 	{addJsDefL name=txtExtraDemandSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
-	{addJsDefL name=txtExtraDemandErr}{l s='Some error occurred while updating demands' js=1}{/addJsDefL}
 {/strip}
 
-{* Css for handling extra demands changes *}
+{* Css for handling extra changes *}
 <style type="text/css">
-	#customer_cart_details .extra-demand-list {
-		padding-left:15px;}
 	#customer_cart_details .delete_hotel_cart_data {
 		margin-bottom:2px !important;}
 	#customer_cart_details .room_type_old_price {
 		text-decoration: line-through;
 		color:#979797;
 		font-size:12px;}
-	/*Extra demands CSS*/
-	#rooms_extra_demands .rooms_extra_demands_head {
-		margin-bottom: 18px;}
-	#rooms_extra_demands .room_demand_block {
-		margin-bottom: 15px;
-		color: #333;}
     #room_type_service_product_desc #back_to_service_btn {
 		display: none;}
     #add_new_room_services_block {

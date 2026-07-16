@@ -186,7 +186,7 @@ class CartCore extends ObjectModel
     const ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE = 17;
     const ONLY_CONVENIENCE_FEE = 18;
 
-    const ONLY_PRODUCTS_WITH_DEMANDS = 19;
+    const ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE = 19;
 
     public function __construct($id = null, $id_lang = null)
     {
@@ -368,8 +368,8 @@ class CartCore extends ObjectModel
      */
     public function getAverageProductsTaxRate(&$cart_amount_te = null, &$cart_amount_ti = null)
     {
-        $cart_amount_ti = $this->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
-        $cart_amount_te = $this->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+        $cart_amount_ti = $this->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
+        $cart_amount_te = $this->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
 
         $cart_vat_amount = $cart_amount_ti - $cart_amount_te;
 
@@ -1571,7 +1571,7 @@ class CartCore extends ObjectModel
             Cart::ONLY_PHYSICAL_PRODUCTS_WITHOUT_SHIPPING,
             Cart::ADVANCE_PAYMENT,
             Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS,
-            Cart::ONLY_PRODUCTS_WITH_DEMANDS,
+           Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE,
         );
 
         // Define virtual context to prevent case where the cart is not the in the global context
@@ -1638,7 +1638,6 @@ class CartCore extends ObjectModel
         }
         $products_total = array();
         $ecotax_total = 0;
-        $totalDemandsPrice = 0;
         $objCartBookingData = new HotelCartBookingData();
         $objServiceProductCartDetail = new ServiceProductCartDetail();
         $objAdvPayment = new HotelAdvancedPayment();
@@ -1914,15 +1913,12 @@ class CartCore extends ObjectModel
                     }
                 }
             }
-
-            // price of extra demands on room type in the cart
-            $totalDemandsPrice += $objCartBookingData->getCartExtraDemands($this->id, $product['id_product'], 0, 0, 0, 1, 0, (int)$with_taxes);
         }
         foreach ($products_total as $key => $price) {
             $order_total += $price;
         }
 
-        $order_total_products = $order_total + $totalDemandsPrice;
+        $order_total_products = $order_total;
 
         if ($type == Cart::ONLY_DISCOUNTS) {
             $order_total = 0;
@@ -1941,15 +1937,6 @@ class CartCore extends ObjectModel
             return $wrapping_fees;
         }
 
-        // price of extra demands on room type in the cart
-        if ($type == Cart::BOTH
-            || $type == Cart::BOTH_WITHOUT_SHIPPING
-            || $type == Cart::ADVANCE_PAYMENT
-            || $type == Cart::ONLY_PRODUCTS_WITH_DEMANDS
-        ) {
-            $order_total += $totalDemandsPrice;
-        }
-
         $order_total_discount = 0;
         $order_shipping_discount = 0;
         $advance_payment_products_discount = 0;
@@ -1964,7 +1951,7 @@ class CartCore extends ObjectModel
             Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD,
             Cart::ONLY_ROOM_SERVICES_WITHOUT_CONVENIENCE_FEE,
             Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE,
-            Cart::ONLY_PRODUCTS_WITH_DEMANDS)
+            Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE)
             ) && CartRule::isFeatureActive()
         ) {
             // First, retrieve the cart rules associated to this "getOrderTotal"
@@ -3827,26 +3814,6 @@ class CartCore extends ObjectModel
         $total_discounts = $this->getOrderTotal(true, Cart::ONLY_DISCOUNTS);
         $total_discounts_tax_exc = $this->getOrderTotal(false, Cart::ONLY_DISCOUNTS);
         $objCartBookingData = new HotelCartBookingData();
-        $total_demands_wt = $objCartBookingData->getCartExtraDemands(
-            $this->id,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1
-        );
-        $total_demands = $objCartBookingData->getCartExtraDemands(
-            $this->id,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            0
-        );
         // The cart content is altered for display
         foreach ($cart_rules as &$cart_rule) {
             // If the cart rule is automatic (wihtout any code) and include free shipping, it should not be displayed as a cart rule but only set the shipping cost to 0
@@ -3933,8 +3900,8 @@ class CartCore extends ObjectModel
         }
 
         $objHotelAdvancedPayment = new HotelAdvancedPayment();
-        $total_rooms_with_services_without_discount_te = $total_rooms + $total_demands + $total_additional_services + $total_additional_services_auto_add + $total_standalone_service_products;
-        $total_rooms_with_services_without_discount_ti = $total_rooms_wt + $total_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt + $total_standalone_service_products_wt;
+        $total_rooms_with_services_without_discount_te = $total_rooms + $total_additional_services + $total_additional_services_auto_add + $total_standalone_service_products;
+        $total_rooms_with_services_without_discount_ti = $total_rooms_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt + $total_standalone_service_products_wt;
 
         $cart_total_without_discount_te = $total_rooms_with_services_without_discount_te + $convenience_fee;
         $cart_total_without_discount_ti = $total_rooms_with_services_without_discount_ti + $convenience_fee_wt;
@@ -3972,8 +3939,6 @@ class CartCore extends ObjectModel
             'convenience_fee_tax' => $convenience_fee_tax,
             'total_standalone_service_products_wt' => $total_standalone_service_products_wt,
             'total_standalone_service_products' => $total_standalone_service_products,
-            'total_extra_demands_wt' => $total_demands_wt,
-            'total_extra_demands' => $total_demands,
             'total_price' => $base_total_tax_inc,
             'total_tax' => $total_tax,
             'total_price_without_tax' => $base_total_tax_exc,
@@ -4907,20 +4872,11 @@ class CartCore extends ObjectModel
             $idCustomer = $objCart->id_customer;
             $idCurrency = $objCart->id_currency;
 
-            $extraDemands = null;
-
             // We have to check the alreadt entered rooms for booking parameters with this variable as Also is sending all the rooms everytime
             // because id_guest is not managed in the API call
             $roomsAddedToCart = [];
             foreach ($bookingRows as $booking) {
                 $booking = json_decode(json_encode($booking, true), true);
-                if (isset($booking['extra_demands']['extra_demand'])) {
-                    $extraDemands = $booking['extra_demands']['extra_demand'];
-                    if (isset($extraDemands['id_global_demand'])) {
-                        $extraDemands = array($extraDemands);
-                    }
-                    $extraDemands = json_encode($extraDemands);
-                }
 
                 // get room booking info
                 $idProduct = $booking['id_product'];
@@ -5027,7 +4983,6 @@ class CartCore extends ObjectModel
                                 $objCartBooking->id_hotel = $val_hotel_room_info['id_hotel'];
                                 $objCartBooking->booking_type = HotelBookingDetail::ALLOTMENT_AUTO;
                                 $objCartBooking->quantity = $numDays;
-                                $objCartBooking->extra_demands = $extraDemands;
                                 $objCartBooking->date_from = $dateFrom;
                                 $objCartBooking->date_to = $dateTo;
                                 $objCartBooking->save();

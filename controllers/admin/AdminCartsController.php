@@ -1056,7 +1056,7 @@ class AdminCartsControllerCore extends AdminController
                 if ($bookingInfo['id'] == $id_booking_data) {
                     $amt_with_qty = $bookingInfo['amt_with_qty'];
                     $bookingInfo['amt_with_qty'] = Tools::displayPrice($amt_with_qty);
-                    $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price'] + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
+                     $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
                     $response = array(
                         'curr_booking_info' => $bookingInfo,
                         'cart_info' => $this->ajaxReturnVars(),
@@ -1129,7 +1129,7 @@ class AdminCartsControllerCore extends AdminController
                 if ($bookingInfo['id'] == $idBookingData) {
                     $amtWithQty = $bookingInfo['amt_with_qty'];
                     $bookingInfo['amt_with_qty'] = Tools::displayPrice($amtWithQty);
-                    $bookingInfo['total_price'] = Tools::displayPrice($amtWithQty + $bookingInfo['demand_price'] + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
+                    $bookingInfo['total_price'] = Tools::displayPrice($amtWithQty + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
                     $response = array(
                         'curr_booking_info' => $bookingInfo,
                         'cart_info' => $this->ajaxReturnVars(),
@@ -1153,8 +1153,8 @@ class AdminCartsControllerCore extends AdminController
         }
     }
 
-    // Process to get extra demands of any room while order creation process form.tpl
-    public function ajaxProcessGetRoomTypeCartDemands()
+    // Process to get extra services of any room while order creation process form.tpl
+    public function ajaxProcessGetRoomTypeCartServices()
     {
         $response['hasError'] = false;
         $response['errors'] = [];
@@ -1166,38 +1166,6 @@ class AdminCartsControllerCore extends AdminController
             && ($idHotelCartBooking = Tools::getValue('id_hotel_cart_booking'))
         ) {
             $objCartBookingData = new HotelCartBookingData();
-            if ($selectedRoomDemands = $objCartBookingData->getCartExtraDemands(
-                $idCart,
-                $idProduct,
-                $idRoom,
-                $dateFrom,
-                $dateTo
-            )) {
-                // get room type additional demands
-                $objRoomDemands = new HotelRoomTypeDemand();
-                if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
-                    foreach ($roomTypeDemands as &$demand) {
-                        // if demand has advance options then set demand price as first advance option price.
-                        if (isset($demand['adv_option']) && $demand['adv_option']) {
-                            $demand['price'] = current($demand['adv_option'])['price'];
-                        }
-                    }
-                    foreach ($selectedRoomDemands as &$selectedDemand) {
-                        $objRoom = new HotelRoomInformation($selectedDemand['id_room']);
-                        $selectedDemand['room_num'] = $objRoom->room_num;
-                        if (isset($selectedDemand['extra_demands']) && $selectedDemand['extra_demands']) {
-                            $extraDmd = array();
-                            foreach ($selectedDemand['extra_demands'] as $sDemand) {
-                                $selectedDemand['selected_global_demands'][] = $sDemand['id_global_demand'];
-                                $extraDmd[$sDemand['id_global_demand'].'-'.$sDemand['id_option']] = $sDemand;
-                            }
-                            $selectedDemand['extra_demands'] = $extraDmd;
-                        }
-                    }
-                    $this->context->smarty->assign('roomTypeDemands', $roomTypeDemands);
-                    $this->context->smarty->assign('selectedRoomDemands', $selectedRoomDemands);
-                }
-            }
 
             $selectedRoomServiceProduct = array();
             if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
@@ -1268,8 +1236,8 @@ class AdminCartsControllerCore extends AdminController
                 'loaderImg' => $this->context->link->getMediaLink(_PS_IMG_.'admin/ajax-loader.gif')
             ));
 
-            $response['html_exta_demands'] = $this->context->smarty->fetch(
-                _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_demands.tpl'
+            $response['html_exta_services'] = $this->context->smarty->fetch(
+                _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_services.tpl'
             );
         } else {
             $response['hasError'] = true;
@@ -1277,26 +1245,6 @@ class AdminCartsControllerCore extends AdminController
         }
 
         $this->ajaxDie(json_encode($response));
-    }
-
-    // Process when admin changes extra demands of any room while order creation process form.tpl
-    public function ajaxProcessChangeRoomDemands()
-    {
-        if ($this->tabAccess['edit'] === 1) {
-            $response = array('status' => false);
-            if ($idCartBooking = Tools::getValue('id_cart_booking')) {
-                if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
-                    $roomDemands = Tools::getValue('room_demands');
-                    $roomDemands = json_decode($roomDemands, true);
-                    $roomDemands = json_encode($roomDemands);
-                    $objCartbookingCata->extra_demands = $roomDemands;
-                    if ($objCartbookingCata->save()) {
-                        $response['status'] = true;
-                    }
-                }
-            }
-            $this->ajaxDie(json_encode($response));
-        }
     }
 
     public static function getOrderTotalUsingTaxCalculationMethod($id_cart)
