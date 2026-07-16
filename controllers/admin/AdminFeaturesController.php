@@ -91,6 +91,15 @@ class AdminFeaturesControllerCore extends AdminController
         parent::__construct();
     }
 
+    public function init()
+    {
+        parent::init();
+
+        if (($id = Tools::getValue('id_feature')) && Tools::getIsset('viewfeature')) {
+            self::$currentIndex .= '&id_feature='.(int)$id.'&viewfeature';
+        }
+    }
+
     /**
      * AdminController::renderList() override
      * @see AdminController::renderList()
@@ -154,7 +163,6 @@ class AdminFeaturesControllerCore extends AdminController
             );
 
             $this->_where = sprintf('AND `id_feature` = %d', (int)$id);
-            self::$currentIndex = self::$currentIndex.'&id_feature='.(int)$id.'&viewfeature';
             $this->processFilter();
             return parent::renderList();
         }
