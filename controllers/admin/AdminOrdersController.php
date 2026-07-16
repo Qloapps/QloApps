@@ -1396,7 +1396,7 @@ class AdminOrdersControllerCore extends AdminController
 
         if ($this->display != 'view') {
             $this->addJS(_PS_JS_DIR_.'admin/orders_stay_periods.js');
-            $this->addCSS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/css/controllers/orders.css');
+            $this->addCSS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/css/controllers/order-stay-periods.css');
         }
 
         if ($this->display == 'view') {
