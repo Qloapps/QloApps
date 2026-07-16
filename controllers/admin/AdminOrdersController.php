@@ -33,6 +33,7 @@ class AdminOrdersControllerCore extends AdminController
 
     protected $statuses_array = array();
     protected $all_order_sources = array();
+    protected $bookingSourcesArray = array();
     protected $hotelsArray = array();
     protected $roomTypesArray = array();
     protected $roomsArray = array();
@@ -74,6 +75,10 @@ class AdminOrdersControllerCore extends AdminController
         hbd.`id_room` AS id_room_information,
         (SELECT COUNT(spod.`id_service_product_order_detail`) FROM `'._DB_PREFIX_.'service_product_order_detail` spod WHERE spod.`id_order` = a.`id_order` AND spod.`id_htl_booking_detail`=0) as num_products';
 
+        $this->_select .= ',
+        (SELECT sl.`name` FROM `'._DB_PREFIX_.'source` s LEFT JOIN `'._DB_PREFIX_.'source_lang` sl ON (sl.`id_source` = s.`id_source` AND sl.`id_lang` = '.(int)$this->context->language->id.') WHERE s.`id_source` = a.`id_source`) AS `booking_source_name`,
+        (SELECT s.`source_code` FROM `'._DB_PREFIX_.'source` s WHERE s.`id_source` = a.`id_source`) AS `booking_source_code`';
+
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
         LEFT JOIN `'._DB_PREFIX_.'currency` cu ON (cu.`id_currency` = a.`id_currency`)
@@ -112,6 +117,9 @@ class AdminOrdersControllerCore extends AdminController
         $all_order_sources = Db::getInstance()->executeS('SELECT DISTINCT(`source`) FROM  `'._DB_PREFIX_.'orders`');
         foreach ($all_order_sources as $source) {
             $this->all_order_sources[$source['source']] = $source['source'];
+        }
+        foreach (Source::getSourcesUsedInOrders((int)$this->context->language->id) as $bookingSource) {
+            $this->bookingSourcesArray[$bookingSource['id_source']] = $bookingSource['name'];
         }
 
         $hotelsArray = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
@@ -272,6 +280,16 @@ class AdminOrdersControllerCore extends AdminController
                 'optional' => true,
                 'visible_default' => true
             ),
+            'booking_source_name' => array(
+                'title' => $this->l('Booking Source'),
+                'type' => 'select',
+                'filter_key' => 'a!id_source',
+                'list' => $this->bookingSourcesArray,
+                'orderby' => false,
+                'callback' => 'formatBookingSource',
+                'optional' => true,
+                'visible_default' => true
+            ),
             'osname' => array(
                 'title' => $this->l('Status'),
                 'type' => 'select',
@@ -357,6 +375,26 @@ class AdminOrdersControllerCore extends AdminController
             $idCurrency = $row['id_currency'];
         }
         return Tools::displayPrice($echo, (int)$idCurrency);
+    }
+
+    /**
+     * fields_list callback for the Booking Source column — shows the Booking Source name and,
+     * only for the built-in "Direct Website" source, a link to the storefront alongside it.
+     */
+    public static function formatBookingSource($echo, $row)
+    {
+        if (!$echo) {
+            return '--';
+        }
+
+        $html = Tools::safeOutput($echo);
+
+        if (isset($row['booking_source_code']) && $row['booking_source_code'] === 'DIRECT_WEBSITE') {
+            $title = Translate::getAdminTranslation('Visit website', 'AdminOrders', true);
+            $html .= ' <a href="'.Context::getContext()->link->getBaseLink().'" target="_blank" title="'.$title.'"><i class="icon-external-link"></i></a>';
+        }
+
+        return $html;
     }
 
     public function initPageHeaderToolbar()

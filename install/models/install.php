@@ -537,6 +537,14 @@ class InstallModelInstall extends InstallAbstractModel
             Configuration::updateGlobalValue('PS_OS_OUTOFSTOCK_PAID', (int)Configuration::get('PS_OS_OUTOFSTOCK'));
         }
 
+        // Set the default Booking Source (Direct Website)
+        $id_default_source = (int)Db::getInstance()->getValue(
+            'SELECT `id_source` FROM '._DB_PREFIX_.'source WHERE `source_code` = \'DIRECT_WEBSITE\''
+        );
+        if ($id_default_source) {
+            Configuration::updateGlobalValue('PS_DEFAULT_BOOKING_SOURCE', $id_default_source);
+        }
+
         // Set logo configuration
         if (file_exists(_PS_IMG_DIR_.'logo.png')) {
             list($width, $height) = getimagesize(_PS_IMG_DIR_.'logo.png');

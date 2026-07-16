@@ -37,6 +37,7 @@
   <tab id="Delivery_Slips" name="Delivery Slips"/>
   <tab id="Credit_Slips" name="Credit Slips"/>
   <tab id="Statuses" name="Statuses"/>
+  <tab id="Sources" name="Business Sources"/>
   <tab id="Order_Messages" name="Order Messages"/>
   <tab id="Customers_1" name="Customers"/>
   <tab id="Addresses" name="Addresses"/>
