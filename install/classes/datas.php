@@ -150,12 +150,7 @@ class Datas
             'name' => 'newsletter',
             'default' => 1,
             'help' => 'Get news from QloApps',
-        ),
-        'enable_ssl' => array(
-            'name' => 'ssl',
-            'default' => 0,
-            'help' => 'Enable SSL for QloApps',
-        ),
+        )
     );
 
     protected $datas = array();
