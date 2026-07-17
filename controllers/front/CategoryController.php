@@ -104,7 +104,7 @@ class CategoryControllerCore extends FrontController
         
         // If this category belongs to a hotel but that hotel is disabled, redirect to home page
         if ($idHotel && !(new HotelBranchInformation())->hotelBranchInfoByCategoryId($id_category)) {
-            Tools::redirect($this->context->link->getPageLink('index'));
+            Tools::redirect($this->context->link->getPageLink('pagenotfound'));
         }
         
         if (!HotelHelper::validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)) {

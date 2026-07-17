@@ -129,7 +129,7 @@ class ProductControllerCore extends FrontController
             
             // If the hotel this room type belongs to is disabled, redirect to home page
             if (!(new HotelBranchInformation())->hotelBranchesInfo(false, 1, 0, $idHotel)) {
-                Tools::redirect($this->context->link->getPageLink('index'));
+                Tools::redirect($this->context->link->getPageLink('pagenotfound'));
             }
 
             if (!HotelHelper::validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)) {
