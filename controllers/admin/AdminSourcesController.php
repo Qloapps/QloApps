@@ -62,22 +62,6 @@ class AdminSourcesControllerCore extends AdminController
 
     public function init()
     {
-        if (Tools::isSubmit('viewbusiness_source')
-            || Tools::isSubmit('submitFiltersource')
-            || Tools::isSubmit('submitResetsource')
-            || Tools::getValue('sourceOrderby')
-            || Tools::getValue('sourceOrderway')
-        ) {
-            $this->list_id = 'source';
-        }
-
-        $idSourceType = (int) Tools::getValue('id_source_type');
-
-        if ($idSourceType && Tools::getValue('viewbusiness_source')) {
-            self::$currentIndex .= '&id_source_type=' . $idSourceType . '&viewbusiness_source';
-            $this->className = 'Source';
-        }
-
         if (Tools::isSubmit('addsource') || Tools::isSubmit('addbusiness_source')) {
             $this->display = 'add';
         }
@@ -91,10 +75,23 @@ class AdminSourcesControllerCore extends AdminController
             $this->display = Tools::getValue('id_source_type') ? 'edit' : 'add';
         }
 
-
         return parent::init();
     }
 
+    public function initContent()
+    {
+        if (Tools::isSubmit('submitFiltersource') || Tools::isSubmit('submitResetsource')) {
+            $this->list_id = 'source';
+            $this->display = 'view';
+            
+            $idSourceType = (int) Tools::getValue('id_source_type');
+            self::$currentIndex .= '&id_source_type=' . $idSourceType . '&viewbusiness_source';
+            if (Tools::isSubmit('submitResetsource')) {
+                $this->processResetFilters('source');
+            }
+        }
+        parent::initContent();
+    }
     /**
      * @see AdminController::initPageHeaderToolbar()
      */
@@ -153,7 +150,7 @@ class AdminSourcesControllerCore extends AdminController
                 'position' => 'position'
             ),
             'orders_count' => array(
-                'title' => $this->l('Orders'),
+                'title' => $this->l('Orders (%)'),
                 'align' => 'text-center',
                 'orderby' => false,
                 'search' => false,
@@ -200,7 +197,7 @@ class AdminSourcesControllerCore extends AdminController
                 'position' => 'position'
             ),
             'orders_count' => array(
-                'title' => $this->l('Orders'),
+                'title' => $this->l('Orders (%)'),
                 'align' => 'text-center',
                 'orderby' => false,
                 'search' => false,
@@ -240,7 +237,7 @@ class AdminSourcesControllerCore extends AdminController
         $idSourceType = (int)Tools::getValue('id_source_type');
         $objBusinessSource = new BusinessSource($idSourceType, (int)$this->context->language->id);
         if (!Validate::isLoadedObject($objBusinessSource)) {
-            return;
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token);
         }
 
         $this->addRowAction('edit');
@@ -428,20 +425,20 @@ class AdminSourcesControllerCore extends AdminController
             } else {
                 Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$objSource->id_source_type.'&conf=1&token='.$this->token);
             }
+        } else if(Tools::isSubmit('statussource')){
+            if(Validate::isLoadedObject($objSource = new Source((int)Tools::getValue('id_source')))){
+                $idSourceType = $objSource->id_source_type;
+                $objSource->active = !$objSource->active;
+                if($objSource->save()){
+                    $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&conf=5&token='.$this->token;
+                }
+
+            }
+
         } else if(Tools::isSubmit('submitBulkenableSelectionsource')){
-                $idSourceType = (int)Tools::getValue('id_source_type');
-                $this->className = 'Source';
-                $this->table = 'source';
-                $this->boxes = Tools::getValue('sourceBox');
-                parent::processBulkEnableSelection();
-                $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&token='.$this->token;
+                $this->processUpdateStatusBulk(1);
         } else if(Tools::isSubmit('submitBulkdisableSelectionsource')){
-                $idSourceType = (int)Tools::getValue('id_source_type');
-                $this->className = 'Source';
-                $this->table = 'source';
-                $this->boxes = Tools::getValue('sourceBox');
-                parent::processBulkDisableSelection();
-                $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&token='.$this->token;
+                $this->processUpdateStatusBulk(0);
         } elseif (Tools::isSubmit('submitBulkdeletesource')) {
             $idSourceType = 0;
             foreach (Tools::getValue('sourceBox') as $selection) {
@@ -483,6 +480,22 @@ class AdminSourcesControllerCore extends AdminController
             }
         } else {
             return parent::postProcess();
+        }
+    }
+
+    protected function processUpdateStatusBulk($status = 1)
+    {
+        $idSourceType = (int)Tools::getValue('id_source_type');
+        $this->className = 'Source';
+        $this->table = 'source';
+        $this->boxes = Tools::getValue('sourceBox');    
+        if(empty($this->boxes)){
+            $this->errors[] = $this->l('You must select at least one item to perform a bulk action.');
+        }
+        $this->display = 'view';
+        if(!$this->errors){
+            parent::processBulkStatusSelection($status);
+            $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&conf=5&token='.$this->token;
         }
     }
 
@@ -549,8 +562,8 @@ class AdminSourcesControllerCore extends AdminController
     protected function postProcessMergeSource()
     {
         $idSourceType = (int)Tools::getValue('id_source_type');
-        $idCurrentSource = (int)Tools::getValue('merge_current_source');
-        $idTargetSource = (int)Tools::getValue('merge_target_source');
+        $idCurrentSource = (int)Tools::getValue('current_source');
+        $idTargetSource = (int)Tools::getValue('target_source');
 
         $objCurrent = new Source($idCurrentSource);
         $objTarget = new Source($idTargetSource);
@@ -564,7 +577,7 @@ class AdminSourcesControllerCore extends AdminController
         } else {
             $objCurrent->mergeOrdersInto($idTargetSource);
         }
-
+        $this->display = 'view';
         if (!count($this->errors)) {
             Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_source_type='.$idSourceType.'&conf=4&token='.$this->token);
         }
@@ -645,7 +658,7 @@ class AdminSourcesControllerCore extends AdminController
                 $this->context->smarty->assign(array(
                     'modal_id' => 'merge_source_modal',
                     'modal_class' => 'modal-md',
-                    'modal_title' => $this->l('Merge Booking Source'),
+                    'modal_title' => '<i class="icon-random"></i> &nbsp ' .$this->l('Merge Booking Source'),
                     'modal_content' => $this->context->smarty->fetch('controllers/sources/modals/_merge_source_form.tpl'),
                 ));
 

@@ -16,7 +16,7 @@
     </source>
     <source id="Email" id_source_type="Direct" source_code="EMAIL" position="4" unremovable="0" active="1">
     </source>
-    <source id="Social_Media" id_source_type="Direct" source_code="SOCIAL_MEDIA" position="0" unremovable="1" active="1">
+    <source id="Social_Media" id_source_type="Direct" source_code="SOCIAL_MEDIA" position="0" unremovable="0" active="1">
     </source>
     <source id="WhatsApp" id_source_type="Direct" source_code="WHATSAPP" position="6" unremovable="0" active="1">
     </source>

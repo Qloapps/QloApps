@@ -356,7 +356,7 @@ abstract class PaymentModuleCore extends Module
                     if (isset($this->idBookingSource) && $this->idBookingSource) {
                         $order->id_source = (int)$this->idBookingSource;
                     } else {
-                        $order->id_source = Source::getDefaultSourceId();
+                        $order->id_source = (int)Source::getDefaultSourceId();
                     }
 
                     if (self::DEBUG_MODE) {

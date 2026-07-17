@@ -34,7 +34,7 @@ $(document).on('click', '.merge-source-btn', function (e) {
                 $('#footer').next('.bootstrap').append(result.modalHtml);
                 $('#merge_source_modal').modal('show');
             } else {
-                showErrorMessage(result.error || 'Could not open the merge form.');
+                showErrorMessage(result.error);
             }
         },
         complete: function () {
