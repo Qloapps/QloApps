@@ -330,8 +330,14 @@ class AdminFeaturesControllerCore extends AdminController
                 break;
 
             case 'view':
-                $bread_extended[] = $this->feature_name[$this->context->employee->id_lang];
-                $this->addMetaTitle($bread_extended[count($bread_extended) - 1]);
+                if (!$this->feature_name && ($id = Tools::getValue('id_feature'))) {
+                    $obj = new Feature((int)$id);
+                    $this->feature_name = $obj->name;
+                }
+                if ($this->feature_name) {
+                    $bread_extended[] = $this->feature_name[$this->context->employee->id_lang];
+                    $this->addMetaTitle($bread_extended[count($bread_extended) - 1]);
+                }
                 break;
 
             case 'editFeatureValue':
