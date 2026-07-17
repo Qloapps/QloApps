@@ -54,7 +54,9 @@ class QctmCronExpressionTranslator
         }
 
         if (preg_match('/^\*\/(\d+)$/', $minute, $m) && $hour == '*' && $dayMonthWildcard && $weekday == '*') {
-            return vsprintf($this->module->l('Every %d minutes'), array((int) $m[1]));
+            return ((int) $m[1] === 1)
+                ? $this->module->l('Every minute')
+                : vsprintf($this->module->l('Every %d minutes'), array((int) $m[1]));
         }
 
         if ($minute == '0' && $hour == '*' && $dayMonthWildcard && $weekday == '*') {
@@ -62,7 +64,9 @@ class QctmCronExpressionTranslator
         }
 
         if ($minute == '0' && preg_match('/^\*\/(\d+)$/', $hour, $m) && $dayMonthWildcard && $weekday == '*') {
-            return vsprintf($this->module->l('Every %d hours'), array((int) $m[1]));
+            return ((int) $m[1] === 1)
+                ? $this->module->l('Every hour')
+                : vsprintf($this->module->l('Every %d hours'), array((int) $m[1]));
         }
 
         if ($hasFixedTime && $dayMonthWildcard && $weekday == '*') {
@@ -70,10 +74,12 @@ class QctmCronExpressionTranslator
         }
 
         if ($hasFixedTime && $day == '*' && $weekday == '*' && preg_match('/^\*\/(\d+)$/', $month, $mm)) {
-            return vsprintf(
-                $this->module->l('Every day every %1$d months at %2$s'),
-                array((int) $mm[1], $this->hourLabel($hour, $minute))
-            );
+            return ((int) $mm[1] === 1)
+                ? vsprintf($this->module->l('Every day every month at %s'), array($this->hourLabel($hour, $minute)))
+                : vsprintf(
+                    $this->module->l('Every day every %1$d months at %2$s'),
+                    array((int) $mm[1], $this->hourLabel($hour, $minute))
+                );
         }
 
         if ($hasFixedTime && $dayMonthWildcard && $weekday == '1-5') {
@@ -145,14 +151,21 @@ class QctmCronExpressionTranslator
             if ($minute === '*') {
                 $minuteFreq = $this->module->l('Every minute');
             } elseif (preg_match('/^\*\/(\d+)$/', $minute, $m)) {
-                $minuteFreq = vsprintf($this->module->l('Every %d minutes'), array((int) $m[1]));
+                $minuteFreq = ((int) $m[1] === 1)
+                    ? $this->module->l('Every minute')
+                    : vsprintf($this->module->l('Every %d minutes'), array((int) $m[1]));
             }
 
             if (preg_match('/^(\d+)-(\d+)\/(\d+)$/', $hour, $hs) && $this->isNumeric($minute)) {
-                $when = vsprintf(
-                    $this->module->l('Every %1$d hours between %2$s and %3$s'),
-                    array((int) $hs[3], $this->hourLabel($hs[1], $minute), $this->hourLabel($hs[2], $minute))
-                );
+                $when = ((int) $hs[3] === 1)
+                    ? vsprintf(
+                        $this->module->l('Every hour between %1$s and %2$s'),
+                        array($this->hourLabel($hs[1], $minute), $this->hourLabel($hs[2], $minute))
+                    )
+                    : vsprintf(
+                        $this->module->l('Every %1$d hours between %2$s and %3$s'),
+                        array((int) $hs[3], $this->hourLabel($hs[1], $minute), $this->hourLabel($hs[2], $minute))
+                    );
             } elseif ($minuteFreq !== null) {
                 if ($hour === '*') {
                     $when = $minuteFreq;
@@ -197,7 +210,9 @@ class QctmCronExpressionTranslator
 
         if ($month !== '*') {
             if (preg_match('/^\*\/(\d+)$/', $month, $mf)) {
-                $conditions[] = vsprintf($this->module->l('every %d months'), array((int) $mf[1]));
+                $conditions[] = ((int) $mf[1] === 1)
+                    ? $this->module->l('every month')
+                    : vsprintf($this->module->l('every %d months'), array((int) $mf[1]));
             } else {
                 if (preg_match('/^(\d+)-(\d+)$/', $month, $mm)) {
                     $monthDesc = vsprintf(
