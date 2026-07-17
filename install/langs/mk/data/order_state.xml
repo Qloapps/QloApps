@@ -48,4 +48,8 @@
     <name>Примено е делумно плаќање</name>
     <template>partial_payment_accepted</template>
   </order_state>
+  <order_state id="No_show">
+    <name>Непојавување</name>
+    <template/>
+  </order_state>
 </entity_order_state>

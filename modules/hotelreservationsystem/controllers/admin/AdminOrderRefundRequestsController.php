@@ -466,6 +466,20 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                             $objHtlBooking = new HotelBookingDetail($idHtlBooking);
                             // perform booking refund processes in the booking tables
                             $objHtlBooking->processRefundInBookingTables();
+
+                            // paid Cancelled/No-show requests only flip the room's status
+                            // once the refund is actually approved here
+                            if ($objOrderReturn->event_type == OrderReturn::EVENT_TYPE_CANCELLATION) {
+                                $objHtlBooking->changeStatus(HotelBookingDetail::STATUS_CANCELLED, array(
+                                    'id_employee' => (int) $this->context->employee->id,
+                                    'remark' => $objOrderReturn->question,
+                                ));
+                            } elseif ($objOrderReturn->event_type == OrderReturn::EVENT_TYPE_NO_SHOW) {
+                                $objHtlBooking->changeStatus(HotelBookingDetail::STATUS_NO_SHOW, array(
+                                    'id_employee' => (int) $this->context->employee->id,
+                                    'remark' => $objOrderReturn->question,
+                                ));
+                            }
                         } elseif ($id_service_product_order_detail = $objOrderReturnDetail->id_service_product_order_detail) {
                             $objServiceProductOrderDetail = new ServiceProductOrderDetail($id_service_product_order_detail);
                             // perform booking refund processes in the service product order tables

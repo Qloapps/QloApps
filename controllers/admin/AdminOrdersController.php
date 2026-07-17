@@ -313,9 +313,11 @@ class AdminOrdersControllerCore extends AdminController
                 'displayed' => false,
                 'type' => 'select',
                 'list' => array(
-                    HotelBookingDetail::STATUS_ALLOTED => $this->l('Alloted'),
+                    HotelBookingDetail::STATUS_ASSIGNED => $this->l('Assigned'),
                     HotelBookingDetail::STATUS_CHECKED_IN => $this->l('Checked in'),
                     HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked out'),
+                    HotelBookingDetail::STATUS_NO_SHOW => $this->l('No-show'),
+                    HotelBookingDetail::STATUS_CANCELLED => $this->l('Cancelled'),
                 ),
             )
         ));
@@ -402,9 +404,7 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if ($this->tabAccess['edit'] === 1) {
-                    if (((int) $order->isReturnable())
-                        && !$order->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG, 0, 0)
-                    ) {
+                    if ((int) $order->isReturnable()) {
                         $orderTotalPaid = $order->getTotalPaid();
                         $orderDiscounts = $order->getCartRules();
                         $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
@@ -784,13 +784,17 @@ class AdminOrdersControllerCore extends AdminController
         // set modal details
         $response['hasError'] = 1;
         if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
-            $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
+            $objHotelBookingStatus = new HotelBookingStatus();
+            $htlOrderStatus = $objHotelBookingStatus->getAllStatuses(
+                $this->context->language->id,
+                (int) Tools::getValue('current_room_status')
+            );
             $this->context->smarty->assign(
                 array(
                     'order' => $objOrder,
                     'current_index' => self::$currentIndex,
                     'hotel_order_status' => $htlOrderStatus,
-                    'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
+                    'ROOM_STATUS_ASSIGNED' => HotelBookingDetail::STATUS_ASSIGNED,
                     'current_room_status' => Tools::getValue('current_room_status')
                 )
             );
@@ -812,7 +816,7 @@ class AdminOrdersControllerCore extends AdminController
             $this->context->smarty->assign($modal);
 
             $response['hasError'] = 0;
-            $response['STATUS_ALLOTED'] = HotelBookingDetail::STATUS_ALLOTED;
+            $response['STATUS_ASSIGNED'] = HotelBookingDetail::STATUS_ASSIGNED;
             $response['STATUS_CHECKED_IN'] = HotelBookingDetail::STATUS_CHECKED_IN;
             $response['STATUS_CHECKED_OUT'] = HotelBookingDetail::STATUS_CHECKED_OUT;
             $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
@@ -1063,11 +1067,12 @@ class AdminOrdersControllerCore extends AdminController
             $objBookingDetail = new HotelBookingDetail();
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
             $objOrderReturn = new OrderReturn();
-            $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1, 0, 1);
             if ($bookingOrderInfo = $objBookingDetail->getBookingDataByOrderId($objOrder->id)) {
                 $objBookingDemand = new HotelBookingDemands();
                 foreach($bookingOrderInfo as $key => $booking) {
-                    if ((in_array($booking['id'], $refundReqBookings)) || $booking['is_refunded']) {
+                    // multiple refund requests are now allowed per booking — only still
+                    // exclude a booking that's already fully refunded, not a re-request
+                    if ($booking['is_refunded']) {
                         unset($bookingOrderInfo[$key]);
                     } else {
                         $bookingOrderInfo[$key]['total_price_tax_incl'] += $objBookingDemand->getRoomTypeBookingExtraDemands(
@@ -1495,7 +1500,7 @@ class AdminOrdersControllerCore extends AdminController
                 LEFT JOIN (
                     SELECT GROUP_CONCAT(
                         CASE
-                            WHEN `id_status`='.HotelBookingDetail::STATUS_ALLOTED.' THEN \''.$this->l('Alloted').'\'
+                            WHEN `id_status`='.HotelBookingDetail::STATUS_ASSIGNED.' THEN \''.$this->l('Assigned').'\'
                             WHEN `id_status`='.HotelBookingDetail::STATUS_CHECKED_IN.' THEN \''.$this->l('Checked in').'\'
                             WHEN `id_status`='.HotelBookingDetail::STATUS_CHECKED_OUT.' THEN \''.$this->l('Checked out').'\'
                             ELSE \''.$this->l('Invalid status').'\'
@@ -1916,10 +1921,11 @@ class AdminOrdersControllerCore extends AdminController
                 $objOrderReturn = new OrderReturn();
                 $bookings = Tools::getValue('id_htl_booking');
                 if ($bookings && count($bookings)) {
-                    $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1, 0, 1);
+                    // multiple refund requests are now allowed per booking — only still
+                    // block a booking that's already fully refunded, not a re-request
                     foreach ($bookings as $idHtlBooking) {
                         $objBookingDetail = new HotelBookingDetail($idHtlBooking);
-                        if ((in_array($idHtlBooking, $refundReqBookings)) || $objBookingDetail->is_refunded) {
+                        if ($objBookingDetail->is_refunded) {
                             $this->errors[] = Tools::displayError('Wrong bookings found for cancelation.');
                             break;
                         }
@@ -1955,6 +1961,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objOrderReturn->by_admin = 1;
                     $objOrderReturn->question = $refundReason;
                     $objOrderReturn->refunded_amount = 0;
+                    $objOrderReturn->event_type = OrderReturn::EVENT_TYPE_REFUND;
                     $objOrderReturn->save();
                     if ($objOrderReturn->id) {
                         if ($bookings) {
@@ -3119,7 +3126,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color1';
             $helper->title = $this->l('Arrivals', null, null, false);
             $helper->subtitle = $this->l('Today', null, null, false);
-            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_ALLOTED.'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d')).'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d'));
+            $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder&submitFilterorder=1&orderFilter_hbd!is_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_ASSIGNED.'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d')).'&orderFilter_hbd!date_from[]='.pSQL(date('Y-m-d'));
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=today_arrivals';
             $helper->tooltip = $this->l('Total number of arrivals for today.', null, null, false);
             $this->kpis[] = $helper;
@@ -3642,6 +3649,18 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
             $bookingOrderRoomInfo['num_checkin_documents'] = HotelBookingDocument::getCountByIdHtlBooking($bookingOrderRoomInfo['id']);
+
+            $roomRefundInfo = $objOrderReturn->getRefundedAmount($bookingOrderRoomInfo['id_order'], 0, $bookingOrderRoomInfo['id'], true);
+            $bookingOrderRoomInfo['refund_amount'] = $roomRefundInfo['amount'];
+            $bookingOrderRoomInfo['refund_count'] = (int) $roomRefundInfo['count'];
+        }
+        unset($bookingOrderRoomInfo);
+
+        // catalog of the 5 booking statuses (id_booking_status => color/name), for the
+        // Rooms Booking Detail table's status badge
+        $htlBookingStatuses = array();
+        foreach ((new HotelBookingStatus())->getAllStatuses($this->context->language->id) as $htlBookingStatus) {
+            $htlBookingStatuses[$htlBookingStatus['id_status']] = $htlBookingStatus;
         }
 
         $objHotelBookingDetail = new HotelBookingDetail();
@@ -3724,6 +3743,7 @@ class AdminOrdersControllerCore extends AdminController
             'totalRoomsCostTE' => $totalRoomsCostTE,
             'total_room_tax' => $total_room_tax,
             'htl_booking_order_data' => $bookingOrderInfo,
+            'htl_booking_statuses' => $htlBookingStatuses,
             'hotel_order_status' => $htlOrderStatus,
             'order_detail_data' => $order_detail_data,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
@@ -3808,6 +3828,8 @@ class AdminOrdersControllerCore extends AdminController
             'orderDocuments' => $order->getDocuments(),
             'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
             'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
+            'ROOM_STATUS_NO_SHOW' => HotelBookingDetail::STATUS_NO_SHOW,
+            'ROOM_STATUS_CANCELLED' => HotelBookingDetail::STATUS_CANCELLED,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
             'order_convenience_fee_services' => $orderConvenienceFeeServices,
             'page_header_toolbar_btn' => $this->page_header_toolbar_btn,
@@ -7007,7 +7029,7 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
 
-        if ($objBookingDetail->id_status != HotelBookingDetail::STATUS_ALLOTED
+        if ($objBookingDetail->id_status != HotelBookingDetail::STATUS_ASSIGNED
             && strtotime($old_date_from) != strtotime($new_date_from)
         ) {
             die(json_encode(array(
@@ -8804,6 +8826,7 @@ class AdminOrdersControllerCore extends AdminController
         $idHotelBookingDetail = (int) Tools::getValue('id_hotel_booking_detail');
         if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail($idHotelBookingDetail))) {
             $newStatus = (int) Tools::getValue('booking_order_status');
+            $statusRemark = Tools::getValue('status_remark');
             // date choosen for the status change
             if ($statusDate = Tools::getValue('status_date')) {
                 $statusDate = date('Y-m-d H:i:s', strtotime($statusDate));
@@ -8823,6 +8846,12 @@ class AdminOrdersControllerCore extends AdminController
                 ) {
                     $this->errors[] = Tools::displayError('Date should be between booking from date and to date.');
                 }
+            } elseif ($newStatus == HotelBookingDetail::STATUS_NO_SHOW && strtotime($dateFrom) > time()) {
+                $this->errors[] = Tools::displayError('Room cannot be marked as No-show before the booking\'s check-in date.');
+            }
+
+            if (!$statusRemark) {
+                $this->errors[] = Tools::displayError('Please enter a note for this status change.');
             }
 
             if ($objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_CHECKED_OUT
@@ -8854,7 +8883,7 @@ class AdminOrdersControllerCore extends AdminController
                 if ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
                     $orderBookings = $objHotelBookingDetail->getOrderCurrentDataByOrderId(
                         $id_order,
-                        array(HotelBookingDetail::STATUS_ALLOTED, HotelBookingDetail::STATUS_CHECKED_IN),
+                        array(HotelBookingDetail::STATUS_ASSIGNED, HotelBookingDetail::STATUS_CHECKED_IN),
                         0,
                         0
                     );
@@ -8865,7 +8894,6 @@ class AdminOrdersControllerCore extends AdminController
                 if ($remainingCheckoutRooms == 1 && $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT && $hasPendingBills) {
                     $this->errors[] = Tools::displayError('You cannot checkout the last room while there are pending bills for this order.');
                 } else {
-                    $objHotelBookingDetail->id_status = $newStatus;
                     if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
                         $objHotelBookingDetail->check_in = $statusDate;
                     } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
@@ -8874,17 +8902,91 @@ class AdminOrdersControllerCore extends AdminController
                         $objHotelBookingDetail->check_in = '';
                         $objHotelBookingDetail->check_out = '';
                     }
-                    if ($objHotelBookingDetail->save()) {
-                        Hook::exec(
-                            'actionRoomBookingStatusUpdateAfter',
-                            array(
-                                'id_hotel_booking_detail' => $objHotelBookingDetail->id,
-                                'id_order' => $objHotelBookingDetail->id_order,
-                                'id_room' => $objHotelBookingDetail->id_room,
-                                'date_from' => $objHotelBookingDetail->date_from,
-                                'date_to' => $objHotelBookingDetail->date_to
-                            )
+
+                    $changeParams = array(
+                        'id_employee' => (int) $this->context->employee->id,
+                        'remark' => $statusRemark,
+                    );
+
+                    if ($newStatus == HotelBookingDetail::STATUS_CANCELLED || $newStatus == HotelBookingDetail::STATUS_NO_SHOW) {
+                        // picking Cancelled/No-show also creates the matching refund
+                        // request — unpaid: everything resolves immediately together;
+                        // paid: room status stays as-is until the request is approved
+                        // in Manage Order Refund Requests
+                        $eventType = ($newStatus == HotelBookingDetail::STATUS_CANCELLED)
+                            ? OrderReturn::EVENT_TYPE_CANCELLATION
+                            : OrderReturn::EVENT_TYPE_NO_SHOW;
+                        $hasOrderDiscountOrPayment = ((float) $order->getTotalPaid() > 0 || $order->getCartRules()) ? true : false;
+
+                        $objOrderReturn = new OrderReturn();
+                        $objOrderReturn->id_customer = $order->id_customer;
+                        $objOrderReturn->id_order = $order->id;
+                        $objOrderReturn->state = 0;
+                        $objOrderReturn->by_admin = 1;
+                        $objOrderReturn->question = $statusRemark;
+                        $objOrderReturn->refunded_amount = 0;
+                        $objOrderReturn->event_type = $eventType;
+                        $objOrderReturn->save();
+
+                        $objOrderReturnDetail = new OrderReturnDetail();
+                        $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
+                        $objOrderReturnDetail->id_order_detail = $objHotelBookingDetail->id_order_detail;
+                        $objOrderReturnDetail->product_quantity = HotelHelper::getNumberOfDays(
+                            $objHotelBookingDetail->date_from,
+                            $objHotelBookingDetail->date_to
                         );
+                        $objOrderReturnDetail->id_htl_booking = $objHotelBookingDetail->id;
+                        $objOrderReturnDetail->refunded_amount = 0;
+                        if (!$hasOrderDiscountOrPayment) {
+                            $objOrderReturnDetail->id_customization = 1;
+                        }
+                        $objOrderReturnDetail->save();
+
+                        $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
+
+                        $statusChanged = false;
+                        if (!$hasOrderDiscountOrPayment) {
+                            $statusChanged = $objHotelBookingDetail->changeStatus($newStatus, $changeParams);
+                            if ($statusChanged) {
+                                $objHotelBookingDetail->processRefundInBookingTables();
+                                $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_REFUNDED'));
+
+                                // if every room in the order is now No-show (or fully
+                                // cancelled/refunded), bump the order's own status —
+                                // same pattern already used by the initiateRefund handler
+                                $order = new Order($order->id);
+                                if ($idOrderState = $order->getOrderCompleteRefundStatus()) {
+                                    $objOrderHistory = new OrderHistory();
+                                    $objOrderHistory->id_order = (int) $order->id;
+                                    $useExistingPayment = !$order->hasInvoice();
+                                    $objOrderHistory->changeIdOrderState($idOrderState, $order, $useExistingPayment);
+                                    $objOrderHistory->addWithemail();
+                                }
+                            }
+                            $success = $statusChanged;
+                        } else {
+                            // paid: request is Pending, room status doesn't change yet —
+                            // nothing to announce via the room-status-update hook below
+                            $success = true;
+                        }
+                    } else {
+                        $statusChanged = $objHotelBookingDetail->changeStatus($newStatus, $changeParams);
+                        $success = $statusChanged;
+                    }
+
+                    if ($success) {
+                        if ($statusChanged) {
+                            Hook::exec(
+                                'actionRoomBookingStatusUpdateAfter',
+                                array(
+                                    'id_hotel_booking_detail' => $objHotelBookingDetail->id,
+                                    'id_order' => $objHotelBookingDetail->id_order,
+                                    'id_room' => $objHotelBookingDetail->id_room,
+                                    'date_from' => $objHotelBookingDetail->date_from,
+                                    'date_to' => $objHotelBookingDetail->date_to
+                                )
+                            );
+                        }
 
                         Tools::redirectAdmin(self::$currentIndex . '&id_order=' . (int) $objHotelBookingDetail->id_order . '&vieworder&token=' . $this->token . '&conf=4');
                     } else {

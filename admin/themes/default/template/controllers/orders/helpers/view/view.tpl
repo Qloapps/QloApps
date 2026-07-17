@@ -104,6 +104,8 @@
                                                 <th>{l s='Check-In'}</th>
                                                 <th>{l s='Check-Out'}</th>
                                                 <th>{l s='Allotment'}</th>
+                                                <th>{l s='Room status'}</th>
+                                                <th>{l s='Refund'}</th>
                                                 <th>{l s='Action'}</th>
                                             </tr>
                                         </thead>
@@ -141,11 +143,25 @@
                                                             {/if}
                                                         </td>
                                                         <td>
+                                                            {if isset($htl_booking_statuses[$data.id_status])}
+                                                                <span class="badge" style="background-color:{$htl_booking_statuses[$data.id_status].color|escape:'html':'UTF-8'}">{$htl_booking_statuses[$data.id_status].name|escape:'html':'UTF-8'}</span>
+                                                            {/if}
+                                                        </td>
+                                                        <td>
+                                                            {if $data.refund_count}
+                                                                {displayPrice price=$data.refund_amount currency=$currency->id} ({$data.refund_count})
+                                                            {else}
+                                                                --
+                                                            {/if}
+                                                        </td>
+                                                        <td>
                                                             <a title="{l s='Upload/Check guest documents'}" class="btn btn-default" href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
                                                                 <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span> <i class="icon-file-text"></i>
                                                             </a>
 
-                                                            {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
+                                                            {if $data.id_status == $ROOM_STATUS_NO_SHOW || $data.id_status == $ROOM_STATUS_CANCELLED}
+                                                                <span class="badge badge-danger">{if $data.id_status == $ROOM_STATUS_NO_SHOW}{l s='No-show'}{else}{l s='Cancelled'}{/if}</span>
+                                                            {elseif isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                                                                 <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
                                                             {elseif $can_edit}
                                                                 <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}" data-check_in="{$data['check_in']}" data-check_out="{$data['check_out']}">
@@ -1367,9 +1383,12 @@
         {addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
         {addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
         {addJsDefL name='select_room_txt'}{l s='Select room' js=1}{/addJsDefL}
+        {addJsDefL name='room_status_sealed_warning_txt'}{l s='Are you sure? You cannot change the booking status after this.' js=1}{/addJsDefL}
         {addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_IN=$ROOM_STATUS_CHECKED_IN|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_OUT=$ROOM_STATUS_CHECKED_OUT|escape:'quotes':'UTF-8'}
+        {addJsDef ROOM_STATUS_NO_SHOW=$ROOM_STATUS_NO_SHOW|escape:'quotes':'UTF-8'}
+        {addJsDef ROOM_STATUS_CANCELLED=$ROOM_STATUS_CANCELLED|escape:'quotes':'UTF-8'}
         {addJsDef ALLOTMENT_MANUAL=$ALLOTMENT_MANUAL|escape:'quotes':'UTF-8'}
         {addJsDef PS_OS_CANCELED=Configuration::get('PS_OS_CANCELED')|escape:'quotes':'UTF-8'}
         {addJsDef PS_OS_REFUND=Configuration::get('PS_OS_REFUND')|escape:'quotes':'UTF-8'}

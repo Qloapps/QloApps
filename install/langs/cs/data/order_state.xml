@@ -48,4 +48,8 @@
     <name>Částečná platba přijata</name>
     <template>partial_payment_accepted</template>
   </order_state>
+  <order_state id="No_show">
+    <name>Nedostavení se</name>
+    <template/>
+  </order_state>
 </entity_order_state>

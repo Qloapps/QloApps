@@ -48,4 +48,8 @@
     <name>Đã nhận được một phần thanh toán</name>
     <template>partial_payment_accepted</template>
   </order_state>
+  <order_state id="No_show">
+    <name>Khách không đến</name>
+    <template/>
+  </order_state>
 </entity_order_state>

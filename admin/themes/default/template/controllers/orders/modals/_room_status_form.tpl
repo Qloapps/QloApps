@@ -30,7 +30,7 @@
                 {/foreach}
             </select>
         </div>
-        <div class="form-group" {if $current_room_status == $ROOM_STATUS_ALLOTED}style="display:none;"{/if}>
+        <div class="form-group" {if $current_room_status == $ROOM_STATUS_ASSIGNED}style="display:none;"{/if}>
             <label class="control-label">{l s='Date'}</label>
             <div class="input-group">
                 <input type="text" name="status_date" class="room_status_date wk-input-date" value="" />
@@ -44,6 +44,11 @@
             <input type="hidden" id="room_status_date_to" name="date_to" />
             <input type="hidden" id="room_status_id_room" name="id_room" />
             <input type="hidden" id="room_status_id_order" name="id_order" />
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">{l s='Note'}</label>
+            <textarea name="status_remark" class="form-control" rows="2" required="required"></textarea>
         </div>
 
         <button class="btn btn-primary" type="submit" name="submitbookingOrderStatus" style="display:none" id="submitbookingOrderStatus"></button>

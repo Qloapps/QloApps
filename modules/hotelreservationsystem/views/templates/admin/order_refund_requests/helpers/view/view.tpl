@@ -125,6 +125,17 @@
 								<span class="badge" style="background-color:{$currentStateInfo['color']|escape:'html':'UTF-8'}">{$currentStateInfo['name']|escape:'html':'UTF-8'}</span>
 							</div>
 						</div>
+						<div class="form-group row">
+							<div class="col-sm-3">
+								<strong>{l s='Request type' mod='hotelreservationsystem'} :</strong>
+							</div>
+							<div class="col-sm-9">
+								{if $orderReturnInfo['event_type'] == OrderReturn::EVENT_TYPE_CANCELLATION}{l s='Cancellation' mod='hotelreservationsystem'}
+								{elseif $orderReturnInfo['event_type'] == OrderReturn::EVENT_TYPE_NO_SHOW}{l s='No-show' mod='hotelreservationsystem'}
+								{elseif $orderReturnInfo['event_type'] == OrderReturn::EVENT_TYPE_REFUND}{l s='Refund' mod='hotelreservationsystem'}
+								{else}--{/if}
+							</div>
+						</div>
 
 						{* list of booking requested for refund by the customer *}
 						{if isset($refundReqBookings) && $refundReqBookings}

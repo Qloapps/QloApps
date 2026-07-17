@@ -1605,6 +1605,10 @@ $(document).ready(function() {
         } else {
             $form.find('.room_status_date').closest('.form-group').hide();
         }
+
+        if (status == ROOM_STATUS_NO_SHOW || status == ROOM_STATUS_CANCELLED) {
+            showErrorMessage(room_status_sealed_warning_txt);
+        }
     });
 
     // open date picker for the date input of check-in checkout dates

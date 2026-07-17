@@ -48,4 +48,8 @@
     <name>已收到部分付款</name>
     <template>partial_payment_accepted</template>
   </order_state>
+  <order_state id="No_show">
+    <name>未入住</name>
+    <template/>
+  </order_state>
 </entity_order_state>

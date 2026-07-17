@@ -526,6 +526,8 @@ class HotelReservationSystem extends Module
 
         $this->installTab('AdminHotelConfigurationSetting', 'General Settings', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelBedTypes', 'Bed Types', 'AdminCatalog');
+        // parented under core Orders, next to the existing "Statuses" tab — same idea, for booking statuses
+        $this->installTab('AdminBookingStatuses', 'Booking Statuses', 'AdminParentOrders');
         // Controllers without tabs
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
@@ -577,6 +579,7 @@ class HotelReservationSystem extends Module
             || !$objHtlHelper->createHotelRoomDefaultFeatures()
             || !$objHtlHelper->createHotelDefaultBedTypes()
             || !$objHtlHelper->insertHotelCommonFeatures()
+            || !$objHtlHelper->createDefaultBookingStatuses()
         ) {
             return false;
         }

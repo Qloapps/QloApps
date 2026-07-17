@@ -497,7 +497,7 @@ class OrderDetailControllerCore extends FrontController
                         'use_tax' => Configuration::get('PS_TAX'),
                         'group_use_tax' => (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC),
                         'reorderingAllowed' => !(bool) Configuration::get('PS_DISALLOW_HISTORY_REORDERING'),
-                        'ROOM_STATUS_ALLOTED' => HotelBookingDetail::STATUS_ALLOTED,
+                        'ROOM_STATUS_ASSIGNED' => HotelBookingDetail::STATUS_ASSIGNED,
                         'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
                         'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
                     )
@@ -610,12 +610,14 @@ class OrderDetailControllerCore extends FrontController
                         }
 
                         // the room has already been checked in/checked out, room will not be able to be cancelled by the customer
-                        if ($objHotelBookingDetail->id_status != HotelBookingDetail::STATUS_ALLOTED) {
+                        if ($objHotelBookingDetail->id_status != HotelBookingDetail::STATUS_ASSIGNED) {
                             $this->errors[] = Tools::displayError('Some selected rooms have already been checked-in/checked-out.');
                             break;
                         }
 
-                        if (OrderReturn::getOrdersReturnDetail($objOrder->id, 0, $idHtlBooking)) {
+                        // multiple refund requests are now allowed per booking — only still
+                        // block a booking that's already fully refunded, not a re-request
+                        if ($objHotelBookingDetail->is_refunded) {
                             $this->errors[] = Tools::displayError('Some selected rooms have already been requested for cancellation.');
                             break;
                         }
@@ -640,6 +642,7 @@ class OrderDetailControllerCore extends FrontController
                 $objOrderReturn->by_admin = 0;
                 $objOrderReturn->question = $cancellationReason;
                 $objOrderReturn->refunded_amount = 0;
+                $objOrderReturn->event_type = OrderReturn::EVENT_TYPE_REFUND;
                 $objOrderReturn->save();
                 if ($objOrderReturn->id) {
                     if ($idsHtlBooking) {

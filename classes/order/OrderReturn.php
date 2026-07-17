@@ -57,6 +57,9 @@ class OrderReturnCore extends ObjectModel
     /** @var int whether $id_return_type is cart_rule or order_slip */
     public $return_type;
 
+    /** @var int why this refund request exists: EVENT_TYPE_CANCELLATION/_NO_SHOW/_REFUND */
+    public $event_type;
+
     /** @var string Object creation date */
     public $date_add;
 
@@ -66,6 +69,11 @@ class OrderReturnCore extends ObjectModel
     /** possible values for $return_type */
     const RETURN_TYPE_CART_RULE = 1;
     const RETURN_TYPE_ORDER_SLIP = 2;
+
+    /** possible values for $event_type */
+    const EVENT_TYPE_CANCELLATION = 1;
+    const EVENT_TYPE_NO_SHOW = 2;
+    const EVENT_TYPE_REFUND = 3;
 
     /**
      * @see ObjectModel::$definition
@@ -84,6 +92,7 @@ class OrderReturnCore extends ObjectModel
             'by_admin' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_return_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'return_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'event_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
@@ -771,20 +780,36 @@ class OrderReturnCore extends ObjectModel
         return false;
     }
 
-    public function getRefundedAmount($idOrder, $idOrderReturn = 0, $idHtlBooking = 0)
+    /**
+     * @param int $idOrder
+     * @param int $idOrderReturn
+     * @param int $idHtlBooking
+     * @param bool $detailedInfo when true, also returns the number of refund
+     *        requests (not just the refunded amount) — e.g. for the order
+     *        detail page's per-room "Refund" column
+     * @return float|array plain refunded amount by default; array('amount', 'count') when $detailedInfo
+     */
+    public function getRefundedAmount($idOrder, $idOrderReturn = 0, $idHtlBooking = 0, $detailedInfo = false)
     {
-        $sql = 'SELECT SUM(ord.`refunded_amount`) FROM `'._DB_PREFIX_.'order_return_detail` ord';
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON (orr.`id_order_return` = ord.`id_order_return`)';
-        $sql .= ' WHERE orr.`id_order` = '.(int)$idOrder;
+        $where = ' WHERE orr.`id_order` = '.(int) $idOrder;
 
         if ($idOrderReturn) {
-            $sql .= ' AND ord.`id_order_return` = '.(int)$idOrderReturn;
+            $where .= ' AND ord.`id_order_return` = '.(int) $idOrderReturn;
         }
 
         if ($idHtlBooking) {
-            $sql .= ' AND ord.`id_htl_booking` = '.(int)$idHtlBooking;
+            $where .= ' AND ord.`id_htl_booking` = '.(int) $idHtlBooking;
         }
 
+        $from = ' FROM `'._DB_PREFIX_.'order_return_detail` ord
+            LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON (orr.`id_order_return` = ord.`id_order_return`)';
+
+        if ($detailedInfo) {
+            $sql = 'SELECT COUNT(ord.`id_order_return_detail`) AS count, SUM(ord.`refunded_amount`) AS amount'.$from.$where;
+            return Db::getInstance()->getRow($sql);
+        }
+
+        $sql = 'SELECT SUM(ord.`refunded_amount`) AS amount'.$from.$where;
         return Db::getInstance()->getValue($sql);
     }
 }

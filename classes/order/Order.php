@@ -45,6 +45,7 @@ class OrderCore extends ObjectModel
     const ORDER_COMPLETE_REFUND_FLAG = 1;
     const ORDER_COMPLETE_CANCELLATION_FLAG = 2;
     const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
+    const ORDER_COMPLETE_NOSHOW_FLAG = 4;
 
     /** @var int Delivery address id */
     public $id_address_delivery;
@@ -2924,6 +2925,28 @@ class OrderCore extends ObjectModel
             if (count($uniqueRefunded) == 1 && $uniqueRefunded[0] == 1) {
                 return true;
             }
+        // If action is Order::ORDER_COMPLETE_NOSHOW_FLAG then we check every room is
+        // No-show — no mixing with Cancelled. A mixed order (some No-show, some
+        // Cancelled) matches neither this flag nor ORDER_COMPLETE_CANCELLATION_FLAG,
+        // same all-or-nothing strictness that flag already uses.
+        } elseif ($action == Order::ORDER_COMPLETE_NOSHOW_FLAG) {
+            if (empty($list)) {
+                return false;
+            }
+            foreach ($list as $product) {
+                if (isset($product['id_status'])) {
+                    // room booking row
+                    if ($product['id_status'] != HotelBookingDetail::STATUS_NO_SHOW) {
+                        return false;
+                    }
+                } elseif (!$product['is_cancelled']) {
+                    // service products can't be "no-show" — just require them to
+                    // already be resolved, same bar as ORDER_COMPLETE_CANCELLATION_FLAG
+                    return false;
+                }
+            }
+
+            return true;
         // If action is Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG (for cancelled and refund requests) then we will check that all rooms are either cancelled or requested for refund
         } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG) {
             foreach ($list as $product) {
@@ -2956,7 +2979,7 @@ class OrderCore extends ObjectModel
                 foreach ($list as $product) {
                     if ($product['is_refunded'] == 0
                         && !OrderReturn::getOrdersReturnDetail($this->id, 0, isset($product['id']) ? $product['id'] : 0)
-                        && $product['id_status'] == HotelBookingDetail::STATUS_ALLOTED
+                        && $product['id_status'] == HotelBookingDetail::STATUS_ASSIGNED
                     ) {
                         return false;
                     }
@@ -2971,7 +2994,12 @@ class OrderCore extends ObjectModel
     public function getOrderCompleteRefundStatus()
     {
         $idOrderState = 0;
-        if ($this->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
+        // checked first, on purpose: a paid No-show room that's been approved ends up with
+        // is_refunded=1 and is_cancelled=0 (same shape ORDER_COMPLETE_REFUND_FLAG looks for),
+        // so No-show has to win the race or a fully no-show order would wrongly become "Refunded"
+        if ($this->hasCompletelyRefunded(Order::ORDER_COMPLETE_NOSHOW_FLAG)) {
+            $idOrderState = Configuration::get('PS_OS_NO_SHOW');
+        } elseif ($this->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
             $idOrderState = Configuration::get('PS_OS_REFUND');
         } elseif ($this->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
             $idOrderState = Configuration::get('PS_OS_CANCELED');

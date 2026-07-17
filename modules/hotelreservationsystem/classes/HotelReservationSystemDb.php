@@ -186,6 +186,38 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_status` (
+                `id_booking_status` int(11) NOT NULL AUTO_INCREMENT,
+                `color` varchar(32) NOT NULL,
+                `is_terminal` tinyint(1) NOT NULL DEFAULT '0',
+                PRIMARY KEY (`id_booking_status`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_status_lang` (
+                `id_booking_status` int(11) NOT NULL,
+                `id_lang` int(11) NOT NULL,
+                `name` varchar(64) NOT NULL,
+                PRIMARY KEY (`id_booking_status`, `id_lang`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_status_history` (
+                `id_booking_status_history` int(11) NOT NULL AUTO_INCREMENT,
+                `id_htl_booking` int(11) NOT NULL,
+                `id_status_from` int(11) DEFAULT NULL,
+                `id_status_to` int(11) NOT NULL,
+                `id_employee` int(11) DEFAULT NULL,
+                `id_customer` int(11) DEFAULT NULL,
+                `date_add` datetime NOT NULL,
+                PRIMARY KEY (`id_booking_status_history`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_status_history_lang` (
+                `id_booking_status_history` int(11) NOT NULL,
+                `id_lang` int(11) NOT NULL,
+                `remark` text,
+                PRIMARY KEY (`id_booking_status_history`, `id_lang`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_document` (
                 `id_htl_booking_document` int(11) NOT NULL AUTO_INCREMENT,
                 `id_htl_booking` int(11) NOT NULL,
@@ -594,6 +626,10 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_features_lang`,
             `'._DB_PREFIX_.'htl_cart_booking_data`,
             `'._DB_PREFIX_.'htl_booking_detail`,
+            `'._DB_PREFIX_.'htl_booking_status`,
+            `'._DB_PREFIX_.'htl_booking_status_lang`,
+            `'._DB_PREFIX_.'htl_booking_status_history`,
+            `'._DB_PREFIX_.'htl_booking_status_history_lang`,
             `'._DB_PREFIX_.'htl_booking_document`,
             `'._DB_PREFIX_.'htl_booking_demands`,
             `'._DB_PREFIX_.'htl_booking_demands_tax`,

@@ -48,4 +48,8 @@
     <name>Pembayaran sebagian diterima</name>
     <template>partial_payment_accepted</template>
   </order_state>
+  <order_state id="No_show">
+    <name>Ketidakhadiran</name>
+    <template/>
+  </order_state>
 </entity_order_state>

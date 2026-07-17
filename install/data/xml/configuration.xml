@@ -461,6 +461,9 @@
     <configuration id="PS_OS_OVERBOOKING_PARTIAL_PAID" name="PS_OS_OVERBOOKING_PARTIAL_PAID">
 		<value>12</value>
 	</configuration>
+	<configuration id="PS_OS_NO_SHOW" name="PS_OS_NO_SHOW">
+		<value>13</value>
+	</configuration>
 	<!-- <configuration id="PS_OS_AWAITING_PARTIAL_PAYMENT" name="PS_OS_AWAITING_PARTIAL_PAYMENT">
 		<value>13</value>
 	</configuration> -->

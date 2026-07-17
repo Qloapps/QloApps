@@ -1118,7 +1118,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     date('Y-m-d'),
                     date('Y-m-d', strtotime('+1 day')),
                     $idHotels,
-                    HotelBookingDetail::STATUS_ALLOTED
+                    HotelBookingDetail::STATUS_ASSIGNED
                 );
 
                 break;

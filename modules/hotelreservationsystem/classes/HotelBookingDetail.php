@@ -70,9 +70,11 @@ class HotelBookingDetail extends ObjectModel
     public $date_add;
     public $date_upd;
     protected $moduleInstance;
-    const STATUS_ALLOTED = 1;
+    const STATUS_ASSIGNED = 1;
     const STATUS_CHECKED_IN = 2;
     const STATUS_CHECKED_OUT = 3;
+    const STATUS_NO_SHOW = 4;
+    const STATUS_CANCELLED = 5;
 
     // booking allotment types
     const ALLOTMENT_AUTO = 1;
@@ -1615,6 +1617,67 @@ class HotelBookingDetail extends ObjectModel
     }
 
     /**
+     * The only place `id_status` is allowed to change on an already-existing booking row.
+     * Validates the transition against HotelBookingStatus::getAllowedTransitions(), saves,
+     * logs the change to HotelBookingStatusHistory, and fires actionBookingStatusBefore/After.
+     *
+     * Not for setting the initial status when a brand-new booking row is first created —
+     * that's plain field initialization, not a transition, and is unaffected by this method.
+     *
+     * @param int $newStatus one of HotelBookingDetail::STATUS_*
+     * @param array $params optional: 'remark' (string), 'id_employee' (int), 'id_customer' (int)
+     * @return bool
+     */
+    public function changeStatus($newStatus, $params = array())
+    {
+        if (!Validate::isLoadedObject($this)) {
+            return false;
+        }
+
+        $idStatusFrom = (int) $this->id_status;
+
+        if ($idStatusFrom == $newStatus) {
+            return false;
+        }
+
+        if (!in_array($newStatus, HotelBookingStatus::getAllowedTransitions($idStatusFrom))) {
+            return false;
+        }
+
+        Hook::exec('actionBookingStatusBefore', array(
+            'object' => $this,
+            'id_status_from' => $idStatusFrom,
+            'id_status_to' => $newStatus,
+        ));
+
+        $this->id_status = $newStatus;
+
+        if (!$this->save()) {
+            return false;
+        }
+
+        $objHistory = new HotelBookingStatusHistory();
+        $objHistory->id_htl_booking = $this->id;
+        $objHistory->id_status_from = $idStatusFrom;
+        $objHistory->id_status_to = $newStatus;
+        $objHistory->id_employee = isset($params['id_employee']) ? (int) $params['id_employee'] : null;
+        $objHistory->id_customer = isset($params['id_customer']) ? (int) $params['id_customer'] : null;
+        $remark = isset($params['remark']) ? $params['remark'] : '';
+        foreach (Language::getLanguages(true) as $lang) {
+            $objHistory->remark[$lang['id_lang']] = $remark;
+        }
+        $objHistory->save();
+
+        Hook::exec('actionBookingStatusAfter', array(
+            'object' => $this,
+            'id_status_from' => $idStatusFrom,
+            'id_status_to' => $newStatus,
+        ));
+
+        return true;
+    }
+
+    /**
      * [updateBookingOrderStatusBYOrderId :: To update the order status of a room in the booking].
      * @param [int] $order_id   [Id of the order]
      * @param [int] $new_status [Id of the new status of the order to be updated]
@@ -1640,18 +1703,15 @@ class HotelBookingDetail extends ObjectModel
             }
 
             if ($newStatus == self::STATUS_CHECKED_IN) {
-                $objHotelBookingDetail->id_status = $newStatus;
                 $objHotelBookingDetail->check_in = ($statusDate > $dateTo ? $dateTo : $statusDate);
             } elseif ($newStatus == self::STATUS_CHECKED_OUT) {
-                $objHotelBookingDetail->id_status = $newStatus;
                 $objHotelBookingDetail->check_out = ($statusDate > $dateTo ? $dateTo : $statusDate);
             } else {
-                $objHotelBookingDetail->id_status = $newStatus;
                 $objHotelBookingDetail->check_in = '';
                 $objHotelBookingDetail->check_out = '';
             }
 
-            return $objHotelBookingDetail->save();
+            return $objHotelBookingDetail->changeStatus($newStatus);
         }
 
         return false;
@@ -3241,7 +3301,7 @@ class HotelBookingDetail extends ObjectModel
                     $objHtlBooking->id_hotel = $objCartBooking->id_hotel;
                     $objHtlBooking->id_customer = $cart->id_customer;
                     $objHtlBooking->booking_type = $objCartBooking->booking_type;
-                    $objHtlBooking->id_status = self::STATUS_ALLOTED;
+                    $objHtlBooking->id_status = self::STATUS_ASSIGNED;
                     $objHtlBooking->comment = $objCartBooking->comment;
 
                     // For Back Order(Because of cart lock)
@@ -3359,9 +3419,9 @@ class HotelBookingDetail extends ObjectModel
         $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
 
         $pages = array(
-            'STATUS_ALLOTED' => array(
-                'id_status' => self::STATUS_ALLOTED,
-                'name' => $moduleInstance->l('Alloted', 'hotelreservationsystem')
+            'STATUS_ASSIGNED' => array(
+                'id_status' => self::STATUS_ASSIGNED,
+                'name' => $moduleInstance->l('Assigned', 'hotelreservationsystem')
             ),
             'STATUS_CHECKED_IN' => array(
                 'id_status' => self::STATUS_CHECKED_IN,

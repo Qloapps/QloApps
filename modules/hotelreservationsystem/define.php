@@ -29,6 +29,8 @@ require_once 'classes/HotelImage.php';
 require_once 'classes/HotelFeatures.php';
 require_once 'classes/HotelBranchFeatures.php';
 require_once 'classes/HotelBookingDetail.php';
+require_once 'classes/HotelBookingStatus.php';
+require_once 'classes/HotelBookingStatusHistory.php';
 require_once 'classes/HotelCartBookingData.php';
 require_once 'classes/HotelAdvancedPayment.php';
 require_once 'classes/HotelOrderRefundRules.php';
