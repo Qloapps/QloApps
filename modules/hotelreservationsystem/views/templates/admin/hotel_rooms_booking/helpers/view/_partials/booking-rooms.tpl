@@ -40,7 +40,12 @@
                                     <tbody>
                                         {foreach from=$book_v['data']['available'] key=avai_k item=avai_v}
                                             <tr>
-                                                <td>{$avai_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$avai_v type='available'}</td>
+                                                <td>{$avai_v['room_num']|escape:'htmlall':'UTF-8'}
+                                                {if isset($htl_connected_rooms[$avai_v['id_room']]) && $htl_connected_rooms[$avai_v['id_room']]|@count > 0}
+                                                    {include file="controllers/products/connected-rooms.tpl" htl_connected_rooms=$htl_connected_rooms[$avai_v['id_room']]}
+                                                {/if}
+
+                                                {hook h='displayRoomNumAfter' data=$avai_v type='available'}</td>
                                                 {assign var="is_full_date" value=($show_full_date && ($date_from|date_format:'%D' == $date_to|date_format:'%D'))}
                                                 <td>{dateFormat date=$date_from full=$is_full_date} - {dateFormat date=$date_to full=$is_full_date}</td>
                                                 <td>{$avai_v['room_comment']|escape:'htmlall':'UTF-8'}</td>
@@ -132,7 +137,11 @@
                                                             <p>{dateFormat date=$part_v['date_from'] full=$is_full_date} - {dateFormat date=$part_v['date_to'] full=$is_full_date}</p>
                                                         </td>
                                                     {/if}
-                                                    <td >{$sub_part_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$sub_part_v type='partially_available'}</td>
+                                                    <td >{$sub_part_v['room_num']|escape:'htmlall':'UTF-8'}
+                                                    {if isset($htl_connected_rooms[$sub_part_v['id_room']]) && $htl_connected_rooms[$sub_part_v['id_room']]|@count > 0}
+                                                        {include file="controllers/products/connected-rooms.tpl" htl_connected_rooms=$htl_connected_rooms[$sub_part_v['id_room']]}
+                                                    {/if}
+                                                    {hook h='displayRoomNumAfter' data=$sub_part_v type='partially_available'}</td>
                                                     <td>
                                                         {foreach $allotment_types as $allotment_type}
                                                             <label class="control-label">
@@ -217,7 +226,11 @@
                                                 <tr>
                                                     {assign var="is_full_date" value=($show_full_date && ($rm_dtl_v['date_from']|date_format:'%D' == $rm_dtl_v['date_to']|date_format:'%D'))}
                                                     {if $rm_dtl_v@first}
-                                                        <td rowspan="{$booked_v['detail']|count}">{$booked_v['room_num']|escape:'htmlall':'UTF-8'} {hook h='displayRoomNumAfter' data=$booked_v key=$rm_dtl_k type='booked'}</td>
+                                                        <td rowspan="{$booked_v['detail']|count}">{$booked_v['room_num']|escape:'htmlall':'UTF-8'}
+                                                        {if isset($htl_connected_rooms[$booked_v['id_room']]) && $htl_connected_rooms[$booked_v['id_room']]|@count > 0}
+                                                            {include file="controllers/products/connected-rooms.tpl" htl_connected_rooms=$htl_connected_rooms[$booked_v['id_room']]}
+                                                        {/if}
+                                                        {hook h='displayRoomNumAfter' data=$booked_v key=$rm_dtl_k type='booked'}</td>
                                                     {/if}
                                                     <td>{dateFormat date=$rm_dtl_v['date_from'] full=$is_full_date} - {dateFormat date=$rm_dtl_v['date_to'] full=$is_full_date}</td>
                                                     <td><a href="{$link->getAdminLink('AdminOrders')}&id_order={$rm_dtl_v['id_order']|intval}&vieworder" target="_blank">#{$rm_dtl_v['id_order']}</a></td>
@@ -257,7 +270,11 @@
                                             {foreach from=$unavai_v['detail'] key=rm_dtl_k item=unavail_dtl_v}
                                                 <tr>
                                                     {if $unavail_dtl_v@first}
-                                                        <td rowspan="{$unavai_v['detail']|count}">{$unavai_v['room_num']|escape:'htmlall':'UTF-8'}</td>
+                                                        <td rowspan="{$unavai_v['detail']|count}">{$unavai_v['room_num']|escape:'htmlall':'UTF-8'}
+                                                        {if isset($htl_connected_rooms[$unavai_v['id_room']]) && $htl_connected_rooms[$unavai_v['id_room']]|@count > 0}
+                                                            {include file="controllers/products/connected-rooms.tpl" htl_connected_rooms=$htl_connected_rooms[$unavai_v['id_room']]}
+                                                        {/if}
+                                                        </td>
                                                     {/if}
                                                     <td>{HotelRoomInformation::getRoomStatusTitle($unavail_dtl_v['id_status'])|escape:'htmlall':'UTF-8'}</td>
                                                     <td>

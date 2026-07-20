@@ -114,8 +114,8 @@
                         </tr>
                     {/foreach}
                 {/if}
+                {assign var=roomCount value=$roomCount+1}
             {/foreach}
-            {assign var=roomCount value=$roomCount+1}
 		</tbody>
 	</table>
 

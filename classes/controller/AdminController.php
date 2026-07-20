@@ -2010,7 +2010,9 @@ class AdminControllerCore extends Controller
         }
 
         if ($conf = Tools::getValue('conf')) {
-            $this->context->smarty->assign('conf', $this->json ? json_encode($this->_conf[(int)$conf]) : $this->_conf[(int)$conf]);
+            if (isset($this->_conf[$conf])) {
+                $this->context->smarty->assign('conf', $this->json ? json_encode($this->_conf[(int)$conf]) : $this->_conf[(int)$conf]);
+            }
         }
 
         foreach (array('errors', 'warnings', 'informations', 'confirmations') as $type) {
@@ -2307,7 +2309,9 @@ class AdminControllerCore extends Controller
             $this->content .= $this->renderDetails();
         } elseif (!$this->ajax) {
             $this->content .= $this->renderModulesList();
-            $this->content .= $this->renderKpis();
+            if ($this->tabAccess['kpi'] === 1) {
+                $this->content .= $this->renderKpis();
+            }
             $this->content .= $this->renderList();
             $this->content .= $this->renderOptions();
 

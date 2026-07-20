@@ -53,7 +53,7 @@ class HotelBranchInformation extends ObjectModel
             'id_category' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'email' => array('type' => self::TYPE_STRING,'validate' => 'isEmail', 'size' => 255, 'required' => true),
             'id_property_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'check_in' => array('type' => self::TYPE_STRING, 'required' => true),
             'check_out' => array('type' => self::TYPE_STRING, 'required' => true),
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
@@ -1162,7 +1162,7 @@ class HotelBranchInformation extends ObjectModel
     {
         // set additional hotel address and restriction fields validations here
         if (isset($this->webservice_validation) && $this->webservice_validation) {
-            if ($this->rating < 1 || $this->rating > 5) {
+            if ($this->rating && ($this->rating < 1 || $this->rating > 5)) {
                 $message = Tools::displayError('Rating must be between 1 and 5.');
             } elseif (!strtotime($this->check_in)) {
                 $message = Tools::displayError('Check In time is invalid.');
