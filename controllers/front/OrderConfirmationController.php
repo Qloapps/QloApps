@@ -184,7 +184,6 @@ class OrderConfirmationControllerCore extends FrontController
                                 $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
                                 $cart_htl_data[$type_key]['room_type_selling_object'] = $rm_dtl['room_type_selling_object'];
                                 $cart_htl_data[$type_key]['multiple_room_type_selling_object'] = $rm_dtl['multiple_room_type_selling_object'];
-                                $cart_htl_data[$type_key]['isOccupancyType'] = Product::isOccupancyBookingMethod($type_value['product_id']);;
 
                                 foreach ($order_bk_data as $data_k => $data_v) {
                                     $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);

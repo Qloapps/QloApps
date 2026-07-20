@@ -482,51 +482,6 @@
 		</div>
 	{/if}
 
-
-	{assign var="has_booking_method" value=(isset($selected_booking_method) && $selected_booking_method)}
-	<div class="form-group">
-		<div class="col-lg-1"></span></div>
-		<label class="control-label col-lg-2">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Override the global booking method setting for this room type.'}">
-				{l s='Search Type'}
-			</span>
-		</label>
-		<div class="col-lg-9">
-			<span class="switch prestashop-switch fixed-width-lg">
-				<input onclick="showBookingMehtodOption(true);" type="radio" name="booking_method_switch" id="booking_method_on" value="1" {if $has_booking_method}checked="checked" {/if} />
-				<label for="booking_method_on" class="radioCheck">
-					{l s='Yes'}
-				</label>
-				<input onclick="showBookingMehtodOption(false);"  type="radio" name="booking_method_switch" id="booking_method_off" value="0" {if !$has_booking_method }checked="checked"{/if} />
-				<label for="booking_method_off" class="radioCheck">
-					{l s='No'}
-				</label>
-				<a class="slide-button btn"></a>
-			</span>
-			<p class="help-block">
-				{l s='Disabled state uses the,'} <a href="{$global_booking_config_link|escape:'html':'UTF-8'}" target="_blank">{l s='global booking search type '}</a> {l s='setting is used.'}
-			</p>
-		</div>
-	</div>
-
-	<div class="form-group booking_method_product_options" {if !$has_booking_method}style="display:none;"{/if}>
-		<label class="control-label col-sm-3">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Override the global booking method setting for this room type.'}">
-				{l s='Booking Method'}
-			</span>
-		</label>
-		<div class="col-sm-5">
-			<div id="booking_method_select" class="margin-top-5" {if !$has_booking_method}style="display:none;"{/if}>
-				<select name="booking_method" id="booking_method" class="form-control" {if !$has_booking_method}disabled="disabled"{/if}>
-					{foreach from=$booking_methods_info item=booking_method_info}
-						<option value="{$booking_method_info['id']}" {if $has_booking_method && $booking_method_info['id'] == $selected_booking_method}selected{/if}>
-							{$booking_method_info['name']}
-						</option>
-					{/foreach}
-				</select>
-			</div>
-		</div>
-	</div>
 	<div class="form-group" id="bed_types_selection">
 		<label class="control-label col-sm-3">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select all bed types available for this room type.'}">

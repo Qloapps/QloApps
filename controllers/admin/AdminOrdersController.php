@@ -473,6 +473,11 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
 
+                $occupancyRequiredForBooking = false;
+                if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                    $occupancyRequiredForBooking = true;
+                }
+
                 $objHotelAdvancedPayment = new HotelAdvancedPayment();
                 $this->context->smarty->assign(array(
                     'order_total' => $cart->getOrderTotal(true),
@@ -488,6 +493,7 @@ class AdminOrdersControllerCore extends AdminController
                     'PAYMENT_TYPE_PAY_AT_HOTEL' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                     'currency' => new Currency((int)$cart->id_currency),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+                    'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 ));
 
             } else {

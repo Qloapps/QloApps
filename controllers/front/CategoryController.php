@@ -220,13 +220,6 @@ class CategoryControllerCore extends FrontController
 
                     array_multisort($indi_arr, $direction, $booking_data['rm_data']);
                 }
-
-                foreach ($booking_data['rm_data'] as $roomKey => $roomData) {
-                    if (isset($roomData['id_product'])) {
-                        $booking_data['rm_data'][$roomKey]['occupancy_required_for_booking'] =
-                            (int) Product::isOccupancyBookingMethod($roomData['id_product']);
-                    }
-                }
             }
 
             $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);

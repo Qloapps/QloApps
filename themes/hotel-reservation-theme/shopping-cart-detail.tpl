@@ -101,7 +101,7 @@
                                     <p class="room_duration_block_value">{$rm_v['data_to']|date_format:"%d %b, %a"}{if $is_full_date} {$rm_v['data_to']|date_format:"%H:%M"}{/if}</p>
                                 </div>
                                 <div class="col-sm-6 col-xs-6">
-                                    {if isset($data_v['isOccupancyType']) && $data_v['isOccupancyType']}
+                                    {if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
                                         <p class="room_duration_block_head">{l s='OCCUPANCY'}</p>
                                         <p class="room_duration_block_value">
                                             {if {$rm_v['adults']} <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {$data_v['multiple_room_type_selling_object']|escape:'html':'UTF-8'}{else} {$data_v['room_type_selling_object']|escape:'html':'UTF-8'}{/if}

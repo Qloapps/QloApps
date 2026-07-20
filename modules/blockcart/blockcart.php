@@ -308,7 +308,11 @@ class Blockcart extends Module
             $room_info =  $objRoomType->getRoomTypeInfoByIdProduct($objProduct->id, $this->context->language->id);
             $addedProduct['room_info'] = $room_info;
             if ($objProduct->booking_product) {
-                $addedProduct['occupancy_required_for_booking'] = (bool) Product::isOccupancyBookingMethod($objProduct->id);
+                $occupancyRequiredForBooking = false;
+                if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                    $occupancyRequiredForBooking = true;
+                }
+                $addedProduct['occupancy_required_for_booking'] = $occupancyRequiredForBooking;
                 $addedProduct['layer_cart_attribute_label'] = $addedProduct['occupancy_required_for_booking']
                     ? sprintf($this->l('%s occupancy'), $room_info['room_type_selling_object'])
                     : sprintf($this->l('%s quantity added'), $room_info['multiple_room_type_selling_object']);
@@ -475,8 +479,6 @@ class Blockcart extends Module
         $res = $this->getContentVars($params);
 
         if (is_array($res) && ($id_product = Tools::getValue('id_product')) && Configuration::get('PS_BLOCK_CART_SHOW_CROSSSELLING')) {
-            $isOccupancyType = Product::isOccupancyBookingMethod($id_product);
-            $this->context->smarty->assign('occupancy_required_for_booking', $isOccupancyType);
             $this->smarty->assign('orderProducts', OrderDetail::getCrossSells($id_product, $this->context->language->id, Configuration::get('PS_BLOCK_CART_XSELL_LIMIT')));
             $res['crossSelling'] = $this->display(__FILE__, 'crossselling.tpl');
         }

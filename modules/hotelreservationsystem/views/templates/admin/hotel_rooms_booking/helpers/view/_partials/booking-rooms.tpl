@@ -31,7 +31,7 @@
                                             <th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
-                                            {if $book_v.occupancy_required_for_booking}
+                                            {if $occupancy_required_for_booking}
                                                 <th class="fixed-width-xxl"><span class="title_box">{l s='Guests' mod='hotelreservationsystem'}</span></th>
                                             {/if}
                                             <th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
@@ -53,8 +53,8 @@
                                                     {/foreach}
                                                     <input type="text" id="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" name="comment_{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
                                                 </td>
-                                                {if $book_v.occupancy_required_for_booking}
-                                                    <td class="booking_occupancy" data-occupancy-required="{$book_v.occupancy_required_for_booking|intval}">
+                                                {if $occupancy_required_for_booking}
+                                                    <td class="booking_occupancy">
                                                         <div class="dropdown">
                                                             <button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
                                                                 <span>{l s='Select occupancy' mod='hotelreservationsystem'}</span>
@@ -100,7 +100,7 @@
                                                     </td>
                                                 {/if}
                                                 <td>
-                                                    <button data-occupancy-required="{$book_v.occupancy_required_for_booking}"  type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+                                                    <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
                                                 </td>
                                             </tr>
                                         {/foreach}
@@ -116,7 +116,7 @@
                                             <th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='%s No.' sprintf=$book_v['room_type_selling_object'] mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Allotment Type' mod='hotelreservationsystem'}</span></th>
-                                            {if $book_v.occupancy_required_for_booking}
+                                            {if $occupancy_required_for_booking}
                                                 <th class="fixed-width-xxl"><span class="title_box">{l s='Guests' mod='hotelreservationsystem'}</span></th>
                                             {/if}
                                             <th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
@@ -142,8 +142,8 @@
                                                         {/foreach}
                                                         <input type="text" id="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" name="comment_{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}_{$sub_part_k|escape:'htmlall':'UTF-8'}" class="form-control booking_type_comment" placeholder="{l s='Allotment message' mod='hotelreservationsystem'}">
                                                     </td>
-                                                    {if $book_v.occupancy_required_for_booking}
-                                                        <td class="booking_occupancy" data-occupancy-required="{$book_v.occupancy_required_for_booking|intval}">
+                                                    {if $occupancy_required_for_booking}
+                                                        <td class="booking_occupancy">
                                                             <div class="dropdown">
                                                                 <button class="btn btn-default btn-left btn-block booking_guest_occupancy input-occupancy" type="button">
                                                                     <span>{l s='Select occupancy' mod='hotelreservationsystem'}</span>
@@ -189,7 +189,7 @@
                                                         </td>
                                                     {/if}
                                                     <td>
-                                                        <button data-occupancy-required="{$book_v.occupancy_required_for_booking}" type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$sub_part_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$sub_part_v['id_hotel']|escape:'htmlall':'UTF-8'}" data-date-from="{$part_v['date_from']|escape:'htmlall':'UTF-8'}" data-date-to ="{$part_v['date_to']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+                                                        <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$sub_part_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$sub_part_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$sub_part_v['id_hotel']|escape:'htmlall':'UTF-8'}" data-date-from="{$part_v['date_from']|escape:'htmlall':'UTF-8'}" data-date-to ="{$part_v['date_to']|escape:'htmlall':'UTF-8'}" data-sub-key="{$sub_part_k|escape:'htmlall':'UTF-8'}" class="btn btn-primary par_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
                                                     </td>
                                                 </tr>
                                             {/foreach}

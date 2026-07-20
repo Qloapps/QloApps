@@ -576,18 +576,6 @@ function redirectSelectChange()
 		showRedirectProductSelectOptions(true);
 }
 
-function showBookingMehtodOption(show)
-{
-	if (show) {
-		$('.booking_method_product_options').fadeIn();
-		$('#booking_method_select').show();
-		$('#booking_method').prop('disabled', false);
-	} else {
-		$('.booking_method_product_options').fadeOut();
-		$('#booking_method').prop('disabled', true);
-	}
-}
-
 function addRelatedProduct(id_product_to_add, product_name)
 {
 	if (!id_product_to_add || id_product == id_product_to_add)

@@ -459,8 +459,12 @@ class HotelCartBookingData extends ObjectModel
         $chkQty = 0;
         $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);
         $objServiceProductCartDetail = new ServiceProductCartDetail();
-        $isOccupancyBooking = Product::isOccupancyBookingMethod($id_product);
-        if ($isOccupancyBooking) {
+        if (defined('_PS_ADMIN_DIR_')) {
+            $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE');
+        } else {
+            $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE');
+        }
+        if ($PS_ROOM_UNIT_SELECTION_TYPE == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             $roomsRequired = count($occupancy);
         } else {
             $objRoomType = new HotelRoomType();
@@ -486,7 +490,7 @@ class HotelCartBookingData extends ObjectModel
                     $obj_htl_cart_booking_data->date_to = $date_to;
                     $obj_htl_cart_booking_data->booking_type = $booking_type;
                     $obj_htl_cart_booking_data->comment = $comment;
-                    if ($isOccupancyBooking) {
+                    if ($PS_ROOM_UNIT_SELECTION_TYPE == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                         $room_occupancy = array_shift($occupancy);
                         $obj_htl_cart_booking_data->adults = $room_occupancy['adults'];
                         $obj_htl_cart_booking_data->children = $room_occupancy['children'];
@@ -590,8 +594,12 @@ class HotelCartBookingData extends ObjectModel
                 'id_cart' => $id_cart,
                 'id_guest' => $id_guest,
             );
-            $isOccupancyBooking = Product::isOccupancyBookingMethod($id_product);
-            if ($isOccupancyBooking) {
+            if (defined('_PS_ADMIN_DIR_')) {
+                $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE');
+            } else {
+                $PS_ROOM_UNIT_SELECTION_TYPE = Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE');
+            }
+            if ($PS_ROOM_UNIT_SELECTION_TYPE == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
                 $roomsRequired = count($occupancy);
             } else {
                 $roomsRequired = $occupancy;
@@ -1170,8 +1178,6 @@ class HotelCartBookingData extends ObjectModel
                 $cart_detail_data[$key]['room_num'] = $obj_htl_room_info->room_num;
                 $cart_detail_data[$key]['date_from'] = $value['date_from'];
                 $cart_detail_data[$key]['date_to'] = $value['date_to'];
-                $cart_detail_data[$key]['occupancy_required_for_booking'] =
-                    Product::isOccupancyBookingMethod($value['id_product']);
 
                 $cart_detail_data[$key]['child_ages'] = json_decode($value['child_ages']);
                 $occupancy = array(
@@ -1559,7 +1565,6 @@ class HotelCartBookingData extends ObjectModel
                         $cartHotelData[$prodKey]['name'] = $objProduct->name;
                         $cartHotelData[$prodKey]['room_type_selling_object'] = $roomDetail['room_type_selling_object'];
                         $cartHotelData[$prodKey]['multiple_room_type_selling_object'] = $roomDetail['multiple_room_type_selling_object'];
-                        $cartHotelData[$prodKey]['isOccupancyType'] = Product::isOccupancyBookingMethod($product['id_product']);;
                         $cartHotelData[$prodKey]['unit_price'] = $unitPrice;
                         $cartHotelData[$prodKey]['unit_price_without_reduction'] = $unitPriceWithoutReduction;
                         $cartHotelData[$prodKey]['total_room_type_amount'] = 0;

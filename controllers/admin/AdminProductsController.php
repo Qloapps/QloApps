@@ -2347,7 +2347,6 @@ class AdminProductsControllerCore extends AdminController
             $saveShort = Tools::getValue('description_short');
             $_POST['description_short'] = strip_tags(Tools::getValue('description_short'));
         }
-        $_POST['booking_method'] = Tools::getValue('booking_method_switch') ? (int)Tools::getValue('booking_method') : 0;
         $_POST['id_room_type_selling_object'] = Tools::getValue('id_room_type_selling_object') ?? 0;
 
         // Check description short size without html
@@ -4600,9 +4599,6 @@ class AdminProductsControllerCore extends AdminController
         $objHotelBedType = new HotelBedType();
         $bedTypes = $objHotelBedType->getAllBedTypes($this->context->language->id);
         $data->assign('bed_types_info', $bedTypes);
-        $bookingMethods = $this->getRoomTypeBookingMethods();
-        $data->assign('booking_methods_info', $bookingMethods);
-        $data->assign('global_booking_config_link', $this->context->link->getAdminLink('AdminPPreferences'));
         $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
         if ($selectedBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($product->id)) {
             $selectedBedTypes = array_column($selectedBedTypes, 'id_bed_type');
@@ -4613,9 +4609,6 @@ class AdminProductsControllerCore extends AdminController
         $data->assign('room_type_selling_object_info', $roomTypeSellingObjects);
         if (!empty($product->id_room_type_selling_object)) {
             $data->assign('selected_room_type_selling_object', $product->id_room_type_selling_object);
-        }
-        if (!empty($product->booking_method)) {
-            $data->assign('selected_booking_method', $product->booking_method);
         }
 
         $this->tpl_form_vars['product'] = $product;
@@ -5720,13 +5713,5 @@ class AdminProductsControllerCore extends AdminController
         ));
 
         return $tpl->fetch();
-    }
-
-    public function getRoomTypeBookingMethods()
-    {
-        return array(
-            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY, 'name' => $this->l('Stay Occupancy')),
-            array('id' => HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_QUANTITY, 'name' => $this->l('Stays Quantity (No. of stays)')),
-        );
     }
 }

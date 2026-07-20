@@ -368,16 +368,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         );
 
         $allotmentTypes = HotelBookingDetail::getAllAllotmentTypes();
-
-        foreach ($booking_data['rm_data'] as $roomKey => $roomData) {
-            if (!isset($roomData['id_product'])) {
-                continue;
-            }
-
-            $booking_data['rm_data'][$roomKey]['occupancy_required_for_booking'] =
-               (int) Product::isOccupancyBookingMethod($roomData['id_product']);
+        $occupancyRequiredForBooking = false;
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $occupancyRequiredForBooking = true;
         }
-        
+
         $this->context->smarty->assign(array(
             'adults' => $adults,
             'children' => $children,
@@ -387,6 +382,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'occupancy' => $this->occupancy,
             'date_from' => $this->date_from,
             'date_to' => $this->date_to,
+            'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'link' => $this->context->link,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
@@ -687,7 +683,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $date_from = Tools::getValue('date_from');
         $date_to = Tools::getValue('date_to');
         $occupancy = Tools::getValue('occupancy');
-        if (Product::isOccupancyBookingMethod($id_product)) {
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             if (!Validate::isOccupancy($occupancy)) {
                 $occupancy = array();
             }
@@ -962,6 +958,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     {
         parent::setMedia();
         $currency = new Currency((int)Configuration::get('PS_CURRENCY_DEFAULT'));
+        $occupancyRequiredForBooking = false;
+        if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+            $occupancyRequiredForBooking = true;
+        }
         if ($this->context->employee->isSuperAdmin()) {
             $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
         } else {

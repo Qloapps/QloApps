@@ -136,7 +136,6 @@ var ajaxCart = {
 
             var dateFrom = $(this).attr('cat_rm_check_in');
             var dateTo = $(this).attr('cat_rm_check_out');
-            occupancy_required_for_booking = $(this).closest('.booking_room_fields').data('occupancy-required');
             var occupancy = getBookingOccupancyDetails($(this).closest('.booking_room_fields'), true);
             /* By Webkul
              * Note : In our case minimalQuantity is taken from Qty. field
@@ -1503,4 +1502,3 @@ function getBookingOccupancyDetails(bookingform, booking_product)
 
     return occupancy;
 }
-

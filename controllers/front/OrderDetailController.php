@@ -134,8 +134,6 @@ class OrderDetailControllerCore extends FrontController
                             if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($type_value['product_id'])) {
                                 $cartHotelData[$type_key]['room_type_selling_object'] = $roomTypeInfo['room_type_selling_object'];
                                 $cartHotelData[$type_key]['multiple_room_type_selling_object'] = $roomTypeInfo['multiple_room_type_selling_object'];
-                                $cart_htl_data[$type_key]['isOccupancyType'] = Product::isOccupancyBookingMethod($type_value['product_id']);;
-
                             }
 
 

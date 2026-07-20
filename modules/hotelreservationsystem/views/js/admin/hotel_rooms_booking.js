@@ -296,23 +296,15 @@ $(document).ready(function() {
 
     function getBookingOccupancyDetails(bookingform)
     {
-        if (!bookingform || !bookingform.length) {
-            return 1;
-        }
-
-        var isOccupancy = $(bookingform).data('occupancy-required');
-        if (typeof isOccupancy === 'undefined') {
-            isOccupancy = (typeof occupancy_required_for_booking !== 'undefined') ? occupancy_required_for_booking : false;
-        }
-        var occupancy;
-        if (isOccupancy) {
+        let occupancy;
+        if (occupancy_required_for_booking) {
             $('.booking_occupancy_wrapper').parent().removeClass('open');
-            var selected_occupancy = $(bookingform).find(".occupancy_info_block.selected");
+            let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
             if (selected_occupancy.length) {
                 occupancy = [];
                 $(selected_occupancy).each(function(ind, element) {
                     if (parseInt($(element).find('.num_adults').val())) {
-                        var child_ages = [];
+                        let child_ages = [];
                         $(element).find('.guest_child_age').each(function(index) {
                             if ($(this).val() > -1) {
                                 child_ages.push($(this).val());
