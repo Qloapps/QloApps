@@ -133,16 +133,14 @@ class HotelBookingDocument extends ObjectModel
 
     public function getDestinationFilePath()
     {
-        $fileExtension = pathinfo($this->fileInfo['rename'], PATHINFO_EXTENSION);
-
-        return $this->documentFolder.$this->id.'.'.$fileExtension;
+        return $this->documentFolder.$this->id.'.'.$this->getFileExtension();
     }
 
     public function setFileType()
     {
         if (ImageManager::isRealImage($this->fileInfo['tmp_name'])) {
             $this->file_type = self::FILE_TYPE_IMAGE;
-        } elseif ($this->fileInfo['mime'] == 'application/pdf') {
+        } elseif (substr((string) @file_get_contents($this->fileInfo['tmp_name'], false, null, 0, 5), 0, 5) === '%PDF-') {
             $this->file_type = self::FILE_TYPE_PDF;
         } else {
             $this->file_type = 0;
@@ -151,8 +149,16 @@ class HotelBookingDocument extends ObjectModel
 
     public function setFileName()
     {
-        $fileExtension = pathinfo($this->fileInfo['rename'], PATHINFO_EXTENSION);
-        $this->file_name = $this->id.'.'.$fileExtension;
+        $this->file_name = $this->id.'.'.$this->getFileExtension();
+    }
+
+    /**
+     * Extension is derived from the validated file_type, never from the
+     * uploaded filename/mime header (both are attacker-controlled).
+     */
+    public function getFileExtension()
+    {
+        return $this->file_type == self::FILE_TYPE_PDF ? 'pdf' : 'jpg';
     }
 
     public function getContentType()
