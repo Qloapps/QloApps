@@ -40,6 +40,7 @@
                                 <th><span class="title_box">{l s='Refund/Cancel Status'}</span></th>
                                 <th><span class="title_box">{l s='Refunded amount'}</span></th>
                             {/if}
+                            {hook h='displayOrderRoomsBookingsTableHeading' order=$order}
                             {if ($can_edit && !$order->hasBeenDelivered())}
                             <th class="fixed-width-md"><span class="title_box">{l s='Actions'}</th>
                             {/if}
