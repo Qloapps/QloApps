@@ -322,7 +322,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             $invoiceAddressPatternRules['avoid'][] = 'lastname';
             if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order_obj->id)) {
                 $objHotelBranchInfo = new HotelBranchInformation((int) $idHotel, $context->language->id);
-                $propertyType = HotelPropertyType::getPropertyType($idHotel);
                 $invoiceAddressPatternRules['avoid'][] = 'lastname';
                 if ($idHotelAddress = $objHotelBranchInfo->getHotelIdAddress()) {
                     $objHotelAddress = new Address((int) $idHotelAddress);
@@ -374,6 +373,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $unit_price_tax_incl = $order_details_obj->unit_price_tax_incl;
 
                             $cart_htl_data[$type_key]['hotel_name'] = $data_v['hotel_name'];
+                            $propertyType = $data_v['property_type_name'];
+
                             $cart_htl_data[$type_key]['name'] = $order_details_obj->product_name;
                             $cart_htl_data[$type_key]['unit_price_tax_excl'] = $unit_price_tax_excl;
                             $cart_htl_data[$type_key]['unit_price_tax_incl'] = $unit_price_tax_incl;

@@ -117,7 +117,7 @@
 																<div class="row">
 																	<div class="col-xs-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{if $rm_v.num_rm > 1}{$data_v['multiple_room_type_selling_object']|escape:'html':'UTF-8'}{else}{$data_v['room_type_selling_object']|escape:'html':'UTF-8'}{/if}</dt>
+																			<dt class="col-xs-5">{if $rm_v.num_rm > 1}{$data_v['multiple_room_type_selling_object']|escape:'html':'UTF-8'}{else}{$data_v['room_type_selling_object']}{/if}</dt>
 																			<dd class="col-xs-7">{$rm_v.num_rm|string_format:'%02d'}</dd>
 																		</div>
 																	</div>

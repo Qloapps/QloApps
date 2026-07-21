@@ -182,6 +182,8 @@ class HotelReservationSystemDb
                 `is_back_order` tinyint(4) NOT NULL,
                 `hotel_name` varchar(255) DEFAULT NULL,
                 `room_type_name` varchar(255) DEFAULT NULL,
+                `room_type_selling_object_name` varchar(255) DEFAULT NULL,
+                `property_type_name` varchar(255) DEFAULT NULL,
                 `city` varchar(255) NOT NULL,
                 `state` varchar(255) DEFAULT NULL,
                 `country` varchar(255) DEFAULT NULL,

@@ -16,10 +16,10 @@
                         </div>
                     </div>
                     <ul class="nav nav-tabs">
-                        <li class="active"><a href="#avail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Available %s' sprintf=$book_v['room_type_selling_object']|cat:'s' mod='hotelreservationsystem'}</a></li>
+                        <li class="active"><a href="#avail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Available %s' sprintf=$book_v['multiple_room_type_selling_object'] mod='hotelreservationsystem'}</a></li>
                         <li><a href="#part_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Partially Available' mod='hotelreservationsystem'}</a></li>
-                        <li><a href="#book_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Booked %s' sprintf=$book_v['room_type_selling_object']|cat:'s' mod='hotelreservationsystem'}</a></li>
-                        <li><a href="#unavail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Unavailable %s' sprintf=$book_v['room_type_selling_object']|cat:'s' mod='hotelreservationsystem'}</a></li>
+                        <li><a href="#book_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Booked %s' sprintf=$book_v['multiple_room_type_selling_object'] mod='hotelreservationsystem'}</a></li>
+                        <li><a href="#unavail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" data-toggle="tab">{l s='Unavailable %s' sprintf=$book_v['multiple_room_type_selling_object'] mod='hotelreservationsystem'}</a></li>
                     </ul>
                     <div class="tab-content panel">
                         <div id="avail_room_data_{$book_k|escape:'htmlall':'UTF-8'}" class="tab-pane active">

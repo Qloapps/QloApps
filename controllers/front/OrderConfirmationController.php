@@ -182,8 +182,13 @@ class OrderConfirmationControllerCore extends FrontController
                                 $cart_htl_data[$type_key]['cover_img'] = $cover_img;
                                 $cart_htl_data[$type_key]['adults'] = $rm_dtl['adults'];
                                 $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
-                                $cart_htl_data[$type_key]['room_type_selling_object'] = $rm_dtl['room_type_selling_object'];
-                                $cart_htl_data[$type_key]['multiple_room_type_selling_object'] = $rm_dtl['multiple_room_type_selling_object'];
+
+                                // Prefer the name stored at order-creation time so it stays historically accurate
+                                if (!empty($order_bk_data[0]['room_type_selling_object_name'])) {
+                                    $sellingObjectNames = explode('|', $order_bk_data[0]['room_type_selling_object_name']);
+                                    $cart_htl_data[$type_key]['room_type_selling_object'] = $sellingObjectNames[0];
+                                    $cart_htl_data[$type_key]['multiple_room_type_selling_object'] = $sellingObjectNames[1];
+                                }
 
                                 foreach ($order_bk_data as $data_k => $data_v) {
                                     $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);

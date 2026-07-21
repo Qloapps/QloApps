@@ -40,15 +40,16 @@ class HotelPropertyType extends ObjectModel
         ),
     );
 
-    public function delete()
+    /**
+     * Check if this property type is currently assigned to any property.
+     *
+     * @return bool
+     */
+    public function isUsed()
     {
-        Db::getInstance()->update(
-            'htl_branch_info',
-            array('id_property_type' => 0),
-            '`id_property_type` = '.(int)$this->id
+        return (bool) Db::getInstance()->getValue(
+            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'htl_branch_info` WHERE `id_property_type` = '.(int) $this->id
         );
-
-        return parent::delete();
     }
 
     /**
@@ -77,8 +78,8 @@ class HotelPropertyType extends ObjectModel
         }
 
         $propertyType = Cache::retrieve($cacheKey);
-
-        return $propertyType ? $propertyType : Translate::getModuleTranslation('hotelreservationsystem', 'Hotel', 'HotelPropertyType');
+        $module = Module::getInstanceByName('hotelreservationsystem');
+        return $propertyType ? $propertyType : $module->l('Hotel', 'HotelPropertyType');
     }
 
     /**

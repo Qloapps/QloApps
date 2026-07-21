@@ -101,6 +101,7 @@ class OrderDetailControllerCore extends FrontController
                 $total_convenience_fee_te = 0;
                 $total_convenience_fee_ti = 0;
                 $roomTypes = array();
+                $propertyType = null;
                 $objOrderReturn = new OrderReturn();
                 $refundedAmount = 0;
                 $refundedAmount = $objOrderReturn->getRefundedAmount($order->id);
@@ -131,9 +132,12 @@ class OrderDetailControllerCore extends FrontController
                             }
                             $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                             $cartHotelData[$type_key]['cover_img'] = $type_value['cover_img'];
-                            if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($type_value['product_id'])) {
-                                $cartHotelData[$type_key]['room_type_selling_object'] = $roomTypeInfo['room_type_selling_object'];
-                                $cartHotelData[$type_key]['multiple_room_type_selling_object'] = $roomTypeInfo['multiple_room_type_selling_object'];
+
+                            // Prefer the name stored at order-creation time so it stays historically accurate
+                            if (!empty($order_bk_data[0]['room_type_selling_object_name'])) {
+                                $sellingObjectNames = explode('|', $order_bk_data[0]['room_type_selling_object_name']);
+                                $cartHotelData[$type_key]['room_type_selling_object'] = $sellingObjectNames[0];
+                                $cartHotelData[$type_key]['multiple_room_type_selling_object'] = $sellingObjectNames[1];
                             }
 
 
@@ -275,6 +279,7 @@ class OrderDetailControllerCore extends FrontController
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
 
                                 $cartHotelData[$type_key]['hotel_name'] = $data_v['hotel_name'];
+                                $propertyType = $data_v['property_type_name'];
                                 // add additional services products in hotel detail.
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services'] = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                                     $id_order,
@@ -451,12 +456,12 @@ class OrderDetailControllerCore extends FrontController
                 if ($idHotel = $addressTax->id_hotel) {
                     $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                     $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
-                    $propertyName = HotelPropertyType::getPropertyType($idHotel);
+                    // Prefer the name stored at order-creation time so it stays historically accurate
                     $objHotelBranchRefundRules = new HotelBranchRefundRules();
                     $hotelRefundRules = $objHotelBranchRefundRules->getHotelRefundRules($idHotel, 0, 1);
                     $this->context->smarty->assign(array(
                         'obj_hotel_branch_information' => $objHotelBranchInformation,
-                        'property_name' => $propertyName,
+                        'property_type' => $propertyType,
                         'hotel_address_info' => $hotelAddressInfo,
                         'hotel_refund_rules' => $hotelRefundRules,
                     ));

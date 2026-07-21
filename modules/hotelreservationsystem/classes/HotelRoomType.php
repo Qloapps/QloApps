@@ -237,7 +237,7 @@ class HotelRoomType extends ObjectModel
 
         $sql = 'SELECT hrt.*, hbl.`hotel_name`,
                     hrtstl.`name` AS `room_type_selling_object`,
-                    CONCAT(hrtstl.`name`, "s") AS `multiple_room_type_selling_object`
+                    hrtstl.`name_plural` AS `multiple_room_type_selling_object`
                 FROM `'._DB_PREFIX_.'htl_room_type` AS hrt
                 INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbl
                     ON (hbl.`id` = hrt.`id_hotel`
@@ -255,8 +255,9 @@ class HotelRoomType extends ObjectModel
         $result = Db::getInstance()->getRow($sql);
 
         if ($result && !$result['room_type_selling_object']) {
-            $result['room_type_selling_object'] = Translate::getModuleTranslation('hotelreservationsystem', 'Room', 'HotelRoomType');
-            $result['multiple_room_type_selling_object'] = Translate::getModuleTranslation('hotelreservationsystem', 'Rooms', 'HotelRoomType');
+            $module = Module::getInstanceByName('hotelreservationsystem');
+            $result['room_type_selling_object'] = $module->l('Room', 'HotelRoomType');
+            $result['multiple_room_type_selling_object'] = $module->l('Rooms', 'HotelRoomType');
         }
 
         return $result;
@@ -317,7 +318,7 @@ class HotelRoomType extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
-        $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`, hrtstl.`name` AS `room_type_selling_object`, CONCAT(hrtstl.`name`, "s") AS `multiple_room_type_selling_object`
+        $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`, hrtstl.`name` AS `room_type_selling_object`, hrtstl.`name_plural` AS `multiple_room_type_selling_object`
         '.($position ? ', cp.`position`' : '').'
         '.($fullDetail ? ', pl.`link_rewrite`, pl.`description_short`' : '').'
         FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
@@ -344,8 +345,9 @@ class HotelRoomType extends ObjectModel
 
         foreach ($results as &$row) {
             if (!$row['room_type_selling_object']) {
-                $row['room_type_selling_object'] = Translate::getModuleTranslation('hotelreservationsystem', 'Room', 'HotelRoomType');
-                $row['multiple_room_type_selling_object'] = Translate::getModuleTranslation('hotelreservationsystem', 'Rooms', 'HotelRoomType');
+                $module = Module::getInstanceByName('hotelreservationsystem');
+                $row['room_type_selling_object'] = $module->l('Room', 'HotelRoomType');
+                $row['multiple_room_type_selling_object'] = $module->l('Rooms', 'HotelRoomType');
             }
         }
         unset($row);

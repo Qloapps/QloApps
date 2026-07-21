@@ -78,7 +78,7 @@
                     {if isset($obj_hotel_branch_information) && $obj_hotel_branch_information}
                         <div class="card hotel-details">
                             <div class="card-header">
-                                {l s='%s Details'  sprintf=[$property_name|default:'Hotel']}
+                                {l s='%s Details'  sprintf=$property_type}
                                 <div class="booking-actions-wrap">
                                     <div class="row">
                                         <div class="col-xs-12 clearfix">
@@ -102,7 +102,7 @@
                                     <div class="description-list">
                                         <dl class="">
                                             <div class="row">
-                                                <dt class="col-xs-6 col-sm-3">{l s='%s Name' sprintf=[$property_name|default:'Hotel']}</dt>
+                                                <dt class="col-xs-6 col-sm-3">{l s='%s Name' sprintf=$property_type}</dt>
                                                 <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
                                                 <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
                                                 <dd class="col-xs-6 col-sm-3">
@@ -186,7 +186,7 @@
                     {if isset($obj_hotel_branch_information)}
                         <div class="card hotel-location visible-xs visible-sm hidden-md hidden-lg">
                             <div class="card-header">
-                                {l s='%s Location' sprintf=[$property_name|default:'Hotel']}
+                                {l s='%s Location' sprintf=$property_type}
                             </div>
                             <div class="card-body">
                                 <p class="card-subtitle">
@@ -201,7 +201,7 @@
                                         {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
                                     </p>
                                 {else}
-                                    <div class="card-text">{l s='%s location not available.' sprintf=[$property_name|default:'Hotel']}</div>
+                                    <div class="card-text">{l s='%s location not available.' sprintf=$property_type}</div>
                                 {/if}
 
                                 {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
@@ -504,7 +504,7 @@
                                     <ul class="nav nav-tabs">
                                         {if $has_general_hotel_policies}
                                             <li class="active">
-                                                <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='%s Policies' sprintf=[$property_name|default:'Hotel']}</a>
+                                                <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='%s Policies' sprintf=$property_type}</a>
                                             </li>
                                         {/if}
                                         {if $has_refund_hotel_policies}
@@ -695,7 +695,7 @@
                     {if isset($obj_hotel_branch_information)}
                         <div class="card hotel-location hidden-xs hidden-sm visible-md">
                             <div class="card-header">
-                                {l s='%s Location' sprintf=[$property_name|default:'Hotel']}
+                                {l s='%s Location' sprintf=$property_type}
                             </div>
                             <div class="card-body">
                                 <p class="card-subtitle">
@@ -711,7 +711,7 @@
                                         {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
                                     </p>
                                 {else}
-                                    <div class="card-text">{l s='%s location not available.' sprintf=[$property_name|default:'Hotel'] }</div>
+                                    <div class="card-text">{l s='%s location not available.' sprintf=$property_type}</div>
                                 {/if}
 
                                 {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}

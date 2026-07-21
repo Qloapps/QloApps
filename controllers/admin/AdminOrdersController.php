@@ -5434,11 +5434,13 @@ class AdminOrdersControllerCore extends AdminController
                     $objBookingDetail->check_in_time = $objHotelBranch->check_in;
                     $objBookingDetail->check_out_time = $objHotelBranch->check_out;
                 }
-                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct, $idLang)) {
                     $objBookingDetail->adults = $objCartBookingData->adults;
                     $objBookingDetail->children = $objCartBookingData->children;
                     $objBookingDetail->child_ages = $objCartBookingData->child_ages;
+                    $objBookingDetail->room_type_selling_object_name = $roomTypeInfo['room_type_selling_object'].'|'.$roomTypeInfo['multiple_room_type_selling_object'];
                 }
+                $objBookingDetail->property_type_name = HotelPropertyType::getPropertyType($objCartBookingData->id_hotel, $idLang);
 
                 if ($objBookingDetail->save()) {
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();

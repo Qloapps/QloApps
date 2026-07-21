@@ -45,6 +45,10 @@ class AdminRoomTypeSellingObjectsController extends AdminController
                 'title' => $this->l('Name'),
                 'align' => 'left',
             ),
+            'name_plural' => array(
+                'title' => $this->l('Plural Name'),
+                'align' => 'left',
+            ),
             'active' => array(
                 'title' => $this->l('Status'),
                 'align' => 'center',
@@ -99,6 +103,14 @@ class AdminRoomTypeSellingObjectsController extends AdminController
                     'hint' => $this->l('Displayed name for this room type selling object.'),
                 ),
                 array(
+                    'type' => 'text',
+                    'label' => $this->l('Plural Name'),
+                    'name' => 'name_plural',
+                    'lang' => true,
+                    'required' => true,
+                    'hint' => $this->l('Displayed name when more than one is booked.'),
+                ),
+                array(
                     'type' => 'switch',
                     'label' => $this->l('Enabled'),
                     'name' => 'active',
@@ -146,6 +158,18 @@ class AdminRoomTypeSellingObjectsController extends AdminController
                 }
             }
 
+            if (!trim(Tools::getValue('name_plural_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Plural Name is required at least in ').$objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('name_plural_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('name_plural_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid Plural Name in ').$lang['name'];
+                        }
+                    }
+                }
+            }
+
             if ($idSellingObject) {
                 $this->display = 'edit';
             } else {
@@ -158,5 +182,44 @@ class AdminRoomTypeSellingObjectsController extends AdminController
         } else {
             parent::postProcess();
         }
+    }
+
+    public function processDelete()
+    {
+        $object = $this->loadObject();
+        if (!$this->checkDeletion($object)) {
+            return false;
+        }
+        return parent::processDelete();
+    }
+
+    protected function processBulkDelete()
+    {
+        if (is_array($this->boxes) && !empty($this->boxes)) {
+            foreach ($this->boxes as $idSellingObject) {
+                $object = new RoomTypeSellingObject((int) $idSellingObject);
+                if (!$this->checkDeletion($object)) {
+                    return false;
+                }
+            }
+        }
+
+        return parent::processBulkDelete();
+    }
+
+    protected function checkDeletion($object)
+    {
+        if (Validate::isLoadedObject($object)) {
+            if ($object->isUsed()) {
+                $this->errors[] = $this->l('You cannot delete this room type selling object because it is currently assigned to one or more room types.');
+            } else {
+                return true;
+            }
+        } else {
+            $this->errors[] = Tools::displayError('An error occurred while deleting the object.').'
+				<b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
+        }
+
+        return false;
     }
 }

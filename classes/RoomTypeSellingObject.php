@@ -27,6 +27,7 @@ class RoomTypeSellingObjectCore extends ObjectModel
     public $date_add;
     public $date_upd;
     public $name;
+    public $name_plural;
 
     public static $definition = array(
         'table' => 'room_type_selling_object',
@@ -37,17 +38,15 @@ class RoomTypeSellingObjectCore extends ObjectModel
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'name' => array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true),
+            'name_plural' => array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true),
         ),
     );
 
-    public function delete()
+    public function isUsed()
     {
-        Db::getInstance()->execute(
-            'UPDATE `'._DB_PREFIX_.'product` SET `id_room_type_selling_object` = NULL
-            WHERE `id_room_type_selling_object` = '.(int)$this->id
+        return (bool) Db::getInstance()->getValue(
+            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'product` WHERE `id_room_type_selling_object` = '.(int) $this->id
         );
-
-        return parent::delete();
     }
 
     public static function getRoomTypeSellingObject($idLang = null, $active = true)
@@ -58,7 +57,7 @@ class RoomTypeSellingObjectCore extends ObjectModel
 
         $cache_key = 'RoomTypeSellingObject::getRoomTypeSellingObject'.(int)$idLang.'_'.(int)$active;
         if (!Cache::isStored($cache_key)) {
-            $sql = 'SELECT hrst.`id_room_type_selling_object` AS `id_room_type_selling_object`, hrstl.`name`
+            $sql = 'SELECT hrst.`id_room_type_selling_object` AS `id_room_type_selling_object`, hrstl.`name`, hrstl.`name_plural`
                 FROM `'._DB_PREFIX_.'room_type_selling_object` hrst
                 LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object_lang` hrstl
                 ON (hrst.`id_room_type_selling_object` = hrstl.`id_room_type_selling_object`

@@ -883,6 +883,12 @@ abstract class PaymentModuleCore extends Module
                                     }
                                 }
 
+                                // Save room selling object and property type names as they are at the time of order creation
+                                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct, $idLang)) {
+                                    $objBookingDetail->room_type_selling_object_name = $roomTypeInfo['room_type_selling_object'].'|'.$roomTypeInfo['multiple_room_type_selling_object'];
+                                }
+                                $objBookingDetail->property_type_name = HotelPropertyType::getPropertyType($objCartBookingData->id_hotel, $idLang);
+
                                 /*for saving details of the advance payment product wise*/
                                 $objBookingDetail->total_paid_amount = $total_price['total_price_tax_incl'];
                                 if ($this->context->cart->is_advance_payment) {

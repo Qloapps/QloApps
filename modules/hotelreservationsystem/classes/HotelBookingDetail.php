@@ -53,6 +53,8 @@ class HotelBookingDetail extends ObjectModel
     // hotel information/location/contact
     public $hotel_name;
     public $room_type_name;
+    public $room_type_selling_object_name;
+    public $property_type_name;
     public $city;
     public $state;
     public $country;
@@ -118,6 +120,8 @@ class HotelBookingDetail extends ObjectModel
             // hotel information/location/contact
             'room_num' => array('type' => self::TYPE_STRING, 'required' => true),
             'room_type_name' => array('type' => self::TYPE_STRING, 'required' => true),
+            'room_type_selling_object_name' => array('type' => self::TYPE_STRING),
+            'property_type_name' => array('type' => self::TYPE_STRING),
             'hotel_name' => array('type' => self::TYPE_STRING, 'required' => true),
             'city' => array('type' => self::TYPE_STRING, 'validate' => 'isCityName', 'size' => 64, 'required' => true),
             'state' => array('type' => self::TYPE_STRING),

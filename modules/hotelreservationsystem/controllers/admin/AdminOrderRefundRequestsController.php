@@ -314,9 +314,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     $booking['id']
                 );
                 
-                $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($booking['id_product']);
-                $booking['room_type_info'] = $roomTypeInfo;
                 $booking = array_merge($booking, array_shift($bookingCharges));
+
+                if (!empty($booking['room_type_selling_object_name'])) {
+                    $sellingObjectNames = explode('|', $booking['room_type_selling_object_name']);
+                    $booking['room_type_selling_object_name'] = $sellingObjectNames[0];
+                }
             }
         }
 

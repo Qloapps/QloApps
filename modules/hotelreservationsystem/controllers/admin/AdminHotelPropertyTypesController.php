@@ -159,4 +159,43 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
             parent::postProcess();
         }
     }
+
+    public function processDelete()
+    {
+        $object = $this->loadObject();
+        if (!$this->checkDeletion($object)) {
+            return false;
+        }
+        return parent::processDelete();
+    }
+
+    protected function processBulkDelete()
+    {
+        if (is_array($this->boxes) && !empty($this->boxes)) {
+            foreach ($this->boxes as $idPropertyType) {
+                $object = new HotelPropertyType((int) $idPropertyType);
+                if (!$this->checkDeletion($object)) {
+                    return false;
+                }
+            }
+        }
+
+        return parent::processBulkDelete();
+    }
+
+    protected function checkDeletion($object)
+    {
+        if (Validate::isLoadedObject($object)) {
+            if ($object->isUsed()) {
+                $this->errors[] = $this->l('You cannot delete this property type because it is currently assigned to one or more properties.');
+            } else {
+                return true;
+            }
+        } else {
+            $this->errors[] = Tools::displayError('An error occurred while deleting the object.').'
+				<b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
+        }
+
+        return false;
+    }
 }
