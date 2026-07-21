@@ -774,10 +774,10 @@
 
 		// toggle payment fields
 		if (jsonSummary.summary.total_price == 0) { // if free order
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount_input_field_group, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
 		} else {
 			$('#send_email_to_customer, [name="is_full_payment"], #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
-			$('#payment_amount_input_field_group').toggle(!parseInt($('input[name="is_full_payment"]:checked').val()));
+			$('#payment_amount').closest('.form-group').toggle(!parseInt($('input[name="is_full_payment"]:checked').val()));
 		}
 	}
 
@@ -1308,10 +1308,10 @@
 
 		// toggle payment fields
 		if (jsonSummary.summary.total_price == 0) { // if free order
-			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount_input_field_group, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
+			$('#send_email_to_customer, [name="is_full_payment"], #payment_amount, #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').hide(200);
 		} else {
 			$('#send_email_to_customer, [name="is_full_payment"], #payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
-			$('#payment_amount_input_field_group').toggle(!parseInt($('input[name="is_full_payment"]:checked').val()));
+			$('#payment_amount').closest('.form-group').toggle(!parseInt($('input[name="is_full_payment"]:checked').val()));
 		}
 
 		resetBind();
@@ -1724,12 +1724,12 @@
 		$(document).on('change', 'input[name="is_full_payment"]', function() {
 			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
 				$('#payment_amount').val({$order_total|floatval}).attr('disabled', true);
-				$('#payment_amount_input_field_group').hide(200);
+				$('#payment_amount').closest('.form-group').hide(200);
 
 				$('#payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
 			} else {
 				$('#payment_amount').val({$order_total|floatval}).attr('disabled', false);
-				$('#payment_amount_input_field_group').show(200);
+				$('#payment_amount').closest('.form-group').show(200);
 
 				managePaymentOptions();
 			}
@@ -2402,7 +2402,7 @@
                             <p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
                         </div>
                     </div>
-                    <div class="form-group" id="payment_amount_input_field_group" {if $order_total <= 0 || $is_full_payment}style="display: none;"{/if}>
+                    <div class="form-group" {if $order_total <= 0 || $is_full_payment}style="display: none;"{/if}>
                         <label class="control-label required col-lg-3">{l s='Payment amount'}</label>
                         <div class="col-lg-9">
                             <div class="input-group fixed-width-xxl">
