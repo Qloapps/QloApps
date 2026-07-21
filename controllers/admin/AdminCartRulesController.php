@@ -47,12 +47,22 @@ class AdminCartRulesControllerCore extends AdminController
         $this->fields_list = array(
             'id_cart_rule' => array('title' => $this->l('ID'), 'align' => 'center', 'class' => 'fixed-width-xs'),
             'name' => array('title' => $this->l('Name')),
+            'hotel_names' => array('title' => $this->l('Hotels'), 'orderby' => false, 'havingFilter' => true, 'filter_key' => 'hotel_names', 'callback' => 'formatHotelNames'),
             'priority' => array('title' => $this->l('Priority'), 'align' => 'center', 'class' => 'fixed-width-xs'),
             'code' => array('title' => $this->l('Code'), 'class' => 'fixed-width-sm'),
             'quantity' => array('title' => $this->l('Quantity'), 'align' => 'center', 'class' => 'fixed-width-xs'),
             'date_to' => array('title' => $this->l('Expiration date'), 'type' => 'datetime', 'class' => 'fixed-width-lg'),
             'active' => array('title' => $this->l('Status'), 'active' => 'status', 'type' => 'bool', 'align' => 'center', 'class' => 'fixed-width-xs', 'orderby' => false),
         );
+
+        $this->_select = 'GROUP_CONCAT(DISTINCT hbl.`hotel_name` ORDER BY hbl.`hotel_name` ASC SEPARATOR "|||") AS hotel_names';
+        $this->_join = 'LEFT JOIN `'._DB_PREFIX_.'cart_rule_hotel` crh ON (crh.`id_cart_rule` = a.`id_cart_rule`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (
+                (a.`hotel_restriction` = 1 AND hbi.`id` = crh.`id_hotel`)
+                OR (a.`hotel_restriction` = 0 AND hbi.`active` = 1)
+            )
+            LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)Context::getContext()->language->id.')';
+        $this->_group = 'GROUP BY a.`id_cart_rule`';
 
         // START send access query information to the admin controller
         $this->access_select = ' SELECT a.`id_cart_rule` FROM '._DB_PREFIX_.'cart_rule a';
@@ -74,6 +84,18 @@ class AdminCartRulesControllerCore extends AdminController
         }
         $this->access_where = ' WHERE a.`id_cart_rule` NOT IN ('.$notInCond.')';
         parent::__construct();
+    }
+
+    public function formatHotelNames($hotelNames, $row)
+    {
+        $hotels = !empty($hotelNames) ? explode('|||', $hotelNames) : array();
+        $this->context->smarty->assign(array(
+            'hotel_names_first'     => !empty($hotels) ? $hotels[0] : null,
+            'hotel_names_remaining' => count($hotels) > 1 ? array_slice($hotels, 1) : array(),
+        ));
+        return $this->context->smarty->fetch(
+            'controllers/cart_rules/helpers/list/_hotel_names_column.tpl'
+        );
     }
 
     public function ajaxProcessLoadCartRules()
