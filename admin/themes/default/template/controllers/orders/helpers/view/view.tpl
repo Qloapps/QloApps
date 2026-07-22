@@ -148,7 +148,7 @@
                                                             {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                                                                 <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
                                                             {elseif $can_edit}
-                                                                <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}">
+                                                                <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}" data-check_in="{$data['check_in']}" data-check_out="{$data['check_out']}">
                                                                     <i class="icon-pencil"></i> {l s='Edit'}
                                                                 </a>
                                                             {/if}
@@ -269,9 +269,14 @@
                                             <input type="hidden" name="id_order" value="{$order->id}" />
                                         </div>
                                         <div class="col-lg-3">
-                                            <button type="submit" name="submitState" class="btn btn-primary">
-                                                {l s='Update status'}
-                                            </button>
+                                            <div class="btn-group">
+                                                <button type="submit" name="submitState" class="btn btn-primary">
+                                                    {l s='Update status'}
+                                                </button>
+                                                <button type="button" id="order_status_disable_info" class="btn btn-default" data-toggle="modal" data-target="#order_status_disable_reason" title="{l s='Click here to see why certain statuses can’t be selected'}" aria-label="{l s='Why are some staClick here to see why certain statuses can’t be selected'}">
+                                                    <i class="icon-info-circle"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
@@ -451,7 +456,7 @@
                                         <th><span class="title_box ">{l s='Transaction ID'}</span></th>
                                         <th><span class="title_box ">{l s='Amount'}</span></th>
                                         <th><span class="title_box ">{l s='Invoice'}</span></th>
-                                        <th></th>
+                                        <th colspan="3"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -463,6 +468,11 @@
                                             <td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
                                             <td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
                                             <td>{if isset($payment['invoice_number'])}{$payment['invoice_number']}{else}--{/if}</td>
+                                            {if isset($receipt_management_active) && $receipt_management_active}
+                                                <td class="actions">
+                                                    <a target="_blank" class="btn btn-default" href="{$link->getAdminLink('AdminPdf')}&submitAction=generatePaymentReceipt&id_order_payment_detail={$payment['id_order_payment_detail']}"><i class="icon-file-text"></i> {l s='Receipt'}</a>
+                                                </td>
+                                            {/if}
                                             <td class="actions">
                                                 <a class="open_payment_information btn btn-default" href="#" data-card_number="{if $payment['card_number']}{$payment['card_number']}{else}{l s='Not defined'}{/if}"  data-card_brand="{if $payment['card_brand']}{$payment['card_brand']}{else}{l s='Not defined'}{/if}"  data-card_expiration="{if $payment['card_expiration']}{$payment['card_expiration']}{else}{l s='Not defined'}{/if}"  data-card_holder="{if $payment['card_holder']}{$payment['card_holder']}{else}{l s='Not defined'}{/if}" data-payment_date="{if $payment['date_add']}{$payment['date_add']}{else}{l s='Not defined'}{/if}" data-payment_method="{if $payment['payment_method']}{$payment['payment_method']}{else}{l s='Not defined'}{/if}" data-payment_source="{if $payment_types[$payment['payment_type']]['name']}{$payment_types[$payment['payment_type']]['name']}{else}{l s='Not defined'}{/if}" data-transaction_id="{if $payment['transaction_id']}{$payment['transaction_id']}{else}{l s='Not defined'}{/if}" data-amount="{if $payment['amount']}{displayPrice currency={$payment['id_currency']} price={$payment['amount']}}{else}{l s='Not defined'}{/if}" data-invoice_number="{if isset($payment['invoice_number']) && $payment['invoice_number']}{$payment['invoice_number']}{else}{l s='Not defined'}{/if}"><i class="icon-search"></i> {l s='Details'}</a>
                                             </td>
@@ -707,7 +717,7 @@
                 {if isset($messages) && $messages}
                     <div class="panel order-notes">
                         <div class="panel-heading">
-                            <i class="icon-undo"></i> &nbsp;{l s='Order Private Notes'}
+                            <i class="icon-undo"></i> &nbsp;{l s='Order Notes'}
                         </div>
                         <div class="panel-content">
                             {foreach from=$messages item=message name=customerMessage}
@@ -720,11 +730,11 @@
                                             <span>{$message['elastname']|escape:'html':'UTF-8'}{else}{$message['cfirstname']|escape:'html':'UTF-8'} {$message['clastname']|escape:'html':'UTF-8'}</span>
                                         {/if},
                                         <span class="message-date">&nbsp;<i class="icon-calendar"></i>
-                                            {dateFormat date=$message['date_add']}
+                                            {dateFormat date=$message.date_add full=1}
                                         </span>
-                                        {if ($message['private'] == 1)}
+                                        {* {if ($message['private'] == 1)}
                                             <span class="badge badge-info">{l s='Private'}</span>
-                                        {/if}
+                                        {/if} *}
                                     </p>
                                 </div>
                                 {if !$smarty.foreach.customerMessage.last}<hr/>{/if}
@@ -1302,7 +1312,30 @@
             {/if}
         </div>
     </div>
-
+    {* Css for handling order disable status modal *}
+    <style type="text/css">
+        #order-status-disable-reason-body p { margin: 0 0 15px; }
+        #order-status-disable-reason-body p:last-child { margin-bottom: 0; }
+    </style>
+    <div class="modal fade" id="order_status_disable_reason" tabindex="-1" role="dialog" aria-labelledby="order_status_disable_reason_label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{l s='Close'}"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="order_status_disable_reason_label"><i class="icon icon-ban"></i> {l s='Order Status Disable Criteria'}</h4>
+                </div>
+                <div class="modal-body" id="order-status-disable-reason-body">
+                    <p><strong>{l s='Refunded:'}</strong> {l s='Disabled when total paid amount is 0 and no discount is applied.'}</p>
+                    <p><strong>{l s='Cancelled:'}</strong> {l s='Disabled when the paid amount is greater than 0 or when discounts are applied.'}</p>
+                    <p><strong>{l s='Overbooking:'}</strong> {l s='Disabled when the order has no overbooked rooms.'}</p>
+                    <p><strong>{l s='Current:'}</strong> {l s='The current order status cannot be selected again.'}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{l s='Close'}</button>
+                </div>
+            </div>
+        </div>
+    </div>
     {strip}
         {addJsDefL name=no_rm_avail_txt}{l s='No room available.' js=1}{/addJsDefL}
         {addJsDefL name=no_realloc_rm_avail_txt}{l s='No room available for reallocation.' js=1}{/addJsDefL}
@@ -1335,7 +1368,6 @@
         {addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
         {addJsDefL name='select_room_txt'}{l s='Select room' js=1}{/addJsDefL}
         {addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
-        {addJsDef max_child_in_room=$max_child_in_room|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_IN=$ROOM_STATUS_CHECKED_IN|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_OUT=$ROOM_STATUS_CHECKED_OUT|escape:'quotes':'UTF-8'}
         {addJsDef ALLOTMENT_MANUAL=$ALLOTMENT_MANUAL|escape:'quotes':'UTF-8'}

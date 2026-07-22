@@ -151,6 +151,24 @@ class AdminPerformanceControllerCore extends AdminController
             'input' => array(
                 array(
                     'type' => 'switch',
+                    'label' => $this->l('Debug mode'),
+                    'name' => 'debug_mode',
+                    'class' => 't',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'value' => 1,
+                            'label' => $this->l('Enabled')
+                        ),
+                        array(
+                            'value' => 0,
+                            'label' => $this->l('Disabled')
+                        )
+                    ),
+                    'hint' => $this->l('Enable or disable debug mode. Debug mode will enable extended error reporting.')
+                ),
+                array(
+                    'type' => 'switch',
                     'label' => $this->l('Disable non QloApps modules'),
                     'name' => 'native_module',
                     'class' => 't',
@@ -196,6 +214,7 @@ class AdminPerformanceControllerCore extends AdminController
         );
 
         $this->fields_value['native_module'] = Configuration::get('PS_DISABLE_NON_NATIVE_MODULE');
+        $this->fields_value['debug_mode'] = _PS_MODE_DEV_;
         $this->fields_value['overrides'] = Configuration::get('PS_DISABLE_OVERRIDES');
     }
 
@@ -885,6 +904,12 @@ class AdminPerformanceControllerCore extends AdminController
         if (Tools::isSubmit('submitAddconfiguration')) {
             Configuration::updateGlobalValue('PS_DISABLE_NON_NATIVE_MODULE', (int)Tools::getValue('native_module'));
             Configuration::updateGlobalValue('PS_DISABLE_OVERRIDES', (int)Tools::getValue('overrides'));
+
+            $debugValue = ((int) Tools::getValue('debug_mode') === 1) ? 'true' : 'false';
+            if (!$this->updateDebugMode($debugValue)) {
+                $this->errors[] = $this->l('Unable to update debug mode. Please check file permissions.');
+            }
+
             Tools::generateIndex();
         }
 
@@ -892,6 +917,26 @@ class AdminPerformanceControllerCore extends AdminController
             Hook::exec('action'.get_class($this).ucfirst($this->action).'After', array('controller' => $this, 'return' => ''));
             Tools::redirectAdmin(self::$currentIndex.'&token='.Tools::getValue('token').'&conf=4');
         }
+    }
+
+    public function updateDebugMode($value)
+    {
+        $filename = _PS_ROOT_DIR_ . '/config/defines.inc.php';
+        
+        if (is_readable($filename)) {
+            $cleanedFileContent = php_strip_whitespace($filename);
+            if (preg_match('/define\(\'_PS_MODE_DEV_\', ([a-zA-Z]+)\);/Ui', $cleanedFileContent)) {
+                $fileContent = Tools::file_get_contents($filename);
+                $fileContent = preg_replace('/define\(\'_PS_MODE_DEV_\', ([a-zA-Z]+)\);/Ui', 'define(\'_PS_MODE_DEV_\', ' . $value . ');', $fileContent);
+                if (@file_put_contents($filename, $fileContent)) {
+                    if (function_exists('opcache_invalidate')) {
+                        @opcache_invalidate($filename);
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public function displayAjaxTestServer()

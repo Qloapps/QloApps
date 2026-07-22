@@ -132,6 +132,29 @@ var QhrReviewImages = {
     init: function() {
         QhrReviewImages.inputHtml = '<input type="file" accept="image/*" class="input-images hidden" name="images[]" multiple>';
     },
+    validateFiles: function () {
+        $('#review-general-errors').hide();
+        let isValid = true;
+        $('.images-field input.input-images').each(function (iInput, input) {
+            let files = input.files;
+            let dataTransfer = new DataTransfer();
+            $.each(files, function (iFile, file) {
+                if (file.type.startsWith('image/')) {
+                    dataTransfer.items.add(file);
+                } else {
+                    isValid = false;
+                }
+            });
+            input.files = dataTransfer.files;
+            if (!input.files.length) {
+                $(input).remove();
+            }
+        });
+        if (!isValid) {
+            QhrReviewForm.showGeneralErrors(qlo_hotel_review_js_vars.texts.allowed_extensions);
+        }
+        return isValid;
+    },
     getFilesCount: function() {
         var count = 0;
         $('.images-field input.input-images').each(function(i, input) {
@@ -156,6 +179,9 @@ var QhrReviewImages = {
             }
         });
         input.files = dataTransfer.files;
+        if (input.files.length === 0) {
+            $(input).remove();
+        }
     },
     resetPreviews: function() {
         $('.previews-wrap').html('');
@@ -241,8 +267,9 @@ $(document).on('change', 'input.input-images', function(e) {
     var filesCount = QhrReviewImages.getFilesCount();
     if (filesCount > qlo_hotel_review_js_vars.num_images_max) {
         QhrReviewImages.removeLastInput();
-        alert(qlo_hotel_review_js_vars.texts.num_files);
+        QhrReviewForm.showGeneralErrors(qlo_hotel_review_js_vars.texts.num_files);
     } else {
+        QhrReviewImages.validateFiles();
         QhrReviewImages.updatePreviews();
 
         if (filesCount == qlo_hotel_review_js_vars.num_images_max) {

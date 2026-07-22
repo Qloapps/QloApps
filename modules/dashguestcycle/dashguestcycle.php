@@ -46,7 +46,7 @@ class DashGuestCycle extends Module
     public function install()
     {
         return (parent::install()
-            && $this->registerHook('dashboardTop')
+            && $this->registerHook('actionAdminDashboardKPIListingModifier')
             && $this->registerHook('dashboardZoneTwo')
             && $this->registerHook('dashboardData')
             && $this->registerHook('actionAdminControllerSetMedia')
@@ -60,9 +60,120 @@ class DashGuestCycle extends Module
         }
     }
 
-    public function hookDashboardTop()
+    public function hookActionAdminDashboardKPIListingModifier(array $params)
     {
-        return $this->display(__FILE__, 'dashboard-top.tpl');
+        $idHotel   = (int)$this->context->cookie->stats_id_hotel;
+        $kpiValues = $this->getKpiValues($idHotel);
+
+        $kpisData = array(
+            array(
+                'id'      => 'box-dgc-arrivals',
+                'color'   => 'color1',
+                'title'   => $this->l('Arrivals'),
+                'tooltip' => $this->l('The number of arrivals scheduled for today.'),
+                'value'   => $kpiValues['box-dgc-arrivals'],
+            ),
+            array(
+                'id'      => 'box-dgc-departures',
+                'color'   => 'color2',
+                'title'   => $this->l('Departures'),
+                'tooltip' => $this->l('The number of departures scheduled for today.'),
+                'value'   => $kpiValues['box-dgc-departures'],
+            ),
+            array(
+                'id'      => 'box-dgc-new-bookings',
+                'color'   => 'color3',
+                'title'   => $this->l('New Bookings'),
+                'tooltip' => $this->l('The number of new bookings created today so far.'),
+                'value'   => $kpiValues['box-dgc-new-bookings'],
+            ),
+            array(
+                'id'      => 'box-dgc-occupied',
+                'color'   => 'color4',
+                'title'   => $this->l('Occupied Rooms'),
+                'tooltip' => $this->l('The count of rooms currently occupied by guests.'),
+                'value'   => $kpiValues['box-dgc-occupied'],
+            ),
+            array(
+                'id'      => 'box-dgc-messages',
+                'color'   => 'color5',
+                'title'   => $this->l('Guest Messages'),
+                'tooltip' => $this->l('The number of new messages received from guests today.'),
+                'value'   => $kpiValues['box-dgc-messages'],
+            ),
+            array(
+                'id'      => 'box-dgc-cancelled',
+                'color'   => 'color6',
+                'title'   => $this->l('Cancelled Bookings'),
+                'tooltip' => $this->l('The number of bookings cancelled today so far.'),
+                'value'   => $kpiValues['box-dgc-cancelled'],
+            ),
+            array(
+                'id'      => 'box-dgc-guests',
+                'color'   => 'color1',
+                'title'   => $this->l('Guests (Adults/Children)'),
+                'tooltip' => $this->l('The number of adults and children scheduled to stay today.'),
+                'value'   => $kpiValues['box-dgc-guests'],
+            ),
+        );
+
+        foreach ($kpisData as $data) {
+            $helper          = new HelperKpi();
+            $helper->id      = $data['id'];
+            $helper->color   = $data['color'];
+            $helper->title   = $data['title'];
+            $helper->tooltip = $data['tooltip'];
+            $helper->value   = $data['value'];
+            $params['kpis'][] = $helper;
+        }
+    }
+
+    private function getKpiValues($idHotel)
+    {
+        $dateToday = date('Y-m-d');
+
+        if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
+            $totalArrivals     = rand(100, 1000);
+            $arrived           = rand(0, $totalArrivals);
+            $totalDepartures   = rand(100, 1000);
+            $departed          = rand(0, $totalDepartures);
+            $newBookings       = rand(10, 500);
+            $occupied          = rand(10, 500);
+            $newMessages       = rand(0, 20);
+            $cancelledBookings = rand(0, 20);
+            $totalAdults       = rand(100, 1000);
+            $children          = rand(0, $totalAdults);
+        } else {
+            $arrivalsData   = AdminStatsController::getArrivalsByDate($dateToday, $idHotel);
+            $departuresData = AdminStatsController::getDeparturesByDate($dateToday, $idHotel);
+            $guestsData     = AdminStatsController::getGuestsByDate($dateToday, $idHotel);
+
+            $arrived           = (int) $arrivalsData['arrived'];
+            $totalArrivals     = (int) $arrivalsData['total_arrivals'];
+            $departed          = (int) $departuresData['departed'];
+            $totalDepartures   = (int) $departuresData['total_departures'];
+            $newBookings       = count(AdminStatsController::getNewBookingsInfoByDate($dateToday, $idHotel));
+            $occupied          = (int) AdminStatsController::getDistinctRoomBookingsCount(
+                date('Y-m-d', strtotime('-1 day')),
+                $dateToday,
+                $idHotel,
+                HotelBookingDetail::STATUS_CHECKED_IN
+            );
+            $newMessages       = (int) CustomerMessage::getMessagesByDate($dateToday);
+            $cancelledBookings = (int) AdminStatsController::getCancelledBookingsByDate($dateToday, $idHotel);
+            $totalAdults       = (int) $guestsData['adults'];
+            $children          = (int) $guestsData['children'];
+        }
+
+        return array(
+            'box-dgc-arrivals'     => sprintf('%02d', $arrived).'/'.sprintf('%02d', $totalArrivals),
+            'box-dgc-departures'   => sprintf('%02d', $departed).'/'.sprintf('%02d', $totalDepartures),
+            'box-dgc-new-bookings' => sprintf('%02d', $newBookings),
+            'box-dgc-occupied'     => sprintf('%02d', $occupied),
+            'box-dgc-messages'     => sprintf('%02d', $newMessages),
+            'box-dgc-cancelled'    => sprintf('%02d', $cancelledBookings),
+            'box-dgc-guests'       => sprintf('%02d', $totalAdults).'/'.sprintf('%02d', $children),
+        );
     }
 
     public function hookDashboardZoneTwo()
@@ -76,37 +187,10 @@ class DashGuestCycle extends Module
         $dataTable = array();
 
         $dateToday = date('Y-m-d');
-        if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
-            $dataValue['dgc_total_arrivals'] = sprintf('%02d', rand(100, 1000));
-            $dataValue['dgc_arrived'] = sprintf('%02d', rand(0, $dataValue['dgc_total_arrivals']));
-            $dataValue['dgc_total_departures'] = sprintf('%02d', rand(100, 1000));
-            $dataValue['dgc_departed'] = sprintf('%02d', rand(0, $dataValue['dgc_total_departures']));
-            $dataValue['dgc_new_bookings'] = sprintf('%02d', rand(10, 500));
-            $dataValue['dgc_occupied'] = sprintf('%02d', rand(10, 500));
-            $dataValue['dgc_new_messages'] = sprintf('%02d', rand(0, 20));
-            $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', rand(0, 20));
-            $dataValue['dgc_guests_adults'] = sprintf('%02d', rand(100, 1000));
-            $dataValue['dgc_guests_children'] = sprintf('%02d', rand(0, $dataValue['dgc_guests_adults']));
-        } else {
-            // set badges data
-            $arrivalsData = AdminStatsController::getArrivalsByDate($dateToday, $params['id_hotel']);
-            $departuresData = AdminStatsController::getDeparturesByDate($dateToday, $params['id_hotel']);
-            $guestsData = AdminStatsController::getGuestsByDate($dateToday, $params['id_hotel']);
-            $dataValue['dgc_arrived'] = sprintf('%02d', $arrivalsData['arrived']);
-            $dataValue['dgc_total_arrivals'] = sprintf('%02d', $arrivalsData['total_arrivals']);
-            $dataValue['dgc_departed'] = sprintf('%02d', $departuresData['departed']);
-            $dataValue['dgc_total_departures'] = sprintf('%02d', $departuresData['total_departures']);
-            $dataValue['dgc_new_bookings'] = sprintf('%02d', count(AdminStatsController::getNewBookingsInfoByDate($dateToday, $params['id_hotel'])));
-            $dataValue['dgc_occupied'] = sprintf('%02d', AdminStatsController::getDistinctRoomBookingsCount(
-                date('Y-m-d', strtotime('-1 day')),
-                $dateToday,
-                $params['id_hotel'],
-                HotelBookingDetail::STATUS_CHECKED_IN
-            ));
-            $dataValue['dgc_new_messages'] = sprintf('%02d', CustomerMessage::getMessagesByDate($dateToday));
-            $dataValue['dgc_cancelled_bookings'] = sprintf('%02d', AdminStatsController::getCancelledBookingsByDate($dateToday, $params['id_hotel']));
-            $dataValue['dgc_guests_adults'] = sprintf('%02d', $guestsData['adults']);
-            $dataValue['dgc_guests_children'] = sprintf('%02d', $guestsData['children']);
+
+        // KPI box values — updated on every AJAX refresh (demo toggle, date change)
+        foreach ($this->getKpiValues((int) $params['id_hotel']) as $boxId => $value) {
+            $dataValue[$boxId . ' .value'] = $value;
         }
 
         // set tables data

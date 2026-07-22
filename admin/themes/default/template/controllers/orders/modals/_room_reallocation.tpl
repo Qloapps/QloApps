@@ -95,6 +95,12 @@
                     </div>
                     <p class="error_text" id="realloc_sel_rm_err_p"></p>
                 </div>
+                <div class="row form-group">
+                    <div class="col-sm-12">
+                    <label class="control-label">{l s='Remark'}</label>
+                        <textarea class="form-control room_remark" name="message" maxlength="250"></textarea>
+                    </div>
+                </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-close" data-dismiss="modal">{l s="Close"}</button>
@@ -139,6 +145,12 @@
                         </div>
                     </div>
                 </div>
+                <div class="row form-group">
+                    <div class="col-sm-12">
+                     <label class="control-label">{l s='Remark'}</label>
+                        <textarea class="form-control room_remark" name="message" maxlength="250"></textarea>
+                    </div>
+                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-close" data-dismiss="modal">{l s="Close"}</button>

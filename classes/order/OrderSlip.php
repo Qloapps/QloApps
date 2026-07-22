@@ -309,7 +309,6 @@ class OrderSlipCore extends ObjectModel
 		SELECT `id_order_slip`
 		FROM `'._DB_PREFIX_.'order_slip` os
 		LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = os.`id_order`)
-        INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (o.id_order = hbd.id_order)
 		WHERE os.`date_add` BETWEEN \''.pSQL($dateFrom).' 00:00:00\' AND \''.pSQL($dateTo).' 23:59:59\'
 		'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o'). ' ' .HotelBranchInformation::addHotelRestriction(false).'
 		ORDER BY os.`date_add` ASC');
@@ -399,6 +398,17 @@ class OrderSlipCore extends ObjectModel
             }
             $price = (float)$product_row['unit_price'];
 
+
+            $order_slip_resume = OrderSlip::getProductSlipResume((int)$order_detail->id);
+
+            if ($quantity + $order_slip_resume['product_quantity'] > $order_detail->product_quantity) {
+                $quantity = $order_detail->product_quantity - $order_slip_resume['product_quantity'];
+            }
+
+            if ($quantity == 0) {
+                continue;
+            }
+
             if (!Tools::isSubmit('cancelProduct') && $order->hasBeenPaid()) {
                 $order_detail->product_quantity_refunded += $quantity;
             }
@@ -465,8 +475,11 @@ class OrderSlipCore extends ObjectModel
         $order_slip->{'total_products_tax_'.$inc_or_ex_2} -= (float)$amount && !$amount_choosen ? (float)$amount : 0;
         $order_slip->amount = $amount_choosen ? (float)$amount : $order_slip->{'total_products_tax_'.$inc_or_ex_1};
 
-        if (isset($orderSlipType) && $orderSlipType) {
-            $order_slip->order_slip_type = $orderSlipType;
+        if ((float)$amount && !$amount_choosen) {
+            $order_slip->order_slip_type = 1;
+        }
+        if (((float)$amount && $amount_choosen)) {
+            $order_slip->order_slip_type = 2;
         }
         if (isset($remark) && $remark) {
             $order_slip->remark = $remark;

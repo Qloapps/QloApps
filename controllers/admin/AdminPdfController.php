@@ -64,6 +64,15 @@ class AdminPdfControllerCore extends AdminController
         }
     }
 
+    public function processGenerateBookingVoucherPDF()
+    {
+        if (Tools::isSubmit('id_order')) {
+            $this->generateBookingVoucherPDFByIdOrder(Tools::getValue('id_order'));
+        } else {
+            die(Tools::displayError('The order ID is missing.'));
+        }
+    }
+
     public function processGenerateOrderSlipPDF()
     {
         $order_slip = new OrderSlip((int)Tools::getValue('id_order_slip'));
@@ -93,7 +102,6 @@ class AdminPdfControllerCore extends AdminController
     public function processGenerateInvoicesPDF()
     {
         $order_invoice_collection = OrderInvoice::getByDateInterval(Tools::getValue('date_from'), Tools::getValue('date_to'));
-
         if (!count($order_invoice_collection)) {
             die(Tools::displayError('No invoice was found.'));
         }
@@ -150,13 +158,37 @@ class AdminPdfControllerCore extends AdminController
 
         $id_supply_order = (int)Tools::getValue('id_supply_order');
         $supply_order = new SupplyOrder($id_supply_order);
-
         if (!Validate::isLoadedObject($supply_order)) {
             die(Tools::displayError('The supply order cannot be found within your database.'));
         }
 
         $this->generatePDF($supply_order, PDF::TEMPLATE_SUPPLY_ORDER_FORM);
+    }  
+
+    public function processGeneratePaymentReceiptsPDF()
+    {
+        $order_payment_collection = OrderPaymentDetail::getByDateInterval(
+            Tools::getValue('date_from'),
+            Tools::getValue('date_to')
+        );
+
+        if (!count($order_payment_collection)) {
+            die(Tools::displayError('No payment receipt was found.'));
+        }
+
+        $this->generatePDF($order_payment_collection, PDF::TEMPLATE_PAYMENT_RECEIPT);
     }
+
+    public function processGeneratePaymentReceipt()
+    {
+        $idOrderPaymentDetail = (int) Tools::getValue('id_order_payment_detail');
+        $orderPaymentDetail = new OrderPaymentDetail($idOrderPaymentDetail);
+        if (!Validate::isLoadedObject($orderPaymentDetail)) {
+            die(Tools::displayError('The order payment detail cannot be found.'));
+        }
+        $this->generatePDF($orderPaymentDetail, PDF::TEMPLATE_PAYMENT_RECEIPT);
+    }
+
 
     public function generateDeliverySlipPDFByIdOrder($id_order)
     {
@@ -200,6 +232,23 @@ class AdminPdfControllerCore extends AdminController
 
         Hook::exec('actionPDFInvoiceRender', array('order_invoice_list' => array($order_invoice)));
         $this->generatePDF($order_invoice, PDF::TEMPLATE_INVOICE);
+    }
+
+    public function generateBookingVoucherPDFByIdOrder($id_order)
+    {
+        $order = new Order((int)$id_order);
+        if (!Validate::isLoadedObject($order)) {
+            die(Tools::displayError('The order cannot be found within your database.'));
+        }
+
+        $objHotelBookingDetail = new HotelBookingDetail();
+        $bookingDetails = $objHotelBookingDetail->getBookingDataByOrderId((int)$order->id);
+        if (empty($bookingDetails)) {
+            die(Tools::displayError('No booking voucher is available for this order.'));
+        }
+
+        $pdf = new PDF($order, PDF::TEMPLATE_BOOKING_VOUCHER, Context::getContext()->smarty);
+        $pdf->render('I');
     }
 
     public function generatePDF($object, $template)

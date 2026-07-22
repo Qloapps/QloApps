@@ -94,7 +94,6 @@ class AdminSlipControllerCore extends AdminController
                 'title' => $this->l('Remark'),
                 'filter_key' => 'a!remark',
                 'align' => 'center',
-                // 'class' => 'fixed-width-xxl',
                 'orderby' => false,
                 'callback' => 'displayRemark',
             ),
@@ -123,7 +122,7 @@ class AdminSlipControllerCore extends AdminController
         $this->_conf['33'] = $this->l('Voucher generated successfully');
     }
 
-    public function initPageHeaderToolbar()
+public function initPageHeaderToolbar()
     {
         if (empty($this->display) || $this->display == 'list') {
             $this->page_header_toolbar_btn['new_credit_slip'] = array(
@@ -136,7 +135,7 @@ class AdminSlipControllerCore extends AdminController
         parent::initPageHeaderToolbar();
     }
 
-    public function renderForm()
+   public function renderForm()
     {
         if ($this->display == 'add') {
             $orderList = Order::getOrdersWithInformations(null, null, true);
@@ -263,7 +262,7 @@ class AdminSlipControllerCore extends AdminController
         return parent::renderForm();
     }
 
-    public function postProcess()
+   public function postProcess()
     {
         if (Tools::getValue('submitCreditSlip')) {
             $creditSlipAmount = trim(Tools::getValue('credit_slip_amount'));
@@ -415,11 +414,11 @@ class AdminSlipControllerCore extends AdminController
         $this->initToolbar();
         $this->initPageHeaderToolbar();
         if ($this->display != "add") {
-        $this->content .= $this->renderList();
+            $this->content .= $this->renderList();
         }
         $this->content .= $this->renderForm();
         if ($this->display != "add") {
-        $this->content .= $this->renderOptions();
+            $this->content .= $this->renderOptions();
         }
 
         $this->context->smarty->assign(array(

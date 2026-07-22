@@ -143,6 +143,15 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
         $this->order->total_paid_tax_excl += $this->order->total_shipping_tax_excl;
 
         $total_cart_rule = 0;
+        if ($this->order_slip->order_slip_type == 1 && is_array($cart_rules = $this->order->getCartRules($this->order_invoice->id))) {
+            foreach ($cart_rules as $cart_rule) {
+                if ($tax_excluded_display) {
+                    $total_cart_rule += $cart_rule['value_tax_excl'];
+                } else {
+                    $total_cart_rule += $cart_rule['value'];
+                }
+            }
+        }
 
         $this->smarty->assign(array(
             'order' => $this->order,
@@ -150,8 +159,8 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
             'order_details' => $this->order->products,
             'roomsDetails' => $roomsDetails,
             'productsDetails' => $productsDetails,
-            'cart_rules' => false,
-            'amount_choosen' => false,
+            'cart_rules' => $this->order_slip->order_slip_type == 1 ? $this->order->getCartRules($this->order_invoice->id) : false,
+            'amount_choosen' => $this->order_slip->order_slip_type == 2 ? true : false,
             'delivery_address' => $formatted_delivery_address,
             'invoice_address' => $formatted_invoice_address,
             'addresses' => array('invoice' => $invoice_address, 'delivery' => $delivery_address),
