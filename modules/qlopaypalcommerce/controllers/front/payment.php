@@ -133,7 +133,8 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                     $returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value'] ?? 0
                                 );
                                 $fullTotal = (float) $cart->getOrderTotal(true, Cart::BOTH);
-                                $isFullyPaid = round($capturedAmount, 2) >= round($fullTotal, 2);
+                                $isFullyPaid = Tools::ps_round($capturedAmount, _PS_PRICE_COMPUTE_PRECISION_)
+                                    >= Tools::ps_round($fullTotal, _PS_PRICE_COMPUTE_PRECISION_);
                                 $total = $isFullyPaid ? $fullTotal : $capturedAmount;
 
                                 // set order status
