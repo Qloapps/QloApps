@@ -53,14 +53,14 @@ class AdminRoomStatusesController extends ModuleAdminController
                 'title' => $this->l('Terminal (final) status'),
                 'align' => 'text-center',
                 'type' => 'bool',
-                'callback' => 'printYesNo',
+                'callback' => 'getTerminalStatusLabel',
                 'orderby' => false,
                 'class' => 'fixed-width-sm',
             ),
         );
     }
 
-    public function printYesNo($value)
+    public function getTerminalStatusLabel($value)
     {
         return $value ? $this->l('Yes') : $this->l('No');
     }
