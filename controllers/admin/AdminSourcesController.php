@@ -41,7 +41,7 @@ class AdminSourcesControllerCore extends AdminController
         $this->_defaultOrderBy = 'position';
         $this->_defaultOrderWay = 'ASC';
         $this->context = Context::getContext();
-
+        $this->_new_list_header_design = true;
         $this->bulk_actions = array(
             'delete' => array(
                 'text' => $this->l('Delete selected'),
@@ -284,7 +284,7 @@ class AdminSourcesControllerCore extends AdminController
         $this->fields_form = array(
             'legend' => array(
                 'title' => $this->l('Business Source'),
-                'icon' => 'icon-tags'
+                'icon' => 'icon-edit'
             ),
             'input' => array(
                 array(
@@ -309,6 +309,7 @@ class AdminSourcesControllerCore extends AdminController
                     'required' => false,
                     'class' => 't',
                     'is_bool' => true,
+                    'default_value' => 1,
                     'values' => array(
                         array('id' => 'active_on', 'value' => 1, 'label' => $this->l('Enabled')),
                         array('id' => 'active_off', 'value' => 0, 'label' => $this->l('Disabled')),
@@ -349,7 +350,7 @@ class AdminSourcesControllerCore extends AdminController
         $this->fields_form = array(
             'legend' => array(
                 'title' => $this->l('Booking Source'),
-                'icon' => 'icon-tags'
+                'icon' => 'icon-edit'
             ),
             'input' => array(
                 array(
@@ -385,6 +386,7 @@ class AdminSourcesControllerCore extends AdminController
                     'required' => false,
                     'class' => 't',
                     'is_bool' => true,
+                    'default_value' => 1,
                     'values' => array(
                         array('id' => 'active_on', 'value' => 1, 'label' => $this->l('Enabled')),
                         array('id' => 'active_off', 'value' => 0, 'label' => $this->l('Disabled')),
@@ -417,68 +419,97 @@ class AdminSourcesControllerCore extends AdminController
         } elseif (Tools::isSubmit('submitMergeSource')) {
             return $this->postProcessMergeSource();
         } elseif (Tools::isSubmit('deletesource')) {
-            $objSource = new Source((int)Tools::getValue('id_source'));
-            if (!$objSource->isRemovable()) {
-                $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Booking Source.');
-            } elseif (!$objSource->delete()) {
-                $this->errors[] = Tools::displayError('An error occurred while deleting the Booking Source.');
-            } else {
-                Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$objSource->id_source_type.'&conf=1&token='.$this->token);
-            }
-        } else if(Tools::isSubmit('statussource')){
-            if(Validate::isLoadedObject($objSource = new Source((int)Tools::getValue('id_source')))){
-                $idSourceType = $objSource->id_source_type;
-                $objSource->active = !$objSource->active;
-                if($objSource->save()){
-                    $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&conf=5&token='.$this->token;
-                }
-
-            }
-
-        } else if(Tools::isSubmit('submitBulkenableSelectionsource')){
-                $this->processUpdateStatusBulk(1);
-        } else if(Tools::isSubmit('submitBulkdisableSelectionsource')){
-                $this->processUpdateStatusBulk(0);
+            return $this->postProcessDeleteSource();
+        } elseif (Tools::isSubmit('statussource')) {
+            return $this->postProcessStatusSource();
+        } elseif (Tools::isSubmit('submitBulkenableSelectionsource')) {
+            return $this->processUpdateStatusBulk(1);
+        } elseif (Tools::isSubmit('submitBulkdisableSelectionsource')) {
+            return $this->processUpdateStatusBulk(0);
         } elseif (Tools::isSubmit('submitBulkdeletesource')) {
-            $idSourceType = 0;
-            foreach (Tools::getValue('sourceBox') as $selection) {
-                $objSource = new Source((int)$selection);
-                $idSourceType = $objSource->id_source_type;
-                if (!$objSource->isRemovable()) {
-                    $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Booking Source.');
-                    break;
-                }
-            }
-
-            if (!count($this->errors)) {
-                $this->className = 'Source';
-                $this->table = 'source';
-                $this->boxes = Tools::getValue('sourceBox');
-                parent::processBulkDelete();
-                $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&conf=1&token='.$this->token;
-            }
+            return $this->postProcessBulkDeleteSource();
         } elseif (Tools::isSubmit('submitAddbusiness_source') || Tools::isSubmit('submitAddbusiness_sourceAndStay')) {
             return $this->postProcessBusinessSource();
         } elseif (Tools::isSubmit('delete'.$this->table)) {
-            $objBusinessSource = new BusinessSource((int)Tools::getValue('id_source_type'));
-            if (!$objBusinessSource->isRemovable()) {
-                $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Business Source.');
-            } else {
-                return parent::postProcess();
-            }
+            return $this->postProcessDeleteBusinessSource();
         } elseif (Tools::isSubmit('submitBulkdelete'.$this->table)) {
-            foreach (Tools::getValue($this->table.'Box') as $selection) {
-                $objBusinessSource = new BusinessSource((int)$selection);
-                if (!$objBusinessSource->isRemovable()) {
-                    $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Business Source.');
-                    break;
+            return $this->postProcessBulkDeleteBusinessSource();
+        } else {
+            return parent::postProcess();
+        }
+    }
+
+    protected function postProcessDeleteSource()
+    {
+        $objSource = new Source((int)Tools::getValue('id_source'));
+        if (!$objSource->isRemovable()) {
+            $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Booking Source.');
+        } elseif (!$objSource->delete()) {
+            $this->errors[] = Tools::displayError('An error occurred while deleting the Booking Source.');
+        } else {
+            Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$objSource->id_source_type.'&conf=1&token='.$this->token);
+        }
+    }
+
+    protected function postProcessStatusSource()
+    {
+        if (Validate::isLoadedObject($objSource = new Source((int)Tools::getValue('id_source')))) {
+            $idSourceType = $objSource->id_source_type;
+            $newActive = !$objSource->active;
+            $objBusinessSource = new BusinessSource($idSourceType);
+            if ($newActive && (!Validate::isLoadedObject($objBusinessSource) || !$objBusinessSource->active)) {
+                $this->errors[] = $this->l('You cannot enable this Booking Source because its Business Source is disabled.');
+            } else {
+                $objSource->active = $newActive;
+                if ($objSource->save()) {
+                    $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&conf=5&token='.$this->token;
                 }
             }
+        }
+    }
 
-            if (!count($this->errors)) {
-                return parent::postProcess();
+    protected function postProcessBulkDeleteSource()
+    {
+        $idSourceType = 0;
+        foreach (Tools::getValue('sourceBox') as $selection) {
+            $objSource = new Source((int)$selection);
+            $idSourceType = $objSource->id_source_type;
+            if (!$objSource->isRemovable()) {
+                $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Booking Source.');
+                break;
             }
+        }
+
+        if (!count($this->errors)) {
+            $this->className = 'Source';
+            $this->table = 'source';
+            $this->boxes = Tools::getValue('sourceBox');
+            parent::processBulkDelete();
+            $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&conf=1&token='.$this->token;
+        }
+    }
+
+    protected function postProcessDeleteBusinessSource()
+    {
+        $objBusinessSource = new BusinessSource((int)Tools::getValue('id_source_type'));
+        if (!$objBusinessSource->isRemovable()) {
+            $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Business Source.');
         } else {
+            return parent::postProcess();
+        }
+    }
+
+    protected function postProcessBulkDeleteBusinessSource()
+    {
+        foreach (Tools::getValue($this->table.'Box') as $selection) {
+            $objBusinessSource = new BusinessSource((int)$selection);
+            if (!$objBusinessSource->isRemovable()) {
+                $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Business Source.');
+                break;
+            }
+        }
+
+        if (!count($this->errors)) {
             return parent::postProcess();
         }
     }
@@ -488,9 +519,18 @@ class AdminSourcesControllerCore extends AdminController
         $idSourceType = (int)Tools::getValue('id_source_type');
         $this->className = 'Source';
         $this->table = 'source';
-        $this->boxes = Tools::getValue('sourceBox');    
+        $this->boxes = Tools::getValue('sourceBox');
         if(empty($this->boxes)){
             $this->errors[] = $this->l('You must select at least one item to perform a bulk action.');
+        } elseif ($status) {
+            foreach ($this->boxes as $selection) {
+                $objSource = new Source((int)$selection);
+                $objBusinessSource = new BusinessSource($objSource->id_source_type);
+                if (!Validate::isLoadedObject($objBusinessSource) || !$objBusinessSource->active) {
+                    $this->errors[] = $this->l('You cannot enable a Booking Source whose Business Source is disabled.');
+                    break;
+                }
+            }
         }
         $this->display = 'view';
         if(!$this->errors){
@@ -524,6 +564,8 @@ class AdminSourcesControllerCore extends AdminController
         $objBusinessSource = new BusinessSource($idSourceType);
         if (!Validate::isLoadedObject($objBusinessSource) || $objBusinessSource->deleted) {
             $this->errors[] = $this->l('Please select a valid Business Source.');
+        } elseif ((int)Tools::getValue('active') && !$objBusinessSource->active) {
+            $this->errors[] = $this->l('You cannot enable this Booking Source because its Business Source is disabled.');
         }
 
         if (!$sourceCode || !Validate::isModuleName($sourceCode)) {
@@ -644,12 +686,11 @@ class AdminSourcesControllerCore extends AdminController
         if ($this->tabAccess['edit'] === 1) {
             $idSourceType = (int)Tools::getValue('id_source_type');
             $idSource = (int)Tools::getValue('id_source');
-            $objSource = new Source($idSource);
-
+            $objSource = new Source($idSource,(int)$this->context->language->id);
             if (Validate::isLoadedObject($objSource) && (int)$objSource->id_source_type === $idSourceType) {
                 $this->context->smarty->assign(array(
-                    'sources' => Source::getActiveListForType($idSourceType, (int)$this->context->language->id),
-                    'id_current_source' => $idSource,
+                    'sources' => Source::getActiveSource($idSourceType, $idSource, (int)$this->context->language->id),
+                    'current_source' => $objSource,
                     'id_source_type' => $idSourceType,
                     'current_index' => self::$currentIndex,
                     'token' => $this->token,

@@ -129,13 +129,13 @@ class SourceCore extends ObjectModel
         return array_map('intval', array_column($rows, 'id_source'));
     }
 
-    public static function getActiveListForType($idSourceType, $idLang)
+    public static function getActiveSource($idSourceType, $idSource, $idLang)
     {
         return Db::getInstance()->executeS('
             SELECT a.`id_source`, al.`name`
             FROM `'._DB_PREFIX_.'source` a
             LEFT JOIN `'._DB_PREFIX_.'source_lang` al ON (al.`id_source` = a.`id_source` AND al.`id_lang` = '.(int)$idLang.')
-            WHERE a.`id_source_type` = '.(int)$idSourceType.' AND a.`deleted` = 0 AND a.`active` = 1
+            WHERE a.`id_source_type` = '.(int)$idSourceType.' AND a.`deleted` = 0 AND a.`id_source` NOT IN ('.(int)$idSource.') AND a.`active` = 1
             ORDER BY a.`position` ASC
         ');
     }

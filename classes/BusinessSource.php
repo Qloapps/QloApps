@@ -57,9 +57,25 @@ class BusinessSourceCore extends ObjectModel
         return parent::add($autodate, $nullValues);
     }
 
-    /**
-     * @return int Highest current position among non-deleted Business Sources, or -1 if none exist
-     */
+    public function update($nullValues = false)
+    {
+        $result = parent::update($nullValues);
+
+        if ($result && !$this->active) {
+            $this->disableSources();
+        }
+
+        return $result;
+    }
+
+    public function disableSources()
+    {
+        return (bool)Db::getInstance()->execute(
+            'UPDATE `'._DB_PREFIX_.'source` SET `active` = 0
+            WHERE `id_source_type` = '.(int)$this->id.' AND `deleted` = 0'
+        );
+    }
+
     public static function getHigherPosition()
     {
         $position = Db::getInstance()->getValue(
@@ -69,12 +85,6 @@ class BusinessSourceCore extends ObjectModel
         return is_numeric($position) ? (int)$position : -1;
     }
 
-    /**
-     * Move this Business Source up/down the list.
-     * @param bool $way Up (1) or Down (0)
-     * @param int $position
-     * @return bool
-     */
     public function updatePosition($way, $position)
     {
         if (!$res = Db::getInstance()->executeS('
@@ -110,10 +120,6 @@ class BusinessSourceCore extends ObjectModel
             WHERE `id_source_type` = '.(int)$moved_item['id_source_type']));
     }
 
-    /**
-     * Reorder Business Source positions into a contiguous 0..N-1 sequence. Call after a delete.
-     * @return bool
-     */
     public static function cleanPositions()
     {
         $return = true;
@@ -161,7 +167,7 @@ class BusinessSourceCore extends ObjectModel
             FROM `'._DB_PREFIX_.'business_source` bs
             LEFT JOIN `'._DB_PREFIX_.'business_source_lang` bsl
                 ON (bsl.`id_source_type` = bs.`id_source_type` AND bsl.`id_lang` = '.(int)$idLang.')
-            WHERE bs.`active` = 1 AND bs.`deleted` = 0
+            WHERE bs.`deleted` = 0
             ORDER BY bs.`position` ASC
         ');
     }

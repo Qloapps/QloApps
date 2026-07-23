@@ -391,7 +391,7 @@ class AdminOrdersControllerCore extends AdminController
 
         if (isset($row['booking_source_code']) && $row['booking_source_code'] === 'DIRECT_WEBSITE') {
             $title = Translate::getAdminTranslation('Visit website', 'AdminOrders', true);
-            $html .= ' <a href="'.Context::getContext()->link->getBaseLink().'" target="_blank" title="'.$title.'"><i class="icon-external-link"></i></a>';
+            $html .= ' <a href="'.Context::getContext()->link->getBaseLink().'" target="_blank" title="'.$title.'" onclick="event.stopPropagation();"><i class="icon-external-link"></i></a>';
         }
 
         return $html;
