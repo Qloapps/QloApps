@@ -169,7 +169,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         'id_order' => 'o.id_order',
         'reference' => 'o.reference',
         'id_room' => 'hbd.id_room',
-        'is_cancelled' => 'hbd.is_cancelled',
+        'is_cancelled' => 'IF(hbd.id_status = '.HotelBookingDetail::STATUS_CANCELLED.', 1, 0)',
         'stay' => 'stay',
         'room_status' => 'hbd.id_status',
         'booking_status' => 'o.current_state',

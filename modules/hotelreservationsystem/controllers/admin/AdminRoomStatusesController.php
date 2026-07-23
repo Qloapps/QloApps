@@ -21,7 +21,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-class AdminBookingStatusesController extends ModuleAdminController
+class AdminRoomStatusesController extends ModuleAdminController
 {
     public function __construct()
     {
@@ -53,11 +53,16 @@ class AdminBookingStatusesController extends ModuleAdminController
                 'title' => $this->l('Terminal (final) status'),
                 'align' => 'text-center',
                 'type' => 'bool',
+                'callback' => 'printYesNo',
                 'orderby' => false,
-                'search' => false,
                 'class' => 'fixed-width-sm',
             ),
         );
+    }
+
+    public function printYesNo($value)
+    {
+        return $value ? $this->l('Yes') : $this->l('No');
     }
 
     public function initToolbar()
@@ -73,7 +78,7 @@ class AdminBookingStatusesController extends ModuleAdminController
             || Tools::isSubmit('delete'.$this->table)
             || Tools::isSubmit('submitBulkdelete'.$this->table)
         ) {
-            $this->errors[] = $this->l('Booking statuses cannot be added or deleted.');
+            $this->errors[] = $this->l('Room statuses cannot be added or deleted.');
             return;
         }
 
@@ -86,9 +91,16 @@ class AdminBookingStatusesController extends ModuleAdminController
             return;
         }
 
+        // decoupled from the real 'is_terminal' field name on purpose: copyFromPost()
+        // writes any POST key matching a real object property, and 'disabled' on the
+        // switch only blocks submission client-side (removable via devtools). Using
+        // a name with no matching property makes server-side tampering impossible,
+        // not just hidden.
+        $this->fields_value['is_terminal_display'] = $this->object->is_terminal;
+
         $this->fields_form = array(
             'legend' => array(
-                'title' => $this->l('Booking Status'),
+                'title' => $this->l('Room Status'),
                 'icon' => 'icon-bookmark',
             ),
             'input' => array(
@@ -105,6 +117,25 @@ class AdminBookingStatusesController extends ModuleAdminController
                     'label' => $this->l('Color'),
                     'name' => 'color',
                     'required' => true,
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Terminal (final) status'),
+                    'name' => 'is_terminal_display',
+                    'hint' => $this->l('A terminal status is final — once a room reaches it, it can\'t move to any other status. Fixed per status, cannot be changed here.'),
+                    'disabled' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'is_terminal_on',
+                            'value' => 1,
+                            'label' => $this->l('Yes'),
+                        ),
+                        array(
+                            'id' => 'is_terminal_off',
+                            'value' => 0,
+                            'label' => $this->l('No'),
+                        ),
+                    ),
                 ),
             ),
             'submit' => array(

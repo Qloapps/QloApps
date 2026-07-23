@@ -347,6 +347,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 $this->context->language->id),
                 'current_id_lang' => $this->context->language->id,
                 'refundStatuses' => $refundStatuses,
+                'ROOM_STATUS_CANCELLED' => HotelBookingDetail::STATUS_CANCELLED,
                 'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
                 'paymentMethods' => $paymentMethods,
                 'name_controller' => Tools::getValue('controller'),
@@ -506,22 +507,31 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 $objHtlBooking = new HotelBookingDetail($idHtlBooking);
                                 $idOrderDetail = $objHtlBooking->id_order_detail;
 
+                                // refund_amounts entered by the admin is a single tax-incl figure;
+                                // derive the tax-excl portion using the booking's own tax ratio
+                                $refundedAmountTaxExcl = $objHtlBooking->total_price_tax_incl
+                                    ? $refundedAmount * ($objHtlBooking->total_price_tax_excl / $objHtlBooking->total_price_tax_incl)
+                                    : $refundedAmount;
+
                                 $bookingList[$idRetDetail] = array(
                                     'id_htl_booking' => $idHtlBooking,
                                     'id_order_detail' => $idOrderDetail,
                                     'quantity' => $numDays,
                                     'num_days' => $numDays,
-                                    'unit_price' => $refundedAmount / $numDays,
-                                    'amount' => $refundedAmount,
+                                    'unit_price' => $refundedAmountTaxExcl / $numDays,
                                 );
                             } elseif ($idServiceProductOrder = $objOrderReturnDetail->id_service_product_order_detail) {
                                 $objServiceProductOrderDetail = new ServiceProductOrderDetail($idServiceProductOrder);
+
+                                $refundedAmountTaxExcl = $objServiceProductOrderDetail->total_price_tax_incl
+                                    ? $refundedAmount * ($objServiceProductOrderDetail->total_price_tax_excl / $objServiceProductOrderDetail->total_price_tax_incl)
+                                    : $refundedAmount;
+
                                 $bookingList[$idRetDetail] = array(
                                     'id_service_product_order_detail' => $idServiceProductOrder,
                                     'id_order_detail' => $objServiceProductOrderDetail->id_order_detail,
                                     'quantity' => $objServiceProductOrderDetail->quantity,
-                                    'unit_price' => $refundedAmount / $objServiceProductOrderDetail->quantity,
-                                    'amount' => $refundedAmount,
+                                    'unit_price' => $refundedAmountTaxExcl / $objServiceProductOrderDetail->quantity,
                                 );
                             }
                         }
@@ -550,8 +560,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     if ($objRefundState->refunded) {
                         $idOrderState = $objOrder->getOrderCompleteRefundStatus();
 
-                        // If order is completely refunded or cancelled then change the order state
-                        if ($idOrderState) {
+                        // If order is completely refunded or cancelled then change the order
+                        // state — but only if it isn't already there (a No-show/Cancelled
+                        // order may have already been bumped to this same state earlier,
+                        // right when the room status itself changed, before this request
+                        // was ever approved — don't log a duplicate history row/email for that)
+                        if ($idOrderState && $idOrderState != $objOrder->current_state) {
                             // check if order is paid the set status of the order to refunded
                             $objOrderHistory = new OrderHistory();
                             $objOrderHistory->id_order = (int)$objOrder->id;

@@ -72,29 +72,17 @@ class HotelBookingStatus extends ObjectModel
 
     /**
      * @param int $idLang
-     * @param int|null $allowedFromStatus when given, only returns statuses reachable from this
-     *        one (per getAllowedTransitions()) instead of the full catalog — e.g. to build the
-     *        room-status dropdown for a booking currently at this status.
      * @return array catalog rows (id_status = id_booking_status, color, is_terminal, name), ordered by id
      */
-    public function getAllStatuses($idLang = 0, $allowedFromStatus = null)
+    public function getAllStatuses($idLang = 0)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
 
         $sql = 'SELECT hbs.*, hbs.`id_booking_status` AS id_status, hbsl.`name` FROM `'._DB_PREFIX_.$this->table.'` hbs
-            LEFT JOIN `'._DB_PREFIX_.$this->table.'_lang` hbsl ON hbs.`id_booking_status` = hbsl.`id_booking_status` AND hbsl.`id_lang` = '.(int) $idLang;
-
-        if ($allowedFromStatus !== null) {
-            $allowed = self::getAllowedTransitions((int) $allowedFromStatus);
-            if (!$allowed) {
-                return array();
-            }
-            $sql .= ' WHERE hbs.`id_booking_status` IN ('.implode(',', array_map('intval', $allowed)).')';
-        }
-
-        $sql .= ' ORDER BY hbs.`id_booking_status` ASC';
+            LEFT JOIN `'._DB_PREFIX_.$this->table.'_lang` hbsl ON hbs.`id_booking_status` = hbsl.`id_booking_status` AND hbsl.`id_lang` = '.(int) $idLang.'
+            ORDER BY hbs.`id_booking_status` ASC';
 
         return Db::getInstance()->executeS($sql);
     }

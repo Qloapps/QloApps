@@ -32,6 +32,8 @@
             <span class="toolbar_order_status_badge badge badge-danger">{l s='Refunded'}</span>
         {elseif $currentState->id == Configuration::get('PS_OS_CANCELED')}
             <span class="toolbar_order_status_badge badge badge-danger">{l s='Cancelled'}</span>
+        {elseif $currentState->id == Configuration::get('PS_OS_NO_SHOW')}
+            <span class="toolbar_order_status_badge badge badge-danger">{l s='No-show'}</span>
         {else}
             <span class="toolbar_order_status_badge badge badge-success">{l s='Booked'}</span>
         {/if}
@@ -104,8 +106,6 @@
                                                 <th>{l s='Check-In'}</th>
                                                 <th>{l s='Check-Out'}</th>
                                                 <th>{l s='Allotment'}</th>
-                                                <th>{l s='Room status'}</th>
-                                                <th>{l s='Refund'}</th>
                                                 <th>{l s='Action'}</th>
                                             </tr>
                                         </thead>
@@ -143,26 +143,14 @@
                                                             {/if}
                                                         </td>
                                                         <td>
-                                                            {if isset($htl_booking_statuses[$data.id_status])}
-                                                                <span class="badge" style="background-color:{$htl_booking_statuses[$data.id_status].color|escape:'html':'UTF-8'}">{$htl_booking_statuses[$data.id_status].name|escape:'html':'UTF-8'}</span>
-                                                            {/if}
-                                                        </td>
-                                                        <td>
-                                                            {if $data.refund_count}
-                                                                {displayPrice price=$data.refund_amount currency=$currency->id} ({$data.refund_count})
-                                                            {else}
-                                                                --
-                                                            {/if}
-                                                        </td>
-                                                        <td>
                                                             <a title="{l s='Upload/Check guest documents'}" class="btn btn-default" href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
                                                                 <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span> <i class="icon-file-text"></i>
                                                             </a>
 
-                                                            {if $data.id_status == $ROOM_STATUS_NO_SHOW || $data.id_status == $ROOM_STATUS_CANCELLED}
-                                                                <span class="badge badge-danger">{if $data.id_status == $ROOM_STATUS_NO_SHOW}{l s='No-show'}{else}{l s='Cancelled'}{/if}</span>
-                                                            {elseif isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
-                                                                <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
+                                                            {if $data.id_status == $ROOM_STATUS_NO_SHOW || (isset($data.is_sealed_no_show) && $data.is_sealed_no_show)}
+                                                                <span class="badge" style="background-color:{$htl_booking_statuses[$ROOM_STATUS_NO_SHOW].color|escape:'html':'UTF-8'}">{$htl_booking_statuses[$ROOM_STATUS_NO_SHOW].name|escape:'html':'UTF-8'}</span>
+                                                            {elseif $data.id_status == $ROOM_STATUS_CANCELLED || (isset($data.is_sealed_cancelled) && $data.is_sealed_cancelled)}
+                                                                <span class="badge" style="background-color:{$htl_booking_statuses[$ROOM_STATUS_CANCELLED].color|escape:'html':'UTF-8'}">{$htl_booking_statuses[$ROOM_STATUS_CANCELLED].name|escape:'html':'UTF-8'}</span>
                                                             {elseif $can_edit}
                                                                 <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}" data-check_in="{$data['check_in']}" data-check_out="{$data['check_out']}">
                                                                     <i class="icon-pencil"></i> {l s='Edit'}
@@ -273,7 +261,7 @@
                             </div>
                             <!-- Change status form -->
                             {* If current state is refunded or cancelled the further order status changes are not allowed *}
-                            {if $can_edit && (!isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))))}
+                            {if $can_edit && (!isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))))}
                                 <form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
                                     <div class="row">
                                         <div class="col-lg-9">
@@ -863,7 +851,7 @@
                         <div class="panel">
                             <div class="panel-heading">
                                 <i class="icon-bed"></i> &nbsp;{l s='Rooms Booking Detail'} <span class="badge">{$order_detail_data|@count}</span>
-                                {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))}
+                                {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
                                     <button type="button" id="add_room" class="btn btn-primary pull-right">
                                         <i class="icon-plus-sign"></i> {l s='Add Rooms'}
                                     </button>
@@ -883,7 +871,7 @@
                             <div class="panel">
                                 <div class="panel-heading">
                                     <i class="icon-bed"></i> &nbsp;{l s='Products Detail'} <span class="badge">{$hotel_service_products|count}</span>
-                                    {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))}
+                                    {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
                                         <button type="button" id="add_product" class="btn btn-primary pull-right">
                                             <i class="icon-plus-sign"></i> {l s='Add Product'}
                                         </button>
@@ -903,7 +891,7 @@
                             <div class="panel">
                                 <div class="panel-heading">
                                     <i class="icon-bed"></i> &nbsp;{l s='Products Detail'} <span class="badge">{$standalone_service_products|count}</span>
-                                    {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))}
+                                    {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
                                         <button type="button" id="add_product" class="btn btn-primary pull-right">
                                             <i class="icon-plus-sign"></i> {l s='Add Product'}
                                         </button>

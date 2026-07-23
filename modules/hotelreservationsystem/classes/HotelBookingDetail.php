@@ -46,8 +46,6 @@ class HotelBookingDetail extends ObjectModel
     public $total_paid_amount;       // Advance payment amount for the room
     public $is_back_order;
     public $id_status;
-    public $is_refunded;
-    public $is_cancelled;
     // public $available_for_order;
 
     // hotel information/location/contact
@@ -113,8 +111,6 @@ class HotelBookingDetail extends ObjectModel
             'total_price_tax_excl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
             'total_price_tax_incl' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'required' => true),
             'total_paid_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isPrice', 'default' => 0, 'required' => true),
-            'is_refunded' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'is_cancelled' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             // 'available_for_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'is_back_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
 
@@ -173,23 +169,6 @@ class HotelBookingDetail extends ObjectModel
     {
         $this->moduleInstance = Module::getInstanceByName('hotelreservationsystem');
         parent::__construct($id);
-    }
-
-    public function update($null_values = false)
-    {
-        $result = parent::update($null_values);
-
-        // if automatic overbooking resolution is enabled
-        if (Configuration::get('PS_OVERBOOKING_AUTO_RESOLVE')) {
-            // if room is getting free and this room is not already in back order then resolve the overbookings for this free room
-            // $this->is_cancelled == 1 is not checked because currently we always set is_refunded to 1 when room is free
-            // $this->is_back_order == 0 is checked because $this->is_back_order == 1 is used as room is free
-            if ($this->is_refunded == 1 && $this->is_back_order == 0) {
-                $this->resolveOverBookings();
-            }
-        }
-
-        return $result;
     }
 
     public function getBookingDataParams(&$params)
@@ -693,7 +672,7 @@ class HotelBookingDetail extends ObjectModel
         $excludeRoomId = array();
         $excludeRoomId['checked_out'] = 'SELECT `id_room`
         FROM `'._DB_PREFIX_.'htl_booking_detail`
-        WHERE `id_hotel` = '.(int)$idHotel.' AND `is_back_order` = 0 AND `is_refunded` = 0 AND IF(`id_status` = '. self::STATUS_CHECKED_OUT.',
+        WHERE `id_hotel` = '.(int)$idHotel.' AND `is_back_order` = 0 AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND IF(`id_status` = '. self::STATUS_CHECKED_OUT.',
             IF('.(int) $hourlyBooking.', 1, (DATE_FORMAT(`check_out`,  "%Y-%m-%d") != DATE_FORMAT(\''.pSQL($dateFrom).'\',  "%Y-%m-%d")) AND (`check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\')) AND (
                 (`date_from` <= \''.pSQL($dateFrom).'\' AND `check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\') OR
                 (`date_from` >= \''.pSQL($dateFrom).'\' AND `check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.pSQL($dateTo).'\') OR
@@ -1023,7 +1002,7 @@ class HotelBookingDetail extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
             INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = bd.`id_room`)
             INNER JOIN `'._DB_PREFIX_.'htl_room_type` AS hrt ON (hrt.`id_product` = rf.`id_product`)
-            WHERE bd.`id_hotel`='.(int)$idHotel.' AND rf.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE .' AND bd.`is_back_order` = 0 AND bd.`is_refunded` = 0 AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', IF('.(int) $hourlyBooking.', 1, (DATE_FORMAT(`check_out`,  "%Y-%m-%d") != DATE_FORMAT(\''.pSQL($dateFrom).'\',  "%Y-%m-%d")) AND (`check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\')) AND (
+            WHERE bd.`id_hotel`='.(int)$idHotel.' AND rf.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE .' AND bd.`is_back_order` = 0 AND bd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', IF('.(int) $hourlyBooking.', 1, (DATE_FORMAT(`check_out`,  "%Y-%m-%d") != DATE_FORMAT(\''.pSQL($dateFrom).'\',  "%Y-%m-%d")) AND (`check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\')) AND (
                 (bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.`check_out` > \''.pSQL($dateFrom).'\' AND bd.`check_out` < \''.pSQL($dateTo).'\') OR
                 (bd.`date_from` > \''.pSQL($dateFrom).'\' AND bd.`date_from` < \''.pSQL($dateTo).'\' AND bd.`check_out` >= \''.pSQL($dateTo).'\') OR
                 (bd.`date_from` > \''.pSQL($dateFrom).'\' AND bd.`date_from` < \''.pSQL($dateTo).'\' AND bd.`check_out` > \''.pSQL($dateFrom).'\' AND bd.`check_out` < \''.pSQL($dateTo).'\')
@@ -1356,7 +1335,7 @@ class HotelBookingDetail extends ObjectModel
 
         $selectBookedRoomSearch = 'SELECT `id`, `id_order`, `id_product`, `id_room`, `id_hotel`, `id_customer`, `booking_type`, `id_status` AS booking_status, `comment`, `room_num`, `date_from`, IF(`id_status` = '. self::STATUS_CHECKED_OUT.', `check_out`,`date_to`) AS `date_to`, `check_in`, `check_out`, `date_to` AS `booking_date_to`';
         $joinBookedRoomSearch = '';
-        $whereBookedRoomSearch = 'WHERE `id_hotel` = '.(int)$idHotel.' AND `is_back_order` = 0 AND `is_refunded` = 0 AND IF(`id_status` = '. self::STATUS_CHECKED_OUT.', (
+        $whereBookedRoomSearch = 'WHERE `id_hotel` = '.(int)$idHotel.' AND `is_back_order` = 0 AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND IF(`id_status` = '. self::STATUS_CHECKED_OUT.', (
             (`date_from` <= \''.pSQL($dateFrom).'\' AND `check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\') OR
             (`date_from` >= \''.pSQL($dateFrom).'\' AND `check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.pSQL($dateTo).'\') OR
             (`date_from` >= \''.pSQL($dateFrom).'\' AND `date_from` < \''.pSQL($dateTo).'\' AND `check_out` >= \''.pSQL($dateTo).'\') OR
@@ -1429,7 +1408,7 @@ class HotelBookingDetail extends ObjectModel
         $sql = 'SELECT `id`, `id_product`, `id_order`, `id_cart`, `id_room`, `id_hotel`, `id_customer`,
         `check_out`, `check_in`, `id_status`
         FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id_room` = '.(int)$id_room.
-        ' AND `is_back_order` = 0 AND `is_refunded` = 0 AND ((date_from <= \''.pSQL($date_from).'\' AND date_to > \''.
+        ' AND `is_back_order` = 0 AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND ((date_from <= \''.pSQL($date_from).'\' AND date_to > \''.
         pSQL($date_from).'\' AND date_to <= \''.pSQL($date_to).'\') OR (date_from > \''.pSQL($date_from).
         '\' AND date_to < \''.pSQL($date_to).'\') OR (date_from >= \''.pSQL($date_from).'\' AND date_from < \''.
         pSQL($date_to).'\' AND date_to >= \''.pSQL($date_to).'\') OR (date_from < \''.pSQL($date_from).
@@ -1902,7 +1881,7 @@ class HotelBookingDetail extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_booking_detail`
             WHERE `id_hotel` = '.(int)$hotel_id.' AND `id_product` = '.(int)$id_room_type.'
             AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'
-            AND `id_room`!='.(int)$id_room.' AND `is_refunded` = 0 AND `is_back_order` = 0';
+            AND `id_room`!='.(int)$id_room.' AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND `is_back_order` = 0';
 
         return Db::getInstance()->executeS($sql);
     }
@@ -2462,7 +2441,7 @@ class HotelBookingDetail extends ObjectModel
 
         // Get the booking details for the given rooms as per given parameters
         $idHotelBookingFrom = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_refunded` = 0
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
             AND `date_from`=\''.pSQL($dateFrom).'\'
             AND `date_to`=\''.pSQL($dateTo).'\'
             AND `id_room`='.(int)$idRoomFrom.
@@ -2470,7 +2449,7 @@ class HotelBookingDetail extends ObjectModel
         );
 
         $idHotelBookingTo = Db::getInstance()->getValue(
-            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_refunded` = 0
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
             AND `date_from`=\''.pSQL($dateFrom).'\'
             AND `date_to`=\''.pSQL($dateTo).'\'
             AND `id_room`='.(int)$idRoomTo.
@@ -2560,43 +2539,6 @@ class HotelBookingDetail extends ObjectModel
     }
 
     /**
-     * [updateOrderRefundStatus :: To update the refund status of a room booked in the order if amount refunded by the admin].
-     * @param [int]  $id_order  [Id of the order]
-     * @param [date] $date_from [start date of the bookin of the room]
-     * @param [date] $date_to   [end date of the bookin of the room]
-     * @param [int]  $id_room   [id of the room for which refund is done]
-     *
-     * @return [boolean] [true if updated otherwise false]
-     */
-    public function updateOrderRefundStatus($id_order, $date_from = false, $date_to = false, $id_rooms = array(), $is_refunded = 1, $is_cancelled = null)
-    {
-        $table = 'htl_booking_detail';
-        $data = array('is_refunded' => (int) $is_refunded);
-
-        if (!is_null($is_cancelled)) {
-            $data['is_cancelled'] = (int) $is_cancelled;
-        }
-
-        if ($id_rooms) {
-            foreach ($id_rooms as $key_rm => $val_rm) {
-                $where = 'id_order='.(int)$id_order.' AND id_room = '.(int)$val_rm['id_room'].' AND `date_from`= \''.
-                pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'';
-                $result = Db::getInstance()->update($table, $data, $where);
-            }
-        } else {
-            $result = Db::getInstance()->update($table, $data, 'id_order='.(int)$id_order);
-        }
-
-        // if automatic overbooking resolution is enabled
-        if ($result && Configuration::get('PS_OVERBOOKING_AUTO_RESOLVE') && $is_refunded) {
-            // if room is getting free and this room is not already in back order then resolve the overbookings for this free room
-            $this->resolveOverBookings();
-        }
-
-        return $result;
-    }
-
-    /**
      * [useTax : To get whether tax is enabled for the current group or disabled].
      *
      * @return [Boolean] [If tax is enabled for the current group returns true else returns false]
@@ -2661,7 +2603,7 @@ class HotelBookingDetail extends ObjectModel
             `date_to` != \''.pSQL($old_date_to).'\' AND `date_to` > \''.pSQL($new_date_from).'\',
             `check_out` != \''.pSQL($old_date_to).'\' AND `check_out` > \''.pSQL($new_date_from).'\'
         )
-        AND `is_refunded`=0 AND `is_back_order`=0';
+        AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND `is_back_order`=0';
 
         return Db::getInstance()->executeS($sql);
     }
@@ -2755,7 +2697,7 @@ class HotelBookingDetail extends ObjectModel
             $sql .= ' AND `id_status` IN ('.implode(',', array_map('intval', $idsStatus)).')';
         }
         if (!is_null($isRefunded)) {
-            $sql .= ' AND `is_refunded` = '.(int) $isRefunded;
+            $sql .= ' AND `id` '.($isRefunded ? '' : 'NOT ').'IN ('.OrderReturn::getRefundedBookingIdsSubquery().')';
         }
         if (!is_null($isBackOrder)) {
             $sql .= ' AND `is_back_order` = '.(int) $isBackOrder;
@@ -3652,16 +3594,21 @@ class HotelBookingDetail extends ObjectModel
                 $objOrderDetail->save();
             }
 
-            // as refund is completed then set the booking as refunded
-            $this->is_refunded = 1;
             if (!$hasOrderDiscountOrPayment) {
                 // Reduce room amount from htl_booking_detail
-                $this->is_cancelled = 1;
                 $this->total_price_tax_excl = 0;
                 $this->total_price_tax_incl = 0;
             }
 
             $this->save();
+
+            // if automatic overbooking resolution is enabled and this room is now
+            // free (and not itself a back-order room), resolve overbookings for it —
+            // moved here from update() since this is the one real trigger point:
+            // a completed refund freeing up the room, which only ever happens here
+            if (Configuration::get('PS_OVERBOOKING_AUTO_RESOLVE') && $this->is_back_order == 0) {
+                $this->resolveOverBookings();
+            }
 
             return true;
         }
@@ -3699,7 +3646,7 @@ class HotelBookingDetail extends ObjectModel
             $sql .= ' *';
         }
 
-        $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_back_order` = 1 AND `is_refunded` = 0 AND `is_cancelled` = 0';
+        $sql .= ' FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_back_order` = 1 AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND `id_status` != '.self::STATUS_CANCELLED;
 
         if ($idOrder) {
             $sql .= ' AND `id_order` = '.(int) $idOrder;
@@ -3757,7 +3704,7 @@ class HotelBookingDetail extends ObjectModel
      */
     public function getOverBookedOrders($onlyFutureDates = 0)
     {
-        $sql = 'SELECT DISTINCT `id_order` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_back_order` = 1 AND `is_refunded` = 0 AND `is_cancelled` = 0';
+        $sql = 'SELECT DISTINCT `id_order` FROM `'._DB_PREFIX_.'htl_booking_detail` WHERE `is_back_order` = 1 AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND `id_status` != '.self::STATUS_CANCELLED;
 
         if ($onlyFutureDates) {
             $sql .= ' AND `date_to` > \''.pSQL(date('Y-m-d')).'\'';

@@ -89,10 +89,15 @@
 	<td>
 		{convertPriceWithCurrency price=($data['total_room_price_ti']) currency=$currency->id}
 	</td>
+	<td>
+		{if isset($htl_booking_statuses[$data.id_status])}
+			<span class="badge" style="background-color:{$htl_booking_statuses[$data.id_status].color|escape:'html':'UTF-8'}">{$htl_booking_statuses[$data.id_status].name|escape:'html':'UTF-8'}</span>
+		{/if}
+	</td>
 	{if (isset($refundReqBookings) && $refundReqBookings)}
 		<td>
             {if $data.id|in_array:$refundReqBookings}
-			    {if $data.is_cancelled}
+			    {if $data.id_status == $ROOM_STATUS_CANCELLED}
 				    <span class="badge badge-danger">{l s='Cancelled'}</span>
 			    {elseif isset($data.refund_info) && (!$data.refund_info.refunded || $data.refund_info.id_customization)}
 				    <span class="badge" style="background-color:{$data.refund_info.color|escape:'html':'UTF-8'}">{$data.refund_info.name|escape:'html':'UTF-8'}</span>
@@ -102,6 +107,13 @@
 			{else}
                 <span>--</span>
             {/if}
+		</td>
+		<td>
+			{if $data.refund_count}
+				{convertPriceWithCurrency price=$data.refund_amount currency=$currency->id} ({$data.refund_count})
+			{else}
+				--
+			{/if}
 		</td>
 		<td>
 			{if $data.is_refunded && isset($data.refund_info) && $data.refund_info}
@@ -114,7 +126,7 @@
 	{if ($can_edit && !$order->hasBeenDelivered())}
 		<td class="product_action">
             <div class="btn-group">
-                {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_cancelled}
+                {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && ($data.id_status == $ROOM_STATUS_CANCELLED || $data.id_status == $ROOM_STATUS_NO_SHOW)}
                     <button href="#" class="btn btn-default delete_room_line">
                         <i class="icon-trash"></i>
                         {l s='Delete'}

@@ -234,7 +234,7 @@
 													</td>
                                                     {if $isRefundCompleted}
                                                         <td>
-                                                            {if $booking['is_cancelled']}
+                                                            {if $booking['id_status'] == $ROOM_STATUS_CANCELLED}
                                                                 <span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
                                                             {* used id_customization to check if in this request which bookings are refunded or not*}
                                                             {else if $booking['id_customization']}

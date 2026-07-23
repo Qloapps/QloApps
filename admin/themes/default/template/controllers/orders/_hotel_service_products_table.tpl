@@ -33,6 +33,7 @@
                     <th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
                     {if isset($refundReqProducts) && $refundReqProducts}
                         <th><span class="title_box">{l s='Refund State'}</span></th>
+                        <th><span class="title_box">{l s='Refund'}</span></th>
                         <th><span class="title_box">{l s='Refunded amount'}</span></th>
                     {/if}
                     {if $can_edit}
@@ -85,6 +86,13 @@
                                         {/if}
                                     {else}
                                         <span>--</span>
+                                    {/if}
+                                </td>
+                                <td>
+                                    {if $product.refund_count}
+                                        {convertPriceWithCurrency price=$product.refund_amount currency=$currency->id} ({$product.refund_count})
+                                    {else}
+                                        --
                                     {/if}
                                 </td>
                                 <td>
@@ -156,7 +164,7 @@
                     <tr>
                         {assign var=colspan value=6}
                         {if isset($refundReqProducts) && $refundReqProducts}
-                            {assign var=colspan value=($colspan+2)}
+                            {assign var=colspan value=($colspan+3)}
                         {/if}
                         {if ($can_edit)}
                             {assign var=colspan value=($colspan+1)}

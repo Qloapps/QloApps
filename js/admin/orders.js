@@ -1590,8 +1590,10 @@ $(document).ready(function() {
     // for updating Room status
     // toggle date input of check-in checkout dates as per status selected
     $(document).on('change', '.booking_order_status', function() {
-        var status = $(this).val();
-        var $form = $(this).closest('.room_status_info_form');
+        var $select = $(this);
+        var status = $select.val();
+        var $form = $select.closest('.room_status_info_form');
+
         if (status == ROOM_STATUS_CHECKED_IN || status == ROOM_STATUS_CHECKED_OUT) {
             $form.find('.room_status_date').closest('.form-group').show();
             var currentStatus = $form.data('current_status');
@@ -1604,10 +1606,6 @@ $(document).ready(function() {
             }
         } else {
             $form.find('.room_status_date').closest('.form-group').hide();
-        }
-
-        if (status == ROOM_STATUS_NO_SHOW || status == ROOM_STATUS_CANCELLED) {
-            showErrorMessage(room_status_sealed_warning_txt);
         }
     });
 
@@ -1640,6 +1638,10 @@ $(document).ready(function() {
 
     $(document).on('click', '.submitRoomStatus', function(e) {
         e.preventDefault();
+        var status = $('#room-status-modal .booking_order_status').val();
+        if ((status == ROOM_STATUS_NO_SHOW || status == ROOM_STATUS_CANCELLED) && !confirm(room_status_sealed_warning_txt)) {
+            return;
+        }
         RoomStatusModal.submit();
     });
     // End: RoomStatusModal: Processes
