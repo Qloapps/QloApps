@@ -1211,18 +1211,26 @@ class AdminControllerCore extends Controller
         if (ob_get_level() && ob_get_length() > 0) {
             ob_clean();
         }
+        $base_fields_list = $this->fields_list;
+
         $this->getList($this->context->language->id, null, null, 0, false);
         if (!count($this->_list)) {
             return;
         }
 
-        if ((int)Configuration::get('PS_EXPORT_FIELDS_TYPE') === CSV::QLO_EXPORT_FIELDS_SELECTED) {
+        if ((int)Configuration::get('PS_EXPORT_FIELDS_TYPE') === HelperList::QLO_EXPORT_FIELDS_SELECTED) {
             $list_visibility = json_decode($this->context->cookie->{'list_visibility_'.$this->context->controller->controller_name});
             foreach ($this->fields_list as $key => $field) {
-                if (!isset($field['optional']) || !$field['optional']) {
+                $reference_field = isset($base_fields_list[$key]) ? $base_fields_list[$key] : $field;
+
+                if (isset($reference_field['displayed']) && !$reference_field['displayed']) {
+                    unset($this->fields_list[$key]);
                     continue;
                 }
-                $is_selected = (!is_array($list_visibility) && isset($field['visible_default']) && $field['visible_default'])
+                if ((!isset($reference_field['optional']) || !$reference_field['optional']) && isset($base_fields_list[$key])) {
+                    continue;
+                }
+                $is_selected = (!is_array($list_visibility) && isset($reference_field['visible_default']) && $reference_field['visible_default'])
                     || ($list_visibility && in_array($key, $list_visibility));
                 if (!$is_selected) {
                     unset($this->fields_list[$key]);

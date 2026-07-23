@@ -202,11 +202,11 @@ class AdminPreferencesControllerCore extends AdminController
                     'cast' => 'intval',
                     'type' => 'select',
                     'list' => array(
-                        array('id' => CSV::QLO_EXPORT_FIELDS_ALL, 'name' => $this->l('All Fields')),
-                        array('id' => CSV::QLO_EXPORT_FIELDS_SELECTED, 'name' => $this->l('Selected Fields')),
+                        array('id' => HelperList::QLO_EXPORT_FIELDS_ALL, 'name' => $this->l('All Fields')),
+                        array('id' => HelperList::QLO_EXPORT_FIELDS_SELECTED, 'name' => $this->l('Selected Fields')),
                     ),
                     'identifier' => 'id',
-                    'defaultValue' => CSV::QLO_EXPORT_FIELDS_ALL,
+                    'defaultValue' => HelperList::QLO_EXPORT_FIELDS_ALL,
                 ),
                 // 'PS_DISPLAY_SUPPLIERS' => array(
                 //     'title' => $this->l('Display suppliers and manufacturers'),
