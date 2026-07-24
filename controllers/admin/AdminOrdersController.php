@@ -397,8 +397,11 @@ class AdminOrdersControllerCore extends AdminController
         $uniqueStayPeriods = count($stayPeriods);
 
         if ($uniqueStayPeriods > 1) {
-            $stayPeriodHtml .= ' <span class="qlo-stay-period-badge qlo-stay-period-tip" data-stay-tip="'
-                .htmlspecialchars(json_encode($stayPeriods)).'">+'
+            $stayPeriodHtml .= ' <span class="badge qlo-stay-period-badge"'
+                .' data-stay-tip="'.htmlspecialchars(json_encode($stayPeriods)).'"'
+                .' data-label-title="'.htmlspecialchars($this->l('Stay Periods')).'"'
+                .' data-label-duration="'.htmlspecialchars($this->l('Duration')).'"'
+                .' data-label-rooms="'.htmlspecialchars($this->l('Rooms')).'">+'
                 .($uniqueStayPeriods - 1).'</span>';
         }
         return $stayPeriodHtml;
@@ -1512,8 +1515,6 @@ class AdminOrdersControllerCore extends AdminController
         $this->tpl_list_vars['title'] = $this->l('Orders');
 
         $this->_new_list_header_design = true;
-
-        $this->content .= $this->context->smarty->fetch('controllers/orders/_stay_periods_tooltip.tpl');
 
         return parent::renderList();
     }

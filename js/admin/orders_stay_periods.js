@@ -21,76 +21,53 @@
 */
 
 $(document).ready(function () {
-    var closeTimer = null;
-
-    function stayPeriodTooltip(periods) {
-        var $stayPeriodCont = $('#qlo-stay-period-tooltip .qlo-stay-period-cont').clone();
-        var $stayPeriodBody = $stayPeriodCont.find('.qlo-stay-period-body').empty();
-
-        $stayPeriodBody.append(
-            $('<div class="qlo-stay-period qlo-stay-period-header">').append(
-                $('<span class="qlo-stay-period-element-head">').text($('#qlo-stay-period-tooltip').data('label-dates')),
-                $('<span class="qlo-stay-period-element-value">').text($('#qlo-stay-period-tooltip').data('label-rooms'))
-            )
-        );
-
-        $.each(periods, function (_, p) {
-            $stayPeriodBody.append(
-                $('<div class="qlo-stay-period">').append(
-                    $('<span class="qlo-stay-period-element-head">').text(p.from + ' – ' + p.to),
-                    $('<span class="qlo-stay-period-element-value">').text(p.count)
-                )
-            );
-        });
-        return $('<div>', {
-            'class': 'ui-tooltip ui-widget ui-corner-all ui-widget-content qlo-stay-period-tooltip',
-            'role' : 'tooltip'
-        }).append(
-            $('<div class="ui-tooltip-content">').append($stayPeriodCont)
-        );
+    if (typeof window.initStayPeriodTooltips === 'undefined') {
+        window.initStayPeriodTooltips = function () {
+            if (typeof $.fn.tooltip === 'undefined' || typeof $.ui === 'undefined' || typeof $.ui.tooltip === 'undefined') {
+                return;
+            }
+            $('.qlo-stay-period-badge').each(function () {
+                if ($(this).data('ui-tooltip')) {
+                    return;
+                }
+                $(this).tooltip({
+                    items: '.qlo-stay-period-badge',
+                    content: function () {
+                        var $badge = $(this);
+                        var periods = $badge.data('stay-tip');
+                        if (!periods || !periods.length) {
+                            return '';
+                        }
+                        var html = '<div class="tooltip_cont qlo-stay-period-tooltip">';
+                        html += '<div class="tip_header"><div class="tip_date">' + $badge.data('label-title') + '</div></div>';
+                        html += '<div class="tip-body">';
+                        html += '<div class="qlo-stay-period-row qlo-stay-period-row-header">'
+                            + '<span class="tip_element_head">' + $badge.data('label-duration') + '</span>'
+                            + '<span class="tip_element_head">' + $badge.data('label-rooms') + '</span>'
+                            + '</div>';
+                        $.each(periods, function (_, p) {
+                            html += '<div class="qlo-stay-period-row">'
+                                + '<span class="tip_element_value">' + p.from + ' – ' + p.to + '</span>'
+                                + '<span class="tip_element_value">' + p.count + '</span>'
+                                + '</div>';
+                        });
+                        html += '</div></div>';
+                        return html;
+                    },
+                    position: { my: 'left top+10', at: 'left bottom', collision: 'flipfit', within: '#content' },
+                    close: function (event, ui) {
+                        ui.tooltip.hover(function () {
+                            $(this).stop(true).fadeTo(300, 1);
+                        },
+                        function () {
+                            $(this).fadeOut('300', function () {
+                                $(this).remove();
+                            });
+                        });
+                    }
+                });
+            });
+        };
     }
-
-    function cancelClose() {
-        clearTimeout(closeTimer);
-        closeTimer = null;
-    }
-
-    function scheduleClose($tip) {
-        cancelClose();
-        closeTimer = setTimeout(function () {
-            $tip.fadeOut(300, function () { $tip.remove(); });
-        }, 300);
-    }
-
-    $(document).on('mouseenter', '.qlo-stay-period-tip', function () {
-        cancelClose();
-
-        var periods = $(this).data('stay-tip');
-        if (!periods || !periods.length) { return; }
-
-        $('.qlo-stay-period-tooltip').stop(true).remove();
-
-        var $icon = $(this);
-        var $tip  = stayPeriodTooltip(periods).appendTo('body').hide().fadeIn(200);
-
-        var iconOffset = $icon.offset();
-        $tip.css({
-            position : 'absolute',
-            zIndex   : 9999,
-            top      : iconOffset.top + ($icon.outerHeight() / 2) - ($tip.outerHeight() / 2),
-            left     : iconOffset.left + $icon.outerWidth() + 8
-        });
-
-        $tip.on('mouseenter', function () {
-            cancelClose();
-        }).on('mouseleave', function () {
-            scheduleClose($tip);
-        });
-
-    }).on('mouseleave', '.qlo-stay-period-tip', function () {
-        var $tip = $('.qlo-stay-period-tooltip');
-        if ($tip.length) {
-            scheduleClose($tip);
-        }
-    });
+    window.initStayPeriodTooltips();
 });
