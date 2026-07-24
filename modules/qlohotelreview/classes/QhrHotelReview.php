@@ -290,9 +290,13 @@ class QhrHotelReview extends ObjectModel
     public function saveReviewImages()
     {
         $files = QhrHotelReviewHelper::fileAttachmentMultiple('images');
+        $allowedExtensions = array('jpg', 'png', 'jpeg',);
         if (is_array($files) && count($files)) {
             foreach ($files as $key => $file) {
                 $ext = pathinfo($file['rename'], PATHINFO_EXTENSION);
+                if (!in_array($ext, $allowedExtensions, true)) {
+                    continue;
+                }
                 $dir = _PS_MODULE_DIR_.'qlohotelreview/views/img/review/'.Image::getImgFolderStatic($this->id);
                 QhrHotelReviewHelper::createDirectory($dir);
                 $useSameExt = false;

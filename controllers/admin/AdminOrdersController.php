@@ -436,12 +436,15 @@ class AdminOrdersControllerCore extends AdminController
                     );
                 }
 
-                $this->page_header_toolbar_btn['print'] = array(
-                    'short' => $this->l('Print'),
-                    'href' => 'javascript:window.print()',
-                    'desc' => $this->l('Print order'),
-                    'class' => 'icon-print',
-                );
+                if (HotelBookingDetail::getIdHotelByIdOrder($order->id, false) && !$this->lite_display) {
+                    $this->page_header_toolbar_btn['booking_voucher'] = array(
+                        'short' => $this->l('Booking Voucher'),
+                        'href' => $this->context->link->getAdminLink('AdminPdf').'&submitAction=generateBookingVoucherPDF&id_order='.$order->id,
+                        'desc' => $this->l('View booking voucher'),
+                        'class' => 'icon-file-text',
+                        'target' => true,
+                    );
+                }
 
                 if ($this->tabAccess['edit'] === 1) {
                     if (((int) $order->isReturnable())
@@ -3268,6 +3271,7 @@ class AdminOrdersControllerCore extends AdminController
         if (!Validate::isLoadedObject($order = new Order(Tools::getValue('id_order')))) {
             return;
         }
+
         if ($this->tabAccess['kpi'] === 1) {
             $this->content .= $this->renderKpis();
         }
@@ -3630,6 +3634,7 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['amt_with_qty_tax_incl'] = $value['total_price_tax_incl'];
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
                 $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
+                $order_detail_data[$key]['connected_rooms'] = HotelConnectedRoom::getConnectedRooms($value['id_room'], null, null, (int) Context::getContext()->language->id);
 
                 if (isset($value['refund_info'])
                     && $value['refund_info']['refunded']
