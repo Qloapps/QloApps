@@ -54,6 +54,7 @@
 				<input type="hidden" name="lang" value="{$lang}" />
 				<input type="hidden" name="type" value="{$type}" />
 				<input type="hidden" name="theme" value="{$theme}" />
+				<input type="hidden" name="reset_mail_name" id="reset_mail_name" value="" />
 				<script type="text/javascript">
 					$(document).ready(function(){
 						$('a.useSpecialSyntax').click(function(){
@@ -80,6 +81,12 @@
 					<a name="submitTranslations{$type|ucfirst}" href="{$cancel_url}" class="btn btn-default">
 						<i class="process-icon-cancel"></i> {l s='Cancel'}
 					</a>
+					{if $theme}
+					<button type="submit" id="{$table}_form_reset_btn" name="submitResetTranslations{$type|ucfirst}" class="btn btn-default js-mail-template-reset-btn" disabled="disabled">
+						<i class="process-icon-refresh"></i>
+						{l s='Reset'}
+					</button>
+					{/if}
 					{*$toggle_button*}
 					<button type="submit" id="{$table}_form_submit_btn" name="submitTranslations{$type|ucfirst}" class="btn btn-default pull-right">
 						<i class="process-icon-save"></i>
@@ -113,7 +120,17 @@
 							// get source url for active email
 							var src = frame.data('email-src');
 							// get rte container for active email
-							var rte_mail_selector = active_email.find('textarea.rte-mail').data('rte');
+							var rte_textarea = active_email.find('textarea.rte-mail');
+							var rte_mail_selector = rte_textarea.data('rte');
+							var rte_name_match = (rte_textarea.attr('name') || '').match(/\[html\]\[(.+)\]$/);
+							if (rte_name_match) {
+								$('#reset_mail_name').val(rte_name_match[1]);
+								$('.js-mail-template-reset-btn').prop('disabled', false);
+								rte_textarea
+							} else {
+								$('#reset_mail_name').val('');
+								$('.js-mail-template-reset-btn').prop('disabled', true);
+							}
 							// create special config
 							var rte_mail_config = {};
 							rte_mail_config['editor_selector'] = 'rte-mail-' + rte_mail_selector;
@@ -147,7 +164,36 @@
 
 							}
 						});
+
+						$('.mail-variable-tag').on('click', function () {
+							var textarea = $(this).closest('.email-collapse').find('> .tab-content > .tab-pane.active textarea').get(0);
+							insertVariable(textarea, $(this).data('variable'));
+						});
 					})
+
+					function insertVariable(field, text) {
+						if (!field) {
+							return;
+						}
+
+						var editor = (typeof tinymce !== 'undefined' && field.id) ? tinymce.get(field.id) : null;
+
+						if (editor) {
+							editor.execCommand('mceInsertContent', false, text);
+							editor.focus();
+							return;
+						}
+
+						field.focus();
+						if (typeof field.selectionStart === 'number') {
+							var startPos = field.selectionStart;
+							var endPos = field.selectionEnd;
+							field.value = field.value.substring(0, startPos) + text + field.value.substring(endPos, field.value.length);
+							field.selectionStart = field.selectionEnd = startPos + text.length;
+						} else {
+							field.value += text;
+						}
+					}
 				//]]>
 				</script>
 				{/literal}

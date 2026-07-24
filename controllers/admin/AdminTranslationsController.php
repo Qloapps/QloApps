@@ -1480,6 +1480,12 @@ class AdminTranslationsControllerCore extends AdminController
                 } else {
                     $this->errors[] = Tools::displayError('You do not have permission to edit this.');
                 }
+            } elseif (Tools::isSubmit('submitResetTranslationsMails')) {
+                if ($this->tabAccess['edit'] === 1) {
+                    $this->submitResetTranslationsMails();
+                } else {
+                    $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+                }
             } elseif (Tools::isSubmit('submitTranslationsMails') || Tools::isSubmit('submitTranslationsMailsAndStay')) {
                 if ($this->tabAccess['edit'] === 1) {
                     $this->submitTranslationsMails();
@@ -1661,6 +1667,51 @@ class AdminTranslationsControllerCore extends AdminController
         } else {
             $this->redirect();
         }
+    }
+
+    protected function submitResetTranslationsMails()
+    {
+        if (!$this->theme_selected) {
+            return;
+        }
+
+        $iso_code = $this->lang_selected->iso_code;
+        $module_name = false;
+
+        $mail_name = Tools::getValue('reset_mail_name');
+        if (($pos = stripos($mail_name, '|')) !== false) {
+            $module_name = substr($mail_name, 0, $pos);
+            $mail_name = substr($mail_name, $pos + 1);
+        }
+        if (!Validate::isTplName($mail_name) || ($module_name && !Validate::isModuleName($module_name))) {
+            $this->errors[] = Tools::displayError('Invalid mail template to reset.');
+            return;
+        }
+
+        if ($module_name) {
+            $core_dir = rtrim($this->translations_informations['modules']['dir'], '/').'/'.$module_name.'/mails/'.$iso_code.'/';
+            $dest_dir = $this->theme_selected ? $this->translations_informations['modules']['override']['dir'].$module_name.'/mails/'.$iso_code.'/' : $core_dir;
+        } else {
+            $core_dir = $this->translations_informations['mails']['dir'];
+            $dest_dir = $this->theme_selected ? $this->translations_informations['mails']['override']['dir'] : $core_dir;
+        }
+
+        if (!Tools::file_exists_cache($core_dir)) {
+            $this->errors[] = Tools::displayError('No core mail template found to reset from.');
+            return;
+        }
+
+        if (!file_exists($dest_dir) && !mkdir($dest_dir, 0777, true)) {
+            $this->errors[] = (sprintf(Tools::displayError('Directory "%s" cannot be created'), $dest_dir));
+        }
+
+        foreach (array($mail_name.'.html', $mail_name.'.txt') as $file) {
+            if (Tools::file_exists_cache($core_dir.$file)) {
+                file_put_contents($dest_dir.$file, file_get_contents($core_dir.$file));
+            }
+        }
+
+        $this->redirect(true);
     }
 
     /**
@@ -2362,9 +2413,12 @@ class AdminTranslationsControllerCore extends AdminController
                         $str_return .= '</div>';
                     }
 
+                    $mail_available_variables = $this->displayMailAvailableVariables($mail_files);
+
                     if (array_key_exists('txt', $mail_files)) {
                         $str_return .= '<div class="tab-pane" id="'.$mail_name.'-text">';
                         $str_return .= $this->displayMailBlockTxt($mail_files['txt'], $obj_lang->iso_code, $mail_name, $group_name, $name_for_module);
+                        $str_return .= $mail_available_variables;
                         $str_return .= '</div>';
                     }
 
@@ -2372,6 +2426,7 @@ class AdminTranslationsControllerCore extends AdminController
                     if (isset($mail_files['html'])) {
                         $str_return .= $this->displayMailEditor($mail_files['html'], $obj_lang->iso_code, $url_mail, $mail_name, $group_name, $name_for_module);
                     }
+                    $str_return .= $mail_available_variables;
                     $str_return .= '</div>';
 
                     $str_return .= '</div>';
@@ -2389,6 +2444,70 @@ class AdminTranslationsControllerCore extends AdminController
         $str_return .= '</div><!-- #'.$id_html.' --></div><!-- end .mails_field -->';
         return $str_return;
     }
+
+    /**
+     * Build the "Available variables" tag list for a mail template, so the
+     * admin can see which {variable} placeholders the template supports and
+     * click one to insert it into the editor.
+     *
+     * @param array $mail_files Same structure as $mails['files'][$mail_name]
+     *
+     * @return string
+     */
+    protected function displayMailAvailableVariables($mail_files)
+    {
+        $variables = $this->getMailTemplateVariables($mail_files);
+        if (empty($variables)) {
+            return '';
+        }
+
+        // Bootstrap's .label is display:inline with vertical padding, so it can't take a
+        // vertical margin; without extra line-height here, wrapped rows visually overlap.
+        $str_return = '<div class="mail-available-variables" style="line-height:2.4;">';
+        foreach ($variables as $variable) {
+            $tag = '{'.$variable.'}';
+            $str_return .= '<span class="label label-default pointer mail-variable-tag" data-variable="'.Tools::htmlentitiesUTF8($tag).'">'.Tools::htmlentitiesUTF8($tag).'</span> ';
+        }
+        $str_return .= '</div>';
+
+        return $str_return;
+    }
+
+    /**
+     * Extract the unique {variable} placeholders used in a mail template's
+     * core content. Reads the 'en' key populated by getMailFiles(), which
+     * actually holds whichever language resolved as the shop's default
+     * (English, or PS_LANG_DEFAULT when English isn't an installed language)
+     * - falls back to any other available language content in the rare case
+     * that key isn't set.
+     *
+     * @param array $mail_files Same structure as $mails['files'][$mail_name]
+     *
+     * @return array Variable names, without braces, sorted alphabetically
+     */
+    protected function getMailTemplateVariables($mail_files)
+    {
+        $content = '';
+        foreach (array('html', 'txt') as $type) {
+            if (empty($mail_files[$type]) || !is_array($mail_files[$type])) {
+                continue;
+            }
+            if (isset($mail_files[$type]['en'])) {
+                $content .= ' '.$mail_files[$type]['en'];
+            } else {
+                $content .= ' '.reset($mail_files[$type]);
+            }
+        }
+
+        $variables = array();
+        if ($content !== '' && preg_match_all('/\{([a-zA-Z0-9_]+)\}/', $content, $matches)) {
+            $variables = array_unique($matches[1]);
+            sort($variables);
+        }
+
+        return $variables;
+    }
+
     /**
      * Just build the html structure for display txt mails
      * @since 1.4.0.14
@@ -3070,9 +3189,33 @@ class AdminTranslationsControllerCore extends AdminController
         }
 
         $sanitizedFilePath = realpath($email_file);
-        $permittedMailDir  = realpath(_PS_MAIL_DIR_) . DIRECTORY_SEPARATOR;
+        if ($sanitizedFilePath === false) {
+            return false;
+        }
 
-        if ($sanitizedFilePath === false || $permittedMailDir === false || strpos($sanitizedFilePath, $permittedMailDir) !== 0) {
+        // Mail templates can also live under a theme's or a module's own
+        // "mails" override directory (themes/<theme>/mails/<iso>/,
+        // modules/<module>/mails/<iso>/, or their theme-override copies),
+        // not just the core mails/ directory - so every permitted root below
+        // is additionally required to have a "mails" path segment.
+        $permitted_roots = array(
+            realpath(_PS_MAIL_DIR_),
+            realpath(_PS_ROOT_DIR_.'/themes/'),
+            realpath(_PS_ROOT_DIR_.'/modules/'),
+        );
+
+        $is_permitted = false;
+        foreach ($permitted_roots as $permitted_root) {
+            if ($permitted_root !== false
+                && strpos($sanitizedFilePath, $permitted_root.DIRECTORY_SEPARATOR) === 0
+                && strpos($sanitizedFilePath, DIRECTORY_SEPARATOR.'mails'.DIRECTORY_SEPARATOR) !== false
+            ) {
+                $is_permitted = true;
+                break;
+            }
+        }
+
+        if (!$is_permitted) {
             return false;
         }
 
