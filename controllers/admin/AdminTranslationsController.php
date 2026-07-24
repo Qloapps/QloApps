@@ -2445,15 +2445,6 @@ class AdminTranslationsControllerCore extends AdminController
         return $str_return;
     }
 
-    /**
-     * Build the "Available variables" tag list for a mail template, so the
-     * admin can see which {variable} placeholders the template supports and
-     * click one to insert it into the editor.
-     *
-     * @param array $mail_files Same structure as $mails['files'][$mail_name]
-     *
-     * @return string
-     */
     protected function displayMailAvailableVariables($mail_files)
     {
         $variables = $this->getMailTemplateVariables($mail_files);
@@ -2461,8 +2452,6 @@ class AdminTranslationsControllerCore extends AdminController
             return '';
         }
 
-        // Bootstrap's .label is display:inline with vertical padding, so it can't take a
-        // vertical margin; without extra line-height here, wrapped rows visually overlap.
         $str_return = '<div class="mail-available-variables" style="line-height:2.4;">';
         foreach ($variables as $variable) {
             $tag = '{'.$variable.'}';
@@ -2473,18 +2462,6 @@ class AdminTranslationsControllerCore extends AdminController
         return $str_return;
     }
 
-    /**
-     * Extract the unique {variable} placeholders used in a mail template's
-     * core content. Reads the 'en' key populated by getMailFiles(), which
-     * actually holds whichever language resolved as the shop's default
-     * (English, or PS_LANG_DEFAULT when English isn't an installed language)
-     * - falls back to any other available language content in the rare case
-     * that key isn't set.
-     *
-     * @param array $mail_files Same structure as $mails['files'][$mail_name]
-     *
-     * @return array Variable names, without braces, sorted alphabetically
-     */
     protected function getMailTemplateVariables($mail_files)
     {
         $content = '';
@@ -3189,33 +3166,9 @@ class AdminTranslationsControllerCore extends AdminController
         }
 
         $sanitizedFilePath = realpath($email_file);
-        if ($sanitizedFilePath === false) {
-            return false;
-        }
+        $permittedMailDir  = realpath(_PS_MAIL_DIR_) . DIRECTORY_SEPARATOR;
 
-        // Mail templates can also live under a theme's or a module's own
-        // "mails" override directory (themes/<theme>/mails/<iso>/,
-        // modules/<module>/mails/<iso>/, or their theme-override copies),
-        // not just the core mails/ directory - so every permitted root below
-        // is additionally required to have a "mails" path segment.
-        $permitted_roots = array(
-            realpath(_PS_MAIL_DIR_),
-            realpath(_PS_ROOT_DIR_.'/themes/'),
-            realpath(_PS_ROOT_DIR_.'/modules/'),
-        );
-
-        $is_permitted = false;
-        foreach ($permitted_roots as $permitted_root) {
-            if ($permitted_root !== false
-                && strpos($sanitizedFilePath, $permitted_root.DIRECTORY_SEPARATOR) === 0
-                && strpos($sanitizedFilePath, DIRECTORY_SEPARATOR.'mails'.DIRECTORY_SEPARATOR) !== false
-            ) {
-                $is_permitted = true;
-                break;
-            }
-        }
-
-        if (!$is_permitted) {
+        if ($sanitizedFilePath === false || $permittedMailDir === false || strpos($sanitizedFilePath, $permittedMailDir) !== 0) {
             return false;
         }
 
