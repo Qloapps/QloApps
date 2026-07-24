@@ -358,6 +358,28 @@ class CartRuleCore extends ObjectModel
                     unset($result[$key]);
                 }
             }
+
+            // Remove cart rule if the cart contains a product from a hotel not covered by its hotel restriction
+            foreach ($result as $key => $cart_rule) {
+                if ($cart_rule['hotel_restriction']) {
+                    $total_cart_products = (int)Db::getInstance()->getValue('
+                        SELECT COUNT(cp.id_product)
+                        FROM '._DB_PREFIX_.'cart_product cp
+                        WHERE cp.id_cart = '.(int)$cart->id
+                    );
+                    $allowed_cart_products = (int)Db::getInstance()->getValue('
+                        SELECT COUNT(cp.id_product)
+                        FROM '._DB_PREFIX_.'cart_product cp
+                        INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
+                        INNER JOIN '._DB_PREFIX_.'cart_rule_hotel crh ON crh.id_hotel = hrt.id_hotel
+                        WHERE crh.id_cart_rule = '.(int)$cart_rule['id_cart_rule'].'
+                        AND cp.id_cart = '.(int)$cart->id
+                    );
+                    if (!$total_cart_products || $total_cart_products != $allowed_cart_products) {
+                        unset($result[$key]);
+                    }
+                }
+            }
         }
 
         $result_bak = $result;
@@ -640,17 +662,22 @@ class CartRuleCore extends ObjectModel
             }
         }
 
-        // Check if the cart contains a product from a restricted hotel
+        // Check if all the products in the cart belong to the restricted hotel(s)
         if ($this->hotel_restriction) {
-            $id_cart_rule = (int)Db::getInstance()->getValue('
-                SELECT crh.id_cart_rule
-                FROM '._DB_PREFIX_.'cart_rule_hotel crh
-                INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_hotel = crh.id_hotel
-                INNER JOIN '._DB_PREFIX_.'cart_product cp ON cp.id_product = hrt.id_product
+            $total_cart_products = (int)Db::getInstance()->getValue('
+                SELECT COUNT(cp.id_product)
+                FROM '._DB_PREFIX_.'cart_product cp
+                WHERE cp.id_cart = '.(int)$context->cart->id
+            );
+            $allowed_cart_products = (int)Db::getInstance()->getValue('
+                SELECT COUNT(cp.id_product)
+                FROM '._DB_PREFIX_.'cart_product cp
+                INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
+                INNER JOIN '._DB_PREFIX_.'cart_rule_hotel crh ON crh.id_hotel = hrt.id_hotel
                 WHERE crh.id_cart_rule = '.(int)$this->id.'
                 AND cp.id_cart = '.(int)$context->cart->id
             );
-            if (!$id_cart_rule) {
+            if (!$total_cart_products || $total_cart_products != $allowed_cart_products) {
                 return (!$display_error) ? false : Tools::displayError('You cannot use this voucher with the selected hotels');
             }
         }
