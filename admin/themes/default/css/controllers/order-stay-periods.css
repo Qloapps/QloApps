@@ -20,46 +20,14 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-.qlo-stay-period-tooltip {
-    border: none;
-    padding-bottom: 10px;
-    min-width: 260px;
+.qlo-stay-period-tooltip .tip-body {
+    display: block;
 }
-.qlo-stay-period-tooltip .qlo-stay-period-date {
-    font-weight: bold;
+.qlo-stay-period-tooltip .qlo-stay-period-row {
+    display: flex;
+    justify-content: space-between;
 }
-.qlo-stay-period-tooltip .qlo-stay-period-body {
-    display: table;
-    width: 100%;
-    margin-top: 6px;
-}
-.qlo-stay-period-tooltip .qlo-stay-period {
-    display: table-row;
-}
-.qlo-stay-period-tooltip .qlo-stay-period-element-head,
-.qlo-stay-period-tooltip .qlo-stay-period-element-value {
-    display: table-cell;
-    padding: 3px 6px;
-}
-.qlo-stay-period-tooltip .qlo-stay-period-element-value {
-    text-align: right;
-}
-.qlo-stay-period-tooltip .qlo-stay-period-header .qlo-stay-period-element-head,
-.qlo-stay-period-tooltip .qlo-stay-period-header .qlo-stay-period-element-value {
+.qlo-stay-period-tooltip .qlo-stay-period-row-header {
     border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
-}
-.qlo-stay-period-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #666;
-    color: #fff;
-    border-radius: 50%;
-    width: 21px;
-    height: 21px;
-    font-size: 10px;
-    font-weight: bold;
-    padding: 0 4px;
-    cursor: pointer;
+    padding-bottom: 6px;
 }
