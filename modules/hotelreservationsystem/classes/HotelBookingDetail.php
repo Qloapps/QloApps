@@ -4179,12 +4179,15 @@ class HotelBookingDetail extends ObjectModel
         $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
         $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
-        $idStatus   = isset($params['id_status'])   ? (int) $params['id_status']   : 0;
+        $idStatus    = isset($params['id_status'])    ? (int) $params['id_status']  : 0;
+        $allStatuses = !empty($params['all_statuses']);
 
-        $statusFilter = $idStatus
-            ? ' AND hbd.`id_status` = '.$idStatus
-            : ' AND hbd.`id_status` != '.(int) self::STATUS_CHECKED_IN.
-              ' AND hbd.`id_status` != '.(int) self::STATUS_CHECKED_OUT;
+        $statusFilter = $allStatuses
+            ? ''
+            : ($idStatus
+                ? ' AND hbd.`id_status` = '.$idStatus
+                : ' AND hbd.`id_status` != '.(int) self::STATUS_CHECKED_IN.
+                  ' AND hbd.`id_status` != '.(int) self::STATUS_CHECKED_OUT);
 
         return Db::getInstance()->executeS(
             'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
@@ -4207,6 +4210,22 @@ class HotelBookingDetail extends ObjectModel
     }
 
     /**
+     * Arrival count summary for a single date: how many expected vs already checked in.
+     * Replicates: AdminStatsController::getArrivalsByDate()
+     *
+     * @param string    $date     Y-m-d
+     * @param int|false $idHotel
+     * @return array  ['arrived' => int, 'total_arrivals' => int]
+     */
+    public static function getArrivalsByDate($date, $idHotel = false)
+    {
+        return array(
+            'arrived'        => self::getTotalArrivals(array('date_from' => $date, 'id_hotel' => $idHotel, 'id_status' => self::STATUS_CHECKED_IN)),
+            'total_arrivals' => self::getTotalArrivals(array('date_from' => $date, 'id_hotel' => $idHotel, 'all_statuses' => true)),
+        );
+    }
+
+    /**
      * Due-to-depart rows: checked-in rooms whose date_to falls in the range.
      * Replicates: AdminStatsController::getDeparturesInfoByDate()
      *
@@ -4223,7 +4242,8 @@ class HotelBookingDetail extends ObjectModel
         $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
         $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
-        $idStatus   = isset($params['id_status'])   ? (int) $params['id_status']   : (int) self::STATUS_CHECKED_IN;
+        $idStatus    = isset($params['id_status'])    ? (int) $params['id_status']  : (int) self::STATUS_CHECKED_IN;
+        $allStatuses = !empty($params['all_statuses']);
 
         return Db::getInstance()->executeS(
             'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
@@ -4235,12 +4255,31 @@ class HotelBookingDetail extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
             WHERE hbd.`is_refunded` = 0
-            AND hbd.`date_to` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
-            AND hbd.`id_status` = '.$idStatus
+            AND hbd.`date_to` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($allStatuses ? '' : ' AND hbd.`id_status` = '.$idStatus)
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+    }
+
+    /**
+     * Departure count summary for a single date: how many expected vs already checked out.
+     * Replicates: AdminStatsController::getDeparturesByDate()
+     *
+     * @param string    $date     Y-m-d
+     * @param int|false $idHotel
+     * @return array  ['departed' => int, 'total_departures' => int]
+     */
+    public static function getDeparturesByDate($date, $idHotel = false)
+    {
+        $departed = self::getTotalDepartures(array('date_from' => $date, 'id_hotel' => $idHotel, 'id_status' => self::STATUS_CHECKED_OUT));
+        $stillIn  = self::getTotalDepartures(array('date_from' => $date, 'id_hotel' => $idHotel));
+
+        return array(
+            'departed'         => $departed,
+            'total_departures' => $stillIn + $departed,
         );
     }
 
@@ -4577,6 +4616,68 @@ class HotelBookingDetail extends ObjectModel
      * @param array $params
      * @return array  one row per explicitly-cancelled booking (ord.id_htl_booking)
      */
+    /**
+     * New bookings placed on a date — one row per order, excluding cancelled/refunded orders.
+     * Replicates: AdminStatsController::getNewBookingsInfoByDate()
+     * Use count() on the result for the dashboard badge count.
+     *
+     * @param array $params  date_from[, date_to, id_hotel]
+     * @return array  rows: id_customer, customer_name, total_rooms, total_guests, id_hotel, hotel_name,
+     *                      id_order, with_occupancy, total_paid_tax_excl, id_currency, state_name, state_color
+     */
+    public static function getNewBookingsInfo(array $params)
+    {
+        $dateFrom   = pSQL($params['date_from']);
+        $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel    = isset($params['id_hotel']) ? $params['id_hotel'] : null;
+        $idLang     = Context::getContext()->language->id;
+
+        return Db::getInstance()->executeS(
+            'SELECT hbd.`id_customer`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+            COUNT(hbd.`id`) AS total_rooms, SUM(hbd.`adults` + hbd.`children`) AS total_guests,
+            hbd.`id_hotel`, hbd.`hotel_name`, hbd.`id_order`, o.`with_occupancy`,
+            o.`total_paid_tax_excl`, o.`id_currency`, osl.`name` AS state_name, os.`color` AS state_color
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+            LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.`current_state` = os.`id_order_state`)
+            LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl
+                ON (osl.`id_order_state` = o.`current_state` AND osl.`id_lang` = '.(int) $idLang.')
+            LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+            WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"
+            AND o.`current_state` NOT IN ('.implode(',', array(
+                (int) Configuration::get('PS_OS_CANCELED'),
+                (int) Configuration::get('PS_OS_REFUND')
+            )).')'
+            .(!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
+            GROUP BY hbd.`id_order`'
+        );
+    }
+
+    /**
+     * Count of orders moved to cancelled/refund state on a given date.
+     * Replicates: AdminStatsController::getCancelledBookingsByDate()
+     * Different from getCancellations() — that counts order_return rows; this counts order state changes.
+     *
+     * @param string    $date     Y-m-d
+     * @param int|false $idHotel
+     * @return int
+     */
+    public static function getCancelledBookingsByDate($date, $idHotel = false)
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT COUNT(DISTINCT o.`id_order`)
+            FROM `'._DB_PREFIX_.'orders` o
+            LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (os.`id_order_state` = o.`current_state`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)
+            WHERE o.`date_upd` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"
+            AND o.`current_state` IN ('.implode(',', array(
+                (int) Configuration::get('PS_OS_CANCELED'),
+                (int) Configuration::get('PS_OS_REFUND')
+            )).')'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+        );
+    }
+
     public static function getCancellations(array $params)
     {
         $dateFrom     = pSQL($params['date_from']);
@@ -5164,8 +5265,8 @@ class HotelBookingDetail extends ObjectModel
             'SELECT IFNULL(SUM(DATEDIFF(hbd.`date_from`, hbd.`date_add`)) / COUNT(hbd.`id`), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0
-            AND hbd.`is_back_order` = 0
-            AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            AND hbd.`is_back_order` = 0'
+            .(($dateFrom && $dateTo) ? ' AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"' : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
         );
     }
@@ -5224,8 +5325,8 @@ class HotelBookingDetail extends ObjectModel
                     IFNULL(SUM(hbd.`children`) / COUNT(hbd.`id`), 0) AS avg_children
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0
-            AND hbd.`is_back_order` = 0
-            AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            AND hbd.`is_back_order` = 0'
+            .(($dateFrom && $dateTo) ? ' AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"' : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
         );
 

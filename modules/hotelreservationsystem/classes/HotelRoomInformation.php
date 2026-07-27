@@ -388,10 +388,13 @@ class HotelRoomInformation extends ObjectModel
      */
     public static function getAvailableRoomsForDiscreteDates(array $params)
     {
-        $dateFrom  = $params['date_from'];
-        $dateTo    = isset($params['date_to']) ? $params['date_to'] : date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : null;
-        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+        $dateFrom    = $params['date_from'];
+        $dateTo      = isset($params['date_to']) ? $params['date_to'] : date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
+        $idHotel     = isset($params['id_hotel'])     ? $params['id_hotel']          : null;
+        $idProduct   = isset($params['id_product'])   ? (int) $params['id_product'] : 0;
+        $showAtFront = isset($params['show_at_front']) ? (int) $params['show_at_front'] : null;
+
+        $showAtFrontFilter = !is_null($showAtFront) ? ' AND p.`show_at_front` = '.$showAtFront : '';
 
         $result  = array();
         $current = $dateFrom;
@@ -400,7 +403,7 @@ class HotelRoomInformation extends ObjectModel
             $ts       = strtotime($current);
             $cacheKey = 'HotelRoomInformation::getAvailableRoomsForDiscreteDates_'.(int) $ts.
                 (is_array($idHotel) ? implode('_', $idHotel) : (int) $idHotel).
-                '_'.$idProduct;
+                '_'.$idProduct.'_'.(is_null($showAtFront) ? 'null' : $showAtFront);
             if (!Cache::isStored($cacheKey)) {
                 $value = Db::getInstance()->getValue(
                     'SELECT (num_total - num_booked - num_inactive - num_temporarily_inactive) AS num_available
@@ -410,6 +413,7 @@ class HotelRoomInformation extends ObjectModel
                             FROM `'._DB_PREFIX_.'htl_room_information` hri
                             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
                             WHERE p.`active` = 1'
+                            .$showAtFrontFilter
                             .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
                             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
                         ) AS num_total,
@@ -418,7 +422,8 @@ class HotelRoomInformation extends ObjectModel
                             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                             LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
                             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
-                            WHERE p.`active` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
+                            WHERE p.`active` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0'
+                            .$showAtFrontFilter.'
                             AND hbd.`date_from` < "'.pSQL($next).' 00:00:00"
                             AND hbd.`date_to` > "'.pSQL($current).' 00:00:00"'
                             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
@@ -430,6 +435,7 @@ class HotelRoomInformation extends ObjectModel
                             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
                             WHERE hri.`id_status` = '.(int) self::STATUS_INACTIVE.'
                             AND p.`active` = 1'
+                            .$showAtFrontFilter
                             .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
                             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
                         ) AS num_inactive,
@@ -441,6 +447,7 @@ class HotelRoomInformation extends ObjectModel
                             WHERE hri.`id_status` = '.(int) self::STATUS_TEMPORARY_INACTIVE.'
                             AND ("'.pSQL($current).'" >= hrdd.`date_from` AND "'.pSQL($current).'" < hrdd.`date_to`)
                             AND p.`active` = 1'
+                            .$showAtFrontFilter
                             .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
                             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
                         ) AS num_temporarily_inactive

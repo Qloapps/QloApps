@@ -112,8 +112,8 @@ class Dashtrends extends Module
             }
         } else {
             $tmp_data['visits'] = AdminStatsController::getVisits(false, $date_from, $date_to, 'day');
-            $tmp_data['orders'] = HotelBookingDetail::getTotalBookings(['date_from' => $date_from, 'date_to' => $date_to, 'id_hotel' => $id_hotel, 'granularity' => 'day']);
-            $tmp_data['total_paid_tax_excl'] = HotelBookingDetail::getTotalRevenue(['date_from' => $date_from, 'date_to' => $date_to, 'id_hotel' => $id_hotel, 'granularity' => 'day']);
+            $tmp_data['orders'] = Order::getOrderCount(['date_from' => $date_from, 'date_to' => $date_to, 'id_hotel' => $id_hotel, 'granularity' => 'day']);
+            $tmp_data['total_paid_tax_excl'] = Order::getTotalSales(['date_from' => $date_from, 'date_to' => $date_to, 'id_hotel' => $id_hotel, 'granularity' => 'day']);
             $tmp_data['total_purchases'] = Order::getTotalPurchases(['date_from' => $date_from, 'date_to' => $date_to, 'id_hotel' => $id_hotel, 'granularity' => 'day']);
             $tmp_data['total_expenses'] = Order::getExpenses(['date_from' => $date_from, 'date_to' => $date_to, 'id_hotel' => $id_hotel, 'granularity' => 'day']);
             $tmp_data['total_refunds'] = Order::getTotalRefund(['date_from' => $date_from, 'date_to' => $date_to, 'id_hotel' => $id_hotel, 'granularity' => 'day']);
