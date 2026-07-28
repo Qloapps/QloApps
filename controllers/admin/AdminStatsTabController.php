@@ -104,6 +104,7 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $action .= ($module ? '&module='.Tools::safeOutput($module) : '');
         $action .= (($id_product = Tools::getValue('id_product')) ? '&id_product='.Tools::safeOutput($id_product) : '');
         $action .= (($id_hotel = Tools::getValue('id_hotel')) ? '&id_hotel='.Tools::safeOutput($id_hotel) : '');
+        $action .= (($tab = Tools::getValue('tab')) ? '&tab='.Tools::safeOutput($tab) : '');
         $tpl->assign(array(
             'current' => self::$currentIndex,
             'token' => $token,
@@ -150,32 +151,65 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         $tpl = $this->createTemplate('menu.tpl');
 
         $modules = $this->getModules();
-        $module_instance = array();
-        foreach ($modules as $m => $module) {
-            if ($module_instance[$module['name']] = Module::getInstanceByName($module['name'])) {
-                $modules[$m]['displayName'] = $module_instance[$module['name']]->displayName;
-            } else {
-                unset($module_instance[$module['name']]);
-                unset($modules[$m]);
+
+        $statsTabs = array();
+        foreach ($modules as $module) {
+            if ($moduleObj = Module::getInstanceByName($module['name'])) {
+                $statsTabs[$module['name']] = array(
+                    'display_name' => $moduleObj->displayName,
+                    'position' => property_exists($moduleObj, 'stats_position') ? (int)$moduleObj->stats_position : null,
+                );
+                if (method_exists($moduleObj, 'getStatsTabs')) {
+                    $statsTabs[$module['name']]['tabs'] = $moduleObj->getStatsTabs();
+                }
             }
         }
 
-        uasort($modules, array($this, 'checkModulesNames'));
+        $positionedModules = array_filter($statsTabs, fn($d) => $d['position'] !== null);
+        $defaultModules    = array_filter($statsTabs, fn($d) => $d['position'] === null);
+
+        $modulesBySlot = [];
+        foreach ($positionedModules as $name => $data) {
+            $modulesBySlot[$data['position']][$name] = $data;
+        }
+        ksort($modulesBySlot);
+
+        $defaultKeys           = array_keys($defaultModules);
+        $defaultCount          = count($defaultKeys);
+        $statsTabs             = [];
+        $defaultModulesIndex   = 0;
+        $positionedModulesCount = 0;
+
+        foreach ($modulesBySlot as $slot => $group) {
+            $defaultsBefore = max(0, $slot - 1 - $positionedModulesCount);
+            while ($defaultModulesIndex < $defaultsBefore && $defaultModulesIndex < $defaultCount) {
+                $key = $defaultKeys[$defaultModulesIndex++];
+                $statsTabs[$key] = $defaultModules[$key];
+            }
+            foreach ($group as $name => $data) {
+                $statsTabs[$name] = $data;
+                $positionedModulesCount++;
+            }
+        }
+
+        while ($defaultModulesIndex < $defaultCount) {
+            $key = $defaultKeys[$defaultModulesIndex++];
+            $statsTabs[$key] = $defaultModules[$key];
+        }
+
+        Hook::exec('actionStatsTabsModifier', array(
+            'stats_tabs' => &$statsTabs
+        ));
 
         $tpl->assign(array(
             'current' => self::$currentIndex,
             'current_module_name' => Tools::getValue('module', 'statsforecast'),
+            'current_tab' => Tools::getValue('tab', ''), // active sub-tab key
             'token' => $this->token,
-            'modules' => $modules,
-            'module_instance' => $module_instance
+            'module_tabs' => $statsTabs,
         ));
 
         return $tpl->fetch();
-    }
-
-    public function checkModulesNames($a, $b)
-    {
-        return ($a['displayName'] > $b['displayName']) ? 1 : 0;
     }
 
     protected function getModules()

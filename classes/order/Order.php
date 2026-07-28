@@ -3180,4 +3180,98 @@ class OrderCore extends ObjectModel
             ),
         );
     }
+
+    // ── REPORT METHODS ────────────────────────────────────────────────────────
+
+    /**
+     * Orders with unpaid balance for the outstanding-payments report.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_product, id_status
+     * @return array
+     */
+    public static function getOutstandingBalance(array $params)
+    {
+        $dateFrom  = pSQL($params['date_from']);
+        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+        $idStatus  = isset($params['id_status'])  ? (int) $params['id_status']  : 0;
+
+        return Db::getInstance()->executeS(
+            'SELECT o.`id_order`, o.`reference`,
+            CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+            c.`email`, a.`phone`,
+            hbd.`room_type_name`, hbd.`room_num`,
+            hbd.`date_from`, hbd.`date_to`, hbd.`id_status`,
+            o.`total_paid_tax_incl` / o.`conversion_rate` AS total_charges,
+            IFNULL(SUM(op.`amount`), 0) / o.`conversion_rate` AS total_paid,
+            (o.`total_paid_tax_incl` - IFNULL(SUM(op.`amount`), 0)) / o.`conversion_rate` AS balance_due,
+            GREATEST(0, DATEDIFF(CURDATE(), hbd.`date_to`)) AS days_overdue,
+            MAX(op.`date_add`) AS last_payment_date
+            FROM `'._DB_PREFIX_.'orders` o
+            INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0)
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
+            LEFT JOIN `'._DB_PREFIX_.'address` a ON (a.`id_address` = o.`id_address_invoice`)
+            LEFT JOIN `'._DB_PREFIX_.'order_payment` op ON (op.`order_reference` = o.`reference`)
+            WHERE o.`valid` = 1
+            AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
+            .($idStatus  ? ' AND hbd.`id_status` = '.$idStatus   : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            GROUP BY o.`id_order`
+            HAVING balance_due > 0.01
+            ORDER BY balance_due DESC'
+        );
+    }
+
+    /**
+     * Total order-level discounts applied to hotel orders in the date range.
+     * Returns positive number representing the discount amount.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_customer, granularity ('day'|false)
+     * @return float|array scalar when no granularity, timestamp => float when granularity='day'
+     */
+    public static function getTotalDiscounts(array $params)
+    {
+        $dateFrom    = pSQL($params['date_from']);
+        $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel     = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idCustomer  = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
+        $granularity = isset($params['granularity']) ? $params['granularity']       : false;
+
+        $hotelExists = ' AND EXISTS (
+            SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`id_order` = o.`id_order`'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .')';
+
+        if ($granularity === 'day') {
+            $rows = Db::getInstance()->executeS(
+                'SELECT LEFT(o.`invoice_date`, 10) AS grp,
+                IFNULL(SUM(o.`total_discounts_tax_excl` / o.`conversion_rate`), 0) AS amt
+                FROM `'._DB_PREFIX_.'orders` o
+                WHERE o.`valid` = 1
+                AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+                .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
+                .$hotelExists.'
+                GROUP BY LEFT(o.`invoice_date`, 10)'
+            );
+            $result = array();
+            foreach ($rows as $row) {
+                $result[strtotime($row['grp'])] = (float) $row['amt'];
+            }
+            return $result;
+        }
+
+        return (float) Db::getInstance()->getValue(
+            'SELECT IFNULL(SUM(o.`total_discounts_tax_excl` / o.`conversion_rate`), 0)
+            FROM `'._DB_PREFIX_.'orders` o
+            WHERE o.`valid` = 1
+            AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
+            .$hotelExists
+        );
+    }
 }

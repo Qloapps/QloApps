@@ -160,4 +160,63 @@ class OrderPaymentCore extends ObjectModel
         return Db::getInstance()->getValue('SELECT (SUM(`amount` * `conversion_rate`) / SUM(`amount`)) FROM `'._DB_PREFIX_.'order_payment` WHERE `order_reference` = \''.pSQL($order_reference).'\' AND `id_currency` = '.(int)$idCurrency);
     }
 
+    // ── REPORT METHODS ────────────────────────────────────────────────────────
+
+    /**
+     * Payment detail rows for the payment report.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_order, id_customer, payment_method
+     * @return array
+     */
+    public static function getPaymentsInfo(array $params)
+    {
+        $dateFrom      = pSQL($params['date_from']);
+        $dateTo        = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel       = isset($params['id_hotel'])       ? $params['id_hotel']              : false;
+        $idOrder       = isset($params['id_order'])       ? (int) $params['id_order']       : 0;
+        $idCustomer    = isset($params['id_customer'])    ? (int) $params['id_customer']    : 0;
+        $paymentMethod = isset($params['payment_method']) ? pSQL($params['payment_method']) : '';
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT op.`id_order_payment`, op.`date_add`, o.`id_order`,
+            op.`order_reference` AS reference,
+            CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+            op.`payment_method`, op.`payment_type`, op.`amount`, op.`conversion_rate`,
+            op.`transaction_id`, cur.`iso_code` AS currency_iso, cur.`sign` AS currency_sign
+            FROM `'._DB_PREFIX_.'order_payment` op
+            INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`reference` = op.`order_reference` AND o.`valid` = 1)
+            INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
+            LEFT JOIN `'._DB_PREFIX_.'currency` cur ON (cur.`id_currency` = op.`id_currency`)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0)
+            WHERE op.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idOrder       ? ' AND o.`id_order` = '.$idOrder                       : '')
+            .($idCustomer    ? ' AND o.`id_customer` = '.$idCustomer                 : '')
+            .($paymentMethod ? ' AND op.`payment_method` = "'.$paymentMethod.'"'     : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            GROUP BY op.`id_order_payment`
+            ORDER BY op.`date_add` DESC'
+        );
+    }
+
+    /**
+     * Distinct payment methods used in hotel orders.
+     *
+     * @param int|false $idHotel
+     * @return array rows: payment_method
+     */
+    public static function getDistinctPaymentMethods($idHotel = false)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT DISTINCT op.`payment_method`
+            FROM `'._DB_PREFIX_.'order_payment` op
+            INNER JOIN `'._DB_PREFIX_.'orders` o
+                ON (o.`reference` = op.`order_reference` AND o.`valid` = 1)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0)
+            WHERE op.`payment_method` IS NOT NULL AND op.`payment_method` != ""'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            ORDER BY op.`payment_method`'
+        );
+    }
 }

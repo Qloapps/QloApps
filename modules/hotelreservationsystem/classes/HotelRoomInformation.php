@@ -329,4 +329,202 @@ class HotelRoomInformation extends ObjectModel
     {
         return $this->delete();
     }
+
+    // ── REPORT METHODS ────────────────────────────────────────────────────────
+
+    /**
+     * Room type list for filter dropdowns in reports.
+     *
+     * @param array $params id_hotel, id_lang
+     * @return array rows: id_product, room_type_name
+     */
+    public static function getRoomTypes(array $params)
+    {
+        $idHotel = isset($params['id_hotel']) ? (int) $params['id_hotel'] : 0;
+        $idLang  = !empty($params['id_lang']) ? (int) $params['id_lang'] : (int) Context::getContext()->language->id;
+
+        return Db::getInstance()->executeS(
+            'SELECT DISTINCT hri.`id_product`, pl.`name` AS room_type_name
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.$idLang.')
+            WHERE p.`active` = 1 AND p.`booking_product` = 1'
+            . ($idHotel ? ' AND hri.`id_hotel` = '.$idHotel : '')
+            . ' ORDER BY pl.`name`'
+        );
+    }
+
+    /**
+     * Room-type × date grid showing total / booked / available / OOO per row.
+     * Used by availability report tab.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_product, id_lang
+     * @return array rows: date, id_product, room_type_name, total_rooms, rooms_booked, out_of_order, available, occupancy_pct
+     */
+    public static function getAvailabilityReport(array $params)
+    {
+        $dateFrom  = pSQL($params['date_from']);
+        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+        $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']     : 0;
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $roomTypes = Db::getInstance()->executeS(
+            'SELECT hri.`id_product`, pl.`name` AS room_type_name,
+                COUNT(hri.`id`) AS total_rooms,
+                SUM(CASE WHEN hri.`id_status` IN ('.(int) self::STATUS_INACTIVE.','.(int) self::STATUS_TEMPORARY_INACTIVE.') THEN 1 ELSE 0 END) AS ooo_rooms
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product` AND p.`active` = 1)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = hri.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+            WHERE 1'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
+            GROUP BY hri.`id_product`'
+        );
+
+        if (!$roomTypes) {
+            return array();
+        }
+
+        $bookingsRaw = Db::getInstance()->executeS(
+            'SELECT hbd.`id_product`, hbd.`id_room`, hbd.`date_from`, hbd.`date_to`
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
+            AND hbd.`date_from` < "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'"'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
+        );
+
+        $bookingsByProduct = array();
+        foreach ($bookingsRaw as $b) {
+            $bookingsByProduct[$b['id_product']][] = $b;
+        }
+
+        $result  = array();
+        $current = $dateFrom;
+        while ($current < $dateTo) {
+            $next = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+            foreach ($roomTypes as $rt) {
+                $idProd      = $rt['id_product'];
+                $bookedRooms = array();
+                if (isset($bookingsByProduct[$idProd])) {
+                    foreach ($bookingsByProduct[$idProd] as $b) {
+                        if ($b['date_from'] < $next && $b['date_to'] > $current) {
+                            $bookedRooms[$b['id_room']] = true;
+                        }
+                    }
+                }
+                $booked    = count($bookedRooms);
+                $total     = (int) $rt['total_rooms'];
+                $ooo       = (int) $rt['ooo_rooms'];
+                $available = max(0, $total - $booked - $ooo);
+                $result[]  = array(
+                    'date'           => $current,
+                    'id_product'     => $idProd,
+                    'room_type_name' => $rt['room_type_name'],
+                    'total_rooms'    => $total,
+                    'rooms_booked'   => $booked,
+                    'out_of_order'   => $ooo,
+                    'available'      => $available,
+                    'occupancy_pct'  => $total ? round($booked / $total * 100, 1) : 0.0,
+                );
+            }
+            $current = $next;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Per-room status with current guest info for room-status report tab.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_product, floor, id_lang, housekeeping_installed
+     * @return array
+     */
+    public static function getRoomStatusForReports(array $params)
+    {
+        $dateFrom              = pSQL($params['date_from']);
+        $dateTo                = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel               = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
+        $idProduct             = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+        $idLang                = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
+        $floor                 = isset($params['floor'])      ? pSQL($params['floor'])       : '';
+        $housekeepingInstalled = !empty($params['housekeeping_installed']);
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT hri.`id` AS id_room, hri.`room_num`, hri.`floor`,
+            CASE WHEN hri.`id_status` = '.(int) self::STATUS_TEMPORARY_INACTIVE.' AND hrdd.`id_room` IS NULL
+                 THEN '.(int) self::STATUS_ACTIVE.'
+                 ELSE hri.`id_status`
+            END AS id_status,
+            pl.`name` AS room_type_name, hbil.`hotel_name`,
+            bkgs.`id_order`, bkgs.`date_from`, bkgs.`date_to`,
+            bkgs.`id_status` AS booking_status,
+            CONCAT(c.`firstname`, " ", c.`lastname`) AS guest_name'
+            .($housekeepingInstalled ? ', hri.`id_housekeeping_status`' : '').'
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = hri.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hri.`id_hotel`)
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+                ON (hbil.`id` = hri.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
+            LEFT JOIN (
+                SELECT `id_room`
+                FROM `'._DB_PREFIX_.'htl_room_disable_dates`
+                WHERE `date_from` < "'.$dateTo.'" AND `date_to` > "'.$dateFrom.'"
+                GROUP BY `id_room`
+            ) hrdd ON (hrdd.`id_room` = hri.`id`)
+            LEFT JOIN (
+                SELECT hbd.`id_room`,
+                    MIN(hbd.`id_order`) AS `id_order`,
+                    MIN(hbd.`date_from`) AS `date_from`,
+                    MAX(hbd.`date_to`) AS `date_to`,
+                    MIN(hbd.`id_status`) AS `id_status`,
+                    MIN(hbd.`id_customer`) AS `id_customer`
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`is_refunded` = 0
+                AND hbd.`date_from` < "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'"
+                GROUP BY hbd.`id_room`
+            ) bkgs ON (bkgs.`id_room` = hri.`id`)
+            LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = bkgs.`id_customer`)
+            WHERE p.`active` = 1 AND p.`booking_product` = 1'
+            .($floor     ? ' AND hri.`floor` = "'.$floor.'"'     : '')
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
+            .($idHotel ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+            ORDER BY hbil.`hotel_name`, pl.`name`, hri.`room_num`'
+        );
+    }
+
+    /**
+     * Floor list for filter dropdown in reports.
+     *
+     * @param array $params id_hotel, id_product
+     * @return array rows: floor
+     */
+    public static function getDistinctFloors(array $params = array())
+    {
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT DISTINCT hri.`floor`
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p
+                ON (p.`id_product` = hri.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
+            WHERE hri.`floor` != "" AND hri.`floor` IS NOT NULL'
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
+            .($idHotel ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+            ORDER BY hri.`floor`'
+        );
+    }
 }
