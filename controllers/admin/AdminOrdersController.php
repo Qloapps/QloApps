@@ -437,7 +437,7 @@ class AdminOrdersControllerCore extends AdminController
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
                 $this->context->currency = new Currency((int)$cart->id_currency);
-
+                $this->context->customer = new Customer((int)$cart->id_customer);
                 // validate cart for removing invalid data from cart before new order creation
                 // remove not linked services with room types from cart if not allowed to book them
                 $this->errors = array_merge(
@@ -999,25 +999,45 @@ class AdminOrdersControllerCore extends AdminController
                     $objProduct = new Product();
                     $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
                     $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                    $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
-                } else {
-                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
-                    $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
-                }
-
-                if ($serviceProducts) {
-                    foreach ($serviceProducts as $key => $servProduct) {
-                        $serviceProducts[$key]['price_tax_exc'] = $servProduct['price'];
-                        if (isset($additionalServices[$productLineData['id']])
-                            && in_array($servProduct['id_product'], array_column($additionalServices[$productLineData['id']]['additional_services'], 'id_product'))
-                        ) {
-                            unset($serviceProducts[$key]);
+                    if ($serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts)) {
+                        foreach ($serviceProducts as $key => $servProduct) {
+                            if (!empty($additionalServices[$productLineData['id']])
+                                && in_array($servProduct['id_product'], array_column($additionalServices[$productLineData['id']]['additional_services'], 'id_product'))
+                            ) {
+                                unset($serviceProducts[$key]);
+                            } else {
+                                $numDays = 1;
+                                if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
+                                    $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+                                }
+                                $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                                    $servProduct['id_product'],
+                                    0,
+                                    0,
+                                    $idProduct,
+                                    false,
+                                    1,
+                                    $dateFrom,
+                                    $dateTo
+                                )/$numDays;
+                            }
                         }
                     }
+                } else {
+                    $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                    if ($serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null)) {
+                        foreach ($serviceProducts as $key => $servProduct) {
+                            if (isset($additionalServices[$productLineData['id']])
+                                && in_array($servProduct['id_product'], array_column($additionalServices[$productLineData['id']]['additional_services'], 'id_product'))
+                            ) {
+                                unset($serviceProducts[$key]);
+                            }
+                        }
 
-                    $smartyVars['serviceProducts'] = $serviceProducts;
+                    }
                 }
-
+                
+                $smartyVars['serviceProducts'] = $serviceProducts;
                 $objOrderReturn = new OrderReturn();
                 $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
                 $smartyVars['refundReqBookings'] = $refundReqBookings;
