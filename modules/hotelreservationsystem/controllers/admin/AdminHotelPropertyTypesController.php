@@ -121,6 +121,15 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
             'submit' => array(
                 'title' => $this->l('Save'),
             ),
+            'buttons' => array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                ),
+            ),
         );
 
         return parent::renderForm();
@@ -128,7 +137,7 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
 
     public function postProcess()
     {
-        if (Tools::isSubmit('submitAdd'.$this->table)) {
+        if (Tools::isSubmit('submitAdd'.$this->table) || Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
             $languages = Language::getLanguages(false);
             $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
             $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
@@ -146,11 +155,7 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
                 }
             }
 
-            if ($idPropertyType) {
-                $this->display = 'edit';
-            } else {
-                $this->display = 'add';
-            }
+            $this->display = $idPropertyType ? 'edit' : 'add';
 
             if (!$this->errors) {
                 parent::postProcess();

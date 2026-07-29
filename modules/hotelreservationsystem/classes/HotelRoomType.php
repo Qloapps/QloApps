@@ -237,7 +237,7 @@ class HotelRoomType extends ObjectModel
 
         $sql = 'SELECT hrt.*, hbl.`hotel_name`,
                     hrtstl.`name` AS `room_type_selling_object`,
-                    hrtstl.`name_plural` AS `multiple_room_type_selling_object`
+                    hrtstl.`plural_name` AS `multiple_room_type_selling_object`
                 FROM `'._DB_PREFIX_.'htl_room_type` AS hrt
                 INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbl
                     ON (hbl.`id` = hrt.`id_hotel`
@@ -318,7 +318,7 @@ class HotelRoomType extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
-        $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`, hrtstl.`name` AS `room_type_selling_object`, hrtstl.`name_plural` AS `multiple_room_type_selling_object`
+        $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`, hrtstl.`name` AS `room_type_selling_object`, hrtstl.`plural_name` AS `multiple_room_type_selling_object`
         '.($position ? ', cp.`position`' : '').'
         '.($fullDetail ? ', pl.`link_rewrite`, pl.`description_short`' : '').'
         FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`

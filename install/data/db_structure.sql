@@ -2792,6 +2792,6 @@ CREATE TABLE IF NOT EXISTS `PREFIX_room_type_selling_object_lang` (
   `id_room_type_selling_object` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
   `name` varchar(255) NOT NULL,
-  `name_plural` varchar(255) DEFAULT NULL,
+  `plural_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id_room_type_selling_object`, `id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;

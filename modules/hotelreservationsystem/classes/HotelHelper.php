@@ -1376,13 +1376,17 @@ class HotelHelper
             'Resort',
             'Hostel',
             'Guest House',
+            'Bed & Breakfast',
             'Lodge',
             'Apartment',
             'Vacation Rental',
             'Homestay',
             'Co-Living',
             'Camping',
-            'Bed & Breakfast',
+            'Glamping',
+            'Farm Stay',
+            'Houseboat',
+            'Boat Stay',
         );
 
         $languages = Language::getLanguages(true);
@@ -1400,29 +1404,144 @@ class HotelHelper
 
     public function createHotelDefaultRoomSellingTypes()
     {
-        $sellingObjects = array(
-            'Room',
-            'Apartment',
-            'Villa',
-            'Cottage',
-            'Bungalow',
-            'House',
-            'Chalet',
-            'Cabin',
-            'Studio',
-            'Penthouse',
-            'Camping Pitch',
-            'Overwater Bungalow',
-            'Heritage Room',
-            'Houseboat',
+       $roomTypeSellingObjects = array(
+            array(
+                'name' => 'Room',
+                'plural_name' => 'Rooms',
+            ),
+            array(
+                'name' => 'Bed',
+                'plural_name' => 'Beds',
+            ),
+            array(
+                'name' => 'Apartment',
+                'plural_name' => 'Apartments',
+            ),
+            array(
+                'name' => 'Villa',
+                'plural_name' => 'Villas',
+            ),
+            array(
+                'name' => 'Cottage',
+                'plural_name' => 'Cottages',
+            ),
+            array(
+                'name' => 'Bungalow',
+                'plural_name' => 'Bungalows',
+            ),
+            array(
+                'name' => 'House',
+                'plural_name' => 'Houses',
+            ),
+            array(
+                'name' => 'Chalet',
+                'plural_name' => 'Chalets',
+            ),
+            array(
+                'name' => 'Cabin',
+                'plural_name' => 'Cabins',
+            ),
+            array(
+                'name' => 'Studio',
+                'plural_name' => 'Studios',
+            ),
+            array(
+                'name' => 'Condo',
+                'plural_name' => 'Condos',
+            ),
+            array(
+                'name' => 'Penthouse',
+                'plural_name' => 'Penthouses',
+            ),
+            array(
+                'name' => 'Tent',
+                'plural_name' => 'Tents',
+            ),
+            array(
+                'name' => 'Camping Pitch',
+                'plural_name' => 'Camping Pitches',
+            ),
+            array(
+                'name' => 'Caravan Site',
+                'plural_name' => 'Caravan Sites',
+            ),
+            array(
+                'name' => 'RV Site',
+                'plural_name' => 'RV Sites',
+            ),
+            array(
+                'name' => 'Pod',
+                'plural_name' => 'Pods',
+            ),
+            array(
+                'name' => 'Capsule',
+                'plural_name' => 'Capsules',
+            ),
+            array(
+                'name' => 'Treehouse',
+                'plural_name' => 'Treehouses',
+            ),
+            array(
+                'name' => 'Hut',
+                'plural_name' => 'Huts',
+            ),
+            array(
+                'name' => 'Yurt',
+                'plural_name' => 'Yurts',
+            ),
+            array(
+                'name' => 'Igloo',
+                'plural_name' => 'Igloos',
+            ),
+            array(
+                'name' => 'Houseboat',
+                'plural_name' => 'Houseboats',
+            ),
+            array(
+                'name' => 'Boat Cabin',
+                'plural_name' => 'Boat Cabins',
+            ),
+            array(
+                'name' => 'Overwater Bungalow',
+                'plural_name' => 'Overwater Bungalows',
+            ),
+            array(
+                'name' => 'Heritage Room',
+                'plural_name' => 'Heritage Rooms',
+            ),
+            array(
+                'name' => 'Holiday Home',
+                'plural_name' => 'Holiday Homes',
+            ),
+            array(
+                'name' => 'Farm Stay Unit',
+                'plural_name' => 'Farm Stay Units',
+            ),
+            array(
+                'name' => 'Cave Room',
+                'plural_name' => 'Cave Rooms',
+            ),
+            array(
+                'name' => 'Container Stay',
+                'plural_name' => 'Container Stays',
+            ),
+            array(
+                'name' => 'Train Cabin',
+                'plural_name' => 'Train Cabins',
+            ),
+            array(
+                'name' => 'Motorhome',
+                'plural_name' => 'Motorhomes',
+            ),
         );
 
         $languages = Language::getLanguages(true);
-        foreach ($sellingObjects as $typeName) {
+        foreach ($roomTypeSellingObjects as $typeName) {
             $objType = new RoomTypeSellingObject();
             $objType->active = 1;
             foreach ($languages as $lang) {
-                $objType->name[$lang['id_lang']] = $typeName;
+                $objType->name[$lang['id_lang']] = $typeName['name'];
+                $objType->plural_name[$lang['id_lang']] = $typeName['plural_name'];
             }
             $objType->save();
         }

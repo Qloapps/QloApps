@@ -45,7 +45,7 @@ class AdminRoomTypeSellingObjectsController extends AdminController
                 'title' => $this->l('Name'),
                 'align' => 'left',
             ),
-            'name_plural' => array(
+            'plural_name' => array(
                 'title' => $this->l('Plural Name'),
                 'align' => 'left',
             ),
@@ -105,7 +105,7 @@ class AdminRoomTypeSellingObjectsController extends AdminController
                 array(
                     'type' => 'text',
                     'label' => $this->l('Plural Name'),
-                    'name' => 'name_plural',
+                    'name' => 'plural_name',
                     'lang' => true,
                     'required' => true,
                     'hint' => $this->l('Displayed name when more than one is booked.'),
@@ -133,6 +133,15 @@ class AdminRoomTypeSellingObjectsController extends AdminController
             'submit' => array(
                 'title' => $this->l('Save'),
             ),
+            'buttons' => array(
+                'save-and-stay' => array(
+                    'title' => $this->l('Save and stay'),
+                    'name' => 'submitAdd'.$this->table.'AndStay',
+                    'type' => 'submit',
+                    'class' => 'btn btn-default pull-right',
+                    'icon' => 'process-icon-save',
+                ),
+            ),
         );
 
         return parent::renderForm();
@@ -140,7 +149,7 @@ class AdminRoomTypeSellingObjectsController extends AdminController
 
     public function postProcess()
     {
-        if (Tools::isSubmit('submitAdd'.$this->table)) {
+        if (Tools::isSubmit('submitAdd'.$this->table) || Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
             $languages = Language::getLanguages(false);
             $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
             $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
@@ -158,24 +167,20 @@ class AdminRoomTypeSellingObjectsController extends AdminController
                 }
             }
 
-            if (!trim(Tools::getValue('name_plural_'.$defaultLangId))) {
+            if (!trim(Tools::getValue('plural_name_'.$defaultLangId))) {
                 $this->errors[] = $this->l('Plural Name is required at least in ').$objDefaultLanguage['name'];
             } else {
                 foreach ($languages as $lang) {
-                    if (trim(Tools::getValue('name_plural_'.$lang['id_lang']))) {
-                        if (!Validate::isGenericName(Tools::getValue('name_plural_'.$lang['id_lang']))) {
+                    if (trim(Tools::getValue('plural_name_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('plural_name_'.$lang['id_lang']))) {
                             $this->errors[] = $this->l('Invalid Plural Name in ').$lang['name'];
                         }
                     }
                 }
             }
 
-            if ($idSellingObject) {
-                $this->display = 'edit';
-            } else {
-                $this->display = 'add';
-            }
-
+            $this->display = $idSellingObject ? 'edit' : 'add';
+            
             if (!$this->errors) {
                 parent::postProcess();
             }
