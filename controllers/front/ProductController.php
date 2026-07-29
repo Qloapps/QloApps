@@ -951,10 +951,11 @@ class ProductControllerCore extends FrontController
                 if ($idProductOption == null) {
                     $idProductOption = $serviceProductOption['id_product_option'];
                 }
-                $serviceProductOption['price'] = RoomTypeServiceProductPrice::getPrice(
+                $serviceProductOption['price'] = Product::getServiceProductPrice(
                     $this->product->id,
-                    $idHotel,
                     $serviceProductOption['id_product_option'],
+                    $idHotel,
+                    false,
                     $useTax,
                     1
                 );
@@ -962,19 +963,25 @@ class ProductControllerCore extends FrontController
 
         }
         $smartyVars['product_option'] = $serviceProductOptions;
-        $smartyVars['service_price']  = RoomTypeServiceProductPrice::getPrice(
+        $smartyVars['service_price']  = Product::getServiceProductPrice(
             $this->product->id,
-            $idHotel,
             $idProductOption,
+            $idHotel,
+            false,
             $useTax,
             $quantity
         );
-        $smartyVars['service_price_without_reduction']  = RoomTypeServiceProductPrice::getPrice(
+        $smartyVars['service_price_without_reduction']  = Product::getServiceProductPrice(
             $this->product->id,
-            $idHotel,
             $idProductOption,
+            $idHotel,
+            false,
             $useTax,
             $quantity,
+            null,
+            null,
+            false,
+            null,
             false
         );
         if ($quantity) {

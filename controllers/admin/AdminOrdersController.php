@@ -4245,21 +4245,23 @@ class AdminOrdersControllerCore extends AdminController
                     $objServiceProductOption = new ServiceProductOption();
                     foreach ($products as $key => &$product) {
                         $idHotelAddress = Cart::getIdAddressForTaxCalculation($product['id_product'], $idHotel);
-                        $product['price_tax_incl'] = RoomTypeServiceProductPrice::getPrice($product['id_product'], $idHotel, null, true);
-                        $product['price_tax_excl'] = RoomTypeServiceProductPrice::getPrice($product['id_product'], $idHotel, null, false);
+                        $product['price_tax_incl'] = Product::getServiceProductPrice($product['id_product'], null, $idHotel, false, true);
+                        $product['price_tax_excl'] = Product::getServiceProductPrice($product['id_product'], null, $idHotel, false, false);
 
                         // if product has options then set the price of the first selected option of the product
                         if ($product['options'] = $objServiceProductOption->getProductOptions($product['id_product'])) {
-                            $product['price_tax_incl'] = RoomTypeServiceProductPrice::getPrice(
+                            $product['price_tax_incl'] = Product::getServiceProductPrice(
                                 $product['id_product'],
-                                $idHotel,
                                 $product['options'][0]['id_product_option'],
+                                $idHotel,
+                                false,
                                 true
                             );
-                            $product['price_tax_excl'] = RoomTypeServiceProductPrice::getPrice(
+                            $product['price_tax_excl'] = Product::getServiceProductPrice(
                                 $product['id_product'],
-                                $idHotel,
                                 $product['options'][0]['id_product_option'],
+                                $idHotel,
+                                false,
                                 false
                             );
                         }
@@ -4394,8 +4396,8 @@ class AdminOrdersControllerCore extends AdminController
             $currency = new Currency((int)$order->id_currency);
             if ($idHotel = $addressTax->id_hotel) {
                 if ($id_product_option = $addProduct['product_option']) {
-                    $price_tax_incl = RoomTypeServiceProductPrice::getPrice($addProduct['product_id'], $idHotel, $id_product_option, true);
-                    $price_tax_excl = RoomTypeServiceProductPrice::getPrice($addProduct['product_id'], $idHotel, $id_product_option, false);
+                    $price_tax_incl = Product::getServiceProductPrice($addProduct['product_id'], $id_product_option, $idHotel, false, true);
+                    $price_tax_excl = Product::getServiceProductPrice($addProduct['product_id'], $id_product_option, $idHotel, false, false);
 
                     // convert price to order currency
                     $price_tax_excl = Tools::ps_round(Tools::convertPrice($price_tax_excl, $currency), _PS_PRICE_COMPUTE_PRECISION_);
@@ -4409,8 +4411,8 @@ class AdminOrdersControllerCore extends AdminController
                 }
             } else {
                 if ($id_product_option = $addProduct['product_option']) {
-                    $price_tax_incl = RoomTypeServiceProductPrice::getPrice($addProduct['product_id'], false, $id_product_option, true);
-                    $price_tax_excl = RoomTypeServiceProductPrice::getPrice($addProduct['product_id'], false, $id_product_option, false);
+                    $price_tax_incl = Product::getServiceProductPrice($addProduct['product_id'], $id_product_option, false, false, true);
+                    $price_tax_excl = Product::getServiceProductPrice($addProduct['product_id'], $id_product_option, false, false, false);
 
                     // convert price to order currency
                     $price_tax_excl = Tools::ps_round(Tools::convertPrice($price_tax_excl, $currency), _PS_PRICE_COMPUTE_PRECISION_);

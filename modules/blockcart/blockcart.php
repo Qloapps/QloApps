@@ -326,10 +326,11 @@ class Blockcart extends Module
                 $canSellStandalone = Product::isSellableAsStandalone($objProduct->id);
 
                 if ($canSellWithHotel && !empty($addedProduct['id_hotel'])) {
-                    $addedProduct['unit_price'] = RoomTypeServiceProductPrice::getPrice(
+                    $addedProduct['unit_price'] = Product::getServiceProductPrice(
                         $objProduct->id,
-                        $addedProduct['id_hotel'],
                         isset($addedProduct['id_product_option']) ? $addedProduct['id_product_option'] : null,
+                        $addedProduct['id_hotel'],
+                        false,
                         $useTax,
                         $addedProduct['qty']
                     );
@@ -343,10 +344,11 @@ class Blockcart extends Module
                         $addedProduct['option_name'] = $productOption->name;
                     }
                 } elseif ($canSellStandalone) {
-                    $addedProduct['unit_price'] = RoomTypeServiceProductPrice::getPrice(
+                    $addedProduct['unit_price'] = Product::getServiceProductPrice(
                         $objProduct->id,
-                        0,
                         isset($addedProduct['id_product_option']) ? $addedProduct['id_product_option'] : null,
+                        0,
+                        false,
                         $useTax,
                         $addedProduct['qty']
                     );
