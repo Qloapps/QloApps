@@ -44,6 +44,13 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             $this->_join .= 'LEFT JOIN '._DB_PREFIX_.'order_return_state_lang orsl ON (orsl.`id_order_return_state` = a.`state` AND orsl.`id_lang` = '.(int)$this->context->language->id.')';
             $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ordrd ON (a.`id_order_return` = ordrd.`id_order_return`)';
             $this->_where = ' AND a.`id_order`='. (int)$idOrder;
+            // optional: narrow the list down to requests that include one specific
+            // booking or product — used by the Refund column's link on the order detail page
+            if ($idHtlBooking = (int) Tools::getValue('id_htl_booking')) {
+                $this->_where .= ' AND ordrd.`id_htl_booking` = '.$idHtlBooking;
+            } elseif ($idServiceProductOrderDetail = (int) Tools::getValue('id_service_product_order_detail')) {
+                $this->_where .= ' AND ordrd.`id_service_product_order_detail` = '.$idServiceProductOrderDetail;
+            }
             $this->_group = 'GROUP BY a.`id_order_return`';
         } else {
             $this->_select .= ', ord.`total_paid_tax_incl` AS total_order, os.`id_order_state`, os.`color`, COUNT(IF(a.`state` = '.(int) Configuration::get('PS_ORS_PENDING').', 1, NULL)) AS total_pending_requests, SUM(a.`refunded_amount`) AS refunded_amount';
