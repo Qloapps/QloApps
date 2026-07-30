@@ -28,7 +28,7 @@
 			{assign var='tooltipLines' value="{$tooltipLines}{if $index > 0}<br>{/if}{$index+1}) {$hotel|escape:'html':'UTF-8'}"}
 		{/foreach}
 		<span class="badge label-tooltip"
-			style="padding:2px 3px;font-weight:normal;font-size:1em;border-radius:50%;cursor:pointer;"
+			style="padding:2px 3px;"
 			data-toggle="tooltip"
 			data-placement="top"
 			data-html="true"
