@@ -19,8 +19,8 @@
     <url_rewrite>napiste-nam</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title>Hotel Prime</title>
-    <description>Místo, kde se komfort a luxus mísí s přírodou!</description>
+    <title></title>
+    <description></description>
     <keywords/>
     <url_rewrite/>
   </meta>
@@ -42,18 +42,22 @@
     <keywords/>
     <url_rewrite>password-recovery</url_rewrite>
   </meta>
+<!--
   <meta id="prices-drop" id_shop="1">
     <title>Slevy</title>
     <description>Our special products</description>
     <keywords/>
     <url_rewrite>slevy</url_rewrite>
   </meta>
+-->
+<!--
   <meta id="sitemap" id_shop="1">
     <title>Mapa stránek</title>
     <description>Lost ? Find what your are looking for</description>
     <keywords/>
     <url_rewrite>mapa-stranek</url_rewrite>
   </meta>
+-->
   <meta id="supplier" id_shop="1">
     <title>Dodavatelé</title>
     <description>Suppliers list</description>
@@ -138,18 +142,22 @@
     <keywords/>
     <url_rewrite>objednavka</url_rewrite>
   </meta>
+<!--
   <meta id="search" id_shop="1">
     <title>Vyhledávání</title>
     <description/>
     <keywords/>
     <url_rewrite>vyhledavani</url_rewrite>
   </meta>
+-->
+<!--
   <meta id="stores" id_shop="1">
     <title>Prodejny</title>
     <description/>
     <keywords/>
     <url_rewrite>prodejny</url_rewrite>
   </meta>
+-->
   <meta id="order-opc" id_shop="1">
     <title>Rychlá Objednávka</title>
     <description/>
@@ -168,10 +176,12 @@
     <keywords/>
     <url_rewrite>potvrzeni-objednavky</url_rewrite>
   </meta>
+<!--
   <meta id="products-comparison" id_shop="1">
     <title>Porovnání produktů</title>
     <description/>
     <keywords/>
     <url_rewrite>porovnani-produktu</url_rewrite>
   </meta>
+-->
 </entity_meta>
