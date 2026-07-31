@@ -561,7 +561,7 @@ class RequestSqlCore extends ObjectModel
     public function checkedOrder($order, $from)
     {
         $order = $order[0];
-        if ($order['type'] == 'expression') {
+        if ($order['expr_type'] == 'colref') {
             if ($attr = $this->cutAttribute(trim($order['base_expr']), $from)) {
                 if (!$this->attributExistInTable($attr['attribut'], $attr['table'])) {
                     $this->error_sql['checkedOrder']['attribut'] = array($attr['attribut'], implode(', ', $attr['table']));
