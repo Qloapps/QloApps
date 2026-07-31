@@ -804,7 +804,9 @@ class LanguageCore extends ObjectModel
         $lang->active = true;
         // If the language pack has not been provided, retrieve it from prestashop.com
         if (!$lang_pack) {
-            $lang_pack = json_decode(Tools::file_get_contents(_QLO_API_URL_.'/lang_pack/get_lang_pack.php?version='._PS_VERSION_.'&iso_lang='.$iso_code));
+            $lang_pack_url = _QLO_API_URL_.'/lang_pack/get_lang_pack.php?version='._PS_VERSION_.'&iso_lang='.$iso_code;
+            $lang_pack_raw = Tools::file_get_contents($lang_pack_url);
+            $lang_pack = json_decode($lang_pack_raw);
         }
 
         // If a language pack has been found or provided, prefill the language object with the value
@@ -829,7 +831,10 @@ class LanguageCore extends ObjectModel
             $lang->name = $lang->iso_code;
         }
 
-        if (!$lang->validateFields() || !$lang->validateFieldsLang() || !$lang->add(true, false, $only_add)) {
+        $valid_fields = $lang->validateFields(false, true);
+        $valid_fields_lang = $lang->validateFieldsLang(false, true);
+
+        if ($valid_fields !== true || $valid_fields_lang !== true || !$lang->add(true, false, $only_add)) {
             return false;
         }
 
@@ -902,6 +907,42 @@ class LanguageCore extends ObjectModel
         }
         return self::$countActiveLanguages[$id_shop];
     }
+    public static function getLanguagePackFile($iso, $version = null)
+    {
+        if (!Validate::isLanguageIsoCode((string) $iso)) {
+            return false;
+        }
+
+        $file = _PS_TRANSLATIONS_DIR_.(string) $iso.'.gzip';
+        if (file_exists($file)) {
+            return $file;
+        }
+
+        if ($version == null) {
+            $version = _QLOAPPS_VERSION_;
+        }
+
+        $lang_pack_url = _QLO_API_URL_.'/lang_pack/get_lang_pack.php?version='.$version.'&iso_lang='.Tools::strtolower((string) $iso);
+
+        if (!$lang_pack_link = Tools::file_get_contents($lang_pack_url)) {
+            return false;
+        }
+
+        if (!$lang_pack = json_decode($lang_pack_link)) {
+            return false;
+        }
+
+        if (!empty($lang_pack->error) || !($content = Tools::file_get_contents($lang_pack->download_link))) {
+            return false;
+        }
+
+        if (!@file_put_contents($file, $content) && is_writable(dirname($file))) {
+            @unlink($file);
+            @file_put_contents($file, $content);
+        }
+
+        return file_exists($file) ? $file : false;
+    }
 
     public static function downloadAndInstallLanguagePack($iso, $version = null, $params = null, $install = true)
     {
@@ -918,8 +959,10 @@ class LanguageCore extends ObjectModel
         $errors = array();
         $file = _PS_TRANSLATIONS_DIR_.(string)$iso.'.gzip';
 
-        if (!$lang_pack_link = Tools::file_get_contents(_QLO_API_URL_.'/lang_pack/get_lang_pack.php?version='.$version.'&iso_lang='.Tools::strtolower((string)$iso))) {
-            $errors[] = Tools::displayError('Archive cannot be downloaded from prestashop.com.');
+        $lang_pack_url = _QLO_API_URL_.'/lang_pack/get_lang_pack.php?version='.$version.'&iso_lang='.Tools::strtolower((string)$iso);
+
+        if (!$lang_pack_link = Tools::file_get_contents($lang_pack_url)) {
+            $errors[] = Tools::displayError('Archive cannot be downloaded from QloApps Api.');
         } elseif (!$lang_pack = json_decode($lang_pack_link)) {
             $errors[] = Tools::displayError('Error occurred when language was checked according to your Prestashop version.');
         } elseif (empty($lang_pack->error) && ($content = Tools::file_get_contents($lang_pack->download_link))) {

@@ -1671,10 +1671,6 @@ class AdminTranslationsControllerCore extends AdminController
 
     protected function submitResetTranslationsMails()
     {
-        if (!$this->theme_selected) {
-            return;
-        }
-
         $iso_code = $this->lang_selected->iso_code;
         $module_name = false;
 
@@ -1688,27 +1684,43 @@ class AdminTranslationsControllerCore extends AdminController
             return;
         }
 
-        if ($module_name) {
-            $core_dir = rtrim($this->translations_informations['modules']['dir'], '/').'/'.$module_name.'/mails/'.$iso_code.'/';
-            $dest_dir = $this->theme_selected ? $this->translations_informations['modules']['override']['dir'].$module_name.'/mails/'.$iso_code.'/' : $core_dir;
+        if ($this->theme_selected) {
+            $dest_dir = $module_name
+                ? $this->translations_informations['modules']['override']['dir'].$module_name.'/mails/'.$iso_code.'/'
+                : $this->translations_informations['mails']['override']['dir'];
         } else {
-            $core_dir = $this->translations_informations['mails']['dir'];
-            $dest_dir = $this->theme_selected ? $this->translations_informations['mails']['override']['dir'] : $core_dir;
-        }
-
-        if (!Tools::file_exists_cache($core_dir)) {
-            $this->errors[] = Tools::displayError('No core mail template found to reset from.');
-            return;
+            $dest_dir = $module_name
+                ? rtrim($this->translations_informations['modules']['dir'], '/').'/'.$module_name.'/mails/'.$iso_code.'/'
+                : $this->translations_informations['mails']['dir'];
         }
 
         if (!file_exists($dest_dir) && !mkdir($dest_dir, 0777, true)) {
-            $this->errors[] = (sprintf(Tools::displayError('Directory "%s" cannot be created'), $dest_dir));
+            throw new PrestaShopException(sprintf(Tools::displayError('Directory "%s" cannot be created'), $dest_dir));
         }
 
+        $gzip_file = Language::getLanguagePackFile($iso_code);
+        if (!$gzip_file) {
+            $this->errors[] = Tools::displayError('Could not download the language pack from the QloApps API. Please check your internet connection and try again.');
+            return;
+        }
+
+        require_once(_PS_TOOL_DIR_.'tar/Tar.php');
+        $gz = new Archive_Tar($gzip_file, true);
+        $archive_dir = $module_name
+            ? 'modules/'.$module_name.'/mails/'.$iso_code.'/'
+            : 'mails/'.$iso_code.'/';
+
+        $found = false;
         foreach (array($mail_name.'.html', $mail_name.'.txt') as $file) {
-            if (Tools::file_exists_cache($core_dir.$file)) {
-                file_put_contents($dest_dir.$file, file_get_contents($core_dir.$file));
+            $content = $gz->extractInString($archive_dir.$file);
+            if ($content !== null) {
+                file_put_contents($dest_dir.$file, $content);
+                $found = true;
             }
+        }
+        if (!$found) {
+            $this->errors[] = Tools::displayError('This template was not found in the downloaded language pack.');
+            return;
         }
 
         $this->redirect(true);
@@ -2452,16 +2464,15 @@ class AdminTranslationsControllerCore extends AdminController
             return '';
         }
 
-        $str_return = '<div class="mail-available-variables" style="line-height:2.4;">';
+        $str_return = '<div class="mail-available-variables" style="margin-top:10px;">';
         foreach ($variables as $variable) {
             $tag = '{'.$variable.'}';
-            $str_return .= '<span class="label label-default pointer mail-variable-tag" data-variable="'.Tools::htmlentitiesUTF8($tag).'">'.Tools::htmlentitiesUTF8($tag).'</span> ';
+            $str_return .= '<span class="label label-default pointer mail-variable-tag" style="display:inline-block;margin:0 4px 6px 0;" data-variable="'.Tools::htmlentitiesUTF8($tag).'">'.Tools::htmlentitiesUTF8($tag).'</span> ';
         }
         $str_return .= '</div>';
 
         return $str_return;
     }
-
     protected function getMailTemplateVariables($mail_files)
     {
         $content = '';
@@ -3166,9 +3177,28 @@ class AdminTranslationsControllerCore extends AdminController
         }
 
         $sanitizedFilePath = realpath($email_file);
-        $permittedMailDir  = realpath(_PS_MAIL_DIR_) . DIRECTORY_SEPARATOR;
+        if ($sanitizedFilePath === false) {
+            return false;
+        }
 
-        if ($sanitizedFilePath === false || $permittedMailDir === false || strpos($sanitizedFilePath, $permittedMailDir) !== 0) {
+        $permitted_roots = array(
+            realpath(_PS_MAIL_DIR_),
+            realpath(_PS_ROOT_DIR_.'/themes/'),
+            realpath(_PS_ROOT_DIR_.'/modules/'),
+        );
+
+        $is_permitted = false;
+        foreach ($permitted_roots as $permitted_root) {
+            if ($permitted_root !== false
+                && strpos($sanitizedFilePath, $permitted_root.DIRECTORY_SEPARATOR) === 0
+                && strpos($sanitizedFilePath, DIRECTORY_SEPARATOR.'mails'.DIRECTORY_SEPARATOR) !== false
+            ) {
+                $is_permitted = true;
+                break;
+            }
+        }
+
+        if (!$is_permitted) {
             return false;
         }
 

@@ -81,12 +81,10 @@
 					<a name="submitTranslations{$type|ucfirst}" href="{$cancel_url}" class="btn btn-default">
 						<i class="process-icon-cancel"></i> {l s='Cancel'}
 					</a>
-					{if $theme}
-					<button type="submit" id="{$table}_form_reset_btn" name="submitResetTranslations{$type|ucfirst}" class="btn btn-default js-mail-template-reset-btn" disabled="disabled">
+					<button type="submit" id="{$table}_form_reset_btn" name="submitResetTranslations{$type|ucfirst}" class="btn btn-default js-mail-template-reset-btn" disabled="disabled" title="{l s='Fetch the pristine template from the QloApps API'}">
 						<i class="process-icon-refresh"></i>
 						{l s='Reset'}
 					</button>
-					{/if}
 					{*$toggle_button*}
 					<button type="submit" id="{$table}_form_submit_btn" name="submitTranslations{$type|ucfirst}" class="btn btn-default pull-right">
 						<i class="process-icon-save"></i>
@@ -167,15 +165,13 @@
 
 						$('.mail-variable-tag').on('click', function () {
 							var textarea = $(this).closest('.email-collapse').find('> .tab-content > .tab-pane.active textarea').get(0);
-							insertVariable(textarea, $(this).data('variable'));
+							if(textarea){
+								insertVariable(textarea, $(this).data('variable'));
+							}
 						});
 					})
 
 					function insertVariable(field, text) {
-						if (!field) {
-							return;
-						}
-
 						var editor = (typeof tinymce !== 'undefined' && field.id) ? tinymce.get(field.id) : null;
 
 						if (editor) {
@@ -185,14 +181,10 @@
 						}
 
 						field.focus();
-						if (typeof field.selectionStart === 'number') {
-							var startPos = field.selectionStart;
-							var endPos = field.selectionEnd;
-							field.value = field.value.substring(0, startPos) + text + field.value.substring(endPos, field.value.length);
-							field.selectionStart = field.selectionEnd = startPos + text.length;
-						} else {
-							field.value += text;
-						}
+						var startPos = field.selectionStart;
+						var endPos = field.selectionEnd;
+						field.value = field.value.substring(0, startPos) + text + field.value.substring(endPos, field.value.length);
+						field.selectionStart = field.selectionEnd = startPos + text.length;
 					}
 				//]]>
 				</script>
