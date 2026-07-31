@@ -3172,6 +3172,7 @@ class AdminProductsControllerCore extends AdminController
                             'product' => $obj,
                             'htl_info' => $hotelInfo,
                             'rm_status' => $roomStatus,
+                            'id_lang' => $this->context->language->id,
                             'locale' => $this->context->language->iso_code
                         )
                     );
@@ -5628,15 +5629,16 @@ class AdminProductsControllerCore extends AdminController
                     if ($prefix) {
                         $roomsInfo['prefix'] = $prefix;
                     } elseif (!(int) $roomNumber) {
-                        $roomsInfo['prefix'] = $objProduct->name[0].'R';
+                        $roomsInfo['prefix'] = preg_replace('/(?:(?<!^)(?<!\s)\p{L}|\P{L})+/u', '', (string) $objProduct->name);
                     } else {
                         $roomsInfo['prefix'] = '';
                     }
 
+                    $startingRoomNumber = (int) $roomNumber;
                     for ($i = 0; $i < $roomQuantity; $i++) {
                         $roomNum = $roomsInfo['prefix'];
-                        if ((int) $roomNumber) {
-                            $roomNum .= ($roomsInfo['prefix'] !== '' ? '-' : '').($roomNumber + $i);
+                        if ($startingRoomNumber) {
+                            $roomNum .= ($roomsInfo['prefix'] !== '' ? '-' : '').($startingRoomNumber + $i);
                         }
 
                         $objHotelRoomInfo = new HotelRoomInformation();
