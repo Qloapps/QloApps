@@ -35,8 +35,7 @@
         <p><a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$data.id_product}&amp;updateproduct" target="_blank"><span>{$data.room_type}</span></a></p>
     </td>
 	<td>
-		{assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
-		{dateFormat date=$data.date_from full=$is_full_date} - {dateFormat date=$data.date_to full=$is_full_date}
+		{dateFormat date=$data.date_from full=true} - {dateFormat date=$data.date_to full=true}
 	</td>
 	<td>
 		{if $data['children']}

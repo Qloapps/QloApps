@@ -316,9 +316,8 @@ class Blockcart extends Module
                 } else {
                     $addedProduct['price'] = Tools::displayPrice($price['total_price_tax_incl']);
                 }
-                $fullDate = ($this->context->controller->show_full_date && (date('Y-m-d', strtotime($addedProduct['date_from'])) == date('Y-m-d', strtotime($addedProduct['date_to']))) ? true : false);
-                $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from'], null, $fullDate);
-                $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to'], null, $fullDate);
+                $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from'], null, true);
+                $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to'], null, true);
             } else {
                 if ($objProduct->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
                     $addedProduct['unit_price'] = RoomTypeServiceProductPrice::getPrice(
