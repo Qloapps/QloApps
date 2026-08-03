@@ -131,12 +131,13 @@ var ajaxCart = {
         //for every 'add' buttons...
         $(document).off('click', '.ajax_add_to_cart_button').on('click', '.ajax_add_to_cart_button', function (e) {
             e.preventDefault();
-            var idProduct = parseInt($(this).data('id-product'));
-            var idProductAttribute = parseInt($(this).data('id-product-attribute'));
+            var $btn = $(this);
+            var idProduct = parseInt($btn.siblings('.rm_book_id_product').val());
+            var idProductAttribute = parseInt($btn.siblings('.rm_book_id_product_attribute').val());
 
-            var dateFrom = $(this).attr('cat_rm_check_in');
-            var dateTo = $(this).attr('cat_rm_check_out');
-            var occupancy = getBookingOccupancyDetails($(this).closest('.booking_room_fields'), true);
+            var dateFrom = $btn.siblings('.rm_book_check_in').val();
+            var dateTo = $btn.siblings('.rm_book_check_out').val();
+            var occupancy = getBookingOccupancyDetails($btn.closest('.booking_room_fields'), true);
             /* By Webkul
              * Note : In our case minimalQuantity is taken from Qty. field
              */
