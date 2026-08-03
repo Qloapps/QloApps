@@ -33,28 +33,17 @@ $(document).ready(function () {
                 $(this).tooltip({
                     items: '.qlo-stay-period-badge',
                     content: function () {
-                        var $badge = $(this);
-                        var periods = $badge.data('stay-tip');
+                        var periods = $(this).data('stay-tip');
                         if (!periods || !periods.length) {
                             return '';
                         }
-                        var html = '<div class="tooltip_cont qlo-stay-period-tooltip">';
-                        html += '<div class="tip_header"><div class="tip_date">' + $badge.data('label-title') + '</div></div>';
-                        html += '<div class="tip-body">';
-                        html += '<div class="qlo-stay-period-row qlo-stay-period-row-header">'
-                            + '<span class="tip_element_head">' + $badge.data('label-duration') + '</span>'
-                            + '<span class="tip_element_head">' + $badge.data('label-rooms') + '</span>'
-                            + '</div>';
-                        $.each(periods, function (_, p) {
-                            html += '<div class="qlo-stay-period-row">'
-                                + '<span class="tip_element_value">' + p.from + ' – ' + p.to + '</span>'
-                                + '<span class="tip_element_value">' + p.count + '</span>'
-                                + '</div>';
-                        });
-                        html += '</div></div>';
-                        return html;
+                        var rows = $.map(periods, function (p) {
+                            return '<tr><td class="tip_element_value">' + p.from + ' – ' + p.to + '</td>'
+                                + '<td class="tip_element_value">' + p.count + '</td></tr>';
+                        }).join('');
+                        $('#qlo-stay-period-tooltip-tpl tbody').html(rows);
+                        return $('#qlo-stay-period-tooltip-tpl').html();
                     },
-                    position: { my: 'left top+10', at: 'left bottom', collision: 'flipfit', within: '#content' },
                     close: function (event, ui) {
                         ui.tooltip.hover(function () {
                             $(this).stop(true).fadeTo(300, 1);

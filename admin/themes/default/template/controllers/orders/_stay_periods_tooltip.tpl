@@ -1,4 +1,4 @@
-/**
+{**
 * NOTICE OF LICENSE
 *
 * This source file is subject to the Open Software License version 3.0
@@ -18,16 +18,21 @@
 * @author Webkul IN
 * @copyright Since 2010 Webkul
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
-*/
+*}
 
-.qlo-stay-period-tooltip .tip-body {
-    display: block;
-}
-.qlo-stay-period-tooltip .qlo-stay-period-row {
-    display: flex;
-    justify-content: space-between;
-}
-.qlo-stay-period-tooltip .qlo-stay-period-row-header {
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 6px;
-}
+<div id="qlo-stay-period-tooltip-tpl" style="display:none">
+    <div class="bootstrap tooltip_cont qlo-stay-period-tooltip">
+        <div class="tip_header">
+            <div>{l s='Stay Periods'}</div>
+        </div>
+        <table class="table qlo-stay-period-table">
+            <thead>
+                <tr>
+                    <th class="tip_element_head">{l s='Duration'}</th>
+                    <th class="tip_element_head">{l s='Rooms'}</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
