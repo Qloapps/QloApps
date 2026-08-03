@@ -26,9 +26,7 @@
 {extends file="helpers/view/view.tpl"}
 
 {block name="override_tpl"}
-<div class="panel">
-	{$kpi}
-</div>
+
 <div class="row">
 	<div class="col-lg-6">
 		<div class="panel">

@@ -25,7 +25,11 @@
 
 <tr class="product-line-row" data-id_htl_booking="{$data.id|escape:'html':'UTF-8'}" data-id_room="{$data.id_room}" data-id_product="{$data.id_product}" data-id_hotel="{$data.id_hotel}" data-date_from="{$data.date_from}" data-date_to="{$data.date_to}" data-product_price="{$data.unit_amt_tax_incl}" data-id_order_detail="{$data.id_order_detail}">
 	<td>
-        <p>{$data.room_num}</p>
+        <p>{$data.room_num}
+		{if isset($data['connected_rooms'][$data.id_room])}
+			{include file="controllers/products/connected-rooms.tpl" htl_connected_rooms=$data['connected_rooms'][$data.id_room]}
+		{/if}
+		</p>
         {if $data.is_back_order}
             <span class="overbooked_room">{l s='overbooked'}</span>
         {/if}

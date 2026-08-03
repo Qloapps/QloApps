@@ -159,4 +159,5 @@ class OrderPaymentCore extends ObjectModel
     {
         return Db::getInstance()->getValue('SELECT (SUM(`amount` * `conversion_rate`) / SUM(`amount`)) FROM `'._DB_PREFIX_.'order_payment` WHERE `order_reference` = \''.pSQL($order_reference).'\' AND `id_currency` = '.(int)$idCurrency);
     }
+
 }

@@ -32,14 +32,18 @@
 			<page>password</page>
 			<configurable>1</configurable>
 		</meta>
+<!--
 		<meta id="prices-drop">
 			<page>prices-drop</page>
 			<configurable>1</configurable>
 		</meta>
+-->
+<!--
 		<meta id="sitemap">
 			<page>sitemap</page>
 			<configurable>1</configurable>
 		</meta>
+-->
 		<meta id="supplier">
 			<page>supplier</page>
 			<configurable>1</configurable>
@@ -92,14 +96,18 @@
 			<page>order</page>
 			<configurable>1</configurable>
 		</meta>
+<!--
 		<meta id="search">
 			<page>search</page>
 			<configurable>1</configurable>
 		</meta>
+-->
+<!--
 		<meta id="stores">
 			<page>stores</page>
 			<configurable>1</configurable>
 		</meta>
+-->
 		<meta id="order-opc">
 			<page>order-opc</page>
 			<configurable>1</configurable>
@@ -144,10 +152,12 @@
 			<page>module-cashondelivery-validation</page>
 			<configurable>0</configurable>
 		</meta>
+<!--
 		<meta id="products-comparison">
 			<page>products-comparison</page>
 			<configurable>1</configurable>
 		</meta>
+-->
 		<meta id="our-properties">
 			<page>our-properties</page>
 			<configurable>1</configurable>
