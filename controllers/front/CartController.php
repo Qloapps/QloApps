@@ -402,6 +402,10 @@ class CartControllerCore extends FrontController
                             }
                         }
 
+                        if (!$this->errors && !HotelHelper::validateDuration($date_from, $date_to, $this->id_product)) {
+                            $this->errors[] = Tools::displayError('Invalid booking duration for this room type.');
+                        }
+
                         if (!$this->errors) {
                             $objBookingDetail = new HotelBookingDetail();
                             $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);

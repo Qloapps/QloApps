@@ -742,7 +742,12 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'success' => false,
             'data' => array()
         );
-        if ($opt) {
+
+        if ($opt && !HotelHelper::validateDuration($date_from, $date_to, $id_product)) {
+            $this->errors[] = $this->l('Invalid booking duration for this room type.');
+        }
+
+        if ($opt && !$this->errors) {
             // add room in cart
             $objRoomType = new HotelRoomType();
             $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product);
@@ -793,6 +798,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     );
                 }
             }
+        }
+
+        if ($this->errors) {
+            $response['errors'] = $this->errors;
         }
         $this->ajaxDie(json_encode($response));
     }

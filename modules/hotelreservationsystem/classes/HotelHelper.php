@@ -2716,9 +2716,26 @@ class HotelHelper
                     $totalDays = (int)$startDate->diff($endDate)->format('%a') + 1;
                     $daysDifference = (int)($totalDays * $hoursPerDay);
                 } else {
-                    $startDate->setTime(0, 0, 0);
-                    $endDate->setTime(0, 0, 0);
-                    $daysDifference = (int)$startDate->diff($endDate)->format('%a');
+                    $checkInHour = (int)$startDate->format('H');
+                    $checkOutHour = (int)$endDate->format('H');
+                    if ($checkOutHour <= 5 && $checkInHour >= 18) {
+                        $wrapEnd = clone $startDate;
+                        $wrapEnd->setTime((int)$endDate->format('H'), (int)$endDate->format('i'), (int)$endDate->format('s'));
+                        $wrapEnd->modify('+1 day');
+                        $hoursPerNight = (int)floor(($wrapEnd->getTimestamp() - $startDate->getTimestamp()) / 3600);
+
+                        $startDateOnly = clone $startDate;
+                        $endDateOnly = clone $endDate;
+                        $startDateOnly->setTime(0, 0, 0);
+                        $endDateOnly->setTime(0, 0, 0);
+                        $nights = (int)$startDateOnly->diff($endDateOnly)->format('%a');
+
+                        $daysDifference = $hoursPerNight * $nights;
+                    } else {
+                        $startDate->setTime(0, 0, 0);
+                        $endDate->setTime(0, 0, 0);
+                        $daysDifference = (int)$startDate->diff($endDate)->format('%a');
+                    }
                 }
             } else {
                 $difference = $startDate->diff($endDate);
@@ -2832,12 +2849,6 @@ class HotelHelper
         $dateFromTimestamp = strtotime($dateFrom);
         $dateToTimestamp = strtotime($dateTo);
 
-        if ($dateFromTimestamp !== false && $dateToTimestamp !== false
-            && self::hasTimeComponent($dateFrom) && self::hasTimeComponent($dateTo)
-        ) {
-            $validStartDateTimeStamp = max($validStartDateTimeStamp, time());
-        }
-
         $isValid = true;
         if ($dateFrom != '' && ($dateFromTimestamp === false || ($dateFromTimestamp < $validStartDateTimeStamp))) {
             $isValid = false;
@@ -2847,14 +2858,66 @@ class HotelHelper
             $isValid = false;
         } else if ($dateToTimestamp > $maxOrderDateTimestamp) {
             $isValid = false;
+        } else if ($dateFrom != '' && $dateTo != '' && $dateFromTimestamp !== false && $dateToTimestamp !== false
+            && date('Y-m-d', $dateFromTimestamp) == date('Y-m-d', $dateToTimestamp)
+            && $dateFromTimestamp < time()
+        ) {
+            $isValid = false;
         }
 
-        // Hook::exec('actionValidateDateRangeForHotel', array(
-        //     'is_valid' => &$isValid,
-        //     'date_from' => $dateFrom,
-        //     'date_to' => $dateTo,
-        //     'id_hotel' => $idHotel
-        // ));
+        Hook::exec('actionValidateDateRangeForHotel', array(
+            'is_valid' => &$isValid,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'id_hotel' => $idHotel
+        ));
+
+        return $isValid;
+    }
+
+    /**
+     * valid whenever date_from's time-of-day matches the hotel's check-in time AND date_to's` time-of-day matches the hotel's check-out time.
+     * @param string $dateFrom Start date/time
+     * @param string $dateTo End date/time
+     * @param int $idProduct Room type (product) id
+     * @return bool True if the date range is valid, otherwise false
+     */
+    public static function validateDuration($dateFrom, $dateTo, $idProduct)
+    {
+        $dateFromTimestamp = strtotime($dateFrom);
+        $dateToTimestamp = strtotime($dateTo);
+        if (!$dateFrom || !$dateTo || $dateFromTimestamp === false || $dateToTimestamp === false
+            || $dateFromTimestamp >= $dateToTimestamp
+        ) {
+            return false;
+        }
+
+        $checkInTime = '12:00:00';
+        $checkOutTime = '11:00:00';
+
+        $idHotel = (int) Db::getInstance()->getValue(
+            'SELECT `id_hotel` FROM `'._DB_PREFIX_.'htl_room_type` WHERE `id_product` = '.(int)$idProduct
+        );
+        if ($idHotel && Validate::isLoadedObject($objHotel = new HotelBranchInformation($idHotel))) {
+            if ($objHotel->check_in && ($ts = strtotime($objHotel->check_in)) !== false) {
+                $checkInTime = date('H:i:s', $ts);
+            }
+            if ($objHotel->check_out && ($ts = strtotime($objHotel->check_out)) !== false) {
+                $checkOutTime = date('H:i:s', $ts);
+            }
+        }
+
+        $isValid = date('H:i:s', $dateFromTimestamp) == $checkInTime
+            && date('H:i:s', $dateToTimestamp) == $checkOutTime;
+
+        if (!$isValid) {
+            Hook::exec('actionvalidateDurationModifier', array(
+                'is_valid' => &$isValid,
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'id_product' => $idProduct,
+            ));
+        }
 
         return $isValid;
     }
