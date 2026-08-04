@@ -436,7 +436,7 @@
                         {l s='For the Room Type'}
                         <strong id="bulk_create_room_example_name">{$product->name[$id_lang]|escape:'html':'UTF-8'}</strong>,
                         {l s='the room name will be'}
-                        <strong id="room_type_acronym"></strong>.
+                        <strong id="room_type_acronym">{$room_type_acronym|escape:'html':'UTF-8'}</strong>.
                     </p>
                 </div>
                 <div class="form-group">
@@ -643,16 +643,10 @@
     var selectRoomText = "{l s='Please select a room' js=1}";
     var roomNoText = "{l s='Room No' js=1}";
     var currentRoomRow = 0;
-    var roomTypeName = "{$product->name[$id_lang]|escape:'javascript':'UTF-8'}";
     $(document).ready(function() {
         var tooltipCounter = 0;
         var disableDatesCounter = {};
 
-        {literal}
-        if (roomTypeName) {
-            $('#room_type_acronym').text(roomTypeName.replace(/(?:(?<!^)(?<!\s)\p{L}|\P{L})+/gu, ''));
-        }
-        {/literal}
         // Setting the Date object without current time.
         const dateToday = new Date("{date('Y-m-d')}");
         {literal}

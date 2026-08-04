@@ -3173,7 +3173,9 @@ class AdminProductsControllerCore extends AdminController
                             'htl_info' => $hotelInfo,
                             'rm_status' => $roomStatus,
                             'id_lang' => $this->context->language->id,
-                            'locale' => $this->context->language->iso_code
+                            'locale' => $this->context->language->iso_code,
+                            'room_type_acronym' => preg_replace(
+                                '/(?:(?<!^)(?<!\s)\p{L}|\P{L})+/u','',(string) $obj->name[$this->context->language->id]),
                         )
                     );
                 } else {
