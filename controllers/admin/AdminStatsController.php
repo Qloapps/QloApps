@@ -1636,7 +1636,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
         $cancelledBookings = Db::getInstance()->getValue(
             'SELECT COUNT(hbd.`id`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            WHERE hbd.`id` IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND hbd.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'.
+            WHERE hbd.`id` IN ('.OrderReturn::getRefundedBookingIdsSubquery(OrderReturn::EVENT_TYPE_CANCELLATION).') AND hbd.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'.
             HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
         );
 

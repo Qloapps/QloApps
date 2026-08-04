@@ -50,6 +50,6 @@
   </order_state>
   <order_state id="No_show">
     <name>অনুপস্থিত</name>
-    <template/>
+    <template>no_show</template>
   </order_state>
 </entity_order_state>

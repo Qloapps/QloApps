@@ -195,12 +195,12 @@ class OrderReturnCore extends ObjectModel
      *
      * @return string raw SQL, not a full query
      */
-    public static function getRefundedBookingIdsSubquery()
+    public static function getRefundedBookingIdsSubquery($eventType = null)
     {
         return 'SELECT ord.`id_htl_booking` FROM `'._DB_PREFIX_.'order_return_detail` ord
             INNER JOIN `'._DB_PREFIX_.'order_return` orr ON orr.`id_order_return` = ord.`id_order_return`
             INNER JOIN `'._DB_PREFIX_.'order_return_state` ors ON ors.`id_order_return_state` = orr.`state`
-            WHERE ors.`refunded` = 1';
+            WHERE ors.`refunded` = 1'.(!is_null($eventType) ? ' AND orr.`event_type` = '.(int) $eventType : '');
     }
 
     /**
