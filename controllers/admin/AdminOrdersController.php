@@ -409,13 +409,12 @@ class AdminOrdersControllerCore extends AdminController
 
                 if ($this->tabAccess['edit'] === 1) {
                     if ((int) $order->isReturnable()) {
-                        $orderTotalPaid = $order->getTotalPaid();
-                        $orderDiscounts = $order->getCartRules();
-                        $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
+                        // always "Initiate refund" now, regardless of order status —
+                        // cancelling a booking happens through Room Status only
                         $this->page_header_toolbar_btn['cancel'] = array(
-                            'short' => ($hasOrderDiscountOrPayment) ? $this->l('Refund') : $this->l('Cancel'),
+                            'short' => $this->l('Refund'),
                             'id' => 'desc-order-standard_refund',
-                            'desc' => ($hasOrderDiscountOrPayment) ? $this->l('Initiate refund') : $this->l('Cancel bookings'),
+                            'desc' => $this->l('Initiate refund'),
                             'class' => 'icon-exchange',
                             'target' => true,
                         );
@@ -1147,7 +1146,7 @@ class AdminOrdersControllerCore extends AdminController
             $modal = array(
                 'modal_id' => 'cancel-room-booking-modal',
                 'modal_class' => 'modal-md order_detail_modal',
-                'modal_title' => '<i class="icon icon-exchange"></i> &nbsp'.$this->l('Cancel Request'),
+                'modal_title' => '<i class="icon icon-exchange"></i> &nbsp'.$this->l('Refund Request'),
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_cancel_room_bookings.tpl'),
             );
 
@@ -1157,7 +1156,7 @@ class AdminOrdersControllerCore extends AdminController
                         'type' => 'button',
                         'value' => 'submitCancelBooking',
                         'class' => 'submitCancelBooking btn-primary pull-right',
-                        'label' => '<i class="icon-exchange"></i> '.$this->l('Cancel Bookings'),
+                        'label' => '<i class="icon-exchange"></i> '.$this->l('Initiate Refund'),
                     )
                 );
             }
@@ -1944,9 +1943,6 @@ class AdminOrdersControllerCore extends AdminController
                                 $objOrderReturnDetail->product_quantity = $numDays;
                                 $objOrderReturnDetail->id_htl_booking = $idHtlBooking;
                                 $objOrderReturnDetail->refunded_amount = 0;
-                                if (!$order->getCartRules() && $order->getTotalPaid() <= 0) {
-                                    $objOrderReturnDetail->id_customization = 1;
-                                }
                                 $objOrderReturnDetail->save();
                             }
                         }
@@ -1960,9 +1956,6 @@ class AdminOrdersControllerCore extends AdminController
                                 $objOrderReturnDetail->product_quantity = $objServiceProductOrderDetail->quantity;
                                 $objOrderReturnDetail->id_service_product_order_detail = $idServiceProductOrderDetail;
                                 $objOrderReturnDetail->refunded_amount = 0;
-                                if (!$order->getCartRules() && $order->getTotalPaid() <= 0) {
-                                    $objOrderReturnDetail->id_customization = 1;
-                                }
                                 $objOrderReturnDetail->save();
                             }
                         }
@@ -1971,47 +1964,6 @@ class AdminOrdersControllerCore extends AdminController
                     // Change order refund state
                     // Emails to customer, superadmin and employees on refund request state change
                     $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
-                    // process direct cancellations
-                    if (!$order->getCartRules() && $order->getTotalPaid() <= 0) {
-                        // Process refund in booking tables
-                        if ($bookings) {
-                            foreach ($bookings as $idHtlBooking) {
-                                $objHtlBooking = new HotelBookingDetail($idHtlBooking);
-                                if (!$objHtlBooking->processRefundInBookingTables()) {
-                                    $this->errors[] = Tools::displayError('An error occurred while cancelling the booking.');
-                                }
-                            }
-                        }
-                        if ($idServiceProductOrderDetails) {
-                            foreach ($idServiceProductOrderDetails as $idServiceProductOrderDetail) {
-                                $objServiceProductOrderDetail = new ServiceProductOrderDetail($idServiceProductOrderDetail);
-                                if (!$objServiceProductOrderDetail->processRefundInTables()) {
-                                    $this->errors[] = Tools::displayError('An error occurred while cancelling the product.');
-                                }
-                            }
-                        }
-
-                        // As object order is already changed in processRefundInBookingTables
-                        $order = new Order($order->id);
-                        // complete the booking refund directly in the refund request
-                        $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_REFUNDED'));
-
-                        // if all bookings are getting cancelled/Refunded then Cancel/Refund the order also
-                        $idOrderState = $order->getOrderCompleteRefundStatus();
-
-                        if ($idOrderState) {
-                            $objOrderHistory = new OrderHistory();
-                            $objOrderHistory->id_order = (int)$order->id;
-
-                            $useExistingPayment = false;
-                            if (!$order->hasInvoice()) {
-                                $useExistingPayment = true;
-                            }
-
-                            $objOrderHistory->changeIdOrderState($idOrderState, $order, $useExistingPayment);
-                            $objOrderHistory->addWithemail();
-                        }
-                    }
                 }
 
                 // Redirect if no errors
@@ -5871,15 +5823,8 @@ class AdminOrdersControllerCore extends AdminController
     public function updateOrderStatusOnOrderChange($objOrder)
     {
         // If order is completely refunded or cancelled then change the order state
-        if ($idOrderState = $objOrder->getOrderCompleteRefundStatus()) {
-            $objOrderHistory = new OrderHistory();
-            $objOrderHistory->id_order = (int)$objOrder->id;
-            $useExistingPayment = false;
-            if (!$objOrder->hasInvoice()) {
-                $useExistingPayment = true;
-            }
-            $objOrderHistory->changeIdOrderState($idOrderState, $objOrder, $useExistingPayment);
-            $objOrderHistory->add();
+        if ($objOrder->getOrderCompleteRefundStatus()) {
+            $objOrder->syncRefundStatus(false);
         } else {
             // check if new order amount is greater that old order amount and order payment is accepted
             // then update order status to partial payment accepted
@@ -8910,13 +8855,11 @@ class AdminOrdersControllerCore extends AdminController
 
                     if ($newStatus == HotelBookingDetail::STATUS_CANCELLED || $newStatus == HotelBookingDetail::STATUS_NO_SHOW) {
                         // picking Cancelled/No-show also creates the matching refund
-                        // request — unpaid: everything resolves immediately together;
-                        // paid: room status stays as-is until the request is approved
-                        // in Manage Order Refund Requests
+                        // request, always left Pending for approval in Manage Order
+                        // Refund Requests — same regardless of order payment status
                         $eventType = ($newStatus == HotelBookingDetail::STATUS_CANCELLED)
                             ? OrderReturn::EVENT_TYPE_CANCELLATION
                             : OrderReturn::EVENT_TYPE_NO_SHOW;
-                        $hasOrderDiscountOrPayment = ((float) $order->getTotalPaid() > 0 || $order->getCartRules()) ? true : false;
 
                         $objOrderReturn = new OrderReturn();
                         $objOrderReturn->id_customer = $order->id_customer;
@@ -8937,23 +8880,14 @@ class AdminOrdersControllerCore extends AdminController
                         );
                         $objOrderReturnDetail->id_htl_booking = $objHotelBookingDetail->id;
                         $objOrderReturnDetail->refunded_amount = 0;
-                        if (!$hasOrderDiscountOrPayment) {
-                            $objOrderReturnDetail->id_customization = 1;
-                        }
                         $objOrderReturnDetail->save();
 
                         $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
 
                         // the room's own status (htl_booking_detail.id_status) flips right
-                        // away either way — that's a factual room-state decision. Only the
-                        // money side (processRefundInBookingTables()) waits for approval
-                        // on a paid booking, same as before
+                        // away — that's a factual room-state decision, independent of the
+                        // refund request's own approval state
                         $statusChanged = $objHotelBookingDetail->changeStatus($newStatus, $changeParams);
-
-                        if ($statusChanged && !$hasOrderDiscountOrPayment) {
-                            $objHotelBookingDetail->processRefundInBookingTables();
-                            $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_REFUNDED'));
-                        }
 
                         if ($statusChanged) {
                             // if every room in the order is now No-show or Cancelled, bump
@@ -8961,13 +8895,7 @@ class AdminOrdersControllerCore extends AdminController
                             // status alone, independent of whether the underlying refund
                             // request has actually been approved yet
                             $order = new Order($order->id);
-                            if ($idOrderState = $order->getOrderCompleteRefundStatus()) {
-                                $objOrderHistory = new OrderHistory();
-                                $objOrderHistory->id_order = (int) $order->id;
-                                $useExistingPayment = !$order->hasInvoice();
-                                $objOrderHistory->changeIdOrderState($idOrderState, $order, $useExistingPayment);
-                                $objOrderHistory->addWithemail();
-                            }
+                            $order->syncRefundStatus();
                         }
                         $success = $statusChanged;
                     } else {

@@ -335,11 +335,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         }
 
         $orderTotalPaid = $objOrder->getTotalPaid();
-        $orderDiscounts = $objOrder->getCartRules();
-        $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
         $this->context->smarty->assign(
             array (
-                'hasOrderDiscountOrPayment' => $hasOrderDiscountOrPayment,
                 'orderTotalPaid' => $orderTotalPaid,
                 'customer_name' => $objCustomer->firstname.' '.$objCustomer->lastname,
                 'customer_email' => $objCustomer->email,
@@ -375,66 +372,62 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             if (Validate::isLoadedObject($objOrderReturn = new OrderReturn($idOrderReturn))) {
                 $objOrder = new Order($objOrderReturn->id_order);
                 $orderTotalPaid = $objOrder->getTotalPaid();
-                $orderDiscounts = $objOrder->getCartRules();
-                $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
 
                 $idRefundState = Tools::getValue('id_refund_state');
                 if (Validate::isLoadedObject($objRefundState = new OrderReturnState($idRefundState))) {
                     if ($idRefundState != $objOrderReturn->state) {
                         if ($objRefundState->refunded) {
                             $refundedAmounts = Tools::getValue('refund_amounts');
-                            if ($hasOrderDiscountOrPayment) {
-                                if ($idsReturnDetail && count($idsReturnDetail)) {
-                                    if ($refundedAmounts) {
-                                        foreach ($idsReturnDetail as $idRetDetail) {
-                                            if (!isset($refundedAmounts[$idRetDetail]) || !Validate::isPrice($refundedAmounts[$idRetDetail])) {
-                                                $this->errors[] = $this->l('Invalid refund amount(s) entered.');
-                                            }
-                                        }
-                                    } else {
-                                        $this->errors[] = $this->l('Invalid refund amount(s) entered.');
-                                    }
-
-                                    // If there are no errors in the refund amounts the check validations depends on refund amount
-                                    if (!count($this->errors)) {
-                                        $totalRefundAmount = array_sum($refundedAmounts);
-                                        if (Tools::isSubmit('generateCreditSlip')) {
-                                            if ($totalRefundAmount <= 0) {
-                                                $this->errors[] = $this->l('Invalid refund amount(s) for generating credit slip.');
-                                            }
-                                        }
-                                        if (Tools::isSubmit('generateDiscount')) {
-                                            if ($totalRefundAmount <= 0) {
-                                                $this->errors[] = $this->l('Invalid refund amount(s) for generating voucher.');
-                                            }
-                                        }
-
-                                        if (Tools::isSubmit('refundTransactionAmount')) {
-                                            if ($totalRefundAmount <= 0) {
-                                                $this->errors[] = $this->l('Invalid refund amount(s) for entering refund transaction details.');
-                                            } else {
-                                                $paymentMode = Tools::getValue('payment_method');
-                                                if (!$paymentMode) {
-                                                    $paymentMode = Tools::getValue('other_payment_mode');
-                                                    if (!$paymentMode) {
-                                                        $this->errors[] = $this->l('Please enter the payment mode of the refund transaction.');
-                                                    } elseif (!Validate::isGenericName($paymentMode)) {
-                                                        $this->errors[] = $this->l('Invalid payment mode entered.');
-                                                    }
-                                                }
-
-                                                $idTransaction = Tools::getValue('id_transaction');
-                                                if (!$idTransaction) {
-                                                    $this->errors[] = $this->l('Please enter the transaction id of the refund transaction.');
-                                                } elseif (!Validate::isGenericName($idTransaction)) {
-                                                    $this->errors[] = $this->l('Invalid transaction id entered.');
-                                                }
-                                            }
+                            if ($idsReturnDetail && count($idsReturnDetail)) {
+                                if ($refundedAmounts) {
+                                    foreach ($idsReturnDetail as $idRetDetail) {
+                                        if (!isset($refundedAmounts[$idRetDetail]) || !Validate::isPrice($refundedAmounts[$idRetDetail])) {
+                                            $this->errors[] = $this->l('Invalid refund amount(s) entered.');
                                         }
                                     }
                                 } else {
-                                    $this->errors[] = $this->l('Select at least one booking for refund.');
+                                    $this->errors[] = $this->l('Invalid refund amount(s) entered.');
                                 }
+
+                                // If there are no errors in the refund amounts the check validations depends on refund amount
+                                if (!count($this->errors)) {
+                                    $totalRefundAmount = array_sum($refundedAmounts);
+                                    if (Tools::isSubmit('generateCreditSlip')) {
+                                        if ($totalRefundAmount <= 0) {
+                                            $this->errors[] = $this->l('Invalid refund amount(s) for generating credit slip.');
+                                        }
+                                    }
+                                    if (Tools::isSubmit('generateDiscount')) {
+                                        if ($totalRefundAmount <= 0) {
+                                            $this->errors[] = $this->l('Invalid refund amount(s) for generating voucher.');
+                                        }
+                                    }
+
+                                    if (Tools::isSubmit('refundTransactionAmount')) {
+                                        if ($totalRefundAmount <= 0) {
+                                            $this->errors[] = $this->l('Invalid refund amount(s) for entering refund transaction details.');
+                                        } else {
+                                            $paymentMode = Tools::getValue('payment_method');
+                                            if (!$paymentMode) {
+                                                $paymentMode = Tools::getValue('other_payment_mode');
+                                                if (!$paymentMode) {
+                                                    $this->errors[] = $this->l('Please enter the payment mode of the refund transaction.');
+                                                } elseif (!Validate::isGenericName($paymentMode)) {
+                                                    $this->errors[] = $this->l('Invalid payment mode entered.');
+                                                }
+                                            }
+
+                                            $idTransaction = Tools::getValue('id_transaction');
+                                            if (!$idTransaction) {
+                                                $this->errors[] = $this->l('Please enter the transaction id of the refund transaction.');
+                                            } elseif (!Validate::isGenericName($idTransaction)) {
+                                                $this->errors[] = $this->l('Invalid transaction id entered.');
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                $this->errors[] = $this->l('Select at least one booking for refund.');
                             }
                         }
                     } else {
@@ -463,17 +456,13 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                 if ($objRefundState->refunded) {
                     foreach ($idsReturnDetail as $idRetDetail) {
                         $objOrderReturnDetail = new OrderReturnDetail($idRetDetail);
-                        // set booking as refunded if return state is refunded/denied
-                        $reduction_amount = array(
-                            'total_price_tax_excl' => 0,
-                            'total_price_tax_incl' => 0,
-                            'total_products_tax_excl' => 0,
-                            'total_products_tax_incl' => 0,
-                        );
+                        // the amount staff entered for this line
+                        $refundedAmount = $refundedAmounts[$idRetDetail];
+
                         if ($idHtlBooking = $objOrderReturnDetail->id_htl_booking) {
                             $objHtlBooking = new HotelBookingDetail($idHtlBooking);
                             // perform booking refund processes in the booking tables
-                            $objHtlBooking->processRefundInBookingTables();
+                            $objHtlBooking->processRefundInBookingTables($refundedAmount);
 
                             // paid Cancelled/No-show requests only flip the room's status
                             // once the refund is actually approved here
@@ -491,11 +480,10 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                         } elseif ($id_service_product_order_detail = $objOrderReturnDetail->id_service_product_order_detail) {
                             $objServiceProductOrderDetail = new ServiceProductOrderDetail($id_service_product_order_detail);
                             // perform booking refund processes in the service product order tables
-                            $objServiceProductOrderDetail->processRefundInTables();
+                            $objServiceProductOrderDetail->processRefundInTables($refundedAmount);
                         }
 
                         // save individual booking amount for every booking refund
-                        $refundedAmount = $refundedAmounts[$idRetDetail];
                         $objOrderReturnDetail->refunded_amount = $refundedAmount;
                         // set the id_customization to check if in this request which bookings are refunded or not for future
                         $objOrderReturnDetail->id_customization = 1;
@@ -514,9 +502,10 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 $objHtlBooking = new HotelBookingDetail($idHtlBooking);
                                 $idOrderDetail = $objHtlBooking->id_order_detail;
 
-                                // refund_amounts entered by the admin is a single tax-incl figure;
-                                // derive the tax-excl portion using the booking's own tax ratio
-                                $refundedAmountTaxExcl = $objHtlBooking->total_price_tax_incl
+                                // split the admin's single tax-incl entry using the booking's
+                                // own tax ratio; (float) cast since DB decimals come back as
+                                // strings like "0.000000", which PHP treats as truthy
+                                $refundedAmountTaxExcl = (float) $objHtlBooking->total_price_tax_incl
                                     ? $refundedAmount * ($objHtlBooking->total_price_tax_excl / $objHtlBooking->total_price_tax_incl)
                                     : $refundedAmount;
 
@@ -530,7 +519,8 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                             } elseif ($idServiceProductOrder = $objOrderReturnDetail->id_service_product_order_detail) {
                                 $objServiceProductOrderDetail = new ServiceProductOrderDetail($idServiceProductOrder);
 
-                                $refundedAmountTaxExcl = $objServiceProductOrderDetail->total_price_tax_incl
+                                // same reasoning as the booking branch above
+                                $refundedAmountTaxExcl = (float) $objServiceProductOrderDetail->total_price_tax_incl
                                     ? $refundedAmount * ($objServiceProductOrderDetail->total_price_tax_excl / $objServiceProductOrderDetail->total_price_tax_incl)
                                     : $refundedAmount;
 
@@ -545,16 +535,14 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     }
 
                     // if bookings are refunded then set the payment information
-                    if ($hasOrderDiscountOrPayment) {
-                        if (Tools::isSubmit('refundTransactionAmount')) {
-                            $objOrderReturn->payment_mode = $paymentMode;
-                            $objOrderReturn->id_transaction = $idTransaction;
-                        } elseif (Tools::isSubmit('generateDiscount')) {
-                            $objOrderReturn->payment_mode = 'Voucher';
-                        } elseif (!((float) $orderTotalPaid)) {
-                            $objOrderReturn->payment_mode = 'Unpaid by customer';
-                            $objOrderReturn->id_transaction = '-';
-                        }
+                    if (Tools::isSubmit('refundTransactionAmount')) {
+                        $objOrderReturn->payment_mode = $paymentMode;
+                        $objOrderReturn->id_transaction = $idTransaction;
+                    } elseif (Tools::isSubmit('generateDiscount')) {
+                        $objOrderReturn->payment_mode = 'Voucher';
+                    } elseif (!((float) $orderTotalPaid)) {
+                        $objOrderReturn->payment_mode = 'Unpaid by customer';
+                        $objOrderReturn->id_transaction = '-';
                     }
                 }
 
@@ -564,27 +552,11 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     $objOrderReturn->changeIdOrderReturnState($idRefundState);
 
                     // change state of the order to refunded if all the room bookings in the order are completely refunded
+                    // (syncRefundStatus() itself skips the bump if the order
+                    // is already at that state — e.g. already bumped by a No-show/Cancelled
+                    // room-status change before this request was ever approved)
                     if ($objRefundState->refunded) {
-                        $idOrderState = $objOrder->getOrderCompleteRefundStatus();
-
-                        // If order is completely refunded or cancelled then change the order
-                        // state — but only if it isn't already there (a No-show/Cancelled
-                        // order may have already been bumped to this same state earlier,
-                        // right when the room status itself changed, before this request
-                        // was ever approved — don't log a duplicate history row/email for that)
-                        if ($idOrderState && $idOrderState != $objOrder->current_state) {
-                            // check if order is paid the set status of the order to refunded
-                            $objOrderHistory = new OrderHistory();
-                            $objOrderHistory->id_order = (int)$objOrder->id;
-
-                            $useExistingPayment = false;
-                            if (!$objOrder->hasInvoice()) {
-                                $useExistingPayment = true;
-                            }
-
-                            $objOrderHistory->changeIdOrderState($idOrderState, $objOrder, $useExistingPayment);
-                            $objOrderHistory->addWithemail();
-                        }
+                        $objOrder->syncRefundStatus();
                     }
 
                     // E-mail params

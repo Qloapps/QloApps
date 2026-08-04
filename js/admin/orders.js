@@ -1021,9 +1021,11 @@ $(document).ready(function() {
         },
     });
 
-    // when change order state to cancel or refund then show modal of bookings cancellation
+    // when changing order state to Refund, show the booking/product selection
+    // modal first — Cancelled is no longer handled here, cancelling a booking
+    // only happens through Room Status now
     $(document).on('change', '#id_order_state', function(e) {
-        if ($(this).val() == PS_OS_CANCELED || $(this).val() == PS_OS_REFUND) {
+        if ($(this).val() == PS_OS_REFUND) {
             e.preventDefault();
             CancelRoomBookingModal.show();
         }

@@ -149,15 +149,12 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
-                        {else}
-                            <li>
-                                <a href="#" class="open_room_status_form" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}" data-check_in="{$data['check_in']}" data-check_out="{$data['check_out']}">
-                                    <i class="icon-clock-o"></i>
-                                    {l s='Room Status'}
-                                </a>
-                            </li>
-                        {/if}
+                        <li>
+                            <a href="#" class="open_room_status_form" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}" data-check_in="{$data['check_in']}" data-check_out="{$data['check_out']}">
+                                <i class="icon-clock-o"></i>
+                                {l s='Room Status'}
+                            </a>
+                        </li>
                         <li>
                             <a href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
                                 <i class="icon-file-text"></i>

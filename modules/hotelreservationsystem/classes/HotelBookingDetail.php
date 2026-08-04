@@ -3411,7 +3411,7 @@ class HotelBookingDetail extends ObjectModel
     }
 
     // process the booking tables changes when a booking refund/cancellation is processed
-    public function processRefundInBookingTables()
+    public function processRefundInBookingTables($refundedAmountTaxIncl = null)
     {
         if (Validate::isLoadedObject($this)) {
             $reduction_amount = array(
@@ -3426,15 +3426,20 @@ class HotelBookingDetail extends ObjectModel
 
             $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
 
-            // things to do if order is not paid
-            if (!$hasOrderDiscountOrPayment) {
+            // only the legacy full-cancellation callers (no amount passed) still
+            // zero this out below. When an amount is passed (refund-approval
+            // screen), an unpaid order is treated the same as a paid one — the
+            // refunded amount lives only in OrderReturnDetail.refunded_amount.
+            if (!$hasOrderDiscountOrPayment && $refundedAmountTaxIncl === null) {
                 $objHotelBookingDemands = new HotelBookingDemands();
                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
 
-                $reduction_amount['total_price_tax_excl'] = (float) $this->total_price_tax_excl;
-                $reduction_amount['total_products_tax_excl'] = (float) $this->total_price_tax_excl;
-                $reduction_amount['total_price_tax_incl'] = (float) $this->total_price_tax_incl;
-                $reduction_amount['total_products_tax_incl'] = (float) $this->total_price_tax_incl;
+                $roomPriceTaxExcl = (float) $this->total_price_tax_excl;
+                $roomPriceTaxIncl = (float) $this->total_price_tax_incl;
+                $reduction_amount['total_price_tax_excl'] = $roomPriceTaxExcl;
+                $reduction_amount['total_products_tax_excl'] = $roomPriceTaxExcl;
+                $reduction_amount['total_price_tax_incl'] = $roomPriceTaxIncl;
+                $reduction_amount['total_products_tax_incl'] = $roomPriceTaxIncl;
 
                 // reduce facilities amount from order and services_detail
                 if ($roomDemands = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
@@ -3532,10 +3537,11 @@ class HotelBookingDetail extends ObjectModel
                     $objOrderDetail->product_quantity_refunded = $objOrderDetail->product_quantity;
                 }
 
-                if (!$hasOrderDiscountOrPayment) {
-                    // reduce room amount from order and order detail
+                if (!$hasOrderDiscountOrPayment && $refundedAmountTaxIncl === null) {
+                    // reduce room amount from order and order detail — only for
+                    // the legacy full-cancellation callers, see comment above
                     $objOrderDetail->total_price_tax_incl -= Tools::processPriceRounding(
-                        $this->total_price_tax_incl,
+                        $reduction_amount['total_price_tax_incl'],
                         1,
                         $objOrder->round_type,
                         $objOrder->round_mode
@@ -3543,7 +3549,7 @@ class HotelBookingDetail extends ObjectModel
                     $objOrderDetail->total_price_tax_incl = $objOrderDetail->total_price_tax_incl > 0 ? $objOrderDetail->total_price_tax_incl : 0;
 
                     $objOrderDetail->total_price_tax_excl -= Tools::processPriceRounding(
-                        $this->total_price_tax_excl,
+                        $reduction_amount['total_price_tax_excl'],
                         1,
                         $objOrder->round_type,
                         $objOrder->round_mode
@@ -3594,8 +3600,9 @@ class HotelBookingDetail extends ObjectModel
                 $objOrderDetail->save();
             }
 
-            if (!$hasOrderDiscountOrPayment) {
-                // Reduce room amount from htl_booking_detail
+            if (!$hasOrderDiscountOrPayment && $refundedAmountTaxIncl === null) {
+                // Reduce room amount from htl_booking_detail — legacy full-
+                // cancellation callers only, see comment above
                 $this->total_price_tax_excl = 0;
                 $this->total_price_tax_incl = 0;
             }

@@ -87,7 +87,7 @@ class AdminRoomStatusesController extends ModuleAdminController
 
     public function renderForm()
     {
-        if (!$this->loadObject(true)) {
+        if (!$this->loadObject()) {
             return;
         }
 
@@ -148,7 +148,7 @@ class AdminRoomStatusesController extends ModuleAdminController
 
     public function processSave()
     {
-        if (!$this->loadObject(true)) {
+        if (!$this->loadObject()) {
             return;
         }
 

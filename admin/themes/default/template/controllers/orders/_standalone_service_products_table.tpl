@@ -25,7 +25,7 @@
         <table class="table" id="customer_products_details">
             <thead>
                 <tr>
-                    <th><span class="title_box">{l s='Image'}</th>
+                    <th><span class="title_box">{l s='Image'}</span></th>
                     <th><span class="title_box">{l s='Name'}</span></th>
                     <th><span class="title_box">{l s='Quantity'}</span></th>
                     <th><span class="title_box">{l s='Price (Tax excl.)'}</span></th>
@@ -34,8 +34,8 @@
                     {if isset($refundReqProducts) && $refundReqProducts}
                         <th><span class="title_box">{l s='Refund'}</span></th>
                     {/if}
-                    {if ($can_edit)}
-                        <th><span class="title_box">{l s='Actions'}</th>
+                    {if ($can_edit && !$order->hasBeenDelivered())}
+                        <th class="fixed-width-md center"><span class="title_box">{l s='Actions'}</span></th>
                     {/if}
                 </tr>
             </thead>
@@ -104,7 +104,7 @@
                                 &nbsp;
                                 {/if}
                                 </td>
-                                <td class="product_action">
+                                <td class="product_action center">
                                     {* edit/delete controls *}
                                     {if isset($refundReqProducts) && $refundReqProducts && $product.id_service_product_order_detail|in_array:$refundReqProducts && $product.is_cancelled}
                                         <button href="#" class="btn btn-default delete_product_line">
@@ -153,7 +153,7 @@
                         {if isset($refundReqProducts) && $refundReqProducts}
                             {assign var=colspan value=($colspan+1)}
                         {/if}
-                        {if ($can_edit)}
+                        {if ($can_edit && !$order->hasBeenDelivered())}
                             {assign var=colspan value=($colspan+1)}
                         {/if}
                         <td class="list-empty hidden-print" colspan="{$colspan}">

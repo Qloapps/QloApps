@@ -718,20 +718,7 @@ class OrderDetailControllerCore extends FrontController
                     $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_REFUNDED'));
 
                     // if all bookings are getting cancelled/Refunded then Cancel/Refund the order also
-                    $idOrderState = $objOrder->getOrderCompleteRefundStatus();
-
-                    if ($idOrderState) {
-                        $objOrderHistory = new OrderHistory();
-                        $objOrderHistory->id_order = (int)$objOrder->id;
-
-                        $useExistingPayment = false;
-                        if (!$objOrder->hasInvoice()) {
-                            $useExistingPayment = true;
-                        }
-
-                        $objOrderHistory->changeIdOrderState($idOrderState, $objOrder, $useExistingPayment);
-                        $objOrderHistory->addWithemail();
-
+                    if ($objOrder->syncRefundStatus()) {
                         $response['order_cancelled'] = true;
                     }
                 }
