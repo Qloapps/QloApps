@@ -60,30 +60,4 @@ class HotelImageCategory extends ObjectModel
             ORDER BY `name` ASC'
         );
     }
-
-    public static function getCategoryName($idHtlImageCategory, $idLang = null)
-    {
-        $idHtlImageCategory = (int) $idHtlImageCategory;
-        if (!$idHtlImageCategory) {
-            return '';
-        }
-
-        if (!$idLang) {
-            $idLang = (int) Context::getContext()->language->id;
-        }
-
-        $defaultLangId = (int) Configuration::get('PS_LANG_DEFAULT');
-
-        return (string) Db::getInstance()->getValue(
-            'SELECT COALESCE(hicl.`name`, hiclDefault.`name`) AS `name`
-            FROM `'._DB_PREFIX_.'htl_image_category` hic
-            LEFT JOIN `'._DB_PREFIX_.'htl_image_category_lang` hicl
-                ON (hicl.`id_htl_image_category` = hic.`id_htl_image_category`
-                AND hicl.`id_lang` = '.(int) $idLang.')
-            LEFT JOIN `'._DB_PREFIX_.'htl_image_category_lang` hiclDefault
-                ON (hiclDefault.`id_htl_image_category` = hic.`id_htl_image_category`
-                AND hiclDefault.`id_lang` = '.(int) $defaultLangId.')
-            WHERE hic.`id_htl_image_category` = '.(int) $idHtlImageCategory
-        );
-    }
 }

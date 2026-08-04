@@ -24,12 +24,10 @@
     {if is_array($hotel_images) && count($hotel_images)}
         {foreach from=$hotel_images item=hotel_image}
             <div class="col-sm-4 image-item">
-                <a class="htl-img-gallery-trigger"
+                <a class="fancybox"
                    href="{$hotel_image.link|escape:'html':'UTF-8'}"
-                   data-large-url="{$hotel_image.link|escape:'html':'UTF-8'}"
-                   data-small-url="{if isset($hotel_image.small_link) && $hotel_image.small_link}{$hotel_image.small_link|escape:'html':'UTF-8'}{else}{$hotel_image.link|escape:'html':'UTF-8'}{/if}"
-                   data-category-id="{if isset($hotel_image.id_htl_image_category)}{$hotel_image.id_htl_image_category|intval}{else}0{/if}"
-                   data-category-name="{if isset($hotel_image.category_name) && $hotel_image.category_name}{$hotel_image.category_name|escape:'html':'UTF-8'}{/if}">
+                   data-fancybox-group="hotel-images"
+                   title="{if isset($hotel_image.category_name) && $hotel_image.category_name}{$hotel_image.category_name|escape:'html':'UTF-8'}{/if}">
                     <img class="img img-responsive" src="{$hotel_image.link|escape:'html':'UTF-8'}">
                 </a>
             </div>

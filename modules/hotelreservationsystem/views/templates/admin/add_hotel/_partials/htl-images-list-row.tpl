@@ -20,7 +20,8 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<tr class="{if $image.cover == 1}cover-image-tr{/if}" data-id-image="{$image.id|escape:'html':'UTF-8'}">
+{assign var="isCoverImage" value=$image.cover == 1}
+<tr class="{if $isCoverImage}cover-image-tr{/if}" data-id-image="{$image.id|escape:'html':'UTF-8'}">
     <td class="row-selector text-center"><input type="checkbox" class="noborder hotel-image-checkbox" value="{$image.id|escape:'html':'UTF-8'}"></td>
     <td class="text-center">{$image.id|escape:'html':'UTF-8'}</td>
     <td class="text-center">
@@ -35,9 +36,9 @@
             &mdash;
         {/if}
     </td>
-    <td class="text-center {if $image.cover == 1}cover-image-td{/if}">
-        <a href="#" class="{if $image.cover == 1}text-success{else}text-danger{/if} changer-cover-image" data-id-hotel="{$hotel_info.id|escape:'html':'UTF-8'}" data-is-cover="{if $image.cover == 1}1{else}0{/if}" data-id-image="{$image.id|escape:'html':'UTF-8'}">
-            {if $image.cover == 1}
+    <td class="text-center {if $isCoverImage}cover-image-td{/if}">
+        <a href="#" class="{if $isCoverImage}text-success{else}text-danger{/if} changer-cover-image" data-id-hotel="{$hotel_info.id|escape:'html':'UTF-8'}" data-is-cover="{if $isCoverImage}1{else}0{/if}" data-id-image="{$image.id|escape:'html':'UTF-8'}">
+            {if $isCoverImage}
                 <i class="icon-check"></i>
             {else}
                 <i class="icon-times"></i>
@@ -45,7 +46,7 @@
         </a>
     </td>
     <td class="text-center">
-        <button type="button" class="btn btn-default edit-hotel-image" data-id-hotel="{$hotel_info.id|escape:'html':'UTF-8'}" data-id-image="{$image.id|escape:'html':'UTF-8'}" data-id-htl-image-category="{if isset($image.id_htl_image_category)}{$image.id_htl_image_category|intval}{else}0{/if}" data-is-cover="{if $image.cover == 1}1{else}0{/if}"><i class="icon-pencil"></i></button>
-        <button type="button" class="btn btn-default delete-hotel-image" data-id-hotel="{$hotel_info.id|escape:'html':'UTF-8'}" data-is-cover="{if $image.cover == 1}1{else}0{/if}" data-id-image="{$image.id|escape:'html':'UTF-8'}"><i class="icon-trash"></i></button>
+        <button type="button" class="btn btn-default edit-hotel-image" data-id-hotel="{$hotel_info.id|escape:'html':'UTF-8'}" data-id-image="{$image.id|escape:'html':'UTF-8'}" data-id-htl-image-category="{if isset($image.id_htl_image_category)}{$image.id_htl_image_category|intval}{else}0{/if}" data-is-cover="{if $isCoverImage}1{else}0{/if}"><i class="icon-pencil"></i></button>
+        <button type="button" class="btn btn-default delete-hotel-image" data-id-hotel="{$hotel_info.id|escape:'html':'UTF-8'}" data-is-cover="{if $isCoverImage}1{else}0{/if}" data-id-image="{$image.id|escape:'html':'UTF-8'}"><i class="icon-trash"></i></button>
     </td>
 </tr>

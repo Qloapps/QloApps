@@ -34,7 +34,7 @@ $(document).ready(function () {
 
     initHotelImagePreview();
 
-    function openModalWithLoader(modalId)
+    function initHotelImageModal(modalId)
     {
         $('#page-loader').show();
         $(modalId).modal('show');
@@ -63,7 +63,7 @@ $(document).ready(function () {
             fileInput.value = '';
         }
         $('#hotel-images-file-name').val('');
-        openModalWithLoader('#addHotelImagesModal');
+        initHotelImageModal('#addHotelImagesModal');
     });
 
     $('#hotel-images-file-add-btn').on('click', function () {
@@ -148,7 +148,6 @@ $(document).ready(function () {
         var idHotel = $(this).attr('data-id-hotel');
         var idImage = $(this).attr('data-id-image');
         var isCover = $(this).attr('data-is-cover');
-        var triggerElement = $(this);
         if (isCover == 0) {
             $('#page-loader').show();
             $.ajax({
@@ -163,15 +162,11 @@ $(document).ready(function () {
                 },
                 success: function(result) {
                     if (result.status) {
-                        var oldCoverImageTr = $("#hotel-image-table tbody tr.cover-image-tr");
-                        oldCoverImageTr.removeClass("cover-image-tr").find("td.cover-image-td").removeClass("cover-image-td").find("a.changer-cover-image").removeClass("text-success").addClass("text-danger").attr("data-is-cover", "0").find("i.icon-check").removeClass("icon-check").addClass("icon-times");
-                        oldCoverImageTr.find("td button.delete-hotel-image").attr("data-is-cover", "0");
-                        oldCoverImageTr.find("td button.edit-hotel-image").attr("data-is-cover", "0");
-
-                        triggerElement.removeClass("text-danger").addClass("text-success").attr("data-is-cover", "1").find("i.icon-times").removeClass("icon-times").addClass("icon-check");
-                        triggerElement.parent().addClass("cover-image-td").parent().addClass("cover-image-tr").find("td button.delete-hotel-image").attr("data-is-cover", "1");
-                        triggerElement.parent().parent().find("td button.edit-hotel-image").attr("data-is-cover", "1");
-
+                        $('#hotel-image-table tr[data-id-image="' + idImage + '"]').replaceWith(result.image_row);
+                        if (result.old_cover_row) {
+                            $('#hotel-image-table tr[data-id-image="' + result.old_cover_id + '"]').replaceWith(result.old_cover_row);
+                        }
+                        initHotelImagePreview();
                         showSuccessMessage(coverImgSuccessMsg);
                     } else {
     					showErrorMessage(coverImgErrorMsg);
@@ -198,7 +193,7 @@ $(document).ready(function () {
         $('#edit_hotel_image_cover_on').prop('checked', isCover);
         $('#edit_hotel_image_cover_off').prop('checked', !isCover);
 
-        openModalWithLoader('#editHotelImageModal');
+        initHotelImageModal('#editHotelImageModal');
     });
 
     $('#save-edit-hotel-image-btn').on('click', function () {
@@ -252,7 +247,7 @@ $(document).ready(function () {
         $('.hotel-image-checkbox').prop('checked', false);
     });
 
-    $('#hotel-image-bulk-update-category').on('click', function (e) {
+    $('#hotel-image-bulk-update').on('click', function (e) {
         e.preventDefault();
         if (!$('.hotel-image-checkbox:checked').length) {
             showErrorMessage(bulkUpdateSelectErrorMsg);
@@ -260,7 +255,7 @@ $(document).ready(function () {
         }
 
         $('#bulk_id_htl_image_category').val(0);
-        openModalWithLoader('#bulkUpdateHotelImageCategoryModal');
+        initHotelImageModal('#bulkUpdateHotelImageModal');
     });
 
     var pendingBulkDeleteImageIds = null;
@@ -276,7 +271,7 @@ $(document).ready(function () {
         $('#confirmDeleteHotelImageModal').modal('show');
     });
 
-    $('#save-bulk-hotel-image-category-btn').on('click', function () {
+    $('#save-bulk-hotel-image-btn').on('click', function () {
         var idHotel = $('#id-hotel').val();
         var idHtlImageCategory = $('#bulk_id_htl_image_category').val();
         var imageIds = getCheckedImageIds();
@@ -290,7 +285,7 @@ $(document).ready(function () {
             dataType: 'json',
             data: {
                 ajax: true,
-                action: 'BulkUpdateHotelImageCategory',
+                action: 'BulkUpdateHotelImage',
                 id_hotel: idHotel,
                 id_htl_image_category: idHtlImageCategory,
                 image_ids: imageIds
@@ -304,7 +299,7 @@ $(document).ready(function () {
                     });
                     $('.hotel-image-checkbox').prop('checked', false);
                     showSuccessMessage(imgUpdateSuccessMsg);
-                    $('#bulkUpdateHotelImageCategoryModal').modal('hide');
+                    $('#bulkUpdateHotelImageModal').modal('hide');
                 } else {
                     showErrorMessage((resp && resp.errors && resp.errors.join('<br>')) || imgUploadErrorMsg);
                 }

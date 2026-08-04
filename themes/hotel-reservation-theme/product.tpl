@@ -353,30 +353,6 @@
 																	</a>
 																</div>
 															</div>
-															<div class="htl-full-gallery-modal" id="htl-img-gallery-modal" style="display:none;">
-																<div class="htl-full-gallery__overlay"></div>
-																<div class="htl-full-gallery__container">
-																	<button class="htl-full-gallery__close" type="button"><i class="icon-remove"></i></button>
-																	<div class="htl-full-gallery__header">
-																		<h2 class="htl-full-gallery__hotel-name">{if isset($hotel_name) && $hotel_name}{$hotel_name|escape:'html':'UTF-8'}{else}{$product->name|escape:'html':'UTF-8'}{/if}</h2>
-																	</div>
-																	<div class="htl-full-gallery__tabs">
-																		<div class="htl-full-gallery__tabs-wrapper">
-																			<button class="htl-gallery-tab active" data-category="all">{l s='All Photos'}</button>
-																		</div>
-																	</div>
-																	<div class="htl-full-gallery__main">
-																		<button class="htl-full-gallery__nav htl-full-gallery__nav--prev" type="button"><i class="icon-chevron-left"></i></button>
-																		<div class="htl-full-gallery__image-container">
-																			<img src="" alt="" class="htl-full-gallery__main-image" id="htl-main-image">
-																		</div>
-																		<button class="htl-full-gallery__nav htl-full-gallery__nav--next" type="button"><i class="icon-chevron-right"></i></button>
-																	</div>
-																	<div class="htl-full-gallery__thumbnails">
-																		<div class="htl-gallery-thumbnails__scroll" id="htl-gallery-thumbnail"></div>
-																	</div>
-																</div>
-															</div>
 														{/if}
 													{/block}
 													<!-- <div class="info_margin_div">
@@ -902,7 +878,6 @@
 			{addJsDefL name=service_updated_txt}{l s='Service updated' js=1}{/addJsDefL}
 			{addJsDefL name=max_service_product_qty_txt}{l s='Maximum allowed quantity in the cart is' js=1}{/addJsDefL}
 			{addJsDefL name=out_of_stock_text}{l s='Requested quantitity is out of stock' js=1}{/addJsDefL}
-			{addJsDefL name=htl_gallery_all_photos}{l s='All Photos' js=1}{/addJsDefL}
 		{/strip}
 	{/block}
 	{/if}

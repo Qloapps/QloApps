@@ -1511,10 +1511,6 @@ class ProductControllerCore extends FrontController
                 $objHotelImage->getImageLink($hotelImage['id'],
                 ImageType::getFormatedName('large'))
             );
-            $hotelImage['small_link'] = $this->context->link->getMediaLink(
-                $objHotelImage->getImageLink($hotelImage['id'],
-                ImageType::getFormatedName('medium'))
-            );
         }
 
         if (is_array($hotelImages) && count($hotelImages)) {

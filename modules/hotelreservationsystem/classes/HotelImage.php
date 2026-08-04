@@ -25,6 +25,7 @@ class HotelImage extends ObjectModel
 {
     public $id;
     public $id_hotel;
+    public $id_htl_image_category;
     public $cover;
     public $source_index;
     public $image_dir;
@@ -37,6 +38,7 @@ class HotelImage extends ObjectModel
         'primary' => 'id',
         'fields' => array(
             'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'id_htl_image_category' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'allow_null' => true),
             'cover' => array('type' => self::TYPE_BOOL,'validate' => 'isBool')
         ),
     );
@@ -183,110 +185,74 @@ class HotelImage extends ObjectModel
 
     public function uploadHotelImages($images, $idHotel, $idHtlImageCategory = 0)
     {
-        if (isset($images) && $idHotel) {
-            $objHotelHelper = new HotelHelper();
-            $hotelImages  = $images['tmp_name'];
-            $idHtlImageCategory = (int) $idHtlImageCategory;
-            if (is_array($images['tmp_name'])) {
-                foreach ($hotelImages as $image) {
-                    $objHtlImage = new HotelImage();
-                    $objHtlImage->id_hotel = $idHotel;
-                    if ($coverImgExist = HotelImage::getCover($idHotel)) {
-                        $objHtlImage->cover = 0;
-                    } else {
-                        $objHtlImage->cover = 1;
-                    }
-                    if ($objHtlImage->save()) {
-                        self::updateImageCategory($objHtlImage->id, $idHtlImageCategory ?: null);
-                        if ($path = $objHtlImage->getPathForCreation()) {
-                            if (ImageManager::resize(
-                                $image,
-                                $path.$objHtlImage->id.'.'.$objHtlImage->image_format
-                                )) {
-                                // add hotel images in all required sizes
-                                $imagesTypes = ImageType::getImagesTypes('hotels');
-                                $generate_hight_dpi_images = (bool)Configuration::get('PS_HIGHT_DPI');
+        if (!isset($images['tmp_name']) || !$idHotel) {
+            return false;
+        }
 
-                                foreach ($imagesTypes as $imageType) {
-                                    if (!ImageManager::resize(
-                                        $image,
-                                        $path.$objHtlImage->id.'-'.stripslashes($imageType['name']).'.'.$objHtlImage->image_format,
-                                        $imageType['width'],
-                                        $imageType['height']
-                                    )) {
-                                        continue;
-                                    }
+        $isMultiple = is_array($images['tmp_name']);
+        $tmpFiles = $isMultiple ? $images['tmp_name'] : array($images['tmp_name']);
 
-                                    if ($generate_hight_dpi_images) {
-                                        if (!ImageManager::resize(
-                                            $image,
-                                            $path.$objHtlImage->id.'-'.stripslashes($imageType['name']).'.'.$objHtlImage->image_format,
-                                            (int)$imageType['width']*2,
-                                            (int)$imageType['height']*2
-                                        )) {
-                                            continue;
-                                        }
-                                    }
-                                }
+        $generateHighDpiImages = (bool) Configuration::get('PS_HIGHT_DPI');
+        $imagesTypes = ImageType::getImagesTypes('hotels');
 
+        $addedImage = false;
+        $allSucceeded = true;
 
-                            }
-                        }
-                    }
+        foreach ($tmpFiles as $tmpFile) {
+            if (!is_string($tmpFile) || $tmpFile === '') {
+                $allSucceeded = false;
+                continue;
+            }
+
+            $objHtlImage = new HotelImage();
+            $objHtlImage->id_hotel = $idHotel;
+            $objHtlImage->id_htl_image_category = $idHtlImageCategory ?: null;
+            $objHtlImage->cover = self::getCover($idHotel) ? 0 : 1;
+
+            if (!$objHtlImage->save()
+                || !($path = $objHtlImage->getPathForCreation())
+                || !ImageManager::resize($tmpFile, $path.$objHtlImage->id.'.'.$objHtlImage->image_format)
+            ) {
+                $allSucceeded = false;
+                continue;
+            }
+
+            foreach ($imagesTypes as $imageType) {
+                if (!ImageManager::resize(
+                    $tmpFile,
+                    $path.$objHtlImage->id.'-'.stripslashes($imageType['name']).'.'.$objHtlImage->image_format,
+                    $imageType['width'],
+                    $imageType['height']
+                )) {
+                    continue;
                 }
-            } else {
-                $objHtlImage = new HotelImage();
-                $objHtlImage->id_hotel = $idHotel;
-                if ($coverImgExist = HotelImage::getCover($idHotel)) {
-                    $objHtlImage->cover = 0;
-                } else {
-                    $objHtlImage->cover = 1;
-                }
-                if ($objHtlImage->save()) {
-                    self::updateImageCategory($objHtlImage->id, $idHtlImageCategory ?: null);
-                    if ($path = $objHtlImage->getPathForCreation()) {
-                        if (ImageManager::resize(
-                            $hotelImages,
-                            $path.$objHtlImage->id.'.'.$objHtlImage->image_format
-                        )) {
-                            $imagesTypes = ImageType::getImagesTypes('hotels');
-                            $generate_hight_dpi_images = (bool)Configuration::get('PS_HIGHT_DPI');
-                            foreach ($imagesTypes as $imageType) {
-                                if (!ImageManager::resize(
-                                    $hotelImages,
-                                    $path.$objHtlImage->id.'-'.stripslashes($imageType['name']).'.'.$objHtlImage->image_format,
-                                    $imageType['width'],
-                                    $imageType['height']
-                                )) {
-                                    continue;
-                                }
 
-                                if ($generate_hight_dpi_images) {
-                                    if (!ImageManager::resize(
-                                        $hotelImages,
-                                        $path.$objHtlImage->id.'-'.stripslashes($imageType['name']).'.'.$objHtlImage->image_format,
-                                        (int)$imageType['width']*2,
-                                        (int)$imageType['height']*2
-                                    )) {
-                                        continue;
-                                    }
-                                }
-                            }
-                            $addedImage = array(
-                                'id' => $objHtlImage->id,
-                                'cover' => $objHtlImage->cover,
-                                'id_htl_image_category' => $idHtlImageCategory,
-                                'category_name' => HotelImageCategory::getCategoryName($idHtlImageCategory),
-                                'image_link' => Context::getContext()->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id)),
-                            );
-                            return $addedImage;
-                        }
-                    }
+                if ($generateHighDpiImages) {
+                    ImageManager::resize(
+                        $tmpFile,
+                        $path.$objHtlImage->id.'-'.stripslashes($imageType['name']).'.'.$objHtlImage->image_format,
+                        (int) $imageType['width'] * 2,
+                        (int) $imageType['height'] * 2
+                    );
                 }
             }
-            return true;
+
+            if (!$isMultiple) {
+                $addedImage = array(
+                    'id' => $objHtlImage->id,
+                    'cover' => $objHtlImage->cover,
+                    'id_htl_image_category' => $idHtlImageCategory,
+                    'category_name' => (string) (new HotelImageCategory($idHtlImageCategory, Context::getContext()->language->id))->name,
+                    'image_link' => Context::getContext()->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id)),
+                );
+            }
         }
-        return false;
+
+        if ($isMultiple) {
+            return $allSucceeded;
+        }
+
+        return $allSucceeded ? $addedImage : false;
     }
 
     public function getPathForCreation()
@@ -323,17 +289,5 @@ class HotelImage extends ObjectModel
     public function getAllImages()
     {
         return Db::getInstance()->executeS('SELECT * FROM `'._DB_PREFIX_.'htl_image`');
-    }
-
-    public static function updateImageCategory($idImage, $idHtlImageCategory = null)
-    {
-        return Db::getInstance()->update('htl_image',
-            array(
-                'id_htl_image_category' => $idHtlImageCategory ? (int) $idHtlImageCategory : null,
-            ),
-            '`id` = '.(int) $idImage,
-            0,
-            true
-        );
     }
 }

@@ -205,7 +205,13 @@ $(document).ready(function() {
     }
 
     if ($('.room_info_hotel_images_wrap').length) {
-        hotelImagesGallery.init();
+        if (!!$.prototype.fancybox) {
+            $('.room_info_hotel_images_wrap .fancybox').fancybox({
+                'hideOnContentClick': true,
+                'openEffect': 'elastic',
+                'closeEffect': 'elastic',
+            });
+        }
         loadHotelImagesByPage(1);
     }
 });
@@ -1506,193 +1512,6 @@ var BookingForm = {
     }
 }
 
-var hotelImagesGallery = {
-    modal: null,
-    images: [],
-    filteredImages: [],
-    currentIndex: 0,
-    currentCategory: 'all',
-    categories: {},
-    loadedSrcs: {},
-
-    init: function () {
-        this.modal = $('#htl-img-gallery-modal');
-        this.bindEvents();
-    },
-
-    addImages: function (newImages) {
-        for (var i = 0; i < newImages.length; i++) {
-            var img = newImages[i];
-            if (this.loadedSrcs[img.src]) { continue; }
-            this.loadedSrcs[img.src] = true;
-            this.images.push(img);
-            if (img.categoryId && img.categoryName && !this.categories[img.categoryId]) {
-                this.categories[img.categoryId] = img.categoryName;
-            }
-        }
-        this.renderCategoryTabs();
-    },
-
-    bindEvents: function () {
-        var self = this;
-
-        $(document).on('click', '.htl-img-gallery-trigger', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var clickedUrl = $(this).data('large-url');
-            var startIndex = 0;
-            for (var i = 0; i < self.images.length; i++) {
-                if (self.images[i].src === clickedUrl) {
-                    startIndex = i;
-                    break;
-                }
-            }
-            self.open(startIndex);
-        });
-
-        this.modal.on('click', '.htl-full-gallery__close, .htl-full-gallery__overlay', function () {
-            self.close();
-        });
-
-        this.modal.on('click', '.htl-full-gallery__nav--prev', function () {
-            self.prevImage();
-        });
-
-        this.modal.on('click', '.htl-full-gallery__nav--next', function () {
-            self.nextImage();
-        });
-
-        $(document).on('keydown', function (e) {
-            if (!self.modal || !self.modal.is(':visible')) return;
-            if (e.key === 'Escape') { self.close(); }
-            else if (e.key === 'ArrowLeft') { self.prevImage(); }
-            else if (e.key === 'ArrowRight') { self.nextImage(); }
-        });
-
-        this.modal.on('click', '.htl-gallery-tab', function () {
-            var category = $(this).data('category');
-            self.filterByCategory(category);
-            self.modal.find('.htl-gallery-tab').removeClass('active');
-            $(this).addClass('active');
-        });
-
-        this.modal.on('click', '.htl-gallery-thumbnail', function () {
-            var index = parseInt($(this).data('index'));
-            self.showImage(index);
-        });
-    },
-
-    open: function (startIndex) {
-        if (!this.modal || !this.modal.length) return;
-        this.currentCategory = 'all';
-        this.filteredImages = this.images.slice();
-        this.modal.find('.htl-gallery-tab').removeClass('active');
-        this.modal.find('.htl-gallery-tab[data-category="all"]').addClass('active');
-        this.renderThumbnails();
-        this.showImage(startIndex || 0);
-        this.modal.fadeIn(300);
-        $('body').addClass('gallery-open');
-    },
-
-    close: function () {
-        if (!this.modal) return;
-        this.modal.fadeOut(300);
-        $('body').removeClass('gallery-open');
-    },
-
-    filterByCategory: function (categoryId) {
-        this.currentCategory = categoryId;
-        if (categoryId === 'all') {
-            this.filteredImages = this.images.slice();
-        } else {
-            var targetId = String(categoryId);
-            this.filteredImages = this.images.filter(function (img) {
-                return String(img.categoryId) === targetId;
-            });
-        }
-        this.renderThumbnails();
-        if (this.filteredImages.length > 0) {
-            this.showImage(0);
-        }
-    },
-
-    showImage: function (index) {
-        if (index < 0 || index >= this.filteredImages.length) return;
-        this.currentIndex = index;
-        var image = this.filteredImages[index];
-        this.modal.find('#htl-main-image').attr('src', image.src);
-        this.modal.find('.htl-gallery-thumbnail').removeClass('active');
-        this.modal.find('.htl-gallery-thumbnail[data-index="' + index + '"]').addClass('active');
-        var thumbContainer = this.modal.find('#htl-gallery-thumbnail');
-        var activeThumb = thumbContainer.find('.htl-gallery-thumbnail.active');
-        if (activeThumb.length) {
-            var scrollTarget = activeThumb.position().left + thumbContainer.scrollLeft() - (thumbContainer.width() / 2) + (activeThumb.outerWidth() / 2);
-            thumbContainer.animate({ scrollLeft: scrollTarget }, 200);
-        }
-    },
-
-    prevImage: function () {
-        var newIndex = this.currentIndex - 1;
-        if (newIndex < 0) { newIndex = this.filteredImages.length - 1; }
-        this.showImage(newIndex);
-    },
-
-    nextImage: function () {
-        var newIndex = this.currentIndex + 1;
-        if (newIndex >= this.filteredImages.length) { newIndex = 0; }
-        this.showImage(newIndex);
-    },
-
-    renderCategoryTabs: function () {
-        var self = this;
-        var tabWrapper = this.modal.find('.htl-full-gallery__tabs-wrapper');
-        if (!tabWrapper.length) return;
-        tabWrapper.empty();
-
-        var catKeys = Object.keys(this.categories);
-        var allPhotosLabel = (typeof htl_gallery_all_photos !== 'undefined') ? htl_gallery_all_photos : 'All Photos';
-
-        var activeCategory = this.currentCategory;
-
-        /* "All Photos" tab is always visible */
-        var allTab = $('<button>', {
-            'class': 'htl-gallery-tab' + (activeCategory === 'all' ? ' active' : ''),
-            'data-category': 'all'
-        }).text(allPhotosLabel);
-        tabWrapper.append(allTab);
-        this.modal.find('.htl-full-gallery__tabs').show();
-
-        for (var catId in this.categories) {
-            if (this.categories.hasOwnProperty(catId)) {
-                (function (id, name) {
-                    var tab = $('<button>', {
-                        'class': 'htl-gallery-tab' + (String(activeCategory) === String(id) ? ' active' : ''),
-                        'data-category': id
-                    }).text(name);
-                    tabWrapper.append(tab);
-                })(catId, self.categories[catId]);
-            }
-        }
-    },
-
-    renderThumbnails: function () {
-        var container = this.modal.find('#htl-gallery-thumbnail');
-        container.empty();
-        for (var i = 0; i < this.filteredImages.length; i++) {
-            var img = this.filteredImages[i];
-            var thumb = $('<div>', {
-                'class': 'htl-gallery-thumbnail',
-                'data-index': i
-            });
-            thumb.append($('<img>', {
-                'src': img.thumb,
-                'alt': img.categoryName || 'Hotel photo'
-            }));
-            container.append(thumb);
-        }
-    }
-};
-
 function loadHotelImagesByPage(page = 1) {
     page = parseInt(page);
 
@@ -1712,18 +1531,6 @@ function loadHotelImagesByPage(page = 1) {
         success: function(response) {
             if (response.status == true && response.message == 'HTML_OK') {
                 $('.room_info_hotel_images_wrap .images-wrap').append(response.html);
-                var newImages = [];
-                $('.room_info_hotel_images_wrap .images-wrap .htl-img-gallery-trigger').each(function () {
-                    newImages.push({
-                        src: $(this).data('large-url'),
-                        thumb: $(this).data('small-url'),
-                        categoryId: $(this).data('category-id'),
-                        categoryName: $(this).data('category-name')
-                    });
-                });
-                if (newImages.length) {
-                    hotelImagesGallery.addImages(newImages);
-                }
                 $('.room_info_hotel_images_wrap .btn-show-more-images').removeClass('hide');
             }
 
