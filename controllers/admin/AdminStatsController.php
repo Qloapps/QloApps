@@ -1447,7 +1447,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     DATE_ADD(occupied_date, INTERVAL 1 DAY),
                     end_date
                 FROM booking_dates
-                WHERE DATE_ADD(occupied_date, INTERVAL 1 DAY) <= end_date
+                WHERE DATE_ADD(occupied_date, INTERVAL 1 DAY) < end_date
             )
 
             SELECT COUNT(DISTINCT id_room, occupied_date)

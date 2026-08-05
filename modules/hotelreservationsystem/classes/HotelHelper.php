@@ -2910,14 +2910,13 @@ class HotelHelper
         $isValid = date('H:i:s', $dateFromTimestamp) == $checkInTime
             && date('H:i:s', $dateToTimestamp) == $checkOutTime;
 
-        if (!$isValid) {
-            Hook::exec('actionvalidateDurationModifier', array(
-                'is_valid' => &$isValid,
-                'date_from' => $dateFrom,
-                'date_to' => $dateTo,
-                'id_product' => $idProduct,
-            ));
-        }
+        Hook::exec('actionValidateDurationModifier', array(
+            'is_valid' => &$isValid,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'id_product' => $idProduct,
+        ));
+     
 
         return $isValid;
     }

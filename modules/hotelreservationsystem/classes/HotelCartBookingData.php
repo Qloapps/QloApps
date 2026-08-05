@@ -1075,6 +1075,15 @@ class HotelCartBookingData extends ObjectModel
                                 }
 
                                 foreach ($cartData as $roomData) {
+                                    if (!HotelHelper::validateDuration($roomData['date_from'], $roomData['date_to'], $product['id_product'])) {
+                                        $errors[] = sprintf(
+                                            $objModule->l('Invalid booking duration for room "%s". Please remove rooms from %s - %s to proceed.', 'HotelOrderRestrictDate'),
+                                            $product['name'],
+                                            Tools::displayDate($roomData['date_from']),
+                                            Tools::displayDate($roomData['date_to'])
+                                        );
+                                    }
+
                                     if (!$forAdminCart) {
                                         if ($maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($roomData['id_hotel'])) {
                                             if (strtotime('-1 day', strtotime($maxOrderDate)) < strtotime($roomData['date_from'])
