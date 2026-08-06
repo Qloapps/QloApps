@@ -54,7 +54,8 @@ class AdminGuestRegistrationControllerCore extends AdminController
 
         $allSelected = empty($savedSections);
         $nodes = array();
-        foreach (Order::getRegistrationCardInfo() as $sectionId => $section) {
+        $objHotelBookingDetail = new HotelBookingDetail();
+        foreach ($objHotelBookingDetail->getRegistrationCardInfo() as $sectionId => $section) {
             $sectionFields = isset($savedSections[$sectionId]) ? $savedSections[$sectionId] : array();
             $fieldNodes = array();
             foreach ($section['fields'] as $fieldId => $fieldName) {
@@ -101,7 +102,8 @@ class AdminGuestRegistrationControllerCore extends AdminController
     {
         if (Tools::isSubmit('submitGrcCardInfo')) {
             $grcInfo = array();
-            foreach (array_keys(Order::getRegistrationCardInfo()) as $sectionId) {
+            $objHotelBookingDetail = new HotelBookingDetail();
+            foreach (array_keys($objHotelBookingDetail->getRegistrationCardInfo()) as $sectionId) {
                 $fields = array_values(array_filter(array_map('intval', (array)Tools::getValue('grc_field_'.$sectionId, array()))));
                 if (!empty($fields)) {
                     $grcInfo[$sectionId] = $fields;

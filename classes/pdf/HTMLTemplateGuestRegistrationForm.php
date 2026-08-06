@@ -129,7 +129,7 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
 
         // One pass: build false|string label for every field directly.
         // false = hidden, non-empty string = visible (used for both visibility check and label text in template).
-        $grcInfo = Order::getRegistrationCardInfo();
+        $grcInfo = $hotelBookingDetail->getRegistrationCardInfo();
         $fieldLabels = array();
         foreach ($grcInfo as $sectionId => $section) {
             $isSectionEnabled = $allVisible || isset($grcFields[$sectionId]);
@@ -140,87 +140,87 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
             }
         }
 
-        $section1  = Order::GRC_SECTION_GUEST_INFO;
-        $section2  = Order::GRC_SECTION_TRAVEL_INFO;
-        $section3  = Order::GRC_SECTION_BOOKING_INFO;
-        $section4  = Order::GRC_SECTION_IDENTIFICATION;
-        $section5  = Order::GRC_SECTION_ADDITIONAL_GUESTS;
-        $section6  = Order::GRC_SECTION_BILLING_CORPORATE;
-        $section7  = Order::GRC_SECTION_PAYMENT_DEPOSIT;
-        $section8  = Order::GRC_SECTION_GUEST_SIGNATURE;
-        $section9  = Order::GRC_SECTION_PROPERTY_REGS;
-        $section10 = Order::GRC_SECTION_OFFICE_USE_ONLY;
+        $section1  = HotelBookingDetail::GRC_SECTION_GUEST_INFO;
+        $section2  = HotelBookingDetail::GRC_SECTION_TRAVEL_INFO;
+        $section3  = HotelBookingDetail::GRC_SECTION_BOOKING_INFO;
+        $section4  = HotelBookingDetail::GRC_SECTION_IDENTIFICATION;
+        $section5  = HotelBookingDetail::GRC_SECTION_ADDITIONAL_GUESTS;
+        $section6  = HotelBookingDetail::GRC_SECTION_BILLING_CORPORATE;
+        $section7  = HotelBookingDetail::GRC_SECTION_PAYMENT_DEPOSIT;
+        $section8  = HotelBookingDetail::GRC_SECTION_GUEST_SIGNATURE;
+        $section9  = HotelBookingDetail::GRC_SECTION_PROPERTY_REGS;
+        $section10 = HotelBookingDetail::GRC_SECTION_OFFICE_USE_ONLY;
 
         // $labels: false = field hidden, label string = field visible.
         // Template uses {if $labels.key} for visibility AND {$labels.key} for label — no separate boolean assigns.
         $labels = array(
             // Section 1: Guest Information
-            'title'        => $fieldLabels[$section1][Order::GRC_GUEST_TITLE],
-            'full_name'    => $fieldLabels[$section1][Order::GRC_GUEST_FULL_NAME],
-            'phone'        => $fieldLabels[$section1][Order::GRC_GUEST_PHONE],
-            'email'        => $fieldLabels[$section1][Order::GRC_GUEST_EMAIL],
-            'dob'          => $fieldLabels[$section1][Order::GRC_GUEST_DOB],
-            'nationality'  => $fieldLabels[$section1][Order::GRC_GUEST_NATIONALITY],
-            'city_country' => $fieldLabels[$section1][Order::GRC_GUEST_CITY_COUNTRY],
-            'postal_code'  => $fieldLabels[$section1][Order::GRC_GUEST_POSTAL_CODE],
-            'address'      => $fieldLabels[$section1][Order::GRC_GUEST_ADDRESS],
+            'title'        => $fieldLabels[$section1][HotelBookingDetail::GRC_GUEST_TITLE],
+            'full_name'    => $fieldLabels[$section1][HotelBookingDetail::GRC_GUEST_FULL_NAME],
+            'phone'        => $fieldLabels[$section1][HotelBookingDetail::GRC_GUEST_PHONE],
+            'email'        => $fieldLabels[$section1][HotelBookingDetail::GRC_GUEST_EMAIL],
+            'dob'          => $fieldLabels[$section1][HotelBookingDetail::GRC_GUEST_DOB],
+            'nationality'  => $fieldLabels[$section1][HotelBookingDetail::GRC_GUEST_NATIONALITY],
+            'city_country' => $fieldLabels[$section1][HotelBookingDetail::GRC_GUEST_CITY_COUNTRY],
+            'postal_code'  => $fieldLabels[$section1][HotelBookingDetail::GRC_GUEST_POSTAL_CODE],
+            'address'      => $fieldLabels[$section1][HotelBookingDetail::GRC_GUEST_ADDRESS],
 
             // Section 2: Travel Information
-            'arrived_from' => $fieldLabels[$section2][Order::GRC_TRAVEL_ARRIVED_FROM],
-            'next_dest'    => $fieldLabels[$section2][Order::GRC_TRAVEL_NEXT_DESTINATION],
-            'flight'       => $fieldLabels[$section2][Order::GRC_TRAVEL_FLIGHT_TRAIN],
-            'vehicle'      => $fieldLabels[$section2][Order::GRC_TRAVEL_VEHICLE_REG],
-            'purpose'      => $fieldLabels[$section2][Order::GRC_TRAVEL_PURPOSE_OF_VISIT],
+            'arrived_from' => $fieldLabels[$section2][HotelBookingDetail::GRC_TRAVEL_ARRIVED_FROM],
+            'next_dest'    => $fieldLabels[$section2][HotelBookingDetail::GRC_TRAVEL_NEXT_DESTINATION],
+            'flight'       => $fieldLabels[$section2][HotelBookingDetail::GRC_TRAVEL_FLIGHT_TRAIN],
+            'vehicle'      => $fieldLabels[$section2][HotelBookingDetail::GRC_TRAVEL_VEHICLE_REG],
+            'purpose'      => $fieldLabels[$section2][HotelBookingDetail::GRC_TRAVEL_PURPOSE_OF_VISIT],
 
             // Section 3: Booking Information
-            'booking_ref'         => $fieldLabels[$section3][Order::GRC_BOOKING_REFERENCE],
-            'booking_rate'        => $fieldLabels[$section3][Order::GRC_BOOKING_RATE_PER_NIGHT],
-            'booking_arrival'     => $fieldLabels[$section3][Order::GRC_BOOKING_ARRIVAL],
-            'booking_departure'   => $fieldLabels[$section3][Order::GRC_BOOKING_DEPARTURE],
-            'booking_room_type'   => $fieldLabels[$section3][Order::GRC_BOOKING_ROOM_TYPE],
-            'booking_room_number' => $fieldLabels[$section3][Order::GRC_BOOKING_ROOM_NUMBER],
-            'num_guests'          => $fieldLabels[$section3][Order::GRC_BOOKING_NUM_GUESTS],
+            'booking_ref'         => $fieldLabels[$section3][HotelBookingDetail::GRC_BOOKING_REFERENCE],
+            'booking_rate'        => $fieldLabels[$section3][HotelBookingDetail::GRC_BOOKING_RATE_PER_NIGHT],
+            'booking_arrival'     => $fieldLabels[$section3][HotelBookingDetail::GRC_BOOKING_ARRIVAL],
+            'booking_departure'   => $fieldLabels[$section3][HotelBookingDetail::GRC_BOOKING_DEPARTURE],
+            'booking_room_type'   => $fieldLabels[$section3][HotelBookingDetail::GRC_BOOKING_ROOM_TYPE],
+            'booking_room_number' => $fieldLabels[$section3][HotelBookingDetail::GRC_BOOKING_ROOM_NUMBER],
+            'num_guests'          => $fieldLabels[$section3][HotelBookingDetail::GRC_BOOKING_NUM_GUESTS],
 
             // Section 4: Identification Document
-            'id_proof'           => $fieldLabels[$section4][Order::GRC_ID_IDENTITY_PROOF],
-            'id_number'          => $fieldLabels[$section4][Order::GRC_ID_NUMBER],
-            'passport'           => $fieldLabels[$section4][Order::GRC_ID_PASSPORT_NO],
-            'place_of_issue'     => $fieldLabels[$section4][Order::GRC_ID_PLACE_OF_ISSUE],
-            'date_of_issue'      => $fieldLabels[$section4][Order::GRC_ID_DATE_OF_ISSUE],
-            'date_of_expiry'     => $fieldLabels[$section4][Order::GRC_ID_DATE_OF_EXPIRY],
-            'visa'               => $fieldLabels[$section4][Order::GRC_ID_VISA_NUMBER],
-            'valid_until'        => $fieldLabels[$section4][Order::GRC_ID_VALID_UNTIL],
-            'arrival_in_country' => $fieldLabels[$section4][Order::GRC_ID_ARRIVAL_DATE_IN_COUNTRY],
+            'id_proof'           => $fieldLabels[$section4][HotelBookingDetail::GRC_ID_IDENTITY_PROOF],
+            'id_number'          => $fieldLabels[$section4][HotelBookingDetail::GRC_ID_NUMBER],
+            'passport'           => $fieldLabels[$section4][HotelBookingDetail::GRC_ID_PASSPORT_NO],
+            'place_of_issue'     => $fieldLabels[$section4][HotelBookingDetail::GRC_ID_PLACE_OF_ISSUE],
+            'date_of_issue'      => $fieldLabels[$section4][HotelBookingDetail::GRC_ID_DATE_OF_ISSUE],
+            'date_of_expiry'     => $fieldLabels[$section4][HotelBookingDetail::GRC_ID_DATE_OF_EXPIRY],
+            'visa'               => $fieldLabels[$section4][HotelBookingDetail::GRC_ID_VISA_NUMBER],
+            'valid_until'        => $fieldLabels[$section4][HotelBookingDetail::GRC_ID_VALID_UNTIL],
+            'arrival_in_country' => $fieldLabels[$section4][HotelBookingDetail::GRC_ID_ARRIVAL_DATE_IN_COUNTRY],
 
             // Section 5: Additional Guests
-            'addguest_name'        => $fieldLabels[$section5][Order::GRC_ADD_GUEST_NAME],
-            'addguest_id_type'     => $fieldLabels[$section5][Order::GRC_ADD_GUEST_ID_TYPE],
-            'addguest_id_number'   => $fieldLabels[$section5][Order::GRC_ADD_GUEST_ID_NUMBER],
-            'addguest_nationality' => $fieldLabels[$section5][Order::GRC_ADD_GUEST_NATIONALITY],
+            'addguest_name'        => $fieldLabels[$section5][HotelBookingDetail::GRC_ADD_GUEST_NAME],
+            'addguest_id_type'     => $fieldLabels[$section5][HotelBookingDetail::GRC_ADD_GUEST_ID_TYPE],
+            'addguest_id_number'   => $fieldLabels[$section5][HotelBookingDetail::GRC_ADD_GUEST_ID_NUMBER],
+            'addguest_nationality' => $fieldLabels[$section5][HotelBookingDetail::GRC_ADD_GUEST_NATIONALITY],
 
             // Section 6: Billing & Corporate
-            'company' => $fieldLabels[$section6][Order::GRC_BILLING_COMPANY],
-            'tax_id'  => $fieldLabels[$section6][Order::GRC_BILLING_TAX_ID],
+            'company' => $fieldLabels[$section6][HotelBookingDetail::GRC_BILLING_COMPANY],
+            'tax_id'  => $fieldLabels[$section6][HotelBookingDetail::GRC_BILLING_TAX_ID],
 
             // Section 7: Payment & Deposit
-            'payment_method'   => $fieldLabels[$section7][Order::GRC_PAYMENT_METHOD],
-            'card_number'      => $fieldLabels[$section7][Order::GRC_PAYMENT_CARD_NUMBER],
-            'security_deposit' => $fieldLabels[$section7][Order::GRC_PAYMENT_SECURITY_DEPOSIT],
+            'payment_method'   => $fieldLabels[$section7][HotelBookingDetail::GRC_PAYMENT_METHOD],
+            'card_number'      => $fieldLabels[$section7][HotelBookingDetail::GRC_PAYMENT_CARD_NUMBER],
+            'security_deposit' => $fieldLabels[$section7][HotelBookingDetail::GRC_PAYMENT_SECURITY_DEPOSIT],
 
             // Section 8: Guest Signature
-            'signature' => $fieldLabels[$section8][Order::GRC_SIG_SIGNATURE],
-            'sig_date'  => $fieldLabels[$section8][Order::GRC_SIG_DATE],
+            'signature' => $fieldLabels[$section8][HotelBookingDetail::GRC_SIG_SIGNATURE],
+            'sig_date'  => $fieldLabels[$section8][HotelBookingDetail::GRC_SIG_DATE],
 
             // Section 9: Property Regulations (checkin/checkout share one visibility flag; two separate PDF sub-labels)
-            'checkin_time'   => $fieldLabels[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? 'Check-in Time'  : false,
-            'checkout_time'  => $fieldLabels[$section9][Order::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? 'Check-out Time' : false,
-            'hotel_policies' => $fieldLabels[$section9][Order::GRC_PROP_HOTEL_POLICIES],
+            'checkin_time'   => $fieldLabels[$section9][HotelBookingDetail::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? 'Check-in Time'  : false,
+            'checkout_time'  => $fieldLabels[$section9][HotelBookingDetail::GRC_PROP_CHECKIN_CHECKOUT_TIME] ? 'Check-out Time' : false,
+            'hotel_policies' => $fieldLabels[$section9][HotelBookingDetail::GRC_PROP_HOTEL_POLICIES],
 
             // Section 10: For Office Use Only
-            'staff_name'          => $fieldLabels[$section10][Order::GRC_OFFICE_STAFF_NAME],
-            'office_checkin_time' => $fieldLabels[$section10][Order::GRC_OFFICE_CHECKIN_TIME],
-            'id_verified'         => $fieldLabels[$section10][Order::GRC_OFFICE_ID_VERIFIED],
-            'reg_no'              => $fieldLabels[$section10][Order::GRC_OFFICE_REG_NO],
+            'staff_name'          => $fieldLabels[$section10][HotelBookingDetail::GRC_OFFICE_STAFF_NAME],
+            'office_checkin_time' => $fieldLabels[$section10][HotelBookingDetail::GRC_OFFICE_CHECKIN_TIME],
+            'id_verified'         => $fieldLabels[$section10][HotelBookingDetail::GRC_OFFICE_ID_VERIFIED],
+            'reg_no'              => $fieldLabels[$section10][HotelBookingDetail::GRC_OFFICE_REG_NO],
         );
 
         $showLocalIdGroup = (bool)$labels['id_proof'] || (bool)$labels['id_number'];

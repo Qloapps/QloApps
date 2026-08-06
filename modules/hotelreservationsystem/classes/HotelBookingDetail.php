@@ -23,6 +23,85 @@
 
 class HotelBookingDetail extends ObjectModel
 {
+    // Guest Registration Card — Section IDs
+    const GRC_SECTION_GUEST_INFO          = 1;
+    const GRC_SECTION_TRAVEL_INFO         = 2;
+    const GRC_SECTION_BOOKING_INFO        = 3;
+    const GRC_SECTION_IDENTIFICATION      = 4;
+    const GRC_SECTION_ADDITIONAL_GUESTS   = 5;
+    const GRC_SECTION_BILLING_CORPORATE   = 6;
+    const GRC_SECTION_PAYMENT_DEPOSIT     = 7;
+    const GRC_SECTION_GUEST_SIGNATURE     = 8;
+    const GRC_SECTION_PROPERTY_REGS       = 9;
+    const GRC_SECTION_OFFICE_USE_ONLY     = 10;
+
+    // Guest Registration Card — Guest Information fields (section 1)
+    const GRC_GUEST_TITLE                 = 1;
+    const GRC_GUEST_FULL_NAME             = 2;
+    const GRC_GUEST_PHONE                 = 3;
+    const GRC_GUEST_EMAIL                 = 4;
+    const GRC_GUEST_DOB                   = 5;
+    const GRC_GUEST_NATIONALITY           = 6;
+    const GRC_GUEST_CITY_COUNTRY          = 7;
+    const GRC_GUEST_POSTAL_CODE           = 8;
+    const GRC_GUEST_ADDRESS               = 9;
+
+    // Guest Registration Card — Travel Information fields (section 2)
+    const GRC_TRAVEL_ARRIVED_FROM         = 1;
+    const GRC_TRAVEL_NEXT_DESTINATION     = 2;
+    const GRC_TRAVEL_FLIGHT_TRAIN         = 3;
+    const GRC_TRAVEL_VEHICLE_REG          = 4;
+    const GRC_TRAVEL_PURPOSE_OF_VISIT     = 5;
+
+    // Guest Registration Card — Booking Information fields (section 3)
+    const GRC_BOOKING_REFERENCE           = 1;
+    const GRC_BOOKING_RATE_PER_NIGHT      = 2;
+    const GRC_BOOKING_ARRIVAL             = 3;
+    const GRC_BOOKING_DEPARTURE           = 4;
+    const GRC_BOOKING_ROOM_TYPE           = 5;
+    const GRC_BOOKING_ROOM_NUMBER         = 6;
+    const GRC_BOOKING_NUM_GUESTS          = 7;
+
+    // Guest Registration Card — Identification Document fields (section 4)
+    const GRC_ID_IDENTITY_PROOF           = 1;
+    const GRC_ID_NUMBER                   = 2;
+    const GRC_ID_PASSPORT_NO              = 3;
+    const GRC_ID_PLACE_OF_ISSUE           = 4;
+    const GRC_ID_DATE_OF_ISSUE            = 5;
+    const GRC_ID_DATE_OF_EXPIRY           = 6;
+    const GRC_ID_VISA_NUMBER              = 7;
+    const GRC_ID_VALID_UNTIL              = 8;
+    const GRC_ID_ARRIVAL_DATE_IN_COUNTRY  = 9;
+
+    // Guest Registration Card — Additional Guests fields (section 5)
+    const GRC_ADD_GUEST_NAME              = 1;
+    const GRC_ADD_GUEST_ID_TYPE           = 2;
+    const GRC_ADD_GUEST_ID_NUMBER         = 3;
+    const GRC_ADD_GUEST_NATIONALITY       = 4;
+
+    // Guest Registration Card — Billing & Corporate Details fields (section 6)
+    const GRC_BILLING_COMPANY             = 1;
+    const GRC_BILLING_TAX_ID              = 2;
+
+    // Guest Registration Card — Payment & Deposit fields (section 7)
+    const GRC_PAYMENT_METHOD              = 1;
+    const GRC_PAYMENT_CARD_NUMBER         = 2;
+    const GRC_PAYMENT_SECURITY_DEPOSIT    = 3;
+
+    // Guest Registration Card — Guest Signature fields (section 8)
+    const GRC_SIG_SIGNATURE               = 1;
+    const GRC_SIG_DATE                    = 2;
+
+    // Guest Registration Card — Property Regulations fields (section 9)
+    const GRC_PROP_CHECKIN_CHECKOUT_TIME  = 1;
+    const GRC_PROP_HOTEL_POLICIES         = 2;
+
+    // Guest Registration Card — For Office Use Only fields (section 10)
+    const GRC_OFFICE_STAFF_NAME           = 1;
+    const GRC_OFFICE_CHECKIN_TIME         = 2;
+    const GRC_OFFICE_ID_VERIFIED          = 3;
+    const GRC_OFFICE_REG_NO               = 4;
+
     private $allReqDates;
     private $dltDates;
     private $partAvaiDates;            // used to remove cart rooms from partial available rooms
@@ -3812,5 +3891,120 @@ class HotelBookingDetail extends ObjectModel
         }
 
         return parent::add($auto_date, $null_values);
+    }
+
+    /**
+     * Returns all Guest Registration Card sections and their fields.
+     * Modules may add, remove, or reorder sections/fields via the hook.
+     *
+     * @return array  sectionId => ['name' => string, 'fields' => [fieldId => string, ...]]
+     */
+    public function getRegistrationCardInfo()
+    {
+        $guestRegCardInfo = array(
+            self::GRC_SECTION_GUEST_INFO => array(
+                'name'   => $this->moduleInstance->l('Guest Information'),
+                'fields' => array(
+                    self::GRC_GUEST_TITLE        => $this->moduleInstance->l('Title'),
+                    self::GRC_GUEST_FULL_NAME    => $this->moduleInstance->l('Full Name (As per ID)'),
+                    self::GRC_GUEST_PHONE        => $this->moduleInstance->l('Phone / Mobile'),
+                    self::GRC_GUEST_EMAIL        => $this->moduleInstance->l('Email'),
+                    self::GRC_GUEST_DOB          => $this->moduleInstance->l('Date of Birth'),
+                    self::GRC_GUEST_NATIONALITY  => $this->moduleInstance->l('Nationality'),
+                    self::GRC_GUEST_CITY_COUNTRY => $this->moduleInstance->l('City / Country'),
+                    self::GRC_GUEST_POSTAL_CODE  => $this->moduleInstance->l('Postal Code'),
+                    self::GRC_GUEST_ADDRESS      => $this->moduleInstance->l('Address'),
+                ),
+            ),
+            self::GRC_SECTION_TRAVEL_INFO => array(
+                'name'   => $this->moduleInstance->l('Travel Information'),
+                'fields' => array(
+                    self::GRC_TRAVEL_ARRIVED_FROM     => $this->moduleInstance->l('Arrived From'),
+                    self::GRC_TRAVEL_NEXT_DESTINATION => $this->moduleInstance->l('Next Destination'),
+                    self::GRC_TRAVEL_FLIGHT_TRAIN     => $this->moduleInstance->l('Flight / Train Number'),
+                    self::GRC_TRAVEL_VEHICLE_REG      => $this->moduleInstance->l('Vehicle Reg. No.'),
+                    self::GRC_TRAVEL_PURPOSE_OF_VISIT => $this->moduleInstance->l('Purpose of Visit'),
+                ),
+            ),
+            self::GRC_SECTION_BOOKING_INFO => array(
+                'name'   => $this->moduleInstance->l('Booking Information'),
+                'fields' => array(
+                    self::GRC_BOOKING_REFERENCE      => $this->moduleInstance->l('Booking Reference No.'),
+                    self::GRC_BOOKING_RATE_PER_NIGHT => $this->moduleInstance->l('Rate per Night'),
+                    self::GRC_BOOKING_ARRIVAL        => $this->moduleInstance->l('Arrival Date & Time'),
+                    self::GRC_BOOKING_DEPARTURE      => $this->moduleInstance->l('Departure Date & Time'),
+                    self::GRC_BOOKING_ROOM_TYPE      => $this->moduleInstance->l('Room Type'),
+                    self::GRC_BOOKING_ROOM_NUMBER    => $this->moduleInstance->l('Room Number'),
+                    self::GRC_BOOKING_NUM_GUESTS     => $this->moduleInstance->l('Number of Guests'),
+                ),
+            ),
+            self::GRC_SECTION_IDENTIFICATION => array(
+                'name'   => $this->moduleInstance->l('Identification Document'),
+                'fields' => array(
+                    self::GRC_ID_IDENTITY_PROOF          => $this->moduleInstance->l('Identity Proof'),
+                    self::GRC_ID_NUMBER                  => $this->moduleInstance->l('ID Number'),
+                    self::GRC_ID_PASSPORT_NO             => $this->moduleInstance->l('Passport No.'),
+                    self::GRC_ID_PLACE_OF_ISSUE          => $this->moduleInstance->l('Place of Issue'),
+                    self::GRC_ID_DATE_OF_ISSUE           => $this->moduleInstance->l('Date of Issue'),
+                    self::GRC_ID_DATE_OF_EXPIRY          => $this->moduleInstance->l('Date of Expiry'),
+                    self::GRC_ID_VISA_NUMBER             => $this->moduleInstance->l('Visa Number'),
+                    self::GRC_ID_VALID_UNTIL             => $this->moduleInstance->l('Valid Until'),
+                    self::GRC_ID_ARRIVAL_DATE_IN_COUNTRY => $this->moduleInstance->l('Arrival Date in Country'),
+                ),
+            ),
+            self::GRC_SECTION_ADDITIONAL_GUESTS => array(
+                'name'   => $this->moduleInstance->l('Additional Guests'),
+                'fields' => array(
+                    self::GRC_ADD_GUEST_NAME        => $this->moduleInstance->l('Guest Name'),
+                    self::GRC_ADD_GUEST_ID_TYPE     => $this->moduleInstance->l('ID Type'),
+                    self::GRC_ADD_GUEST_ID_NUMBER   => $this->moduleInstance->l('ID Number'),
+                    self::GRC_ADD_GUEST_NATIONALITY => $this->moduleInstance->l('Nationality'),
+                ),
+            ),
+            self::GRC_SECTION_BILLING_CORPORATE => array(
+                'name'   => $this->moduleInstance->l('Billing & Corporate Details'),
+                'fields' => array(
+                    self::GRC_BILLING_COMPANY => $this->moduleInstance->l('Company / Agent'),
+                    self::GRC_BILLING_TAX_ID  => $this->moduleInstance->l('Tax ID / VAT No.'),
+                ),
+            ),
+            self::GRC_SECTION_PAYMENT_DEPOSIT => array(
+                'name'   => $this->moduleInstance->l('Payment & Deposit'),
+                'fields' => array(
+                    self::GRC_PAYMENT_METHOD           => $this->moduleInstance->l('Payment Method'),
+                    self::GRC_PAYMENT_CARD_NUMBER      => $this->moduleInstance->l('Credit Card Number'),
+                    self::GRC_PAYMENT_SECURITY_DEPOSIT => $this->moduleInstance->l('Security Deposit'),
+                ),
+            ),
+            self::GRC_SECTION_GUEST_SIGNATURE => array(
+                'name'   => $this->moduleInstance->l('Guest Signature'),
+                'fields' => array(
+                    self::GRC_SIG_SIGNATURE => $this->moduleInstance->l('Signature'),
+                    self::GRC_SIG_DATE      => $this->moduleInstance->l('Date'),
+                ),
+            ),
+            self::GRC_SECTION_PROPERTY_REGS => array(
+                'name'   => $this->moduleInstance->l('Property Regulations'),
+                'fields' => array(
+                    self::GRC_PROP_CHECKIN_CHECKOUT_TIME => $this->moduleInstance->l('Check-in / Check-out Time'),
+                    self::GRC_PROP_HOTEL_POLICIES        => $this->moduleInstance->l('Hotel Policies'),
+                ),
+            ),
+            self::GRC_SECTION_OFFICE_USE_ONLY => array(
+                'name'   => $this->moduleInstance->l('For Office Use Only'),
+                'fields' => array(
+                    self::GRC_OFFICE_STAFF_NAME   => $this->moduleInstance->l('Staff Name'),
+                    self::GRC_OFFICE_CHECKIN_TIME => $this->moduleInstance->l('Check-in Time'),
+                    self::GRC_OFFICE_ID_VERIFIED  => $this->moduleInstance->l('ID Verified'),
+                    self::GRC_OFFICE_REG_NO       => $this->moduleInstance->l('Registration No.'),
+                ),
+            ),
+        );
+
+        Hook::exec('actionGuestRegCardInfoModifier', array(
+            'guest_registration_info' => &$guestRegCardInfo,
+        ));
+
+        return $guestRegCardInfo;
     }
 }
