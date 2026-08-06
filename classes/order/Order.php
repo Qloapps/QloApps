@@ -3139,14 +3139,15 @@ class OrderCore extends ObjectModel
                 if (!$objHotelBooking->getOverbookedRooms($this->id)) {
                     $result['errors'][] = Tools::displayError('Order status can not be changed to any overbooking status as there are no overbooked rooms in the order.');
                 }
-            } elseif ($objNewOrderState->id == Configuration::get('PS_OS_REFUND')
-                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)
-            ) {
-                $result['errors'][] = Tools::displayError('Order status can not be set to Refunded until all bookings in the order are completely refunded.');
-            } elseif ($objNewOrderState->id == Configuration::get('PS_OS_CANCELED')
-                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG, 0, 1)
-            ) {
-                $result['errors'][] = Tools::displayError('Order status can not be set to Cancelled until all bookings in the order are cancelled.');
+            } elseif (in_array($objNewOrderState->id, array(
+                Configuration::get('PS_OS_REFUND'),
+                Configuration::get('PS_OS_CANCELED'),
+                Configuration::get('PS_OS_NO_SHOW'),
+            ))) {
+                // Refunded/Cancelled/No-show are never a direct manual pick — they're
+                // only ever reached automatically, via Order::syncRefundStatus(), when
+                // a refund completes or a room's status changes to Cancelled/No-show.
+                $result['errors'][] = Tools::displayError('Order status cannot be changed directly to Refunded, Cancelled, or No-show — it is set automatically based on the booking/refund status.');
             } elseif ($objCurrentOrderState->id == Configuration::get('PS_OS_ERROR') && !($objNewOrderState->id == Configuration::get('PS_OS_ERROR'))) {
                 // All rooms must be available before changing status from Payment Error to Other status in which rooms are getting blocked again
                 if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
