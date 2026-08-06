@@ -52,6 +52,10 @@
     margin-bottom: 14px;
 }
 
+#add-review-popup .hint {
+    margin-top: 6px;
+}
+
 #add-review-popup .review-error {
     margin-top: 2px;
     color: #E85757;
