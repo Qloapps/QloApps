@@ -167,10 +167,25 @@ class StatsCatalog extends Module
     public function getTotalBookedRooms()
     {
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-            'SELECT IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
-            '.($this->id_hotel ? ' AND hbd.`id_hotel` = '.(int) $this->id_hotel : '')
+            'WITH RECURSIVE booking_dates AS (
+                SELECT
+                    hbd.`id_room`,
+                    DATE(hbd.`date_from`) AS occupied_date,
+                    DATE(IF(hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.', hbd.`check_out`, hbd.`date_to`)) AS end_date
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE 1 '.HotelBranchInformation::addHotelRestriction(false, 'hbd').'
+                '.($this->id_hotel ? ' AND hbd.`id_hotel` = '.(int) $this->id_hotel : '').'
+
+                UNION ALL
+
+                SELECT
+                    id_room,
+                    DATE_ADD(occupied_date, INTERVAL 1 DAY),
+                    end_date
+                FROM booking_dates
+                WHERE DATE_ADD(occupied_date, INTERVAL 1 DAY) < end_date
+            )
+            SELECT COUNT(DISTINCT id_room, occupied_date) FROM booking_dates'
         );
     }
 

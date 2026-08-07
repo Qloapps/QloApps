@@ -160,16 +160,35 @@ class StatsBestProducts extends ModuleGrid
         $this->query = 'SELECT p.`id_product`, pl.`name` AS roomTypeName,
         p.`active`, hrt.`id_hotel`, hbil.`hotel_name` AS hotelName,
         (
-            SELECT IFNULL(SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))), 0)
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'orders` o
-            ON (o.`id_order` = hbd.`id_order`)
-            WHERE hbd.`id_product` = p.`id_product` AND o.`valid` = 1
-            AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
+            WITH RECURSIVE booking_dates AS (
+                SELECT
+                    hbd.`id_room`,
+                    DATE(GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) AS occupied_date,
+                    DATE(LEAST(
+                        IF(hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.', hbd.`check_out`, hbd.`date_to`),
+                        "'.pSQL($date_to).'"
+                    )) AS end_date
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                LEFT JOIN `'._DB_PREFIX_.'orders` o
+                ON (o.`id_order` = hbd.`id_order`)
+                WHERE hbd.`id_product` = p.`id_product` AND o.`valid` = 1
+                AND IF(hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.', hbd.`check_out`, hbd.`date_to`) > "'.pSQL($date_from).'"
+                AND hbd.`date_from` < "'.pSQL($date_to).'"
+
+                UNION ALL
+
+                SELECT
+                    id_room,
+                    DATE_ADD(occupied_date, INTERVAL 1 DAY),
+                    end_date
+                FROM booking_dates
+                WHERE DATE_ADD(occupied_date, INTERVAL 1 DAY) < end_date
+            )
+            SELECT COUNT(DISTINCT id_room, occupied_date) FROM booking_dates
         ) AS totalRoomsBooked,
         (
             SELECT IFNULL(ROUND(
-                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / (o.`conversion_rate` * DATEDIFF(hbd.`date_to`, hbd.`date_from`))) / SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))),
+                SUM(hbd.`total_price_tax_excl` * GREATEST(1, DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))) / (o.`conversion_rate` * GREATEST(1, DATEDIFF(hbd.`date_to`, hbd.`date_from`)))) / SUM(GREATEST(1, DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")))),
                 2
             ), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -180,7 +199,7 @@ class StatsBestProducts extends ModuleGrid
         ) AS sellingPrice,
         (
             SELECT IFNULL(ROUND(
-                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / (o.`conversion_rate` * DATEDIFF(hbd.`date_to`, hbd.`date_from`))),
+                SUM(hbd.`total_price_tax_excl` * GREATEST(1, DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))) / (o.`conversion_rate` * GREATEST(1, DATEDIFF(hbd.`date_to`, hbd.`date_from`)))),
                 2
             ), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
