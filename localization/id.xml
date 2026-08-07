@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Indonesia" version="1.0">
 	<currencies>
-		<currency name="Rupiah" iso_code="IDR" iso_code_num="360" sign="Rp‎" blank="1" conversion_rate="12177.63" format="2" decimals="1" />
+		<currency name="Rupiah" iso_code="IDR" iso_code_num="360" sign="Rp‎" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="id" />
 	</languages>
 	<taxes>
 		<tax id="1" name="PPN ID 10%" rate="10" />
-		<tax id="2" name="PPN ID 5%" rate="5" />
-		
+		<tax id="2" name="PPN ID 0%" rate="0" />
+
 		<taxRulesGroup name="ID Standard Rate (10%)">
 			<taxRule iso_code_country="id" id_tax="1" />
 		</taxRulesGroup>
-		
-		<taxRulesGroup name="ID Reduced Rate (5%)">
+
+		<taxRulesGroup name="ID Zero Rate (0%)">
 			<taxRule iso_code_country="id" id_tax="2" />
 		</taxRulesGroup>
 	</taxes>
@@ -25,4 +25,40 @@
 		<unit type="base_distance" value="m" />
 		<unit type="long_distance" value="km" />
 	</units>
+	<states>
+		<state name="Aceh" iso_code="ID-AC" country="ID" zone="Asia"/>
+		<state name="Bali" iso_code="ID-BA" country="ID" zone="Asia"/>
+		<state name="Banten" iso_code="ID-BT" country="ID" zone="Asia"/>
+		<state name="Bengkulu" iso_code="ID-BE" country="ID" zone="Asia"/>
+		<state name="Gorontalo" iso_code="ID-GO" country="ID" zone="Asia"/>
+		<state name="Jakarta" iso_code="ID-JK" country="ID" zone="Asia"/>
+		<state name="Jambi" iso_code="ID-JA" country="ID" zone="Asia"/>
+		<state name="Jawa Barat" iso_code="ID-JB" country="ID" zone="Asia"/>
+		<state name="Jawa Tengah" iso_code="ID-JT" country="ID" zone="Asia"/>
+		<state name="Jawa Timur" iso_code="ID-JI" country="ID" zone="Asia"/>
+		<state name="Kalimantan Barat" iso_code="ID-KB" country="ID" zone="Asia"/>
+		<state name="Kalimantan Selatan" iso_code="ID-KS" country="ID" zone="Asia"/>
+		<state name="Kalimantan Tengah" iso_code="ID-KT" country="ID" zone="Asia"/>
+		<state name="Kalimantan Timur" iso_code="ID-KI" country="ID" zone="Asia"/>
+		<state name="Kalimantan Utara" iso_code="ID-KU" country="ID" zone="Asia"/>
+		<state name="Kepulauan Bangka Belitug" iso_code="ID-BB" country="ID" zone="Asia"/>
+		<state name="Kepulauan Riau" iso_code="ID-KR" country="ID" zone="Asia"/>
+		<state name="Lampung" iso_code="ID-LA" country="ID" zone="Asia"/>
+		<state name="Maluku" iso_code="ID-MA" country="ID" zone="Asia"/>
+		<state name="Maluku Utara" iso_code="ID-MU" country="ID" zone="Asia"/>
+		<state name="Nusa Tengara Barat" iso_code="ID-NB" country="ID" zone="Asia"/>
+		<state name="Nusa Tenggara Timur" iso_code="ID-NT" country="ID" zone="Asia"/>
+		<state name="Papua" iso_code="ID-PA" country="ID" zone="Asia"/>
+		<state name="Papua Barat" iso_code="ID-PB" country="ID" zone="Asia"/>
+		<state name="Riau" iso_code="ID-RI" country="ID" zone="Asia"/>
+		<state name="Sulawesi Barat" iso_code="ID-SR" country="ID" zone="Asia"/>
+		<state name="Sulawesi Selatan" iso_code="ID-SN" country="ID" zone="Asia"/>
+		<state name="Sulawesi Tengah" iso_code="ID-ST" country="ID" zone="Asia"/>
+		<state name="Sulawesi Tenggara" iso_code="ID-SG" country="ID" zone="Asia"/>
+		<state name="Sulawesi Utara" iso_code="ID-SA" country="ID" zone="Asia"/>
+		<state name="Sumatera Barat" iso_code="ID-SB" country="ID" zone="Asia"/>
+		<state name="Sumatera Selatan" iso_code="ID-SS" country="ID" zone="Asia"/>
+		<state name="Sumatera Utara" iso_code="ID-SU" country="ID" zone="Asia"/>
+		<state name="Yogyakarta" iso_code="ID-YO" country="ID" zone="Asia"/>
+	</states>
 </localizationPack>
