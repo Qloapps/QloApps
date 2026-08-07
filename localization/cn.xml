@@ -1,33 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="China" version="1.0">
 	<currencies>
-		<currency name="Yuan" iso_code="CNY" iso_code_num="156" sign="¥" blank="1" conversion_rate="9.13916" format="1" decimals="1" />
+		<currency name="Yuan" iso_code="CNY" iso_code_num="156" sign="¥" blank="1" format="1" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="tw" />
 		<language iso_code="zh" />
 	</languages>
 	<taxes>
-		<tax id="1" name="增值税 CN 17%" rate="17" />
-		<tax id="2" name="增值税 CN 13%" rate="13" />
-		<tax id="3" name="增值税 CN 6%" rate="6" />
-		<tax id="4" name="增值税 CN 3%" rate="3" />
-		
-		<taxRulesGroup name="CN Standard Rate (17%)">
-			<taxRule iso_code_country="cn" id_tax="1" />
-		</taxRulesGroup>
-		
-		<taxRulesGroup name="CN Reduced Rate (13%)">
-			<taxRule iso_code_country="cn" id_tax="2" />
-		</taxRulesGroup>
-        
-        <taxRulesGroup name="CN Super Reduced Rate (6%)">
-			<taxRule iso_code_country="cn" id_tax="3" />
-		</taxRulesGroup>
-		
-		<taxRulesGroup name="CN Super Reduced Rate (3%)">
-			<taxRule iso_code_country="cn" id_tax="4" />
-		</taxRulesGroup>
+    <tax id="1" name="增值税 CN 13%" rate="13"/>
+    <tax id="2" name="增值税 CN 9%" rate="9"/>
+    <tax id="3" name="增值税 CN 6%" rate="6"/>
+
+    <taxRulesGroup name="CN Standard Rate (13%)">
+      <taxRule iso_code_country="cn" id_tax="1"/>
+    </taxRulesGroup>
+
+    <taxRulesGroup name="CN Standard Rate (9%)">
+      <taxRule iso_code_country="cn" id_tax="2"/>
+    </taxRulesGroup>
+
+    <taxRulesGroup name="CN Standard Rate (6%)">
+      <taxRule iso_code_country="cn" id_tax="3"/>
+    </taxRulesGroup>
 	</taxes>
 	<states>
 		<state name="Beijing" iso_code="11" country="CN" zone="Asia" tax_behavior="0" />

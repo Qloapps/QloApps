@@ -1,18 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Guatemala" version="1.0">
 	<currencies>
-		<currency name="Quetzal" iso_code="GTQ" iso_code_num="320" sign="Q" blank="1" conversion_rate="11.0988" format="2" decimals="1" />
+		<currency name="Quetzal" iso_code="GTQ" iso_code_num="320" sign="Q" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="es" />
 	</languages>
 	<taxes>
 		<tax id="1" name="IVA GT 12%" rate="12" />
-		
+
 		<taxRulesGroup name="GT Standard Rate (12%)">
 			<taxRule iso_code_country="gt" id_tax="1" />
 		</taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Alta Verapaz" iso_code="16" country="GT" zone="Central America/Antilla" />
+		<state name="Baja Verapaz" iso_code="15" country="GT" zone="Central America/Antilla" />
+		<state name="Chimaltenango" iso_code="04" country="GT" zone="Central America/Antilla" />
+		<state name="Chiquimula" iso_code="20" country="GT" zone="Central America/Antilla" />
+		<state name="El Progreso" iso_code="02" country="GT" zone="Central America/Antilla" />
+		<state name="Escuintla" iso_code="05" country="GT" zone="Central America/Antilla" />
+		<state name="Guatemala" iso_code="01" country="GT" zone="Central America/Antilla" />
+		<state name="Huehuetenango" iso_code="13" country="GT" zone="Central America/Antilla" />
+		<state name="Izabal" iso_code="18" country="GT" zone="Central America/Antilla" />
+		<state name="Jalapa" iso_code="21" country="GT" zone="Central America/Antilla" />
+		<state name="Jutiapa" iso_code="22" country="GT" zone="Central America/Antilla" />
+		<state name="Petén" iso_code="17" country="GT" zone="Central America/Antilla" />
+		<state name="Quetzaltenango" iso_code="09" country="GT" zone="Central America/Antilla" />
+		<state name="Quiché" iso_code="14" country="GT" zone="Central America/Antilla" />
+		<state name="Retalhuleu" iso_code="11" country="GT" zone="Central America/Antilla" />
+		<state name="Sacatepéquez" iso_code="03" country="GT" zone="Central America/Antilla" />
+		<state name="San Marcos" iso_code="12" country="GT" zone="Central America/Antilla" />
+		<state name="Santa Rosa" iso_code="06" country="GT" zone="Central America/Antilla" />
+		<state name="Sololá" iso_code="07" country="GT" zone="Central America/Antilla" />
+		<state name="Suchitepéquez" iso_code="10" country="GT" zone="Central America/Antilla" />
+		<state name="Totonicapán" iso_code="08" country="GT" zone="Central America/Antilla" />
+		<state name="Zacapa" iso_code="19" country="GT" zone="Central America/Antilla" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

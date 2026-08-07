@@ -18,8 +18,8 @@
         <meta meta_page="manufacturer" left="1" right="0"/>
         <meta meta_page="new-products" left="1" right="0"/>
         <meta meta_page="password" left="0" right="0"/>
-        <meta meta_page="prices-drop" left="1" right="0"/>
-        <meta meta_page="sitemap" left="1" right="0"/>
+        <!-- <meta meta_page="prices-drop" left="1" right="0"/> -->
+        <!-- <meta meta_page="sitemap" left="1" right="0"/> -->
         <meta meta_page="supplier" left="0" right="0"/>
         <meta meta_page="address" left="0" right="0"/>
         <meta meta_page="addresses" left="0" right="0"/>
@@ -32,8 +32,8 @@
         <meta meta_page="order-follow" left="0" right="0"/>
         <meta meta_page="order-slip" left="0" right="0"/>
         <meta meta_page="order" left="0" right="0"/>
-        <meta meta_page="search" left="1" right="0"/>
-        <meta meta_page="stores" left="0" right="0"/>
+        <!-- <meta meta_page="search" left="1" right="0"/> -->
+        <!-- <meta meta_page="stores" left="0" right="0"/> -->
         <meta meta_page="order-opc" left="0" right="0"/>
         <meta meta_page="guest-tracking" left="0" right="0"/>
         <meta meta_page="order-confirmation" left="0" right="0"/>
@@ -45,7 +45,6 @@
         <meta meta_page="module-bankwire-validation" left="0" right="0"/>
         <meta meta_page="module-bankwire-payment" left="0" right="0"/>
         <meta meta_page="module-cashondelivery-validation" left="0" right="0"/>
-        <meta meta_page="module-blocknewsletter-verification" left="1" right="0"/>
     </metas>
     <modules>
         <module action="enable" name="blocknewsletter"/>

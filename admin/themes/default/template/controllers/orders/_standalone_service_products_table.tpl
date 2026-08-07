@@ -117,7 +117,7 @@
                                             {l s='Delete'}
                                         </button>
                                     {else}
-                                        <div class="btn-group">
+                                        <div class="btn-group pull-right">
                                             {* <button type="button" class="btn btn-default delete_product_line">
                                                 <i class="icon-trash"></i>
                                                 {l s='Delete'}

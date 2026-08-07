@@ -754,9 +754,8 @@ class CartCore extends ObjectModel
                         $totalPriceByProductTaxExcl += $roomTotalPrice['total_price_tax_excl'];
                     }
 
-                    // Rounding as per configurations
-                    $row['total'] = Tools::processPriceRounding($totalPriceByProductTaxExcl);
-                    $row['total_wt'] = Tools::processPriceRounding($totalPriceByProductTaxIncl);
+                    $row['total'] = $totalPriceByProductTaxExcl;
+                    $row['total_wt'] = $totalPriceByProductTaxIncl;
                 }
             } else {
                 $row['total'] = 0;
@@ -1768,10 +1767,11 @@ class CartCore extends ObjectModel
                             } else {
                                 $priceAdd = $servicePorduct['unit_price_tax_excl'];
                             }
+                            $lineTotal = Tools::processPriceRounding($priceAdd, (int)$servicePorduct['quantity']);
                             if ($ps_round_type == Order::ROUND_TOTAL) {
-                                $products_total[$id_tax_rules_group.'_'.$id_address] += $priceAdd * (int)$servicePorduct['quantity'];
+                                $products_total[$id_tax_rules_group.'_'.$id_address] += $lineTotal;
                             } else {
-                                $products_total[$id_tax_rules_group] += $priceAdd * (int)$servicePorduct['quantity'];
+                                $products_total[$id_tax_rules_group] += $lineTotal;
                             }
                         }
                     }
