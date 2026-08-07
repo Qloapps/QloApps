@@ -1,24 +1,60 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Argentina" version="1.0">
 	<currencies>
-		<currency name="Peso Argentino" iso_code="ARS" iso_code_num="032" sign="ARS" blank="1" conversion_rate="5.39" format="2" decimals="1" />
+		<currency name="Peso Argentino" iso_code="ARS" iso_code_num="032" sign="ARS" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="ag" />
 		<language iso_code="es" />
 	</languages>
 	<taxes>
-		<tax id="1" name="IVA AR 21%" rate="21" />
-        <tax id="2" name="IVA AR 10.5%" rate="10.5" />
-		
-		<taxRulesGroup name="AR Standard rate (21%)">
-            <taxRule iso_code_country="ar" id_tax="1" />
-        </taxRulesGroup>
-        
-		<taxRulesGroup name="AR Reduced rate (10.5%)">
-            <taxRule iso_code_country="ar" id_tax="2" />
-        </taxRulesGroup>
+    <tax id="1" name="IVA AR 21%" rate="21"/>
+    <tax id="2" name="IVA AR 10.5%" rate="10.5"/>
+    <tax id="3" name="IVA AR 2.5%" rate="2.5"/>
+    <tax id="4" name="IVA AR 0%" rate="0"/>
+
+    <taxRulesGroup name="AR Standard rate (21%)">
+      <taxRule iso_code_country="ar" id_tax="1"/>
+    </taxRulesGroup>
+
+    <taxRulesGroup name="AR Reduced rate (10.5%)">
+      <taxRule iso_code_country="ar" id_tax="2"/>
+    </taxRulesGroup>
+
+    <taxRulesGroup name="AR Reduced rate (2.5%)">
+      <taxRule iso_code_country="ar" id_tax="3"/>
+    </taxRulesGroup>
+
+    <taxRulesGroup name="AR Zero rate (0%)">
+      <taxRule iso_code_country="ar" id_tax="4"/>
+    </taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Buenos Aires" iso_code="B" country="AR" zone="South America" />
+		<state name="Catamarca" iso_code="K" country="AR" zone="South America" />
+		<state name="Chaco" iso_code="H" country="AR" zone="South America" />
+		<state name="Chubut" iso_code="U" country="AR" zone="South America" />
+		<state name="Ciudad de Buenos Aires" iso_code="C" country="AR" zone="South America" />
+		<state name="Córdoba" iso_code="X" country="AR" zone="South America" />
+		<state name="Corrientes" iso_code="W" country="AR" zone="South America" />
+		<state name="Entre Ríos" iso_code="E" country="AR" zone="South America" />
+		<state name="Formosa" iso_code="P" country="AR" zone="South America" />
+		<state name="Jujuy" iso_code="Y" country="AR" zone="South America" />
+		<state name="La Pampa" iso_code="L" country="AR" zone="South America" />
+		<state name="La Rioja" iso_code="F" country="AR" zone="South America" />
+		<state name="Mendoza" iso_code="M" country="AR" zone="South America" />
+		<state name="Misiones" iso_code="N" country="AR" zone="South America" />
+		<state name="Neuquén" iso_code="Q" country="AR" zone="South America" />
+		<state name="Río Negro" iso_code="R" country="AR" zone="South America" />
+		<state name="Salta" iso_code="A" country="AR" zone="South America" />
+		<state name="San Juan" iso_code="J" country="AR" zone="South America" />
+		<state name="San Luis" iso_code="D" country="AR" zone="South America" />
+		<state name="Santa Cruz" iso_code="Z" country="AR" zone="South America" />
+		<state name="Santa Fe" iso_code="S" country="AR" zone="South America" />
+		<state name="Santiago del Estero" iso_code="G" country="AR" zone="South America" />
+		<state name="Tierra del Fuego" iso_code="V" country="AR" zone="South America" />
+		<state name="Tucumán" iso_code="T" country="AR" zone="South America" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

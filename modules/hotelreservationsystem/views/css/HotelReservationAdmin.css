@@ -577,36 +577,6 @@ p.room_cat_data
         .fc-today-button:disabled {
             display: none;
         }
-/* book now page tooltip */
-.tooltip_cont {
-    min-width: 280px;
-    width: 100%;
-    font-size: 14px;
-    font-weight: 600;
-    /* display: grid; */
-}
-.tooltip_cont .tip_header {
-    margin-bottom: 10px;
-}
-.tooltip_cont .tip-body > div {
-    margin-bottom: 6px;
-}
-.tip_element_head {
-    font-size: 12px;
-}
-.tip_element_value {
-    font-size: 16px;
-    opacity: 0.6;
-}
-.tip-body {
-    display: grid;
-    grid-template-columns: auto auto;
-}
-body.adminhotelroomsbooking .ui-tooltip {
-    border: unset;
-    padding: 10px;
-    box-shadow: 0px 0px 15px 0px #00000026;
-}
 
 #room-reallocation-modal .modal-footer {
 	padding: 15px 0px 0px 0px

@@ -415,7 +415,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $use_reduc
                 )) {
                     foreach($servicesWithTax as $service) {
-                        $totalPrice['total_price_tax_incl'] += Tools::processPriceRounding($service['price']);
+                        $totalPrice['total_price_tax_incl'] += $service['price'];
                     }
                 }
                 if ($servicesWithoutTax = RoomTypeServiceProduct::getAutoAddServices(
@@ -427,7 +427,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $use_reduc
                 )) {
                     foreach($servicesWithoutTax as $service) {
-                        $totalPrice['total_price_tax_excl'] += Tools::processPriceRounding($service['price']);
+                        $totalPrice['total_price_tax_excl'] += $service['price'];
                     }
                 }
             }
@@ -436,8 +436,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         if (!$quantity) {
             $quantity = 1;
         }
-        $totalPrice['total_price_tax_incl'] = Tools::processPriceRounding($totalPrice['total_price_tax_incl'], $quantity);
-        $totalPrice['total_price_tax_excl'] = Tools::processPriceRounding($totalPrice['total_price_tax_excl'], $quantity);
+        $totalPrice['total_price_tax_incl'] = $totalPrice['total_price_tax_incl'] * $quantity;
+        $totalPrice['total_price_tax_excl'] = $totalPrice['total_price_tax_excl'] * $quantity;
 
         $totalPrice['tourism_tax_online'] = 0.0;
         if (Configuration::get('QLO_USE_TOURISM_TAX')

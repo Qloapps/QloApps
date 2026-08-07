@@ -1627,7 +1627,8 @@ class AdminProductsControllerCore extends AdminController
         ) {
             $this->addJqueryUI(array(
                 'ui.core',
-                'ui.widget'
+                'ui.widget',
+                'ui.tooltip'
             ));
 
             $this->addjQueryPlugin(array(
@@ -3184,6 +3185,7 @@ class AdminProductsControllerCore extends AdminController
                                     $disableDates = $objRoomDisableDates->getRoomDisableDates($room['id']);
                                     $room['disable_dates_json'] = json_encode($disableDates);
                                 }
+                                $room['connected_rooms_count'] = HotelConnectedRoom::getTotalConnectedRooms($room['id']);
                             }
 
                             $data->assign('htl_room_info', $hotelRoomInfo);
@@ -3195,7 +3197,10 @@ class AdminProductsControllerCore extends AdminController
                             'product' => $obj,
                             'htl_info' => $hotelInfo,
                             'rm_status' => $roomStatus,
-                            'locale' => $this->context->language->iso_code
+                            'id_lang' => $this->context->language->id,
+                            'locale' => $this->context->language->iso_code,
+                            'room_type_acronym' => preg_replace(
+                                '/(?:(?<!^)(?<!\s)\p{L}|\P{L})+/u','',(string) $obj->name[$this->context->language->id]),
                         )
                     );
                 } else {
@@ -3811,6 +3816,7 @@ class AdminProductsControllerCore extends AdminController
                 $this->errors[] = $this->l('This room cannot be deleted as this room contains future booking.');
             }
             if (empty($this->errors)) {
+                $response['affected_rooms'] = HotelConnectedRoom::getTotalConnectedRooms(null, $idRoom);
                 if ($objRoomInfo->delete()) {
                     $response['success'] = true;
                 } else {
@@ -5551,7 +5557,9 @@ class AdminProductsControllerCore extends AdminController
                 if (empty($this->errors)) {
                     foreach ($roomsInfo as $roomInfo) {
                         $objHotelRoomInfo = new HotelRoomInformation($roomInfo['id']);
-                        $objHotelRoomInfo->id_status = $roomInfo['id_status'];
+                        if (!empty($roomInfo['id_status'])) {
+                            $objHotelRoomInfo->id_status = $roomInfo['id_status'];
+                        }
                         if (isset($roomInfo['floor']) && $roomInfo['floor'] != '') {
                             $objHotelRoomInfo->floor = $roomInfo['floor'];
                         }
@@ -5634,6 +5642,8 @@ class AdminProductsControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('Number of rooms is required.');
                 } else if (!Validate::isUnsignedInt($roomQuantity) || $roomQuantity < 1) {
                     $this->errors[] = Tools::displayError('Invalid value for number of rooms.');
+                } else if ($roomQuantity > 50) {
+                    $this->errors[] = Tools::displayError('You cannot create more than 50 rooms at a time.');
                 }
 
                 if (trim($comment = Tools::getValue('room_comment'))) {
@@ -5663,16 +5673,19 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if (empty($this->errors)) {
-                    if (!$prefix) {
-                        $roomsInfo['prefix'] = $objProduct->name[0].'R';
-                    } else {
+                    if ($prefix) {
                         $roomsInfo['prefix'] = $prefix;
+                    } elseif (!(int) $roomNumber) {
+                        $roomsInfo['prefix'] = preg_replace('/(?:(?<!^)(?<!\s)\p{L}|\P{L})+/u', '', (string) $objProduct->name);
+                    } else {
+                        $roomsInfo['prefix'] = '';
                     }
 
+                    $startingRoomNumber = (int) $roomNumber;
                     for ($i = 0; $i < $roomQuantity; $i++) {
                         $roomNum = $roomsInfo['prefix'];
-                        if ((int) $roomNumber) {
-                            $roomNum .= '-'.($roomNumber + $i);
+                        if ($startingRoomNumber) {
+                            $roomNum .= ($roomsInfo['prefix'] !== '' ? '-' : '').($startingRoomNumber + $i);
                         }
 
                         $objHotelRoomInfo = new HotelRoomInformation();
@@ -5752,4 +5765,102 @@ class AdminProductsControllerCore extends AdminController
 
         return $tpl->fetch();
     }
+
+    public function ajaxProcessGetNotConnectedRooms()
+    {
+        $roomId = (int) Tools::getValue('room_id');
+        $roomTypeId = (int) Tools::getValue('room_type_id');
+        $allGroups = HotelConnectedRoom::getNotConnectedRooms($roomId, $this->context->language->id);
+        $rooms = isset($allGroups[$roomTypeId]) ? $allGroups[$roomTypeId]['rooms'] : array();
+        die(Tools::jsonEncode(['success' => true, 'rooms' => $rooms]));
+    }
+
+    public function ajaxProcessInitConnectedRoomModal()
+    {
+        $response['hasError'] = 1;
+        $roomId = (int) Tools::getValue('room_id');
+        $objRoom = new HotelRoomInformation($roomId);
+        $idProduct = (int) $objRoom->id_product;
+        $idHotel = (int) $objRoom->id_hotel;
+
+        $this->context->smarty->assign(array(
+            'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($roomId, null, null, $this->context->language->id),
+            'htl_not_connected_rooms' => HotelConnectedRoom::getNotConnectedRooms($roomId, $this->context->language->id),
+            'main_room_id' => $roomId,
+            'current_roomtype' => $idProduct,
+        ));
+
+        $modal = array(
+            'modal_id' => 'connectedRoomModal',
+            'modal_class' => 'modal-md',
+            'modal_title' => '<i class="icon-random"></i>&nbsp; '.$this->l('Connected Room').' <span id="connected_room_title" class="connected_room_num"></span>',
+            'modal_content' => $this->context->smarty->fetch('controllers/products/modal-connected-rooms.tpl'),
+            'modal_actions' => array(),
+        );
+
+        $this->context->smarty->assign($modal);
+        $response['hasError'] = 0;
+        $response['modalHtml'] = $this->context->smarty->fetch('modal.tpl');
+
+        die(Tools::jsonEncode($response));
+    }
+
+    public function ajaxProcessManageConnectedRoom()
+    {
+        if ($this->tabAccess['edit'] !== 1) {
+            die(json_encode(['success' => false, 'message' => $this->l('You do not have permission to edit this.')]));
+        }
+
+        $mode = Tools::getValue('mode');
+        $roomId = (int) Tools::getValue('room_id');
+        $connectedRoomId = (int) Tools::getValue('connected_room_id');
+        $connectedId = (int) Tools::getValue('connected_id');
+        $objRoom = new HotelRoomInformation($roomId);
+        $idProduct = (int) $objRoom->id_product;
+        $idHotel = (int) $objRoom->id_hotel;
+
+        if ($mode === 'add') {
+            $connection = new HotelConnectedRoom();
+            $connection->id_room = $roomId;
+            $connection->id_room_connected = $connectedRoomId;
+            if ($connection->add()) {
+                $this->context->smarty->assign(array(
+                    'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($roomId, null, null, $this->context->language->id),
+                    'htl_not_connected_rooms' => HotelConnectedRoom::getNotConnectedRooms($roomId, $this->context->language->id),
+                    'main_room_id' => $roomId,
+                    'current_roomtype' => $idProduct,
+                ));
+                die(json_encode([
+                    'html' => $this->context->smarty->fetch('controllers/products/modal-connected-rooms.tpl'),
+                    'success' => true,
+                    'message' => $this->l('Room connected successfully.'),
+                    'connected_count' => HotelConnectedRoom::getTotalConnectedRooms($roomId),
+                ]));
+            }
+            die(json_encode(['success' => false, 'message' => $this->l('Failed to connect room.')]));
+        }
+
+        if ($mode === 'delete') {
+            if (!$connectedId) {
+                die(json_encode(['success' => false, 'message' => $this->l('Invalid data.')]));
+            }
+            $objHotelConnectedRoom = new HotelConnectedRoom($connectedId);
+            if ($objHotelConnectedRoom->delete()) {
+                $this->context->smarty->assign(array(
+                    'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms($roomId, null, null, $this->context->language->id),
+                    'htl_not_connected_rooms' => HotelConnectedRoom::getNotConnectedRooms($roomId, $this->context->language->id),
+                    'main_room_id' => $roomId,
+                    'current_roomtype' => $idProduct,
+                ));
+                die(json_encode([
+                    'success' => true,
+                    'html' => $this->context->smarty->fetch('controllers/products/modal-connected-rooms.tpl'),
+                    'message' => $this->l('Connected room removed successfully.'),
+                    'connected_count' => HotelConnectedRoom::getTotalConnectedRooms($roomId),
+                ]));
+            }
+            die(json_encode(['success' => false, 'message' => $this->l('Failed to remove connected room.')]));
+        }
+    }
+
 }

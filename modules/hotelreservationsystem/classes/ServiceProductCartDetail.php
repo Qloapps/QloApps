@@ -361,14 +361,14 @@ class ServiceProductCartDetail extends ObjectModel
                             'max_quantity' => $objProduct->max_quantity,
                             'unit_price_tax_incl' => $priceTaxIncl,
                             'unit_price_tax_excl' => $priceTaxExcl,
-                            'quantity' => $quantity,
-                            'total_price_tax_incl' => $priceTaxIncl * $quantity * $numDays,
-                            'total_price_tax_excl' => $priceTaxExcl * $quantity * $numDays,
+                            'quantity' => $product['quantity'],
+                            'total_price_tax_incl' => $priceTaxIncl * $numDays * (int)$product['quantity'],
+                            'total_price_tax_excl' => $priceTaxExcl * $numDays * (int)$product['quantity'],
                             'cover_img' => $coverImg,
                             'price_calculation_method' => $product['price_calculation_method'],
                             'auto_add_to_cart' => $product['auto_add_to_cart'],
                             'price_addition_type' => $product['price_addition_type'],
-                            'total_price' => ($useTax ? $priceTaxIncl * $quantity * $numDays : $priceTaxExcl * $quantity * $numDays),
+                            'total_price' => ($useTax ? $priceTaxIncl : $priceTaxExcl) * $numDays * (int)$product['quantity'],
                         );
 
                         if ($objHotelCartBooking) {
