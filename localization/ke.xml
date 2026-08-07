@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <localizationPack name="Kenya">
   <currencies>
-    <currency name="Kenyan shilling" iso_code="KES" iso_code_num="404" sign="KSh" blank="1" conversion_rate="1.000000" format="1" decimals="0"/>
+    <currency name="Kenyan shilling" iso_code="KES" iso_code_num="404" sign="KSh" blank="1" format="1" decimals="0"/>
   </currencies>
   <languages>
-    <language iso_code="en"/>
+    <language iso_code="sw" />
+    <language iso_code="en" />
   </languages>
   <taxes>
     <taxRulesGroup name="Kenya VAT 16%">
