@@ -2408,6 +2408,8 @@ class AdminOrdersControllerCore extends AdminController
                         $fields = array(
                             'total_price_tax_excl',
                             'total_price_tax_incl',
+                            'unit_price_tax_excl',
+                            'unit_price_tax_incl',
                             'total_paid_amount',
                         );
                         foreach ($orderRoomBookings as $roomBooking) {
@@ -5415,6 +5417,11 @@ class AdminOrdersControllerCore extends AdminController
                 $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
                 $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
                 $objBookingDetail->total_paid_amount = $total_price['total_price_tax_incl'];
+                $numNights = max(1, (int) round(
+                    (strtotime($objCartBookingData->date_to) - strtotime($objCartBookingData->date_from)) / 86400
+                ));
+                $objBookingDetail->unit_price_tax_excl = $total_price['total_price_tax_excl'] / $numNights;
+                $objBookingDetail->unit_price_tax_incl = $total_price['total_price_tax_incl'] / $numNights;
 
                 // Save hotel information/location/contact
                 if (Validate::isLoadedObject($objRoom = new HotelRoomInformation($objCartBookingData->id_room))) {

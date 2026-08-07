@@ -210,7 +210,7 @@ class DashInsights extends Module
             if ($idHotel == 0) { // if 'All Hotels' is selected
                 $idsHotel = $this->accessibleIdsHotel;
                 $allHotelSeriesInfo = array(
-                    'data' => AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idsHotel),
+                    'data' => HotelBookingDetail::getOccupiedRoomsForDiscreteDates(array('date_from' => $dateFrom, 'date_to' => $dateTo, 'id_hotel' => $idsHotel)),
                     'label' => $this->l('All Hotels'),
                 );
 
@@ -220,7 +220,7 @@ class DashInsights extends Module
                 $otherHotelsRoomNights = array();
 
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
-                $currentHotelRoomNightsData = AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idHotel);
+                $currentHotelRoomNightsData = HotelBookingDetail::getOccupiedRoomsForDiscreteDates(array('date_from' => $dateFrom, 'date_to' => $dateTo, 'id_hotel' => $idHotel));
 
                 $currentHotelSeriesInfo = array(
                     'data' => $currentHotelRoomNightsData,
@@ -236,7 +236,26 @@ class DashInsights extends Module
                 }
 
                 if (count($idsHotel) > 0) { // display average series only if other hotels are available
-                    $averageRoomNightsData = AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idsHotel, true, true, true);
+                    $averageRoomNightsData = array();
+                    foreach ($idsHotel as $id) {
+                        $hotelData = HotelBookingDetail::getOccupiedRoomsForDiscreteDates(array(
+                            'date_from' => $dateFrom,
+                            'date_to'   => $dateTo,
+                            'id_hotel'  => $id,
+                        ));
+                        foreach ($hotelData as $ts => $count) {
+                            $averageRoomNightsData[$ts] = isset($averageRoomNightsData[$ts])
+                                ? $averageRoomNightsData[$ts] + $count
+                                : $count;
+                        }
+                    }
+                    $totalHotels = count($idsHotel);
+                    if ($totalHotels > 1) {
+                        foreach ($averageRoomNightsData as $ts => &$value) {
+                            $value = Tools::ps_round($value / $totalHotels, 2);
+                        }
+                        unset($value);
+                    }
                     $averageSeriesInfo = array(
                         'data' => $averageRoomNightsData,
                         'label' => $this->l('Others Average'),
@@ -319,7 +338,7 @@ class DashInsights extends Module
             if ($idHotel == 0) { // if 'All Hotels' is selected
                 $idsHotel = $this->accessibleIdsHotel;
                 $allHotelSeriesInfo = array(
-                    'data' => AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idsHotel),
+                    'data' => HotelBookingDetail::getOccupiedRoomsForDaysOfTheWeek(array('date_from' => $dateFrom, 'date_to' => $dateTo, 'id_hotel' => $idsHotel)),
                     'label' => $this->l('All Hotels'),
                 );
 
@@ -329,7 +348,7 @@ class DashInsights extends Module
                 $otherHotelsDaysOfTheWeek = array();
 
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
-                $currentHotelDaysOfTheWeekData = AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idHotel);
+                $currentHotelDaysOfTheWeekData = HotelBookingDetail::getOccupiedRoomsForDaysOfTheWeek(array('date_from' => $dateFrom, 'date_to' => $dateTo, 'id_hotel' => $idHotel));
 
                 $currentHotelSeriesInfo = array(
                     'data' => $currentHotelDaysOfTheWeekData,
@@ -345,7 +364,7 @@ class DashInsights extends Module
                 }
 
                 if (count($idsHotel) > 0) { // display average series only if other hotels are available
-                    $averageDaysOfTheWeekData = AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idsHotel, true, true);
+                    $averageDaysOfTheWeekData = HotelBookingDetail::getOccupiedRoomsForDaysOfTheWeek(array('date_from' => $dateFrom, 'date_to' => $dateTo, 'id_hotel' => $idsHotel, 'average' => true));
                     $averageSeriesInfo = array(
                         'data' => $averageDaysOfTheWeekData,
                         'label' => $this->l('Other Hotels Average'),
@@ -489,7 +508,7 @@ class DashInsights extends Module
             if ($idHotel == 0) { // if 'All Hotels' is selected
                 $idsHotel = $this->accessibleIdsHotel;
                 $allHotelSeriesInfo = array(
-                    'data' => AdminStatsController::getLengthOfStayInfo($day, $dateFrom, $dateTo, $idsHotel),
+                    'data' => HotelBookingDetail::getLengthOfStayInfo(array('date_from' => $dateFrom, 'date_to' => $dateTo, 'id_hotel' => $idsHotel, 'days' => $day)),
                     'label' => $this->l('All Hotels'),
                 );
 
@@ -498,7 +517,7 @@ class DashInsights extends Module
                 $otherHotelsLengthOfStay = array();
 
                 $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
-                $currentHotelLengthOfStayData = AdminStatsController::getLengthOfStayInfo($day, $dateFrom, $dateTo, $idHotel);
+                $currentHotelLengthOfStayData = HotelBookingDetail::getLengthOfStayInfo(array('date_from' => $dateFrom, 'date_to' => $dateTo, 'id_hotel' => $idHotel, 'days' => $day));
 
                 $currentHotelSeriesInfo = array(
                     'data' => $currentHotelLengthOfStayData,
@@ -514,7 +533,7 @@ class DashInsights extends Module
                 }
 
                 if (count($idsHotel) > 0) { // display average series only if other hotels are available
-                    $averageLengthOfStayData = AdminStatsController::getLengthOfStayInfo($day, $dateFrom, $dateTo, $idsHotel, true, true);
+                    $averageLengthOfStayData = HotelBookingDetail::getLengthOfStayInfo(array('date_from' => $dateFrom, 'date_to' => $dateTo, 'id_hotel' => $idsHotel, 'days' => $day));
                     $averageSeriesInfo = array(
                         'data' => $averageLengthOfStayData,
                         'label' => $this->l('Others Average'),

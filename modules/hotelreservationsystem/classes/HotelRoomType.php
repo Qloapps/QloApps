@@ -437,6 +437,80 @@ class HotelRoomType extends ObjectModel
         );
     }
 
+    /**
+     * Per-room-type aggregates for the reporting period: inventory size, bookings,
+     * room nights, revenue, tax, ADR, and occupancy %.
+     * All room types appear even if they had zero bookings (LEFT JOIN date filter in ON clause).
+     *
+     * @param array $params  date_from, date_to, id_hotel, id_lang
+     * @return array  rows: id_product, id_hotel, room_type_name, hotel_name, total_rooms,
+     *                      bookings, room_nights, room_revenue, tax_amount, adr, occupancy_pct
+     */
+    public static function getRoomTypePerformance(array $params)
+    {
+        $dateFrom  = pSQL($params['date_from']);
+        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+        $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']     : 0;
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $numNights = max(1, (int)(new DateTime($dateTo))->diff(new DateTime($dateFrom))->days);
+
+        $rows = Db::getInstance()->executeS(
+            'SELECT hrt.`id_product`, hrt.`id_hotel`,
+            pl.`name` AS room_type_name, hbil.`hotel_name`,
+            (
+                SELECT COUNT(r.`id`)
+                FROM `'._DB_PREFIX_.'htl_room_information` r
+                WHERE r.`id_product` = hrt.`id_product` AND r.`id_hotel` = hrt.`id_hotel`
+            ) AS total_rooms,
+            COUNT(CASE WHEN hbd.`is_cancelled` = 0 THEN hbd.`id` END) AS bookings,
+            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END), 0) AS room_nights,
+            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 THEN hbd.`total_price_tax_excl` / o.`conversion_rate` ELSE 0 END), 0) AS room_revenue,
+            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 THEN (hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate` ELSE 0 END), 0) AS tax_amount,
+            COUNT(CASE WHEN hbd.`is_cancelled` = 1 THEN hbd.`id` END) AS cancel_count,
+            COUNT(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`id_status` = 1 AND hbd.`date_from` < CURDATE() THEN hbd.`id` END) AS no_show_count
+            FROM `'._DB_PREFIX_.'htl_room_type` hrt
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hrt.`id_product`)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+                ON (hbil.`id` = hrt.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
+            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_product` = hrt.`id_product` AND hbd.`is_refunded` = 0)
+            LEFT JOIN `'._DB_PREFIX_.'orders` o
+                ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1
+                    AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59")
+            WHERE p.`active` = 1 AND p.`booking_product` = 1'
+            .($idHotel   ? HotelBranchInformation::addHotelRestriction($idHotel, 'hrt') : '')
+            .($idProduct ? ' AND hrt.`id_product` = '.$idProduct : '').'
+            GROUP BY hrt.`id_product`, hrt.`id_hotel`
+            ORDER BY room_revenue DESC'
+        );
+
+        foreach ($rows as &$row) {
+            $roomNights  = (int) $row['room_nights'];
+            $totalRooms  = (int) $row['total_rooms'];
+            $roomRevenue = (float) $row['room_revenue'];
+            $taxAmount   = (float) $row['tax_amount'];
+            $row['total_revenue']           = $roomRevenue + $taxAmount;
+            $row['total_nights_available']  = $totalRooms * $numNights;
+            $row['adr']                     = $roomNights ? round($roomRevenue / $roomNights, 2) : 0.0;
+            $row['revpar']                  = ($totalRooms && $numNights)
+                ? round($roomRevenue / ($totalRooms * $numNights), 2) : 0.0;
+            $row['occupancy_pct']           = ($totalRooms && $numNights)
+                ? round(($roomNights / ($totalRooms * $numNights)) * 100, 1) : 0.0;
+            $row['avg_los']                 = (int) $row['bookings'] > 0
+                ? round($roomNights / (int) $row['bookings'], 1) : 0.0;
+        }
+        unset($row);
+
+        return $rows;
+    }
+
     public function validateFields($die = true, $error_return = false)
     {
         if (isset($this->webservice_validation) && $this->webservice_validation) {

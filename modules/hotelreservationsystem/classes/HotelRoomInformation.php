@@ -329,4 +329,484 @@ class HotelRoomInformation extends ObjectModel
     {
         return $this->delete();
     }
+
+    /**
+     * Total room count. Optional hotel and active filters.
+     *
+     * Replaces: AdminStatsController::getTotalRooms()
+     *
+     * @param mixed    $idHotel  int|array|null — null = all hotels (no restriction)
+     * @param int|null $active   1 = active only, 0 = inactive only, null = both
+     * @return int
+     */
+    public static function getTotalRooms($idHotel = null, $active = null)
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT COUNT(hri.`id`)
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            WHERE p.`booking_product` = 1'
+            .(!is_null($active) ? ' AND p.`active` = '.(int) $active : '')
+            .(!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '')
+        );
+    }
+
+    /**
+     * Total active rooms per night across a date range.
+     * Returns one entry per night: timestamp => int.
+     * Note: does not account for temporarily-disabled rooms (future improvement).
+     *
+     * Replaces: AdminStatsController::getTotalRoomsForDiscreteDates() (simplified)
+     *
+     * @param array $params date_from, date_to, id_hotel
+     * @return array  unix_timestamp => int
+     */
+    public static function getTotalRoomsForDiscreteDates(array $params)
+    {
+        $dateFrom = $params['date_from'];
+        $dateTo   = isset($params['date_to']) ? $params['date_to'] : date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
+        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : null;
+
+        $totalRooms = self::getTotalRooms($idHotel, 1);
+
+        $result   = array();
+        $dateTemp = $dateFrom;
+        while ($dateTemp < $dateTo) {
+            $result[strtotime($dateTemp)] = $totalRooms;
+            $dateTemp = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Available rooms per night (total minus booked, inactive, temporarily inactive).
+     * Replaces: AdminStatsController::getAvailableRoomsForDiscreteDates()
+     *
+     * @param array $params date_from, date_to, id_hotel
+     * @return array  unix_timestamp => int
+     */
+    public static function getAvailableRoomsForDiscreteDates(array $params)
+    {
+        $dateFrom    = $params['date_from'];
+        $dateTo      = isset($params['date_to']) ? $params['date_to'] : date('Y-m-d', strtotime('+1 day', strtotime($dateFrom)));
+        $idHotel     = isset($params['id_hotel'])     ? $params['id_hotel']          : null;
+        $idProduct   = isset($params['id_product'])   ? (int) $params['id_product'] : 0;
+        $showAtFront = isset($params['show_at_front']) ? (int) $params['show_at_front'] : null;
+
+        $showAtFrontFilter = !is_null($showAtFront) ? ' AND p.`show_at_front` = '.$showAtFront : '';
+
+        $result  = array();
+        $current = $dateFrom;
+        while ($current < $dateTo) {
+            $next     = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+            $ts       = strtotime($current);
+            $cacheKey = 'HotelRoomInformation::getAvailableRoomsForDiscreteDates_'.(int) $ts.
+                (is_array($idHotel) ? implode('_', $idHotel) : (int) $idHotel).
+                '_'.$idProduct.'_'.(is_null($showAtFront) ? 'null' : $showAtFront);
+            if (!Cache::isStored($cacheKey)) {
+                $value = Db::getInstance()->getValue(
+                    'SELECT (num_total - num_booked - num_inactive - num_temporarily_inactive) AS num_available
+                    FROM (
+                        SELECT (
+                            SELECT IFNULL(COUNT(hri.`id`), 0)
+                            FROM `'._DB_PREFIX_.'htl_room_information` hri
+                            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+                            WHERE p.`active` = 1'
+                            .$showAtFrontFilter
+                            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
+                            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
+                        ) AS num_total,
+                        (
+                            SELECT COUNT(DISTINCT hbd.`id_room`)
+                            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                            LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
+                            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+                            WHERE p.`active` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0'
+                            .$showAtFrontFilter.'
+                            AND hbd.`date_from` < "'.pSQL($next).' 00:00:00"
+                            AND hbd.`date_to` > "'.pSQL($current).' 00:00:00"'
+                            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+                            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '').'
+                        ) AS num_booked,
+                        (
+                            SELECT IFNULL(COUNT(hri.`id`), 0)
+                            FROM `'._DB_PREFIX_.'htl_room_information` hri
+                            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+                            WHERE hri.`id_status` = '.(int) self::STATUS_INACTIVE.'
+                            AND p.`active` = 1'
+                            .$showAtFrontFilter
+                            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
+                            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
+                        ) AS num_inactive,
+                        (
+                            SELECT IFNULL(COUNT(hri.`id`), 0)
+                            FROM `'._DB_PREFIX_.'htl_room_information` hri
+                            LEFT JOIN `'._DB_PREFIX_.'htl_room_disable_dates` hrdd ON (hrdd.`id_room` = hri.`id`)
+                            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+                            WHERE hri.`id_status` = '.(int) self::STATUS_TEMPORARY_INACTIVE.'
+                            AND ("'.pSQL($current).'" >= hrdd.`date_from` AND "'.pSQL($current).'" < hrdd.`date_to`)
+                            AND p.`active` = 1'
+                            .$showAtFrontFilter
+                            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
+                            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
+                        ) AS num_temporarily_inactive
+                    ) AS t'
+                );
+                Cache::store($cacheKey, $value);
+            }
+            $result[$ts] = Cache::retrieve($cacheKey);
+            $current     = $next;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Day-by-day availability per room type for the Room Type Availability report.
+     * Returns flat array of rows: one per (date × room type).
+     *
+     * @param array $params date_from, date_to, id_hotel, id_product, id_lang
+     * @return array  date, id_product, room_type_name, total_rooms, rooms_booked, out_of_order, available, rate, occupancy_pct
+     */
+    public static function getAvailabilityReport(array $params)
+    {
+        $dateFrom  = pSQL($params['date_from']);
+        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+        $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']     : 0;
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $roomTypes = Db::getInstance()->executeS(
+            'SELECT hri.`id_product`, pl.`name` AS room_type_name,
+                COUNT(hri.`id`) AS total_rooms,
+                SUM(CASE WHEN hri.`id_status` IN ('.(int) self::STATUS_INACTIVE.','.(int) self::STATUS_TEMPORARY_INACTIVE.') THEN 1 ELSE 0 END) AS ooo_rooms
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product` AND p.`active` = 1)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = hri.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+            WHERE 1'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
+            GROUP BY hri.`id_product`'
+        );
+
+        if (!$roomTypes) {
+            return array();
+        }
+
+        $bookingsRaw = Db::getInstance()->executeS(
+            'SELECT hbd.`id_product`, hbd.`id_room`, hbd.`date_from`, hbd.`date_to`
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
+            WHERE hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
+            AND hbd.`date_from` < "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'"'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
+        );
+
+        $bookingsByProduct = array();
+        foreach ($bookingsRaw as $b) {
+            $bookingsByProduct[$b['id_product']][] = $b;
+        }
+
+        $result  = array();
+        $current = $dateFrom;
+        while ($current < $dateTo) {
+            $next = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+            foreach ($roomTypes as $rt) {
+                $idProd      = $rt['id_product'];
+                $bookedRooms = array();
+                if (isset($bookingsByProduct[$idProd])) {
+                    foreach ($bookingsByProduct[$idProd] as $b) {
+                        if ($b['date_from'] < $next && $b['date_to'] > $current) {
+                            $bookedRooms[$b['id_room']] = true;
+                        }
+                    }
+                }
+                $booked    = count($bookedRooms);
+                $total     = (int) $rt['total_rooms'];
+                $ooo       = (int) $rt['ooo_rooms'];
+                $available = max(0, $total - $booked - $ooo);
+                $result[]  = array(
+                    'date'           => $current,
+                    'id_product'     => $idProd,
+                    'room_type_name' => $rt['room_type_name'],
+                    'total_rooms'    => $total,
+                    'rooms_booked'   => $booked,
+                    'out_of_order'   => $ooo,
+                    'available'      => $available,
+                    'occupancy_pct'  => $total ? round($booked / $total * 100, 1) : 0.0,
+                );
+            }
+            $current = $next;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Room-night occupancy breakdown (total / occupied / available / unavailable).
+     * Replaces: AdminStatsController::getOccupancyData()
+     *
+     * @param array $params date_from, date_to, id_hotel
+     * @return array  count_total, count_occupied, count_available, count_unavailable
+     */
+    public static function getOccupancyData(array $params)
+    {
+        $dateFrom  = $params['date_from'];
+        $dateTo    = isset($params['date_to']) ? $params['date_to'] : $dateFrom;
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+
+        if ($dateFrom == $dateTo) {
+            $dateTo = date('Y-m-d', strtotime('+1 day', strtotime($dateTo)));
+        }
+
+        $dtFrom    = new DateTime($dateFrom);
+        $dtTo      = new DateTime($dateTo);
+        $numNights = (int) $dtFrom->diff($dtTo)->days;
+        if ($numNights <= 0) {
+            $numNights = 1;
+        }
+
+        $data = array('count_total' => 0, 'count_occupied' => 0, 'count_available' => 0, 'count_unavailable' => 0);
+
+        $totalRooms = (int) Db::getInstance()->getValue(
+            'SELECT IFNULL(COUNT(hri.`id`), 0)
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            WHERE p.`active` = 1 AND p.`booking_product` = 1'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
+        );
+        $data['count_total'] = $totalRooms * $numNights;
+
+        $checkedOutStatus = (int) HotelBookingDetail::STATUS_CHECKED_OUT;
+
+        $data['count_occupied'] = (int) Db::getInstance()->getValue(
+            'SELECT IFNULL(SUM(
+                GREATEST(0, DATEDIFF(
+                    LEAST(
+                        IF(hbd.`id_status` = '.$checkedOutStatus.',
+                            DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"), hbd.`date_to`),
+                        "'.pSQL($dateTo).'"
+                    ),
+                    GREATEST(hbd.`date_from`, "'.pSQL($dateFrom).'")
+                ))
+            ), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            WHERE p.`active` = 1 AND p.`booking_product` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
+            AND hbd.`date_from` < "'.pSQL($dateTo).'"
+            AND IF(hbd.`id_status` = '.$checkedOutStatus.',
+                DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"), hbd.`date_to`
+            ) > "'.pSQL($dateFrom).'"'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
+        );
+
+        $countInactiveRooms = (int) Db::getInstance()->getValue(
+            'SELECT IFNULL(COUNT(hri.`id`), 0)
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            WHERE hri.`id_status` = '.(int) self::STATUS_INACTIVE.'
+            AND p.`active` = 1 AND p.`booking_product` = 1'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
+        );
+
+        $countOccupiedInactiveNights = (int) Db::getInstance()->getValue(
+            'SELECT IFNULL(SUM(
+                GREATEST(0, DATEDIFF(
+                    LEAST(
+                        IF(hbd.`id_status` = '.$checkedOutStatus.',
+                            DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"), hbd.`date_to`),
+                        "'.pSQL($dateTo).'"
+                    ),
+                    GREATEST(hbd.`date_from`, "'.pSQL($dateFrom).'")
+                ))
+            ), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            WHERE hri.`id_status` = '.(int) self::STATUS_INACTIVE.'
+            AND p.`active` = 1 AND p.`booking_product` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
+            AND hbd.`date_from` < "'.pSQL($dateTo).'"
+            AND IF(hbd.`id_status` = '.$checkedOutStatus.',
+                DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"), hbd.`date_to`
+            ) > "'.pSQL($dateFrom).'"'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
+        );
+
+        $countTemporarilyInactiveNights = (int) Db::getInstance()->getValue(
+            'SELECT IFNULL(SUM(
+                GREATEST(0, DATEDIFF(
+                    LEAST(hrdd.`date_to`, "'.pSQL($dateTo).'"),
+                    GREATEST(hrdd.`date_from`, "'.pSQL($dateFrom).'")
+                ))
+            ), 0)
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` hrdd ON (hrdd.`id_room` = hri.`id`)
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            WHERE hri.`id_status` = '.(int) self::STATUS_TEMPORARY_INACTIVE.'
+            AND hrdd.`date_from` < "'.pSQL($dateTo).'" AND hrdd.`date_to` > "'.pSQL($dateFrom).'"
+            AND p.`active` = 1 AND p.`booking_product` = 1'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
+        );
+
+        $countOccupiedTemporaryInactiveNights = (int) Db::getInstance()->getValue(
+            'SELECT IFNULL(SUM(
+                GREATEST(0, DATEDIFF(
+                    LEAST(
+                        IF(hbd.`id_status` = '.$checkedOutStatus.',
+                            DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"), hbd.`date_to`),
+                        hrdd.`date_to`, "'.pSQL($dateTo).'"
+                    ),
+                    GREATEST(hbd.`date_from`, hrdd.`date_from`, "'.pSQL($dateFrom).'")
+                ))
+            ), 0)
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` hrdd ON (hrdd.`id_room` = hbd.`id_room`)
+            INNER JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            WHERE hri.`id_status` = '.(int) self::STATUS_TEMPORARY_INACTIVE.'
+            AND p.`active` = 1 AND p.`booking_product` = 1 AND hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
+            AND hrdd.`date_from` < "'.pSQL($dateTo).'" AND hrdd.`date_to` > "'.pSQL($dateFrom).'"
+            AND hbd.`date_from` < "'.pSQL($dateTo).'"
+            AND IF(hbd.`id_status` = '.$checkedOutStatus.',
+                DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"), hbd.`date_to`
+            ) > "'.pSQL($dateFrom).'"'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
+        );
+
+        $inactiveUnavailable  = max(0, ($countInactiveRooms * $numNights) - $countOccupiedInactiveNights);
+        $temporaryUnavailable = max(0, $countTemporarilyInactiveNights - $countOccupiedTemporaryInactiveNights);
+
+        $data['count_unavailable'] = (int) ($inactiveUnavailable + $temporaryUnavailable);
+        $countAvailable = (int) $data['count_total'] - (int) $data['count_occupied'] - (int) $data['count_unavailable'];
+        $data['count_available'] = $countAvailable > 0 ? $countAvailable : 0;
+
+        return $data;
+    }
+
+    /**
+     * Distinct active room types for a hotel, for use in filter dropdowns.
+     *
+     * @param array $params  id_hotel (required), id_lang (optional)
+     * @return array  rows: id_product, room_type_name
+     */
+    public static function getRoomTypes(array $params)
+    {
+        $idHotel = isset($params['id_hotel']) ? (int) $params['id_hotel'] : 0;
+        $idLang  = !empty($params['id_lang']) ? (int) $params['id_lang'] : (int) Context::getContext()->language->id;
+
+        return Db::getInstance()->executeS(
+            'SELECT DISTINCT hri.`id_product`, pl.`name` AS room_type_name
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.$idLang.')
+            WHERE p.`active` = 1 AND p.`booking_product` = 1'
+            . ($idHotel ? ' AND hri.`id_hotel` = '.$idHotel : '')
+            . ' ORDER BY pl.`name`'
+        );
+    }
+
+    /**
+     * Room status for a date range — for reporting use only.
+     * A room is Occupied if any booking overlaps [date_from, date_to).
+     * A room is Under Maintenance if any disable-date entry overlaps the range
+     * AND hri.id_status = STATUS_TEMPORARY_INACTIVE; otherwise treated as Active.
+     * Each room appears exactly once regardless of how many bookings fall in range.
+     *
+     * @param array $params  date_from, date_to, id_hotel, id_product, floor, id_lang
+     * @return array  rows: id_room, room_num, floor, id_status, room_type_name, hotel_name,
+     *                      id_order, date_from, date_to, booking_status, guest_name
+     */
+    public static function getRoomStatusForReports(array $params)
+    {
+        $dateFrom              = pSQL($params['date_from']);
+        $dateTo                = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel               = isset($params['id_hotel'])               ? $params['id_hotel']                : false;
+        $idProduct             = isset($params['id_product'])             ? (int) $params['id_product']        : 0;
+        $idLang                = isset($params['id_lang'])                ? (int) $params['id_lang']           : 0;
+        $floor                 = isset($params['floor'])                  ? pSQL($params['floor'])             : '';
+        $housekeepingInstalled = !empty($params['housekeeping_installed']);
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT hri.`id` AS id_room, hri.`room_num`, hri.`floor`,
+            CASE WHEN hri.`id_status` = '.(int) self::STATUS_TEMPORARY_INACTIVE.' AND hrdd.`id_room` IS NULL
+                 THEN '.(int) self::STATUS_ACTIVE.'
+                 ELSE hri.`id_status`
+            END AS id_status,
+            pl.`name` AS room_type_name, hbil.`hotel_name`,
+            bkgs.`id_order`, bkgs.`date_from`, bkgs.`date_to`,
+            bkgs.`id_status` AS booking_status,
+            CONCAT(c.`firstname`, " ", c.`lastname`) AS guest_name'
+            .($housekeepingInstalled ? ', hri.`id_housekeeping_status`' : '').'
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hri.`id_hotel`)
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+                ON (hbil.`id` = hri.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
+            LEFT JOIN (
+                SELECT `id_room`
+                FROM `'._DB_PREFIX_.'htl_room_disable_dates`
+                WHERE `date_from` < "'.$dateTo.'" AND `date_to` > "'.$dateFrom.'"
+                GROUP BY `id_room`
+            ) hrdd ON (hrdd.`id_room` = hri.`id`)
+            LEFT JOIN (
+                SELECT hbd.`id_room`,
+                    MIN(hbd.`id_order`) AS `id_order`,
+                    MIN(hbd.`date_from`) AS `date_from`,
+                    MAX(hbd.`date_to`) AS `date_to`,
+                    MIN(hbd.`id_status`) AS `id_status`,
+                    MIN(hbd.`id_customer`) AS `id_customer`
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`is_refunded` = 0
+                AND hbd.`date_from` < "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'"
+                GROUP BY hbd.`id_room`
+            ) bkgs ON (bkgs.`id_room` = hri.`id`)
+            LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = bkgs.`id_customer`)
+            WHERE p.`active` = 1 AND p.`booking_product` = 1'
+            .($floor     ? ' AND hri.`floor` = "'.$floor.'"'     : '')
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
+            .($idHotel ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+            ORDER BY hbil.`hotel_name`, pl.`name`, hri.`room_num`'
+        );
+    }
+
+    /**
+     * @param array $params  id_hotel, id_product
+     * @return array  rows with 'floor' key, sorted
+     */
+    public static function getDistinctFloors(array $params = array())
+    {
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT DISTINCT hri.`floor`
+            FROM `'._DB_PREFIX_.'htl_room_information` hri
+            INNER JOIN `'._DB_PREFIX_.'product` p
+                ON (p.`id_product` = hri.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
+            WHERE hri.`floor` != "" AND hri.`floor` IS NOT NULL'
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
+            .($idHotel ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+            ORDER BY hri.`floor`'
+        );
+    }
 }

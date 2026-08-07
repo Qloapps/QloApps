@@ -77,7 +77,11 @@ class DashOccupancy extends Module
             $tmp = $tmp - $occupancyData['count_available'];
             $occupancyData['count_unavailable'] = sprintf('%02d', $tmp);
         } else {
-            $occupancyData = AdminStatsController::getOccupancyData($params['date_from'], $params['date_to'], $params['id_hotel']);
+            $occupancyData = HotelRoomInformation::getOccupancyData(array(
+                'date_from' => $params['date_from'],
+                'date_to'   => $params['date_to'],
+                'id_hotel'  => $params['id_hotel'],
+            ));
         }
 
         $dataValue = array(

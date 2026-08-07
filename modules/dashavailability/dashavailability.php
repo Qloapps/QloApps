@@ -98,7 +98,16 @@ class DashAvailability extends Module
                 $availability_data['values'][] = array($date, round(rand(0, 20)));
             }
         } else {
-            $availability_data = AdminStatsController::getAvailabilityLineChartData($days, $dateFrom, $params['id_hotel']);
+            $dateTo = date('Y-m-d', strtotime($dateFrom.'+'.(int) $days.' days'));
+            $availableRoomsDiscrete = HotelRoomInformation::getAvailableRoomsForDiscreteDates(array(
+                'date_from' => $dateFrom,
+                'date_to'   => $dateTo,
+                'id_hotel'  => $params['id_hotel'],
+            ));
+            $availability_data = array();
+            foreach ($availableRoomsDiscrete as $timestamp => $count) {
+                $availability_data['values'][] = array($timestamp, sprintf('%02d', $count));
+            }
         }
 
         $availability_data = array_merge(
