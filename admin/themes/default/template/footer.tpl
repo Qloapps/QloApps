@@ -45,9 +45,6 @@
 			<a class="link-social link-github _blank" href="https://github.com/webkul/hotelcommerce" title="Github">
 				<i class="icon-github"></i>
 			</a>
-			<a class="link-social link-google _blank" href="https://plus.google.com/110221570427070809661" title="Google">
-				<i class="icon-google-plus"></i>
-			</a>
 		</div>
 	</div>
 	<div class="col-sm-5">
