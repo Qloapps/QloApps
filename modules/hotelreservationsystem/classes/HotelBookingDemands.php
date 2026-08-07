@@ -126,9 +126,9 @@ class HotelBookingDemands extends ObjectModel
             if ($getTotalPrice) {
                 foreach ($roomTypeDemands as $demand) {
                     if ($useTax) {
-                        $totalDemandsPrice += Tools::processPriceRounding($demand['total_price_tax_incl']);
+                        $totalDemandsPrice += (float)$demand['total_price_tax_incl'];
                     } else {
-                        $totalDemandsPrice += Tools::processPriceRounding($demand['total_price_tax_excl']);
+                        $totalDemandsPrice += (float)$demand['total_price_tax_excl'];
                     }
                 }
             } else {
@@ -203,15 +203,16 @@ class HotelBookingDemands extends ObjectModel
                 }
                 $values = '';
                 $priceTaxExcl = $this->unit_price_tax_excl;
+                $objBkDetail = new HotelBookingDetail($this->id_htl_booking);
+                $objOrder = new Order($objBkDetail->id_order);
                 foreach ($taxCalculator->getTaxesAmount($priceTaxExcl) as $idTax => $amount) {
                     $quantity = 1;
                     if ($this->price_calc_method == HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY) {
-                        $objBkDetail = new HotelBookingDetail($this->id_htl_booking);
                         $quantity = HotelHelper::getNumberOfDays($objBkDetail->date_from, $objBkDetail->date_to);
                     }
 
-                    // Rounding as per configurations
-                    $totalAmount = Tools::processPriceRounding($amount, $quantity);
+                    // Rounding as per configurations — use order's stored round settings
+                    $totalAmount = Tools::processPriceRounding($amount, $quantity, $objOrder->round_type, $objOrder->round_mode);
 
                     $values .= '('.(int)$this->id.','.(int)$idTax.','.(float)$amount.','.
                     (float)$totalAmount.'),';

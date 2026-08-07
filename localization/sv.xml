@@ -1,18 +1,34 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="El Salvador" version="1.0">
 	<currencies>
-		<currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" conversion_rate="1.36550" format="1" decimals="1" />
+		<currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" format="1" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="es" />
 	</languages>
 	<taxes>
 		<tax id="1" name="IVA SV 13%" rate="13" />
-		
+
 		<taxRulesGroup name="SV Standard Rate (13%)">
 			<taxRule iso_code_country="sv" id_tax="1" />
 		</taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Ahuachapán" iso_code="AH" country="SV" zone="Central America/Antilla" />
+		<state name="Cabañas" iso_code="CA" country="SV" zone="Central America/Antilla" />
+		<state name="Chalatenango" iso_code="CH" country="SV" zone="Central America/Antilla" />
+		<state name="Cuscatlán" iso_code="CU" country="SV" zone="Central America/Antilla" />
+		<state name="La Libertad" iso_code="LI" country="SV" zone="Central America/Antilla" />
+		<state name="La Paz" iso_code="PA" country="SV" zone="Central America/Antilla" />
+		<state name="La Unión" iso_code="UN" country="SV" zone="Central America/Antilla" />
+		<state name="Morazán" iso_code="MO" country="SV" zone="Central America/Antilla" />
+		<state name="San Miguel" iso_code="SM" country="SV" zone="Central America/Antilla" />
+		<state name="San Salvador" iso_code="SS" country="SV" zone="Central America/Antilla" />
+		<state name="San Vicente" iso_code="SV" country="SV" zone="Central America/Antilla" />
+		<state name="Santa Ana" iso_code="SA" country="SV" zone="Central America/Antilla" />
+		<state name="Sonsonate" iso_code="SO" country="SV" zone="Central America/Antilla" />
+		<state name="Usulután" iso_code="US" country="SV" zone="Central America/Antilla" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />
