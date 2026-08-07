@@ -2096,7 +2096,8 @@ class HotelBookingDetail extends ObjectModel
                             $context->cart->id,
                             $context->cookie->id_guest,
                             $objCartBookingData->id_room,
-                            0
+                            0,
+                            1
                         );
                         $objBookingDetail->total_price_tax_excl = $totalRoomTypePrice['total_price_tax_excl'];
                         $objBookingDetail->total_price_tax_incl = $totalRoomTypePrice['total_price_tax_incl'];

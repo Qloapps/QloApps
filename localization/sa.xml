@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Saudi Arabia" version="1.0">
 	<currencies>
-		<currency name="Riyal" iso_code="SAR" iso_code_num="682" sign="﷼" blank="1" conversion_rate="5.10682" format="2" decimals="1" />
+		<currency name="Riyal" iso_code="SAR" iso_code_num="682" sign="﷼" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="ar" />
 	</languages>
+	<taxes>
+		<tax id="1" name="VAT SA 5%" rate="5" />
+		<tax id="2" name="VAT SA 0%" rate="0" />
+
+		<taxRulesGroup name="SA Standard Rate (5%)">
+			<taxRule iso_code_country="az" id_tax="1" />
+		</taxRulesGroup>
+
+		<taxRulesGroup name="SA Zero Rate (0%)">
+			<taxRule iso_code_country="az" id_tax="2" />
+		</taxRulesGroup>
+	</taxes>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

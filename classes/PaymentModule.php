@@ -229,12 +229,12 @@ abstract class PaymentModuleCore extends Module
             $this->currentOrderReference = $reference;
 
             $order_creation_failed = false;
-            $cart_total_paid = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH), 2);
+            $cart_total_paid = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH), _PS_PRICE_COMPUTE_PRECISION_);
 
             if ($this->context->cart->is_advance_payment) {
                 $cart_total_paid = (float)Tools::ps_round(
                     (float)$this->context->cart->getOrderTotal(true, CART::ADVANCE_PAYMENT),
-                    2
+                    _PS_PRICE_COMPUTE_PRECISION_
                 );
             }
 
@@ -314,7 +314,7 @@ abstract class PaymentModuleCore extends Module
                     $order->gift_message = $this->context->cart->gift_message;
                     $order->mobile_theme = $this->context->cart->mobile_theme;
                     $order->conversion_rate = $this->context->currency->conversion_rate;
-                    $amount_paid = !$dont_touch_amount ? Tools::ps_round((float)$amount_paid, 2) : $amount_paid;
+                    $amount_paid = !$dont_touch_amount ? Tools::ps_round((float)$amount_paid, _PS_PRICE_COMPUTE_PRECISION_) : $amount_paid;
                     $order->total_paid_real = 0;
 
                     $order->total_products = (float)$this->context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS, $order->product_list, $id_carrier);
@@ -389,7 +389,7 @@ abstract class PaymentModuleCore extends Module
                             (float)$this->context->cart->getOrderTotal(true, Cart::BOTH, $order->product_list, $id_carrier),
                             _PS_PRICE_COMPUTE_PRECISION_
                         );
-                        if ($orderTotal = $this->context->cart->getOrderTotal(true, Cart::BOTH, null, $id_carrier)) {
+                        if ($orderTotal = Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH, null, $id_carrier), _PS_PRICE_COMPUTE_PRECISION_)) {
                             $order->amount_paid = (float)Tools::ps_round(
                                 (($order->advance_paid_amount * $amount_paid) / $orderTotal),
                                 _PS_PRICE_COMPUTE_PRECISION_
@@ -677,7 +677,7 @@ abstract class PaymentModuleCore extends Module
                             $orderTotals[$order->id]['excl'] -= $used['excl'];
                             $cart_rules[$key]['remaining'] -= $used['excl'];
                         }
-
+                        
                         $order->addCartRule($cart_rule['obj']->id, $cart_rule['obj']->name, $values, 0, $cart_rule['obj']->free_shipping);
 
                         if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && !in_array($cart_rule['obj']->id, $cart_rule_used)) {
@@ -850,7 +850,8 @@ abstract class PaymentModuleCore extends Module
                                     $objCartBookingData->id_cart,
                                     $objCartBookingData->id_guest,
                                     $objCartBookingData->id_room,
-                                    0
+                                    0,
+                                    1
                                 );
 
                                 $objBookingDetail->date_from = $objCartBookingData->date_from;
@@ -941,8 +942,8 @@ abstract class PaymentModuleCore extends Module
                                                 );
                                             }
 
-                                            $objBookingDemand->total_price_tax_excl = Tools::processPriceRounding(($objBookingDemand->unit_price_tax_excl * $numDays));
-                                            $objBookingDemand->total_price_tax_incl = Tools::processPriceRounding(($objBookingDemand->unit_price_tax_incl * $numDays));
+                                            $objBookingDemand->total_price_tax_excl = $objBookingDemand->unit_price_tax_excl * $numDays;
+                                            $objBookingDemand->total_price_tax_incl = $objBookingDemand->unit_price_tax_incl * $numDays;
 
                                             $objBookingDemand->price_calc_method = $objGlobalDemand->price_calc_method;
                                             $objBookingDemand->id_tax_rules_group = $objGlobalDemand->id_tax_rules_group;
@@ -2042,6 +2043,7 @@ abstract class PaymentModuleCore extends Module
                         // calculate averages now
                         foreach ($cart_htl_data[$type_key]['date_diff'] as $key => &$value) {
                             $value['avg_paid_unit_price_tax_incl'] = Tools::ps_round($value['avg_paid_unit_price_tax_incl'] / $value['num_rm'], 6);
+                            $value['avg_paid_unit_price_tax_excl'] = Tools::ps_round($value['avg_paid_unit_price_tax_excl'] / $value['num_rm'], 6);
                         }
                     }
                 }
