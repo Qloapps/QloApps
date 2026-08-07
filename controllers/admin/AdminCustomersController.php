@@ -126,7 +126,6 @@ class AdminCustomersControllerCore extends AdminController
                 'title' => $this->l('Phone'),
                 'filter_key' => 'a!phone',
                 'visible_default' => true,
-                'visible_default' => false,
             ),
             'default_group_name' => array(
                 'title' => $this->l('Default Group'),
@@ -297,7 +296,7 @@ class AdminCustomersControllerCore extends AdminController
             ORDER BY c.date_add DESC
             LIMIT 1
         ) as connect,
-        ad.alias, ad.company as address_company, ad.vat_number,
+        ad.company as address_company, ad.vat_number,
         ad.address1, ad.address2, ad.city, adstate.name as state,
         ad.postcode, adcountry.name as country, ad.phone as address_phone,
         ad.phone_mobile, ad.dni';
