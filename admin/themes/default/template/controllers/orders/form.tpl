@@ -2400,6 +2400,10 @@
                                 <a class="slide-button btn"></a>
                             </span>
                             <p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
+							<p class="help-block">
+                                <span>{l s='Total amount: '}</span>
+                                <span id="full_payment_amount_value">{displayPrice price=$order_total currency=$currency->id}</span>
+                            </p>
                         </div>
                     </div>
                     <div class="form-group" {if $order_total <= 0 || $is_full_payment}style="display: none;"{/if}>
@@ -2409,10 +2413,6 @@
                                 <span class="input-group-addon">{$currency->sign}</span>
                                 <input type="text" name="payment_amount" id="payment_amount" value="{if !$is_full_payment && isset($smarty.post.payment_amount)}{$smarty.post.payment_amount|escape:'html':'UTF-8'}{else}{$order_total}{/if}" {if $is_full_payment}disabled{/if} />
                             </div>
-                            <p class="help-block" id="full_payment_amount_hint">
-                                <span>{l s='Full amount: '}</span>
-                                <span id="full_payment_amount_value">{displayPrice price=$order_total currency=$currency->id}</span>
-                            </p>
                             <p class="help-block" id="advance_payment_amount_block" {if isset($is_advance_payment_active) && $is_advance_payment_active}style="display: block;"{else}style="display: none;"{/if}>
                                 <span>{l s='Advance payment amount: '}</span>
                                 <span id="advance_payment_amount">{displayPrice price=$advance_payment_amount_with_tax currency=$currency->id}</span>
