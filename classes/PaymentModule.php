@@ -677,7 +677,7 @@ abstract class PaymentModuleCore extends Module
                             $orderTotals[$order->id]['excl'] -= $used['excl'];
                             $cart_rules[$key]['remaining'] -= $used['excl'];
                         }
-
+                        
                         $order->addCartRule($cart_rule['obj']->id, $cart_rule['obj']->name, $values, 0, $cart_rule['obj']->free_shipping);
 
                         if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && !in_array($cart_rule['obj']->id, $cart_rule_used)) {

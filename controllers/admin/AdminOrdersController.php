@@ -5881,25 +5881,28 @@ class AdminOrdersControllerCore extends AdminController
             $objOrderHistory->changeIdOrderState($idOrderState, $objOrder, $useExistingPayment);
             $objOrderHistory->add();
         } else {
-            // check if new order amount is greater that old order amount and order payment is accepted
-            // then update order status to partial payment accepted
             $currentOrderState = $objOrder->getCurrentOrderState();
-            $psOsPartialPaymentAccepted = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-            if ($currentOrderState->paid == 1 && $currentOrderState->id != $psOsPartialPaymentAccepted) {
+            if ($currentOrderState->paid == 1) {                 
                 // calculate due amount
                 $dueAmount = $objOrder->total_paid_tax_incl - $objOrder->total_paid_real;
                 if ($dueAmount > 0) {
-                    // now change order status to partial payment
+                    $psOsPartialPaymentAccepted = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                    $psOSPaymentComplete = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+
+                    if ($objOrder->total_paid_real == 0) {
+                        $targetState = Configuration::get('PS_OS_AWAITING_PAYMENT');
+                    } elseif ($currentOrderState->id != $psOsPartialPaymentAccepted) {
+                        $targetState = $psOsPartialPaymentAccepted;
+                    }
                     $objOrderHistory = new OrderHistory();
                     $objOrderHistory->id_order = $objOrder->id;
                     $objOrderHistory->id_employee = (int) $this->context->employee->id;
-
                     $useExistingPayment = false;
                     if (!$objOrder->hasInvoice()) {
                         $useExistingPayment = true;
                     }
 
-                    $objOrderHistory->changeIdOrderState($psOsPartialPaymentAccepted, $objOrder, $useExistingPayment);
+                    $objOrderHistory->changeIdOrderState($targetState, $objOrder, $useExistingPayment);
                     $objOrderHistory->add();
                 }
             }
@@ -7749,6 +7752,7 @@ class AdminOrdersControllerCore extends AdminController
                         $response['hasError'] = true;
                         $response['errors'][] = Tools::displayError('Error while updating service, please try again after refresing the page');
                     } else {
+                        $this->sendChangedNotification($objOrder);
                         $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
                             $objOrderDetail->id_order,
                             $objHotelBookingDetail->id_product,
@@ -8005,6 +8009,8 @@ class AdminOrdersControllerCore extends AdminController
                             }
                         }
                     }
+
+                    $this->sendChangedNotification($order);
                     $response['service_panel'] = $this->processRenderServicesPanel(
                         $order->id,
                         $objHotelBookingDetail->id_product,
@@ -8287,6 +8293,7 @@ class AdminOrdersControllerCore extends AdminController
 
                                                 // Save changes of order
                                                 if ($objOrder->update()) {
+                                                    $this->sendChangedNotification($objOrder);
                                                     $response['service_panel'] = $this->processRenderServicesPanel(
                                                         $objOrder->id,
                                                         $objHotelBookingDetail->id_product,
