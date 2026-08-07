@@ -72,7 +72,7 @@ class WkHotelRoom extends Module
                     $idProduct,
                     $dateFrom,
                     $dateTo,
-                    1,
+                    array(array('adults' => 1, 'children' => 0, 'child_ages' => array())),
                     0,
                     0,
                     0,
@@ -83,6 +83,10 @@ class WkHotelRoom extends Module
 
                 if ($useTax) {
                     $priceWithoutReduction = $productPriceWithoutReduction['total_price_tax_incl'];
+                    if (TourismTax::isGrossedUp($productPriceWithoutReduction['tourism_tax_online'])) {
+                        $numDaysInDuration = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+                        $priceWithoutReduction += $productPriceWithoutReduction['tourism_tax_online'] / $numDaysInDuration;
+                    }
                 } else {
                     $priceWithoutReduction = $productPriceWithoutReduction['total_price_tax_excl'];
                 }
@@ -98,7 +102,14 @@ class WkHotelRoom extends Module
                     $idProduct,
                     $dateFrom,
                     $dateTo,
-                    $useTax
+                    $useTax,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    array(array('adults' => 1, 'children' => 0, 'child_ages' => array()))
                 );
                 $htlRoom['feature_price'] = $featurePrice;
                 $htlRoom['feature_price_diff'] = (float)($priceWithoutReduction - $featurePrice);

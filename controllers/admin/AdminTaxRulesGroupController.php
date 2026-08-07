@@ -103,10 +103,10 @@ class AdminTaxRulesGroupControllerCore extends AdminController
      */
     protected function getTaxOptionsForGroup()
     {
-        $idTrg = (int) Tools::getValue('id_tax_rules_group');
+        $idTaxRulesGroup = (int) Tools::getValue('id_tax_rules_group');
         $isTourism = false;
-        if ($idTrg) {
-            $trg = new TaxRulesGroup($idTrg);
+        if ($idTaxRulesGroup) {
+            $trg = new TaxRulesGroup($idTaxRulesGroup);
             if (Validate::isLoadedObject($trg)) {
                 $isTourism = (bool) $trg->is_tourism_tax_rule;
             }
@@ -117,8 +117,8 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         if ($isTourism) {
             $sql->select(
                 't.`id_tax`, tl.`name`,'
-                . ' IFNULL(ht.`tax_type`, 0) AS ht_tax_type,'
-                . ' IFNULL(ht.`tax_value`, 0) AS ht_tax_value'
+                . ' IFNULL(tourism_tax.`tax_calc_type`, 0) AS tourism_tax_calc_type,'
+                . ' IFNULL(tourism_tax.`tax_value`, 0) AS tourism_tax_value'
             );
         } else {
             $sql->select('t.`id_tax`, tl.`name`, t.`rate`');
@@ -126,7 +126,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         $sql->from('tax', 't');
         $sql->leftJoin('tax_lang', 'tl', 't.`id_tax` = tl.`id_tax` AND tl.`id_lang` = ' . $idLang);
         if ($isTourism) {
-            $sql->leftJoin('htl_tourism_tax', 'ht', 'ht.`id_tax` = t.`id_tax`');
+            $sql->leftJoin('tourism_tax', 'tourism_tax', 'tourism_tax.`id_tax` = t.`id_tax`');
         }
         $sql->where('t.`deleted` != 1 AND t.`active` = 1');
         $sql->where('t.`is_tourism_tax` = ' . ($isTourism ? 1 : 0));
@@ -138,9 +138,9 @@ class AdminTaxRulesGroupControllerCore extends AdminController
             $currency = $this->context->currency;
             $currencySign = Tools::safeOutput(trim($currency->prefix . $currency->suffix));
             foreach ($rows as &$row) {
-                $typeLabel = ((int) $row['ht_tax_type'] === 1)
-                    ? (float) $row['ht_tax_value'] . '%'
-                    : $currencySign . ' ' . (float) $row['ht_tax_value'];
+                $typeLabel = ((int) $row['tourism_tax_calc_type'] === 1)
+                    ? (float) $row['tourism_tax_value'] . '%'
+                    : $currencySign . ' ' . (float) $row['tourism_tax_value'];
                 $row['name'] = $row['name'] . ' (' . $typeLabel . ')';
             }
             unset($row);
@@ -199,8 +199,8 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 			CONCAT_WS(" - ", a.`zipcode_from`, a.`zipcode_to`) AS zipcode,
 			t.`rate`,
 			t.`is_tourism_tax`,
-			IFNULL(ht.`tax_type`, 0) AS ht_tax_type,
-			IFNULL(ht.`tax_value`, 0) AS ht_tax_value';
+			IFNULL(tourism_tax.`tax_calc_type`, 0) AS tourism_tax_calc_type,
+			IFNULL(tourism_tax.`tax_value`, 0) AS tourism_tax_value';
 
         $this->_join = '
 			LEFT JOIN `'._DB_PREFIX_.'country_lang` c
@@ -209,8 +209,8 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 				ON (a.`id_state` = s.`id_state`)
 			LEFT JOIN `'._DB_PREFIX_.'tax` t
 				ON (a.`id_tax` = t.`id_tax`)
-			LEFT JOIN `'._DB_PREFIX_.'htl_tourism_tax` ht
-				ON (ht.`id_tax` = t.`id_tax`)';
+			LEFT JOIN `'._DB_PREFIX_.'tourism_tax` tourism_tax
+				ON (tourism_tax.`id_tax` = t.`id_tax`)';
         $this->_where = 'AND `id_tax_rules_group` = '.(int)$id_group;
         $this->_use_found_rows = false;
 
@@ -452,21 +452,12 @@ class AdminTaxRulesGroupControllerCore extends AdminController
      * Tourism-fixed taxes show the currency sign; tourism-percent and regular VAT taxes show %.
      *
      * @param mixed $value  t.rate (always 0 for tourism taxes)
-     * @param array $row    Full list row — includes is_tourism_tax, ht_tax_type, ht_tax_value
+     * @param array $row    Full list row — includes is_tourism_tax, tourism_tax_calc_type, tourism_tax_value
      * @return string
      */
     public function displayTaxRuleRate($value, $row)
     {
-        if (!(int) $row['is_tourism_tax']) {
-            return Tools::safeOutput($value) . '%';
-        }
-        $displayValue = Tools::safeOutput((float) $row['ht_tax_value']);
-        if ((int) $row['ht_tax_type'] === 1) {
-            return $displayValue . '%';
-        }
-        $currency = $this->context->currency;
-        $currencySign = Tools::safeOutput(trim($currency->prefix . $currency->suffix));
-        return $currencySign . ' ' . $displayValue;
+        return TourismTax::getFormattedRateForDisplay($value, $row, $this->context->currency);
     }
 
     public function postProcess()
@@ -499,6 +490,19 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                             $this->display = 'edit';
                             return;
                         }
+
+                        $hasTourismProductConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'product_shop`
+                             WHERE `id_tourism_tax_rules_group` = ' . $idGroup
+                        );
+                        if ($hasTourismProductConflict) {
+                            $this->errors[] = $this->l(
+                                'Cannot convert this to a VAT group: one or more products still use it as their tourism tax rule. Reassign them first.'
+                            );
+                            $_POST['is_tourism_tax_rule'] = $oldIsTourism;
+                            $this->display = 'edit';
+                            return;
+                        }
                     }
 
                     // VAT → Tourism: block while regular VAT tax rules still exist in this group.
@@ -516,6 +520,23 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                                 'Cannot convert this to a tourism group: it still contains VAT taxes. Remove the VAT tax rules first.'
                             );
                             // Same reason: reset POST to DB state so the whole form is consistent.
+                            $_POST['is_tourism_tax_rule'] = $oldIsTourism;
+                            $this->display = 'edit';
+                            return;
+                        }
+
+                        $hasRegularProductConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'product_shop`
+                             WHERE `id_tax_rules_group` = ' . $idGroup
+                        );
+                        $hasServicePriceConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
+                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'htl_room_type_service_product_price`
+                             WHERE `id_tax_rules_group` = ' . $idGroup
+                        );
+                        if ($hasRegularProductConflict || $hasServicePriceConflict) {
+                            $this->errors[] = $this->l(
+                                'Cannot convert this to a tourism group: one or more products or services still use it as their regular tax rule. Reassign them first.'
+                            );
                             $_POST['is_tourism_tax_rule'] = $oldIsTourism;
                             $this->display = 'edit';
                             return;

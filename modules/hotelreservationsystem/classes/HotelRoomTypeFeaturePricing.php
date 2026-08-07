@@ -262,6 +262,11 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      * @param [int]  $id_product [id of the room type]
      * @param [date] $date_from  [date from]
      * @param [date] $date_to    [date to]
+     * @param bool   $bypassCollectionTypeGate Bypasses the at-hotel tourism-tax collection-type gate —
+     *                               only for previews (e.g. admin "final price" list columns) that
+     *                               must show the true total regardless of collection type; every
+     *                               cart/order/front-office caller must leave this false so a
+     *                               manual-collection hotel's tax stays hidden until applied.
      *
      * @return [float] [Returns Total price of the room type]
      */
@@ -275,7 +280,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_guest = 0,
         $id_room = 0,
         $with_auto_room_services = 1,
-        $use_reduc = 1
+        $use_reduc = 1,
+        $bypassCollectionTypeGate = false
     ) {
         $totalPrice = array();
         $totalPrice['total_price_tax_incl'] = 0;
@@ -433,49 +439,33 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $totalPrice['total_price_tax_incl'] = Tools::processPriceRounding($totalPrice['total_price_tax_incl'], $quantity);
         $totalPrice['total_price_tax_excl'] = Tools::processPriceRounding($totalPrice['total_price_tax_excl'], $quantity);
 
-        $totalPrice['tourism_tax_online']   = 0.0;
-        $totalPrice['tourism_tax_at_hotel'] = 0.0;
+        $totalPrice['tourism_tax_online'] = 0.0;
         if (Configuration::get('QLO_USE_TOURISM_TAX')
             && is_array($occupancy) && !empty($occupancy) && isset($occupancy[0]['adults'])
         ) {
-            $idTourismTrg = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                'SELECT `id_tourism_tax_rules_group`
-                 FROM `' . _DB_PREFIX_ . 'product_shop` product_shop
-                 WHERE `id_product` = ' . (int) $id_product
-                . Shop::addSqlRestriction(false)
-            );
-            if ($idTourismTrg) {
-                $idHotel = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                    'SELECT `id_hotel` FROM `' . _DB_PREFIX_ . 'htl_room_type`
-                     WHERE `id_product` = ' . (int) $id_product
-                );
-                $branchObj      = new HotelBranchInformation($idHotel);
-                $collectionType = (int) $branchObj->tourism_tax_collection_type;
-                $checkInDt      = new DateTime($date_from);
-                $checkOutDt     = new DateTime($date_to);
-                $numNights      = max(1, (int) $checkInDt->diff($checkOutDt)->days);
-                $unitPriceTe    = (float) $totalPrice['total_price_tax_excl'] / $numNights;
-                $idLang         = (int) Context::getContext()->language->id;
+            $idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $id_product);
+            if ($idTourismTaxRulesGroup) {
+                $hotelBranch = new HotelBranchInformation((int) $objAddress->id_hotel);
+                $collectionType = (int) $hotelBranch->tourism_tax_collection_type;
+                $numNights = max(1, (int) HotelHelper::getNumberOfDays($date_from, $date_to));
+                $unitPriceTe = (float) $totalPrice['total_price_tax_excl'] / $numNights;
+                $idLang = (int) Context::getContext()->language->id;
+                $taxCalculator = TaxManagerFactory::getManager($objAddress, $idTourismTaxRulesGroup)->getTaxCalculator();
                 foreach ($occupancy as $roomOcc) {
                     $childAges = !empty($roomOcc['child_ages']) ? (array) $roomOcc['child_ages'] : array();
-                    $rows = HotelTourismTaxCalculator::compute(
-                        $idTourismTrg,
-                        $objAddress,
+                    $tourismTaxResult = $taxCalculator->getTourismTaxRows(
                         $unitPriceTe,
                         $date_from,
                         $numNights,
-                        (int) $roomOcc['adults'],
+                        $roomOcc['adults'],
                         $childAges,
                         $id_currency,
                         $collectionType,
-                        $idLang
+                        $idLang,
+                        1,
+                        $bypassCollectionTypeGate
                     );
-                    $amount = (float) array_sum(array_column($rows, 'total_amount'));
-                    if ($collectionType === 0) {
-                        $totalPrice['tourism_tax_online'] += $amount;
-                    } else {
-                        $totalPrice['tourism_tax_at_hotel'] += $amount;
-                    }
+                    $totalPrice['tourism_tax_online'] += $tourismTaxResult['tourism_tax_online'];
                 }
             }
         }
@@ -522,6 +512,9 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $totalDurationPriceTE = $totalDurationPrice['total_price_tax_excl'];
         $numDaysInDuration = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
         if ($use_tax) {
+            if (TourismTax::isGrossedUp($totalDurationPrice['tourism_tax_online'])) {
+                $totalDurationPriceTI += $totalDurationPrice['tourism_tax_online'];
+            }
             $pricePerDay = $totalDurationPriceTI/$numDaysInDuration;
         } else {
             $pricePerDay = $totalDurationPriceTE/$numDaysInDuration;

@@ -81,14 +81,15 @@
 	</td>
 	<td>
 		{convertPriceWithCurrency price=($data['total_room_tax']) currency=$currency->id}
-		{if isset($use_tourism_tax) && $use_tourism_tax
-			&& isset($data.tourism_tax_status)
-			&& $data.tourism_tax_status eq $tourism_tax_status_applied
-			&& isset($data.tourism_tax_total) && $data.tourism_tax_total > 0}
+		{if isset($data.tourism_tax_status) && $data.tourism_tax_status == $tourism_tax_status_applied && isset($data.tourism_tax_total) && $data.tourism_tax_total > 0}
 			<span class="price_info">
 				&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
 			</span>
 			<div class="price_info_container" style="display: none;">
+				<div>
+					<label>{l s='Room & Service Tax:'}</label>
+					<span class="pull-right">{convertPriceWithCurrency price=$data.total_room_service_tax_only currency=$currency->id}</span>
+				</div>
 				<div>
 					<label>{l s='Tourism Tax:'}</label>
 					<span class="pull-right">{convertPriceWithCurrency price=$data.tourism_tax_total currency=$currency->id}</span>
@@ -151,10 +152,10 @@
                             </a>
                         </li>
                         {if isset($use_tourism_tax) && $use_tourism_tax && isset($data.tourism_tax_status)}
-                            {if $data.tourism_tax_status eq $tourism_tax_status_applied}
+                            {if $data.tourism_tax_status == $tourism_tax_status_applied}
                                 <li>
                                     <a href="#" class="tt-exempt-booking" data-id_htl_booking="{$data.id|intval}">
-                                        <i class="icon-ban-circle"></i>
+                                        <i class="icon-ban"></i>
                                         {l s='Exempt Tourism Tax'}
                                     </a>
                                 </li>

@@ -854,12 +854,12 @@
                                 {/if}
                                 {if isset($use_tourism_tax) && $use_tourism_tax && $order_detail_data}
                                     {if isset($order_tourism_tax_has_applied) && $order_tourism_tax_has_applied}
-                                        <button type="button" class="btn btn-default pull-right tt-exempt-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px">
-                                            <i class="icon-ban-circle"></i> {l s='Exempt Tourism Tax'}
+                                        <button type="button" class="btn btn-default pull-right tt-exempt-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px; text-transform:uppercase">
+                                            <i class="icon-ban"></i> {l s='Exempt Tourism Tax'}
                                         </button>
                                     {/if}
                                     {if isset($order_tourism_tax_has_unapplied) && $order_tourism_tax_has_unapplied}
-                                        <button type="button" class="btn btn-default pull-right tt-apply-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px">
+                                        <button type="button" class="btn btn-default pull-right tt-apply-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px; text-transform:uppercase">
                                             <i class="icon-check"></i> {l s='Apply Tourism Tax'}
                                         </button>
                                     {/if}
@@ -959,6 +959,8 @@
 
                             {assign var=order_total_price_tax_excl value=($total_rooms_price_tax_excl + $total_room_services_and_demands_tax_excl + $total_products_price_tax_excl)}
                             {assign var=order_total_price_tax_incl value=($total_rooms_price_tax_incl + $total_room_services_and_demands_tax_incl + $total_products_price_tax_incl)}
+                            {assign var=total_rooms_tax_only value=(($total_rooms_price_tax_incl - $total_rooms_price_tax_excl) - $tourism_tax_online_room)}
+                            {assign var=total_services_tax_only value=((($total_room_services_and_demands_tax_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) - $tourism_tax_online_service)}
 
                             {if $total_rooms_price_tax_excl}
                                 <tr id="total_products">
@@ -1034,19 +1036,36 @@
                                     <td colspan="3" class="panel">
                                         <table class="table table-responsive">
                                             <tbody>
-                                                {if $total_rooms_price_tax_excl}
+                                                {if $total_rooms_price_tax_excl && $total_rooms_tax_only > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Total Rooms Tax'}</td>
                                                         <td class="text-right">
-                                                            {displayPrice price=($total_rooms_price_tax_incl - $total_rooms_price_tax_excl) currency=$currency->id}
+                                                            {displayPrice price=$total_rooms_tax_only currency=$currency->id}
                                                         </td>
                                                     </tr>
                                                 {/if}
-                                                {if isset($total_room_services_and_demands_tax_incl) && (($total_room_services_and_demands_tax_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) > 0}
+                                                {if $tourism_tax_online_room > 0}
+                                                    <tr>
+                                                        <td class="text-left">{l s='Tourism Tax (Room)'}</td>
+                                                        <td class="text-right">
+                                                            {displayPrice price=$tourism_tax_online_room currency=$currency->id}
+                                                        </td>
+                                                    </tr>
+                                                {/if}
+                                                {if isset($total_room_services_and_demands_tax_incl) && $total_services_tax_only > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Extra services Tax'}</td>
                                                         <td class="text-right nowrap">
-                                                            {displayPrice price=(($total_room_services_and_demands_tax_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) currency=$currency->id}
+                                                            {displayPrice price=$total_services_tax_only currency=$currency->id}
+                                                        </td>
+                                                        <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                                    </tr>
+                                                {/if}
+                                                {if $tourism_tax_online_service > 0}
+                                                    <tr>
+                                                        <td class="text-left">{l s='Tourism Tax (Service Product)'}</td>
+                                                        <td class="text-right nowrap">
+                                                            {displayPrice price=$tourism_tax_online_service currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>

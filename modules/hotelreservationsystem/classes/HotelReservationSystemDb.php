@@ -514,81 +514,6 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id_room_type_bed_type`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_tourism_tax` (
-                `id_tax` INT(11) UNSIGNED NOT NULL,
-                `tax_type` TINYINT(1) NOT NULL DEFAULT '0',
-                `is_per_night` TINYINT(1) NOT NULL DEFAULT '1',
-                `is_per_person` TINYINT(1) NOT NULL DEFAULT '0',
-                `tax_value` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                `is_tiered` TINYINT(1) NOT NULL DEFAULT '0',
-                `has_child_rate` TINYINT(1) NOT NULL DEFAULT '0',
-                `child_tax_value` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                `valid_from` DATE NULL DEFAULT NULL,
-                `valid_to` DATE NULL DEFAULT NULL,
-                `is_special_days_exists` TINYINT(1) NOT NULL DEFAULT '0',
-                `special_days` TEXT NULL DEFAULT NULL,
-                PRIMARY KEY (`id_tax`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_tourism_tax_tier` (
-                `id_tier` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `id_tax` INT(11) UNSIGNED NOT NULL,
-                `min_amount` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                `max_amount` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                `tax_value` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                `position` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-                PRIMARY KEY (`id_tier`),
-                KEY `id_tax` (`id_tax`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_tourism_tax_child_range` (
-                `id_child_range` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `id_tax` INT(11) UNSIGNED NOT NULL,
-                `min_age` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-                `max_age` TINYINT(3) UNSIGNED NOT NULL DEFAULT '17',
-                `tax_value` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                `position` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0',
-                PRIMARY KEY (`id_child_range`),
-                KEY `id_tax` (`id_tax`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_order_tourism_tax` (
-                `id_order_tourism_tax` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `id_order` INT(11) UNSIGNED NOT NULL,
-                `id_order_detail` INT(11) UNSIGNED NOT NULL,
-                `id_htl_booking` INT(11) UNSIGNED NOT NULL,
-                `id_hotel` INT(11) UNSIGNED NOT NULL,
-                `id_tax` INT(11) UNSIGNED NOT NULL,
-                `id_currency` INT(11) UNSIGNED NOT NULL,
-                `tax_name` VARCHAR(100) NOT NULL,
-                `num_nights` SMALLINT(5) UNSIGNED NOT NULL DEFAULT '1',
-                `num_adults` TINYINT(3) UNSIGNED NOT NULL DEFAULT '1',
-                `total_amount` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                `collection_type` TINYINT(1) NOT NULL DEFAULT '0',
-                `is_exempted` TINYINT(1) NOT NULL DEFAULT '0',
-                `is_refunded` TINYINT(1) NOT NULL DEFAULT '0',
-                `date_add` DATETIME NOT NULL,
-                `date_upd` DATETIME NOT NULL,
-                PRIMARY KEY (`id_order_tourism_tax`),
-                UNIQUE KEY `biz_key` (`id_order_detail`, `id_tax`),
-                KEY `id_order` (`id_order`),
-                KEY `id_htl_booking` (`id_htl_booking`),
-                KEY `id_hotel` (`id_hotel`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_tax_exemption` (
-                `id_exemption` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-                `id_order_tourism_tax` INT(11) UNSIGNED NOT NULL,
-                `id_htl_booking` INT(11) UNSIGNED NOT NULL,
-                `id_order` INT(11) UNSIGNED NOT NULL,
-                `id_employee` INT(11) UNSIGNED NOT NULL,
-                `date_add` DATETIME NOT NULL,
-                PRIMARY KEY (`id_exemption`),
-                KEY `id_order_tourism_tax` (`id_order_tourism_tax`),
-                KEY `id_htl_booking` (`id_htl_booking`),
-                KEY `id_order` (`id_order`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
             "INSERT INTO `"._DB_PREFIX_."htl_settings_link` (`id_settings_link`, `icon`, `link`, `new_window`, `position`, `unremovable`, `active`, `date_add`, `date_upd`) VALUES
             (1, 'icon-cogs', 'index.php?controller=AdminHotelGeneralSettings', 0, 0, 1, 1, NOW(), NOW()),
             (2, 'icon-dollar', 'index.php?controller=AdminHotelFeaturePricesSettings', 0, 2, 1, 1, NOW(), NOW()),
@@ -691,12 +616,7 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_room_type_bed_type`,
             `'._DB_PREFIX_.'htl_access`,
             `'._DB_PREFIX_.'htl_settings_link`,
-            `'._DB_PREFIX_.'htl_settings_link_lang`,
-            `'._DB_PREFIX_.'htl_tourism_tax`,
-            `'._DB_PREFIX_.'htl_tourism_tax_tier`,
-            `'._DB_PREFIX_.'htl_tourism_tax_child_range`,
-            `'._DB_PREFIX_.'htl_order_tourism_tax`,
-            `'._DB_PREFIX_.'htl_booking_tax_exemption`'
+            `'._DB_PREFIX_.'htl_settings_link_lang`'
         );
     }
 }

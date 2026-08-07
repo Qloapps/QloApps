@@ -109,30 +109,20 @@
 	{if $footer.total_tax_without_discount > 0}
 	<tr class="bold">
 		<td class="grey">
-			{l s='Total Tax' pdf='true'}
+			{l s='Room and Service Tax' pdf='true'}
 		</td>
 		<td class="white">
 			{displayPrice currency=$order->id_currency price=$footer.total_tax_without_discount}
 		</td>
 	</tr>
 	{/if}
-	{if isset($footer.tourism_tax_online) && $footer.tourism_tax_online > 0}
-	<tr class="bold">
-		<td class="grey">
-			{l s='Tourism Tax' pdf='true'}
-		</td>
-		<td class="white">
-			{displayPrice currency=$order->id_currency price=$footer.tourism_tax_online}
-		</td>
-	</tr>
-	{/if}
-	{if isset($footer.tourism_tax_at_hotel) && $footer.tourism_tax_at_hotel > 0}
+	{if isset($footer.total_tourism_tax) && $footer.total_tourism_tax > 0}
 	<tr>
 		<td class="grey">
-			{l s='Tourism Tax (payable at hotel)' pdf='true'}
+			{l s='Total Tourism Tax' pdf='true'}
 		</td>
 		<td class="white">
-			{displayPrice currency=$order->id_currency price=$footer.tourism_tax_at_hotel}
+			{displayPrice currency=$order->id_currency price=$footer.total_tourism_tax}
 		</td>
 	</tr>
 	{/if}

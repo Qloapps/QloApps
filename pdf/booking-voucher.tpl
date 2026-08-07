@@ -257,8 +257,14 @@
                     </tr>
                     {if $footer.total_tax_without_discount > 0}
                         <tr>
-                            <td class="grey small bold" width="70%">{l s='Total Tax' pdf='true'}</td>
+                            <td class="grey small bold" width="70%">{l s='Room and Service Tax' pdf='true'}</td>
                             <td class="white right small bold" width="30%">{displayPrice currency=$order->id_currency price=$footer.total_tax_without_discount}</td>
+                        </tr>
+                    {/if}
+                    {if isset($footer.total_tourism_tax) && $footer.total_tourism_tax > 0}
+                        <tr>
+                            <td class="grey small bold" width="70%">{l s='Total Tourism Tax' pdf='true'}</td>
+                            <td class="white right small bold" width="30%">{displayPrice currency=$order->id_currency price=$footer.total_tourism_tax}</td>
                         </tr>
                     {/if}
                     {if isset($footer.product_discounts_tax_incl) && $footer.product_discounts_tax_incl > 0}

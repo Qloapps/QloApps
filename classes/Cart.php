@@ -187,6 +187,7 @@ class CartCore extends ObjectModel
     const ONLY_CONVENIENCE_FEE = 18;
 
     const ONLY_PRODUCTS_WITH_DEMANDS = 19;
+    const ONLY_TOURISM_TAX = 20;
 
     public function __construct($id = null, $id_lang = null)
     {
@@ -1572,6 +1573,7 @@ class CartCore extends ObjectModel
             Cart::ADVANCE_PAYMENT,
             Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS,
             Cart::ONLY_PRODUCTS_WITH_DEMANDS,
+            Cart::ONLY_TOURISM_TAX,
         );
 
         // Define virtual context to prevent case where the cart is not the in the global context
@@ -1639,6 +1641,7 @@ class CartCore extends ObjectModel
         $products_total = array();
         $ecotax_total = 0;
         $tourism_tax_total = 0.0;
+        $tourism_tax_online_service = 0.0;
         $totalDemandsPrice = 0;
         $objCartBookingData = new HotelCartBookingData();
         $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -1774,6 +1777,11 @@ class CartCore extends ObjectModel
                             } else {
                                 $products_total[$id_tax_rules_group] += $priceAdd * (int)$servicePorduct['quantity'];
                             }
+
+                            if ($with_taxes && in_array($type, array(Cart::BOTH, Cart::BOTH_WITHOUT_SHIPPING, Cart::ONLY_TOURISM_TAX))) {
+                                $tourism_tax_total += $servicePorduct['tourism_tax_online'];
+                                $tourism_tax_online_service += $servicePorduct['tourism_tax_online'];
+                            }
                         }
                     }
 
@@ -1827,6 +1835,11 @@ class CartCore extends ObjectModel
                             } else {
                                 $products_total[$id_tax_rules_group] += $priceAdd;
                             }
+
+                            if ($with_taxes && in_array($type, array(Cart::BOTH, Cart::BOTH_WITHOUT_SHIPPING, Cart::ONLY_TOURISM_TAX))) {
+                                $tourism_tax_total += $servicePorduct['tourism_tax_online'];
+                                $tourism_tax_online_service += $servicePorduct['tourism_tax_online'];
+                            }
                         }
                     }
                 } else if (Product::SELLING_PREFERENCE_WITH_ROOM_TYPE == $product['selling_preference_type']) {
@@ -1856,6 +1869,11 @@ class CartCore extends ObjectModel
                             } else {
                                 $products_total[$id_tax_rules_group] += $servicePrice;
                             }
+
+                            if ($with_taxes && in_array($type, array(Cart::BOTH, Cart::BOTH_WITHOUT_SHIPPING, Cart::ONLY_TOURISM_TAX))) {
+                                $tourism_tax_total += $service['tourism_tax_online'];
+                                $tourism_tax_online_service += $service['tourism_tax_online'];
+                            }
                         }
                     }
                 }
@@ -1865,8 +1883,6 @@ class CartCore extends ObjectModel
                 $priceDisplay = Group::getPriceDisplayMethod(Group::getCurrent()->id);
 
                 if ($type == Cart::ADVANCE_PAYMENT || $type == Cart::ADVANCE_PAYMENT_ONLY_PRODUCTS) {
-                    // getProductMinAdvPaymentAmountByIdCart already aggregates all rooms for this product internally,
-                    // so call it once and add once — not inside the per-room loop.
                     $advProductPrice = $objAdvPayment->getProductMinAdvPaymentAmountByIdCart(
                         $this->id,
                         $product['id_product'],
@@ -1913,7 +1929,7 @@ class CartCore extends ObjectModel
                             $products_total[$id_tax_rules_group] += Tools::processPriceRounding($totalPriceByProduct);
                         }
 
-                        if ($with_taxes && in_array($type, array(Cart::BOTH, Cart::BOTH_WITHOUT_SHIPPING))) {
+                        if ($with_taxes && in_array($type, array(Cart::BOTH, Cart::BOTH_WITHOUT_SHIPPING, Cart::ONLY_TOURISM_TAX))) {
                             $tourism_tax_total += $roomTotalPrice['tourism_tax_online'];
                         }
                     }
@@ -1923,6 +1939,14 @@ class CartCore extends ObjectModel
             // price of extra demands on room type in the cart
             $totalDemandsPrice += $objCartBookingData->getCartExtraDemands($this->id, $product['id_product'], 0, 0, 0, 1, 0, (int)$with_taxes);
         }
+
+        if ($type == Cart::ONLY_TOURISM_TAX) {
+            return array(
+                'tourism_tax_online' => $tourism_tax_total,
+                'tourism_tax_online_service' => $tourism_tax_online_service,
+            );
+        }
+
         foreach ($products_total as $key => $price) {
             $order_total += $price;
         }
@@ -3951,14 +3975,16 @@ class CartCore extends ObjectModel
         if ($total_tax_without_discount < 0) {
             $total_tax_without_discount = 0;
         }
-        $tourism_tax_online = $total_tax - $total_tax_without_discount;
-        if ($tourism_tax_online > 0) {
-            if (Configuration::get('QLO_TOURISM_TAX_GROSSED_UP')) {
-                $total_rooms_wt += $tourism_tax_online;
-                $total_rooms_with_services_without_discount_ti += $tourism_tax_online;
-            } else {
-                $total_tax_without_discount += $tourism_tax_online;
-            }
+
+        $tourismTaxTotals = $this->getOrderTotal(true, Cart::ONLY_TOURISM_TAX);
+        $tourism_tax_online = $tourismTaxTotals['tourism_tax_online'];
+        $tourism_tax_online_service = $tourismTaxTotals['tourism_tax_online_service'];
+        $tourism_tax_online_room = $tourism_tax_online - $tourism_tax_online_service;
+
+        if (TourismTax::isGrossedUp($tourism_tax_online)) {
+            $total_rooms_wt += $tourism_tax_online_room;
+            $total_additional_services_wt += $tourism_tax_online_service;
+            $total_rooms_with_services_without_discount_ti += $tourism_tax_online;
         }
 
         $summary = array(
@@ -4008,7 +4034,8 @@ class CartCore extends ObjectModel
             'cart_total_without_discount_ti' => $cart_total_without_discount_ti,
             'total_tax_without_discount' => $total_tax_without_discount,
             'tourism_tax_online' => max(0.0, (float) $tourism_tax_online),
-            'tourism_tax_grossed_up' => (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP'),
+            'total_tourism_tax' => max(0.0, (float) $tourism_tax_online),
+            'tourism_tax_grossed_up' => TourismTax::isGrossedUp($tourism_tax_online),
         );
         $hook = Hook::exec('actionCartSummary', $summary, null, true);
         if (is_array($hook)) {

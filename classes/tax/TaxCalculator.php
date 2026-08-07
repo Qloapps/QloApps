@@ -171,4 +171,141 @@ class TaxCalculatorCore
 
         return $amount;
     }
+
+    /**
+     * @param float  $unitPriceTaxExcl Room/service unit_price_tax_excl (% base and tier lookup)
+     * @param string $checkInDate      'YYYY-MM-DD'
+     * @param int    $numNights
+     * @param int    $numAdults
+     * @param int[]  $childrenAges     Ages at check-in date
+     * @param int    $idCurrency
+     * @param int    $collectionType   HotelBranchInformation::tourism_tax_collection_type snapshot
+     * @param int    $idLang
+     * @param int    $quantity         Line quantity multiplier. Rooms: always 1.
+     * @param bool   $isManualApply    true only from the admin Apply-button flow — bypasses the
+     *                                 at-hotel collection-type gate. Every automatic call site
+     *                                 (order creation, cart/product-page/list preview) leaves this
+     *                                 false, so a manual-collection hotel computes/shows nothing
+     *                                 until staff act.
+     * @return array ['tourism_tax_online' => float,
+     *                'rows' => [['id_tax','tax_name','num_nights','num_adults','total_amount','collection_type'], ...]]
+     */
+    public function getTourismTaxRows(
+        $unitPriceTaxExcl,
+        $checkInDate,
+        $numNights,
+        $numAdults,
+        $childrenAges,
+        $idCurrency,
+        $collectionType,
+        $idLang,
+        $quantity = 1,
+        $isManualApply = false
+    ) {
+        $result = array('tourism_tax_online' => 0.0, 'rows' => array());
+
+        $collectionType = (int) $collectionType;
+        if (!Configuration::get('QLO_USE_TOURISM_TAX')) {
+            return $result;
+        }
+        if ($collectionType === TourismTax::COLLECTION_TYPE_AT_HOTEL && !$isManualApply) {
+            return $result;
+        }
+
+        $checkIn = new DateTime($checkInDate);
+        $isoDayIndex = $checkIn->format('N') - 1;
+
+        $rows = array();
+
+        foreach ($this->taxes as $tax) {
+            $tourismTax = TourismTax::getByTaxId((int) $tax->id);
+            if (!$tourismTax) {
+                continue;
+            }
+
+            if (!empty($tourismTax->valid_from) && $tourismTax->valid_from !== '0000-00-00') {
+                $validFrom = new DateTime($tourismTax->valid_from);
+                if ($checkIn < $validFrom) {
+                    continue;
+                }
+            }
+            if (!empty($tourismTax->valid_to) && $tourismTax->valid_to !== '0000-00-00') {
+                $validTo = new DateTime($tourismTax->valid_to);
+                if ($checkIn > $validTo) {
+                    continue;
+                }
+            }
+            if ($tourismTax->special_days) {
+                $specialDays = json_decode($tourismTax->special_days, true);
+                if (!is_array($specialDays) || !in_array(TourismTax::DAY_KEYS[$isoDayIndex], $specialDays)) {
+                    continue;
+                }
+            }
+
+            $isTiered = (bool) $tourismTax->is_tiered;
+            $taxType = (int) $tourismTax->tax_calc_type;
+            $isPerNight = (bool) $tourismTax->is_per_night;
+            $isPerPerson = (bool) $tourismTax->is_per_person;
+            $hasChildRate = (bool) $tourismTax->has_child_rate;
+
+            $baseValue = (float) $tourismTax->tax_value;
+            if ($isTiered) {
+                $tier = TourismTaxTier::getMatchingTier((int) $tax->id, $unitPriceTaxExcl);
+                if (!$tier) {
+                    continue;
+                }
+                $baseValue = (float) $tier['tax_value'];
+            }
+
+            $adultMultiplier = 1;
+            if ($isPerNight) {
+                $adultMultiplier *= $numNights;
+            }
+            if ($isPerPerson) {
+                $adultMultiplier *= $numAdults;
+            }
+
+            if ($taxType === 0) {
+                $unitAmountAdult = $baseValue;
+                $totalAmountAdult = $baseValue * $adultMultiplier;
+            } else {
+                $unitAmountAdult = $unitPriceTaxExcl * ($baseValue / 100);
+                $totalAmountAdult = $unitAmountAdult * $adultMultiplier;
+            }
+
+            $totalAmountChild = 0.0;
+
+            if ($hasChildRate && !empty($childrenAges)) {
+                $contribution = TourismTaxChildRange::getChildContribution(
+                    (int) $tax->id,
+                    $childrenAges,
+                    $taxType,
+                    $unitPriceTaxExcl,
+                    $baseValue
+                );
+                if ((int) $contribution['count'] > 0) {
+                    $nightMultiplier = $isPerNight ? $numNights : 1;
+                    $totalAmountChild = $contribution['total'] * $nightMultiplier;
+                }
+            }
+
+            $totalAmountAdult = Tools::convertPrice($totalAmountAdult, $idCurrency);
+            $totalAmountChild = Tools::convertPrice($totalAmountChild, $idCurrency);
+            $totalAmount = Tools::ps_round(($totalAmountAdult + $totalAmountChild) * max(1, $quantity), 6);
+
+            $rows[] = array(
+                'id_tax' => (int) $tax->id,
+                'tax_name' => (string) (isset($tax->name[$idLang]) ? $tax->name[$idLang] : ''),
+                'num_nights' => $numNights,
+                'num_adults' => $numAdults,
+                'total_amount' => $totalAmount,
+                'collection_type' => $collectionType,
+            );
+        }
+
+        $result['rows'] = $rows;
+        $result['tourism_tax_online'] = (float) array_sum(array_column($rows, 'total_amount'));
+
+        return $result;
+    }
 }

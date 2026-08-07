@@ -160,6 +160,8 @@
 											{/if}
 										</tr>
 										{foreach $refundReqBookings as $booking}
+											{assign var="tourismTaxAppliedAmount" value=(isset($booking['tourism_tax_applied_amount']) ? $booking['tourism_tax_applied_amount'] : 0)}
+											{assign var="tourismTaxPaidAmount" value=(isset($booking['tourism_tax_paid_amount']) ? $booking['tourism_tax_paid_amount'] : 0)}
 											<tr>
 												{if !$isRefundCompleted}
 													<td><input type="checkbox" name="id_order_return_detail[]" value="{$booking['id_order_return_detail']|escape:'html':'UTF-8'}" checked/></td>
@@ -170,7 +172,7 @@
 												{assign var="is_full_date" value=($show_full_date && ($booking['date_from']|date_format:'%D' == $booking['date_to']|date_format:'%D'))}
 												<td>{dateFormat date=$booking['date_from'] full=$is_full_date} {l s='To' mod='hotelreservationsystem'} {dateFormat date=$booking['date_to'] full=$is_full_date}</td>
 												<td>
-													{displayPrice price=($booking['total_price_tax_incl'] + $booking['extra_service_total_price_tax_incl'] + $booking['tourism_tax_online_amount']) currency=$orderCurrency['id']}
+													{displayPrice price=($booking['total_price_tax_incl'] + $booking['extra_service_total_price_tax_incl'] + $tourismTaxAppliedAmount) currency=$orderCurrency['id']}
 													<span class="price_info">
 														&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
 													</span>
@@ -183,16 +185,16 @@
 															<label>{l s='Services cost:' mod='hotelreservationsystem'}</label>
 															<span class="pull-right">{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</span>
 														</div>
-														{if $booking['tourism_tax_online_amount'] > 0}
+														{if $tourismTaxAppliedAmount > 0}
 															<div>
 																<label>{l s='Tourism Tax:' mod='hotelreservationsystem'}</label>
-																<span class="pull-right">{displayPrice price=$booking['tourism_tax_online_amount'] currency=$orderCurrency['id']}</span>
+																<span class="pull-right">{displayPrice price=$tourismTaxAppliedAmount currency=$orderCurrency['id']}</span>
 															</div>
 														{/if}
 													</div>
 												</td>
 												<td>
-													{displayPrice price=($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] + $booking['tourism_tax_paid_amount']) currency=$orderCurrency['id']}
+													{displayPrice price=($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] + $tourismTaxPaidAmount) currency=$orderCurrency['id']}
 													<span class="price_info">
 														&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
 													</span>
@@ -205,10 +207,10 @@
 															<label>{l s='Services paid amount:' mod='hotelreservationsystem'}</label>
 															<span class="pull-right">{displayPrice price=$booking['extra_service_total_paid_amount'] currency=$orderCurrency['id']}</span>
 														</div>
-														{if $booking['tourism_tax_paid_amount'] > 0}
+														{if $tourismTaxPaidAmount > 0}
 															<div>
 																<label>{l s='Tourism Tax paid:' mod='hotelreservationsystem'}</label>
-																<span class="pull-right">{displayPrice price=$booking['tourism_tax_paid_amount'] currency=$orderCurrency['id']}</span>
+																<span class="pull-right">{displayPrice price=$tourismTaxPaidAmount currency=$orderCurrency['id']}</span>
 															</div>
 														{/if}
 													</div>
@@ -217,7 +219,7 @@
 													<td>
 														{displayPrice price=$booking['cancelation_charge'] currency=$orderCurrency['id']}
 														{if $booking['reduction_type'] == HotelOrderRefundRules::WK_REFUND_RULE_PAYMENT_TYPE_PERCENTAGE}
-															<p class="help-block">{Tools::ps_round($booking['reduction_value'], 2)}{l s='% of' mod='hotelreservationsystem'} {displayPrice price=($booking['total_price_tax_incl'] + $booking['extra_service_total_price_tax_incl']) currency=$orderCurrency['id']}</p>
+															<p class="help-block">{Tools::ps_round($booking['reduction_value'], 2)}{l s='% of' mod='hotelreservationsystem'} {displayPrice price=($booking['total_price_tax_incl'] + $booking['extra_service_total_price_tax_incl'] + $tourismTaxAppliedAmount) currency=$orderCurrency['id']}</p>
 														{/if}
 													</td>
 												{/if}
@@ -228,7 +230,7 @@
                                                                 {displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
 															{else}
 																<span class="input-group-addon">{$orderCurrency['sign']|escape:'html':'UTF-8'}</span>
-																<input placeholder="" type="text" name="refund_amounts[{$booking['id_order_return_detail']|escape:'html':'UTF-8'}]" value="{if ($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] + $booking['tourism_tax_paid_amount'] - $booking['cancelation_charge']) > 0}{Tools::ps_round(($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] + $booking['tourism_tax_paid_amount'] - $booking['cancelation_charge']), 2)}{else}0{/if}">
+																<input placeholder="" type="text" name="refund_amounts[{$booking['id_order_return_detail']|escape:'html':'UTF-8'}]" value="{if ($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] + $tourismTaxPaidAmount - $booking['cancelation_charge']) > 0}{Tools::ps_round(($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] + $tourismTaxPaidAmount - $booking['cancelation_charge']), 2)}{else}0{/if}">
 																<span class="input-group-addon">{l s='tax incl.' mod='hotelreservationsystem'}</span>
 															{/if}
 														</div>

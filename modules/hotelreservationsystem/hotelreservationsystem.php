@@ -504,46 +504,15 @@ class HotelReservationSystem extends Module
 
     public function HookActionCartSummary($params)
     {
-        if (!Configuration::get('QLO_USE_TOURISM_TAX') || !Configuration::get('PS_TAX')) {
-            return array();
-        }
-
-        $cart = $this->context->cart;
-        if (!Validate::isLoadedObject($cart)) {
-            return array();
-        }
-
-        $tourismTaxAtHotel = 0.0;
-        $objCartBookingData = new HotelCartBookingData();
-        $cartItems = $objCartBookingData->getCartCurrentDataByCartId($cart->id);
-        if ($cartItems) {
-            foreach ($cartItems as $item) {
-                $occupancy = array(
-                    array(
-                        'adults'     => (int) $item['adults'],
-                        'children'   => (int) $item['children'],
-                        'child_ages' => json_decode($item['child_ages']),
-                    )
-                );
-                $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                    $item['id_product'],
-                    $item['date_from'],
-                    $item['date_to'],
-                    $occupancy,
-                    Group::getCurrent()->id,
-                    $item['id_cart'],
-                    $item['id_guest'],
-                    $item['id_room'],
-                    0
-                );
-                $tourismTaxAtHotel += (float) $roomTotalPrice['tourism_tax_at_hotel'];
-            }
-        }
-
-        return array(
-            'tourism_tax_at_hotel'  => $tourismTaxAtHotel,
-            'tourism_tax_grossed_up' => (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP'),
-        );
+        // $objCartBookingData = new HotelCartBookingData();
+        // $totalFacilityCostTI = $objCartBookingData->getCartExtraDemands($params['cart']->id, 0, 0, 0, 0, 1, 0, 1);
+        // $totalFacilityCostTE = $objCartBookingData->getCartExtraDemands($params['cart']->id, 0, 0, 0, 0, 1, 0, 0);
+        // return array(
+        //     'additional_facilities_tax' => ($totalFacilityCostTI - $totalFacilityCostTE),
+        //     'totalFacilityCostTE' => $totalFacilityCostTE,
+        //     'totalFacilityCostTI' => $totalFacilityCostTI,
+        // );
+        return array();
     }
 
     public function callInstallTab()

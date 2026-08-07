@@ -331,7 +331,7 @@
                                         {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_te)}
                                         {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_ti)}
 
-                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl ))}
+                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl) - ($total_tourism_tax|default:0))}
 
                                         {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
                                         {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
@@ -374,26 +374,19 @@
                                         {/if}
 
                                         <tr class="totalprice item">
-                                            <td>{l s='Total Tax'}</td>
+                                            <td>{l s='Room and Service Tax'}</td>
                                             <td class="text-right">
                                                 <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
                                             </td>
                                         </tr>
 
-                                        {if isset($tourism_tax_breakdown) && $tourism_tax_breakdown}
-                                            {foreach from=$tourism_tax_breakdown item=ttRow}
-                                                <tr class="item">
-                                                    <td>
-                                                        {$ttRow.tax_name|escape:'htmlall':'UTF-8'}
-                                                        {if $ttRow.collection_type == 1}
-                                                            &nbsp;({l s='payable at hotel'})
-                                                        {/if}
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <span class="price">{displayWtPriceWithCurrency price=$ttRow.total_amount currency=$currency}</span>
-                                                    </td>
-                                                </tr>
-                                            {/foreach}
+                                        {if isset($total_tourism_tax) && $total_tourism_tax > 0}
+                                            <tr class="item">
+                                                <td>{l s='Total Tourism Tax'}</td>
+                                                <td class="text-right">
+                                                    <span class="price">{displayWtPriceWithCurrency price=$total_tourism_tax currency=$currency}</span>
+                                                </td>
+                                            </tr>
                                         {/if}
 
                                         {if $order->total_discounts > 0}
@@ -768,7 +761,7 @@
                                         {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
                                         {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
 
-                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl) + ($total_standard_products_tax_incl - $total_standard_products_tax_excl))}
+                                        {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl) + ($total_standard_products_tax_incl - $total_standard_products_tax_excl) - ($total_tourism_tax|default:0))}
 
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
@@ -809,11 +802,19 @@
                                         {/if}
 
                                         <tr class="totalprice item">
-                                            <td>{l s='Total Tax'}</td>
+                                            <td>{l s='Room and Service Tax'}</td>
                                             <td class="text-right">
                                                 <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
                                             </td>
                                         </tr>
+                                        {if isset($total_tourism_tax) && $total_tourism_tax > 0}
+                                            <tr class="item">
+                                                <td>{l s='Total Tourism Tax'}</td>
+                                                <td class="text-right">
+                                                    <span class="price">{displayWtPriceWithCurrency price=$total_tourism_tax currency=$currency}</span>
+                                                </td>
+                                            </tr>
+                                        {/if}
                                         {if $order->total_discounts > 0}
                                             <tr>
                                                 <td>{l s='Total Vouchers'}</td>

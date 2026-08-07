@@ -128,6 +128,16 @@
                     </div>
                 {/if}
             </div>
+            {if isset($use_tourism_tax) && $use_tourism_tax}
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <label class="control-label">
+                            <input type="checkbox" name="add_product[apply_tourism_tax]" value="1" checked="checked" />
+                            {l s='Apply tourism tax to this room'}
+                        </label>
+                    </div>
+                </div>
+            {/if}
             <div class="form-group row">
                 <div class="col-sm-12">
                     <label class="control-label">{l s='Remark'}</label>

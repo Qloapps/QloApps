@@ -1725,6 +1725,11 @@ class HotelCartBookingData extends ObjectModel
                                         $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_incl'];
                                         $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_incl'];
+                                        if (TourismTax::isGrossedUp($roomTypeDateRangePrice['tourism_tax_online'])) {
+                                            $amount += (float) $roomTypeDateRangePrice['tourism_tax_online'];
+                                            $amountWithoutAutoAdd += (float) $roomTypeDateRangePriceWithoutAutoAdd['tourism_tax_online'];
+                                            $totalPriceWithoutDiscount += (float) $priceWithoutDiscount['tourism_tax_online'];
+                                        }
                                     }
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] += $amount;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['total_price_without_discount'] += $totalPriceWithoutDiscount;
@@ -1787,6 +1792,11 @@ class HotelCartBookingData extends ObjectModel
                                         $amount = $roomTypeDateRangePrice['total_price_tax_incl'];
                                         $amountWithoutAutoAdd = $roomTypeDateRangePriceWithoutAutoAdd['total_price_tax_incl'];
                                         $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_incl'];
+                                        if (TourismTax::isGrossedUp($roomTypeDateRangePrice['tourism_tax_online'])) {
+                                            $amount += (float) $roomTypeDateRangePrice['tourism_tax_online'];
+                                            $amountWithoutAutoAdd += (float) $roomTypeDateRangePriceWithoutAutoAdd['tourism_tax_online'];
+                                            $totalPriceWithoutDiscount += (float) $priceWithoutDiscount['tourism_tax_online'];
+                                        }
                                     }
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount'] = $amount;
                                     $cartHotelData[$prodKey]['date_diff'][$dateJoin]['amount_without_auto_add'] = $amountWithoutAutoAdd;

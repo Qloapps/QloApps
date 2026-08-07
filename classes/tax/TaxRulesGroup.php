@@ -166,8 +166,7 @@ class TaxRulesGroupCore extends ObjectModel
      */
     public static function getTaxRulesGroupsForOptions($onlyActive = true, $isTourismTax = false)
     {
-        $placeholder = $isTourismTax ? Tools::displayError('None') : Tools::displayError('No tax');
-        $tax_rules = array(array('id_tax_rules_group' => 0, 'name' => $placeholder));
+        $tax_rules[] = array('id_tax_rules_group' => 0, 'name' => Tools::displayError('No Tax'));
         return array_merge($tax_rules, TaxRulesGroup::getTaxRulesGroups($onlyActive, $isTourismTax));
     }
 

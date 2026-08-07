@@ -2518,10 +2518,10 @@ class HotelBookingDetail extends ObjectModel
         }
 
         $tourismBookingIds = array();
-        if ((int) $is_refunded && Configuration::get('QLO_USE_TOURISM_TAX')) {
+        if ((int) $is_refunded) {
             if ($id_rooms) {
                 foreach ($id_rooms as $val_rm) {
-                    $bid = (int) Db::getInstance()->getValue(
+                    $idHtlBooking = (int) Db::getInstance()->getValue(
                         'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail`
                          WHERE `id_order` = '.(int) $id_order.'
                            AND `id_room` = '.(int) $val_rm['id_room'].'
@@ -2529,8 +2529,8 @@ class HotelBookingDetail extends ObjectModel
                            AND `date_to` = \''.pSQL($date_to).'\'
                            AND `is_refunded` = 0'
                     );
-                    if ($bid) {
-                        $tourismBookingIds[] = $bid;
+                    if ($idHtlBooking) {
+                        $tourismBookingIds[] = $idHtlBooking;
                     }
                 }
             } else {
@@ -2557,8 +2557,8 @@ class HotelBookingDetail extends ObjectModel
         }
 
         if ($result && $tourismBookingIds) {
-            foreach ($tourismBookingIds as $bid) {
-                HotelOrderTourismTax::setRefunded($bid);
+            foreach ($tourismBookingIds as $idHtlBooking) {
+                OrderTourismTax::setRefundedByHtlBooking($idHtlBooking);
             }
         }
 
@@ -3637,6 +3637,8 @@ class HotelBookingDetail extends ObjectModel
             }
 
             $this->save();
+
+            OrderTourismTax::setRefundedByHtlBooking($this->id);
 
             return true;
         }

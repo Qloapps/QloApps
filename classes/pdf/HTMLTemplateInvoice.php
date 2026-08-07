@@ -687,25 +687,11 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         $footer['total_without_discount_te'] = $footer['room_price_tax_excl'] + $footer['total_convenience_fee_te'] + $footer['additional_service_price_tax_excl'] + $footer['service_products_price_tax_excl'];
         $footer['total_without_discount_ti'] = $footer['room_price_tax_incl'] + $footer['total_convenience_fee_ti'] + $footer['additional_service_price_tax_incl'] + $footer['service_products_price_tax_incl'];
 
-        $footer['total_tax_without_discount'] = $footer['total_without_discount_ti'] - $footer['total_without_discount_te'];
+        $footer['total_tourism_tax'] = OrderTourismTax::getOrderTourismTaxTotal((int) $this->order->id);
+
+        $footer['total_tax_without_discount'] = $footer['total_without_discount_ti'] - $footer['total_without_discount_te'] - $footer['total_tourism_tax'];
         if ($footer['total_tax_without_discount'] < 0) {
             $footer['total_tax_without_discount'] = 0;
-        }
-
-        $ttBreakdown = Configuration::get('QLO_USE_TOURISM_TAX') ? HotelOrderTourismTax::getBreakdownForInvoice((int) $this->order->id) : array();
-        $footer['tourism_tax_breakdown'] = $ttBreakdown;
-        $footer['tourism_tax_online']    = 0.0;
-        $footer['tourism_tax_at_hotel']  = 0.0;
-        foreach ($ttBreakdown as $ttRow) {
-            if ((int) $ttRow['collection_type'] === 0) {
-                $footer['tourism_tax_online'] += (float) $ttRow['total_amount'];
-            } else {
-                $footer['tourism_tax_at_hotel'] += (float) $ttRow['total_amount'];
-            }
-        }
-
-        if ($footer['tourism_tax_online'] > 0) {
-            $footer['total_tax_without_discount'] = max(0.0, $footer['total_tax_without_discount'] - $footer['tourism_tax_online']);
         }
 
         $data = array(

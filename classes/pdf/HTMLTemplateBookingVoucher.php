@@ -321,7 +321,9 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
 
         $footer['total_without_discount_te'] = $footer['room_price_tax_excl'] + $footer['total_convenience_fee_te'] + $footer['additional_service_price_tax_excl'] + $footer['service_products_price_tax_excl'];
         $totalWithoutDiscountTaxIncl = $roomsCostTaxIncl + $serviceProductsCostTaxIncl + $additionalServicesCostTaxIncl + $convenienceFeeTaxIncl;
-        $footer['total_tax_without_discount'] = max(0, $totalWithoutDiscountTaxIncl - $footer['total_without_discount_te']);
+        $totalTourismTax = OrderTourismTax::getOrderTourismTaxTotal((int) $this->order->id);
+        $footer['total_tax_without_discount'] = max(0, $totalWithoutDiscountTaxIncl - $footer['total_without_discount_te'] - $totalTourismTax);
+        $footer['total_tourism_tax'] = $totalTourismTax;
         $grandTotal = max(0.0, $totalWithoutDiscountTaxIncl - $productDiscountsTaxIncl);
         $footer['product_discounts_tax_incl'] = $productDiscountsTaxIncl;
         $footer['total_paid_tax_incl'] = $grandTotal;

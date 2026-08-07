@@ -861,21 +861,21 @@ class OrderInvoiceCore extends ObjectModel
     }
 
     /**
-     * Returns the ecotax taxes breakdown
-     *
-     * @since 1.5
-     * @return array
-     */
-    /**
      * Return tourism tax breakdown grouped by id_tax for invoice display.
      *
      * @return array  [['tax_name' => string, 'total_amount' => float], ...]
      */
     public function getTourismTaxBreakdown()
     {
-        return HotelOrderTourismTax::getBreakdownForInvoice((int) $this->id_order);
+        return OrderTourismTax::getBreakdownForInvoice((int) $this->id_order);
     }
 
+    /**
+     * Returns the ecotax taxes breakdown
+     *
+     * @since 1.5
+     * @return array
+     */
     public function getEcoTaxTaxesBreakdown()
     {
         $result = Db::getInstance()->executeS('

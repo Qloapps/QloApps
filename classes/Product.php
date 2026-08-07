@@ -5417,6 +5417,31 @@ class ProductCore extends ObjectModel
     }
 
     /**
+     * Returns the tourism tax rules group assigned to a product, mirroring
+     * getIdTaxRulesGroupByIdProduct() for tourism tax's own product_shop column.
+     *
+     * @param int $id_product
+     * @param Context|null $context
+     * @return int
+     */
+    public static function getIdTourismTaxRulesGroupByIdProduct($id_product, ?Context $context = null)
+    {
+        if (!$context) {
+            $context = Context::getContext();
+        }
+        $key = 'product_id_tourism_tax_rules_group_'.(int)$id_product.'_'.(int)$context->shop->id;
+        if (!Cache::isStored($key)) {
+            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                        SELECT `id_tourism_tax_rules_group`
+                        FROM `'._DB_PREFIX_.'product_shop`
+                        WHERE `id_product` = '.(int)$id_product.' AND id_shop='.(int)$context->shop->id);
+            Cache::store($key, (int)$result);
+            return (int)$result;
+        }
+        return Cache::retrieve($key);
+    }
+
+    /**
      * Returns tax rate.
      *
      * @param Address|null $address

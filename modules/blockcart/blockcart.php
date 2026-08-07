@@ -207,11 +207,16 @@ class Blockcart extends Module
         $shipping_cost_float = Tools::convertPrice($base_shipping, $currency);
         $wrappingCost = (float) ($params['cart']->getOrderTotal($useTax, Cart::ONLY_WRAPPING));
         $totalToPay = $params['cart']->getOrderTotal($useTax);
+        $tourismTaxTotals = $params['cart']->getOrderTotal(true, Cart::ONLY_TOURISM_TAX);
+        $tourismTaxOnline = (float) $tourismTaxTotals['tourism_tax_online'];
+        $tourismTaxOnlineRoom = $tourismTaxOnline - (float) $tourismTaxTotals['tourism_tax_online_service'];
 
         $tax_cost = 0;
+        $tourismTaxCost = Tools::displayPrice(0, $currency);
         if ($useTax && $useTax) {
             $totalToPayWithoutTaxes = $params['cart']->getOrderTotal(false);
-            $tax_cost = Tools::displayPrice($totalToPay - $totalToPayWithoutTaxes, $currency);
+            $tax_cost = Tools::displayPrice(($totalToPay - $totalToPayWithoutTaxes) - $tourismTaxOnline, $currency);
+            $tourismTaxCost = Tools::displayPrice($tourismTaxOnline, $currency);
         }
         // The cart content is altered for display
         $orderProcess = Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
@@ -314,7 +319,11 @@ class Blockcart extends Module
                 if ($priceDisplayMethod == PS_TAX_EXC) {
                     $addedProduct['price'] = Tools::displayPrice($price['total_price_tax_excl']);
                 } else {
-                    $addedProduct['price'] = Tools::displayPrice($price['total_price_tax_incl']);
+                    $roomPriceTaxIncl = (float) $price['total_price_tax_incl'];
+                    if (TourismTax::isGrossedUp($price['tourism_tax_online'])) {
+                        $roomPriceTaxIncl += (float) $price['tourism_tax_online'];
+                    }
+                    $addedProduct['price'] = Tools::displayPrice($roomPriceTaxIncl);
                 }
                 $fullDate = ($this->context->controller->show_full_date && (date('Y-m-d', strtotime($addedProduct['date_from'])) == date('Y-m-d', strtotime($addedProduct['date_to']))) ? true : false);
                 $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from'], null, $fullDate);
@@ -365,6 +374,9 @@ class Blockcart extends Module
         $totalAdditionalServicesWithAutoAddPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOM_SERVICES);
         $totalConvenienceFee = $params['cart']->getOrderTotal($useTax, Cart::ONLY_CONVENIENCE_FEE);
         $totalRoomsPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOMS);
+        if ($useTax && TourismTax::isGrossedUp($tourismTaxOnlineRoom)) {
+            $totalRoomsPrice += $tourismTaxOnlineRoom;
+        }
         $totalNormalProductPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_STANDALONE_PRODUCTS);
 
         $response = array(
@@ -381,6 +393,8 @@ class Blockcart extends Module
             'show_tax' => $showTax,
             'use_tax' => $useTax,
             'tax_cost' => $tax_cost,
+            'tourism_tax_cost' => $tourismTaxCost,
+            'tourism_tax_online' => $tourismTaxOnline,
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
             'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
             'room_total' => ($totalRoomsPrice + $totalDemandsPrice + $totalAdditionalServicesWithAutoAddPrice),

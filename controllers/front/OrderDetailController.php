@@ -89,6 +89,7 @@ class OrderDetailControllerCore extends FrontController
                 $objRoomType = new HotelRoomType();
                 $objBookingDemand = new HotelBookingDemands();
                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+                $roomTourismTaxByBooking = OrderTourismTax::getAppliedTotalsByBooking($order->id);
                 $anyBackOrder = 0;
                 $processedProducts = array();
                 $cartHotelData = array();
@@ -150,6 +151,12 @@ class OrderDetailControllerCore extends FrontController
                                     $bookingRefundDetail = reset($bookingRefundDetail);
                                 }
 
+                                $roomTourismTax = isset($roomTourismTaxByBooking[$data_v['id']]) ? $roomTourismTaxByBooking[$data_v['id']] : 0.0;
+                                $roomTotalPriceTaxIncl = (float) $data_v['total_price_tax_incl'];
+                                if (TourismTax::isGrossedUp($roomTourismTax)) {
+                                    $roomTotalPriceTaxIncl += $roomTourismTax;
+                                }
+
                                 if (isset($cartHotelData[$type_key]['date_diff'][$date_join])) {
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 
@@ -160,10 +167,10 @@ class OrderDetailControllerCore extends FrontController
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['children'] += $data_v['children'];
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $roomTotalPriceTaxIncl/$num_days;
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] += $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] += $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'];
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['amount_tax_incl'] += $data_v['total_price_tax_incl'];
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['amount_tax_incl'] += $roomTotalPriceTaxIncl;
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['amount_tax_excl'] += $data_v['total_price_tax_excl'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['is_backorder'] = $data_v['is_back_order'];
                                     if ($data_v['is_back_order']) {
@@ -187,10 +194,10 @@ class OrderDetailControllerCore extends FrontController
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['children'] = $data_v['children'];
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'] = $data_v['total_price_tax_excl']/$num_days;
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $data_v['total_price_tax_incl']/$num_days;
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'] = $roomTotalPriceTaxIncl/$num_days;
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_excl'] = $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_excl'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['avg_paid_unit_price_tax_incl'] = $cartHotelData[$type_key]['date_diff'][$date_join]['paid_unit_price_tax_incl'];
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = $data_v['total_price_tax_incl'];
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['amount_tax_incl'] = $roomTotalPriceTaxIncl;
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['amount_tax_excl'] = $data_v['total_price_tax_excl'];
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['is_backorder'] = $data_v['is_back_order'];
                                     if ($data_v['is_back_order']) {
@@ -422,6 +429,7 @@ class OrderDetailControllerCore extends FrontController
                     }
                 }
 
+                $totalTourismTax = OrderTourismTax::getOrderTourismTaxTotal((int) $id_order);
 
                 $this->context->smarty->assign(
                     array(
@@ -429,7 +437,7 @@ class OrderDetailControllerCore extends FrontController
                         'THEME_DIR' => _THEME_DIR_,
                         'total_convenience_fee_ti' => $total_convenience_fee_ti,
                         'total_convenience_fee_te' => $total_convenience_fee_te,
-                        'tourism_tax_breakdown' => Configuration::get('QLO_USE_TOURISM_TAX') ? HotelOrderTourismTax::getBreakdownForInvoice((int) $id_order) : array(),
+                        'total_tourism_tax' => $totalTourismTax,
                         'total_demands_price_ti' => $total_demands_price_ti,
                         'total_demands_price_te' => $total_demands_price_te,
                         'any_back_order' => $anyBackOrder,

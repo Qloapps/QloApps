@@ -497,6 +497,24 @@ class ProductControllerCore extends FrontController
                         $feature_price = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($this->product->id, $date_from, $date_to, false, 0, 0, 0, 0, 1, 1, $occupancy_value);
                     }
                     $productPriceWithoutReduction = $this->product->getPriceWithoutReduct(!$useTax);
+                    if ($useTax) {
+                        $totalsWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                            $this->product->id,
+                            $date_from,
+                            $date_to,
+                            $occupancy_value,
+                            0,
+                            0,
+                            0,
+                            0,
+                            1,
+                            0
+                        );
+                        if (TourismTax::isGrossedUp($totalsWithoutReduction['tourism_tax_online'])) {
+                            $numDaysInDuration = HotelHelper::getNumberOfDays($date_from, $date_to);
+                            $productPriceWithoutReduction += $totalsWithoutReduction['tourism_tax_online'] / $numDaysInDuration;
+                        }
+                    }
                     $feature_price_diff = (float)($productPriceWithoutReduction - $feature_price);
                     $this->context->smarty->assign('feature_price', $feature_price);
                     $this->context->smarty->assign('feature_price_diff', $feature_price_diff);
@@ -766,8 +784,16 @@ class ProductControllerCore extends FrontController
                 1,
                 $occupancy
             );
-            $roomTypeDateRangePrice = $roomTypeDateRangePrice['total_price_tax_incl'];
             $totalPriceWithoutDiscount = $priceWithoutDiscount['total_price_tax_incl'];
+            if (TourismTax::isGrossedUp($priceWithoutDiscount['tourism_tax_online'])) {
+                $totalPriceWithoutDiscount += $priceWithoutDiscount['tourism_tax_online'];
+            }
+
+            $roomTypeDateRangePriceTaxIncl = $roomTypeDateRangePrice['total_price_tax_incl'];
+            if (TourismTax::isGrossedUp($roomTypeDateRangePrice['tourism_tax_online'])) {
+                $roomTypeDateRangePriceTaxIncl += $roomTypeDateRangePrice['tourism_tax_online'];
+            }
+            $roomTypeDateRangePrice = $roomTypeDateRangePriceTaxIncl;
 
         } else {
             $featurePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay(
@@ -839,6 +865,11 @@ class ProductControllerCore extends FrontController
             if ($roomServiceProducts = json_decode($roomServiceProducts, true)) {
                 $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
+                $serviceOccupancy = (is_array($occupancy) && isset($occupancy[0])) ? $occupancy[0] : array('adults' => 1, 'child_ages' => array());
+                $serviceNumAdults = isset($serviceOccupancy['adults']) ? (int) $serviceOccupancy['adults'] : 1;
+                $serviceChildAges = !empty($serviceOccupancy['child_ages']) ? (array) $serviceOccupancy['child_ages'] : array();
+                $serviceIdCurrency = (int) $this->context->cart->id_currency ?: (int) Configuration::get('PS_CURRENCY_DEFAULT');
+
                 foreach ($roomServiceProducts as &$product) {
                     if (!$objRoomTypeServiceProduct->isRoomTypeLinkedWithProduct($idProduct, $product['id_product'])) {
                         unset($product);
@@ -865,6 +896,53 @@ class ProductControllerCore extends FrontController
                         $dateFrom,
                         $dateTo
                     );
+
+                    if ($useTax) {
+                        $servicePriceNumDays = 1;
+                        if ($objServiceProduct->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                            $servicePriceNumDays = $numDays ?: 1;
+                        }
+
+                        $serviceUnitPriceTaxExcl = Product::getServiceProductPrice(
+                            $product['id_product'],
+                            0,
+                            false,
+                            $idProduct,
+                            false,
+                            1,
+                            $dateFrom,
+                            $dateTo
+                        ) / $servicePriceNumDays;
+                        $serviceTourismTax = array('tourism_tax_online' => 0.0);
+                        $idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $product['id_product']);
+                        if ($idTourismTaxRulesGroup) {
+                            $tourismTaxContext = TourismTax::resolveServiceLineTaxContext(
+                                $idHotel,
+                                0,
+                                new Address((int) Cart::getIdAddressForTaxCalculation((int) $product['id_product']))
+                            );
+                            $taxCalculator = TaxManagerFactory::getManager(
+                                $tourismTaxContext['address'],
+                                $idTourismTaxRulesGroup
+                            )->getTaxCalculator();
+                            $serviceTourismTax = $taxCalculator->getTourismTaxRows(
+                                $serviceUnitPriceTaxExcl,
+                                $dateFrom,
+                                max(1, (int) $numDays),
+                                $serviceNumAdults,
+                                $serviceChildAges,
+                                $serviceIdCurrency,
+                                $tourismTaxContext['collectionType'],
+                                $this->context->language->id,
+                                $product['quantity']
+                            );
+                        }
+
+                        if (TourismTax::isGrossedUp($serviceTourismTax['tourism_tax_online'])) {
+                            $productPrice += $serviceTourismTax['tourism_tax_online'];
+                        }
+                    }
+
                     $product['price'] = $productPrice;
                     $serviceProductsPrice += $productPrice;
                 }

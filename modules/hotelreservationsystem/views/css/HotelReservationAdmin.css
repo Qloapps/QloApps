@@ -635,3 +635,7 @@ body.adminhotelroomsbooking .ui-tooltip {
 .error-border {
     outline: rgb(210, 124, 130) solid 1px;
     border-radius: 2px;}
+.tourism-tax-field {
+    display: none;}
+.tourism-tax-non-tourism {
+    display: none;}

@@ -172,7 +172,13 @@ class HotelOrderRefundRules extends ObjectModel
                         0,
                         $objHtlBooking->id
                     );
-                    $totalAmount = $objHtlBooking->total_price_tax_incl + $totalDemandsPrice + $totalServicesPrice;
+
+                    $appliedTourismTaxByBooking = OrderTourismTax::getAppliedTotalsByBooking($objHtlBooking->id_order);
+                    $appliedServiceTourismTaxByBooking = OrderTourismTax::getAppliedServiceTotalsByBooking($objHtlBooking->id_order);
+                    $bookingTourismTaxApplied = (isset($appliedTourismTaxByBooking[$objHtlBooking->id]) ? (float) $appliedTourismTaxByBooking[$objHtlBooking->id] : 0.0)
+                        + (isset($appliedServiceTourismTaxByBooking[$objHtlBooking->id]) ? (float) $appliedServiceTourismTaxByBooking[$objHtlBooking->id] : 0.0);
+
+                    $totalAmount = $objHtlBooking->total_price_tax_incl + $totalDemandsPrice + $totalServicesPrice + $bookingTourismTaxApplied;
 
                     if ($refundRules = $objHtlRefundRules->getHotelRefundRules($objHtlBooking->id_hotel, 0, 1)) {
                         $orderCurrency = $objOrder->id_currency;

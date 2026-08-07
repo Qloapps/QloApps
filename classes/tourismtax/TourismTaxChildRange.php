@@ -21,54 +21,51 @@
  * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
  */
 
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
-/**
- * Age-band definitions for tourism taxes with has_child_rate = 1.
- * Child age is measured at check-in date.
- * All ranges for a tax share the parent's child_tax_value.
- */
-class HotelTourismTaxChildRange extends ObjectModel
+class TourismTaxChildRangeCore extends ObjectModel
 {
     public $id_child_range;
     public $id_tax;
     public $min_age;
     public $max_age;
     public $tax_value;
-    public $position;
 
     public static $definition = array(
-        'table' => 'htl_tourism_tax_child_range',
+        'table' => 'tourism_tax_child_range',
         'primary' => 'id_child_range',
         'fields' => array(
             'id_tax' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'min_age' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'max_age' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'tax_value' => array('type' => self::TYPE_FLOAT, 'validate' => 'isUnsignedFloat'),
-            'position' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
         ),
     );
 
     /**
-     * Return all child age ranges for a tax sorted by position.
+     * All child age ranges for a tax in entry order (id_child_range order), cached per request.
      *
      * @param int $idTax
      * @return array
      */
     public static function getByTaxId($idTax)
     {
-        return Db::getInstance()->executeS(
-            'SELECT * FROM `' . _DB_PREFIX_ . 'htl_tourism_tax_child_range`
-             WHERE `id_tax` = ' . (int) $idTax . '
-             ORDER BY `position` ASC, `min_age` ASC'
+        $idTax = (int) $idTax;
+        $cacheId = 'TourismTaxChildRange::getByTaxId-' . $idTax;
+        if (Cache::isStored($cacheId)) {
+            return Cache::retrieve($cacheId);
+        }
+
+        $ranges = Db::getInstance()->executeS(
+            'SELECT * FROM `' . _DB_PREFIX_ . 'tourism_tax_child_range`
+             WHERE `id_tax` = ' . $idTax . '
+             ORDER BY `id_child_range` ASC'
         );
+        Cache::store($cacheId, $ranges);
+
+        return $ranges;
     }
 
     /**
-     * Replace all child range rows for $idTax with the submitted arrays.
-     * Skips entries where tax_value is empty.
+     * Replace all child range rows for $idTax with the submitted arrays, skipping entries where tax_value is empty.
      *
      * @param int   $idTax
      * @param array $mins
@@ -79,90 +76,60 @@ class HotelTourismTaxChildRange extends ObjectModel
     public static function saveAll($idTax, array $mins, array $maxs, array $values)
     {
         Db::getInstance()->execute(
-            'DELETE FROM `' . _DB_PREFIX_ . 'htl_tourism_tax_child_range`
+            'DELETE FROM `' . _DB_PREFIX_ . 'tourism_tax_child_range`
              WHERE `id_tax` = ' . (int) $idTax
         );
         foreach ($values as $i => $value) {
             if ($value === '' || $value === false) {
                 continue;
             }
-            $range = new HotelTourismTaxChildRange();
+            $range = new TourismTaxChildRange();
             $range->id_tax = (int) $idTax;
             $range->min_age = isset($mins[$i]) ? (int) $mins[$i] : 0;
             $range->max_age = isset($maxs[$i]) ? (int) $maxs[$i] : 0;
             $range->tax_value = (float) $value;
-            $range->position = (int) $i;
             $range->add();
         }
     }
 
     /**
-     * Sum per-band tax contributions for the given child ages.
-     * Each child is matched to the first qualifying band; unmatched children pay the adult rate
-     * when $adultBaseValue is provided, otherwise they contribute 0.
-     *
-     * Returns array: ['total' => float, 'count' => int]
+     * Sum per-band tax contributions for the given child ages — each child matched to the first qualifying band, unmatched children pay the adult rate if given, else 0.
      *
      * @param int        $idTax
-     * @param int[]      $ages         Ages at check-in date
-     * @param int        $taxType      0=fixed, 1=percentage
-     * @param float      $unitPrice    Room unit_price_tax_excl (used for percentage type)
+     * @param int[]      $ages           Ages at check-in date
+     * @param int        $taxType        0=fixed, 1=percentage
+     * @param float      $unitPrice      Room unit_price_tax_excl (used for percentage type)
      * @param float|null $adultBaseValue Adult tax_value (fixed amount or percentage); null = exempt unmatched children
-     * @return array
+     * @return array ['total' => float, 'count' => int]
      */
-    public static function computeChildContribution($idTax, array $ages, $taxType, $unitPrice, $adultBaseValue = null)
+    public static function getChildContribution($idTax, array $ages, $taxType, $unitPrice, $adultBaseValue = null)
     {
+        $taxType = (int) $taxType;
+        $unitPrice = (float) $unitPrice;
         $ranges = self::getByTaxId((int) $idTax);
         $total = 0.0;
         $count = 0;
         foreach ($ages as $age) {
+            $age = (int) $age;
             $matched = false;
             foreach ($ranges as $range) {
-                $inLower = ((int) $age >= (int) $range['min_age']);
-                $inUpper = ((int) $range['max_age'] == 0 || (int) $age <= (int) $range['max_age']);
+                $maxAge = (int) $range['max_age'];
+                $inLower = ($age >= (int) $range['min_age']);
+                $inUpper = ($maxAge == 0 || $age <= $maxAge);
                 if ($inLower && $inUpper) {
                     $bandValue = (float) $range['tax_value'];
-                    $total += ((int) $taxType === 0)
-                        ? $bandValue
-                        : ((float) $unitPrice * ($bandValue / 100));
+                    $total += ($taxType === 0) ? $bandValue : ($unitPrice * ($bandValue / 100));
                     $count++;
                     $matched = true;
                     break;
                 }
             }
             if (!$matched && $adultBaseValue !== null) {
-                $total += ((int) $taxType === 0)
-                    ? (float) $adultBaseValue
-                    : ((float) $unitPrice * ((float) $adultBaseValue / 100));
+                $adultBaseValue = (float) $adultBaseValue;
+                $total += ($taxType === 0) ? $adultBaseValue : ($unitPrice * ($adultBaseValue / 100));
                 $count++;
             }
         }
         return array('total' => $total, 'count' => $count);
-    }
-
-    /**
-     * Check whether a new range [newMin, newMax] overlaps any existing range for the same tax.
-     *
-     * @param int $idTax
-     * @param int $newMin
-     * @param int $newMax
-     * @param int $excludeId  Range id to exclude (for edit validation)
-     * @return bool
-     */
-    public static function hasOverlap($idTax, $newMin, $newMax, $excludeId = 0)
-    {
-        $ranges = self::getByTaxId((int) $idTax);
-        foreach ($ranges as $range) {
-            if ($excludeId && (int) $range['id_child_range'] === (int) $excludeId) {
-                continue;
-            }
-            $exMax = (int) $range['max_age'];
-            $newMaxEff = ($newMax == 0) ? PHP_INT_MAX : (int) $newMax;
-            $exMaxEff = ($exMax == 0) ? PHP_INT_MAX : $exMax;
-            if ((int) $newMin <= $exMaxEff && $newMaxEff >= (int) $range['min_age']) {
-                return true;
-            }
-        }
-        return false;
     }
 }

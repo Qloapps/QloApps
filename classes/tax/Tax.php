@@ -39,7 +39,7 @@ class TaxCore extends ObjectModel
     /** @var bool true if the tax has been historized */
     public $deleted = 0;
 
-    /** @var int 1 = this ps_tax row is a tourism tax (subtype params in htl_tourism_tax) */
+    /** @var int 1 = this ps_tax row is a tourism tax (subtype params in tourism_tax) */
     public $is_tourism_tax = 0;
 
     /**
@@ -138,6 +138,10 @@ class TaxCore extends ObjectModel
         return Db::getInstance()->getValue('
 		SELECT `id_tax`
 		FROM `'._DB_PREFIX_.'order_detail_tax`
+		WHERE `id_tax` = '.(int)$this->id
+        ) || Db::getInstance()->getValue('
+		SELECT `id_tax`
+		FROM `'._DB_PREFIX_.'order_tourism_tax`
 		WHERE `id_tax` = '.(int)$this->id
         );
     }
