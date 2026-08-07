@@ -1034,7 +1034,11 @@ class AdminOrdersControllerCore extends AdminController
                 $taxRulesGroups = TaxRulesGroup::getTaxRulesGroups(true);
                 $smartyVars['taxRulesGroups'] = $taxRulesGroups;
                 $smartyVars['invoices_collection'] = $objOrder->getInvoicesCollection();
-                $smartyVars['customServiceAllowed'] = Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING');
+                $serviceProductAccess = Profile::getProfileAccess(
+                    $this->context->employee->id_profile,
+                    Tab::getIdFromClassName('AdminNormalProducts')
+                );
+                $smartyVars['customServiceAllowed'] = $serviceProductAccess['add'] && Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING');
                 $smartyVars['current_id_lang'] = $this->context->language->id;
 
                 $this->context->smarty->assign($smartyVars);
@@ -3703,6 +3707,8 @@ class AdminOrdersControllerCore extends AdminController
         $objProduct = new Product();
         $hotelStandaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
         $standaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
+        $cartRuleAccess = Profile::getProfileAccess($this->context->employee->id_profile, (int)Tab::getIdFromClassName('AdminCartRules'));
+        $addressAccess = Profile::getProfileAccess($this->context->employee->id_profile, (int)Tab::getIdFromClassName('AdminAddresses'));
 
         $this->tpl_view_vars = array(
             'hotelStandaloneProducts' => $hotelStandaloneProducts,
@@ -3770,6 +3776,8 @@ class AdminOrdersControllerCore extends AdminController
             'iso_code_lang' => $this->context->language->iso_code,
             'id_lang' => $this->context->language->id,
             'can_edit' => ($this->tabAccess['edit'] === 1),
+            'cartRuleAccess' => $cartRuleAccess,
+            'addressAccess' => $addressAccess,
             'current_id_lang' => $this->context->language->id,
             'invoices_collection' => $order->getInvoicesCollection(),
             'not_paid_invoices_collection' => $order->getNotPaidInvoicesCollection(),
