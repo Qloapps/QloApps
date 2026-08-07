@@ -122,6 +122,12 @@ class AdminCustomersControllerCore extends AdminController
         }
 
         $this->fields_list = array_merge($this->fields_list, array(
+            'phone' => array(
+                'title' => $this->l('Phone'),
+                'filter_key' => 'a!phone',
+                'visible_default' => true,
+                'visible_default' => false,
+            ),
             'default_group_name' => array(
                 'title' => $this->l('Default Group'),
                 'optional' => true,
@@ -146,19 +152,6 @@ class AdminCustomersControllerCore extends AdminController
                 'havingFilter' => true,
                 'align' => 'text-right',
                 'badge_success' => true
-            ),
-            'phone' => array(
-                'title' => $this->l('Phone'),
-                'filter_key' => 'a!phone',
-                'optional' => true,
-                'visible_default' => false,
-            ),
-            'alias' => array(
-                'title' => $this->l('Address alias'),
-                'optional' => true,
-                'visible_default' => false,
-                'search' => false,
-                'orderby' => false,
             ),
             'address_company' => array(
                 'title' => $this->l('Company'),
@@ -258,7 +251,9 @@ class AdminCustomersControllerCore extends AdminController
                 'align' => 'text-center',
                 'type' => 'bool',
                 'callback' => 'printOptinIcon',
-                'orderby' => false
+                'orderby' => false,
+                'optional' => true,
+                'visible_default' => false
             ),
             'date_add' => array(
                 'title' => $this->l('Registration'),
@@ -270,7 +265,9 @@ class AdminCustomersControllerCore extends AdminController
                 'title' => $this->l('Last visit'),
                 'type' => 'datetime',
                 'search' => false,
-                'havingFilter' => true
+                'havingFilter' => true,
+                'optional' => true,
+                'visible_default' => false,
             ),
             'deleted' => array(
                 'title' => $this->l('Banned'),
