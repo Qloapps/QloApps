@@ -155,7 +155,26 @@ class StatsForecast extends Module
             '.$date_from_ginvoice.' AS fix_date,
             '.($this->context->cookie->stats_granularity == 42 ? $date_to_ginvoice : '').'
             COUNT(DISTINCT(o.`id_order`)) AS countOrders,
-            SUM((SELECT IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE o.`id_order` = hbd.`id_order`)) AS totalRoomsBooked,
+            SUM((
+                WITH RECURSIVE booking_dates AS (
+                    SELECT
+                        hbd.`id_room`,
+                        DATE(hbd.`date_from`) AS occupied_date,
+                        DATE(IF(hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.', hbd.`check_out`, hbd.`date_to`)) AS end_date
+                    FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                    WHERE hbd.`id_order` = o.`id_order`
+
+                    UNION ALL
+
+                    SELECT
+                        id_room,
+                        DATE_ADD(occupied_date, INTERVAL 1 DAY),
+                        end_date
+                    FROM booking_dates
+                    WHERE DATE_ADD(occupied_date, INTERVAL 1 DAY) < end_date
+                )
+                SELECT COUNT(DISTINCT id_room, occupied_date) FROM booking_dates
+            )) AS totalRoomsBooked,
 			SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) AS totalSales,
             SUM((
                 SELECT SUM(ROUND(IFNULL(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1) * (
@@ -197,7 +216,6 @@ class StatsForecast extends Module
         while ($row = $db->nextRow($result)) {
             $data_table[$row['fix_date']] = $row;
         }
-
         $this->html .= '<div>
 			<div class="panel-heading"><i class="icon-dashboard"></i> '.$this->displayName.'</div>
 			<div class="alert alert-info">'.$this->l('The listed amounts do not include tax.').'</div>
