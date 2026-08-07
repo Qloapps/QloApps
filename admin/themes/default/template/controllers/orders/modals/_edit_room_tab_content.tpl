@@ -43,7 +43,7 @@
     <div class="edit_room_fields">
         <div class="row form-group">
             <div class="col-sm-6 room_check_in_div">
-                <label class="control-label">{l s='Check-In'}</label>
+                <label class="control-label">{l s='Date From'}</label>
                 <div class="input-group">
                     <input type="hidden" class="edit_product_date_from_actual" name="edit_product[date_from]"/>
                     {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
@@ -55,7 +55,7 @@
                 </div>
             </div>
             <div class="col-sm-6 room_check_out_div">
-                <label class="control-label">{l s='Check-Out'}</label>
+                <label class="control-label">{l s='Date To'}</label>
                 <div class="input-group">
                     <input type="hidden" class="edit_product_date_to_actual" name="edit_product[date_to]"/>
                     {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
