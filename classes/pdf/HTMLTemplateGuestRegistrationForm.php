@@ -26,19 +26,19 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
 {
     public $order;
     public $available_in_your_account = false;
-    protected $id_hotel_booking_detail = null;
+    protected $hotelBookingDetail = null;
 
     /**
-     * @param Order $objOrder
+     * @param int $idHotelBookingDetail
      * @param $smarty
      */
-    public function __construct(Order $objOrder, $smarty)
+    public function __construct($idHotelBookingDetail, $smarty)
     {
-        $this->order = $objOrder;
+        $this->hotelBookingDetail = new HotelBookingDetail((int)$idHotelBookingDetail);
+        $this->order = new Order((int)$this->hotelBookingDetail->id_order);
         $this->smarty = $smarty;
-        $this->id_hotel_booking_detail = (int)Tools::getValue('id_hotel_booking_detail');
-        $this->date = Tools::displayDate($objOrder->date_add);
-        $this->title = $objOrder->getUniqReference();
+        $this->date = Tools::displayDate($this->order->date_add);
+        $this->title = $this->order->getUniqReference();
         $this->shop = new Shop((int)$this->order->id_shop);
     }
 
@@ -63,8 +63,8 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
     public function getContent()
     {
         $idLang = (int)$this->order->id_lang;
-        $hotelBookingDetail = new HotelBookingDetail((int)$this->id_hotel_booking_detail);
-        $idHotel = Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->id_hotel : 0;
+        $objHotelBookingDetail = $this->hotelBookingDetail;
+        $idHotel = (int)$objHotelBookingDetail->id_hotel;
 
         $objHotelBranchInformation = null;
         $hotelCountry = '';
@@ -87,14 +87,14 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
         $arrivalDateTime = '';
         $departureDateTime = '';
 
-        if (Validate::isLoadedObject($hotelBookingDetail)) {
-            $nights = (int)HotelHelper::getNumberOfDays($hotelBookingDetail->date_from, $hotelBookingDetail->date_to);
+        if (Validate::isLoadedObject($objHotelBookingDetail)) {
+            $nights = (int)HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
             if ($nights > 0) {
                 $currency = new Currency((int)$this->order->id_currency);
-                $ratePerNight = Tools::displayPrice((float)$hotelBookingDetail->total_price_tax_incl / $nights, $currency, false);
+                $ratePerNight = Tools::displayPrice((float)$objHotelBookingDetail->total_price_tax_incl / $nights, $currency, false);
             }
-            $arrivalDateTime = $hotelBookingDetail->date_from ? Tools::displayDate($hotelBookingDetail->date_from) : '';
-            $departureDateTime = $hotelBookingDetail->date_to ? Tools::displayDate($hotelBookingDetail->date_to) : '';
+            $arrivalDateTime = $objHotelBookingDetail->date_from ? Tools::displayDate($objHotelBookingDetail->date_from) : '';
+            $departureDateTime = $objHotelBookingDetail->date_to ? Tools::displayDate($objHotelBookingDetail->date_to) : '';
             if ($arrivalDateTime && $objHotelBranchInformation && $objHotelBranchInformation->check_in && $objHotelBranchInformation->check_in != '00:00:00') {
                 $arrivalDateTime .= ' '.date('h:i a', strtotime($objHotelBranchInformation->check_in));
             }
@@ -104,8 +104,8 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
         }
 
         $additionalGuestsRows = 0;
-        if (Validate::isLoadedObject($hotelBookingDetail)) {
-            $totalGuests = (int)$hotelBookingDetail->adults + (int)$hotelBookingDetail->children;
+        if (Validate::isLoadedObject($objHotelBookingDetail)) {
+            $totalGuests = (int)$objHotelBookingDetail->adults + (int)$objHotelBookingDetail->children;
             $additionalGuestsRows = ($totalGuests > 1) ? ($totalGuests - 1) : 0;
         }
 
@@ -129,7 +129,7 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
 
         // One pass: build false|string label for every field directly.
         // false = hidden, non-empty string = visible (used for both visibility check and label text in template).
-        $grcInfo = $hotelBookingDetail->getRegistrationCardInfo();
+        $grcInfo = $this->hotelBookingDetail->getRegistrationCardInfo();
         $fieldLabels = array();
         foreach ($grcInfo as $sectionId => $section) {
             $isSectionEnabled = $allVisible || isset($grcFields[$sectionId]);
@@ -235,10 +235,10 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
             'booking_reference'      => $this->order->getUniqReference(),
             'arrival_date_time'      => $arrivalDateTime,
             'departure_date_time'    => $departureDateTime,
-            'room_type'              => Validate::isLoadedObject($hotelBookingDetail) ? $hotelBookingDetail->room_type_name : '',
-            'room_number'            => Validate::isLoadedObject($hotelBookingDetail) ? $hotelBookingDetail->room_num : '',
-            'adults'                 => Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->adults : 0,
-            'children'               => Validate::isLoadedObject($hotelBookingDetail) ? (int)$hotelBookingDetail->children : 0,
+            'room_type'              => Validate::isLoadedObject($objHotelBookingDetail) ? $objHotelBookingDetail->room_type_name : '',
+            'room_number'            => Validate::isLoadedObject($objHotelBookingDetail) ? $objHotelBookingDetail->room_num : '',
+            'adults'                 => Validate::isLoadedObject($objHotelBookingDetail) ? (int)$objHotelBookingDetail->adults : 0,
+            'children'               => Validate::isLoadedObject($objHotelBookingDetail) ? (int)$objHotelBookingDetail->children : 0,
             'rate_per_night'         => $ratePerNight,
             'additional_guests_rows' => $additionalGuestsRows,
 
@@ -283,8 +283,8 @@ class HTMLTemplateGuestRegistrationFormCore extends HTMLTemplate
     public function getFilename()
     {
         $filename = 'guest-registration-form-'.$this->order->reference;
-        if ($this->id_hotel_booking_detail) {
-            $filename .= '-room-'.$this->id_hotel_booking_detail;
+        if ($this->hotelBookingDetail->id) {
+            $filename .= '-room-'.$this->hotelBookingDetail->id;
         }
 
         return $filename.'.pdf';

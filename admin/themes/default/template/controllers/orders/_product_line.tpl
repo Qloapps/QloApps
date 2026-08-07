@@ -165,7 +165,7 @@
                             </a>
                         </li>
                         <li>
-                            <a title="{l s='Guest Registration Card'}" href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateGuestRegistrationFormPDF&amp;id_order={$data['id_order']}&amp;id_hotel_booking_detail={$data['id']}" target="_blank">
+                            <a title="{l s='Guest Registration Card'}" href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateGuestRegistrationFormPDF&amp;id_hotel_booking_detail={$data['id']}" target="_blank">
                                 <i class="icon-download"></i> {l s='GRC'}
                             </a>
                         </li>
