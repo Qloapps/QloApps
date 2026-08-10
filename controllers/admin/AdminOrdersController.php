@@ -1034,7 +1034,11 @@ class AdminOrdersControllerCore extends AdminController
                 $taxRulesGroups = TaxRulesGroup::getTaxRulesGroups(true);
                 $smartyVars['taxRulesGroups'] = $taxRulesGroups;
                 $smartyVars['invoices_collection'] = $objOrder->getInvoicesCollection();
-                $smartyVars['customServiceAllowed'] = Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING');
+                $serviceProductAccess = Profile::getProfileAccess(
+                    $this->context->employee->id_profile,
+                    Tab::getIdFromClassName('AdminNormalProducts')
+                );
+                $smartyVars['customServiceAllowed'] = $serviceProductAccess['add'] && Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING');
                 $smartyVars['current_id_lang'] = $this->context->language->id;
 
                 $this->context->smarty->assign($smartyVars);
@@ -3703,6 +3707,8 @@ class AdminOrdersControllerCore extends AdminController
         $objProduct = new Product();
         $hotelStandaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
         $standaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
+        $cartRuleAccess = Profile::getProfileAccess($this->context->employee->id_profile, (int)Tab::getIdFromClassName('AdminCartRules'));
+        $addressAccess = Profile::getProfileAccess($this->context->employee->id_profile, (int)Tab::getIdFromClassName('AdminAddresses'));
 
         $this->tpl_view_vars = array(
             'hotelStandaloneProducts' => $hotelStandaloneProducts,
@@ -3770,6 +3776,8 @@ class AdminOrdersControllerCore extends AdminController
             'iso_code_lang' => $this->context->language->iso_code,
             'id_lang' => $this->context->language->id,
             'can_edit' => ($this->tabAccess['edit'] === 1),
+            'cartRuleAccess' => $cartRuleAccess,
+            'addressAccess' => $addressAccess,
             'current_id_lang' => $this->context->language->id,
             'invoices_collection' => $order->getInvoicesCollection(),
             'not_paid_invoices_collection' => $order->getNotPaidInvoicesCollection(),
@@ -5172,8 +5180,8 @@ class AdminOrdersControllerCore extends AdminController
                 $carrier = new Carrier((int)$order->id_carrier);
                 $tax_calculator = $carrier->getTaxCalculator($invoice_address);
 
-                $order_invoice->total_paid_tax_excl = Tools::ps_round((float)$cart->getOrderTotal(false, $total_method), 2);
-                $order_invoice->total_paid_tax_incl = Tools::ps_round((float)$cart->getOrderTotal($use_taxes, $total_method), 2);
+                $order_invoice->total_paid_tax_excl = Tools::ps_round((float)$cart->getOrderTotal(false, $total_method), _PS_PRICE_COMPUTE_PRECISION_);
+                $order_invoice->total_paid_tax_incl = Tools::ps_round((float)$cart->getOrderTotal($use_taxes, $total_method), _PS_PRICE_COMPUTE_PRECISION_);
                 $order_invoice->total_products = (float)$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_products_wt = (float)$cart->getOrderTotal($use_taxes, Cart::ONLY_PRODUCTS);
                 $order_invoice->total_shipping_tax_excl = (float)$cart->getTotalShippingCost(null, false);
@@ -5410,7 +5418,8 @@ class AdminOrdersControllerCore extends AdminController
                     $this->context->cart->id,
                     $this->context->cookie->id_guest,
                     $objCartBookingData->id_room,
-                    0
+                    0,
+                    1
                 );
                 $objBookingDetail->total_price_tax_excl = $total_price['total_price_tax_excl'];
                 $objBookingDetail->total_price_tax_incl = $total_price['total_price_tax_incl'];
@@ -5730,8 +5739,8 @@ class AdminOrdersControllerCore extends AdminController
                             $invoice_address = new Address((int) $objOrder->{Configuration::get('PS_TAX_ADDRESS_TYPE', null, null, $objOrder->id_shop)});
                             $carrier = new Carrier((int)$objOrder->id_carrier);
                             $tax_calculator = $carrier->getTaxCalculator($invoice_address);
-                            $objOrderInvoice->total_paid_tax_excl = Tools::ps_round((float)$objCart->getOrderTotal(false, $totalMethod), 2);
-                            $objOrderInvoice->total_paid_tax_incl = Tools::ps_round((float)$objCart->getOrderTotal($useTaxes, $totalMethod), 2);
+                            $objOrderInvoice->total_paid_tax_excl = Tools::ps_round((float)$objCart->getOrderTotal(false, $totalMethod), _PS_PRICE_COMPUTE_PRECISION_);
+                            $objOrderInvoice->total_paid_tax_incl = Tools::ps_round((float)$objCart->getOrderTotal($useTaxes, $totalMethod), _PS_PRICE_COMPUTE_PRECISION_);
                             $objOrderInvoice->total_products = (float)$objCart->getOrderTotal(false, Cart::ONLY_PRODUCTS);
                             $objOrderInvoice->total_products_wt = (float)$objCart->getOrderTotal($useTaxes, Cart::ONLY_PRODUCTS);
                             $objOrderInvoice->total_shipping_tax_excl = (float)$objCart->getTotalShippingCost(null, false);
@@ -5872,25 +5881,28 @@ class AdminOrdersControllerCore extends AdminController
             $objOrderHistory->changeIdOrderState($idOrderState, $objOrder, $useExistingPayment);
             $objOrderHistory->add();
         } else {
-            // check if new order amount is greater that old order amount and order payment is accepted
-            // then update order status to partial payment accepted
             $currentOrderState = $objOrder->getCurrentOrderState();
-            $psOsPartialPaymentAccepted = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-            if ($currentOrderState->paid == 1 && $currentOrderState->id != $psOsPartialPaymentAccepted) {
+            if ($currentOrderState->paid == 1) {                 
                 // calculate due amount
                 $dueAmount = $objOrder->total_paid_tax_incl - $objOrder->total_paid_real;
                 if ($dueAmount > 0) {
-                    // now change order status to partial payment
+                    $psOsPartialPaymentAccepted = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                    $psOSPaymentComplete = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+
+                    if ($objOrder->total_paid_real == 0) {
+                        $targetState = Configuration::get('PS_OS_AWAITING_PAYMENT');
+                    } elseif ($currentOrderState->id != $psOsPartialPaymentAccepted) {
+                        $targetState = $psOsPartialPaymentAccepted;
+                    }
                     $objOrderHistory = new OrderHistory();
                     $objOrderHistory->id_order = $objOrder->id;
                     $objOrderHistory->id_employee = (int) $this->context->employee->id;
-
                     $useExistingPayment = false;
                     if (!$objOrder->hasInvoice()) {
                         $useExistingPayment = true;
                     }
 
-                    $objOrderHistory->changeIdOrderState($psOsPartialPaymentAccepted, $objOrder, $useExistingPayment);
+                    $objOrderHistory->changeIdOrderState($targetState, $objOrder, $useExistingPayment);
                     $objOrderHistory->add();
                 }
             }
@@ -5988,7 +6000,8 @@ class AdminOrdersControllerCore extends AdminController
                 $cart->id,
                 $cart->id_guest,
                 $id_room,
-                0
+                0,
+                1
             );
 
             $totalRoomPriceAfterTE = (float) $roomTotalPrice['total_price_tax_excl'];
@@ -7739,6 +7752,7 @@ class AdminOrdersControllerCore extends AdminController
                         $response['hasError'] = true;
                         $response['errors'][] = Tools::displayError('Error while updating service, please try again after refresing the page');
                     } else {
+                        $this->sendChangedNotification($objOrder);
                         $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
                             $objOrderDetail->id_order,
                             $objHotelBookingDetail->id_product,
@@ -7995,6 +8009,8 @@ class AdminOrdersControllerCore extends AdminController
                             }
                         }
                     }
+
+                    $this->sendChangedNotification($order);
                     $response['service_panel'] = $this->processRenderServicesPanel(
                         $order->id,
                         $objHotelBookingDetail->id_product,
@@ -8277,6 +8293,7 @@ class AdminOrdersControllerCore extends AdminController
 
                                                 // Save changes of order
                                                 if ($objOrder->update()) {
+                                                    $this->sendChangedNotification($objOrder);
                                                     $response['service_panel'] = $this->processRenderServicesPanel(
                                                         $objOrder->id,
                                                         $objHotelBookingDetail->id_product,
@@ -8530,7 +8547,7 @@ class AdminOrdersControllerCore extends AdminController
                                         $objBookingDetail->date_to
                                     );
                                 }
-                                $objBookingDemand->total_price_tax_excl = $totalPriceTaxIncl = Tools::processPriceRounding(
+                                $objBookingDemand->total_price_tax_excl = $totalPriceTaxExcl = Tools::processPriceRounding(
                                     ($objBookingDemand->unit_price_tax_excl * $numDays),
                                     1,
                                     $order->round_type,
@@ -8630,7 +8647,7 @@ class AdminOrdersControllerCore extends AdminController
                             $order->round_type,
                             $order->round_mode
                         );
-                        $objBookingDemand->total_price_tax_excl = Tools::processPriceRounding(
+                        $objBookingDemand->total_price_tax_incl = Tools::processPriceRounding(
                             ($objBookingDemand->unit_price_tax_incl * $numDays),
                             1,
                             $order->round_type,
@@ -8936,7 +8953,8 @@ class AdminOrdersControllerCore extends AdminController
                         0,
                         0,
                         0,
-                        0
+                        0,
+                        1
                     );
                     if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
                         $result['has_price_changes'] = 1;
