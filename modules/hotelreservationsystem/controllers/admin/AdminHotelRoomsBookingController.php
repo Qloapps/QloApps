@@ -913,6 +913,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 // if room is changing in the reallocation
                 if ($objHotelBooking->id_product != $idNewRoomType) {
                     $result['has_room_type_change'] = 1;
+                    $objOrder = new Order($objHotelBooking->id_order);
                     $occupancy = array(
                         array(
                             'adults' => $objHotelBooking->adults,
@@ -929,7 +930,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                         0,
                         0,
                         0,
-                        0
+                        0,
+                        1
                     );
 
                     if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
