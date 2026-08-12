@@ -1,23 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Dominican Republic" version="1.0">
 	<currencies>
-		<currency name="Peso" iso_code="DOP" iso_code_num="214" sign="RD$" blank="1" conversion_rate="50.0426" format="2" decimals="1" />
+		<currency name="Peso" iso_code="DOP" iso_code_num="214" sign="RD$" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="es" />
 	</languages>
 	<taxes>
-		<tax id="1" name="ITBIS DO 16%" rate="16" />
-		<tax id="2" name="ITBIS DO 12%" rate="12" />
-		
-		<taxRulesGroup name="DO Standard Rate (16%)">
+		<tax id="1" name="ITBIS DO 18%" rate="18" />
+		<tax id="2" name="ITBIS DO 13%" rate="13" />
+
+		<taxRulesGroup name="DO Standard Rate (18%)">
 			<taxRule iso_code_country="do" id_tax="1" />
 		</taxRulesGroup>
-		
-		<taxRulesGroup name="DO Reduced Rate (12%)">
+
+    <taxRulesGroup name="DO Reduced Rate (13%)">
 			<taxRule iso_code_country="do" id_tax="2" />
 		</taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Azua" iso_code="02" country="DO" zone="Central America/Antilla" />
+		<state name="Baoruco" iso_code="03" country="DO" zone="Central America/Antilla" />
+		<state name="Barahona" iso_code="04" country="DO" zone="Central America/Antilla" />
+		<state name="Cibao Nordeste" iso_code="33" country="DO" zone="Central America/Antilla" />
+		<state name="Cibao Noroeste" iso_code="34" country="DO" zone="Central America/Antilla" />
+		<state name="Cibao Norte" iso_code="35" country="DO" zone="Central America/Antilla" />
+		<state name="Cibao Sur" iso_code="36" country="DO" zone="Central America/Antilla" />
+		<state name="Dajabón" iso_code="05" country="DO" zone="Central America/Antilla" />
+		<state name="Santo Domingo" iso_code="01" country="DO" zone="Central America/Antilla" />
+		<state name="Duarte" iso_code="06" country="DO" zone="Central America/Antilla" />
+		<state name="El Seibo" iso_code="08" country="DO" zone="Central America/Antilla" />
+		<state name="El Valle" iso_code="37" country="DO" zone="Central America/Antilla" />
+		<state name="Elías Piña" iso_code="07" country="DO" zone="Central America/Antilla" />
+		<state name="Enriquillo" iso_code="38" country="DO" zone="Central America/Antilla" />
+		<state name="Espaillat" iso_code="09" country="DO" zone="Central America/Antilla" />
+		<state name="Hato Mayor" iso_code="30" country="DO" zone="Central America/Antilla" />
+		<state name="Hermanas Mirabal" iso_code="19" country="DO" zone="Central America/Antilla" />
+		<state name="Higuamo" iso_code="39" country="DO" zone="Central America/Antilla" />
+		<state name="Independencia" iso_code="10" country="DO" zone="Central America/Antilla" />
+		<state name="La Altagracia" iso_code="11" country="DO" zone="Central America/Antilla" />
+		<state name="La Romana" iso_code="12" country="DO" zone="Central America/Antilla" />
+		<state name="La Vega" iso_code="13" country="DO" zone="Central America/Antilla" />
+		<state name="María Trinidad Sánchez" iso_code="14" country="DO" zone="Central America/Antilla" />
+		<state name="Monseñor Nouel" iso_code="28" country="DO" zone="Central America/Antilla" />
+		<state name="Monte Cristi" iso_code="15" country="DO" zone="Central America/Antilla" />
+		<state name="Monte Plata" iso_code="29" country="DO" zone="Central America/Antilla" />
+		<state name="Ozama" iso_code="40" country="DO" zone="Central America/Antilla" />
+		<state name="Pedernales" iso_code="16" country="DO" zone="Central America/Antilla" />
+		<state name="Peravia" iso_code="17" country="DO" zone="Central America/Antilla" />
+		<state name="Puerto Plata" iso_code="18" country="DO" zone="Central America/Antilla" />
+		<state name="Samaná" iso_code="20" country="DO" zone="Central America/Antilla" />
+		<state name="San Cristóbal" iso_code="21" country="DO" zone="Central America/Antilla" />
+		<state name="San José de Ocoa" iso_code="31" country="DO" zone="Central America/Antilla" />
+		<state name="San Juan" iso_code="22" country="DO" zone="Central America/Antilla" />
+		<state name="San Pedro de Macorís" iso_code="23" country="DO" zone="Central America/Antilla" />
+		<state name="Sánchez Ramírez" iso_code="24" country="DO" zone="Central America/Antilla" />
+		<state name="Santiago" iso_code="25" country="DO" zone="Central America/Antilla" />
+		<state name="Santiago Rodríguez" iso_code="26" country="DO" zone="Central America/Antilla" />
+		<state name="Santo Domingo" iso_code="32" country="DO" zone="Central America/Antilla" />
+		<state name="Valdesia" iso_code="41" country="DO" zone="Central America/Antilla" />
+		<state name="Valverde" iso_code="27" country="DO" zone="Central America/Antilla" />
+		<state name="Yuma" iso_code="42" country="DO" zone="Central America/Antilla" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

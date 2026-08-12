@@ -141,13 +141,13 @@ class AdminHotelFeaturesController extends ModuleAdminController
                         $this->errors[] = $this->l('Child features name is required at least in ').
                         $objDefaultLanguage['name'];
                     } elseif (!Validate::isGenericName($childftr)) {
-                        $this->errors[] = $this->l('Child features name is invalid : ').$childftr;
+                        $this->errors[] = $this->l('Child features name is invalid : ').Tools::safeOutput($childftr);
                     } else {
                         foreach ($languages as $lang) {
                             if ($childFtrLang = Tools::getValue('child_features_'.$lang['id_lang'])) {
                                 if (!Validate::isGenericName($childFtrLang[$kChild])) {
                                     $this->errors[] = $this->l('Invalid child feature name in ').$lang['name'].
-                                    ' : '.$childFtrLang[$kChild];
+                                    ' : '.Tools::safeOutput($childFtrLang[$kChild]);
                                 }
                             }
                         }
