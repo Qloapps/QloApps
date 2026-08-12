@@ -23,4 +23,4 @@
 {l s='Total service price:'} <strong><span id="booking-service-amount">-</span></strong><br>
 {l s='Total order amount:'} <strong><span id="booking-amount">-</span></strong><br>
 {l s='Total credit slip amount for this order:'} <strong><span id="booking-total-slip-amount">-</span></strong><br>
-<span id="booking-slip-ids-wrapper" style="display:none;">{l s='Credit slip which are generated is -'} <strong><span id="booking-slip-ids"></span></strong></span>
+<span id="booking-slip-ids-wrapper" style="display:none;">{l s='Credit slip generated -'} <strong><span id="booking-slip-ids"></span></strong></span>

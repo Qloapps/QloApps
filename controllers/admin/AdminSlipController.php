@@ -54,7 +54,8 @@ class AdminSlipControllerCore extends AdminController
                 'title' => $this->l('Order ID'),
                 'align' => 'center',
                 'class' => 'fixed-width-md',
-                'havingFilter' => true
+                'havingFilter' => true,
+                'callback' => 'displayOrderLink',
             ),
             'date_add' => array(
                 'title' => $this->l('Date issued'),
@@ -462,8 +463,19 @@ public function initPageHeaderToolbar()
     public function displayVoucherLink($idCartRule, $row)
     {
         $this->context->smarty->assign(array(
+            'id_order' => 0,
             'id_cart_rule' => (int) $idCartRule,
             'row' => $row
+        ));
+
+        return $this->createTemplate('_display_voucher_link.tpl')->fetch();
+    }
+
+    public function displayOrderLink($idOrder, $row)
+    {
+        $this->context->smarty->assign(array(
+            'id_order' => (int) $idOrder,
+            'id_cart_rule' => 0,
         ));
 
         return $this->createTemplate('_display_voucher_link.tpl')->fetch();
@@ -598,10 +610,9 @@ public function initPageHeaderToolbar()
         Media::addJsDef(
             array(
                 'admin_order_slip_tab_link' => $this->context->link->getAdminLink('AdminSlip'),
-                'ajax_booking_url' => $this->context->link->getAdminLink('AdminSlip', true),
                 'admin_order_view_link' => $this->context->link->getAdminLink('AdminOrders'),
-                'prevRoomType' => (int) Tools::getValue('id_room_type'),
-                'prevBookingDetail' => (int) Tools::getValue('id_booking_detail'),
+                'restoreRoomTypeId' => (int) Tools::getValue('id_room_type'),
+                'restoreBookingDetailId' => (int) Tools::getValue('id_booking_detail'),
             )
         );
         $this->addJS(_PS_JS_DIR_.'admin/slips.js');

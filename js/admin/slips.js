@@ -148,7 +148,7 @@ $(document).ready(function() {
             .show();
 
         $.ajax({
-            url: ajax_booking_url,
+            url: admin_order_slip_tab_link,
             type: 'POST',
             dataType: 'json',
             data: {
@@ -194,9 +194,9 @@ $(document).ready(function() {
 
                 $roomTypeSelect.trigger('chosen:updated');
 
-                if (prevRoomType > 0) {
-                    $roomTypeSelect.val(prevRoomType).trigger('chosen:updated');
-                    prevRoomType = 0;
+                if (restoreRoomTypeId > 0) {
+                    $roomTypeSelect.val(restoreRoomTypeId).trigger('chosen:updated');
+                    restoreRoomTypeId = 0;
                 }
                 $roomTypeSelect.trigger('change');
             },
@@ -230,9 +230,9 @@ $(document).ready(function() {
 
         $bookingSelect.trigger('chosen:updated');
 
-        if (prevBookingDetail > 0) {
-            $bookingSelect.val(prevBookingDetail).trigger('chosen:updated');
-            prevBookingDetail = 0;
+        if (restoreBookingDetailId > 0) {
+            $bookingSelect.val(restoreBookingDetailId).trigger('chosen:updated');
+            restoreBookingDetailId = 0;
         }
         $bookingSelect.trigger('change');
     });

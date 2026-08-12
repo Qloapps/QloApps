@@ -20,7 +20,11 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
- {if $id_cart_rule}
+ {if $id_order}
+    <a class="btn btn-link" href="{$link->getAdminLink('AdminOrders')|escape:'html':'UTF-8'}&id_order={$id_order}&vieworder" target="_blank">
+        #{$id_order}
+    </a>
+{elseif $id_cart_rule}
     <a class="btn btn-link" href="{$link->getAdminLink('AdminCartRules')|escape:'html':'UTF-8'}&updatecart_rule&id_cart_rule={$id_cart_rule}" target="_blank">
         #{$id_cart_rule}
     </a>
