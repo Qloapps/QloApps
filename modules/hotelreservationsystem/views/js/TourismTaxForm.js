@@ -51,9 +51,10 @@ $(document).ready(function () {
         return true;
     }
 
-    function isTourismOn()   { return $('input[name="is_tourism_tax"]:checked').val()    == '1'; }
-    function isChildRateOn() { return $('input[name="has_child_rate"]:checked').val() == '1'; }
-    function isTieredOn()    { return $('input[name="is_tiered"]:checked').val()     == '1'; }
+    function isTourismOn()       { return $('input[name="is_tourism_tax"]:checked').val()      == '1'; }
+    function isChildRateOn()     { return $('input[name="has_child_rate"]:checked').val()      == '1'; }
+    function isChildAgeRangeOn() { return $('input[name="has_child_age_range"]:checked').val() == '1'; }
+    function isTieredOn()        { return $('input[name="is_tiered"]:checked').val()           == '1'; }
 
     function setVisible($el, visible, animate) {
         var duration = animate ? 200 : 0;
@@ -75,12 +76,15 @@ $(document).ready(function () {
 
     function updateAllVisibility(animate) {
         var t = isTourismOn();
-        setVisible($('.tourism-tax-field').not('.tourism-tax-child-field, .tourism-tax-tiered-field'), t, animate);
+        setVisible($('.tourism-tax-field').not('.tourism-tax-child-field, .tourism-tax-child-band-field, .tourism-tax-tiered-field'), t, animate);
         setVisible($('.tourism-tax-non-tourism'), !t, animate);
 
         var showChild = t && isChildRateOn();
         setVisible($('.tourism-tax-child-field'), showChild, animate);
-        if (showChild) {
+
+        var showChildBands = showChild && isChildAgeRangeOn();
+        setVisible($('.tourism-tax-child-band-field'), showChildBands, animate);
+        if (showChildBands) {
             ensureOneRow('tourism-tax-child-body', 'tourism-tax-child-row-tpl', childIdxRef);
         }
 
@@ -94,7 +98,7 @@ $(document).ready(function () {
     updateAllVisibility(false);
     updateTypeSign();
 
-    $('input[name="is_tourism_tax"], input[name="has_child_rate"], input[name="is_tiered"]').on('change', function () {
+    $('input[name="is_tourism_tax"], input[name="has_child_rate"], input[name="has_child_age_range"], input[name="is_tiered"]').on('change', function () {
         setTimeout(function () { updateAllVisibility(true); }, 0);
     });
 

@@ -1149,7 +1149,8 @@ class OrderCore extends ObjectModel
         $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
-        $ids_order_detail = []
+        $ids_order_detail = [],
+        $includeTourismTax = true
     ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
@@ -1159,6 +1160,9 @@ class OrderCore extends ObjectModel
         $return = 0;
         foreach ($products as $row) {
             $return += $row['total_price_tax_incl'];
+            if (!$includeTourismTax) {
+                $return -= isset($row['tourism_tax_amount']) ? (float) $row['tourism_tax_amount'] : 0;
+            }
         }
 
         return $return;

@@ -24,7 +24,6 @@
 class OrderTourismTaxExemptionCore extends ObjectModel
 {
     public $id_exemption;
-    public $id_order_tourism_tax;
     public $id_htl_booking;
     public $id_service_product_order_detail;
     public $id_order;
@@ -36,8 +35,7 @@ class OrderTourismTaxExemptionCore extends ObjectModel
         'table' => 'order_tourism_tax_exemption',
         'primary' => 'id_exemption',
         'fields' => array(
-            'id_order_tourism_tax' => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedId', 'required' => true),
-            'id_htl_booking' => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedId', 'required' => true),
+            'id_htl_booking' => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedId'),
             'id_service_product_order_detail' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_order' => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedId', 'required' => true),
             'id_employee' => array('type' => self::TYPE_INT,  'validate' => 'isUnsignedId', 'required' => true),
@@ -45,19 +43,4 @@ class OrderTourismTaxExemptionCore extends ObjectModel
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
     );
-
-    /**
-     * Return all exemption records for a given order_tourism_tax row.
-     *
-     * @param int $idOrderTourismTax
-     * @return array
-     */
-    public static function getByOrderTourismTax($idOrderTourismTax)
-    {
-        return Db::getInstance()->executeS(
-            'SELECT e.* FROM `' . _DB_PREFIX_ . 'order_tourism_tax_exemption` e
-             WHERE e.`id_order_tourism_tax` = ' . (int) $idOrderTourismTax . '
-             ORDER BY e.`date_add` ASC'
-        );
-    }
 }

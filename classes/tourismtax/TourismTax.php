@@ -35,6 +35,7 @@ class TourismTaxCore extends ObjectModel
     public $tax_value;
     public $is_tiered;
     public $has_child_rate;
+    public $has_child_age_range;
     public $child_tax_value;
     public $valid_from;
     public $valid_to;
@@ -50,6 +51,7 @@ class TourismTaxCore extends ObjectModel
             'tax_value' => array('type' => self::TYPE_FLOAT, 'validate' => 'isUnsignedFloat'),
             'is_tiered' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'has_child_rate' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'has_child_age_range' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'child_tax_value' => array('type' => self::TYPE_FLOAT, 'validate' => 'isUnsignedFloat'),
             'valid_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'allow_null' => true),
             'valid_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'allow_null' => true),
@@ -80,6 +82,7 @@ class TourismTaxCore extends ObjectModel
                 'tax_value' => (float) $this->tax_value,
                 'is_tiered' => (int) $this->is_tiered,
                 'has_child_rate' => (int) $this->has_child_rate,
+                'has_child_age_range' => (int) $this->has_child_age_range,
                 'child_tax_value' => (float) $this->child_tax_value,
                 'valid_from' => $this->valid_from ? pSQL($this->valid_from) : null,
                 'valid_to' => $this->valid_to ? pSQL($this->valid_to) : null,
@@ -307,10 +310,10 @@ class TourismTaxCore extends ObjectModel
      * @param int    $idLang
      * @return array List of ['tax_calc_type','is_tiered','tax_value','tiers']
      */
-    public static function getPreviewParams($idTaxRulesGroup, Address $address, $idLang)
+    public static function getPreviewParams($idTaxRulesGroup, Address $address, $idLang, $collectionType = self::COLLECTION_TYPE_ONLINE)
     {
         $idTaxRulesGroup = (int) $idTaxRulesGroup;
-        if (!$idTaxRulesGroup || Tax::excludeTaxeOption()) {
+        if (!$idTaxRulesGroup || Tax::excludeTaxeOption() || (int) $collectionType === self::COLLECTION_TYPE_AT_HOTEL) {
             return array();
         }
 

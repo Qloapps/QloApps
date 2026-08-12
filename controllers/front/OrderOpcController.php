@@ -1000,6 +1000,16 @@ class OrderOpcControllerCore extends ParentOrderController
                         null,
                         1
                     );
+                    foreach ($cartBookingData['selected_service'] as &$selectedService) {
+                        if ($selectedService['tourism_tax_online'] > 0 && TourismTax::isGrossedUp($selectedService['tourism_tax_online'])) {
+                            $selectedService['total_price_tax_incl'] += $selectedService['tourism_tax_online'];
+                            $quantity = $selectedService['quantity'] ?: 1;
+                            $impliedNumDays = $selectedService['unit_price_tax_excl'] > 0 ? $selectedService['total_price_tax_excl'] / ($selectedService['unit_price_tax_excl'] * $quantity) : 1;
+                            $unitDivisor = $impliedNumDays * $quantity;
+                            $selectedService['unit_price_tax_incl'] += $unitDivisor > 0 ? ($selectedService['tourism_tax_online'] / $unitDivisor) : 0;
+                        }
+                    }
+                    unset($selectedService);
                 }
                 $this->context->smarty->assign(array(
                     'roomTypeServiceProducts' => $roomTypeServiceProducts,

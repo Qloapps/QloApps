@@ -37,6 +37,10 @@ class OrderTourismTaxCore extends ObjectModel
     const EXEMPT_ERROR_SAVE = 2;
     const EXEMPT_ERROR_REFUNDED = 3;
 
+    const SCOPE_ROOM = 0;
+    const SCOPE_ROOM_STATUS = 1;
+    const SCOPE_SERVICE = 2;
+
     public $id_order_tourism_tax;
     public $id_order;
     public $id_order_detail;
@@ -48,7 +52,6 @@ class OrderTourismTaxCore extends ObjectModel
     public $num_nights;
     public $num_adults;
     public $total_amount;
-    public $is_exempted;
     public $is_refunded;
     public $date_add;
     public $date_upd;
@@ -67,7 +70,6 @@ class OrderTourismTaxCore extends ObjectModel
             'num_nights' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'num_adults' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'total_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isUnsignedFloat'),
-            'is_exempted' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'is_refunded' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
@@ -75,100 +77,114 @@ class OrderTourismTaxCore extends ObjectModel
     );
 
     /**
+     * Whether a booking's tourism tax (room + every attached service) is currently excluded from totals.
+     *
+     * @param int $idHtlBooking
+     * @return bool
+     */
+    public static function isBookingExempted($idHtlBooking)
+    {
+        return (bool) Db::getInstance()->getValue(
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'order_tourism_tax_exemption`
+             WHERE `id_htl_booking` = ' . (int) $idHtlBooking . '
+               AND `id_service_product_order_detail` = 0'
+        );
+    }
+
+    /**
+     * Whether a standalone (no room attachment) service line is currently excluded from totals.
+     *
+     * @param int $idServiceProductOrderDetail
+     * @return bool
+     */
+    public static function isServiceLineExempted($idServiceProductOrderDetail)
+    {
+        return (bool) Db::getInstance()->getValue(
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'order_tourism_tax_exemption`
+             WHERE `id_htl_booking` = 0
+               AND `id_service_product_order_detail` = ' . (int) $idServiceProductOrderDetail
+        );
+    }
+
+    /**
+     * Delete the exemption marker for a booking or standalone service line — id_htl_booking=0 for the
+     * latter, id_service_product_order_detail=0 for the former (their own two-shape storage key).
+     * Kept as a shared helper since it's used 3 times (hardDeleteForBooking, applyBooking, applyServiceLine).
+     *
+     * @param int $idHtlBooking
+     * @param int $idServiceProductOrderDetail
+     * @return bool
+     */
+    protected static function deleteExemptionMarker($idHtlBooking, $idServiceProductOrderDetail)
+    {
+        return Db::getInstance()->execute(
+            'DELETE FROM `' . _DB_PREFIX_ . 'order_tourism_tax_exemption`
+             WHERE `id_htl_booking` = ' . (int) $idHtlBooking . '
+               AND `id_service_product_order_detail` = ' . (int) $idServiceProductOrderDetail
+        );
+    }
+
+    /**
      * Applied (non-exempted, non-refunded) tourism tax totals for every booking of an order, keyed by id_htl_booking — cached per order.
      *
      * @param int $idOrder
-     * @return array  [id_htl_booking => float total_amount]
+     * @param int $scope self::SCOPE_ROOM (default)      — float per room, keyed by id_htl_booking (room's own tax only)
+     *                    self::SCOPE_ROOM_STATUS         — ['status' => int, 'total' => float] per room, same keys
+     *                    self::SCOPE_SERVICE             — float per room, keyed by the attached room's id_htl_booking
+     * @return array  keyed as described above per $scope
      */
-    public static function getAppliedTotalsByBooking($idOrder)
+    public static function getAppliedTourismTaxTotals($idOrder, $scope = self::SCOPE_ROOM)
     {
         $idOrder = (int) $idOrder;
-        $cacheId = 'OrderTourismTax::getAppliedTotalsByBooking-' . $idOrder;
+        $cacheId = 'OrderTourismTax::getAppliedTourismTaxTotals-' . $idOrder . '-' . $scope;
         if (Cache::isStored($cacheId)) {
             return Cache::retrieve($cacheId);
         }
 
-        $rows = Db::getInstance()->executeS(
-            'SELECT `id_htl_booking`, SUM(`total_amount`) AS total_amount
-             FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `id_order` = ' . $idOrder . '
-               AND `is_exempted` = 0
-               AND `is_refunded` = 0
-             GROUP BY `id_htl_booking`'
-        );
         $result = array();
-        if ($rows) {
-            foreach ($rows as $row) {
-                $result[(int) $row['id_htl_booking']] = (float) $row['total_amount'];
-            }
-        }
-        Cache::store($cacheId, $result);
-
-        return $result;
-    }
-
-    /**
-     * Applied (non-exempted, non-refunded) tourism tax totals for every service line of an order, keyed by the room booking it's attached to — cached per order.
-     *
-     * @param int $idOrder
-     * @return array  [id_htl_booking_detail => float total_amount]
-     */
-    public static function getAppliedServiceTotalsByBooking($idOrder)
-    {
-        $idOrder = (int) $idOrder;
-        $cacheId = 'OrderTourismTax::getAppliedServiceTotalsByBooking-' . $idOrder;
-        if (Cache::isStored($cacheId)) {
-            return Cache::retrieve($cacheId);
-        }
-
-        $rows = Db::getInstance()->executeS(
-            'SELECT spod.`id_htl_booking_detail`, SUM(tt.`total_amount`) AS total_amount
-             FROM `' . _DB_PREFIX_ . 'order_tourism_tax` tt
-             INNER JOIN `' . _DB_PREFIX_ . 'service_product_order_detail` spod
-                ON spod.`id_service_product_order_detail` = tt.`id_service_product_order_detail`
-             WHERE tt.`id_order` = ' . $idOrder . '
-               AND spod.`id_htl_booking_detail` != 0
-               AND tt.`is_exempted` = 0
-               AND tt.`is_refunded` = 0
-             GROUP BY spod.`id_htl_booking_detail`'
-        );
-        $result = array();
-        if ($rows) {
-            foreach ($rows as $row) {
+        if ($scope === self::SCOPE_SERVICE) {
+            $sql = 'SELECT spod.`id_htl_booking_detail`, SUM(tt.`total_amount`) AS total_amount
+                 FROM `' . _DB_PREFIX_ . 'order_tourism_tax` tt
+                 INNER JOIN `' . _DB_PREFIX_ . 'service_product_order_detail` spod
+                    ON spod.`id_service_product_order_detail` = tt.`id_service_product_order_detail`
+                 LEFT JOIN `' . _DB_PREFIX_ . 'order_tourism_tax_exemption` ex
+                    ON (spod.`id_htl_booking_detail` != 0 AND ex.`id_htl_booking` = spod.`id_htl_booking_detail`)
+                    OR (spod.`id_htl_booking_detail` = 0 AND ex.`id_service_product_order_detail` = tt.`id_service_product_order_detail` AND ex.`id_htl_booking` = 0)
+                 WHERE tt.`id_order` = ' . $idOrder . '
+                   AND spod.`id_htl_booking_detail` != 0
+                   AND tt.`is_refunded` = 0
+                   AND ex.`id_exemption` IS NULL
+                 GROUP BY spod.`id_htl_booking_detail`';
+            $rows = Db::getInstance()->executeS($sql);
+            foreach ((array) $rows as $row) {
                 $result[(int) $row['id_htl_booking_detail']] = (float) $row['total_amount'];
             }
+        } else {
+            $rows = Db::getInstance()->executeS(
+                'SELECT tt.`id_htl_booking`,
+                        SUM(CASE WHEN ex.`id_exemption` IS NULL THEN tt.`total_amount` ELSE 0 END) AS total_amount,
+                        MAX(CASE WHEN ex.`id_exemption` IS NULL THEN 1 ELSE 0 END) AS applied_count
+                 FROM `' . _DB_PREFIX_ . 'order_tourism_tax` tt
+                 LEFT JOIN `' . _DB_PREFIX_ . 'order_tourism_tax_exemption` ex
+                    ON ex.`id_htl_booking` = tt.`id_htl_booking`
+                 WHERE tt.`id_order` = ' . $idOrder . '
+                   AND tt.`id_htl_booking` != 0
+                   AND tt.`is_refunded` = 0
+                 GROUP BY tt.`id_htl_booking`'
+            );
+            foreach ((array) $rows as $row) {
+                if ($scope === self::SCOPE_ROOM_STATUS) {
+                    $result[(int) $row['id_htl_booking']] = array(
+                        'status' => ((int) $row['applied_count'] > 0) ? self::STATUS_APPLIED : self::STATUS_EXEMPTED,
+                        'total' => (float) $row['total_amount'],
+                    );
+                } else {
+                    $result[(int) $row['id_htl_booking']] = (float) $row['total_amount'];
+                }
+            }
         }
         Cache::store($cacheId, $result);
 
-        return $result;
-    }
-
-    /**
-     * Status + total (non-exempted, non-refunded) for every booking of an order in one query.
-     *
-     * @param int $idOrder
-     * @return array  [id_htl_booking => ['status' => int, 'total' => float]]
-     */
-    public static function getStatusAndTotalByBooking($idOrder)
-    {
-        $rows = Db::getInstance()->executeS(
-            'SELECT `id_htl_booking`,
-                    SUM(CASE WHEN `is_exempted` = 0 THEN `total_amount` ELSE 0 END) AS total_amount,
-                    SUM(CASE WHEN `is_exempted` = 0 THEN 1 ELSE 0 END) AS applied_count
-             FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `id_order` = ' . (int) $idOrder . '
-               AND `is_refunded` = 0
-             GROUP BY `id_htl_booking`'
-        );
-        $result = array();
-        if ($rows) {
-            foreach ($rows as $row) {
-                $result[(int) $row['id_htl_booking']] = array(
-                    'status' => ((int) $row['applied_count'] > 0) ? self::STATUS_APPLIED : self::STATUS_EXEMPTED,
-                    'total' => (float) $row['total_amount'],
-                );
-            }
-        }
         return $result;
     }
 
@@ -226,7 +242,8 @@ class OrderTourismTaxCore extends ObjectModel
     }
 
     /**
-     * Hard-delete every tourism tax row for a booking and its attached service lines (room removed from an already-placed order).
+     * Hard-delete every tourism tax row for a booking and its attached service lines (room removed from an already-placed order),
+     * plus the exemption marker if one exists.
      *
      * @param int   $idHtlBooking
      * @param int[] $serviceLineIds  ServiceProductOrderDetail ids attached to this booking
@@ -234,14 +251,17 @@ class OrderTourismTaxCore extends ObjectModel
      */
     public static function hardDeleteForBooking($idHtlBooking, array $serviceLineIds)
     {
-        self::deleteForScope('id_htl_booking', (int) $idHtlBooking);
+        $idHtlBooking = (int) $idHtlBooking;
+        self::deleteForScope('id_htl_booking', $idHtlBooking);
         foreach ($serviceLineIds as $idServiceLine) {
             self::deleteForScope('id_service_product_order_detail', (int) $idServiceLine);
         }
+        self::deleteExemptionMarker($idHtlBooking, 0);
     }
 
     /**
-     * Sum of applied (non-exempted) total_amount for a booking/service-line scope — exemption-aware.
+     * Sum of total_amount for a booking/service-line scope (every row counts — exemption is never
+     * stored on the row itself, it's derived from marker existence at read time).
      *
      * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
      * @param int    $scopeValue
@@ -250,30 +270,59 @@ class OrderTourismTaxCore extends ObjectModel
     protected static function getScopedTotal($scopeColumn, $scopeValue)
     {
         return (float) Db::getInstance()->getValue(
-            'SELECT COALESCE(SUM(CASE WHEN `is_exempted` = 0 THEN `total_amount` ELSE 0 END), 0)
+            'SELECT COALESCE(SUM(`total_amount`), 0)
              FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
              WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
         );
     }
 
     /**
-     * Whether any row currently exists for this scope with is_exempted = 1.
+     * Whether tourism tax has never been computed for this scope — no rows exist yet, and none were
+     * ever refunded either. True means a fresh compute (buildRoomTaxParams()/buildServiceLineTaxParams()
+     * + saveTourismTaxFromParams()) is needed instead of restoring/reusing existing rows.
      *
      * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
      * @param int    $scopeValue
      * @return bool
      */
-    protected static function wasScopeExempted($scopeColumn, $scopeValue)
+    protected static function hasNeverBeenComputed($scopeColumn, $scopeValue)
     {
-        return (bool) Db::getInstance()->getValue(
+        if (self::hasRefundedRowsForScope($scopeColumn, $scopeValue)) {
+            return false;
+        }
+
+        return !(bool) Db::getInstance()->getValue(
             'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue . ' AND `is_exempted` = 1'
+             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
         );
     }
 
     /**
-     * Compute via TaxCalculator::getTourismTaxRows() and persist tourism tax for one room-booking or service-product line.
+     * Whether a scope's tax is currently excluded from totals — resolves a service line to its parent
+     * room's marker when attached, its own marker when standalone. Used by saveTourismTax() to decide
+     * whether a freshly (re)computed amount should move the denormalized display totals.
      *
+     * @param int $idHtlBooking                 0 for a service-line scope
+     * @param int $idServiceProductOrderDetail   0 for a room-booking scope
+     * @return bool
+     */
+    protected static function isScopeExempted($idHtlBooking, $idServiceProductOrderDetail)
+    {
+        if ($idHtlBooking) {
+            return self::isBookingExempted($idHtlBooking);
+        }
+        if ($idServiceProductOrderDetail) {
+            $serviceLine = new ServiceProductOrderDetail((int) $idServiceProductOrderDetail);
+            if (Validate::isLoadedObject($serviceLine) && $serviceLine->id_htl_booking_detail) {
+                return self::isBookingExempted((int) $serviceLine->id_htl_booking_detail);
+            }
+            return self::isServiceLineExempted($idServiceProductOrderDetail);
+        }
+        return false;
+    }
+
+    /**
+     * Compute and save tourism tax for one room-booking or service-product line.
      * @param int      $idTaxRulesGroup             Tourism TRG assigned to the product
      * @param Address  $address                     Jurisdiction address (the hotel's own, not the customer's)
      * @param float    $unitPriceTaxExcl             Room/service unit_price_tax_excl (% base and tier lookup)
@@ -290,7 +339,6 @@ class OrderTourismTaxCore extends ObjectModel
      * @param int      $idHtlBooking                 0 for service lines
      * @param int      $idServiceProductOrderDetail  0 for room bookings
      * @param int      $idHotel
-     * @param bool     $isManualApply                true only from the admin Apply-button flow
      * @return void
      */
     public static function saveTourismTax(
@@ -309,8 +357,7 @@ class OrderTourismTaxCore extends ObjectModel
         $idOrderDetail,
         $idHtlBooking,
         $idServiceProductOrderDetail,
-        $idHotel,
-        $isManualApply = false
+        $idHotel
     ) {
         $idTaxRulesGroup = (int) $idTaxRulesGroup;
         $idOrderDetail = (int) $idOrderDetail;
@@ -328,8 +375,7 @@ class OrderTourismTaxCore extends ObjectModel
             $idCurrency,
             $collectionType,
             $idLang,
-            $quantity,
-            $isManualApply
+            $quantity
         )['rows'];
 
         $idOrder = (int) $idOrder;
@@ -340,7 +386,6 @@ class OrderTourismTaxCore extends ObjectModel
         $scopeColumn = $idServiceProductOrderDetail ? 'id_service_product_order_detail' : 'id_htl_booking';
         $scopeValue = $idServiceProductOrderDetail ?: $idHtlBooking;
 
-        $wasExempted = self::wasScopeExempted($scopeColumn, $scopeValue);
         $prevTotal = self::getScopedTotal($scopeColumn, $scopeValue);
         self::deleteForScope($scopeColumn, $scopeValue);
 
@@ -348,89 +393,49 @@ class OrderTourismTaxCore extends ObjectModel
         foreach ($rows as $row) {
             $rowAmount = (float) $row['total_amount'];
 
-            self::insertRow(
-                $idOrder,
-                $idOrderDetail,
-                $idHtlBooking,
-                $idServiceProductOrderDetail,
-                $idHotel,
-                (int) $row['id_tax'],
-                $idCurrency,
-                (int) $row['num_nights'],
-                (int) $row['num_adults'],
-                $rowAmount,
-                $wasExempted ? 1 : 0
-            );
+            $taxRow = new OrderTourismTax();
+            $taxRow->id_order = $idOrder;
+            $taxRow->id_order_detail = $idOrderDetail;
+            $taxRow->id_htl_booking = $idHtlBooking;
+            $taxRow->id_service_product_order_detail = $idServiceProductOrderDetail;
+            $taxRow->id_hotel = $idHotel;
+            $taxRow->id_tax = (int) $row['id_tax'];
+            $taxRow->id_currency = $idCurrency;
+            $taxRow->num_nights = (int) $row['num_nights'];
+            $taxRow->num_adults = (int) $row['num_adults'];
+            $taxRow->total_amount = $rowAmount;
+            $taxRow->is_refunded = 0;
+            $taxRow->add();
 
-            if (!$wasExempted) {
-                $totalTourismTax += $rowAmount;
-            }
+            $totalTourismTax += $rowAmount;
         }
 
-        self::adjustOrderDetailTotals($idOrderDetail, $prevTotal, $totalTourismTax);
+        if (!self::isScopeExempted($idHtlBooking, $idServiceProductOrderDetail)) {
+            self::adjustDependentTotals($idOrderDetail, $idHtlBooking, $idServiceProductOrderDetail, $prevTotal, $totalTourismTax);
+        }
     }
 
     /**
-     * Insert one persisted tourism tax snapshot row for a matched tax on a booking/service line.
-     *
-     * @param int    $idOrder
-     * @param int    $idOrderDetail
-     * @param int    $idHtlBooking                    0 for service lines
-     * @param int    $idServiceProductOrderDetail      0 for room bookings
-     * @param int    $idHotel
-     * @param int    $idTax
-     * @param int    $idCurrency
-     * @param int    $numNights
-     * @param int    $numAdults
-     * @param float  $totalAmount
-     * @param int    $isExempted
-     * @return bool
-     */
-    protected static function insertRow(
-        $idOrder,
-        $idOrderDetail,
-        $idHtlBooking,
-        $idServiceProductOrderDetail,
-        $idHotel,
-        $idTax,
-        $idCurrency,
-        $numNights,
-        $numAdults,
-        $totalAmount,
-        $isExempted = 0
-    ) {
-        $row = new OrderTourismTax();
-        $row->id_order = (int) $idOrder;
-        $row->id_order_detail = (int) $idOrderDetail;
-        $row->id_htl_booking = (int) $idHtlBooking;
-        $row->id_service_product_order_detail = (int) $idServiceProductOrderDetail;
-        $row->id_hotel = (int) $idHotel;
-        $row->id_tax = (int) $idTax;
-        $row->id_currency = (int) $idCurrency;
-        $row->num_nights = (int) $numNights;
-        $row->num_adults = (int) $numAdults;
-        $row->total_amount = (float) $totalAmount;
-        $row->is_exempted = (int) $isExempted;
-        $row->is_refunded = 0;
-
-        return $row->add();
-    }
-
-    /**
-     * Delta-adjust order_detail's own tourism tax totals after (re)computing a booking/service line.
+     * Delta-adjust order_detail's (and, when relevant, htl_booking_detail's/service_product_order_detail's)
+     * own denormalized tourism tax totals after (re)computing or including/excluding a booking/service line.
      *
      * @param int   $idOrderDetail
-     * @param float $prevTotal  Previous exemption-aware total_amount sum for this scope
-     * @param float $newTotal   New exemption-aware total_amount sum for this scope
+     * @param int   $idHtlBooking                 0 for a service-line scope (no room booking row)
+     * @param int   $idServiceProductOrderDetail  0 for a room-booking scope (no service line row)
+     * @param float $prevTotal  Previously-synced total_amount for this scope
+     * @param float $newTotal   Newly-synced total_amount for this scope
      * @return bool
      */
-    protected static function adjustOrderDetailTotals($idOrderDetail, $prevTotal, $newTotal)
+    protected static function adjustDependentTotals($idOrderDetail, $idHtlBooking, $idServiceProductOrderDetail, $prevTotal, $newTotal)
     {
         $idOrderDetail = (int) $idOrderDetail;
+        $idHtlBooking = (int) $idHtlBooking;
+        $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
         $prevTotal = (float) $prevTotal;
         $newTotal = (float) $newTotal;
+        $db = Db::getInstance();
 
-        return Db::getInstance()->execute(
+        $result = $db->execute(
             'UPDATE `' . _DB_PREFIX_ . 'order_detail`
              SET `tourism_tax_amount` = GREATEST(0, `tourism_tax_amount`
                                          - ' . $prevTotal . '
@@ -442,10 +447,34 @@ class OrderTourismTaxCore extends ObjectModel
                                          + COALESCE((' . $newTotal . ' - ' . $prevTotal . ') / NULLIF(`product_quantity`, 0), 0)
              WHERE `id_order_detail` = ' . $idOrderDetail
         );
+
+        if ($idHtlBooking) {
+            $result = $db->execute(
+                'UPDATE `' . _DB_PREFIX_ . 'htl_booking_detail`
+                 SET `total_price_tax_incl` = `total_price_tax_incl`
+                                             - ' . $prevTotal . '
+                                             + ' . $newTotal . '
+                 WHERE `id` = ' . $idHtlBooking
+            ) && $result;
+        }
+
+        if ($idServiceProductOrderDetail) {
+            $result = $db->execute(
+                'UPDATE `' . _DB_PREFIX_ . 'service_product_order_detail`
+                 SET `total_price_tax_incl` = `total_price_tax_incl`
+                                             - ' . $prevTotal . '
+                                             + ' . $newTotal . ',
+                     `unit_price_tax_incl` = `unit_price_tax_incl`
+                                             + COALESCE((' . $newTotal . ' - ' . $prevTotal . ') / NULLIF(`quantity`, 0), 0)
+                 WHERE `id_service_product_order_detail` = ' . $idServiceProductOrderDetail
+            ) && $result;
+        }
+
+        return $result;
     }
 
     /**
-     * Breakdown for invoice/PDF — grouped by id_tax, excluding exempted or refunded rows, cached per order+lang.
+     * Breakdown for invoice/PDF — grouped by id_tax, excluding exempted (via marker) or refunded rows, cached per order+lang.
      *
      * @param int $idOrder
      * @param int|null $idLang  defaults to the current context language
@@ -466,11 +495,17 @@ class OrderTourismTaxCore extends ObjectModel
                     SUM(ott.`num_adults`) AS num_adults,
                     SUM(ott.`total_amount`) AS total_amount
              FROM `' . _DB_PREFIX_ . 'order_tourism_tax` ott
+             LEFT JOIN `' . _DB_PREFIX_ . 'service_product_order_detail` spod
+                ON spod.`id_service_product_order_detail` = ott.`id_service_product_order_detail`
+             LEFT JOIN `' . _DB_PREFIX_ . 'order_tourism_tax_exemption` ex
+                ON (ott.`id_htl_booking` != 0 AND ex.`id_htl_booking` = ott.`id_htl_booking`)
+                OR (ott.`id_htl_booking` = 0 AND spod.`id_htl_booking_detail` != 0 AND ex.`id_htl_booking` = spod.`id_htl_booking_detail`)
+                OR (ott.`id_htl_booking` = 0 AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL) AND ex.`id_service_product_order_detail` = ott.`id_service_product_order_detail` AND ex.`id_htl_booking` = 0)
              LEFT JOIN `' . _DB_PREFIX_ . 'tax_lang` tl
                 ON tl.`id_tax` = ott.`id_tax` AND tl.`id_lang` = ' . $idLang . '
              WHERE ott.`id_order` = ' . $idOrder . '
-               AND ott.`is_exempted` = 0
                AND ott.`is_refunded` = 0
+               AND ex.`id_exemption` IS NULL
              GROUP BY ott.`id_tax`, tl.`name`'
         );
         Cache::store($cacheId, $result);
@@ -487,232 +522,6 @@ class OrderTourismTaxCore extends ObjectModel
     public static function getOrderTourismTaxTotal($idOrder)
     {
         return (float) array_sum(array_column(self::getBreakdownForInvoice((int) $idOrder), 'total_amount'));
-    }
-
-    /**
-     * Tourism tax status for a single booking — STATUS_NONE (no rows), STATUS_APPLIED (any non-exempted row), STATUS_EXEMPTED (all rows exempted).
-     *
-     * @param int $idHtlBooking
-     * @return string
-     */
-    protected static function getStatusForBooking($idHtlBooking)
-    {
-        return self::getStatusForScope('id_htl_booking', (int) $idHtlBooking);
-    }
-
-    /**
-     * Same state machine as getStatusForBooking(), scoped to a service product order-detail line.
-     *
-     * @param int $idServiceProductOrderDetail
-     * @return string
-     */
-    protected static function getStatusForServiceLine($idServiceProductOrderDetail)
-    {
-        return self::getStatusForScope('id_service_product_order_detail', (int) $idServiceProductOrderDetail);
-    }
-
-    /**
-     * Shared core for getStatusForBooking()/getStatusForServiceLine() — same STATUS_NONE/APPLIED/EXEMPTED state machine, only the scope column differs.
-     *
-     * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
-     * @param int    $scopeValue
-     * @return string
-     */
-    protected static function getStatusForScope($scopeColumn, $scopeValue)
-    {
-        $rows = Db::getInstance()->executeS(
-            'SELECT `is_exempted` FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue . '
-               AND `is_refunded` = 0'
-        );
-        if (empty($rows)) {
-            return self::STATUS_NONE;
-        }
-        foreach ($rows as $row) {
-            if (!(int) $row['is_exempted']) {
-                return self::STATUS_APPLIED;
-            }
-        }
-        return self::STATUS_EXEMPTED;
-    }
-
-    /**
-     * Mark all non-refunded rows for a booking as exempted.
-     *
-     * @param int         $idHtlBooking
-     * @param int         $idEmployee  PS employee id (0 = resolved from Context)
-     * @param string|null $note        Reason for exemption, entered by the employee
-     * @return bool
-     */
-    protected static function exemptForBooking($idHtlBooking, $idEmployee = 0, $note = null)
-    {
-        return self::exemptForScope('id_htl_booking', (int) $idHtlBooking, $idEmployee, $note);
-    }
-
-    /**
-     * Same as exemptForBooking(), scoped to a service product order-detail line.
-     *
-     * @param int         $idServiceProductOrderDetail
-     * @param int         $idEmployee
-     * @param string|null $note
-     * @return bool
-     */
-    protected static function exemptForServiceLine($idServiceProductOrderDetail, $idEmployee = 0, $note = null)
-    {
-        return self::exemptForScope('id_service_product_order_detail', (int) $idServiceProductOrderDetail, $idEmployee, $note);
-    }
-
-    /**
-     * Mark all non-refunded rows for a scope as exempted, writing one audit row per row exempted (not wrapped in a DB transaction).
-     *
-     * @param string      $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
-     * @param int         $scopeValue
-     * @param int         $idEmployee   PS employee id (0 = resolved from Context)
-     * @param string|null $note         Reason for exemption, entered by the employee
-     * @return bool
-     */
-    protected static function exemptForScope($scopeColumn, $scopeValue, $idEmployee = 0, $note = null)
-    {
-        $scopeValue = (int) $scopeValue;
-        $db = Db::getInstance();
-        $rows = $db->executeS(
-            'SELECT `id_order_tourism_tax`, `id_order`, `id_order_detail`, `id_htl_booking`,
-                    `id_service_product_order_detail`, `total_amount`
-             FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . $scopeValue . '
-               AND `is_exempted` = 0
-               AND `is_refunded` = 0'
-        );
-
-        if (empty($rows)) {
-            return true;
-        }
-
-        $db->execute(
-            'UPDATE `' . _DB_PREFIX_ . 'order_tourism_tax`
-             SET `is_exempted` = 1, `date_upd` = NOW()
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . $scopeValue . '
-               AND `is_refunded` = 0'
-        );
-
-        $idOrderDetail = (int) $rows[0]['id_order_detail'];
-        $idOrder = (int) $rows[0]['id_order'];
-        $totalExemptedAmount = 0.0;
-        $idEmployeeResolved = $idEmployee ? (int) $idEmployee : (int) Context::getContext()->employee->id;
-
-        foreach ($rows as $row) {
-            $totalExemptedAmount += (float) $row['total_amount'];
-            $exemption = new OrderTourismTaxExemption();
-            $exemption->id_order_tourism_tax = (int) $row['id_order_tourism_tax'];
-            $exemption->id_htl_booking = (int) $row['id_htl_booking'];
-            $exemption->id_service_product_order_detail = (int) $row['id_service_product_order_detail'];
-            $exemption->id_order = $idOrder;
-            $exemption->id_employee = $idEmployeeResolved;
-            $exemption->note = $note;
-            if (!$exemption->add()) {
-                PrestaShopLogger::addLog(
-                    'OrderTourismTax::exemptForScope - Failed to save exemption audit row',
-                    3,
-                    null,
-                    'HotelBookingDetail',
-                    $scopeValue,
-                    true
-                );
-                return false;
-            }
-        }
-
-        self::adjustOrderDetailTotals($idOrderDetail, $totalExemptedAmount, 0.0);
-        self::adjustOrderAndInvoiceTotals($idOrder, -$totalExemptedAmount);
-
-        return true;
-    }
-
-    /**
-     * Remove exemption for all rows of a booking (restore applied state).
-     *
-     * @param int $idHtlBooking
-     * @return bool
-     */
-    protected static function unExemptForBooking($idHtlBooking)
-    {
-        return self::unExemptForScope('id_htl_booking', (int) $idHtlBooking);
-    }
-
-    /**
-     * Same as unExemptForBooking(), scoped to a service product order-detail line.
-     *
-     * @param int $idServiceProductOrderDetail
-     * @return bool
-     */
-    protected static function unExemptForServiceLine($idServiceProductOrderDetail)
-    {
-        return self::unExemptForScope('id_service_product_order_detail', (int) $idServiceProductOrderDetail);
-    }
-
-    /**
-     * Remove exemption for all rows of a scope, recomputing tourism_tax_amount from every non-refunded, non-exempted row sharing the order_detail (not wrapped in a DB transaction).
-     *
-     * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
-     * @param int    $scopeValue
-     * @return bool
-     */
-    protected static function unExemptForScope($scopeColumn, $scopeValue)
-    {
-        $scopeValue = (int) $scopeValue;
-        $db = Db::getInstance();
-        $rows = $db->executeS(
-            'SELECT `id_order`, `id_order_detail`, `total_amount`
-             FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . $scopeValue . '
-               AND `is_exempted` = 1
-               AND `is_refunded` = 0'
-        );
-
-        if (empty($rows)) {
-            return true;
-        }
-
-        $db->execute(
-            'UPDATE `' . _DB_PREFIX_ . 'order_tourism_tax`
-             SET `is_exempted` = 0, `date_upd` = NOW()
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . $scopeValue . '
-               AND `is_refunded` = 0'
-        );
-
-        $idOrderDetail = (int) $rows[0]['id_order_detail'];
-        $idOrder = (int) $rows[0]['id_order'];
-        $restoredAmount = 0.0;
-
-        foreach ($rows as $row) {
-            $restoredAmount += (float) $row['total_amount'];
-        }
-
-        $restored = (float) $db->getValue(
-            'SELECT SUM(`total_amount`)
-             FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `id_order_detail` = ' . $idOrderDetail . '
-               AND `is_exempted` = 0
-               AND `is_refunded` = 0'
-        );
-
-        $productQuantity = (int) $db->getValue(
-            'SELECT `product_quantity` FROM `' . _DB_PREFIX_ . 'order_detail`
-             WHERE `id_order_detail` = ' . $idOrderDetail
-        );
-        $unitDelta = $productQuantity > 0 ? ($restoredAmount / $productQuantity) : 0.0;
-
-        $db->execute(
-            'UPDATE `' . _DB_PREFIX_ . 'order_detail`
-             SET `tourism_tax_amount` = ' . $restored . ',
-                 `total_price_tax_incl` = `total_price_tax_incl` + ' . $restoredAmount . ',
-                 `unit_price_tax_incl` = `unit_price_tax_incl` + ' . $unitDelta . '
-             WHERE `id_order_detail` = ' . $idOrderDetail
-        );
-
-        self::adjustOrderAndInvoiceTotals($idOrder, $restoredAmount);
-
-        return true;
     }
 
     /**
@@ -871,230 +680,215 @@ class OrderTourismTaxCore extends ObjectModel
     }
 
     /**
-     * Apply or restore tourism tax for a booking's room based on its current status (exempted → restore, none → compute fresh, applied → no-op).
+     * Call saveTourismTax() with a buildRoomTaxParams()/buildServiceLineTaxParams() result.
      *
-     * @param int $idHtlBooking
-     * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_NO_RULE | APPLY_ERROR_REFUNDED
+     * @param array $params
+     * @return void
      */
-    protected static function applyForRoom($idHtlBooking)
+    protected static function saveTourismTaxFromParams(array $params)
     {
-        $idHtlBooking = (int) $idHtlBooking;
-        $status = self::getStatusForBooking($idHtlBooking);
-
-        if ($status === self::STATUS_EXEMPTED) {
-            return self::unExemptForBooking($idHtlBooking) ? self::APPLY_OK : self::APPLY_ERROR_RESTORE;
-        }
-
-        if ($status === self::STATUS_NONE) {
-            if (self::hasRefundedRowsForScope('id_htl_booking', $idHtlBooking)) {
-                return self::APPLY_ERROR_REFUNDED;
-            }
-
-            $params = self::buildRoomTaxParams($idHtlBooking);
-            if (!$params) {
-                return self::APPLY_ERROR_NO_RULE;
-            }
-            self::saveTourismTax(
-                $params['idTaxRulesGroup'],
-                $params['address'],
-                $params['unitPriceTaxExcl'],
-                $params['checkInDate'],
-                $params['numNights'],
-                $params['numAdults'],
-                $params['childrenAges'],
-                $params['idCurrency'],
-                $params['collectionType'],
-                $params['idLang'],
-                $params['quantity'],
-                $params['idOrder'],
-                $params['idOrderDetail'],
-                $params['idHtlBooking'],
-                $params['idServiceProductOrderDetail'],
-                $params['idHotel'],
-                true
-            );
-            self::adjustOrderTotalsForNewBooking($idHtlBooking);
-        }
-
-        return self::APPLY_OK;
-    }
-
-    /**
-     * Same state machine as applyForRoom(), for a single service line.
-     *
-     * @param int $idServiceProductOrderDetail
-     * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_NO_RULE | APPLY_ERROR_REFUNDED
-     */
-    protected static function applyForServiceLine($idServiceProductOrderDetail)
-    {
-        $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
-        $status = self::getStatusForServiceLine($idServiceProductOrderDetail);
-
-        if ($status === self::STATUS_EXEMPTED) {
-            return self::unExemptForServiceLine($idServiceProductOrderDetail) ? self::APPLY_OK : self::APPLY_ERROR_RESTORE;
-        }
-
-        if ($status === self::STATUS_NONE) {
-            if (self::hasRefundedRowsForScope('id_service_product_order_detail', $idServiceProductOrderDetail)) {
-                return self::APPLY_ERROR_REFUNDED;
-            }
-
-            $params = self::buildServiceLineTaxParams($idServiceProductOrderDetail);
-            if (!$params) {
-                return self::APPLY_ERROR_NO_RULE;
-            }
-            self::saveTourismTax(
-                $params['idTaxRulesGroup'],
-                $params['address'],
-                $params['unitPriceTaxExcl'],
-                $params['checkInDate'],
-                $params['numNights'],
-                $params['numAdults'],
-                $params['childrenAges'],
-                $params['idCurrency'],
-                $params['collectionType'],
-                $params['idLang'],
-                $params['quantity'],
-                $params['idOrder'],
-                $params['idOrderDetail'],
-                $params['idHtlBooking'],
-                $params['idServiceProductOrderDetail'],
-                $params['idHotel'],
-                true
-            );
-            self::adjustOrderTotalsForNewServiceLine($idServiceProductOrderDetail);
-        }
-
-        return self::APPLY_OK;
-    }
-
-    /**
-     * Apply or restore tourism tax for a booking's room and each of its active service lines independently.
-     *
-     * @param int $idHtlBooking
-     * @return array List of ['scope' => 'room', 'booking_id' => int, 'result' => int]
-     *               or ['scope' => 'service', 'id_service_product_order_detail' => int, 'result' => int]
-     */
-    public static function applyForBooking($idHtlBooking)
-    {
-        $idHtlBooking = (int) $idHtlBooking;
-        $results = array(
-            array('scope' => 'room', 'booking_id' => $idHtlBooking, 'result' => self::applyForRoom($idHtlBooking)),
+        self::saveTourismTax(
+            $params['idTaxRulesGroup'],
+            $params['address'],
+            $params['unitPriceTaxExcl'],
+            $params['checkInDate'],
+            $params['numNights'],
+            $params['numAdults'],
+            $params['childrenAges'],
+            $params['idCurrency'],
+            $params['collectionType'],
+            $params['idLang'],
+            $params['quantity'],
+            $params['idOrder'],
+            $params['idOrderDetail'],
+            $params['idHtlBooking'],
+            $params['idServiceProductOrderDetail'],
+            $params['idHotel']
         );
-
-        foreach (ServiceProductOrderDetail::getActiveIdsByHtlBookingDetail($idHtlBooking) as $idServiceLine) {
-            $results[] = array(
-                'scope' => 'service',
-                'id_service_product_order_detail' => $idServiceLine,
-                'result' => self::applyForServiceLine($idServiceLine),
-            );
-        }
-
-        return $results;
     }
 
     /**
-     * Apply tourism tax for every room and service line of every booking in an order; returns only the failing target entries.
-     *
-     * @param int $idOrder
-     * @return array
-     */
-    public static function applyForOrder($idOrder)
-    {
-        $failures = array();
-        $objBookingDetail = new HotelBookingDetail();
-        $bookings = $objBookingDetail->getBookingDataByOrderId((int) $idOrder);
-        if ($bookings) {
-            foreach ($bookings as $booking) {
-                foreach (self::applyForBooking($booking['id']) as $targetResult) {
-                    if ($targetResult['result'] !== self::APPLY_OK) {
-                        $failures[] = $targetResult;
-                    }
-                }
-            }
-        }
-        return $failures;
-    }
-
-    /**
-     * Exempt tourism tax for a booking's room only if it is currently STATUS_APPLIED.
+     * Exempt a booking's tourism tax — one marker row covers the room and every service attached to
+     * it. Idempotent: exempting an already-exempted booking is a no-op success.
      *
      * @param int         $idHtlBooking
-     * @param int         $idEmployee
-     * @param string|null $note  Reason for exemption, entered by the employee
+     * @param int         $idEmployee   PS employee id (0 = resolved from Context)
+     * @param string|null $note         Reason for exemption, entered by the employee
      * @return int EXEMPT_OK | EXEMPT_ERROR_NO_RULE | EXEMPT_ERROR_SAVE | EXEMPT_ERROR_REFUNDED
      */
-    protected static function exemptIfAppliedForRoom($idHtlBooking, $idEmployee = 0, $note = null)
+    public static function exemptBooking($idHtlBooking, $idEmployee = 0, $note = null)
     {
         $idHtlBooking = (int) $idHtlBooking;
-        $status = self::getStatusForBooking($idHtlBooking);
-        if ($status === self::STATUS_NONE) {
-            return self::hasRefundedRowsForScope('id_htl_booking', $idHtlBooking) ? self::EXEMPT_ERROR_REFUNDED : self::EXEMPT_ERROR_NO_RULE;
+        if (self::isBookingExempted($idHtlBooking)) {
+            return self::EXEMPT_OK;
         }
-        if ($status === self::STATUS_APPLIED) {
-            return self::exemptForBooking($idHtlBooking, $idEmployee, $note)
-                ? self::EXEMPT_OK
-                : self::EXEMPT_ERROR_SAVE;
+        if (self::hasRefundedRowsForScope('id_htl_booking', $idHtlBooking)) {
+            return self::EXEMPT_ERROR_REFUNDED;
         }
+
+        $booking = new HotelBookingDetail($idHtlBooking);
+        if (!Validate::isLoadedObject($booking)) {
+            return self::EXEMPT_ERROR_NO_RULE;
+        }
+
+        $objOrderTourismTaxExemption = new OrderTourismTaxExemption();
+        $objOrderTourismTaxExemption->id_htl_booking = $idHtlBooking;
+        $objOrderTourismTaxExemption->id_service_product_order_detail = 0;
+        $objOrderTourismTaxExemption->id_order = (int) $booking->id_order;
+        $objOrderTourismTaxExemption->id_employee = $idEmployee ? (int) $idEmployee : (int) Context::getContext()->employee->id;
+        $objOrderTourismTaxExemption->note = $note;
+        if (!$objOrderTourismTaxExemption->add()) {
+            return self::EXEMPT_ERROR_SAVE;
+        }
+
+        self::syncDenormalizedTotalsForBooking($idHtlBooking, false);
+
         return self::EXEMPT_OK;
     }
 
     /**
-     * Same state machine as exemptIfAppliedForRoom(), for a single service line.
+     * Apply (or re-apply) tourism tax for a booking — deletes the exemption marker if one exists,
+     * restoring the room + every attached service's tax into the denormalized display totals. If
+     * nothing has ever been computed for the room and/or a given service line (e.g. config was off
+     * at order time), computes it fresh instead.
+     *
+     * @param int $idHtlBooking
+     * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_REFUNDED
+     */
+    public static function applyBooking($idHtlBooking)
+    {
+        $idHtlBooking = (int) $idHtlBooking;
+        $wasExempted = self::isBookingExempted($idHtlBooking);
+
+        if ($wasExempted) {
+            if (self::hasRefundedRowsForScope('id_htl_booking', $idHtlBooking)) {
+                return self::APPLY_ERROR_REFUNDED;
+            }
+            if (!self::deleteExemptionMarker($idHtlBooking, 0)) {
+                return self::APPLY_ERROR_RESTORE;
+            }
+        }
+
+        if (self::hasNeverBeenComputed('id_htl_booking', $idHtlBooking)) {
+            $params = self::buildRoomTaxParams($idHtlBooking);
+            if ($params) {
+                self::saveTourismTaxFromParams($params);
+                self::adjustOrderTotalsForNewRows('id_htl_booking', $idHtlBooking, $params['idOrder']);
+            }
+        }
+
+        foreach (ServiceProductOrderDetail::getActiveIdsByHtlBookingDetail($idHtlBooking) as $idServiceLine) {
+            if (!self::hasNeverBeenComputed('id_service_product_order_detail', $idServiceLine)) {
+                continue;
+            }
+            $svcParams = self::buildServiceLineTaxParams($idServiceLine);
+            if ($svcParams) {
+                self::saveTourismTaxFromParams($svcParams);
+                self::adjustOrderTotalsForNewRows('id_service_product_order_detail', $idServiceLine, $svcParams['idOrder']);
+            }
+        }
+
+        if ($wasExempted) {
+            self::syncDenormalizedTotalsForBooking($idHtlBooking, true);
+        }
+
+        return self::APPLY_OK;
+    }
+
+    /**
+     * Exempt a single standalone (no room attachment) service line directly — the one case a
+     * booking-level marker can't cover, since there's no booking to attach it to.
      *
      * @param int         $idServiceProductOrderDetail
      * @param int         $idEmployee
      * @param string|null $note
      * @return int EXEMPT_OK | EXEMPT_ERROR_NO_RULE | EXEMPT_ERROR_SAVE | EXEMPT_ERROR_REFUNDED
      */
-    protected static function exemptIfAppliedForServiceLine($idServiceProductOrderDetail, $idEmployee = 0, $note = null)
+    public static function exemptServiceLine($idServiceProductOrderDetail, $idEmployee = 0, $note = null)
     {
         $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
-        $status = self::getStatusForServiceLine($idServiceProductOrderDetail);
-        if ($status === self::STATUS_NONE) {
-            return self::hasRefundedRowsForScope('id_service_product_order_detail', $idServiceProductOrderDetail) ? self::EXEMPT_ERROR_REFUNDED : self::EXEMPT_ERROR_NO_RULE;
+        if (self::isServiceLineExempted($idServiceProductOrderDetail)) {
+            return self::EXEMPT_OK;
         }
-        if ($status === self::STATUS_APPLIED) {
-            return self::exemptForServiceLine($idServiceProductOrderDetail, $idEmployee, $note)
-                ? self::EXEMPT_OK
-                : self::EXEMPT_ERROR_SAVE;
+        if (self::hasRefundedRowsForScope('id_service_product_order_detail', $idServiceProductOrderDetail)) {
+            return self::EXEMPT_ERROR_REFUNDED;
         }
+
+        $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
+        if (!Validate::isLoadedObject($serviceLine) || $serviceLine->id_htl_booking_detail) {
+            // Room-attached lines must go through exemptBooking() instead.
+            return self::EXEMPT_ERROR_NO_RULE;
+        }
+
+        $objOrderTourismTaxExemption = new OrderTourismTaxExemption();
+        $objOrderTourismTaxExemption->id_htl_booking = 0;
+        $objOrderTourismTaxExemption->id_service_product_order_detail = $idServiceProductOrderDetail;
+        $objOrderTourismTaxExemption->id_order = (int) $serviceLine->id_order;
+        $objOrderTourismTaxExemption->id_employee = $idEmployee ? (int) $idEmployee : (int) Context::getContext()->employee->id;
+        $objOrderTourismTaxExemption->note = $note;
+        if (!$objOrderTourismTaxExemption->add()) {
+            return self::EXEMPT_ERROR_SAVE;
+        }
+
+        $total = self::getScopedTotal('id_service_product_order_detail', $idServiceProductOrderDetail);
+        if ($total) {
+            self::adjustDependentTotals((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail, $total, 0.0);
+            self::adjustOrderAndInvoiceTotals((int) $serviceLine->id_order, -$total);
+        }
+
         return self::EXEMPT_OK;
     }
 
     /**
-     * Exempt tourism tax for a booking's room and each of its active service lines — same one-call-multiple-targets shape as applyForBooking().
+     * Apply (or re-apply) tourism tax for a single standalone service line.
      *
-     * @param int         $idHtlBooking
-     * @param int         $idEmployee
-     * @param string|null $note  Reason for exemption, applied to every target touched
-     * @return array See applyForBooking() for the entry shape.
+     * @param int $idServiceProductOrderDetail
+     * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_REFUNDED
      */
-    public static function exemptIfApplied($idHtlBooking, $idEmployee = 0, $note = null)
+    public static function applyServiceLine($idServiceProductOrderDetail)
     {
-        $idHtlBooking = (int) $idHtlBooking;
-        $results = array(
-            array('scope' => 'room', 'booking_id' => $idHtlBooking, 'result' => self::exemptIfAppliedForRoom($idHtlBooking, $idEmployee, $note)),
-        );
+        $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
+        $wasExempted = self::isServiceLineExempted($idServiceProductOrderDetail);
 
-        foreach (ServiceProductOrderDetail::getActiveIdsByHtlBookingDetail($idHtlBooking) as $idServiceLine) {
-            $results[] = array(
-                'scope' => 'service',
-                'id_service_product_order_detail' => $idServiceLine,
-                'result' => self::exemptIfAppliedForServiceLine($idServiceLine, $idEmployee, $note),
-            );
+        if ($wasExempted) {
+            if (self::hasRefundedRowsForScope('id_service_product_order_detail', $idServiceProductOrderDetail)) {
+                return self::APPLY_ERROR_REFUNDED;
+            }
+            if (!self::deleteExemptionMarker(0, $idServiceProductOrderDetail)) {
+                return self::APPLY_ERROR_RESTORE;
+            }
         }
 
-        return $results;
+        if (self::hasNeverBeenComputed('id_service_product_order_detail', $idServiceProductOrderDetail)) {
+            $params = self::buildServiceLineTaxParams($idServiceProductOrderDetail);
+            if ($params) {
+                self::saveTourismTaxFromParams($params);
+                self::adjustOrderTotalsForNewRows('id_service_product_order_detail', $idServiceProductOrderDetail, $params['idOrder']);
+            }
+        }
+
+        if ($wasExempted) {
+            $total = self::getScopedTotal('id_service_product_order_detail', $idServiceProductOrderDetail);
+            if ($total) {
+                $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
+                if (Validate::isLoadedObject($serviceLine)) {
+                    self::adjustDependentTotals((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail, 0.0, $total);
+                    self::adjustOrderAndInvoiceTotals((int) $serviceLine->id_order, $total);
+                }
+            }
+        }
+
+        return self::APPLY_OK;
     }
 
     /**
-     * Exempt tourism tax for every room and service line of every booking in an order; returns only the failing target entries.
+     * Exempt tourism tax for every booking (room + attached services) of an order; returns only the failing entries.
+     * Standalone service lines aren't part of any booking, so this doesn't reach them — same as before.
      *
      * @param int         $idOrder
      * @param int         $idEmployee
      * @param string|null $note  Reason for exemption, applied to every booking in the order
-     * @return array
+     * @return array  [{'id_htl_booking' => int, 'result' => int}, ...] — failures only
      */
     public static function exemptForOrder($idOrder, $idEmployee = 0, $note = null)
     {
@@ -1103,10 +897,9 @@ class OrderTourismTaxCore extends ObjectModel
         $bookings = $objBookingDetail->getBookingDataByOrderId((int) $idOrder);
         if ($bookings) {
             foreach ($bookings as $booking) {
-                foreach (self::exemptIfApplied($booking['id'], $idEmployee, $note) as $targetResult) {
-                    if ($targetResult['result'] !== self::EXEMPT_OK) {
-                        $failures[] = $targetResult;
-                    }
+                $result = self::exemptBooking($booking['id'], $idEmployee, $note);
+                if ($result !== self::EXEMPT_OK) {
+                    $failures[] = array('id_htl_booking' => (int) $booking['id'], 'result' => $result);
                 }
             }
         }
@@ -1114,39 +907,32 @@ class OrderTourismTaxCore extends ObjectModel
     }
 
     /**
-     * After fresh-applying tourism tax to a STATUS_NONE booking, add the applied total to the order's own totals.
+     * Apply tourism tax for every booking of an order; returns only the failing entries.
      *
-     * @param int $idHtlBooking
-     * @return void
+     * @param int $idOrder
+     * @return array  [{'id_htl_booking' => int, 'result' => int}, ...] — failures only
      */
-    protected static function adjustOrderTotalsForNewBooking($idHtlBooking)
+    public static function applyForOrder($idOrder)
     {
-        $idHtlBooking = (int) $idHtlBooking;
-        $booking = new HotelBookingDetail($idHtlBooking);
-        if (!Validate::isLoadedObject($booking)) {
-            return;
+        $failures = array();
+        $objBookingDetail = new HotelBookingDetail();
+        $bookings = $objBookingDetail->getBookingDataByOrderId((int) $idOrder);
+        if ($bookings) {
+            foreach ($bookings as $booking) {
+                $result = self::applyBooking($booking['id']);
+                if ($result !== self::APPLY_OK) {
+                    $failures[] = array('id_htl_booking' => (int) $booking['id'], 'result' => $result);
+                }
+            }
         }
-        self::adjustOrderTotalsForNewRows('id_htl_booking', $idHtlBooking, (int) $booking->id_order);
+        return $failures;
     }
 
     /**
-     * Same as adjustOrderTotalsForNewBooking(), for a single service line.
-     *
-     * @param int $idServiceProductOrderDetail
-     * @return void
-     */
-    protected static function adjustOrderTotalsForNewServiceLine($idServiceProductOrderDetail)
-    {
-        $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
-        $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
-        if (!Validate::isLoadedObject($serviceLine)) {
-            return;
-        }
-        self::adjustOrderTotalsForNewRows('id_service_product_order_detail', $idServiceProductOrderDetail, (int) $serviceLine->id_order);
-    }
-
-    /**
-     * Shared core for adjustOrderTotalsForNewBooking()/adjustOrderTotalsForNewServiceLine().
+     * After fresh-computing tourism tax for a scope that had no prior rows (e.g. config was off at
+     * order time), fold the newly-applied total into the order's own totals — adjustDependentTotals()
+     * (called inside saveTourismTax()) only syncs order_detail/htl_booking_detail/service_product_order_detail,
+     * never orders/order_invoice.
      *
      * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
      * @param int    $scopeValue
@@ -1155,14 +941,52 @@ class OrderTourismTaxCore extends ObjectModel
      */
     protected static function adjustOrderTotalsForNewRows($scopeColumn, $scopeValue, $idOrder)
     {
-        $appliedTotal = (float) Db::getInstance()->getValue(
-            'SELECT SUM(`total_amount`)
-             FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue . '
-               AND `is_exempted` = 0
-               AND `is_refunded` = 0'
-        );
+        $appliedTotal = self::getScopedTotal($scopeColumn, $scopeValue);
         self::adjustOrderAndInvoiceTotals($idOrder, $appliedTotal);
+    }
+
+    /**
+     * Sum the room's own tax + every attached service line's tax and apply that whole delta once —
+     * used on exemptBooking()/applyBooking() to move the booking's tourism tax in or out of the
+     * denormalized display totals in one pass, rather than per-row.
+     *
+     * @param int  $idHtlBooking
+     * @param bool $nowIncluded  true = restoring (apply), false = removing (exempt)
+     * @return void
+     */
+    protected static function syncDenormalizedTotalsForBooking($idHtlBooking, $nowIncluded)
+    {
+        $idHtlBooking = (int) $idHtlBooking;
+        $booking = new HotelBookingDetail($idHtlBooking);
+        if (!Validate::isLoadedObject($booking)) {
+            return;
+        }
+        $totalDelta = 0.0;
+
+        $roomTotal = self::getScopedTotal('id_htl_booking', $idHtlBooking);
+        if ($roomTotal) {
+            $prev = $nowIncluded ? 0.0 : $roomTotal;
+            $new = $nowIncluded ? $roomTotal : 0.0;
+            self::adjustDependentTotals((int) $booking->id_order_detail, $idHtlBooking, 0, $prev, $new);
+            $totalDelta += ($new - $prev);
+        }
+
+        foreach (ServiceProductOrderDetail::getActiveIdsByHtlBookingDetail($idHtlBooking) as $idServiceLine) {
+            $serviceTotal = self::getScopedTotal('id_service_product_order_detail', $idServiceLine);
+            if (!$serviceTotal) {
+                continue;
+            }
+            $serviceLine = new ServiceProductOrderDetail($idServiceLine);
+            if (!Validate::isLoadedObject($serviceLine)) {
+                continue;
+            }
+            $prev = $nowIncluded ? 0.0 : $serviceTotal;
+            $new = $nowIncluded ? $serviceTotal : 0.0;
+            self::adjustDependentTotals((int) $serviceLine->id_order_detail, 0, $idServiceLine, $prev, $new);
+            $totalDelta += ($new - $prev);
+        }
+
+        self::adjustOrderAndInvoiceTotals((int) $booking->id_order, $totalDelta);
     }
 
     /**

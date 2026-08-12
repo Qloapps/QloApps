@@ -263,8 +263,7 @@ class ServiceProductCartDetail extends ObjectModel
                     $idHotelForTourismTax = (int) $product['id_hotel'] ?: ($objHotelCartBooking ? (int) $objHotelCartBooking->id_hotel : 0);
 
                     $tourismTax = array('tourism_tax_online' => 0.0);
-                    $idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($objProduct->id);
-                    if ($idTourismTaxRulesGroup) {
+                    if ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($objProduct->id)) {
                         $tourismTaxContext = TourismTax::resolveServiceLineTaxContext(
                             $idHotelForTourismTax,
                             0,

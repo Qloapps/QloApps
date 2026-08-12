@@ -138,7 +138,7 @@ class AdminTaxesControllerCore extends AdminController
 
         if (Configuration::get('QLO_USE_TOURISM_TAX') || Tools::getValue('QLO_USE_TOURISM_TAX')) {
             $this->fields_options['general']['fields']['QLO_TOURISM_TAX_GROSSED_UP'] = array(
-                'title' => $this->l('Include tourism tax in displayed room price'),
+                'title' => $this->l('Include tourism tax in displayed prices'),
                 'validation' => 'isBool',
                 'cast' => 'intval',
                 'type' => 'bool',
@@ -258,6 +258,7 @@ class AdminTaxesControllerCore extends AdminController
                 $_POST['tax_value'] = $subtype->tax_value;
                 $_POST['is_tiered'] = $subtype->is_tiered;
                 $_POST['has_child_rate'] = $subtype->has_child_rate;
+                $_POST['has_child_age_range'] = $subtype->has_child_age_range;
                 $_POST['valid_from'] = $subtype->valid_from ?: '';
                 $_POST['valid_to'] = $subtype->valid_to ?: '';
 
@@ -355,7 +356,7 @@ class AdminTaxesControllerCore extends AdminController
             <div class="form-group tourism-tax-add-row-btn">
                 <div class="col-sm-12">
                     <button type="button" class="btn btn-default" id="tourism-tax-add-tier">
-                        <i class="icon-plus-circle"></i> ' . $this->l('Add bracket') . '
+                        <i class="icon-plus-circle"></i> ' . $this->l('Add Range') . '
                     </button>
                 </div>
             </div>
@@ -363,19 +364,22 @@ class AdminTaxesControllerCore extends AdminController
                 . $this->buildTierRow('__IDX__', array())
             . '</script>';
 
+        $infantMaxAge = (int) Configuration::get('QLO_GLOBAL_MAX_INFANT_AGE');
+        $childMaxAge = (int) Configuration::get('WK_GLOBAL_CHILD_MAX_AGE');
+
         $ageBandsHtml = '
             <table class="table" id="tourism-tax-child-table">
                 <thead><tr class="nodrag nodrop">
                     <th class="col-sm-4 center">
                         <label class="control-label">
-                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars($this->l('Enter the minimum age (inclusive) for this child band. Leave blank for no lower limit.')) . '">
+                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars(sprintf($this->l('Enter the minimum age (inclusive) for this child band. Leave blank for no lower limit. Cannot be below %d.'), $infantMaxAge)) . '">
                                 ' . $this->l('Min age') . '
                             </span>
                         </label>
                     </th>
                     <th class="col-sm-4 center">
                         <label class="control-label">
-                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars($this->l('Enter the maximum age for this band. Leave blank for no upper limit.')) . '">
+                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars(sprintf($this->l('Enter the maximum age for this band. Leave blank for no upper limit. Cannot be %d or above (the general child age setting).'), $childMaxAge)) . '">
                                 ' . $this->l('Max age') . '
                             </span>
                         </label>
@@ -399,7 +403,7 @@ class AdminTaxesControllerCore extends AdminController
             <div class="form-group tourism-tax-add-row-btn">
                 <div class="col-sm-12">
                     <button type="button" class="btn btn-default" id="tourism-tax-add-child">
-                        <i class="icon-plus-circle"></i> ' . $this->l('Add band') . '
+                        <i class="icon-plus-circle"></i> ' . $this->l('Add Range') . '
                     </button>
                 </div>
             </div>
@@ -555,7 +559,11 @@ class AdminTaxesControllerCore extends AdminController
                     'label' => $this->l('Apply on child'),
                     'name' => 'has_child_rate',
                     'is_bool' => true,
-                    'hint' => $this->l('When enabled, children in the defined age range pay the child tax rate; all others pay the adult rate.'),
+                    'hint' => sprintf(
+                        $this->l('When enabled, children pay the adult rate by default (default child age ranges %d–%d according to current general settings.'),
+                        $infantMaxAge,
+                        $childMaxAge - 1
+                    ),
                     'form_group_class' => 'tourism-tax-field',
                     'values' => array(
                         array('id' => 'child_rate_on', 'value' => 1, 'label' => $this->l('Yes')),
@@ -563,18 +571,30 @@ class AdminTaxesControllerCore extends AdminController
                     ),
                 ),
                 array(
+                    'type' => 'switch',
+                    'label' => $this->l('Set child age range'),
+                    'name' => 'has_child_age_range',
+                    'is_bool' => true,
+                    'hint' => $this->l('When enabled, define a custom set of child age ranges below, each with its own tax value.'),
+                    'form_group_class' => 'tourism-tax-field tourism-tax-child-field',
+                    'values' => array(
+                        array('id' => 'child_age_range_on', 'value' => 1, 'label' => $this->l('Yes')),
+                        array('id' => 'child_age_range_off', 'value' => 0, 'label' => $this->l('No')),
+                    ),
+                ),
+                array(
                     'type' => 'html',
-                    'label' => $this->l('Child age bands'),
+                    'label' => $this->l('Child age ranges'),
                     'name' => 'child_ranges',
                     'html_content' => $ageBandsHtml,
-                    'form_group_class' => 'tourism-tax-field tourism-tax-child-field',
+                    'form_group_class' => 'tourism-tax-field tourism-tax-child-band-field',
                 ),
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Tiered pricing'),
                     'name' => 'is_tiered',
                     'is_bool' => true,
-                    'hint' => $this->l('When enabled, the tax amount is determined by the matching price bracket. Prices outside all brackets use the base tax amount.'),
+                    'hint' => $this->l('When enabled, the tax amount is determined by the matching price range. Prices outside all ranges use the base tax amount.'),
                     'form_group_class' => 'tourism-tax-field',
                     'values' => array(
                         array('id' => 'tiered_on', 'value' => 1, 'label' => $this->l('Yes')),
@@ -583,7 +603,7 @@ class AdminTaxesControllerCore extends AdminController
                 ),
                 array(
                     'type' => 'html',
-                    'label' => $this->l('Price brackets'),
+                    'label' => $this->l('Price ranges'),
                     'name' => 'tiers',
                     'html_content' => $priceBracketsHtml,
                     'form_group_class' => 'tourism-tax-field tourism-tax-tiered-field',
@@ -592,8 +612,10 @@ class AdminTaxesControllerCore extends AdminController
                     'type' => 'html',
                     'label' => $this->l('Valid'),
                     'name' => 'validity_wrap',
-                    'html_content' => $validityInputHtml,
-                    'hint' => $this->l('Leave both blank to apply with no date restriction. Set only "From" for no end date, or only "To" for no start date.'),
+                    'html_content' => $validityInputHtml
+                        . '<p class="help-block">'
+                            . $this->l('Leave both blank to apply with no date restriction. Set only "From" for no end date, or only "To" for no start date.')
+                        . '</p>',
                     'form_group_class' => 'tourism-tax-field',
                 ),
                 array(
@@ -847,7 +869,9 @@ class AdminTaxesControllerCore extends AdminController
             $this->invalidCoreFields['valid_to'] = true;
         }
 
-        if ((int) Tools::getValue('has_child_rate')) {
+        if ((int) Tools::getValue('has_child_rate') && (int) Tools::getValue('has_child_age_range')) {
+            $infantMaxAge = (int) Configuration::get('QLO_GLOBAL_MAX_INFANT_AGE');
+            $childMaxAge = (int) Configuration::get('WK_GLOBAL_CHILD_MAX_AGE');
             $submittedBandMins = Tools::getValue('child_min', array());
             $submittedBandMaxs = Tools::getValue('child_max', array());
             $submittedBandValues = Tools::getValue('child_value', array());
@@ -876,6 +900,14 @@ class AdminTaxesControllerCore extends AdminController
                 if ($bandMax > 0 && $bandMin > $bandMax) {
                     $this->errors[] = sprintf($this->l('Child band #%d: min age cannot be greater than max age.'), $rowNum);
                     $this->invalidChildFields[$rowIndex]['min'] = true;
+                    $this->invalidChildFields[$rowIndex]['max'] = true;
+                }
+                if ($bandMin > 0 && $bandMin < $infantMaxAge) {
+                    $this->errors[] = sprintf($this->l('Child band #%d: min age cannot be below the infant age (%d).'), $rowNum, $infantMaxAge);
+                    $this->invalidChildFields[$rowIndex]['min'] = true;
+                }
+                if ($bandMax > 0 && $bandMax >= $childMaxAge) {
+                    $this->errors[] = sprintf($this->l('Child band #%d: max age cannot be %d or above (the general child age setting).'), $rowNum, $childMaxAge);
                     $this->invalidChildFields[$rowIndex]['max'] = true;
                 }
                 $filledBands[] = array('minAge' => $bandMin, 'maxAge' => $bandMax, 'rowNum' => $rowNum, 'rowIndex' => $rowIndex);
@@ -988,6 +1020,7 @@ class AdminTaxesControllerCore extends AdminController
         $tourismTax->tax_value = (float) Tools::getValue('tax_value', 0);
         $tourismTax->is_tiered = (int) Tools::getValue('is_tiered', 0);
         $tourismTax->has_child_rate = (int) Tools::getValue('has_child_rate', 0);
+        $tourismTax->has_child_age_range = (int) Tools::getValue('has_child_age_range', 0);
         $validFromRaw = trim(Tools::getValue('valid_from', ''));
         $validToRaw = trim(Tools::getValue('valid_to', ''));
         $tourismTax->valid_from = ($validFromRaw && $validFromRaw !== '0000-00-00') ? $validFromRaw : null;

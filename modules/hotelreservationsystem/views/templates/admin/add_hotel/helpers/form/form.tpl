@@ -645,7 +645,7 @@
 						<label class="control-label col-lg-3">
 							{l s='Collection Time' mod='hotelreservationsystem'}
 						</label>
-						<div class="col-lg-6">
+						<div class="col-lg-4">
 							<select name="tourism_tax_collection_type" id="tourism_tax_collection_type">
 								<option value="0" {if isset($tourism_tax_collection_type) && $tourism_tax_collection_type == 0}selected="selected"{/if}>
 									{l s='At time of booking' mod='hotelreservationsystem'}

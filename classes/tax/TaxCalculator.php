@@ -182,11 +182,6 @@ class TaxCalculatorCore
      * @param int    $collectionType   HotelBranchInformation::tourism_tax_collection_type snapshot
      * @param int    $idLang
      * @param int    $quantity         Line quantity multiplier. Rooms: always 1.
-     * @param bool   $isManualApply    true only from the admin Apply-button flow — bypasses the
-     *                                 at-hotel collection-type gate. Every automatic call site
-     *                                 (order creation, cart/product-page/list preview) leaves this
-     *                                 false, so a manual-collection hotel computes/shows nothing
-     *                                 until staff act.
      * @return array ['tourism_tax_online' => float,
      *                'rows' => [['id_tax','tax_name','num_nights','num_adults','total_amount','collection_type'], ...]]
      */
@@ -199,23 +194,29 @@ class TaxCalculatorCore
         $idCurrency,
         $collectionType,
         $idLang,
-        $quantity = 1,
-        $isManualApply = false
+        $quantity = 1
     ) {
         $result = array('tourism_tax_online' => 0.0, 'rows' => array());
 
-        $collectionType = (int) $collectionType;
         if (!Configuration::get('QLO_USE_TOURISM_TAX')) {
             return $result;
         }
-        if ($collectionType === TourismTax::COLLECTION_TYPE_AT_HOTEL && !$isManualApply) {
+        if ($collectionType === TourismTax::COLLECTION_TYPE_AT_HOTEL) {
             return $result;
         }
 
         $checkIn = new DateTime($checkInDate);
         $isoDayIndex = $checkIn->format('N') - 1;
 
+        $infantMaxAge = (int) Configuration::get('QLO_GLOBAL_MAX_INFANT_AGE');
+        $childMaxAge = (int) Configuration::get('WK_GLOBAL_CHILD_MAX_AGE');
+        $eligibleChildAges = array_filter($childrenAges, function ($age) use ($infantMaxAge, $childMaxAge) {
+            $age = (int) $age;
+            return $age >= $infantMaxAge && $age < $childMaxAge;
+        });
+
         $rows = array();
+        $runningPriceExcl = (float) $unitPriceTaxExcl;
 
         foreach ($this->taxes as $tax) {
             $tourismTax = TourismTax::getByTaxId((int) $tax->id);
@@ -250,11 +251,10 @@ class TaxCalculatorCore
 
             $baseValue = (float) $tourismTax->tax_value;
             if ($isTiered) {
-                $tier = TourismTaxTier::getMatchingTier((int) $tax->id, $unitPriceTaxExcl);
-                if (!$tier) {
-                    continue;
+                $tier = TourismTaxTier::getMatchingTier((int) $tax->id, $runningPriceExcl);
+                if ($tier) {
+                    $baseValue = (float) $tier['tax_value'];
                 }
-                $baseValue = (float) $tier['tax_value'];
             }
 
             $adultMultiplier = 1;
@@ -269,24 +269,29 @@ class TaxCalculatorCore
                 $unitAmountAdult = $baseValue;
                 $totalAmountAdult = $baseValue * $adultMultiplier;
             } else {
-                $unitAmountAdult = $unitPriceTaxExcl * ($baseValue / 100);
+                $unitAmountAdult = $runningPriceExcl * ($baseValue / 100);
                 $totalAmountAdult = $unitAmountAdult * $adultMultiplier;
             }
 
             $totalAmountChild = 0.0;
 
-            if ($hasChildRate && !empty($childrenAges)) {
+            if ($hasChildRate && !empty($eligibleChildAges)) {
                 $contribution = TourismTaxChildRange::getChildContribution(
                     (int) $tax->id,
-                    $childrenAges,
+                    $eligibleChildAges,
                     $taxType,
-                    $unitPriceTaxExcl,
-                    $baseValue
+                    $runningPriceExcl,
+                    $baseValue,
+                    (bool) $tourismTax->has_child_age_range
                 );
                 if ((int) $contribution['count'] > 0) {
                     $nightMultiplier = $isPerNight ? $numNights : 1;
                     $totalAmountChild = $contribution['total'] * $nightMultiplier;
                 }
+            }
+
+            if ($this->computation_method == TaxCalculator::ONE_AFTER_ANOTHER_METHOD) {
+                $runningPriceExcl += $unitAmountAdult;
             }
 
             $totalAmountAdult = Tools::convertPrice($totalAmountAdult, $idCurrency);

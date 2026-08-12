@@ -262,11 +262,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
      * @param [int]  $id_product [id of the room type]
      * @param [date] $date_from  [date from]
      * @param [date] $date_to    [date to]
-     * @param bool   $bypassCollectionTypeGate Bypasses the at-hotel tourism-tax collection-type gate —
-     *                               only for previews (e.g. admin "final price" list columns) that
-     *                               must show the true total regardless of collection type; every
-     *                               cart/order/front-office caller must leave this false so a
-     *                               manual-collection hotel's tax stays hidden until applied.
      *
      * @return [float] [Returns Total price of the room type]
      */
@@ -280,8 +275,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_guest = 0,
         $id_room = 0,
         $with_auto_room_services = 1,
-        $use_reduc = 1,
-        $bypassCollectionTypeGate = false
+        $use_reduc = 1
     ) {
         $totalPrice = array();
         $totalPrice['total_price_tax_incl'] = 0;
@@ -462,8 +456,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                         $id_currency,
                         $collectionType,
                         $idLang,
-                        1,
-                        $bypassCollectionTypeGate
+                        1
                     );
                     $totalPrice['tourism_tax_online'] += $tourismTaxResult['tourism_tax_online'];
                 }

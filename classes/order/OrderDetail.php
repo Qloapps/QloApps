@@ -733,6 +733,11 @@ class OrderDetailCore extends ObjectModel
         $this->total_price_tax_incl = (float)$product['total_wt'];
         $this->total_price_tax_excl = (float)$product['total'];
 
+        if (isset($this->tax_calculator) && Product::getIdTourismTaxRulesGroupByIdProduct((int) $product['id_product'])) {
+            $this->unit_price_tax_incl = $this->tax_calculator->addTaxes($this->unit_price_tax_excl);
+            $this->total_price_tax_incl = $this->tax_calculator->addTaxes($this->total_price_tax_excl);
+        }
+
         $this->purchase_supplier_price = (float)$product['wholesale_price'];
         if ($product['id_supplier'] > 0 && ($supplier_price = ProductSupplier::getProductPrice((int)$product['id_supplier'], $product['id_product'], $product['id_product_attribute'], true)) > 0) {
             $this->purchase_supplier_price = (float)$supplier_price;

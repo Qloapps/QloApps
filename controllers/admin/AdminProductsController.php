@@ -748,8 +748,7 @@ class AdminProductsControllerCore extends AdminController
                         0,
                         0,
                         0,
-                        1,
-                        true
+                        1
                     );
                     $this->_list[$i]['price_tmp'] += (float) $roomTotalPrice['tourism_tax_online'];
                 }
@@ -4193,6 +4192,14 @@ class AdminProductsControllerCore extends AdminController
             $data->assign('tourismTaxRulesGroups', $tourismTaxRulesGroups);
             $data->assign('id_tourism_tax_rules_group', isset($product->id_tourism_tax_rules_group) ? (int) $product->id_tourism_tax_rules_group : 0);
 
+            // Same "no matching rule -> naturally empty" pattern as the VAT rates loop above
+            // (TaxManagerFactory::getManager($address, $trg)->taxes coming back empty for a
+            // non-matching country) — here the mismatch is the hotel's collection type instead
+            // of the address, so getPreviewParams() is handed it to resolve the same way.
+            $roomTypeInfo = (new HotelRoomType())->getRoomTypeInfoByIdProduct((int) $product->id);
+            $idHotel = $roomTypeInfo ? (int) $roomTypeInfo['id_hotel'] : 0;
+            $collectionType = TourismTax::resolveHotelAddressAndCollectionType($idHotel, $address)['collectionType'];
+
             $tourismTaxRates = array();
             foreach ($tourismTaxRulesGroups as $tourismTaxRulesGroup) {
                 $idTourismTaxRulesGroup = (int) $tourismTaxRulesGroup['id_tax_rules_group'];
@@ -4202,7 +4209,8 @@ class AdminProductsControllerCore extends AdminController
                 $tourismTaxRates[$idTourismTaxRulesGroup] = TourismTax::getPreviewParams(
                     $idTourismTaxRulesGroup,
                     $address,
-                    (int) $this->context->language->id
+                    (int) $this->context->language->id,
+                    $collectionType
                 );
             }
             $data->assign('tourismTaxRatesByGroup', $tourismTaxRates);

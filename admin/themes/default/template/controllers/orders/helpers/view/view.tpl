@@ -875,10 +875,14 @@
                             {assign var=total_convenience_fee_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
                             {assign var=total_convenience_fee_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
 
+                            {assign var=total_room_services_and_demands_vat_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, null, null, null, false) + $totalDemandsPriceTI)}
+                            {assign var=total_convenience_fee_vat_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, null, false)}
+
                             {assign var=order_total_price_tax_excl value=($total_rooms_price_tax_excl + $total_room_services_and_demands_tax_excl + $total_products_price_tax_excl)}
                             {assign var=order_total_price_tax_incl value=($total_rooms_price_tax_incl + $total_room_services_and_demands_tax_incl + $total_products_price_tax_incl)}
                             {assign var=total_rooms_tax_only value=(($total_rooms_price_tax_incl - $total_rooms_price_tax_excl) - $tourism_tax_online_room)}
-                            {assign var=total_services_tax_only value=((($total_room_services_and_demands_tax_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) - $tourism_tax_online_service)}
+                            {assign var=total_services_tax_only value=(($total_room_services_and_demands_vat_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_vat_incl - $total_convenience_fee_tax_excl))}
+                            {assign var=total_convenience_fee_tax_only value=($total_convenience_fee_vat_incl - $total_convenience_fee_tax_excl)}
 
                             {if $total_rooms_price_tax_excl}
                                 <tr id="total_products">
@@ -964,7 +968,7 @@
                                                 {/if}
                                                 {if $tourism_tax_online_room > 0}
                                                     <tr>
-                                                        <td class="text-left">{l s='Tourism Tax (Room)'}</td>
+                                                        <td class="text-left">{l s='Tourism Tax on Room'}</td>
                                                         <td class="text-right">
                                                             {displayPrice price=$tourism_tax_online_room currency=$currency->id}
                                                         </td>
@@ -981,7 +985,7 @@
                                                 {/if}
                                                 {if $tourism_tax_online_service > 0}
                                                     <tr>
-                                                        <td class="text-left">{l s='Tourism Tax (Service Product)'}</td>
+                                                        <td class="text-left">{l s='Tourism Tax on Extra Services'}</td>
                                                         <td class="text-right nowrap">
                                                             {displayPrice price=$tourism_tax_online_service currency=$currency->id}
                                                         </td>
@@ -1001,7 +1005,7 @@
                                                     <tr id="total_products">
                                                         <td class="text-left">{l s='Convenience Fee Tax'}</td>
                                                         <td class="amount text-right nowrap">
-                                                            {displayPrice price=($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl) currency=$currency->id}
+                                                            {displayPrice price=$total_convenience_fee_tax_only currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>

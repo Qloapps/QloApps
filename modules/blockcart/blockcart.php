@@ -374,8 +374,29 @@ class Blockcart extends Module
         $totalAdditionalServicesWithAutoAddPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOM_SERVICES);
         $totalConvenienceFee = $params['cart']->getOrderTotal($useTax, Cart::ONLY_CONVENIENCE_FEE);
         $totalRoomsPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOMS);
+        $tourismTaxOnlineConvenienceFee = 0.0;
+        if ($convenienceFeeServices = $objServiceProductCartDetail->getServiceProductsInCart(
+            $params['cart']->id,
+            [],
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            0,
+            1,
+            Product::PRICE_ADDITION_TYPE_INDEPENDENT
+        )) {
+            foreach ($convenienceFeeServices as $convenienceFeeService) {
+                $tourismTaxOnlineConvenienceFee += (float) $convenienceFeeService['tourism_tax_online'];
+            }
+        }
         if ($useTax && TourismTax::isGrossedUp($tourismTaxOnlineRoom)) {
             $totalRoomsPrice += $tourismTaxOnlineRoom;
+        }
+        if ($useTax && TourismTax::isGrossedUp($tourismTaxOnlineConvenienceFee)) {
+            $totalConvenienceFee += $tourismTaxOnlineConvenienceFee;
         }
         $totalNormalProductPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_STANDALONE_PRODUCTS);
 

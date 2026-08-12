@@ -155,7 +155,7 @@ class OrderConfirmationControllerCore extends FrontController
                     $idOrder = $cartOrder['id_order'];
                     $objCartOrder = new Order($idOrder);
                     $orderProducts = $objCartOrder->getProducts();
-                    $roomTourismTaxByBooking = OrderTourismTax::getAppliedTotalsByBooking($idOrder);
+                    $roomTourismTaxByBooking = OrderTourismTax::getAppliedTourismTaxTotals($idOrder, OrderTourismTax::SCOPE_ROOM);
 
                     if (!empty($orderProducts)) {
                         foreach ($orderProducts as $type_key => $type_value) {
@@ -191,11 +191,7 @@ class OrderConfirmationControllerCore extends FrontController
                                     $order_details_obj = new OrderDetail($data_v['id_order_detail']);
                                     $cart_htl_data[$type_key]['name'] = $order_details_obj->product_name;
                                     $stage_name = '';
-                                    $roomTourismTax = isset($roomTourismTaxByBooking[$data_v['id']]) ? $roomTourismTaxByBooking[$data_v['id']] : 0.0;
                                     $roomTotalPriceTaxIncl = (float) $data_v['total_price_tax_incl'];
-                                    if (TourismTax::isGrossedUp($roomTourismTax)) {
-                                        $roomTotalPriceTaxIncl += $roomTourismTax;
-                                    }
                                     if (isset($cart_htl_data[$type_key]['date_diff'][$date_join])) {
                                         $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
 

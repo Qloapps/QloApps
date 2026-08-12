@@ -105,7 +105,6 @@
 	</td>
 	<td class="center">
 		{convertPriceWithCurrency price=($data['total_room_tax']) currency=$currency->id}
-		{if isset($data.tourism_tax_status) && $data.tourism_tax_status == $tourism_tax_status_applied && isset($data.tourism_tax_total) && $data.tourism_tax_total > 0}
 			<span class="price_info">
 				&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
 			</span>
@@ -114,12 +113,13 @@
 					<label>{l s='Room & Service Tax:'}</label>
 					<span class="pull-right">{convertPriceWithCurrency price=$data.total_room_service_tax_only currency=$currency->id}</span>
 				</div>
+				{if isset($data.tourism_tax_status) && $data.tourism_tax_status == $tourism_tax_status_applied && isset($data.tourism_tax_total) && $data.tourism_tax_total > 0}
 				<div>
 					<label>{l s='Tourism Tax:'}</label>
 					<span class="pull-right">{convertPriceWithCurrency price=$data.tourism_tax_total currency=$currency->id}</span>
 				</div>
+				{/if}
 			</div>
-		{/if}
 	</td>
 	<td class="center">
 		{convertPriceWithCurrency price=($data['total_room_price_ti']) currency=$currency->id}

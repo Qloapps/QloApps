@@ -230,8 +230,7 @@ class RoomTypeServiceProduct extends ObjectModel
                 );
 
                 $serviceTourismTax = array('tourism_tax_online' => 0.0);
-                $idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $serviceProduct['id_product']);
-                if ($idTourismTaxRulesGroup) {
+                if ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $serviceProduct['id_product'])) {
                     $tourismTaxContext = TourismTax::resolveServiceLineTaxContext(
                         $idHotel,
                         0,

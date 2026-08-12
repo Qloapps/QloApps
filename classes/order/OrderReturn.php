@@ -211,8 +211,8 @@ class OrderReturnCore extends ObjectModel
                 $calcServicePriceFirst = true;
             }
 
-            $appliedTourismTaxByBooking = OrderTourismTax::getAppliedTotalsByBooking($idOrder);
-            $appliedServiceTourismTaxByBooking = OrderTourismTax::getAppliedServiceTotalsByBooking($idOrder);
+            $appliedTourismTaxByBooking = OrderTourismTax::getAppliedTourismTaxTotals($idOrder, OrderTourismTax::SCOPE_ROOM);
+            $appliedServiceTourismTaxByBooking = OrderTourismTax::getAppliedTourismTaxTotals($idOrder, OrderTourismTax::SCOPE_SERVICE);
 
             foreach ($returnDetails as $key => &$bookingRow) {
                 if ($skipReqCompletedNonRefunded) {

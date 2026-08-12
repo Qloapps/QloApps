@@ -625,8 +625,7 @@ class AdminNormalProductsControllerCore extends AdminController
                             (int) $this->context->currency->id,
                             $tourismTaxContext['collectionType'],
                             (int) $id_lang,
-                            1,
-                            true
+                            1
                         );
                     }
                     $this->_list[$i]['price_tmp'] += (float) $serviceTourismTax['tourism_tax_online'];

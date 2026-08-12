@@ -100,13 +100,14 @@ class TourismTaxChildRangeCore extends ObjectModel
      * @param int        $taxType        0=fixed, 1=percentage
      * @param float      $unitPrice      Room unit_price_tax_excl (used for percentage type)
      * @param float|null $adultBaseValue Adult tax_value (fixed amount or percentage); null = exempt unmatched children
+     * @param bool       $useRanges      false = skip band lookup entirely
      * @return array ['total' => float, 'count' => int]
      */
-    public static function getChildContribution($idTax, array $ages, $taxType, $unitPrice, $adultBaseValue = null)
+    public static function getChildContribution($idTax, array $ages, $taxType, $unitPrice, $adultBaseValue = null, $useRanges = true)
     {
         $taxType = (int) $taxType;
         $unitPrice = (float) $unitPrice;
-        $ranges = self::getByTaxId((int) $idTax);
+        $ranges = $useRanges ? self::getByTaxId((int) $idTax) : array();
         $total = 0.0;
         $count = 0;
         foreach ($ages as $age) {

@@ -89,7 +89,7 @@ class OrderDetailControllerCore extends FrontController
                 $objRoomType = new HotelRoomType();
                 $objBookingDemand = new HotelBookingDemands();
                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-                $roomTourismTaxByBooking = OrderTourismTax::getAppliedTotalsByBooking($order->id);
+                $roomTourismTaxByBooking = OrderTourismTax::getAppliedTourismTaxTotals($order->id, OrderTourismTax::SCOPE_ROOM);
                 $anyBackOrder = 0;
                 $processedProducts = array();
                 $cartHotelData = array();
@@ -151,11 +151,7 @@ class OrderDetailControllerCore extends FrontController
                                     $bookingRefundDetail = reset($bookingRefundDetail);
                                 }
 
-                                $roomTourismTax = isset($roomTourismTaxByBooking[$data_v['id']]) ? $roomTourismTaxByBooking[$data_v['id']] : 0.0;
                                 $roomTotalPriceTaxIncl = (float) $data_v['total_price_tax_incl'];
-                                if (TourismTax::isGrossedUp($roomTourismTax)) {
-                                    $roomTotalPriceTaxIncl += $roomTourismTax;
-                                }
 
                                 if (isset($cartHotelData[$type_key]['date_diff'][$date_join])) {
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['num_rm'] += 1;
