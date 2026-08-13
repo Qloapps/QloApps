@@ -599,9 +599,11 @@
                                     </div>
                                 {/if}
                             {else}
+                                {if $addressAccess['add'] === 1}
                                 <button id="add_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;addaddress&amp;id_order={$order->id|intval}&amp;address_type=2&amp;id_customer={$order->id_customer}&amp;liteDisplaying=1&amp;submitFormAjax=1#">
                                     <i class="icon-plus-circle"></i> {l s='Add Address'}
                                 </button>
+                                {/if}
                                 {if $idCurrentAddress}
                                     <div class="guest_address_actions dropdown">
                                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -1036,7 +1038,7 @@
                 <div class="panel panel-vouchers">
                     <div class="panel-heading">
                         <span><i class="icon-tag"></i> &nbsp;{l s='Voucher'}</span>
-                        {if $can_edit && $order->total_paid > 0}
+                        {if $can_edit && $order->total_paid > 0 && $cartRuleAccess['add'] === 1}
                             <button id="add_voucher" class="btn btn-primary pull-right" type="button" >
                                 <i class="icon-ticket"></i> {l s='Add new voucher'}
                             </button>
