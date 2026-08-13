@@ -262,7 +262,7 @@ class HotelOrderRefundRules extends ObjectModel
                 ON (horr.`id_refund_rule` = hbrr.`id_refund_rule`)
                 LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` horrl
                 ON (horrl.`id_refund_rule` = horr.`id_refund_rule` AND horrl.`id_lang` = '.(int) $idLang.')
-                LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
                 ON (hbd.`id_hotel` = hbrr.`id_hotel` AND hbd.`id_order` = '.(int) $idOrder.')
                 WHERE horr.`days` <= '.(int) $days.'
                 GROUP BY hbrr.`id_refund_rule`

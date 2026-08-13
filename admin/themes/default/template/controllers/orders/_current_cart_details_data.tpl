@@ -51,7 +51,12 @@
 						{assign var=curr_id value=$cart->id_currency|intval}
 						{foreach from=$cart_detail_data item=data}
 							<tr  data-id-booking-data="{$data.id}" data-id-product="{$data.id_product}" data-id-room="{$data.id_room}" data-date-from="{$data.date_from}" data-date-to="{$data.date_to}" >
-								<td>{$data.room_num|escape:'html':'UTF-8'} {hook h='displayRoomNumAfter' data=$data type='adminOrder'}</td>
+								<td>{$data.room_num|escape:'html':'UTF-8'}
+								{if isset($data['connected_rooms'][$data.id_room])}
+									{include file="controllers/products/connected-rooms.tpl" htl_connected_rooms=$data['connected_rooms'][$data.id_room]}
+								{/if}
+
+								{hook h='displayRoomNumAfter' data=$data type='adminOrder'}</td>
 								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Room image" /></td>
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
@@ -130,7 +135,7 @@
 								{* <td class="cart_line_total_rooms_price" id="cart_detail_data_price_{$data.id|escape:'html':'UTF-8'}">
 									{displayPrice price=$data.amt_with_qty}</td> *}
 								<td class="cart_line_total_price">
-									{if (isset($data.extra_demands) && $data.extra_demands) || (isset($data.additional_service) && $data.additional_service)}
+									{if (isset($data.extra_demands) && $data.extra_demands) || (isset($data.additional_service) && $data.additional_service) || (isset($data.selected_services) && $data.selected_services)}
 										{displayPrice price=($data.amt_with_qty + $data.additional_services_auto_add_price + $data.demand_price +  $data.additional_service_price)|escape:'html':'UTF-8'}
 									{else}
 										{displayPrice price=$data.amt_with_qty|escape:'html':'UTF-8'}

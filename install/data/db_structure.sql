@@ -8,6 +8,7 @@ CREATE TABLE `PREFIX_access` (
   `add` int(11) NOT NULL,
   `edit` int(11) NOT NULL,
   `delete` int(11) NOT NULL,
+  `kpi` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_profile`,`id_tab`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
@@ -1495,7 +1496,7 @@ CREATE TABLE `PREFIX_order_payment` (
 	`id_order_payment` INT NOT NULL auto_increment,
 	`order_reference` VARCHAR(9),
 	`id_currency` INT UNSIGNED NOT NULL,
-	`amount` DECIMAL(10,2) NOT NULL,
+	`amount` DECIMAL(20,6) NOT NULL,
 	`payment_method` varchar(255) NOT NULL,
 	`payment_type` INT UNSIGNED NOT NULL,
 	`conversion_rate` decimal(13,6) NOT NULL DEFAULT 1,
@@ -1513,7 +1514,8 @@ CREATE TABLE `PREFIX_order_payment_detail` (
 	`id_order_payment_detail` INT(10) unsigned NOT NULL auto_increment,
 	`id_order_payment` INT(10) unsigned NOT NULL,
 	`id_order` INT(10) unsigned NOT NULL,
-	`amount` DECIMAL(10,2) NOT NULL,
+	`amount` DECIMAL(20,6) NOT NULL,
+  `receipt_number` INT(10) NOT NULL,
 	`date_add` DATETIME NOT NULL,
 	PRIMARY KEY (`id_order_payment_detail`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;

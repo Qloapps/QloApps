@@ -19,8 +19,8 @@
     <url_rewrite>contact-us</url_rewrite>
   </meta>
   <meta id="index" id_shop="1">
-    <title>Hotel Prime</title>
-    <description>Vieta, kur komfortas ir prabanga dera su gamta!</description>
+    <title></title>
+    <description></description>
     <keywords/>
     <url_rewrite/>
   </meta>
@@ -42,18 +42,22 @@
     <keywords/>
     <url_rewrite>password-recovery</url_rewrite>
   </meta>
+<!--
   <meta id="prices-drop" id_shop="1">
     <title>Prices drop</title>
     <description>Our special products</description>
     <keywords/>
     <url_rewrite>prices-drop</url_rewrite>
   </meta>
+-->
+<!--
   <meta id="sitemap" id_shop="1">
     <title>Sitemap</title>
     <description>Lost ? Find what your are looking for</description>
     <keywords/>
     <url_rewrite>sitemap</url_rewrite>
   </meta>
+-->
   <meta id="supplier" id_shop="1">
     <title>Suppliers</title>
     <description>Suppliers list</description>
@@ -138,18 +142,22 @@
     <keywords/>
     <url_rewrite>order</url_rewrite>
   </meta>
+<!--
   <meta id="search" id_shop="1">
     <title>Search</title>
     <description/>
     <keywords/>
     <url_rewrite>search</url_rewrite>
   </meta>
+-->
+<!--
   <meta id="stores" id_shop="1">
     <title>Stores</title>
     <description/>
     <keywords/>
     <url_rewrite>stores</url_rewrite>
   </meta>
+-->
   <meta id="order-opc" id_shop="1">
     <title>Order</title>
     <description/>
@@ -168,10 +176,12 @@
     <keywords/>
     <url_rewrite>order-confirmation</url_rewrite>
   </meta>
+<!--
   <meta id="products-comparison" id_shop="1">
     <title>Products Comparison</title>
     <description/>
     <keywords/>
     <url_rewrite>products-comparison</url_rewrite>
   </meta>
+-->
 </entity_meta>

@@ -88,90 +88,6 @@
 
         <div class="row">
             <div class="col-lg-7">
-                {if isset($htl_booking_order_data) && $htl_booking_order_data}
-                    <div class="panel">
-                        <div class="panel-heading order_status_heading">
-                            <i class="icon-bed"></i> &nbsp;{l s='Rooms Status'}
-                        </div>
-                        <div class="panel-content">
-                            <div class="row">
-                                <div class="col-lg-12 table-responsive" id="room_status_info_wrapper">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>{l s='Room'}</th>
-                                                <th>{l s='Duration'}</th>
-                                                <th>{l s='Check-In'}</th>
-                                                <th>{l s='Check-Out'}</th>
-                                                <th>{l s='Allotment'}</th>
-                                                <th>{l s='Action'}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {if isset($htl_booking_order_data) && $htl_booking_order_data}
-                                                {foreach from=$htl_booking_order_data item=data}
-                                                    <tr>
-                                                        <td>
-                                                            {$data['room_num']}<br>
-                                                            <a href="{$link->getAdminLink('AdminProducts')|escape:'html':'UTF-8'}&amp;id_product={$data['id_product']}&amp;updateproduct" target="_blank">{$data['room_type_name']|escape:'html':'UTF-8'}</a>
-                                                        </td>
-                                                        <td>
-                                                            {assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
-                                                            {dateFormat date=$data['date_from'] full=$is_full_date} - {dateFormat date=$data['date_to'] full=$is_full_date}
-                                                        </td>
-                                                        <td>
-                                                            {if ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_IN']['id_status']) || ($data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status'])}
-                                                                <span class="text-danger room_status">{l s='Checked in on'}<br>{dateFormat date=$data['check_in'] full=1}</span>
-                                                            {else}
-                                                                --
-                                                            {/if}
-                                                        </td>
-                                                        <td>
-                                                            {if $data['id_status'] == $hotel_order_status['STATUS_CHECKED_OUT']['id_status']}
-                                                                <span class="text-success room_status">{l s='Checked out on'}<br>{dateFormat date=$data['check_out'] full=1}</span>
-                                                            {else}
-                                                                --
-                                                            {/if}
-                                                        </td>
-                                                        <td>
-                                                            {if $data['booking_type'] == $ALLOTMENT_MANUAL}
-                                                                {l s='Manual'} &nbsp;{if $data['comment'] != ''}<a class="manual_allotment_comment" href="#" data-id_hotel_booking_detail="{$data['id']}"><i class="icon-info-circle"></i></a>{/if}
-                                                            {else}
-                                                                {l s='Auto'}
-                                                            {/if}
-                                                        </td>
-                                                        <td>
-                                                            <a title="{l s='Upload/Check guest documents'}" class="btn btn-default" href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
-                                                                <span class="badge badge-info">{if $data.num_checkin_documents > 0}{$data.num_checkin_documents}{else}0{/if}</span> <i class="icon-file-text"></i>
-                                                            </a>
-
-                                                            {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
-                                                                <span class="badge badge-danger">{if $data.is_cancelled}{l s='Cancelled'}{else}{l s='Refunded'}{/if}</span>
-                                                            {elseif $can_edit}
-                                                                <a class="open_room_status_form btn btn-default" href="#" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}" data-check_in="{$data['check_in']}" data-check_out="{$data['check_out']}">
-                                                                    <i class="icon-pencil"></i> {l s='Edit'}
-                                                                </a>
-                                                            {/if}
-                                                        </td>
-                                                    </tr>
-                                                {/foreach}
-                                            {else}
-                                                <tr>
-                                                    <td class="list-empty hidden-print" colspan="6">
-                                                        <div class="list-empty-msg">
-                                                            <i class="icon-warning-sign list-empty-icon"></i>
-                                                            {l s='No rooms found'}
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            {/if}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {/if}
                 <div class="panel">
                     <div class="panel-heading">
                         <i class="icon-file"></i> &nbsp;{l s='Order'}
@@ -456,7 +372,7 @@
                                         <th><span class="title_box ">{l s='Transaction ID'}</span></th>
                                         <th><span class="title_box ">{l s='Amount'}</span></th>
                                         <th><span class="title_box ">{l s='Invoice'}</span></th>
-                                        <th></th>
+                                        <th colspan="3"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -468,6 +384,11 @@
                                             <td>{$payment['transaction_id']|escape:'html':'UTF-8'}</td>
                                             <td>{displayPrice price=$payment['real_paid_amount'] currency=$payment['id_currency']}</td>
                                             <td>{if isset($payment['invoice_number'])}{$payment['invoice_number']}{else}--{/if}</td>
+                                            {if isset($receipt_management_active) && $receipt_management_active}
+                                                <td class="actions">
+                                                    <a target="_blank" class="btn btn-default" href="{$link->getAdminLink('AdminPdf')}&submitAction=generatePaymentReceipt&id_order_payment_detail={$payment['id_order_payment_detail']}"><i class="icon-file-text"></i> {l s='Receipt'}</a>
+                                                </td>
+                                            {/if}
                                             <td class="actions">
                                                 <a class="open_payment_information btn btn-default" href="#" data-card_number="{if $payment['card_number']}{$payment['card_number']}{else}{l s='Not defined'}{/if}"  data-card_brand="{if $payment['card_brand']}{$payment['card_brand']}{else}{l s='Not defined'}{/if}"  data-card_expiration="{if $payment['card_expiration']}{$payment['card_expiration']}{else}{l s='Not defined'}{/if}"  data-card_holder="{if $payment['card_holder']}{$payment['card_holder']}{else}{l s='Not defined'}{/if}" data-payment_date="{if $payment['date_add']}{$payment['date_add']}{else}{l s='Not defined'}{/if}" data-payment_method="{if $payment['payment_method']}{$payment['payment_method']}{else}{l s='Not defined'}{/if}" data-payment_source="{if $payment_types[$payment['payment_type']]['name']}{$payment_types[$payment['payment_type']]['name']}{else}{l s='Not defined'}{/if}" data-transaction_id="{if $payment['transaction_id']}{$payment['transaction_id']}{else}{l s='Not defined'}{/if}" data-amount="{if $payment['amount']}{displayPrice currency={$payment['id_currency']} price={$payment['amount']}}{else}{l s='Not defined'}{/if}" data-invoice_number="{if isset($payment['invoice_number']) && $payment['invoice_number']}{$payment['invoice_number']}{else}{l s='Not defined'}{/if}"><i class="icon-search"></i> {l s='Details'}</a>
                                             </td>
@@ -678,9 +599,11 @@
                                     </div>
                                 {/if}
                             {else}
+                                {if $addressAccess['add'] === 1}
                                 <button id="add_guest_address" class="btn btn-primary pull-right fancybox" href="{$link->getAdminLink('AdminAddresses')}&amp;addaddress&amp;id_order={$order->id|intval}&amp;address_type=2&amp;id_customer={$order->id_customer}&amp;liteDisplaying=1&amp;submitFormAjax=1#">
                                     <i class="icon-plus-circle"></i> {l s='Add Address'}
                                 </button>
+                                {/if}
                                 {if $idCurrentAddress}
                                     <div class="guest_address_actions dropdown">
                                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -1115,7 +1038,7 @@
                 <div class="panel panel-vouchers">
                     <div class="panel-heading">
                         <span><i class="icon-tag"></i> &nbsp;{l s='Voucher'}</span>
-                        {if $can_edit && $order->total_paid > 0}
+                        {if $can_edit && $order->total_paid > 0 && $cartRuleAccess['add'] === 1}
                             <button id="add_voucher" class="btn btn-primary pull-right" type="button" >
                                 <i class="icon-ticket"></i> {l s='Add new voucher'}
                             </button>

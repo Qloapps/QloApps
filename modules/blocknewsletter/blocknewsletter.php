@@ -54,8 +54,6 @@ class Blocknewsletter extends Module
         $this->tab = 'front_office_features';
         $this->need_instance = 0;
 
-        $this->controllers = array('verification');
-
         $this->bootstrap = true;
         parent::__construct();
 
