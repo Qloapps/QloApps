@@ -98,7 +98,8 @@
 											<div class="dates-wrap">
 												<a class="btn btn-default btn-sm deactiveDatesModal "
 												   data-toggle="modal" data-target="#deactiveDatesModal"
-												   data-id-room="{if isset($room_info['id'])}{$room_info['id']}{/if}">
+												   data-id-room="{if isset($room_info['id'])}{$room_info['id']}{/if}"
+												   data-room-num="{$room_info['room_num']|escape:'html':'UTF-8'}">
 													{if isset($room_info['disable_dates_json']) && json_decode($room_info['disable_dates_json'])}{l s='View Dates'}{else}{l s='Add Dates'}{/if}
 												</a>
 
@@ -224,9 +225,50 @@
 											*}
 									</div>
 								</div>
-							</div>
 
+								{* Action — sibling of .room-selection/.room-cell-grid within .card-row,
+								   so it never joins the field wrap; .card-row's align-items:stretch
+								   makes it span the full card height at every breakpoint. *}
+								<div class="col-action">
+									<span class="room-field-label">{l s='Action'}</span>
+									{if isset($room_info['id'])}
+										<div class="btn-group">
+											<button type="button" class="btn btn-default btn-sm btn-edit-room">
+												<i class="icon-pencil"></i> {l s='Edit'}
+											</button>
+											<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+												<span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu dropdown-menu-right">
+												<li>
+													<a href="#" class="rm_htl_room" data-id-htl-info="{$room_info['id']}">
+														<i class="icon-trash"></i> {l s='Delete'}
+													</a>
+												</li>
+											</ul>
+										</div>      
+									{else}
+										<div class="btn-group">
+											<button type="button" class="btn btn-default btn-sm btn-edit-room">
+												<i class="icon-pencil"></i> {l s='Edit'}
+											</button>
+											<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+												<span class="caret"></span>
+											</button>
+											<ul class="dropdown-menu dropdown-menu-right">
+												<li>
+													<a href="#" class="remove-rooms-button">
+														<i class="icon-trash"></i> {l s='Delete'}
+													</a>
+												</li>
+											</ul>
+										</div>
+									{/if}
+								</div>
+							</div>
 						</div>
+
+					</div>
 					{/foreach}
 				{else}
 					<div class="alert alert-info">{l s='No rooms have been added yet.'}</div>
@@ -280,7 +322,7 @@
 							<span id="rooms-pagination-per-page">10</span>
 							<i class="icon-caret-down"></i>
 						</button>
-						<ul class="dropdown-menu">
+						<ul class="dropdown-menu dropdown-menu-right">
 							{foreach from=[10, 20, 50, 100] item=perPageOption}
 								<li>
 									<a href="javascript:void(0);" class="rooms-pagination-per-page-option" data-items="{$perPageOption}">{$perPageOption}</a>
@@ -1119,18 +1161,27 @@
 
         // Reseting and populating the modal.
         $('#deactiveDatesModal').on('show.bs.modal', function(e) {
+            // ponytail: AdminProductsController loads jQuery UI's tooltip widget (for the
+            // Connected Rooms header hints), which clobbers $.fn.tooltip after Bootstrap's own
+            // registers it — jQuery UI's tooltip has no 'show'/'hide' string commands, unlike
+            // Bootstrap's, so the calendar's tooltips below would throw. Checking here (at
+            // modal-open, a real user action) instead of once at page load guarantees every
+            // script has finished loading by now, regardless of load/defer order.
+            if ($.fn.tooltip && $.fn.tooltip.noConflict) {
+                $.fn.tooltip = $.fn.tooltip.noConflict();
+            }
             $('#deactiveDatesModal').css('visibility', 'hidden');
             $('#page-loader').show();
             DisableDatesObj.reset();
             DisableDatesObj.init($(e.relatedTarget));
         });
 
-        // Disable dates data filling in the tr so that we cal validate it while saving this room type.
+        // Refresh the room card's "Add Dates"/"View Dates" label to reflect the dates just edited.
         $('#deactiveDatesModal').on('hide.bs.modal', function(e) {
             const disableDates = DisableDatesObj.getAllDisableDates();
             const roomRowIndex = parseInt($('#deactiveDatesModal').attr('data-room-row-index'));
-            const roomRow = $('#product-configuration .hotel-room tr.room_data_values[data-row-index='+roomRowIndex+']');
-            $(roomRow).find('.disable_dates_json').val(JSON.stringify(disableDates));
+            const roomRow = $('.rooms-list-body .room_data_values[data-row-index='+roomRowIndex+']');
+            $(roomRow).find('.deactiveDatesModal').text(disableDates.length ? '{l s='View Dates'}' : '{l s='Add Dates'}');
             DisableDatesObj.reset();
             DisableDatesObj.allowCalendarActions();
         });
@@ -1145,7 +1196,7 @@
 
         $('#select-all-rooms').on('click', function(e) {
             e.preventDefault();
-            $('[type="checkbox"][name="selected_room_ids[]"]').each(function(){
+            $('[type="checkbox"][name="selected_room_ids[]"]:visible').each(function(){
                 if (!$(this).prop('disabled')) {
                     $(this).prop('checked', true);
                 }
@@ -1557,7 +1608,7 @@
             init: function(triggerRoomRow) {
                 var idRoom = parseInt($(triggerRoomRow).attr('data-id-room'));
                 var roomRowIndex = parseInt($(triggerRoomRow).closest('.room_data_values').attr('data-row-index'));
-                var roomNum = $(triggerRoomRow).closest('.room_data_values').find('[name="rooms_info['+roomRowIndex+'][room_num]"]').val();
+                var roomNum = $(triggerRoomRow).attr('data-room-num');
                 $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
                 $('#deactiveDatesModal').attr('data-id-room', idRoom);
                 if ($.trim(roomNum) != '') {
