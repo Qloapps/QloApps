@@ -52,7 +52,7 @@
 				{/block}
 				{block name='password_form_action'}
 					<p class="submit">
-						<button type="submit" class="btn button button-medium"><span>{l s='Retrieve Password'}&nbsp;<i class="icon-chevron-right right"></i></span></button>
+						<button type="submit" class="qlo-btn qlo-btn--primary"><span>{l s='Retrieve Password'}&nbsp;<i class="icon-chevron-right right"></i></span></button>
 					</p>
 				{/block}
 			</fieldset>

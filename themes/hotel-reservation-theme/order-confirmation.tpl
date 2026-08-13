@@ -393,7 +393,7 @@
 												<label class="col-xs-6 title">{l s='Status'}</label>
 												<div class="col-xs-6 text-right value status">
 													{if isset($order_history[0]) && $order_history[0]}
-														<span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+														<span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="badge">
 															{if $order_history[0].id_order_state|in_array:$overbooking_order_states}
 																{l s='Order Not Confirmed'}
 															{else}
@@ -530,7 +530,7 @@
 					<br />{l s='If you have questions, comments or concerns, please contact our'} <a class="cust_serv_lnk" href="{$link->getPageLink('contact', true)|escape:'html'}">{l s='expert customer support team.'}</a>
 				</p>
 				<p class="cart_navigation exclusive">
-					<a class="btn" href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Go to your order history page'}"><i class="icon-chevron-left"></i>{l s='View your order history'}</a>
+					<a class="qlo-btn qlo-btn--transparent" href="{$link->getPageLink('history', true)|escape:'html':'UTF-8'}" title="{l s='Go to your order history page'}"><i class="icon-chevron-left"></i>{l s='View your order history'}</a>
 				</p>
 			{/if}
 		{/if}

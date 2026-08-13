@@ -262,9 +262,13 @@
     /* font-size: 16px; */
 }
 
-.label {
-    font-size: 14px;
-    color: #333;
-    font-weight: normal;
-    border-radius: 2px;
-}
+/* .label rule removed (2026-07-29): the order-status chip on this page now uses the real .badge
+   class (see order-confirmation.tpl) instead of a .label look-alike, so this page no longer has
+   any .label element for this rule to target. */
+
+.order-confirmation.box {
+  line-height: 29px; }
+  .order-confirmation.box a {
+    text-decoration: underline; }
+    .order-confirmation.box a:hover {
+      text-decoration: none; }

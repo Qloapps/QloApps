@@ -27,9 +27,9 @@
                 <div class="dropdown review-sort-by">
                     <label class="sort-by">{l s='SORT BY' mod='qlohotelreview'}</label>
                     <div class="review-sort-by-container">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" data-value="{QhrHotelReview::QHR_SORT_BY_TIME_NEW}">
+                        <button class="qlo-dropdown-trigger dropdown-toggle" type="button" data-toggle="dropdown" data-value="{QhrHotelReview::QHR_SORT_BY_TIME_NEW}">
                             <span>{l s='Newest First' mod='qlohotelreview'}</span>
-                            <span class="caret"></span>
+                            <span class="qlo-dropdown-trigger__icon"></span>
                         </button>
                         <ul class="dropdown-menu text-left">
                             <li><a class="sort-by-option" data-id-hotel="{$id_hotel}" data-value="{QhrHotelReview::QHR_SORT_BY_RELEVANCE}" href="#">{l s='Most Relevant' mod='qlohotelreview'}</a></li>

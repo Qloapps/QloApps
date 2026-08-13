@@ -494,6 +494,12 @@
     border-top: 1px solid #E5E5E5;
 }
 
+/* .btn/.btn-primary/.btn-secondary below are dead now that this card-footer's buttons use
+   .qlo-btn (2026-07-29, Button component rollout) — padding/radius/font/color are already
+   covered by .qlo-btn's own rules in global.css. Left in place per the standardization spec's
+   Step 11 (stale-CSS cleanup is its own later pass, not bundled into a rollout) — a zero-residual
+   grep hasn't been run for them yet. Only the two still-needed page-specific bits (inter-button
+   gap, hover feedback) are retargeted below. */
 .fancybox-wrap.fancybox-order-detail .card-footer .btn {
     padding: 10px 30px;
     border-radius: 2px;
@@ -502,11 +508,11 @@
     font-weight: bold;
 }
 
-.fancybox-wrap.fancybox-order-detail .card-footer .btn:not(:last-of-type) {
+.fancybox-wrap.fancybox-order-detail .card-footer .qlo-btn:not(:last-of-type) {
     margin-right: 10px;
 }
 
-.fancybox-wrap.fancybox-order-detail .card-footer .btn:hover {
+.fancybox-wrap.fancybox-order-detail .card-footer .qlo-btn:hover {
     opacity: 0.8;
 }
 
@@ -890,12 +896,15 @@
 #create-new-refund-popup .tab-content .refund_element_details.cancelled {
     background-color: #F5F5F5;
 }
+/* Shape aligned to the redesigned .badge-danger (2026-07-29) — was a bespoke 31px pill with a
+   hardcoded color; now matches the site-wide Badges component exactly (padding/radius from
+   global.css's .badge-danger group rule, color from the same token). Only margin-left stays —
+   that's this popup's own spacing need, not part of the badge's shape. */
 #create-new-refund-popup .tab-content .refund_element_details.cancelled .badge-cancelled {
     margin-left: 6px;
-    padding: 5px 10px;
-    border-radius: 31px;
-    font-size: 12px;
-    background-color: #FF4B4B;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background-color: var(--message-error, #FF4B4B);
 }
 
 #create-new-refund-popup .refund_element_details .occupancy-wrap {

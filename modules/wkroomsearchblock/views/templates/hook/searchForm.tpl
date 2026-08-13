@@ -103,16 +103,18 @@
                                                             <label>{l s='Adults' mod='wkroomsearchblock'}</label>
                                                             <div>
                                                                 <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$occupancy['adults']|escape:'htmlall':'UTF-8'}">
-                                                                <div class="occupancy_count pull-left">
+                                                                <div class="qlo-input-number qlo-input-number--sm">
+                                                                <div class="occupancy_count qlo-input">
                                                                     <span>{$occupancy['adults']|escape:'htmlall':'UTF-8'}</span>
                                                                 </div>
-                                                                <div class="qty_direction pull-left">
-                                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                                                <div class="qty_direction qlo-stepper qlo-stepper--sm">
+                                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">
                                                                         <span><i class="icon-plus"></i></span>
                                                                     </a>
-                                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">
                                                                         <span><i class="icon-minus"></i></span>
                                                                     </a>
+                                                                </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -120,16 +122,18 @@
                                                             <label>{l s='Children' mod='wkroomsearchblock'}</label>
                                                             <div class="clearfix">
                                                                 <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}">
-                                                                <div class="occupancy_count pull-left">
+                                                                <div class="qlo-input-number qlo-input-number--sm">
+                                                                <div class="occupancy_count qlo-input">
                                                                     <span>{$occupancy['children']|escape:'htmlall':'UTF-8'}</span>
                                                                 </div>
-                                                                <div class="qty_direction pull-left">
-                                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                                                <div class="qty_direction qlo-stepper qlo-stepper--sm">
+                                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">
                                                                         <span><i class="icon-plus"></i></span>
                                                                     </a>
-                                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                                    <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">
                                                                         <span><i class="icon-minus"></i></span>
                                                                     </a>
+                                                                </div>
                                                                 </div>
                                                             </div>
                                                             <p class="label-desc-txt">({l s='Below' mod='wkroomsearchblock'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='wkroomsearchblock'})</p>
@@ -143,14 +147,15 @@
                                                             <div class="children_ages">
                                                                 {if isset($occupancy['child_ages']) && $occupancy['child_ages']}
                                                                     {foreach $occupancy['child_ages'] as $childAge}
-                                                                        <div>
-                                                                            <select class="guest_child_age room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
+                                                                        <div class="qlo-input-wrap">
+                                                                            <select class="guest_child_age room_occupancies qlo-input not_uniform" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
                                                                                 <option value="-1" {if $childAge == -1}selected{/if}>{l s='Select 1' mod='wkroomsearchblock'}</option>
                                                                                 <option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1' mod='wkroomsearchblock'}</option>
                                                                                 {for $age=1 to ($max_child_age-1)}
                                                                                     <option value="{$age|escape:'htmlall':'UTF-8'}" {if $childAge == $age}selected{/if}>{$age|escape:'htmlall':'UTF-8'}</option>
                                                                                 {/for}
                                                                             </select>
+                                                                            <span class="qlo-select-icon qlo-input-icon"></span>
                                                                         </div>
                                                                     {/foreach}
                                                                 {/if}
@@ -171,20 +176,22 @@
                                                         <label>{l s='Adults' mod='wkroomsearchblock'}</label>
                                                         <div>
                                                             <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[0][adults]" value="1">
-                                                            <div class="occupancy_count pull-left">
+                                                            <div class="qlo-input-number qlo-input-number--sm">
+                                                            <div class="occupancy_count qlo-input">
                                                                 <span>1</span>
                                                             </div>
-                                                            <div class="qty_direction pull-left">
-                                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                                            <div class="qty_direction qlo-stepper qlo-stepper--sm">
+                                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">
                                                                     <span>
                                                                         <i class="icon-plus"></i>
                                                                     </span>
                                                                 </a>
-                                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">
                                                                     <span>
                                                                         <i class="icon-minus"></i>
                                                                     </span>
                                                                 </a>
+                                                            </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -192,20 +199,22 @@
                                                         <label>{l s='Children' mod='wkroomsearchblock'}</label>
                                                         <div class="clearfix">
                                                             <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[0][children]" value="0">
-                                                            <div class="occupancy_count pull-left">
+                                                            <div class="qlo-input-number qlo-input-number--sm">
+                                                            <div class="occupancy_count qlo-input">
                                                                 <span>0</span>
                                                             </div>
-                                                            <div class="qty_direction pull-left">
-                                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                                            <div class="qty_direction qlo-stepper qlo-stepper--sm">
+                                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">
                                                                     <span>
                                                                         <i class="icon-plus"></i>
                                                                     </span>
                                                                 </a>
-                                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">
                                                                     <span>
                                                                         <i class="icon-minus"></i>
                                                                     </span>
                                                                 </a>
+                                                            </div>
                                                             </div>
                                                         </div>
                                                         <p class="label-desc-txt">({l s='Below' mod='wkroomsearchblock'}  {$max_child_age|escape:'htmlall':'UTF-8'} {l s='years' mod='wkroomsearchblock'})</p>
@@ -229,7 +238,7 @@
                                         <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='wkroomsearchblock'}</span></a>
                                     </span>
                                     <span>
-                                        <button class="submit_occupancy_btn btn btn-primary">{l s='Done' mod='wkroomsearchblock'}</button>
+                                        <button class="qlo-btn qlo-btn--primary submit_occupancy_btn">{l s='Done' mod='wkroomsearchblock'}</button>
                                     </span>
                                 </div>
                             </div>
@@ -239,7 +248,7 @@
             {/block}
             {block name='search_form_submit'}
                 <div class="form-group grid-item search_room_submit_block area-4" style="grid-column: span 4;">
-                    <button type="submit" class="btn btn btn-primary" name="search_room_submit" id="search_room_submit">
+                    <button type="submit" class="qlo-btn qlo-btn--primary" name="search_room_submit" id="search_room_submit">
                         <span>{l s='Search Rooms' mod='wkroomsearchblock'}</span>
                     </button>
                 </div>

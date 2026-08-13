@@ -38,8 +38,13 @@
 						<div class="col-sm-12 lf_sub_cont">
 							{foreach $all_feat as $feat}
 								<div class="layered_filt">
-									<input type="checkbox" class="filter" data-type="amenities" value="{$feat.id_feature}">
-									<span class="filters_name">{$feat.name}</span>
+									<label class="qlo-checkbox">
+										<span class="qlo-checkbox__control">
+											<input type="checkbox" class="filter not_uniform" data-type="amenities" value="{$feat.id_feature}">
+											<span class="qlo-checkbox__box"></span>
+										</span>
+										<span class="filters_name">{$feat.name}</span>
+									</label>
 								</div>
 							{/foreach}
 						</div>

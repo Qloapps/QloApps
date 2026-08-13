@@ -26,9 +26,9 @@
             <div class="dropdown">
                 {foreach from=$languages key=k item=language}
                     {if $language.iso_code == $lang_iso}
-                        <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">
+                        <button class="qlo-dropdown-trigger dropdown-toggle" type="button" data-toggle="dropdown">
                             {$language.name|regex_replace:"/\s\(.*\)$/":""}
-                            <span class="caret"></span>
+                            <span class="qlo-dropdown-trigger__icon"></span>
                         </button>
                     {/if}
                 {/foreach}

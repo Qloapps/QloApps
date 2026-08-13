@@ -46,7 +46,7 @@
 	{block name='order_slip_list'}
 		<div class="block-center" id="block-history">
 			{if $ordersSlip && count($ordersSlip)}
-				<table id="order-list" class="table table-bordered footab">
+				<table id="order-list" class="table table-bordered footab qlo-table">
 					<thead>
 						<tr>
 							<th data-sort-ignore="true" class="first_item">{l s='Credit slip'}</th>
@@ -109,14 +109,14 @@
 	{block name='order_slip_footer_links'}
 		<ul class="footer_links clearfix">
 			<li>
-				<a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
+				<a class="qlo-btn qlo-btn--transparent" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}">
 					<span>
 						<i class="icon-chevron-left"></i> {l s='Back to My account'}
 					</span>
 				</a>
 			</li>
 			<li>
-				<a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
+				<a class="qlo-btn qlo-btn--transparent" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
 					<span>
 						<i class="icon-chevron-left"></i> {l s='Home'}
 					</span>

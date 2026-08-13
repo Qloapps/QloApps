@@ -27,11 +27,11 @@
     {if count($currencies) > 1}
         <div id="currencies-block-top" class="currencies-block-wrap nav-main-item-right hidden-xs pull-right">
             <div class="dropdown">
-                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">
+                <button class="qlo-dropdown-trigger dropdown-toggle" type="button" data-toggle="dropdown">
                     {foreach from=$currencies key=k item=f_currency}
                         {if $cookie->id_currency == $f_currency.id_currency}{$f_currency.iso_code}{/if}
                     {/foreach}
-                    <span class="caret"></span>
+                    <span class="qlo-dropdown-trigger__icon"></span>
                 </button>
 
                 <ul class="dropdown-menu">

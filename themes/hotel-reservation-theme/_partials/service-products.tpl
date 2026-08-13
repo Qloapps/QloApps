@@ -22,12 +22,12 @@
 
 {if isset($service_products_exists) && $service_products_exists}
     {block name='service_products_tabs'}
-        <ul class="nav nav-tabs product_description_tabs">
+        <ul class="nav qlo-nav-tabs">
             {if !$PS_SERVICE_PRODUCT_CATEGORY_FILTER}
-                <li class="active"><a href="#all_products" class="idTabHrefShort" data-toggle="tab">{l s='Services'}</a></li>
+                <li class="active"><a href="#all_products" data-toggle="tab">{l s='Services'}</a></li>
             {else}
                 {foreach $service_products_by_category as $category}
-                    <li {if $category@iteration == 1}class="active"{/if}><a class="idTabHrefShort" href="#category_{$category['id_category']}" data-toggle="tab">{$category['name']}</a></li>
+                    <li {if $category@iteration == 1}class="active"{/if}><a href="#category_{$category['id_category']}" data-toggle="tab">{$category['name']}</a></li>
                 {/foreach}
             {/if}
         </ul>

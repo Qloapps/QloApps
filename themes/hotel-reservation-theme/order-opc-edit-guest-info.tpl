@@ -42,7 +42,7 @@
                     {block name='order_opc_edit_guest_info_login_submit'}
                         <p class="submit">
                             {if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-                            <button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default button-medium pull-right"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
+                            <button type="submit" id="SubmitLogin" name="SubmitLogin" class="qlo-btn qlo-btn--primary pull-right"><span><i class="icon-lock left"></i>{l s='Sign in'}</span></button>
                         </p>
                     {/block}
                 </div>
@@ -298,7 +298,7 @@
                 {/block}
                 {block name='order_opc_edit_guest_info_account_submit'}
                     <div class="submit opc-add-save clearfix">
-                        <button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
+                        <button type="submit" name="submitAccount" id="submitAccount" class="qlo-btn qlo-btn--primary pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
                     </div>
                 {/block}
             <!-- END Account -->

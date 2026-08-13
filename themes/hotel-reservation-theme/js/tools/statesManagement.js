@@ -78,7 +78,7 @@ function bindCheckbox()
 function bindUniform()
 {
 	if (!!$.prototype.uniform)
-		$("select.form-control,input[type='radio'],input[type='checkbox']").uniform();
+		$("select.form-control,input[type='radio'],input[type='checkbox']").not(".not_uniform").uniform();
 }
 
 function bindZipcode()
@@ -140,7 +140,7 @@ function updateState(suffix)
 		});
 
 		$('.id_state' + (typeof suffix !== 'undefined' ? '_' + suffix : '') + ':hidden').fadeIn('slow');
-		$('#id_state_invoice').uniform();
+		$('#id_state_invoice').not('.not_uniform').uniform();
 	}
 	else
 		$('.id_state' + (typeof suffix !== 'undefined' ? '_' + suffix : '')).fadeOut('fast');

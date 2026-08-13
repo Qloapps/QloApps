@@ -97,7 +97,7 @@
 								<label for="user_name" class="control-label">
 									{l s='Name'}{if isset($contactNameRequired) && $contactNameRequired}*{/if}
 								</label>
-								<input class="form-control contact_input" type="text" id="user_name" name="user_name" value="{if isset($smarty.post.user_name)}{$smarty.post.user_name}{elseif isset($customerThread.user_name)}{$customerThread.user_name|escape:'html':'UTF-8'}{elseif isset($customerName)}{$customerName}{/if}" {if isset($customerThread.user_name)} readonly{/if}/>
+								<input class="qlo-input" type="text" id="user_name" name="user_name" value="{if isset($smarty.post.user_name)}{$smarty.post.user_name}{elseif isset($customerThread.user_name)}{$customerThread.user_name|escape:'html':'UTF-8'}{elseif isset($customerName)}{$customerName}{/if}" {if isset($customerThread.user_name)} readonly{/if}/>
 							</div>
 						</div>
 					{/if}
@@ -107,9 +107,9 @@
 									{l s='Email'}*
 								</label>
 								{if isset($customerThread.email)}
-									<input class="form-control contact_input" type="email" id="email" name="from" value="{if isset($customerThread.email)}{$customerThread.email|escape:'html':'UTF-8'}" readonly="readonly"{/if} />
+									<input class="qlo-input" type="email" id="email" name="from" value="{if isset($customerThread.email)}{$customerThread.email|escape:'html':'UTF-8'}" readonly="readonly"{/if} />
 								{else}
-									<input class="form-control contact_input validate" type="email" id="email" name="from" data-validate="isEmail" value="{if isset($smarty.post.email)}{$smarty.post.email}{else}{$email|escape:'html':'UTF-8'}{/if}" />
+									<input class="qlo-input validate" type="email" id="email" name="from" data-validate="isEmail" value="{if isset($smarty.post.email)}{$smarty.post.email}{else}{$email|escape:'html':'UTF-8'}{/if}" />
 								{/if}
 							</div>
 						</div>
@@ -119,7 +119,7 @@
 								<label for="phone" class="control-label">
 									{l s='Phone'}{if isset($contactPhoneRequired) && $contactPhoneRequired}*{/if}
 								</label>
-								<input class="form-control contact_input" type="text" id="phone" name="phone" value="{if isset($smarty.post.phone)}{$smarty.post.phone}{else if isset($customerThread.phone)}{$customerThread.phone|escape:'html':'UTF-8'}{elseif isset($customerPhone)}{$customerPhone}{/if}" {if isset($customerThread.phone)}readonly="readonly"{/if}/>
+								<input class="qlo-input" type="text" id="phone" name="phone" value="{if isset($smarty.post.phone)}{$smarty.post.phone}{else if isset($customerThread.phone)}{$customerThread.phone|escape:'html':'UTF-8'}{elseif isset($customerPhone)}{$customerPhone}{/if}" {if isset($customerThread.phone)}readonly="readonly"{/if}/>
 							</div>
 						</div>
 					{/if}
@@ -128,7 +128,7 @@
 								<label for="subject" class="control-label">
 									{l s='Title'}*
 								</label>
-								<input class="form-control contact_input" type="text" id="subject" name="subject" value="{if isset($smarty.post.subject)}{$smarty.post.subject}{else if isset($customerThread.subject)}{$customerThread.subject|escape:'html':'UTF-8'}{/if}" {if isset($customerThread.subject)}readonly="readonly"{/if}/>
+								<input class="qlo-input" type="text" id="subject" name="subject" value="{if isset($smarty.post.subject)}{$smarty.post.subject}{else if isset($customerThread.subject)}{$customerThread.subject|escape:'html':'UTF-8'}{/if}" {if isset($customerThread.subject)}readonly="readonly"{/if}/>
 							</div>
 						</div>
 						{if !isset($customerThread.id_contact) && isset($allowContactSelection) && $allowContactSelection}
@@ -189,7 +189,7 @@
 						<div class="form-group">
 							<input type="text" name="url" value="" class="hidden" />
 							<input type="hidden" name="contactKey" value="{$contactKey}" />
-							<button class="btn button button-medium contact_btn" type="submit" name="submitMessage" id="submitMessage" ><span>{l s='Send Message'}</span></button>
+							<button class="qlo-btn qlo-btn--primary contact_btn" type="submit" name="submitMessage" id="submitMessage" ><span>{l s='Send Message'}</span></button>
 						</div>
 					</form>
 				{/block}

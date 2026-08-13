@@ -211,14 +211,14 @@
 							<!--HOOK_PRODUCT_TAB -->
 							<section class="page-product-box">
 								{block name='product_tabs'}
-									<ul class="nav nav-tabs product_description_tabs">
-									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='Room Information'}{else}{l s='Product Information'}{/if}</a></li>
+									<ul class="nav qlo-nav-tabs">
+									<li class="active"><a href="#product_info_tab" data-toggle="tab">{if $product->booking_product}{l s='Room Information'}{else}{l s='Product Information'}{/if}</a></li>
 										{* Block for booking products *}
 										{if isset($id_hotel) && $id_hotel}
-											<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
+											<li><a href="#refund_policies_tab" data-toggle="tab">{l s='Refund Policies'}</a></li>
 										{/if}
 										{if $display_google_maps && !empty($hotel_latitude) && !empty($hotel_longitude) && ($hotel_latitude|floatval != 0 && $hotel_longitude|floatval != 0)}
-											<li><a href="#room_type_map_tab" class="idTabHrefShort" data-toggle="tab">{l s='View on Map'}</a></li>
+											<li><a href="#room_type_map_tab" data-toggle="tab">{l s='View on Map'}</a></li>
 										{/if}
 										{block name='displayProductTab'}
 											{$HOOK_PRODUCT_TAB}
@@ -732,7 +732,7 @@
 							<p id="customizedDatas">
 								<input type="hidden" name="quantityBackup" id="quantityBackup" value="" />
 								<input type="hidden" name="submitCustomizedDatas" value="1" />
-								<button class="button btn btn-default button button-small" name="saveCustomization">
+								<button class="qlo-btn qlo-btn--primary qlo-btn--sm" name="saveCustomization">
 									<span>{l s='Save'}</span>
 								</button>
 								<span id="ajax-loader" class="unvisible">

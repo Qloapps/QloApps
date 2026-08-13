@@ -162,7 +162,7 @@
                                 <div class="pull-left title">{l s='Status'}</div>
                                 <div class="pull-right value status">
                                     {if isset($order_history[0]) && $order_history[0]}
-                                        <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                        <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="badge">
                                             {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
                                                 {l s='Order Not Confirmed'}
                                             {else}
@@ -501,7 +501,7 @@
                         {if $has_general_hotel_policies || $has_refund_hotel_policies}
                             <div class="card hotel-policies card-tabs">
                                 <div class="card-header">
-                                    <ul class="nav nav-tabs">
+                                    <ul class="nav qlo-nav-tabs">
                                         {if $has_general_hotel_policies}
                                             <li class="active">
                                                 <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='Hotel Policies'}</a>
@@ -619,7 +619,7 @@
                                         <div class="submit">
                                             <input type="hidden" name="id_order" value="{$order->id|intval|escape:'html':'UTF-8'}" />
                                             <input type="submit" class="unvisible" name="submitMessage" value="{l s='Send'}" />
-                                            <button type="submit" name="submitMessage" id="submitMessage" class="button btn button-medium"><span>{l s='Send'}</span></button>
+                                            <button type="submit" name="submitMessage" id="submitMessage" class="qlo-btn qlo-btn--primary"><span>{l s='Send'}</span></button>
                                         </div>
                                     </form>
                                 {/block}
@@ -671,7 +671,7 @@
                                 <div class="pull-left title">{l s='Status'}</div>
                                 <div class="pull-right value status">
                                     {if isset($order_history[0]) && $order_history[0]}
-                                        <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'}30; border: 1px solid {$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="label">
+                                        <span{if isset($order_history[0].color) && $order_history[0].color} style="background-color:{$order_history[0].color|escape:'html':'UTF-8'};" {/if} class="badge">
                                             {if $order_history[0].id_order_state|in_array:$overbooking_order_states}
                                                 {l s='Order Not Confirmed'}
                                             {else}
@@ -1080,10 +1080,10 @@
                                         {l s='Selected: '}<span class="num-selected-rooms">{l s='00'}</span>
                                     </div>
                                     <div class="actions-wrap">
-                                        <button class="btn btn-secondary btn-cancel">
+                                        <button class="qlo-btn qlo-btn--outline-secondary btn-cancel">
                                             {l s='Cancel'}
                                         </button>
-                                        <button class="btn btn-primary btn-next">
+                                        <button class="qlo-btn qlo-btn--primary btn-next">
                                             {l s='Next'}
                                         </button>
                                     </div>
@@ -1108,10 +1108,10 @@
                                 </div>
                                 <div class="card-footer clearfix">
                                     <div class="pull-right">
-                                        <button class="btn btn-secondary btn-back">
+                                        <button class="qlo-btn qlo-btn--outline-secondary btn-back">
                                             {l s='Back'}
                                         </button>
-                                        <button class="btn btn-primary btn-submit">
+                                        <button class="qlo-btn qlo-btn--primary btn-submit">
                                             {l s='Submit'}
                                         </button>
                                     </div>

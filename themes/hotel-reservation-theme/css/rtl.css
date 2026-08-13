@@ -490,6 +490,124 @@ p.payment_module a {
 }
 /* footer - end */
 
+/* breadcrumb - start */
+.breadcrumb .navigation-pipe:before {
+  transform: rotate(225deg) !important;
+}
+.breadcrumb .navigation-pipe:nth-last-child(2) {
+  background: linear-gradient(to left, transparent 50%, #F6F6F6 50%) !important;
+}
+.breadcrumb .navigation_page:last-of-type {
+  margin-right: 0 !important;
+  margin-left: -11px !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+}
+/* breadcrumb - end */
 
+/* number stepper - start */
+.qlo-stepper__btn + .qlo-stepper__btn {
+  border-left: 1px solid var(--color-secondary, #333333) !important;
+  border-right: none !important;
+}
+/* number stepper - end */
+
+/* input validation icon - start */
+.qlo-input-icon {
+  right: auto !important;
+  left: 15px !important;
+}
+.qlo-input-wrap .qlo-input {
+  padding-right: 10px !important;
+  padding-left: 40px !important;
+}
+/* input validation icon - end */
+
+/* input groups - start */
+.input-group-addon:first-child,
+.input-group .qlo-input:first-child,
+.input-group .qlo-input-wrap:first-child .qlo-input {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-top-right-radius: 2px !important;
+  border-bottom-right-radius: 2px !important;
+}
+.input-group-addon:last-child,
+.input-group .qlo-input:last-child,
+.input-group .qlo-input-wrap:last-child .qlo-input {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-top-left-radius: 2px !important;
+  border-bottom-left-radius: 2px !important;
+}
+.input-group-btn:first-child > .qlo-dropdown-btn,
+.input-group-btn:first-child > .qlo-btn {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-top-right-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+}
+.input-group-btn:last-child > .qlo-dropdown-btn,
+.input-group-btn:last-child > .qlo-btn {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+}
+.input-group-addon:first-child {
+  border-right: 1px solid var(--color-border, #D6D4D4) !important;
+  border-left: 0 !important;
+}
+.input-group-addon:last-child {
+  border-left: 1px solid var(--color-border, #D6D4D4) !important;
+  border-right: 0 !important;
+}
+/* input groups - end */
+
+/* switch - start */
+.qlo-switch:not(.qlo-switch--check) .qlo-switch__knob {
+  left: auto !important;
+  right: 2px !important;
+}
+.qlo-switch:not(.qlo-switch--check) input:checked ~ .qlo-switch__track .qlo-switch__knob {
+  left: 2px !important;
+  right: auto !important;
+}
+.qlo-switch--check .qlo-switch__knob {
+  left: auto !important;
+  right: 0 !important;
+}
+.qlo-switch--check input:checked ~ .qlo-switch__track .qlo-switch__knob {
+  left: 0 !important;
+  right: auto !important;
+}
+/* switch - end */
+
+/* list-group - start */
+.list-group-item > .badge {
+  float: left !important;
+  margin-left: 0 !important;
+  margin-right: 10px !important;
+}
+/* list-group - end */
+
+/* alerts - start */
+.alert-success,
+.alert-info,
+.alert-warning,
+.alert-danger {
+  padding-left: 10px !important;
+  padding-right: 42px !important;
+}
+.alert.alert-success:before,
+.alert.alert-info:before,
+.alert.alert-warning:before,
+.alert.alert-danger:before {
+  left: auto !important;
+  right: 12px !important;
+}
+/* alerts - end */
 
 /*# sourceMappingURL=rtl.css.map */

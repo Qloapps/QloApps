@@ -116,7 +116,7 @@
 									<input type="hidden" name="order_reference" value="{if isset($smarty.get.order_reference)}{$smarty.get.order_reference|escape:'html':'UTF-8'}{else}{if isset($smarty.post.order_reference)}{$smarty.post.order_reference|escape:'html':'UTF-8'}{/if}{/if}" />
 									<input type="hidden" name="email" value="{if isset($smarty.get.email)}{$smarty.get.email|escape:'html':'UTF-8'}{else}{if isset($smarty.post.email)}{$smarty.post.email|escape:'html':'UTF-8'}{/if}{/if}" />
 
-									<button type="submit" name="submitTransformGuestToCustomer" class="button button-medium btn btn-submit">
+									<button type="submit" name="submitTransformGuestToCustomer" class="qlo-btn qlo-btn--primary btn-submit">
 										<span>{l s='Send'}</span>
 									</button>
 								</form>
@@ -151,7 +151,7 @@
 					</div>
 					{block name='guest_tracking_submit'}
 						<p>
-							<button type="submit" name="submitGuestTracking" class="button btn btn-default button-medium"><span>{l s='Send'}<i class="icon-chevron-right right"></i></span></button>
+							<button type="submit" name="submitGuestTracking" class="qlo-btn qlo-btn--primary"><span>{l s='Send'}<i class="icon-chevron-right right"></i></span></button>
 						</p>
 					{/block}
 				</fieldset>

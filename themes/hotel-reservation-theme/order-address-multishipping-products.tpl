@@ -25,7 +25,7 @@
 *}
 <p class="info-title">{l s='Choose the delivery addresses'}</p>
 <div id="order-detail-content" class="table_block table-responsive">
-	<table id="cart_summary" class="table table-bordered multishipping-cart">
+	<table id="cart_summary" class="table table-bordered qlo-table multishipping-cart">
 		<thead>
 			<tr>
 				<th class="cart_product first_item">{l s='Product'}</th>

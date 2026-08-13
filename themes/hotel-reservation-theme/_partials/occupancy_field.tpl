@@ -53,16 +53,18 @@
                                         <label class="col-sm-12">{l s='Adults'}</label>
                                         <div class="col-sm-12">
                                             <input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][adults]" value="{$occupancy['adults']|escape:'htmlall':'UTF-8'}">
-                                            <div class="occupancy_count pull-left">
+                                            <div class="qlo-input-number qlo-input-number--sm">
+                                            <div class="occupancy_count qlo-input">
                                                 <span>{$occupancy['adults']|escape:'htmlall':'UTF-8'}</span>
                                             </div>
-                                            <div class="qty_direction pull-left">
-                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                            <div class="qty_direction qlo-stepper qlo-stepper--sm">
+                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">
                                                     <span><i class="icon-plus"></i></span>
                                                 </a>
-                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">
                                                     <span><i class="icon-minus"></i></span>
                                                 </a>
+                                            </div>
                                             </div>
                                         </div>
                                     </div>
@@ -72,16 +74,18 @@
                                         <label class="col-sm-12">{l s='Children'}</label>
                                         <div class="col-sm-12 clearfix">
                                             <input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][children]" max="{}" value="{$occupancy['children']|escape:'htmlall':'UTF-8'}">
-                                            <div class="occupancy_count pull-left">
+                                            <div class="qlo-input-number qlo-input-number--sm">
+                                            <div class="occupancy_count qlo-input">
                                                 <span>{$occupancy['children']|escape:'htmlall':'UTF-8'}</span>
                                             </div>
-                                            <div class="qty_direction pull-left">
-                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                            <div class="qty_direction qlo-stepper qlo-stepper--sm">
+                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">
                                                     <span><i class="icon-plus"></i></span>
                                                 </a>
-                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                                <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">
                                                     <span><i class="icon-minus"></i></span>
                                                 </a>
+                                            </div>
                                             </div>
                                         </div>
                                         <div class="col-sm-12">
@@ -97,14 +101,15 @@
                                     <div class="children_ages">
                                         {if isset($occupancy['child_ages']) && $occupancy['child_ages']}
                                             {foreach $occupancy['child_ages'] as $childAge}
-                                                <div>
-                                                    <select class="guest_child_age room_occupancies" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
+                                                <div class="qlo-input-wrap">
+                                                    <select class="guest_child_age room_occupancies qlo-input not_uniform" name="occupancy[{$key|escape:'htmlall':'UTF-8'}][child_ages][]">
                                                         <option value="-1" {if $childAge == -1}selected{/if}>{l s='Select 1'}</option>
                                                         <option value="0" {if $childAge == 0}selected{/if}>{l s='Under 1'}</option>
                                                         {for $age=1 to ($max_child_age-1)}
                                                             <option value="{$age|escape:'htmlall':'UTF-8'}" {if $childAge == $age}selected{/if}>{$age|escape:'htmlall':'UTF-8'}</option>
                                                         {/for}
                                                     </select>
+                                                    <span class="qlo-select-icon qlo-input-icon"></span>
                                                 </div>
                                             {/foreach}
                                         {/if}
@@ -124,20 +129,22 @@
                                     <label class="col-sm-12">{l s='Adults'}</label>
                                     <div class="col-sm-12">
                                         <input type="hidden" class="num_occupancy num_adults" name="occupancy[0][adults]" value="{$room_type_info['adults']}">
-                                        <div class="occupancy_count pull-left">
+                                        <div class="qlo-input-number qlo-input-number--sm">
+                                        <div class="occupancy_count qlo-input">
                                             <span>{$room_type_info['adults']}</span>
                                         </div>
-                                        <div class="qty_direction pull-left">
-                                            <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                        <div class="qty_direction qlo-stepper qlo-stepper--sm">
+                                            <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">
                                                 <span>
                                                     <i class="icon-plus"></i>
                                                 </span>
                                             </a>
-                                            <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                            <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">
                                                 <span>
                                                     <i class="icon-minus"></i>
                                                 </span>
                                             </a>
+                                        </div>
                                         </div>
                                     </div>
                                 </div>
@@ -147,20 +154,22 @@
                                     <label class="col-sm-12">{l s='Children'}</label>
                                     <div class="col-sm-12 clearfix">
                                         <input type="hidden" class="num_occupancy num_children" name="occupancy[0][children]" value="0">
-                                        <div class="occupancy_count pull-left">
+                                        <div class="qlo-input-number qlo-input-number--sm">
+                                        <div class="occupancy_count qlo-input">
                                             <span>0</span>
                                         </div>
-                                        <div class="qty_direction pull-left">
-                                            <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">
+                                        <div class="qty_direction qlo-stepper qlo-stepper--sm">
+                                            <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">
                                                 <span>
                                                     <i class="icon-plus"></i>
                                                 </span>
                                             </a>
-                                            <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">
+                                            <a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">
                                                 <span>
                                                     <i class="icon-minus"></i>
                                                 </span>
                                             </a>
+                                        </div>
                                         </div>
                                     </div>
                                     <div class="col-sm-12">
@@ -190,7 +199,7 @@
                         </a>
                     </span>
                     <span>
-                        <button type="submit" class="submit_occupancy_btn btn btn-primary">{l s='Done'}</button>
+                        <button type="submit" class="qlo-btn qlo-btn--primary submit_occupancy_btn">{l s='Done'}</button>
                     </span>
                 </div>
             {/block}

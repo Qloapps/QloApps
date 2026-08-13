@@ -78,7 +78,7 @@
 							{block name='authentication_create_account_submit'}
 								<div class="submit">
 									{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-									<button class="btn button button-medium" type="submit" id="SubmitCreate" name="SubmitCreate">
+									<button class="qlo-btn qlo-btn--primary" type="submit" id="SubmitCreate" name="SubmitCreate">
 										<span>
 											<i class="icon-user left"></i>
 											{l s='Create an account'}
@@ -110,7 +110,7 @@
 							{block name='authentication_login_submit'}
 								<p class="submit">
 									{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-									<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn button button-medium">
+									<button type="submit" id="SubmitLogin" name="SubmitLogin" class="qlo-btn qlo-btn--primary">
 										<span>
 											<i class="icon-lock left"></i>
 											{l s='Sign in'}
@@ -141,8 +141,11 @@
 								<label>{l s='Title'}</label>
 								{foreach from=$genders key=k item=gender}
 									<div class="radio-inline">
-										<label for="id_gender{$gender->id}" class="top">
-											<input type="radio" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id}"{if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id} checked="checked"{/if} />
+										<label for="id_gender{$gender->id}" class="top qlo-radio">
+											<span class="qlo-radio__control">
+											<input type="radio" class="not_uniform" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id}"{if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id} checked="checked"{/if} />
+											<span class="qlo-radio__box"></span>
+											</span>
 											{$gender->name}
 										</label>
 									</div>
@@ -201,15 +204,21 @@
 							</div>
 							{if isset($newsletter) && $newsletter}
 								<div class="checkbox">
-									<label for="newsletter">
-									<input type="checkbox" name="newsletter" id="newsletter" value="1" {if isset($smarty.post.newsletter) && $smarty.post.newsletter == '1'}checked="checked"{/if} />
+									<label for="newsletter" class="qlo-checkbox">
+									<span class="qlo-checkbox__control">
+									<input type="checkbox" class="not_uniform" name="newsletter" id="newsletter" value="1" {if isset($smarty.post.newsletter) && $smarty.post.newsletter == '1'}checked="checked"{/if} />
+									<span class="qlo-checkbox__box"></span>
+									</span>
 									{l s='Sign up for our newsletter!'}</label>
 								</div>
 							{/if}
 							{if isset($optin) && $optin}
 								<div class="checkbox">
-									<label for="optin">
-									<input type="checkbox" name="optin" id="optin" value="1" {if isset($smarty.post.optin) && $smarty.post.optin == '1'}checked="checked"{/if} />
+									<label for="optin" class="qlo-checkbox">
+									<span class="qlo-checkbox__control">
+									<input type="checkbox" class="not_uniform" name="optin" id="optin" value="1" {if isset($smarty.post.optin) && $smarty.post.optin == '1'}checked="checked"{/if} />
+									<span class="qlo-checkbox__box"></span>
+									</span>
 									{l s='Receive special offers from our partners!'}</label>
 								</div>
 							{/if}
@@ -303,8 +312,11 @@
 							<input type="hidden" name="alias" id="alias" value="{l s='My address'}" />
 							<input type="hidden" name="is_new_customer" id="is_new_customer" value="0" />
 							<div class="checkbox">
-								<label for="invoice_address">
-								<input type="checkbox" name="invoice_address" id="invoice_address"{if (isset($smarty.post.invoice_address) && $smarty.post.invoice_address) || (isset($smarty.post.invoice_address) && $smarty.post.invoice_address)} checked="checked"{/if} autocomplete="off"/>
+								<label for="invoice_address" class="qlo-checkbox">
+								<span class="qlo-checkbox__control">
+								<input type="checkbox" class="not_uniform" name="invoice_address" id="invoice_address"{if (isset($smarty.post.invoice_address) && $smarty.post.invoice_address) || (isset($smarty.post.invoice_address) && $smarty.post.invoice_address)} checked="checked"{/if} autocomplete="off"/>
+								<span class="qlo-checkbox__box"></span>
+								</span>
 								{l s='Please use another address for invoice'}</label>
 							</div>
 							<div id="opc_invoice_address"  class="unvisible">
@@ -431,7 +443,7 @@
 						<span><sup>*</sup>{l s='Required field'}</span>
 						<input type="hidden" name="display_guest_checkout" value="1" />
 						{block name='authentication_guest_submit'}
-							<button type="submit" class="button btn btn-default button-medium" name="submitGuestAccount" id="submitGuestAccount">
+							<button type="submit" class="qlo-btn qlo-btn--primary" name="submitGuestAccount" id="submitGuestAccount">
 								<span>
 									{l s='Proceed to checkout'}
 									<i class="icon-chevron-right right"></i>
@@ -469,8 +481,11 @@
 						<br />
 						{foreach from=$genders key=k item=gender}
 							<div class="radio-inline">
-								<label for="id_gender{$gender->id}" class="top">
-									<input checked="" type="radio" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id}" {if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id}checked="checked"{/if} />
+								<label for="id_gender{$gender->id}" class="top qlo-radio">
+									<span class="qlo-radio__control">
+									<input checked="" type="radio" class="not_uniform" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id}" {if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id}checked="checked"{/if} />
+									<span class="qlo-radio__box"></span>
+								</span>
 								{$gender->name}
 								</label>
 							</div>
@@ -544,8 +559,12 @@
 					{/if}
 					{if isset($newsletter) && $newsletter}
 						<div class="checkbox">
-							<input type="checkbox" name="newsletter" id="newsletter" value="1" {if isset($smarty.post.newsletter) AND $smarty.post.newsletter == 1} checked="checked"{/if} />
-							<label for="newsletter">{l s='Sign up for our newsletter!'}</label>
+							<label for="newsletter" class="qlo-checkbox">
+							<span class="qlo-checkbox__control">
+							<input type="checkbox" class="not_uniform" name="newsletter" id="newsletter" value="1" {if isset($smarty.post.newsletter) AND $smarty.post.newsletter == 1} checked="checked"{/if} />
+							<span class="qlo-checkbox__box"></span>
+							</span>
+							{l s='Sign up for our newsletter!'}</label>
 							{if array_key_exists('newsletter', $field_required)}
 								<sup> *</sup>
 							{/if}
@@ -553,8 +572,12 @@
 					{/if}
 					{if isset($optin) && $optin}
 						<div class="checkbox">
-							<input type="checkbox" name="optin" id="optin" value="1" {if isset($smarty.post.optin) AND $smarty.post.optin == 1} checked="checked"{/if} />
-							<label for="optin">{l s='Receive special offers from our partners!'}</label>
+							<label for="optin" class="qlo-checkbox">
+							<span class="qlo-checkbox__control">
+							<input type="checkbox" class="not_uniform" name="optin" id="optin" value="1" {if isset($smarty.post.optin) AND $smarty.post.optin == 1} checked="checked"{/if} />
+							<span class="qlo-checkbox__box"></span>
+							</span>
+							{l s='Receive special offers from our partners!'}</label>
 							{if array_key_exists('optin', $field_required)}
 								<sup> *</sup>
 							{/if}
@@ -705,7 +728,7 @@
 					<input type="hidden" name="is_new_customer" value="1" />
 					{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
 					{block name='authentication_account_submit'}
-						<button type="submit" name="submitAccount" id="submitAccount" class="btn button button-medium">
+						<button type="submit" name="submitAccount" id="submitAccount" class="qlo-btn qlo-btn--primary">
 							<span>{l s='Register'}&nbsp;<i class="icon-chevron-right right"></i></span>
 						</button>
 					{/block}

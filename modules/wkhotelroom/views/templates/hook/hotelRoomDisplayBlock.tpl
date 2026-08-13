@@ -78,7 +78,7 @@
                                                 {/block}
                                                 {block name='hotel_room_block_action'}
                                                     <div class="row margin-lr-0">
-                                                        <a class="btn htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE}{l s='book now' mod='wkhotelroom'}{else}{l s='View' mod='wkhotelroom'}{/if}</span></a>
+                                                        <a class="qlo-btn qlo-btn--outline-dark" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE}{l s='book now' mod='wkhotelroom'}{else}{l s='View' mod='wkhotelroom'}{/if}</span></a>
                                                     </div>
                                                 {/block}
                                             </div>

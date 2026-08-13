@@ -45,7 +45,7 @@
         {if !$opc}
             {block name='order_payment_classic_cart_summary'}
                 <div id="order-detail-content" class="table_block table-responsive">
-                    <table id="cart_summary" class="table table-bordered">
+                    <table id="cart_summary" class="table table-bordered qlo-table">
                         <thead>
                         <tr>
                             <th class="cart_product first_item">{l s='Product'}</th>
@@ -187,7 +187,7 @@
                                                         <h4>{l s='Vouchers'}</h4>
                                                         <input type="text" id="discount_name" class="form-control" name="discount_name" value="{if isset($discount_name) && $discount_name}{$discount_name}{/if}" />
                                                         <input type="hidden" name="submitDiscount" />
-                                                        <button type="submit" name="submitAddDiscount" class="button btn btn-default button-small"><span>{l s='ok'}</span></button>
+                                                        <button type="submit" name="submitAddDiscount" class="qlo-btn qlo-btn--primary qlo-btn--sm"><span>{l s='ok'}</span></button>
                                                         {if $displayVouchers}
                                                             <p id="title" class="title_offers">{l s='Take advantage of our offers:'}</p>
                                                             <div id="display_cart_vouchers">

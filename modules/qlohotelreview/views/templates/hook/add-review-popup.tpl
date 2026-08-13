@@ -94,10 +94,10 @@
                     {block name='hotel_review_add_form_actions'}
                         <div class="card-footer clearfix review-actions-wrap">
                             <div class="pull-right">
-                                <button class="btn btn-secondary" id="btn-cancel-review">
+                                <button class="qlo-btn qlo-btn--outline-secondary" id="btn-cancel-review">
                                     {l s='Cancel' mod='qlohotelreview'}
                                 </button>
-                                <button class="btn btn-primary" id="btn-submit-review">
+                                <button class="qlo-btn qlo-btn--primary" id="btn-submit-review">
                                     {l s='Make Review' mod='qlohotelreview'}
                                 </button>
                             </div>

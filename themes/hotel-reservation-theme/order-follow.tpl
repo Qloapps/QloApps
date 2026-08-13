@@ -43,7 +43,7 @@
 		{/block}
 		{if $ordersReturns && $ordersReturns|count}
 			<div class="table-responsive wk-datatable-wrapper">
-				<table class="table table-bordered">
+				<table class="table table-bordered qlo-table">
 					<thead>
 						<tr>
 							<th>{l s='Order'}</th>
@@ -95,8 +95,8 @@
 
 	{block name='order_follow_footer_links'}
 		<ul class="footer_links clearfix">
-			<li><a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-chevron-left"></i> {l s='Back to My account'}</span></a></li>
-			<li><a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>
+			<li><a class="qlo-btn qlo-btn--transparent" href="{$link->getPageLink('my-account', true)|escape:'html':'UTF-8'}"><span><i class="icon-chevron-left"></i> {l s='Back to My account'}</span></a></li>
+			<li><a class="qlo-btn qlo-btn--transparent" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}"><span><i class="icon-chevron-left"></i> {l s='Home'}</span></a></li>
 		</ul>
 	{/block}
 {/block}

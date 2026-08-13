@@ -69,14 +69,14 @@
                             {if $service_product.available_for_order && !$PS_CATALOG_MODE && !$order_date_restrict && !((isset($restricted_country_mode) && $restricted_country_mode))}
                                 <div class="service-product-actions">
                                     {if $service_product.allow_multiple_quantity && $service_product.available_for_order}
-                                        <div class="qty_container">
+                                        <div class="qty_container qlo-input-number qlo-input-number--sm">
                                             <input type="hidden" class="room_service_product_qty" id="room_service_product_qty_{$service_product.id_product}" name="room_service_product_qty_{$service_product.id_product}" data-id-product="{$service_product.id_product}" data-max_quantity="{$service_product.max_quantity}" value="{if isset($service_product.quantity_added) && $service_product.quantity_added}{$service_product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}">
-                                            <div class="qty_count pull-left">
+                                            <div class="qty_count qlo-input">
                                                 <span>{if isset($service_product.quantity_added) && $service_product.quantity_added}{$service_product.quantity_added|escape:'html':'UTF-8'}{else}1{/if}</span>
                                             </div>
-                                            <div class="qty_direction pull-left">
-                                                <a href="#" class="btn btn-default quantity_up room_service_product_qty_up"><span><i class="icon-plus"></i></span></a>
-                                                <a href="#" class="btn btn-default quantity_down room_service_product_qty_down"><span><i class="icon-minus"></i></span></a>
+                                            <div class="qty_direction qlo-stepper qlo-stepper--sm">
+                                                <a href="#" class="btn btn-default quantity_up room_service_product_qty_up qlo-stepper__btn"><span><i class="icon-plus"></i></span></a>
+                                                <a href="#" class="btn btn-default quantity_down room_service_product_qty_down qlo-stepper__btn"><span><i class="icon-minus"></i></span></a>
                                             </div>
                                         </div>
                                     {/if}

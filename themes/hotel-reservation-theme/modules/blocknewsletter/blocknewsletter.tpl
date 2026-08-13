@@ -44,7 +44,7 @@
                         {hook h='displayGDPRConsent' id_module=$id_module}
                     {/if}
                     {hook h='displayNewsletterFormFieldsAfter'}
-                    <button type="submit" name="submitNewsletter" class="btn button button-medium newsletter-btn">
+                    <button type="submit" name="submitNewsletter" class="qlo-btn qlo-btn--primary newsletter-btn">
                         <span>{l s='Subscribe' mod='blocknewsletter'}</span>
                     </button>
                     <span class="loader loading" style="display: none;"></span>
