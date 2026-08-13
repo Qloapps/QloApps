@@ -128,3 +128,16 @@ if (Tools::isSubmit('getEmailHTML') && $email = Tools::getValue('email')) {
     $email_html = AdminTranslationsController::getEmailHTML($email);
     die($email_html);
 }
+
+if (Tools::isSubmit('resetTranslationMail') && $reset_mail_name = Tools::getValue('mail_name')) {
+    $theme = Tools::getValue('theme') ? Tools::getValue('theme') : null;
+    $iso_code = Tools::getValue('iso_code') ? Tools::getValue('iso_code') : null;
+    $token = Tools::getValue('token') ? Tools::getValue('token') : null;
+    $reset_result = AdminTranslationsController::resetMailTemplate(
+        $iso_code,
+        $theme,
+        $reset_mail_name,
+        $token
+    );
+    die(json_encode($reset_result));
+}

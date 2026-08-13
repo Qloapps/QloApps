@@ -55,14 +55,7 @@
 				<input type="hidden" name="type" value="{$type}" />
 				<input type="hidden" name="theme" value="{$theme}" />
 				<input type="hidden" name="reset_mail_name" id="reset_mail_name" value="" />
-				<script type="text/javascript">
-					$(document).ready(function(){
-						$('a.useSpecialSyntax').click(function(){
-							var syntax = $(this).find('img').attr('alt');
-							$('#BoxUseSpecialSyntax .syntax span').html(syntax+".");
-						});
-					});
-				</script>
+				<input type="hidden" name="token" id="translation_mails_token" value="{$token}" />
 				<div id="BoxUseSpecialSyntax">
 					<div class="alert alert-warning">
 						<p>
@@ -81,7 +74,7 @@
 					<a name="submitTranslations{$type|ucfirst}" href="{$cancel_url}" class="btn btn-default">
 						<i class="process-icon-cancel"></i> {l s='Cancel'}
 					</a>
-					<button type="submit" id="{$table}_form_reset_btn" name="submitResetTranslations{$type|ucfirst}" class="btn btn-default js-mail-template-reset-btn" disabled="disabled" title="{l s='Fetch the pristine template from the QloApps API'}">
+					<button type="button" id="{$table}_form_reset_btn" class="btn btn-default mail-template-reset-btn" disabled="disabled" >
 						<i class="process-icon-refresh"></i>
 						{l s='Reset'}
 					</button>
@@ -106,89 +99,6 @@
 					</span>
 				</h3>
 				{$mail_content}
-				{literal}
-				<script type="text/javascript">
-				//<![CDATA[
-					$(document).ready(function () {
-						$('.mails_field').on('shown.bs.collapse', function () {
-							// get active email
-							var active_email = $(this).find('.email-collapse.in');
-							// get iframe container for active email
-							var frame = active_email.find('.email-html-frame');
-							// get source url for active email
-							var src = frame.data('email-src');
-							// get rte container for active email
-							var rte_textarea = active_email.find('textarea.rte-mail');
-							var rte_mail_selector = rte_textarea.data('rte');
-							var rte_name_match = (rte_textarea.attr('name') || '').match(/\[html\]\[(.+)\]$/);
-							if (rte_name_match) {
-								$('#reset_mail_name').val(rte_name_match[1]);
-								$('.js-mail-template-reset-btn').prop('disabled', false);
-								rte_textarea
-							} else {
-								$('#reset_mail_name').val('');
-								$('.js-mail-template-reset-btn').prop('disabled', true);
-							}
-							// create special config
-							var rte_mail_config = {};
-							rte_mail_config['editor_selector'] = 'rte-mail-' + rte_mail_selector;
-							rte_mail_config['height'] = '500px';
-							// We want the default plugins + 'fullpage' plugin for HTML emails
-							rte_mail_config['plugins'] = "colorpicker link image paste pagebreak table contextmenu filemanager table code media autoresize textcolor anchor fullpage";
-							// move controls to active panel
-							$('#translation_mails-control-actions').appendTo($(this).find('.panel-collapse.in'));
-							// when user first open email
-							if (frame.find('iframe.email-frame').length == 0) {
-								// load iframe
-								frame.append('<iframe class="email-frame" />');
-								$.ajax({
-									url:'ajax.php',
-									type: 'POST',
-									dataType: 'html',
-									data: {
-										getEmailHTML : true,
-										email : src
-									},
-									success: function(result)
-									{
-										var doc = frame.find('iframe')[0].contentWindow.document;
-										doc.open();
-										doc.write(result);
-										doc.close();
-										tinySetup(rte_mail_config);
-										// init tinyMCE with special config
-									}
-								});
-
-							}
-						});
-
-						$('.mail-variable-tag').on('click', function () {
-							var textarea = $(this).closest('.email-collapse').find('> .tab-content > .tab-pane.active textarea').get(0);
-							if(textarea){
-								insertVariable(textarea, $(this).data('variable'));
-							}
-						});
-					})
-
-					function insertVariable(field, text) {
-						var editor = (typeof tinymce !== 'undefined' && field.id) ? tinymce.get(field.id) : null;
-
-						if (editor) {
-							editor.execCommand('mceInsertContent', false, text);
-							editor.focus();
-							return;
-						}
-
-						field.focus();
-						var startPos = field.selectionStart;
-						var endPos = field.selectionEnd;
-						field.value = field.value.substring(0, startPos) + text + field.value.substring(endPos, field.value.length);
-						field.selectionStart = field.selectionEnd = startPos + text.length;
-					}
-				//]]>
-				</script>
-				{/literal}
 			</div>
 			<div class="panel">
 				<h3>

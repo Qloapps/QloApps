@@ -110,6 +110,18 @@ class AdminTranslationsControllerCore extends AdminController
             'page_header_toolbar_title' => $this->page_header_toolbar_title,
             'page_header_toolbar_btn' => $this->page_header_toolbar_btn));
     }
+    public function setMedia()
+    {
+        parent::setMedia();
+
+        if (Tools::getValue('type') == 'mails') {
+            Media::addJsDef(array(
+                'mailResetSuccessMsg' => $this->l('The template was reset to its original content.'),
+                'mailResetErrorMsg' => $this->l('An error occurred while resetting the template.'),
+            ));
+            $this->addJS(_PS_JS_DIR_.'admin/translations.js');
+        }
+    }
 
     /**
      * This function create vars by default and call the good method for generate form
@@ -1480,12 +1492,6 @@ class AdminTranslationsControllerCore extends AdminController
                 } else {
                     $this->errors[] = Tools::displayError('You do not have permission to edit this.');
                 }
-            } elseif (Tools::isSubmit('submitResetTranslationsMails')) {
-                if ($this->tabAccess['edit'] === 1) {
-                    $this->submitResetTranslationsMails();
-                } else {
-                    $this->errors[] = Tools::displayError('You do not have permission to edit this.');
-                }
             } elseif (Tools::isSubmit('submitTranslationsMails') || Tools::isSubmit('submitTranslationsMailsAndStay')) {
                 if ($this->tabAccess['edit'] === 1) {
                     $this->submitTranslationsMails();
@@ -1669,61 +1675,109 @@ class AdminTranslationsControllerCore extends AdminController
         }
     }
 
-    protected function submitResetTranslationsMails()
+    public static function resetMailTemplate($iso_code,$theme, $mail_name, $token)
     {
-        $iso_code = $this->lang_selected->iso_code;
-        $module_name = false;
+        if ($token !== Tools::getAdminTokenLite('AdminTranslations')) {
+            return array('hasError' => true, 'error' => Tools::displayError('Invalid security token.'));
+        }
 
-        $mail_name = Tools::getValue('reset_mail_name');
+        $id_tab = Tab::getIdFromClassName('AdminTranslations');
+        $access = Profile::getProfileAccess(Context::getContext()->employee->id_profile, $id_tab);
+        if (!is_array($access) || empty($access['edit'])) {
+            return array('hasError' => true, 'error' => Tools::displayError('You do not have permission to edit this.'));
+        }
+
+        if (!Validate::isLanguageIsoCode($iso_code)) {
+            return array('hasError' => true, 'error' => Tools::displayError('Invalid iso code.'));
+        }
+
+        $module_name = false;
         if (($pos = stripos($mail_name, '|')) !== false) {
             $module_name = substr($mail_name, 0, $pos);
             $mail_name = substr($mail_name, $pos + 1);
         }
         if (!Validate::isTplName($mail_name) || ($module_name && !Validate::isModuleName($module_name))) {
-            $this->errors[] = Tools::displayError('Invalid mail template to reset.');
-            return;
+            return array('hasError' => true, 'error' => Tools::displayError('Invalid mail template to reset.'));
+        }
+        if ($theme) {
+            $theme_exists = false;
+            foreach (Theme::getThemes() as $existing_theme) {
+                if ($existing_theme->directory == $theme) {
+                    $theme_exists = true;
+                    break;
+                }
+            }
+            if (!$theme_exists) {
+                return array('hasError' => true, 'error' => Tools::displayError('Invalid theme.'));
+            }
         }
 
-        if ($this->theme_selected) {
+        if ($theme) {
             $dest_dir = $module_name
-                ? $this->translations_informations['modules']['override']['dir'].$module_name.'/mails/'.$iso_code.'/'
-                : $this->translations_informations['mails']['override']['dir'];
+                ? _PS_ROOT_DIR_.'/themes/'.$theme.'/modules/'.$module_name.'/mails/'.$iso_code.'/'
+                : _PS_ROOT_DIR_.'/themes/'.$theme.'/mails/'.$iso_code.'/';
         } else {
             $dest_dir = $module_name
-                ? rtrim($this->translations_informations['modules']['dir'], '/').'/'.$module_name.'/mails/'.$iso_code.'/'
-                : $this->translations_informations['mails']['dir'];
+                ? rtrim(_PS_MODULE_DIR_, '/').'/'.$module_name.'/mails/'.$iso_code.'/'
+                : _PS_MAIL_DIR_.$iso_code.'/';
         }
 
-        if (!file_exists($dest_dir) && !mkdir($dest_dir, 0777, true)) {
-            throw new PrestaShopException(sprintf(Tools::displayError('Directory "%s" cannot be created'), $dest_dir));
+        if (!is_dir($dest_dir) && !mkdir($dest_dir, 0777, true)) {
+            return array('hasError' => true, 'error' => sprintf(Tools::displayError('Directory "%s" could not be created.'), $dest_dir));
+        }
+        if (!is_writable($dest_dir)) {
+            return array('hasError' => true, 'error' => sprintf(Tools::displayError('Directory "%s" is not writable.'), $dest_dir));
         }
 
-        $gzip_file = Language::getLanguagePackFile($iso_code);
-        if (!$gzip_file) {
-            $this->errors[] = Tools::displayError('Could not download the language pack from the QloApps API. Please check your internet connection and try again.');
-            return;
+        // Reuse the already-downloaded language pack if we have one, only hit the API when it's missing
+        $gzip_file = _PS_TRANSLATIONS_DIR_.$iso_code.'.gzip';
+        if (!file_exists($gzip_file)) {
+            Language::downloadAndInstallLanguagePack($iso_code, null, null, false);
+        }
+        if (!file_exists($gzip_file)) {
+            return array('hasError' => true, 'error' => Tools::displayError('Could not download the language pack from the QloApps API. Please check your internet connection and try again.'));
         }
 
         require_once(_PS_TOOL_DIR_.'tar/Tar.php');
         $gz = new Archive_Tar($gzip_file, true);
+        if ($gz->error_object) {
+            return array('hasError' => true, 'error' => Tools::displayError('The downloaded language pack is corrupted. Please try again.'));
+        }
         $archive_dir = $module_name
             ? 'modules/'.$module_name.'/mails/'.$iso_code.'/'
             : 'mails/'.$iso_code.'/';
 
-        $found = false;
-        foreach (array($mail_name.'.html', $mail_name.'.txt') as $file) {
-            $content = $gz->extractInString($archive_dir.$file);
-            if ($content !== null) {
-                file_put_contents($dest_dir.$file, $content);
-                $found = true;
+        $mail_dir = $module_name
+            ? rtrim(_PS_MODULE_DIR_, '/').'/'.$module_name.'/mails/'
+            : _PS_MAIL_DIR_;
+
+        $content = array('html' => null, 'txt' => null);
+        foreach (array_keys($content) as $ext) {
+            $file_content = $gz->extractInString($archive_dir.$mail_name.'.'.$ext);
+            if ($file_content === null) {
+                if (file_exists($mail_dir.$iso_code.'/'.$mail_name.'.'.$ext)) {
+                    $file_content = file_get_contents($mail_dir.$iso_code.'/'.$mail_name.'.'.$ext);
+                } elseif (file_exists($mail_dir.'en/'.$mail_name.'.'.$ext)) {
+                    $file_content = file_get_contents($mail_dir.'en/'.$mail_name.'.'.$ext);
+                }
+            }
+            if ($file_content !== null) {
+                if (file_put_contents($dest_dir.$mail_name.'.'.$ext, $file_content) === false) {
+                    return array('hasError' => true, 'error' => sprintf(Tools::displayError('Could not write file "%s".'), $dest_dir.$mail_name.'.'.$ext));
+                }
+                $content[$ext] = $file_content;
             }
         }
-        if (!$found) {
-            $this->errors[] = Tools::displayError('This template was not found in the downloaded language pack.');
-            return;
+
+        if ($content['html'] === null && $content['txt'] === null) {
+            return array('hasError' => true, 'error' => Tools::displayError('This template was not found in the downloaded language pack.'));
         }
 
-        $this->redirect(true);
+        return array(
+            'hasError' => false,
+            'html' => $content['html'],
+            'txt' => $content['txt'],
+        );
     }
 
     /**
