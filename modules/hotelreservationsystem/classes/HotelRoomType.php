@@ -250,8 +250,8 @@ class HotelRoomType extends ObjectModel
         $cache_key = 'HotelRoomType::getRoomTypeInfoByIdProduct_'.$id_product.'_'.$idLang;
         if (!Cache::isStored($cache_key)) {
             $sql = 'SELECT hrt.*, hbl.`hotel_name`,
-                    COALESCE(hrtstl.`name`, "'.$this->selling_object_name.'") AS `selling_object_name`,
-                    COALESCE(hrtstl.`plural_name`, "'.$this->selling_object_plural_name.'") AS `selling_object_plural_name`
+                    COALESCE(hrtstl.`name`, "'.pSQL($this->selling_object_name).'") AS `selling_object_name`,
+                    COALESCE(hrtstl.`plural_name`, "'.pSQL($this->selling_object_plural_name).'") AS `selling_object_plural_name`
                     FROM `'._DB_PREFIX_.'htl_room_type` AS hrt
                     INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbl
                         ON (hbl.`id` = hrt.`id_hotel`
@@ -333,7 +333,7 @@ class HotelRoomType extends ObjectModel
         $cache_key = 'HotelRoomType::getRoomTypeDetailByRoomTypeIds_'.$roomTypesList.'_'.$position.'_'.$fullDetail.'_'.$idLang;
         if (!Cache::isStored($cache_key)) {
 
-            $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`, COALESCE(hrtstl.`name`, "'.$this->selling_object_name.'") AS `selling_object_name`, COALESCE(hrtstl.`plural_name`, "'.$this->selling_object_plural_name.'") AS `selling_object_plural_name`
+            $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`, COALESCE(hrtstl.`name`, "'.pSQL($this->selling_object_name).'") AS `selling_object_name`, COALESCE(hrtstl.`plural_name`, "'.pSQL($this->selling_object_plural_name).'") AS `selling_object_plural_name`
             '.($position ? ', cp.`position`' : '').'
             '.($fullDetail ? ', pl.`link_rewrite`, pl.`description_short`' : '').'
             FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
