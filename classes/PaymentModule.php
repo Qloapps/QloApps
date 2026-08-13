@@ -882,13 +882,16 @@ abstract class PaymentModuleCore extends Module
                                         $objBookingDetail->zipcode = $hotelAddress['postcode'];
                                         $objBookingDetail->phone = $hotelAddress['phone'];
                                     }
+                                    $objBookingDetail->property_type_name = $objHotelBranch->propertyTypeName;
+
+
                                 }
 
                                 // Save room selling object and property type names as they are at the time of order creation
                                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct, $idLang)) {
-                                    $objBookingDetail->room_type_selling_object_name = $roomTypeInfo['room_type_selling_object'].'|'.$roomTypeInfo['multiple_room_type_selling_object'];
+                                    $objBookingDetail->selling_object_name = $roomTypeInfo['selling_object_name'];
+                                    $objBookingDetail->selling_object_plural_name = $roomTypeInfo['selling_object_plural_name'];
                                 }
-                                $objBookingDetail->property_type_name = HotelPropertyType::getPropertyType($objCartBookingData->id_hotel, $idLang);
 
                                 /*for saving details of the advance payment product wise*/
                                 $objBookingDetail->total_paid_amount = $total_price['total_price_tax_incl'];

@@ -134,10 +134,9 @@ class OrderDetailControllerCore extends FrontController
                             $cartHotelData[$type_key]['cover_img'] = $type_value['cover_img'];
 
                             // Prefer the name stored at order-creation time so it stays historically accurate
-                            if (!empty($order_bk_data[0]['room_type_selling_object_name'])) {
-                                $sellingObjectNames = explode('|', $order_bk_data[0]['room_type_selling_object_name']);
-                                $cartHotelData[$type_key]['room_type_selling_object'] = $sellingObjectNames[0];
-                                $cartHotelData[$type_key]['multiple_room_type_selling_object'] = $sellingObjectNames[1];
+                            if (!empty($order_bk_data[0]['selling_object_name'])) {
+                                $cartHotelData[$type_key]['selling_object_name'] = $order_bk_data[0]['selling_object_name'];
+                                $cartHotelData[$type_key]['selling_object_plural_name'] = $order_bk_data[0]['selling_object_plural_name'];
                             }
 
 

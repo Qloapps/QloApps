@@ -23,7 +23,7 @@
 {if isset($product->id)}
 	<div id="product-configuration" class="panel product-tab">
 		<input type="hidden" name="submitted_tabs[]" value="Configuration" />
-		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {$htl_room_type['multiple_room_type_selling_object']}</h3>
+		<h3 class="tab"> <i class="icon-AdminAdmin"></i> {$htl_room_type['selling_object_plural_name']}</h3>
 
 		<input type="hidden" id="checkConfSubmit" value="0" name="checkConfSubmit">
 
@@ -34,35 +34,35 @@
                         <th class="center"></th>
 						<th class="col-sm-2 center">
 							<label class="control-label required">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter %s number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}' sprintf=$htl_room_type['room_type_selling_object']}">
-									{l s='%s No.' sprintf=$htl_room_type['room_type_selling_object']}
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter %s number. For eg. A-101, A-102 etc. Invalid characters <>;=#{}' sprintf=$htl_room_type['selling_object_name']}">
+									{l s='%s No.' sprintf=$htl_room_type['selling_object_name']}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter floor of the %s. For eg. First, Second etc. Invalid characters <>;=#{}' sprintf=$htl_room_type['room_type_selling_object']}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter floor of the %s. For eg. First, Second etc. Invalid characters <>;=#{}' sprintf=$htl_room_type['selling_object_name']}">
 									{l s='Floor'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select status of the %s.' sprintf=$htl_room_type['room_type_selling_object']}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select status of the %s.' sprintf=$htl_room_type['selling_object_name']}">
 									{l s='Status'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-3 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter extra information about this %s. Leave empty if not required.' sprintf=$htl_room_type['multiple_room_type_selling_object']}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Enter extra information about this %s. Leave empty if not required.' sprintf=$htl_room_type['selling_object_plural_name']}">
 									{l s='Extra Information'}
 								</span>
 							</label>
 						</th>
 						<th class="col-sm-2 center">
 							<label class="control-label">
-								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set date ranges when %s is set to Temporarily Inactive.' sprintf=$htl_room_type['multiple_room_type_selling_object']}">
+								<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Set date ranges when %s is set to Temporarily Inactive.' sprintf=$htl_room_type['selling_object_plural_name']}">
 									{l s='Disable Dates'}
 								</span>
 							</label>
@@ -70,8 +70,8 @@
                         <th class="col-sm-1 center">
                             <label class="control-label">
                                 <span class="label-tooltip" data-toggle="tooltip"
-                                    data-original-title="{l s='Manage connected rooms for this room'}">
-                                    {l s='Connected Rooms'}
+                                    data-original-title="{l s='Manage connected rooms for this %s' sprintf=$htl_room_type['selling_object_name']}">
+                                    {l s='Connected %s' sprintf=$htl_room_type['selling_object_plural_name']}
                                 </span>
                             </label>
                         </th>
@@ -224,14 +224,14 @@
                             <li class="divider"></li>
                             <li>
                                 <a id="bulk-create-rooms-button" class="bulkCreateRoomModal" data-toggle="modal" data-target="#bulkCreateRoomModal" type="button" data-size="s" data-style="expand-right">
-                                    <i class="icon-plus"></i>&nbsp;{l s='Create %s' sprintf=$htl_room_type['multiple_room_type_selling_object']}
+                                    <i class="icon-plus"></i>&nbsp;{l s='Create %s' sprintf=$htl_room_type['selling_object_plural_name']}
                                 </a>
                             </li>
                         </ul>
                     </div>
 					<button id="add-more-rooms-button" class="btn btn-default" type="button" data-size="s" data-style="expand-right">
 						<i class="icon icon-plus"></i>
-						{l s='Add More %s'  sprintf=$htl_room_type['multiple_room_type_selling_object']}
+						{l s='Add More %s'  sprintf=$htl_room_type['selling_object_plural_name']}
 					</button>
 				</div>
 			</div>
@@ -276,7 +276,7 @@
                     <div class="alert alert-warning">
                         <button type="button" class="close" data-dismiss="alert">&times;</button>
                         <ul class="list-unstyled">
-                            <li>{l s='Please save this %s first to add dates.' sprintf=$htl_room_type['multiple_room_type_selling_object']}</li>
+                            <li>{l s='Please save this %s first to add dates.' sprintf=$htl_room_type['selling_object_plural_name']}</li>
                         </ul>
                     </div>
                 </div>
@@ -348,7 +348,7 @@
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Update %s'  sprintf=$htl_room_type['multiple_room_type_selling_object']}</h4>
+				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Update %s'  sprintf=$htl_room_type['selling_object_plural_name']}</h4>
 			</div>
 			<div class="modal-body padding-top-20">
 				<div class="text-left errors-wrap" style="display: none;"></div>
@@ -424,13 +424,13 @@
 				<button type="button" class="close margin-right-10" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Create %s' sprintf=$htl_room_type['multiple_room_type_selling_object']}</h4>
+				<h4 class="modal-title"><i class="icon-calendar"></i>&nbsp; {l s='Bulk Create %s' sprintf=$htl_room_type['selling_object_plural_name']}</h4>
 			</div>
 			<div class="modal-body padding-top-20">
 				<div class="text-left errors-wrap" style="display: none;"></div>
                 <div class="alert alert-info">
                     <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <p>{l s='If both the Room Prefix and Starting Room No. fields are left blank, the room name will be generated using the acronym of the Room Type name.'}</p>
+                    <p>{l s='If both the %s Prefix and Starting %s No. fields are left blank, the %s name will be generated using the acronym of the Room Type name.' sprintf=array($htl_room_type['selling_object_name'], $htl_room_type['selling_object_plural_name'], $htl_room_type['selling_object_name'])}</p>
                     <p>
                         <strong>{l s='Example:'}</strong>
                         {l s='For the Room Type'}
@@ -441,7 +441,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-3">
-                        <span>{l s='%s prefix'  sprintf=$htl_room_type['room_type_selling_object']}</span>
+                        <span>{l s='%s prefix'  sprintf=$htl_room_type['selling_object_name']}</span>
                     </label>
                     <div class="col-lg-6">
                         <input type="text" name="bulk_create_room_prefix"/>
@@ -449,7 +449,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label col-lg-3">
-                        <span>{l s='Starting %s No.'  sprintf=$htl_room_type['room_type_selling_object']}</span>
+                        <span>{l s='Starting %s No.'  sprintf=$htl_room_type['selling_object_name']}</span>
                     </label>
                     <div class="col-lg-6">
                         <input type="text" name="bulk_create_room_num"/>
@@ -457,7 +457,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label required col-lg-3">
-                        <span>{l s='Number of %s'  sprintf=$htl_room_type['multiple_room_type_selling_object']}</span>
+                        <span>{l s='Number of %s'  sprintf=$htl_room_type['selling_object_plural_name']}</span>
                     </label>
                     <div class="col-lg-6">
                         <input type="text" name="bulk_create_room_qty"/>
@@ -593,13 +593,13 @@
                     <li class="enable_selected_dates btn btn-default">
                         <span class="enable_selected_dates">
                             <i class="icon-check"></i>
-                            {l s='Make %s Available'  sprintf=$htl_room_type['room_type_selling_object']}
+                            {l s='Make %s Available'  sprintf=$htl_room_type['selling_object_name']}
                         </span>
                     </li>
                     <li class="disabled_selected_dates btn btn-default">
                         <span class="disabled_selected_dates">
                             <i class="icon-ban"></i>
-                            {l s='Disable %s'  sprintf=$htl_room_type['room_type_selling_object']}
+                            {l s='Disable %s'  sprintf=$htl_room_type['selling_object_name']}
                         </span>
                     </li>
                 </ul>
@@ -1606,7 +1606,7 @@
                 $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
                 $('#deactiveDatesModal').attr('data-id-room', idRoom);
                 if ($.trim(roomNum) != '') {
-                    roomNum = '( '+'{l s='%s No' sprintf=$htl_room_type['multiple_room_type_selling_object']}'+' '+roomNum+')';
+                    roomNum = '( '+'{l s='%s No' sprintf=$htl_room_type['selling_object_plural_name']}'+' '+roomNum+')';
                 }
 
                 $('#deactiveDatesModal .disable_dates_room_num').html(roomNum);

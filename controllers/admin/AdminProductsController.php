@@ -2178,6 +2178,8 @@ class AdminProductsControllerCore extends AdminController
                     $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
                     $objHotelRoomTypeBedType->updateRoomTypeBedTypes(Tools::getValue('id_bed_types'), $object->id);
 
+                    $this->assignRoomType($object);
+
                     // update position in category
                     $object->setPositionInCategory(Tools::getValue('category_position'));
 
@@ -2348,7 +2350,7 @@ class AdminProductsControllerCore extends AdminController
             $saveShort = Tools::getValue('description_short');
             $_POST['description_short'] = strip_tags(Tools::getValue('description_short'));
         }
-        $_POST['id_room_type_selling_object'] = Tools::getValue('id_room_type_selling_object') ?? 0;
+        $_POST['id_selling_object'] = Tools::getValue('id_selling_object') ?? 0;
 
         // Check description short size without html
         $limit = (int)Configuration::get('PS_SHORT_DESC_LIMIT');
@@ -3115,8 +3117,12 @@ class AdminProductsControllerCore extends AdminController
         if (Validate::isLoadedObject($product)) {
             if ($id_hotel = Tools::getValue('id_hotel')) {
                 $objRoomType = new HotelRoomType();
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($product->id)) {
+                    $objRoomType = new HotelRoomType((int)$roomTypeInfo['id']);
+                }
                 $objRoomType->id_product = $product->id;
                 $objRoomType->id_hotel = $id_hotel;
+                $objRoomType->id_selling_object = (int)$product->id_selling_object;
                 $objRoomType->save();
             }
         }
@@ -4611,10 +4617,10 @@ class AdminProductsControllerCore extends AdminController
             $data->assign('selected_bed_types', $selectedBedTypes);
         }
 
-        $roomTypeSellingObjects = RoomTypeSellingObject::getRoomTypeSellingObject($this->context->language->id);
-        $data->assign('room_type_selling_object_info', $roomTypeSellingObjects);
-        if (!empty($product->id_room_type_selling_object)) {
-            $data->assign('selected_room_type_selling_object', $product->id_room_type_selling_object);
+        $roomTypeSellingObjects = RoomTypeSellingObject::getRoomTypeSellingObjects($this->context->language->id);
+        $data->assign('selling_object_info', $roomTypeSellingObjects);
+        if (!empty($product->id_selling_object)) {
+            $data->assign('selected_room_type_selling_object', $product->id_selling_object);
         }
 
         $this->tpl_form_vars['product'] = $product;
@@ -5597,15 +5603,15 @@ class AdminProductsControllerCore extends AdminController
                 if (!empty($roomNumber = trim(Tools::getValue('num')))
                     && !Validate::isUnsignedInt($roomNumber)
                 ) {
-                    $this->errors[] = sprintf(Tools::displayError('Invalid Starting %s No.') , $roomTypeInfo['room_type_selling_object']);
+                    $this->errors[] = sprintf(Tools::displayError('Invalid Starting %s No.') , $roomTypeInfo['selling_object_name']);
                 }
 
                 if (!($roomQuantity = Tools::getValue('qty'))) {
-                    $this->errors[] = sprintf(Tools::displayError('Number of %s is required.') ,$roomTypeInfo['room_type_selling_object']);
+                    $this->errors[] = sprintf(Tools::displayError('Number of %s is required.') ,$roomTypeInfo['selling_object_name']);
                 } else if (!Validate::isUnsignedInt($roomQuantity) || $roomQuantity < 1) {
-                    $this->errors[] = sprintf(Tools::displayError('Invalid value for number of %s.') ,$roomTypeInfo['room_type_selling_object']);
+                    $this->errors[] = sprintf(Tools::displayError('Invalid value for number of %s.') ,$roomTypeInfo['selling_object_name']);
                 } else if ($roomQuantity > 50) {
-                    $this->errors[] = sprintf(Tools::displayError('You cannot create more than 50 %s at a time.'), $roomTypeInfo['room_type_selling_object']);
+                    $this->errors[] = sprintf(Tools::displayError('You cannot create more than 50 %s at a time.'), $roomTypeInfo['selling_object_name']);
                 }
 
                 if (trim($comment = Tools::getValue('room_comment'))) {
@@ -5618,7 +5624,7 @@ class AdminProductsControllerCore extends AdminController
                     $disableDates = Tools::getValue('disable_dates');
                     $roomsInfo['disable_dates_json'] = json_encode($disableDates);
                     if (!$disableDates) {
-                        $this->errors[] = sprintf(Tools::displayError('Please add at least one date range for updating the %s status to temporary inactive.') , $roomTypeInfo['room_type_selling_object']);
+                        $this->errors[] = sprintf(Tools::displayError('Please add at least one date range for updating the %s status to temporary inactive.') , $roomTypeInfo['selling_object_name']);
                     } else {
                         $hasMissingRowError = false;
                         foreach ($disableDates as $key => $dateRange) {

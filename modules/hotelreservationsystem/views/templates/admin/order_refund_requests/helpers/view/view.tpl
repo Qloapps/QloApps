@@ -176,7 +176,7 @@
 													</span>
 													<div class="price_info_container" style="display: none;">
 														<div>
-															<label>{l s='%s cost:' sprintf=$booking.room_type_selling_object_name mod='hotelreservationsystem'}</label>
+															<label>{l s='%s cost:' sprintf=$booking.selling_object_name mod='hotelreservationsystem'}</label>
 															<span class="pull-right">{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</span>
 														</div>
 														<div>
@@ -192,7 +192,7 @@
 													</span>
 													<div class="price_info_container" style="display: none;">
 														<div>
-															<label>{l s='%s paid amount:' sprintf=$booking.room_type_selling_object_name mod='hotelreservationsystem'}</label>
+															<label>{l s='%s paid amount:' sprintf=$booking.selling_object_name mod='hotelreservationsystem'}</label>
 															<span class="pull-right">{displayPrice price=$booking['room_paid_amount'] currency=$orderCurrency['id']}</span>
 														</div>
 														<div>

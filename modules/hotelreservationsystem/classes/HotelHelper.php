@@ -1402,7 +1402,7 @@ class HotelHelper
         return true;
     }
 
-    public function createHotelDefaultRoomSellingTypes()
+    public function createDefaultRoomSellingObjects()
     {
        $roomTypeSellingObjects = array(
             array(
@@ -2171,7 +2171,7 @@ class HotelHelper
             $product->show_at_front = 1;
             $product->is_virtual = 1;
             $product->indexed = 1;
-            $product->id_room_type_selling_object= 1;
+            $product->id_selling_object = 1;
             $product->save();
             $product_id = $product->id;
 
@@ -2252,6 +2252,7 @@ class HotelHelper
             $htl_rm_type = new HotelRoomType();
             $htl_rm_type->id_product = $product_id;
             $htl_rm_type->id_hotel = $id_hotel;
+            $htl_rm_type->id_selling_object = $product->id_selling_object;
             $htl_rm_type->adults = 2;
             $htl_rm_type->children = 2;
             $htl_rm_type->max_adults = 2;
@@ -2661,7 +2662,7 @@ class HotelHelper
         $this->saveDummyProductsAndRelatedInfo($htl_id);
         $this->saveDummyServiceProductsAndRelatedInfo();
         $this->createHotelDefaultPropertyTypes();
-        $this->createHotelDefaultRoomSellingTypes();
+        $this->createDefaultRoomSellingObjects();
 
         return true;
     }

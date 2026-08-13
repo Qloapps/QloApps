@@ -66,7 +66,7 @@
                                                     {include file="./occupancy_field.tpl"}
                                                 {/block}
                                             {else}
-                                                <label class="control-label">{l s='No. of %s' sprintf=$room_type_info['multiple_room_type_selling_object']}</label>
+                                                <label class="control-label">{l s='No. of %s' sprintf=$room_type_info['selling_object_plural_name']}</label>
                                                 {block name='quantity_field'}
                                                     {include file="./quantity_field.tpl"}
                                                 {/block}
@@ -79,7 +79,7 @@
                                         <hr class="separator-hr-mg-10">
                                         <div class="row price_desc_block">
                                             <div class="col-sm-6">
-                                                <label class="control-label">{l s='%s Price' sprintf=$room_type_info['room_type_selling_object']}</label>
+                                                <label class="control-label">{l s='%s Price' sprintf=$room_type_info['selling_object_name']}</label>
                                                     <p>
                                                         <span class="total_price_block">{convertPrice price=$rooms_price|floatval}</span>
                                                         <span class="pull-right plus-sign">+</span>
@@ -100,7 +100,7 @@
                                                         <div class="services-info-tooltip-cont">
                                                             {if isset($selected_service_product) && $selected_service_product}
                                                                 <div class="extra-service-panel">
-                                                                    <p class="panel_title">{l s='Selected services'} <span>{l s='(Per %s)' sprintf=$room_type_info['room_type_selling_object']}</span></p>
+                                                                    <p class="panel_title">{l s='Selected services'} <span>{l s='(Per %s)' sprintf=$room_type_info['selling_object_name']}</span></p>
                                                                     <div class="services-list">
                                                                         {foreach $selected_service_product as $product}
                                                                             <div class="services-list-row">
@@ -143,7 +143,7 @@
                                                             <hr>
                                                             <div class="extra-service-panel">
                                                                 <div class="summary-row">
-                                                                    <div>{l s='Total price per %s' sprintf=$room_type_info['room_type_selling_object']}</div>
+                                                                    <div>{l s='Total price per %s' sprintf=$room_type_info['selling_object_name']}</div>
                                                                     <div><p class="service_price">{displayPrice price=$demands_price_per_room}</p></div>
                                                                 </div>
                                                                 <div class="summary-row">
@@ -181,7 +181,7 @@
                                                         <span class="num_searched_avail_rooms">
                                                             {$total_available_rooms|escape:'html':'UTF-8'}
                                                         </span>
-                                                        {if $total_available_rooms > 1} {l s='%s left!' sprintf=$room_type_info['multiple_room_type_selling_object']} {else} {l s='%s left!' sprintf=$room_type_info['room_type_selling_object']} {/if}
+                                                        {if $total_available_rooms > 1} {l s='%s left!' sprintf=$room_type_info['selling_object_plural_name']} {else} {l s='%s left!' sprintf=$room_type_info['selling_object_name']} {/if}
                                                     </div>
                                                 {/if}
                                             {/block}
@@ -221,7 +221,7 @@
                                             {/if}
                                         </span>
                                     {else}
-                                        <span>{l s='All %s sold out!' sprintf=$room_type_info['multiple_room_type_selling_object']}</span>
+                                        <span>{l s='All %s sold out!' sprintf=$room_type_info['selling_object_plural_name']}</span>
                                     {/if}
                                 </div>
                             {/if}

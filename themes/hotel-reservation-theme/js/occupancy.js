@@ -27,7 +27,7 @@ $(document).ready(function(){
 
 		booking_occupancy_inner = $(this).closest('.booking_occupancy_inner');
         var booking_occupancy_wrapper = $(this).closest('.booking_occupancy_wrapper');
-        var room_type_selling_keys = getRoomTypeSellingObject(booking_occupancy_wrapper);
+        var room_type_selling_keys = getRoomTypeSellingObjects(booking_occupancy_wrapper);
         $(this).closest('.occupancy_info_block').hide('fast', function(){
             $(this).remove()
             $(booking_occupancy_inner).find('.room_num_wrapper').each(function(key, val) {
@@ -239,7 +239,7 @@ $(document).ready(function(){
         e.preventDefault();
 
         var booking_occupancy_wrapper = $(this).closest('.booking_occupancy_wrapper');
-        var room_type_selling_keys = getRoomTypeSellingObject(booking_occupancy_wrapper);
+        var room_type_selling_keys = getRoomTypeSellingObjects(booking_occupancy_wrapper);
         var occupancy_block = '';
         var roomBlockIndex = parseInt($(booking_occupancy_wrapper).find(".occupancy_info_block").last().attr('occ_block_index'));
         roomBlockIndex += 1;
@@ -363,7 +363,7 @@ function setRoomTypeGuestOccupancy(booking_occupancy_wrapper)
     var adults = 0;
     var children = 0;
 	var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
-    var room_type_selling_keys = getRoomTypeSellingObject(booking_occupancy_wrapper);
+    var room_type_selling_keys = getRoomTypeSellingObjects(booking_occupancy_wrapper);
 
 	$(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
         adults += parseInt($(this).val());
@@ -399,7 +399,7 @@ function getRoomTypeGuestOccupancyFormated(adults, children, rooms, selling_obje
 	return guestButtonVal;
 }
 
-function getRoomTypeSellingObject(booking_occupancy_wrapper)
+function getRoomTypeSellingObjects(booking_occupancy_wrapper)
 {
     var $wrapper = $(booking_occupancy_wrapper);
     var selling_object = $wrapper.attr('data-selling-object');

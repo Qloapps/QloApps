@@ -45,17 +45,38 @@ class RoomTypeSellingObjectCore extends ObjectModel
     public function isUsed()
     {
         return (bool) Db::getInstance()->getValue(
-            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'product` WHERE `id_room_type_selling_object` = '.(int) $this->id
+            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'product` WHERE `id_selling_object` = '.(int) $this->id
         );
     }
 
-    public static function getRoomTypeSellingObject($idLang = null, $active = true)
+    public static function getRoomTypeSellingObjectBySellingObjectId($idSellingObject = null, $idLang = null)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
 
-        $cache_key = 'RoomTypeSellingObject::getRoomTypeSellingObject'.(int)$idLang.'_'.(int)$active;
+        $cache_key = 'RoomTypeSellingObject::getRoomTypeSellingObjectBySellingObjectId_'.(int)$idSellingObject.'_'.(int)$idLang;
+        if (!Cache::isStored($cache_key)) {
+            $sql = 'SELECT hrstl.`name`, hrstl.`plural_name`
+                FROM `'._DB_PREFIX_.'room_type_selling_object` hrst
+                LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object_lang` hrstl
+                ON (hrst.`id_room_type_selling_object` = hrstl.`id_room_type_selling_object`
+                    AND hrstl.`id_lang` = '.(int)$idLang.')
+                WHERE hrst.`id_room_type_selling_object` = '.(int)$idSellingObject;
+            $res = Db::getInstance()->getRow($sql);
+            Cache::store($cache_key, $res);
+        }
+
+        return Cache::retrieve($cache_key);
+    }
+
+    public static function getRoomTypeSellingObjects($idLang = null, $active = true)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $cache_key = 'RoomTypeSellingObject::getRoomTypeSellingObjects'.(int)$idLang.'_'.(int)$active;
         if (!Cache::isStored($cache_key)) {
             $sql = 'SELECT hrst.`id_room_type_selling_object` AS `id_room_type_selling_object`, hrstl.`name`, hrstl.`plural_name`
                 FROM `'._DB_PREFIX_.'room_type_selling_object` hrst

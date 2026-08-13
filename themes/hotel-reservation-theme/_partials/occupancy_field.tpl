@@ -25,7 +25,7 @@
         <button class="form-control booking_guest_occupancy input-occupancy{if isset($error) && $error == 1} error_border{/if}" type="button">
             <span class="">
                 {if isset($occupancies) && $occupancies}
-                    {if (isset($occupancy_adults) && $occupancy_adults)}{$occupancy_adults} {if $occupancy_adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if isset($occupancy_children) && $occupancy_children}{$occupancy_children} {if $occupancy_children > 1} {l s='Children'}{else}{l s='Child'}{/if}, {/if}{$occupancies|count} {if $occupancies|count > 1}{$room_type_info['multiple_room_type_selling_object']|escape:'html':'UTF-8'}{else}{$room_type_info['room_type_selling_object']|escape:'html':'UTF-8'}{/if}{else}1 {l s='Adult'}, 1 {$room_type_info['room_type_selling_object']|escape:'html':'UTF-8'}{/if}
+                    {if (isset($occupancy_adults) && $occupancy_adults)}{$occupancy_adults} {if $occupancy_adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if isset($occupancy_children) && $occupancy_children}{$occupancy_children} {if $occupancy_children > 1} {l s='Children'}{else}{l s='Child'}{/if}, {/if}{$occupancies|count} {if $occupancies|count > 1}{$room_type_info['selling_object_plural_name']|escape:'html':'UTF-8'}{else}{$room_type_info['selling_object_name']|escape:'html':'UTF-8'}{/if}{else}1 {l s='Adult'}, 1 {$room_type_info['selling_object_name']|escape:'html':'UTF-8'}{/if}
                 {else}
                     {l s='Select Occupancy'}
                 {/if}
@@ -34,7 +34,7 @@
     {/block}
 
     {block name='occupancy_field_content'}
-        <div class="dropdown-menu booking_occupancy_wrapper" data-selling-object="{$room_type_info['room_type_selling_object']|escape:'html':'UTF-8'}" data-multiple-selling-object="{$room_type_info['multiple_room_type_selling_object']|escape:'html':'UTF-8'}">
+        <div class="dropdown-menu booking_occupancy_wrapper" data-selling-object="{$room_type_info['selling_object_name']|escape:'html':'UTF-8'}" data-multiple-selling-object="{$room_type_info['selling_object_plural_name']|escape:'html':'UTF-8'}">
             <input type="hidden" class="max_avail_type_qty" value="{if isset($total_available_rooms)}{$total_available_rooms|escape:'html':'UTF-8'}{/if}">
             <input type="hidden" class="max_adults" value="{$room_type_info['max_adults']|escape:'html':'UTF-8'}">
             <input type="hidden" class="max_children" value="{$room_type_info['max_children']|escape:'html':'UTF-8'}">
@@ -46,7 +46,7 @@
                     {assign var=countRoom value=1}
                     {foreach from=$occupancies key=key item=$occupancy name=occupancyInfo}
                         <div class="occupancy_info_block selected" occ_block_index="{$key|escape:'htmlall':'UTF-8'}">
-                            <div class="occupancy_info_head"><span class="room_num_wrapper">{$room_type_info['room_type_selling_object']|escape:'htmlall':'UTF-8'} - {$countRoom|escape:'htmlall':'UTF-8'} </span>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-stay-link pull-right" href="#">{l s='Remove'}</a>{/if}</div>
+                            <div class="occupancy_info_head"><span class="room_num_wrapper">{$room_type_info['selling_object_name']|escape:'htmlall':'UTF-8'} - {$countRoom|escape:'htmlall':'UTF-8'} </span>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-stay-link pull-right" href="#">{l s='Remove'}</a>{/if}</div>
                             <div class="row">
                                 <div class="form-group col-sm-5 col-xs-6 occupancy_count_block">
                                     <div class="row">
@@ -117,7 +117,7 @@
                     {/foreach}
                 {else}
                     <div class="occupancy_info_block" occ_block_index="0">
-                        <div class="occupancy_info_head"><span class="room_num_wrapper">{$room_type_info['room_type_selling_object']|escape:'htmlall':'UTF-8'} - 1</span></div>
+                        <div class="occupancy_info_head"><span class="room_num_wrapper">{$room_type_info['selling_object_name']|escape:'htmlall':'UTF-8'} - 1</span></div>
                         <div class="row">
                             <div class="form-group col-sm-5 col-xs-6 occupancy_count_block">
                                 <div class="row">
@@ -186,7 +186,7 @@
                     <span class="add_occupancy_block">
                         <a class="add_new_occupancy_btn {if isset($occupancies) && $occupancies && isset($total_available_rooms) && $total_available_rooms <= count($occupancies)} disabled{/if}" data-title-available="{l s='Click to add more stays.'}" data-title-unavailable="{l s='No more stays available.'}" href="#">
                             <i class="icon-plus"></i>
-                            <span>{l s='Add'} {$room_type_info['room_type_selling_object']|escape:'html':'UTF-8'}</span>
+                            <span>{l s='Add'} {$room_type_info['selling_object_name']|escape:'html':'UTF-8'}</span>
                         </a>
                     </span>
                     <span>

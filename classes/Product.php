@@ -56,6 +56,13 @@ class ProductCore extends ObjectModel
     /** @var string Manufacturer name */
     public $manufacturer_name;
 
+    /** @var string Room Type Selling Object  name */
+    public $selling_object_name;
+
+    /** @var string Room Type Selling Object  plural name */
+    public $selling_object_plural_name;
+
+
     /** @var string Supplier name */
     public $supplier_name;
 
@@ -247,7 +254,7 @@ class ProductCore extends ObjectModel
     public $is_virtual;
     public $booking_product;
     public $id_pack_product_attribute;
-    public $id_room_type_selling_object;
+    public $id_selling_object;
     public $cache_default_attribute;
 
     /**
@@ -342,7 +349,7 @@ class ProductCore extends ObjectModel
             'show_price' =>                array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'indexed' =>                    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'visibility' =>                array('type' => self::TYPE_STRING, 'shop' => true, 'validate' => 'isProductVisibility', 'values' => array('both', 'catalog', 'search', 'none'), 'default' => 'both'),
-            'id_room_type_selling_object' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => false),
+            'id_selling_object' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => false),
             'cache_default_attribute' =>    array('type' => self::TYPE_INT, 'shop' => true),
             'advanced_stock_management' =>    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'date_add' =>                    array('type' => self::TYPE_DATE, 'shop' => true, 'validate' => 'isDate'),
@@ -587,6 +594,9 @@ class ProductCore extends ObjectModel
             $this->tax_name = 'deprecated'; // The applicable tax may be BOTH the product one AND the state one (moreover this variable is some deadcode)
             $this->manufacturer_name = Manufacturer::getNameById((int)$this->id_manufacturer);
             $this->supplier_name = Supplier::getNameById((int)$this->id_supplier);
+            $sellingObject = RoomTypeSellingObject::getRoomTypeSellingObjectBySellingObjectId((int)$this->id_selling_object, (int)$id_lang);
+            $this->selling_object_name = $sellingObject ? $sellingObject['name'] : null;
+            $this->selling_object_plural_name = $sellingObject ? $sellingObject['plural_name'] : null;
             $address = null;
             $id_address = Cart::getIdAddressForTaxCalculation($this->id);
             $this->tax_rate = $this->getTaxesRate(new Address($id_address));

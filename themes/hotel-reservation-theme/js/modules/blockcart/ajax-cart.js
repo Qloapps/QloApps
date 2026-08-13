@@ -1218,7 +1218,7 @@ var ajaxCart = {
                     adults += parseInt(val.adults);
                     children += parseInt(val.children);
                 });
-                product_quantity_text = getRoomTypeGuestOccupancyFormated(adults, children, rooms,product.room_info.room_type_selling_object, product.room_info.multiple_room_type_selling_object);
+                product_quantity_text = getRoomTypeGuestOccupancyFormated(adults, children, rooms,product.room_info.selling_object_name, product.room_info.selling_object_plural_name);
             } else {
                 product_quantity_text = product.occupancy;
             }

@@ -52,35 +52,6 @@ class HotelPropertyType extends ObjectModel
         );
     }
 
-    /**
-     * Get the property type name of a hotel in the requested language.
-     *
-     * @param int|null $idHotel
-     * @param int|null $idLang
-     *
-     * @return string
-     */
-    public static function getPropertyType($idHotel = null, $idLang = null)
-    {
-        $idHotel = (int) $idHotel;
-        $idLang = $idLang ? (int) $idLang : (int) Context::getContext()->language->id;
-        $cacheKey = 'HotelPropertyType::getPropertyType'.$idHotel.'_'.$idLang;
-
-        if (!Cache::isStored($cacheKey)) {
-            $sql = 'SELECT hptl.`name`
-                FROM `'._DB_PREFIX_.'htl_branch_info` hbi
-                LEFT JOIN `'._DB_PREFIX_.'htl_property_type_lang` hptl
-                    ON (hbi.`id_property_type` = hptl.`id_htl_property_type`
-                        AND hptl.`id_lang` = '.$idLang.')
-                WHERE hbi.`id` = '.$idHotel;
-
-            Cache::store($cacheKey, Db::getInstance()->getValue($sql));
-        }
-
-        $propertyType = Cache::retrieve($cacheKey);
-        $module = Module::getInstanceByName('hotelreservationsystem');
-        return $propertyType ? $propertyType : $module->l('Hotel', 'HotelPropertyType');
-    }
 
     /**
      * Get the list of property types in the requested language.

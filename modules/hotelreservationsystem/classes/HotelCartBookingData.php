@@ -1564,8 +1564,8 @@ class HotelCartBookingData extends ObjectModel
                         $cartHotelData[$prodKey]['total_num_rooms'] = 0;
                         $cartHotelData[$prodKey]['id_product'] = $product['id_product'];
                         $cartHotelData[$prodKey]['name'] = $objProduct->name;
-                        $cartHotelData[$prodKey]['room_type_selling_object'] = $roomDetail['room_type_selling_object'];
-                        $cartHotelData[$prodKey]['multiple_room_type_selling_object'] = $roomDetail['multiple_room_type_selling_object'];
+                        $cartHotelData[$prodKey]['selling_object_name'] = $roomDetail['selling_object_name'];
+                        $cartHotelData[$prodKey]['selling_object_plural_name'] = $roomDetail['selling_object_plural_name'];
                         $cartHotelData[$prodKey]['unit_price'] = $unitPrice;
                         $cartHotelData[$prodKey]['unit_price_without_reduction'] = $unitPriceWithoutReduction;
                         $cartHotelData[$prodKey]['total_room_type_amount'] = 0;

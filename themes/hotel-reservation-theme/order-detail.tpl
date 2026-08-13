@@ -979,11 +979,11 @@
                                                                 <div class="refund_element_summary clearfix">
                                                                     <p class="refund_element_name">{$data_v.name}</p>
                                                                     <div class="col-xs-3">
-                                                                        <p>{l s='Total %s' sprintf=$data_v.multiple_room_type_selling_object|escape:'html':'UTF-8'}</p>
+                                                                        <p>{l s='Total %s' sprintf=$data_v.selling_object_plural_name|escape:'html':'UTF-8'}</p>
                                                                         <strong>{$rm_v.num_rm|string_format:'%02d'}</strong>
                                                                     </div>
                                                                     <div class="col-xs-3">
-                                                                        <p>{l s='Cancelled %s' sprintf=$data_v.multiple_room_type_selling_object|escape:'html':'UTF-8'}</p>
+                                                                        <p>{l s='Cancelled %s' sprintf=$data_v.selling_object_plural_name|escape:'html':'UTF-8'}</p>
                                                                         <strong>{($rm_v.count_cancelled + $rm_v.count_refunded)|string_format:'%02d'}</strong>
                                                                     </div>
                                                                 </div>
@@ -995,7 +995,7 @@
                                                                                 <div class="checkbox">
                                                                                     <label for="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}">
                                                                                         <input type="checkbox" class="bookings_to_refund" id="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}" name="bookings_to_refund[]" value="{$hotel_booking_detail.id_htl_booking|escape:'html':'UTF-8'}" {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}disabled{/if}/>
-                                                                                        {l s='%s - %s' sprintf=[$data_v.room_type_selling_object|escape:'html':'UTF-8', $smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d']}
+                                                                                        {l s='%s - %s' sprintf=[$data_v.selling_object_name|escape:'html':'UTF-8', $smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d']}
                                                                                     </label>
 
                                                                                     <span>({$hotel_booking_detail.adults|string_format:'%02d'} {if $hotel_booking_detail.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $hotel_booking_detail.children > 0}{l s=', '}{$hotel_booking_detail.children|string_format:'%02d'} {if $hotel_booking_detail.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
@@ -1036,7 +1036,7 @@
                                                                                 </div>
                                                                             {else}
                                                                                 <div class="extra-services-wrap clearfix">
-                                                                                    <p class="text-muted">{l s='No extra services added for this %s.' sprintf=$data_v.room_type_selling_object|escape:'html':'UTF-8'}</p>
+                                                                                    <p class="text-muted">{l s='No extra services added for this %s.' sprintf=$data_v.selling_object_name|escape:'html':'UTF-8'}</p>
                                                                                 </div>
                                                                             {/if}
                                                                         </div>

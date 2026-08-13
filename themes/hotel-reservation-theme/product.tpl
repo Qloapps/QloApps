@@ -211,7 +211,7 @@
 							<section class="page-product-box">
 								{block name='product_tabs'}
 									<ul class="nav nav-tabs product_description_tabs">
-									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='%s Information' sprintf=$room_type_info['room_type_selling_object']}{else}{l s='Product Information'}{/if}</a></li>
+									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='%s Information' sprintf=$room_type_info['selling_object_name']}{else}{l s='Product Information'}{/if}</a></li>
 										{* Block for booking products *}
 										{if isset($id_hotel) && $id_hotel}
 											<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
@@ -281,7 +281,7 @@
 														{if isset($features) && $features}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
-																	<span>{l s='%s Features' sprintf=$room_type_info['room_type_selling_object']}</span>
+																	<span>{l s='%s Features' sprintf=$room_type_info['selling_object_name']}</span>
 																</div>
 																<div class="room_info_content row">
 																	{foreach from=$features key=ftr_k item=ftr_v}
@@ -301,7 +301,7 @@
 															{if isset($hotel_features) && $hotel_features}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='%s Features' sprintf=[$property_type|default:'Hotel']}</span>
+																		<span>{l s='%s Features' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$hotel_features key=ftr_k item=ftr_v}
@@ -315,7 +315,7 @@
 															{if isset($hotel_description) && $hotel_description}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='%s Description' sprintf=[$property_type|default:'Hotel']}</span>
+																		<span>{l s='%s Description' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content">
 																		{$hotel_description}
@@ -364,7 +364,7 @@
 														{if isset($hotel_policies) && $hotel_policies}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
-																	<span>{l s='%s Policies' sprintf=[$property_type|default:'Hotel']}</span>
+																	<span>{l s='%s Policies' sprintf=$property_type}</span>
 																</div>
 																<div class="room_info_content">
 																	<p class="">{$hotel_policies}</p>

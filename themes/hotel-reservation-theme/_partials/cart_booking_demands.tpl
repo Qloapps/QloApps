@@ -39,7 +39,7 @@
 						{if isset($selectedRoomDemands) && $selectedRoomDemands}
 							<div id="room_type_demands_desc" class="tab-pane active">
 								<div class="rooms_extra_demands_head">
-									<p class="rooms_extra_demands_text">{l s='Add below facilities to the %s for better hotel experience' sprintf=$room_type_info['room_type_selling_object']}</p>
+									<p class="rooms_extra_demands_text">{l s='Add below facilities to the %s for better hotel experience' sprintf=$room_type_info['selling_object_name']}</p>
 								</div>
 								{assign var=roomCount value=1}
 								{foreach $selectedRoomDemands as $key => $roomDemand}
@@ -47,7 +47,7 @@
 										<div class="row accordion-section">
 											<div class="col-sm-12 demand_header">
 												<a class="accordion-section-title {if $roomCount == 1}active{/if}" href="#accordion_demand_{$key|escape:'html':'UTF-8'}">
-													{$room_type_info['room_type_selling_object']} {$roomCount|escape:'html':'UTF-8'}&nbsp;
+													{$room_type_info['selling_object_name']} {$roomCount|escape:'html':'UTF-8'}&nbsp;
 													<span>({if {$roomDemand['adults']} <= 9}0{$roomDemand['adults']}{else}{$roomDemand['adults']}{/if} {if $roomDemand['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if {$roomDemand['children']} <= 9}0{$roomDemand['children']}{else}{$roomDemand['children']}{/if} {if $roomDemand['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if})</span>
 												</a>
 											</div>
@@ -101,7 +101,7 @@
 						{if isset($roomTypeServiceProducts) && $roomTypeServiceProducts}
 							<div id="room_type_service_product_desc" class="tab-pane{if !isset($selectedRoomDemands) || !$selectedRoomDemands} active{/if}">
 								<div class="rooms_extra_demands_head">
-									<p class="rooms_extra_demands_text">{l s='Add below services to the %s for better hotel experience' sprintf=$room_type_info['room_type_selling_object']}</p>
+									<p class="rooms_extra_demands_text">{l s='Add below services to the %s for better hotel experience' sprintf=$room_type_info['selling_object_name']}</p>
 								</div>
 								{assign var=roomCount value=1}
 								{foreach $cartRooms as $key => $cartRoom}
@@ -109,7 +109,7 @@
 										<div class="row accordion-section">
 											<div class="col-sm-12 demand_header">
 												<a class="accordion-section-title {if $roomCount == 1}active{/if}" href="#accordion_service_{$key|escape:'html':'UTF-8'}">
-													{$room_type_info['room_type_selling_object']} {$roomCount|escape:'html':'UTF-8'}&nbsp;
+													{$room_type_info['selling_object_name']} {$roomCount|escape:'html':'UTF-8'}&nbsp;
 													<span>({if {$cartRoom['adults']} <= 9}0{$cartRoom['adults']}{else}{$cartRoom['adults']}{/if} {if $cartRoom['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if {$cartRoom['children']} <= 9}0{$cartRoom['children']}{else}{$cartRoom['children']}{/if} {if $cartRoom['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if})</span>
 												</a>
 											</div>

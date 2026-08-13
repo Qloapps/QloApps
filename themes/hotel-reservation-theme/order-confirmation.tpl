@@ -117,7 +117,7 @@
 																<div class="row">
 																	<div class="col-xs-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{if $rm_v.num_rm > 1}{$data_v['multiple_room_type_selling_object']|escape:'html':'UTF-8'}{else}{$data_v['room_type_selling_object']}{/if}</dt>
+																			<dt class="col-xs-5">{if $rm_v.num_rm > 1}{$data_v['selling_object_plural_name']|escape:'html':'UTF-8'}{else}{$data_v['selling_object_name']}{/if}</dt>
 																			<dd class="col-xs-7">{$rm_v.num_rm|string_format:'%02d'}</dd>
 																		</div>
 																	</div>
@@ -166,7 +166,7 @@
 																						<div class="price-info-tooltip-cont">
 																							<div class="list-row">
 																								<div>
-																									<p>{l s='%s cost' sprintf=$data_v['multiple_room_type_selling_object']} : </p>
+																									<p>{l s='%s cost' sprintf=$data_v['selling_object_plural_name']} : </p>
 																								</div>
 																								<div class="text-right">
 																									<p>

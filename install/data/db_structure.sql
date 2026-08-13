@@ -1572,7 +1572,7 @@ CREATE TABLE `PREFIX_product` (
   `cache_has_attachments` tinyint(1) NOT NULL DEFAULT '0',
   `is_virtual` tinyint(1) NOT NULL DEFAULT '0',
   `booking_product` tinyint(1) NOT NULL DEFAULT '1',
-  `id_room_type_selling_object` int(10) unsigned DEFAULT NULL,
+  `id_selling_object` int(10) unsigned DEFAULT NULL,
   `cache_default_attribute` int(10) unsigned DEFAULT NULL,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
