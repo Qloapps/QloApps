@@ -525,7 +525,9 @@ class ServiceProductCartDetail extends ObjectModel
                             $objHotelCartBooking->date_from,
                             $objHotelCartBooking->date_to
                         );
-                        $removedQuantity = $removedQuantity * $numDays;
+                        if ($numDays) {
+                            $removedQuantity = $removedQuantity * $numDays;
+                        }
                     }
 
                     $objCart = new Cart($idCart);

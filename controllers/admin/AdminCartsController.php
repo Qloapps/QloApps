@@ -1210,7 +1210,7 @@ class AdminCartsControllerCore extends AdminController
                 // get all services
                 $objProduct = new Product();
                 $serviceProducts = array_values(array_filter(
-                    $objProduct->getServiceProducts(null),
+                    $objProduct->getServiceProducts(true),
                     function ($serviceProduct) {
                         return Product::isSellableWithRoomType($serviceProduct['id_product']);
                     }
@@ -1561,7 +1561,7 @@ class AdminCartsControllerCore extends AdminController
                 // get all services
                 $objProduct = new Product();
                 $serviceProducts = array_values(array_filter(
-                    $objProduct->getServiceProducts(null),
+                    $objProduct->getServiceProducts(true),
                     function ($serviceProduct) {
                         return Product::isSellableWithRoomType($serviceProduct['id_product']);
                     }

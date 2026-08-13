@@ -3027,20 +3027,7 @@ class AdminNormalProductsControllerCore extends AdminController
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
             $allAssociations = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product->id);
 
-            $roomTypeSellingPreferences = array(
-                Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
-            );
-            $hotelSellingPreferences = array(
-                Product::SELLING_PREFERENCE_WITH_HOTEL,
-                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
-                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
-                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
-            );
-
-            if (in_array((int)$product->selling_preference_type, $roomTypeSellingPreferences, true)) {
+            if (Product::isSellableWithRoomType($product->id)) {
                 $associatedRoomTypes = $allAssociations['room_type'];
                 $selectedRoomTypes = Tools::getValue('RT_tree_room_type_box', array());
 
@@ -3084,7 +3071,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 );
             }
 
-            if (in_array((int)$product->selling_preference_type, $hotelSellingPreferences, true)) {
+            if (Product::isSellableWithHotel($product->id)) {
                 $associatedHotels = $allAssociations['hotel'];
                 $selectedHotel = Tools::getValue('hotel_box', array());
                 // Generate list of new associations
@@ -3127,8 +3114,8 @@ class AdminNormalProductsControllerCore extends AdminController
                 );
             }
 
-            if (!in_array((int)$product->selling_preference_type, $roomTypeSellingPreferences, true)
-                && !in_array((int)$product->selling_preference_type, $hotelSellingPreferences, true)
+            if (!Product::isSellableWithRoomType($product->id)
+                && !Product::isSellableWithHotel($product->id)
             ) {
                 RoomTypeServiceProduct::deleteRoomProductLink($product->id);
             }

@@ -1785,7 +1785,7 @@ class CartCore extends ObjectModel
                             } else {
                                 $priceAdd = $serviceProduct['unit_price_tax_excl'];
                             }
-                            $lineTotal = Tools::processPriceRounding($priceAdd, (int)$servicePorduct['quantity']);
+                            $lineTotal = Tools::processPriceRounding($priceAdd, (int)$serviceProduct['quantity']);
                             if ($ps_round_type == Order::ROUND_TOTAL) {
                                 $products_total[$id_tax_rules_group.'_'.$id_address] += $lineTotal;
                             } else {
