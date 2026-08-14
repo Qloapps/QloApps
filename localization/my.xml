@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <localizationPack name="Malaysia">
   <currencies>
-    <currency name="Ringgit" iso_code="MYR" iso_code_num="458" sign="RM" blank="0" conversion_rate="1.000000" format="1" decimals="1"/>
+    <currency name="Ringgit" iso_code="MYR" iso_code_num="458" sign="RM" blank="0" format="1" decimals="1"/>
   </currencies>
   <languages>
     <language iso_code="ms"/>

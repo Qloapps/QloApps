@@ -1,20 +1,25 @@
 <?xml version="1.0"?>
 <localizationPack name="Philippines">
   <currencies>
-    <currency name="Philippine Peso" iso_code="PHP" iso_code_num="608" sign="PHP" blank="1" conversion_rate="1.000000" format="1" decimals="1"/>
+    <currency name="Philippine Peso" iso_code="PHP" iso_code_num="608" sign="PHP" blank="1" format="1" decimals="1"/>
   </currencies>
   <languages>
     <language iso_code="en"/>
+    <language iso_code="tl"/>
   </languages>
   <taxes>
-    <taxRulesGroup name="RVAT 12%">
-      <taxRule iso_code_country="ph" behavior="0" id_tax="68"/>
+    <tax id="1" name="RVAT 18%" rate="18.000"/>
+    <tax id="2" name="RVAT 12%" rate="12.000"/>
+    <tax id="3" name="RVAT 0%" rate="0"/>
+    <taxRulesGroup name="RVAT Higher Rate 18%">
+      <taxRule iso_code_country="ph" behavior="0" id_tax="1"/>
     </taxRulesGroup>
-    <taxRulesGroup name="RVAT 6%">
-      <taxRule iso_code_country="ph" behavior="0" id_tax="69"/>
+    <taxRulesGroup name="RVAT Standard Rate 12%">
+      <taxRule iso_code_country="ph" behavior="0" id_tax="2"/>
     </taxRulesGroup>
-    <tax id="68" name="RVAT 12%" rate="12.000"/>
-    <tax id="69" name="RVAT 6%" rate="6.000"/>
+    <taxRulesGroup name="RVAT Zero Rate 0%">
+      <taxRule iso_code_country="ph" behavior="0" id_tax="3"/>
+    </taxRulesGroup>
   </taxes>
   <units>
     <unit type="weight" value="kg"/>

@@ -3172,7 +3172,10 @@ class AdminProductsControllerCore extends AdminController
                             'product' => $obj,
                             'htl_info' => $hotelInfo,
                             'rm_status' => $roomStatus,
-                            'locale' => $this->context->language->iso_code
+                            'id_lang' => $this->context->language->id,
+                            'locale' => $this->context->language->iso_code,
+                            'room_type_acronym' => preg_replace(
+                                '/(?:(?<!^)(?<!\s)\p{L}|\P{L})+/u','',(string) $obj->name[$this->context->language->id]),
                         )
                     );
                 } else {
@@ -5594,6 +5597,8 @@ class AdminProductsControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('Number of rooms is required.');
                 } else if (!Validate::isUnsignedInt($roomQuantity) || $roomQuantity < 1) {
                     $this->errors[] = Tools::displayError('Invalid value for number of rooms.');
+                } else if ($roomQuantity > 50) {
+                    $this->errors[] = Tools::displayError('You cannot create more than 50 rooms at a time.');
                 }
 
                 if (trim($comment = Tools::getValue('room_comment'))) {
@@ -5623,16 +5628,19 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if (empty($this->errors)) {
-                    if (!$prefix) {
-                        $roomsInfo['prefix'] = $objProduct->name[0].'R';
-                    } else {
+                    if ($prefix) {
                         $roomsInfo['prefix'] = $prefix;
+                    } elseif (!(int) $roomNumber) {
+                        $roomsInfo['prefix'] = preg_replace('/(?:(?<!^)(?<!\s)\p{L}|\P{L})+/u', '', (string) $objProduct->name);
+                    } else {
+                        $roomsInfo['prefix'] = '';
                     }
 
+                    $startingRoomNumber = (int) $roomNumber;
                     for ($i = 0; $i < $roomQuantity; $i++) {
                         $roomNum = $roomsInfo['prefix'];
-                        if ((int) $roomNumber) {
-                            $roomNum .= '-'.($roomNumber + $i);
+                        if ($startingRoomNumber) {
+                            $roomNum .= ($roomsInfo['prefix'] !== '' ? '-' : '').($startingRoomNumber + $i);
                         }
 
                         $objHotelRoomInfo = new HotelRoomInformation();
