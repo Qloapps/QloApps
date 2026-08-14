@@ -54,6 +54,7 @@
   <tab id="Monitoring" name="Suivi"/>
   <tab id="Multistore" name="Multiboutique"/>
   <tab id="Order_Messages" name="Messages prédéfinis"/>
+  <tab id="Guest_Registration" name="Carte d'enregistrement des hôtes"/>
   <tab id="Orders_2" name="Commandes"/>
   <tab id="Orders" name="Commandes"/>
   <tab id="Orders_1" name="Commandes"/>
