@@ -116,7 +116,7 @@ class AdminTranslationsControllerCore extends AdminController
 
         if (Tools::getValue('type') == 'mails') {
             Media::addJsDef(array(
-                'mailResetSuccessMsg' => $this->l('The template was reset to its original content.'),
+                'mailResetSuccessMsg' => $this->l('The template is reset to its original content.'),
                 'mailResetErrorMsg' => $this->l('An error occurred while resetting the template.'),
             ));
             $this->addJS(_PS_JS_DIR_.'admin/translations.js');
