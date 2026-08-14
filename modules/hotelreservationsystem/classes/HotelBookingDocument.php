@@ -153,12 +153,19 @@ class HotelBookingDocument extends ObjectModel
     }
 
     /**
-     * Extension is derived from the validated file_type, never from the
-     * uploaded filename/mime header (both are attacker-controlled).
+     * Extension is derived from the file's real, validated content
+     * (getimagesize()/PDF signature), never from the uploaded
+     * filename or mime header (both are attacker-controlled).
      */
     public function getFileExtension()
     {
-        return $this->file_type == self::FILE_TYPE_PDF ? 'pdf' : 'jpg';
+        if ($this->file_type == self::FILE_TYPE_PDF) {
+            return 'pdf';
+        }
+
+        $imageInfo = @getimagesize($this->fileInfo['tmp_name']);
+
+        return $imageInfo ? image_type_to_extension($imageInfo[2], false) : 'jpg';
     }
 
     public function getContentType()
