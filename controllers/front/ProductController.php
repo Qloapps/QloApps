@@ -126,6 +126,12 @@ class ProductControllerCore extends FrontController
         $objHotelRoomType = new HotelRoomType();
         if ($hotelRoomInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($this->product->id)) {
             $idHotel = (int) $hotelRoomInfo['id_hotel'];
+            
+            // If the hotel this room type belongs to is disabled, redirect to home page
+            if (!(new HotelBranchInformation())->hotelBranchesInfo(false, 1, 0, $idHotel)) {
+                Tools::redirect($this->context->link->getPageLink('pagenotfound'));
+            }
+
             if (!HotelHelper::validateDateRangeForHotel($dateFrom, $dateTo, $idHotel)) {
                 Tools::redirect($this->context->link->getPageLink('pagenotfound'));
             }

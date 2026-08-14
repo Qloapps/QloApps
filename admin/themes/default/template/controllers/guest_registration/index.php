@@ -1,10 +1,11 @@
-{**
+<?php
+/**
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
+* This source file is subject to the Academic Free License (AFL 3.0)
 * that is bundled with this package in the file LICENSE.md
 * It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
+* https://opensource.org/licenses/afl-3.0.php
 * If you did not receive a copy of the license and are unable to
 * obtain it through the world-wide-web, please send an email
 * to support@qloapps.com so we can send you a copy immediately.
@@ -17,9 +18,15 @@
 *
 * @author Webkul IN
 * @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
-*}
+* @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
+*/
 
-<a class="btn btn-default btn-review pull-right" id="add-review-btn" data-id-order="{$id_order}" data-id-hotel="{$id_hotel}" data-hotel-name="{$hotel_name}" data-secure-key="{$order_secure_key}">
-    {l s='Write a Review' mod='qlohotelreview'}
-</a>
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+
+header('Location: ../../../');
+exit;
