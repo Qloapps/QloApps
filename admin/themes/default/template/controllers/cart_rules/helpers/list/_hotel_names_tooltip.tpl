@@ -20,12 +20,13 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{if $hotel_names_first}
-	<span>{$hotel_names_first|escape:'html':'UTF-8'}</span>
-	{if $hotel_names_remaining}
-		<span class="badge qlo-hotel-names-badge"
-			data-hotel-names="{$hotel_names_remaining_json}">+{$hotel_names_remaining|@count}</span>
-	{/if}
-{else}
-	--
-{/if}
+<div id="qlo-hotel-names-tooltip" style="display:none">
+    <div class="bootstrap tooltip_cont">
+        <div class="tip_header">
+            <div>{l s='Selected Hotels'}</div>
+        </div>
+        <div class="tip-body">
+            <div class="qlo-hotel-names-list"></div>
+        </div>
+    </div>
+</div>
