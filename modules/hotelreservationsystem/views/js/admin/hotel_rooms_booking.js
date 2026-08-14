@@ -60,118 +60,34 @@ $(document).ready(function() {
                     } else {
                         $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#FF3838');
                     }
-                    $(info.el).closest('td').find('.day-info').tooltip({
-                        content: function()
-                        {
-                            $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
-                            $.each(info.event.extendedProps.data.stats, function(elem, val) {
-                                if (elem == 'num_part_avai') {
-                                    $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
-                                } else {
-                                    $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
-                                }
-                            });
-                            return $('#date-stats-tooltop').html();
-                        },
-                        items: "div",
-                        trigger : 'hover',
-                        show: {
-                            delay: 100,
-                        },
-                        hide: {
-                            delay: 300,
-                        },
-                        open: function(event, ui)
-                        {
-                            if(event.buttons == 1 || event.buttons == 3){
-                                ui.tooltip.remove();
-                            }
-
-                            if (typeof(event.originalEvent) === 'undefined') {
-                                return false;
-                            }
-
-                            var $id = $(ui.tooltip).attr('id');
-
-                            // close any lingering tooltips
-                            if ($('div.ui-tooltip').not('#' + $id).length) {
-                                return false;
-                            }
-
-                        // ajax function to pull in data and add it to the tooltip goes here
-                    },
-                    close: function(event, ui)
-                    {
-                        ui.tooltip.hover(function() {
-                            $(this).stop(true).fadeTo(300, 1);
-                        },
-                        function() {
-                            $(this).fadeOut('300', function()
-                            {
-                                $(this).remove();
-                            });
-                        });
-                    }
-                });
-                info.event.remove();
-            } else {
-                $(info.el).tooltip({
-                    content: function()
-                    {
-                        $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_from_format + ' - ' +info.event.extendedProps.data.date_to_format);
+                    initTooltip($(info.el).closest('td').find('.day-info'), function() {
+                        $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
                         $.each(info.event.extendedProps.data.stats, function(elem, val) {
                             if (elem == 'num_part_avai') {
-                                if (val > 0) {
-                                    $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
-                                } else {
-                                    $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
-                                }
+                                $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
                             } else {
-                                $('#date-stats-tooltop').find('.'+elem).find('.tip_element_value').text(val);
+                                $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
                             }
                         });
                         return $('#date-stats-tooltop').html();
-                    },
-                    items: "div",
-                    trigger : 'hover',
-                    show: {
-                        delay: 100,
-                    },
-                    hide: {
-                        delay: 300,
-                    },
-                    open: function(event, ui)
-                    {
-                        if(event.buttons == 1 || event.buttons == 3){
-                            ui.tooltip.remove();
-                        }
-
-                            if (typeof(event.originalEvent) === 'undefined') {
-                                return false;
+                    }, 'div');
+                    info.event.remove();
+            } else {
+                initTooltip($(info.el), function() {
+                    $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_from_format + ' - ' +info.event.extendedProps.data.date_to_format);
+                    $.each(info.event.extendedProps.data.stats, function(elem, val) {
+                        if (elem == 'num_part_avai') {
+                            if (val > 0) {
+                                $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
+                            } else {
+                                $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
                             }
-
-                            var $id = $(ui.tooltip).attr('id');
-
-                            // close any lingering tooltips
-                            if ($('div.ui-tooltip').not('#' + $id).length) {
-                                return false;
-                            }
-
-                            // ajax function to pull in data and add it to the tooltip goes here
-                        },
-                        close: function(event, ui)
-                        {
-                            ui.tooltip.hover(function() {
-                                $(this).stop(true).fadeTo(300, 1);
-                            },
-                            function() {
-                                $(this).fadeOut('300', function()
-                                {
-                                    $(this).remove();
-                                });
-                            });
+                        } else {
+                            $('#date-stats-tooltop').find('.'+elem).find('.tip_element_value').text(val);
                         }
                     });
+                    return $('#date-stats-tooltop').html();
+                }, 'div');
                 }
             },
             dayCellDidMount: (arg)  => {
@@ -515,6 +431,7 @@ $(document).ready(function() {
                 } else {
                     showSuccessMessage(removed_room_success_txt);
                     $("#htl_rooms_list").empty().append(result.data.room_tpl);
+                    initTooltip();
                     refreshCartData();
                     refreshStatsData();
                     calendar.refetchEvents();
