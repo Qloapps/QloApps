@@ -935,9 +935,6 @@ class LanguageCore extends ObjectModel
 
         if (!file_exists($file)) {
             $errors[] = Tools::displayError('No language pack is available for your version.');
-            if ($install && Language::checkAndAddLanguage((string)$iso, false, true, $params)) {
-                $errors = [];
-            }
         } elseif ($install) {
             require_once(_PS_TOOL_DIR_.'tar/Tar.php');
             $gz = new Archive_Tar($file, true);
