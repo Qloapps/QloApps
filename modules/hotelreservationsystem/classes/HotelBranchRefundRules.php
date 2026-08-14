@@ -87,7 +87,7 @@ class HotelBranchRefundRules extends ObjectModel
             $condition .= ' AND `id_refund_rule` = '.(int)$idRefundRule;
         }
         if ($notInVals) {
-            $condition .= ' AND `id_refund_rule` NOT IN ('.implode(',', $notInVals).')';
+            $condition .= ' AND `id_refund_rule` NOT IN ('.implode(',', array_map('intval', $notInVals)).')';
         }
         return Db::getInstance()->delete(
             'htl_branch_refund_rules',

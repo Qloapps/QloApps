@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="Dobropisy"/>
   <tab id="Statuses" name="Stavy objednávek"/>
   <tab id="Order_Messages" name="Zprávy k objednávkám"/>
+  <tab id="Guest_Registration" name="Registrační karta hosta"/>
   <tab id="Customers_1" name="Zákazníci"/>
   <tab id="Addresses" name="Adresy"/>
   <tab id="Groups" name="Skupiny zákazníků"/>
