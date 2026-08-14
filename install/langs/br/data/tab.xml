@@ -54,6 +54,7 @@
   <tab id="Monitoring" name="Monitoramento"/>
   <tab id="Multistore" name="Multiloja"/>
   <tab id="Order_Messages" name="Mensagens de compras"/>
+  <tab id="Guest_Registration" name="Cartão de Registro de Hóspede"/>
   <tab id="Orders_2" name="Compras"/>
   <tab id="Orders" name="Compras"/>
   <tab id="Orders_1" name="Compras"/>

@@ -64,6 +64,15 @@ class AdminPdfControllerCore extends AdminController
         }
     }
 
+    public function processGenerateGuestRegistrationFormPDF()
+    {
+        if (Tools::isSubmit('id_hotel_booking_detail')) {
+            $this->generateGuestRegistrationFormPDF((int)Tools::getValue('id_hotel_booking_detail'));
+        } else {
+            die(Tools::displayError('The hotel booking detail ID is missing.'));
+        }
+    }
+
     public function processGenerateBookingVoucherPDF()
     {
         if (Tools::isSubmit('id_order')) {
@@ -232,6 +241,17 @@ class AdminPdfControllerCore extends AdminController
 
         Hook::exec('actionPDFInvoiceRender', array('order_invoice_list' => array($order_invoice)));
         $this->generatePDF($order_invoice, PDF::TEMPLATE_INVOICE);
+    }
+
+    public function generateGuestRegistrationFormPDF($idHotelBookingDetail)
+    {
+        $idHotelBookingDetail = (int)$idHotelBookingDetail;
+        if (!$idHotelBookingDetail || !Validate::isLoadedObject(new HotelBookingDetail($idHotelBookingDetail))) {
+            die(Tools::displayError('The hotel booking cannot be found within your database.'));
+        }
+
+        $pdf = new PDF($idHotelBookingDetail, PDF::TEMPLATE_GUEST_REGISTRATION_FORM, Context::getContext()->smarty);
+        $pdf->render('I');
     }
 
     public function generateBookingVoucherPDFByIdOrder($id_order)
