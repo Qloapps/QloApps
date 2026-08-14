@@ -353,7 +353,7 @@ class ParentOrderControllerCore extends FrontController
             // For Advanced Payment work
             $objAdvPayment = new HotelAdvancedPayment();
             if ($objAdvPayment->isAdvancePaymentAvailableForCurrentCart()) {
-                if (Tools::isSubmit('submitAdvPayment') && !$this->context->cart->orderExists()) {
+                if (Tools::isSubmit('submitAdvPayment')) {
                     if (Tools::getValue('payment_type') == Order::ORDER_PAYMENT_TYPE_ADVANCE) {
                         $this->context->cart->is_advance_payment = 1;
                     } else {

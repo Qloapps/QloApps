@@ -96,11 +96,14 @@ class WkPaypalCommerceWebhook
                     // if order completed then change the status of the order
                     if ($eventData['event_type'] == 'CHECKOUT.ORDER.COMPLETED') {
                         $cartID = $transactionData['id_cart'];
+                        $objCart = new Cart($cartID);
+                        if ($objCart->is_advance_payment) {
+                            $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+                        } else {
+                            $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                        }
                         if ($orders = WkPaypalCommerceHelper::getOrdersByCartId($cartID)) {
                             foreach ($orders as $order) {
-                                $orderStatus = $order['is_advance_payment']
-                                    ? Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED')
-                                    : Configuration::get('PS_OS_PAYMENT_ACCEPTED');
                                 $this->updatePaymentStatus(
                                     (int)$orderStatus,
                                     $order['id_order']
@@ -123,11 +126,14 @@ class WkPaypalCommerceWebhook
             $transaction_id
         )) {
             $cartID = $transactionData['id_cart'];
+            $objCart = new Cart($cartID);
+            if ($objCart->is_advance_payment) {
+                $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+            } else {
+                $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+            }
             if ($orders = WkPaypalCommerceHelper::getOrdersByCartId($cartID)) {
                 foreach ($orders as $order) {
-                    $orderStatus = $order['is_advance_payment']
-                        ? Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED')
-                        : Configuration::get('PS_OS_PAYMENT_ACCEPTED');
                     $this->updatePaymentStatus(
                         (int)$orderStatus,
                         $order['id_order']
