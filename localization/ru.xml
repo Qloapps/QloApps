@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Russia" version="1.0">
 	<currencies>
-		<currency name="Ruble" iso_code="RUB" iso_code_num="643" sign="руб" blank="1" conversion_rate="41.7632" format="2" decimals="1" />
+		<currency name="Ruble" iso_code="RUB" iso_code_num="643" sign="руб" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="ru" />
 	</languages>
 	<taxes>
-		<tax id="1" name="НДС RU 18%" rate="18" />
-		<tax id="2" name="НДС RU 10%" rate="10" />
-		
-		<taxRulesGroup name="RU Standard Rate (18%)">
+		<tax id="1" name="НДС RU 20%" rate="20" />
+		<tax id="2" name="НДС RU 16.67%" rate="16.67" />
+		<tax id="3" name="НДС RU 0%" rate="0" />
+
+		<taxRulesGroup name="RU Standard Rate (20%)">
 			<taxRule iso_code_country="ru" id_tax="1" />
 		</taxRulesGroup>
-		
-		<taxRulesGroup name="RU Reduced Rate (10%)">
+
+		<taxRulesGroup name="RU Reduced Rate (16.67%)">
 			<taxRule iso_code_country="ru" id_tax="2" />
 		</taxRulesGroup>
-	</taxes>
+
+		<taxRulesGroup name="RU Reduced Rate (0%)">
+			<taxRule iso_code_country="ru" id_tax="3" />
+		</taxRulesGroup>
+  </taxes>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

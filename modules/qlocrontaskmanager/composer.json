@@ -1,0 +1,7 @@
+{
+    "name": "qloapps/qlocrontaskmanager",
+    "description": "Centralized cron task manager for QloApps modules",
+    "require": {
+        "dragonmantank/cron-expression": "^3.0"
+    }
+}
