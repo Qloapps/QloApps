@@ -32,7 +32,7 @@
                     <th><span class="title_box">{l s='Total Tax'}</span></th>
                     <th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
                     {if isset($refundReqProducts) && $refundReqProducts}
-                        <th><span class="title_box">{l s='Refund'}</span></th>
+                        <th><span class="title_box">{l s='No. of Refunds'}</span></th>
                     {/if}
                     {if ($can_edit && !$order->hasBeenDelivered())}
                         <th class="fixed-width-md center"><span class="title_box">{l s='Actions'}</span></th>
