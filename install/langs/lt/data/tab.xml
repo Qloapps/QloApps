@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="Grąžinimo kuponai"/>
   <tab id="Statuses" name="Būsenos"/>
   <tab id="Order_Messages" name="Užsakymo pranešimai"/>
+  <tab id="Guest_Registration" name="Svečio registracijos kortelė"/>
   <tab id="Customers_1" name="Klientai"/>
   <tab id="Addresses" name="Adresai"/>
   <tab id="Groups" name="Grupės"/>

@@ -182,6 +182,7 @@ class QloHotelReview extends Module
                     $this->l('You can upload a maximum of %d images.', false, true),
                     (int) Configuration::get('QHR_MAX_IMAGES_PER_REVIEW')
                 ),
+                'allowed_extensions' => $this->l('Only images with the following extensions are allowed: jpg, jpeg, png', false, true),
             ),
         )));
 
@@ -198,10 +199,12 @@ class QloHotelReview extends Module
             && !QhrHotelReview::getByIdOrder($idOrder)
         ) {
             if ($hotel = QhrHotelReviewHelper::getHotelByOrder($idOrder)) {
+                $objOrder = new Order((int) $idOrder);
                 $this->smarty->assign(array(
                     'id_order' => (int) $idOrder,
                     'id_hotel' => $hotel['id_hotel'],
                     'hotel_name' => $hotel['hotel_name'],
+                    'order_secure_key' => $objOrder->secure_key,
                 ));
                 return $this->display(__FILE__, 'booking-action.tpl');
             }

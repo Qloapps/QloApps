@@ -1,0 +1,30 @@
+.tooltip_cont
+    min-width: 280px
+    width: 100%
+    font-size: 14px
+    font-weight: 600
+    .tip_header
+        margin-bottom: 10px
+    .tip-body > div
+        margin-bottom: 6px
+
+.tip_element_head
+    font-size: 12px
+
+.tip_element_value
+    font-size: 14px
+    font-weight: 400
+    opacity: 0.8
+
+.tip-body
+    display: grid
+    grid-template-columns: auto auto
+    &.tip-body-grid
+        grid-template-columns: 1fr 1fr
+        gap: 8px 16px
+
+.ui-tooltip,
+.ui-tooltip.ui-widget-content
+    border: none
+    padding: 10px
+    box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.15)

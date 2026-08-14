@@ -386,6 +386,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'link' => $this->context->link,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
+            'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms(null, null, $this->id_hotel, $this->context->language->id),
         ));
 
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
@@ -891,6 +892,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 // if room is changing in the reallocation
                 if ($objHotelBooking->id_product != $idNewRoomType) {
                     $result['has_room_type_change'] = 1;
+                    $objOrder = new Order($objHotelBooking->id_order);
                     $occupancy = array(
                         array(
                             'adults' => $objHotelBooking->adults,
@@ -907,7 +909,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                         0,
                         0,
                         0,
-                        0
+                        0,
+                        1
                     );
 
                     if ($objHotelBooking->total_price_tax_excl != $newRoomTotalPrice['total_price_tax_excl']) {
@@ -1035,6 +1038,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         // add fullcalender plugin
         $this->addJqueryUI('ui.tooltip', 'base', true);
         $this->removeJS(Media::getJqueryUIPath('effects.core', 'base', false), false);
+        $this->addCSS(array(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css'));
 
         $this->addCSS(_PS_JS_DIR_.'fullcalendar/main.css');
         $this->addJs(_PS_JS_DIR_.'fullcalendar/main.js');

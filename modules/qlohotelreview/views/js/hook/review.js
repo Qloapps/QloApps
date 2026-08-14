@@ -21,10 +21,12 @@
 */
 
 var QhrReviewForm = {
-    init: function(idOrder, idHotel, hotelName) {
+    orderSecureKey: '',
+    init: function(idOrder, idHotel, hotelName, secureKey) {
         $('#add-review-form').find('[name="id_order"]').val(idOrder);
         $('#add-review-form').find('[name="id_hotel"]').val(idHotel);
         $('#add-review-popup').find('.hotel-name').html(hotelName);
+        QhrReviewForm.orderSecureKey = secureKey || '';
         QhrReviewImages.init();
     },
     show: function() {
@@ -47,6 +49,7 @@ var QhrReviewForm = {
         formData.append('ajax', true);
         formData.append('token', qlo_hotel_review_js_vars.review_ajax_token);
         formData.append('action', 'AddReview');
+        formData.append('order_secure_key', QhrReviewForm.orderSecureKey);
         $.ajax({
             url: qlo_hotel_review_js_vars.review_ajax_link,
             data: formData,
@@ -132,6 +135,29 @@ var QhrReviewImages = {
     init: function() {
         QhrReviewImages.inputHtml = '<input type="file" accept="image/*" class="input-images hidden" name="images[]" multiple>';
     },
+    validateFiles: function () {
+        $('#review-general-errors').hide();
+        let isValid = true;
+        $('.images-field input.input-images').each(function (iInput, input) {
+            let files = input.files;
+            let dataTransfer = new DataTransfer();
+            $.each(files, function (iFile, file) {
+                if (file.type.startsWith('image/')) {
+                    dataTransfer.items.add(file);
+                } else {
+                    isValid = false;
+                }
+            });
+            input.files = dataTransfer.files;
+            if (!input.files.length) {
+                $(input).remove();
+            }
+        });
+        if (!isValid) {
+            QhrReviewForm.showGeneralErrors(qlo_hotel_review_js_vars.texts.allowed_extensions);
+        }
+        return isValid;
+    },
     getFilesCount: function() {
         var count = 0;
         $('.images-field input.input-images').each(function(i, input) {
@@ -156,6 +182,9 @@ var QhrReviewImages = {
             }
         });
         input.files = dataTransfer.files;
+        if (input.files.length === 0) {
+            $(input).remove();
+        }
     },
     resetPreviews: function() {
         $('.previews-wrap').html('');
@@ -202,7 +231,8 @@ $(document).on('click', '#add-review-btn', function(e) {
     var idOrder = parseInt($(this).data('id-order'));
     var idHotel = parseInt($(this).data('id-hotel'));
     var hotelName = $(this).data('hotel-name');
-    QhrReviewForm.init(idOrder, idHotel, hotelName);
+    var secureKey = $(this).data('secure-key') || '';
+    QhrReviewForm.init(idOrder, idHotel, hotelName, secureKey);
     QhrReviewForm.show();
 });
 
@@ -241,8 +271,9 @@ $(document).on('change', 'input.input-images', function(e) {
     var filesCount = QhrReviewImages.getFilesCount();
     if (filesCount > qlo_hotel_review_js_vars.num_images_max) {
         QhrReviewImages.removeLastInput();
-        alert(qlo_hotel_review_js_vars.texts.num_files);
+        QhrReviewForm.showGeneralErrors(qlo_hotel_review_js_vars.texts.num_files);
     } else {
+        QhrReviewImages.validateFiles();
         QhrReviewImages.updatePreviews();
 
         if (filesCount == qlo_hotel_review_js_vars.num_images_max) {

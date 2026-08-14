@@ -20,6 +20,6 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<a class="btn btn-default btn-review pull-right" id="add-review-btn" data-id-order="{$id_order}" data-id-hotel="{$id_hotel}" data-hotel-name="{$hotel_name}">
+<a class="btn btn-default btn-review pull-right" id="add-review-btn" data-id-order="{$id_order}" data-id-hotel="{$id_hotel}" data-hotel-name="{$hotel_name}" data-secure-key="{$order_secure_key}">
     {l s='Write a Review' mod='qlohotelreview'}
 </a>

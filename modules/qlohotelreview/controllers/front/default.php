@@ -61,6 +61,12 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
             $errors['general'][] = $objModule->l('Invalid order ID.', 'default');
         }
 
+        $submittedSecureKey = Tools::getValue('order_secure_key', '');
+        if (!Validate::isLoadedObject($objOrder) || !$submittedSecureKey || $submittedSecureKey !== $objOrder->secure_key ) {
+            $errors['general'][] = $objModule->l('You are not authorized to submit a review.', 'default');
+            $this->ajaxDie(json_encode(array('status' => false, 'errors' => $errors)));
+        }
+
         if (!$subject) {
             $errors['by_key']['subject'] = $objModule->l('This field can not be empty.', 'default');
         } elseif(!Validate::isGenericName($subject)) {
@@ -84,6 +90,17 @@ class QloHotelReviewDefaultModuleFrontController extends ModuleFrontController
                 );
             }
         }
+
+        if (is_array($_FILES) && array_key_exists('images', $_FILES) ) {
+            $allowedExtensions = array('jpg', 'png', 'jpeg',);
+            foreach ($_FILES['images']['name'] as $key => $imageName) {
+                $extension = Tools::strtolower(pathinfo($imageName, PATHINFO_EXTENSION));
+                if (!in_array($extension, $allowedExtensions)) {
+                    $errors['general'][] = $objModule->l('Only images with the following extensions are allowed: jpg, jpeg, png','default');
+                }
+            }
+        }
+
 
         if (!count($errors['by_key']) && !count($errors['general'])) {
             $customerReview = QhrHotelReview::getByCustomer(
