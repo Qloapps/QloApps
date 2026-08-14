@@ -25,10 +25,9 @@
 	{if $hotel_names_remaining}
 		{assign var='tooltipLines' value=''}
 		{foreach from=$hotel_names_remaining item='hotel' key='index'}
-			{assign var='tooltipLines' value="{$tooltipLines}{if $index > 0}<br>{/if}{$index+1}) {$hotel|escape:'html':'UTF-8'}"}
+			{assign var='tooltipLines' value="{$tooltipLines}{if $index > 0}<br>{/if}{$hotel|escape:'html':'UTF-8'}"}
 		{/foreach}
 		<span class="badge label-tooltip"
-			style="padding:2px 3px;font-weight:normal;font-size:1em;border-radius:50%;cursor:pointer;"
 			data-toggle="tooltip"
 			data-placement="top"
 			data-html="true"
