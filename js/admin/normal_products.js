@@ -476,6 +476,11 @@ product_tabs['Informations'] = new function(){
 	this.bindAutoAddProduct = function (){
 		$('input[name="auto_add_to_cart"]').on('change',function(){
 			if ($(this).val() == 1) {
+				$('#sp_with_room_type').prop('checked', true);
+				var $checkedSpOthers = $('#sp_with_hotel, #sp_standalone').filter(':checked');
+				if ($checkedSpOthers.length) {
+					$checkedSpOthers.prop('checked', false).trigger('change');
+				}
 				$("#price_addition_type_container").show('fast');
 				$("#show_at_front_container").hide('fast');
 				// $('#show_at_front_off').prop("checked", true).change();
