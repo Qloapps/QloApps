@@ -373,6 +373,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $occupancyRequiredForBooking = true;
         }
 
+        $adminCartsAccess = Profile::getProfileAccess(
+            (int) $this->context->employee->id_profile,
+            (int) Tab::getIdFromClassName('AdminCarts')
+        );
+
         $this->context->smarty->assign(array(
             'adults' => $adults,
             'children' => $children,
@@ -386,6 +391,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'link' => $this->context->link,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
+            'can_add_booking_carts' => (!empty($adminCartsAccess['add']) && (int) $adminCartsAccess['add'] === 1),
             'htl_connected_rooms' => HotelConnectedRoom::getConnectedRooms(null, null, $this->id_hotel, $this->context->language->id),
         ));
 
