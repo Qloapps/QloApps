@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Brazil" version="1.0">
 	<currencies>
-		<currency name="Real" iso_code="BRL" iso_code_num="986" sign="R$" blank="1" conversion_rate="2.31583" format="3" decimals="1" />
+		<currency name="Real" iso_code="BRL" iso_code_num="986" sign="R$" blank="1" format="3" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="br" />
@@ -9,7 +9,7 @@
 	<taxes>
 		<tax id="1" name="IPI BR 12%" rate="12" />
 		<tax id="2" name="ICMS BR 25%" rate="25" />
-		<tax id="3" name="ISS BR 5%" rate="5" />
+		<tax id="3" name="ISS BR 7%" rate="7" />
 
 		<taxRulesGroup name="BR ICMS (25%)">
 			<taxRule iso_code_country="br" id_tax="2" />
@@ -19,7 +19,7 @@
 			<taxRule iso_code_country="br" id_tax="1" />
 		</taxRulesGroup>
 
-		<taxRulesGroup name="BR ISS (5%)">
+		<taxRulesGroup name="BR ISS (7%)">
 			<taxRule iso_code_country="br" id_tax="3" />
 		</taxRulesGroup>
 	</taxes>

@@ -29,6 +29,8 @@
  */
 class HelperListCore extends Helper
 {
+    const QLO_EXPORT_FIELDS_ALL = 0;
+    const QLO_EXPORT_FIELDS_SELECTED = 1;
     /**
      * @var int|null
      */
