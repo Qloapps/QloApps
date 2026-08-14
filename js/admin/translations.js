@@ -1,3 +1,24 @@
+/*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*/
 $(document).ready(function () {
 	$('a.useSpecialSyntax').click(function () {
 		var syntax = $(this).find('img').attr('alt');
@@ -20,13 +41,26 @@ $(document).ready(function () {
 			var txt_textarea = active_email.find('textarea.rte.noEditor');
 			rte_name_match = (txt_textarea.attr('name') || '').match(/\[txt\]\[(.+)\]$/);
 		}
+		var $resetBtn = $('.mail-template-reset-btn');
 		if (rte_name_match) {
-			$('#reset_mail_name').val(rte_name_match[1]);
-			$('.mail-template-reset-btn').prop('disabled', false);
+			var name_parts = rte_name_match[1].split('|');
+			var has_module = name_parts.length > 1;
+			$('#reset_mail_name').val(has_module ? name_parts[1] : name_parts[0]);
+			$('#reset_template_type').val(has_module ? EMAIL_TEMPLATE_TYPE_MODULE : EMAIL_TEMPLATE_TYPE_CORE);
+			$('#reset_module_name').val(has_module ? name_parts[0] : '');
+			$resetBtn.prop('disabled', false);
+
+			var reset_tooltip = has_module
+				? mailResetTooltipModule.replace('{module}', name_parts[0]).replace('{iso}', $('input[name="lang"]').val())
+				: mailResetTooltipCore;
+			$resetBtn.attr('title', reset_tooltip).attr('data-original-title', reset_tooltip).tooltip('fixTitle');
 			rte_textarea
 		} else {
 			$('#reset_mail_name').val('');
-			$('.mail-template-reset-btn').prop('disabled', true);
+			$('#reset_template_type').val('');
+			$('#reset_module_name').val('');
+			$resetBtn.prop('disabled', true);
+			$resetBtn.attr('title', '').attr('data-original-title', '').tooltip('fixTitle');
 		}
 		var rte_mail_config = {};
 		rte_mail_config['editor_selector'] = 'rte-mail-' + rte_mail_selector;
@@ -73,6 +107,9 @@ $(document).ready(function () {
 			return;
 		}
 
+		var templateType = $('#reset_template_type').val();
+		var moduleName = $('#reset_module_name').val();
+
 		var $panel = $btn.closest('.email-collapse.in');
 		var $htmlTextarea = $panel.find('textarea.rte-mail');
 		var $txtTextarea = $panel.find('textarea.rte.noEditor');
@@ -84,14 +121,17 @@ $(document).ready(function () {
 		$icon.addClass('icon-spin');
 
 		$.ajax({
-			url: 'ajax.php',
+			url: admin_translations_link,
 			type: 'POST',
 			dataType: 'json',
 			data: {
-				resetTranslationMail: true,
+				ajax: true,
+				action: 'ResetMailTemplate',
 				iso_code: $('input[name="lang"]').val(),
 				theme: $('input[name="theme"]').val(),
 				mail_name: mailName,
+				template_type: templateType,
+				module_name: moduleName,
 				token: $('#translation_mails_token').val()
 			},
 			success: function (result) {

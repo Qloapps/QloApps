@@ -118,6 +118,11 @@ class AdminTranslationsControllerCore extends AdminController
             Media::addJsDef(array(
                 'mailResetSuccessMsg' => $this->l('The template is reset to its original content.'),
                 'mailResetErrorMsg' => $this->l('An error occurred while resetting the template.'),
+                'mailResetTooltipCore' => $this->l('On reset, the template will be reset to the default mail template.'),
+                'mailResetTooltipModule' => $this->l('On reset, the template will be reset using modules/{module}/mails/{iso}/'),
+                'admin_translations_link' => $this->context->link->getAdminLink('AdminTranslations'),
+                'EMAIL_TEMPLATE_TYPE_CORE' => Language::EMAIL_TEMPLATE_TYPE_CORE,
+                'EMAIL_TEMPLATE_TYPE_MODULE' => Language::EMAIL_TEMPLATE_TYPE_MODULE,
             ));
             $this->addJS(_PS_JS_DIR_.'admin/translations.js');
         }
@@ -1441,6 +1446,9 @@ class AdminTranslationsControllerCore extends AdminController
      */
     public function postProcess()
     {
+        if ($this->ajax) {
+            return parent::postProcess();
+        }
         $this->getInformations();
 
         /* PrestaShop demo mode */
@@ -1675,109 +1683,48 @@ class AdminTranslationsControllerCore extends AdminController
         }
     }
 
-    public static function resetMailTemplate($iso_code,$theme, $mail_name, $token)
+    public function ajaxProcessResetMailTemplate()
     {
-        if ($token !== Tools::getAdminTokenLite('AdminTranslations')) {
-            return array('hasError' => true, 'error' => Tools::displayError('Invalid security token.'));
+        if (empty($this->tabAccess['edit'])) {
+            die(json_encode(array('hasError' => true, 'error' => Tools::displayError('You do not have permission to edit this.'))));
         }
 
-        $id_tab = Tab::getIdFromClassName('AdminTranslations');
-        $access = Profile::getProfileAccess(Context::getContext()->employee->id_profile, $id_tab);
-        if (!is_array($access) || empty($access['edit'])) {
-            return array('hasError' => true, 'error' => Tools::displayError('You do not have permission to edit this.'));
-        }
+        $iso_code = Tools::getValue('iso_code') ? Tools::getValue('iso_code') : null;
+        $theme = Tools::getValue('theme');
+        $mail_template_name = Tools::getValue('mail_name');
+        $template_type = (int)Tools::getValue('template_type');
+        $module_name = Tools::getValue('module_name') ? Tools::getValue('module_name') : false;
 
         if (!Validate::isLanguageIsoCode($iso_code)) {
-            return array('hasError' => true, 'error' => Tools::displayError('Invalid iso code.'));
+            die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid iso code.'))));
         }
 
-        $module_name = false;
-        if (($pos = stripos($mail_name, '|')) !== false) {
-            $module_name = substr($mail_name, 0, $pos);
-            $mail_name = substr($mail_name, $pos + 1);
-        }
-        if (!Validate::isTplName($mail_name) || ($module_name && !Validate::isModuleName($module_name))) {
-            return array('hasError' => true, 'error' => Tools::displayError('Invalid mail template to reset.'));
-        }
-        if ($theme) {
-            $theme_exists = false;
-            foreach (Theme::getThemes() as $existing_theme) {
-                if ($existing_theme->directory == $theme) {
-                    $theme_exists = true;
-                    break;
-                }
-            }
-            if (!$theme_exists) {
-                return array('hasError' => true, 'error' => Tools::displayError('Invalid theme.'));
-            }
+        if (!Validate::isTplName($mail_template_name)) {
+            die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid mail template to reset.'))));
         }
 
-        if ($theme) {
-            $dest_dir = $module_name
-                ? _PS_ROOT_DIR_.'/themes/'.$theme.'/modules/'.$module_name.'/mails/'.$iso_code.'/'
-                : _PS_ROOT_DIR_.'/themes/'.$theme.'/mails/'.$iso_code.'/';
+        if ($template_type === Language::EMAIL_TEMPLATE_TYPE_MODULE) {
+            if (!$module_name || !Validate::isModuleName($module_name)) {
+                die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid module name.'))));
+            }
+        } elseif ($template_type === Language::EMAIL_TEMPLATE_TYPE_CORE) {
+            $module_name = false;
         } else {
-            $dest_dir = $module_name
-                ? rtrim(_PS_MODULE_DIR_, '/').'/'.$module_name.'/mails/'.$iso_code.'/'
-                : _PS_MAIL_DIR_.$iso_code.'/';
+            die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid template type.'))));
         }
 
-        if (!is_dir($dest_dir) && !mkdir($dest_dir, 0777, true)) {
-            return array('hasError' => true, 'error' => sprintf(Tools::displayError('Directory "%s" could not be created.'), $dest_dir));
-        }
-        if (!is_writable($dest_dir)) {
-            return array('hasError' => true, 'error' => sprintf(Tools::displayError('Directory "%s" is not writable.'), $dest_dir));
-        }
-
-        // Reuse the already-downloaded language pack if we have one, only hit the API when it's missing
-        $gzip_file = _PS_TRANSLATIONS_DIR_.$iso_code.'.gzip';
-        if (!file_exists($gzip_file)) {
-            Language::downloadAndInstallLanguagePack($iso_code, null, null, false);
-        }
-        if (!file_exists($gzip_file)) {
-            return array('hasError' => true, 'error' => Tools::displayError('Could not download the language pack from the QloApps API. Please check your internet connection and try again.'));
-        }
-
-        require_once(_PS_TOOL_DIR_.'tar/Tar.php');
-        $gz = new Archive_Tar($gzip_file, true);
-        if ($gz->error_object) {
-            return array('hasError' => true, 'error' => Tools::displayError('The downloaded language pack is corrupted. Please try again.'));
-        }
-        $archive_dir = $module_name
-            ? 'modules/'.$module_name.'/mails/'.$iso_code.'/'
-            : 'mails/'.$iso_code.'/';
-
-        $mail_dir = $module_name
-            ? rtrim(_PS_MODULE_DIR_, '/').'/'.$module_name.'/mails/'
-            : _PS_MAIL_DIR_;
-
-        $content = array('html' => null, 'txt' => null);
-        foreach (array_keys($content) as $ext) {
-            $file_content = $gz->extractInString($archive_dir.$mail_name.'.'.$ext);
-            if ($file_content === null) {
-                if (file_exists($mail_dir.$iso_code.'/'.$mail_name.'.'.$ext)) {
-                    $file_content = file_get_contents($mail_dir.$iso_code.'/'.$mail_name.'.'.$ext);
-                } elseif (file_exists($mail_dir.'en/'.$mail_name.'.'.$ext)) {
-                    $file_content = file_get_contents($mail_dir.'en/'.$mail_name.'.'.$ext);
-                }
-            }
-            if ($file_content !== null) {
-                if (file_put_contents($dest_dir.$mail_name.'.'.$ext, $file_content) === false) {
-                    return array('hasError' => true, 'error' => sprintf(Tools::displayError('Could not write file "%s".'), $dest_dir.$mail_name.'.'.$ext));
-                }
-                $content[$ext] = $file_content;
+        if ($theme) {
+            $themes_base_dir = realpath(_PS_ALL_THEMES_DIR_);
+            $theme_real_path = realpath(_PS_ALL_THEMES_DIR_.$theme);
+            if ($themes_base_dir === false
+                || $theme_real_path === false
+                || strncmp($theme_real_path, $themes_base_dir.DIRECTORY_SEPARATOR, strlen($themes_base_dir) + 1) !== 0
+            ) {
+                die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid theme.'))));
             }
         }
 
-        if ($content['html'] === null && $content['txt'] === null) {
-            return array('hasError' => true, 'error' => Tools::displayError('This template was not found in the downloaded language pack.'));
-        }
-
-        return array(
-            'hasError' => false,
-            'html' => $content['html'],
-            'txt' => $content['txt'],
-        );
+        die(json_encode(Language::resetEmailTemplate($mail_template_name, $iso_code, $template_type, $module_name, $theme)));
     }
 
     /**

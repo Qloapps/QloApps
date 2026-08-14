@@ -55,6 +55,8 @@
 				<input type="hidden" name="type" value="{$type}" />
 				<input type="hidden" name="theme" value="{$theme}" />
 				<input type="hidden" name="reset_mail_name" id="reset_mail_name" value="" />
+				<input type="hidden" name="reset_template_type" id="reset_template_type" value="" />
+				<input type="hidden" name="reset_module_name" id="reset_module_name" value="" />
 				<input type="hidden" name="token" id="translation_mails_token" value="{$token}" />
 				<div id="BoxUseSpecialSyntax">
 					<div class="alert alert-warning">
@@ -74,7 +76,7 @@
 					<a name="submitTranslations{$type|ucfirst}" href="{$cancel_url}" class="btn btn-default">
 						<i class="process-icon-cancel"></i> {l s='Cancel'}
 					</a>
-					<button type="button" id="{$table}_form_reset_btn" class="btn btn-default mail-template-reset-btn" disabled="disabled" >
+					<button type="button" id="{$table}_form_reset_btn" class="btn btn-default mail-template-reset-btn label-tooltip" disabled="disabled" data-toggle="tooltip" title="">
 						<i class="process-icon-refresh"></i>
 						{l s='Reset'}
 					</button>
