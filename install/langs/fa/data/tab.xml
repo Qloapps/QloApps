@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="رسیدهای اعتبار"/>
   <tab id="Statuses" name="وضعیت‌ها"/>
   <tab id="Order_Messages" name="پیام‌های سفارش"/>
+  <tab id="Guest_Registration" name="کارت ثبت نام مهمان"/>
   <tab id="Customers_1" name="مشتریان"/>
   <tab id="Addresses" name="آدرس‌ها"/>
   <tab id="Groups" name="گروه‌ها"/>
