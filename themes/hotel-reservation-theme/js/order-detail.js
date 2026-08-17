@@ -338,6 +338,7 @@ $(document).on('click', '.btn-view-extra-services', function(e) {
 
     let idProduct = $(this).data('id_product');
     let idOrder = $(this).data('id_order');
+    let secureKey = $(this).data('secure_key');
     let dateFrom = $(this).data('date_from');
     let dateTo = $(this).data('date_to');
 
@@ -354,6 +355,7 @@ $(document).on('click', '.btn-view-extra-services', function(e) {
             date_to: dateTo,
             id_product: idProduct,
             id_order: idOrder,
+            secure_key: secureKey,
             action: 'getRoomTypeBookingDemands',
             ajax: true,
             token: static_token,

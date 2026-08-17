@@ -352,12 +352,12 @@ class ProductControllerCore extends FrontController
                     $hotel_location = $addressInfo['city'].
                     ($addressInfo['id_state']?', '.$addressInfo['state']:'').', '.$addressInfo['country'];
 
-                    $obj_hotel_feaures_ids = $obj_hotel_branch->getFeaturesOfHotelByHotelId($hotel_id);
+                    $obj_hotel_amenities_ids = $obj_hotel_branch->getAmenitiesOfHotelByHotelId($hotel_id);
 
-                    if (isset($obj_hotel_feaures_ids) && $obj_hotel_feaures_ids) {
-                        foreach ($obj_hotel_feaures_ids as $key => $value) {
-                            $obj_htl_ftr = new HotelFeatures();
-                            $htl_info = $obj_htl_ftr->getFeatureInfoById($value['feature_id']);
+                    if (isset($obj_hotel_amenities_ids) && $obj_hotel_amenities_ids) {
+                        foreach ($obj_hotel_amenities_ids as $key => $value) {
+                            $obj_htl_amenity = new HotelAmenities();
+                            $htl_info = $obj_htl_amenity->getAmenityInfoById($value['amenity_id']);
                             $htl_features[] = $htl_info['name'];
                         }
                     }
@@ -415,19 +415,9 @@ class ProductControllerCore extends FrontController
                         }
                     }
 
-                    $objHotelBedType = new HotelBedType();
-                    if ($bedTypes = $objHotelBedType->getAllBedTypes($this->context->language->id)) {
-                        foreach ($bedTypes as $bedTypeKey => $bedType) {
-                            $bedTypes[$bedTypeKey]['area'] = Tools::ps_round($bedType['width'], 2).' * '.Tools::ps_round($bedType['length'], 2);
-                        }
-
-                        $bedTypes = array_column($bedTypes, null, 'id_bed_type');
-                    }
-
-                    $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-                    if ($selectedBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($this->product->id)) {
-                        $selectedBedTypes = array_column($selectedBedTypes, 'id_bed_type');
-                    }
+                    $roomFeatures = $this->product->getFrontFeatures($this->context->language->id);
+                    $roomAmenities = HotelRoomTypeAmenities::getAmenities($this->product->id, $this->context->language->id);
+                    $hotelAmenities = HotelBranchAmenities::getAmenities($hotel_id, $this->context->language->id);
 
                     $this->context->smarty->assign(
                         array(
@@ -455,14 +445,14 @@ class ProductControllerCore extends FrontController
                             'hotel_description' => $hotel_info_by_id['description'],
                             'hotel_policies' => $hotel_policies,
                             'hotel_features' => $htl_features,
+                            'room_type_features' => $roomFeatures,
+                            'room_dynamic_amenities' => $roomAmenities,
+                            'hotel_dynamic_amenities' => $hotelAmenities,
+                            'amenity_img_dir' => _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_amenities/',
                             'hotel_image_link' => $hotelImageLink,
                             'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),
-                            'ftr_img_src' => _PS_IMG_.'rf/',
                             'order_date_restrict' => $order_date_restrict,
                             'PS_SERVICE_PRODUCT_CATEGORY_FILTER' => Configuration::get('PS_SERVICE_PRODUCT_CATEGORY_FILTER'),
-                            'bed_types_info' => $bedTypes,
-                            'selected_bed_types' => $selectedBedTypes,
-                            'dimension_unit' => Configuration::get('WK_DIMENSION_UNIT', $this->context->language->id),
                         )
                     );
 
