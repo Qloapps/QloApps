@@ -397,9 +397,11 @@ class AdminOrdersControllerCore extends AdminController
         $uniqueStayPeriods = count($stayPeriods);
 
         if ($uniqueStayPeriods > 1) {
-            $stayPeriodHtml .= ' <span class="badge qlo-stay-period-badge"'
-                .' data-stay-tip="'.htmlspecialchars(json_encode($stayPeriods)).'">+'
-                .($uniqueStayPeriods - 1).'</span>';
+            $this->context->smarty->assign(array(
+                'stay_periods' => $stayPeriods,
+                'extra_stay_periods_count' => $uniqueStayPeriods - 1,
+            ));
+            $stayPeriodHtml .= ' '.$this->createTemplate('_stay_periods_tooltip.tpl')->fetch();
         }
         return $stayPeriodHtml;
     }
@@ -1422,10 +1424,6 @@ class AdminOrdersControllerCore extends AdminController
         $this->addJqueryUI('ui.tooltip', 'base', true);
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
 
-        if ($this->display != 'view') {
-            $this->addJS(_PS_JS_DIR_.'admin/orders_stay_periods.js');
-        }
-
         if ($this->display == 'view') {
             if ($this->loadObject()) {
                 $this->addJS(_PS_JS_DIR_.'admin/orders.js');
@@ -1521,8 +1519,6 @@ class AdminOrdersControllerCore extends AdminController
             $this->context->smarty->assign('resolvableOverBookings', $resolvableOverBookings);
             $this->content .= $this->context->smarty->fetch('controllers/orders/_resolvable_overbookings.tpl');
         }
-
-        $this->content .= $this->context->smarty->fetch('controllers/orders/_stay_periods_tooltip.tpl');
 
         if (Tools::isSubmit('submitBulkupdateOrderStatus'.$this->table)) {
             if (Tools::getIsset('cancel')) {
