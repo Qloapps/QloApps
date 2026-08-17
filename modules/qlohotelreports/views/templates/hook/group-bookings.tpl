@@ -113,7 +113,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Reservation ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
                         <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th>{l s='Guest Contact' mod='qlohotelreports'}</th>
                         <th>{l s='Room Type' mod='qlohotelreports'}</th>
@@ -331,8 +331,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest' mod='qlohotelreports'}</th>
+                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th>{l s='Hotel' mod='qlohotelreports'}</th>
                         <th>{l s='Room Type' mod='qlohotelreports'}</th>
                         <th>{l s='Room No.' mod='qlohotelreports'}</th>
@@ -397,8 +397,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest' mod='qlohotelreports'}</th>
+                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th>{l s='Hotel' mod='qlohotelreports'}</th>
                         <th>{l s='Room Type' mod='qlohotelreports'}</th>
                         <th>{l s='Room No.' mod='qlohotelreports'}</th>
@@ -466,8 +466,8 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest' mod='qlohotelreports'}</th>
+                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th>{l s='Hotel' mod='qlohotelreports'}</th>
                         <th>{l s='Room Type' mod='qlohotelreports'}</th>
                         <th>{l s='Room No.' mod='qlohotelreports'}</th>

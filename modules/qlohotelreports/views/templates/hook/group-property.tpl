@@ -29,7 +29,7 @@
     <input type="hidden" name="tab" value="{$active_report|escape:'html':'UTF-8'}">
     {if isset($smarty.get.token)}<input type="hidden" name="token" value="{$smarty.get.token|escape:'html':'UTF-8'}">{/if}
     <div class="list_filters">
-        {if $hotels|count > 1}
+        {if $hotels|count > 1 && $active_report != 'hotel-comparison'}
         <div class="row">
             <label class="col-xs-3">{l s='Hotel' mod='qlohotelreports'}</label>
             <div class="col-xs-9">
@@ -70,6 +70,7 @@
         </div>
         {/if}
         {/if}
+        {if $active_report != 'hotel-comparison'}
         <div class="actions">
             <hr>
             <span class="pull-right">
@@ -78,6 +79,7 @@
                 </button>
             </span>
         </div>
+        {/if}
     </div>
 </form>
 
@@ -250,10 +252,10 @@
                         <td>&mdash;</td>
                         <td class="text-center">{if $outOfOrderRow.disabled_days}{$outOfOrderRow.disabled_days|intval}{else}&mdash;{/if}</td>
                         <td class="text-center">
-                            {if !$outOfOrderRow.disabled_from}
-                                <span class="label label-success">{l s='Active' mod='qlohotelreports'}</span>
+                            {if !$outOfOrderRow.disabled_to || $outOfOrderRow.disabled_to >= $today}
+                                <span class="label label-warning">{l s='Ongoing' mod='qlohotelreports'}</span>
                             {else}
-                                <span class="label label-danger">{l s='Inactive' mod='qlohotelreports'}</span>
+                                <span class="label label-success">{l s='Resolved' mod='qlohotelreports'}</span>
                             {/if}
                         </td>
                         <td>&mdash;</td>

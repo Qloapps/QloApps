@@ -3877,23 +3877,33 @@ class HotelBookingDetail extends ObjectModel
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
 
-        while ($current <= $dateTo) {
+        $loopEnd = ($dateFrom === $dateTo) ? $dateTo : date('Y-m-d', strtotime('-1 day', strtotime($dateTo)));
+        while ($current <= $loopEnd) {
+            $nextDay = date('Y-m-d', strtotime('+1 day', strtotime($current)));
             $ts  = strtotime($current);
             $row = Db::getInstance()->getRow(
-                'SELECT IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS room_revenue,
-                IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount
+                'SELECT IFNULL(SUM(
+                    ROUND(hbd.`total_price_tax_excl` / NULLIF(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0), 6)
+                    / o.`conversion_rate`
+                ), 0) AS room_revenue,
+                IFNULL(SUM(
+                    ROUND((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / NULLIF(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0), 6)
+                    / o.`conversion_rate`
+                ), 0) AS tax_amount
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
                 WHERE p.`active` = 1 AND o.`valid` = 1 AND hbd.`is_refunded` = 0
-                AND o.`invoice_date` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
+                AND hbd.`is_cancelled` = 0
+                AND hbd.`date_from` < "'.pSQL($nextDay).' 00:00:00"
+                AND hbd.`date_to` > "'.pSQL($current).' 00:00:00"'
                 .$whereFilters
             );
             $result[$ts] = array(
                 'room_revenue' => (float) $row['room_revenue'],
                 'tax_amount'   => (float) $row['tax_amount'],
             );
-            $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
+            $current = $nextDay;
         }
 
         return $result;
@@ -4134,7 +4144,7 @@ class HotelBookingDetail extends ObjectModel
             (SELECT CONCAT(e.`firstname`, " ", e.`lastname`)
                 FROM `'._DB_PREFIX_.'order_history` oh
                 INNER JOIN `'._DB_PREFIX_.'employee` e ON (e.`id_employee` = oh.`id_employee`)
-                WHERE oh.`id_order` = hbd.`id_order` AND oh.`id_employee` > 0
+                WHERE oh.`id_order` = hbd.`id_order`
                 ORDER BY oh.`id_order_history` ASC LIMIT 1) AS created_by
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
@@ -4348,7 +4358,6 @@ class HotelBookingDetail extends ObjectModel
                     FROM `'._DB_PREFIX_.'order_history` oh
                     INNER JOIN `'._DB_PREFIX_.'employee` e ON (e.`id_employee` = oh.`id_employee`)
                     WHERE oh.`id_order` = hbd.`id_order` AND oh.`id_employee` > 0
-                        AND oh.`id_order_state` = 5
                     ORDER BY oh.`date_add` DESC LIMIT 1) AS processed_by'
             : '';
 
@@ -4444,7 +4453,7 @@ class HotelBookingDetail extends ObjectModel
             'SELECT c.`id_customer`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             c.`email`,
-            a.`phone`, a.`address1`, a.`address2`, a.`city`, a.`postcode`, a.`vat_number`, a.`company`,
+            c.`phone`, a.`address1`, a.`address2`, a.`city`, a.`postcode`, a.`vat_number`, a.`company`,
             cl.`name` AS country,
             st.`name` AS state,
             COUNT(DISTINCT hbd.`id_order`) AS total_stays,
@@ -4468,7 +4477,7 @@ class HotelBookingDetail extends ObjectModel
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
             GROUP BY c.`id_customer`'
             .($dateFrom && $dateTo
-                ? ' HAVING last_stay BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+                ? ' HAVING MAX(IF(hbd.`date_from` <= "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'", 1, 0)) = 1'
                 : '').'
             ORDER BY total_stays DESC, lifetime_revenue DESC'
         );

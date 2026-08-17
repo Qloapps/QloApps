@@ -706,7 +706,7 @@ class ServiceProductOrderDetail extends ObjectModel
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             spod.`name` AS service_name,
             IFNULL(cl.`name`, "") AS service_category,
-            spod.`quantity`,
+            spod.`quantity`, sp.`allow_multiple_quantity`,
             (spod.`unit_price_tax_excl` / o.`conversion_rate`) AS unit_price,
             spod.`hotel_name`, hbd.`room_num`, hbd.`room_type_name`,
             hbd.`date_from`, hbd.`date_to`,

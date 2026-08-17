@@ -499,10 +499,11 @@ class HotelRoomType extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
                 ON (hbil.`id` = hrt.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
             LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
-                ON (hbd.`id_product` = hrt.`id_product` AND hbd.`is_refunded` = 0)
+                ON (hbd.`id_product` = hrt.`id_product` AND hbd.`is_refunded` = 0
+                    AND hbd.`date_from` < "'.$dateTo.' 23:59:59"
+                    AND hbd.`date_to` > "'.$dateFrom.' 00:00:00")
             LEFT JOIN `'._DB_PREFIX_.'orders` o
-                ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1
-                    AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59")
+                ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
             WHERE p.`active` = 1 AND p.`booking_product` = 1'
             .($idHotel   ? HotelBranchInformation::addHotelRestriction($idHotel, 'hrt') : '')
             .($idProduct ? ' AND hrt.`id_product` = '.$idProduct : '').'

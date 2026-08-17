@@ -254,28 +254,27 @@ class QloHotelReports extends Module
                     'total_refunded' => $totalRefunded,
                 ));
             } elseif ($report === 'no-show') {
-                $noShows = HotelBookingDetail::getArrivalsInfo(array(
-                    'date_from'  => $dateFrom,
-                    'date_to'    => $dateTo,
-                    'id_hotel'   => $idHotel ?: false,
-                    'id_product' => $idProduct,
-                    'id_status'  => HotelBookingDetail::STATUS_ALLOTED,
-                ));
-                $this->attachCurrencyToRows($noShows, $currencyMap, $currency->iso_code);
-
-                $noShowTotals = array('los' => 0, 'adults' => 0, 'children' => 0, 'total_price_tax_incl' => 0.0);
-                foreach ($noShows as $row) {
-                    $rate = (float) $row['conversion_rate'];
-                    if ($rate <= 0) { $rate = 1.0; }
-                    $noShowTotals['los']                  += (int)   $row['los'];
-                    $noShowTotals['adults']               += (int)   $row['adults'];
-                    $noShowTotals['children']             += (int)   $row['children'];
-                    $noShowTotals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'] / $rate;
-                }
-
+                // TODO: No-show logic will be replaced by a dedicated PR. Kept below for reference.
+                // $noShows = HotelBookingDetail::getArrivalsInfo(array(
+                //     'date_from'  => $dateFrom,
+                //     'date_to'    => $dateTo,
+                //     'id_hotel'   => $idHotel ?: false,
+                //     'id_product' => $idProduct,
+                //     'id_status'  => HotelBookingDetail::STATUS_ALLOTED,
+                // ));
+                // $this->attachCurrencyToRows($noShows, $currencyMap, $currency->iso_code);
+                // $noShowTotals = array('los' => 0, 'adults' => 0, 'children' => 0, 'total_price_tax_incl' => 0.0);
+                // foreach ($noShows as $row) {
+                //     $rate = (float) $row['conversion_rate'];
+                //     if ($rate <= 0) { $rate = 1.0; }
+                //     $noShowTotals['los']                  += (int)   $row['los'];
+                //     $noShowTotals['adults']               += (int)   $row['adults'];
+                //     $noShowTotals['children']             += (int)   $row['children'];
+                //     $noShowTotals['total_price_tax_incl'] += (float) $row['total_price_tax_incl'] / $rate;
+                // }
                 $this->context->smarty->assign(array(
-                    'no_shows'       => $noShows,
-                    'no_show_totals' => $noShowTotals,
+                    'no_shows'       => array(),
+                    'no_show_totals' => array('los' => 0, 'adults' => 0, 'children' => 0, 'total_price_tax_incl' => 0.0),
                 ));
             } elseif ($report === 'arrivals') {
                 $arrivals = HotelBookingDetail::getArrivalsInfo(array(
@@ -935,7 +934,7 @@ class QloHotelReports extends Module
                         'hotel_name'          => $hotel['hotel_name'],
                         'total_rooms'         => AdminStatsController::getTotalRooms($hotelId, 1),
                         'rooms_sold'          => $roomNights,
-                        'occupancy'           => HotelBookingDetail::getOccupancyRate($hotelParams) * 100,
+                        'occupancy'           => HotelBookingDetail::getOccupancyRate($hotelParams),
                         'room_revenue'        => $roomRevenue,
                         'extra_service_rev'   => $extraRev,
                         'gross_revenue'       => $roomRevenue + $extraRev,
@@ -1002,14 +1001,24 @@ class QloHotelReports extends Module
         $csvCurrencyMap  = $this->currencySignMap();
 
         if ($report === 'no-show') {
-            $rows = HotelBookingDetail::getArrivalsInfo(array(
-                'date_from'  => $dateFrom,
-                'date_to'    => $dateTo,
-                'id_hotel'   => $idHotel ?: false,
-                'id_product' => $idProduct,
-                'id_status'  => HotelBookingDetail::STATUS_ALLOTED,
-            ));
-            $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->iso_code);
+            // TODO: No-show logic will be replaced by a dedicated PR. Kept below for reference.
+            // $rows = HotelBookingDetail::getArrivalsInfo(array(
+            //     'date_from'  => $dateFrom,
+            //     'date_to'    => $dateTo,
+            //     'id_hotel'   => $idHotel ?: false,
+            //     'id_product' => $idProduct,
+            //     'id_status'  => HotelBookingDetail::STATUS_ALLOTED,
+            // ));
+            // $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->iso_code);
+            // foreach ($rows as $row) {
+            //     fputcsv($out, array(
+            //         $row['id_order'], $row['customer_name'],
+            //         $row['room_type_name'], $row['room_num'], $row['actual_checkin'],
+            //         number_format((float) $row['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
+            //         '',
+            //         $row['currency_iso'],
+            //     ));
+            // }
             header('Content-Disposition: attachment; filename="no-show-report-'.$dateFrom.'-to-'.$dateTo.'.csv"');
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
@@ -1018,15 +1027,6 @@ class QloHotelReports extends Module
                 $this->l('Room No.'), $this->l('Check-in Date'),
                 $this->l('Total Amount'), $this->l('Penalty Charged'), $this->l('Currency'),
             ));
-            foreach ($rows as $row) {
-                fputcsv($out, array(
-                    $row['id_order'], $row['customer_name'],
-                    $row['room_type_name'], $row['room_num'], $row['actual_checkin'],
-                    number_format((float) $row['total_price_tax_incl'], _PS_PRICE_DISPLAY_PRECISION_, '.', ''),
-                    '',
-                    $row['currency_iso'],
-                ));
-            }
             fclose($out);
             exit;
         }
@@ -1054,7 +1054,7 @@ class QloHotelReports extends Module
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
             fputcsv($out, array(
-                $this->l('Order ID'), $this->l('Guest'), $this->l('Hotel'),
+                $this->l('Booking ID'), $this->l('Guest Name'), $this->l('Hotel'),
                 $this->l('Room Type'), $this->l('Room No.'), $this->l('Check-in'),
                 $this->l('Check-out'), $this->l('Nights'), $this->l('Adults'),
                 $this->l('Children'), $this->l('Total (incl. Tax)'), $this->l('Status'),
@@ -1091,7 +1091,7 @@ class QloHotelReports extends Module
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
             fputcsv($out, array(
-                $this->l('Order ID'), $this->l('Guest'), $this->l('Hotel'),
+                $this->l('Booking ID'), $this->l('Guest Name'), $this->l('Hotel'),
                 $this->l('Room Type'), $this->l('Room No.'), $this->l('Check-in'),
                 $this->l('Check-out'), $this->l('Nights'), $this->l('Adults'),
                 $this->l('Children'), $this->l('Total (incl. Tax)'), $this->l('Currency'),
@@ -1180,7 +1180,7 @@ class QloHotelReports extends Module
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
             fputcsv($out, array(
-                $this->l('Reservation ID'),
+                $this->l('Booking ID'),
                 $this->l('Guest Name'),
                 $this->l('Guest Contact'),
                 $this->l('Room Type'),
@@ -1265,7 +1265,7 @@ class QloHotelReports extends Module
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
             fputcsv($out, array(
-                $this->l('Date'), $this->l('Order ID'), $this->l('Reference'),
+                $this->l('Date'), $this->l('Booking ID'), $this->l('Reference'),
                 $this->l('Guest Name'), $this->l('Payment Method'), $this->l('Payment Type'),
                 $this->l('Amount'), $this->l('Currency'), $this->l('Transaction ID'),
                 $this->l('Payment Status'),
@@ -1299,7 +1299,7 @@ class QloHotelReports extends Module
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
             fputcsv($out, array(
-                $this->l('Order ID'), $this->l('Guest Name'), $this->l('Booking Date'),
+                $this->l('Booking ID'), $this->l('Guest Name'), $this->l('Booking Date'),
                 $this->l('Cancellation Date'), $this->l('Check-in'), $this->l('Check-out'),
                 $this->l('Original Booking Amount'), $this->l('Refunded Amount'),
                 $this->l('Refund Status'), $this->l('Reason'), $this->l('Currency'),
@@ -1367,7 +1367,7 @@ class QloHotelReports extends Module
             $out = fopen('php://output', 'w');
             fputs($out, "\xEF\xBB\xBF");
             fputcsv($out, array(
-                $this->l('Order ID'), $this->l('Reference'), $this->l('Guest Name'),
+                $this->l('Booking ID'), $this->l('Reference'), $this->l('Guest Name'),
                 $this->l('Email'), $this->l('Phone'),
                 $this->l('Room Type'), $this->l('Room No.'),
                 $this->l('Check-in'), $this->l('Check-out'),
@@ -1920,7 +1920,7 @@ class QloHotelReports extends Module
                 $roomRevenue  = (float) HotelBookingDetail::getTotalRoomRevenue($hotelParams);
                 $extraRev     = (float) ServiceProductOrderDetail::getTotalServiceRevenue($hotelParams);
                 $grossRevenue = $roomRevenue + $extraRev;
-                $occupancy    = round(HotelBookingDetail::getOccupancyRate($hotelParams) * 100, 1);
+                $occupancy    = round(HotelBookingDetail::getOccupancyRate($hotelParams), 1);
                 $noShows      = (int) HotelBookingDetail::getTotalNoShows($hotelParams);
                 $avgLos       = ($bookings > 0 && $roomNights > 0) ? round($roomNights / $bookings, 1) : 0.0;
                 $obRows       = Order::getOutstandingBalance($hotelParams);
@@ -1970,8 +1970,8 @@ class QloHotelReports extends Module
             foreach ($rows as $row) {
                 $oooStatus     = ((int) $row['id_status'] === 2)
                     ? $this->l('Out of Order') : $this->l('Under Maintenance');
-                $currentStatus = ($row['disabled_to'] >= $today)
-                    ? $this->l('Active') : $this->l('Resolved');
+                $currentStatus = (!$row['disabled_to'] || $row['disabled_to'] >= $today)
+                    ? $this->l('Ongoing') : $this->l('Resolved');
                 fputcsv($out, array(
                     $row['room_num'],
                     isset($row['floor']) ? $row['floor'] : '',

@@ -127,7 +127,7 @@
                         <td>{$serviceRow.room_num|escape:'html':'UTF-8'}</td>
                         <td>{$serviceRow.service_name|escape:'html':'UTF-8'}</td>
                         <td>{if $serviceRow.service_category}{$serviceRow.service_category|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
-                        <td class="text-center">{$serviceRow.quantity|intval}</td>
+                        <td class="text-center">{if $serviceRow.allow_multiple_quantity}{$serviceRow.quantity|intval}{else}<span class="text-muted">&mdash;</span>{/if}</td>
                         <td class="text-right">{displayPrice price=$serviceRow.unit_price currency=$id_currency}</td>
                         <td class="text-right">{displayPrice price=$serviceRow.total_price_tax_excl currency=$id_currency}</td>
                         <td class="text-right">{displayPrice price=$serviceRow.tax_amount currency=$id_currency}</td>
