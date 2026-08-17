@@ -129,13 +129,11 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                 // Order status/amount must reflect what PayPal actually captured,
                                 // not the cart's is_advance_payment flag (still editable by the
                                 // customer after payment, so it cannot be trusted here).
-                                $capturedAmount = (float) (
-                                    $returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value'] ?? 0
-                                );
+                                $capturedAmount = isset(
+                                    $returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value']
+                                ) ? (float) $returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value'] : 0;
                                 $fullTotal = (float) $cart->getOrderTotal(true, Cart::BOTH);
-                                $isFullyPaid = Tools::ps_round($capturedAmount, _PS_PRICE_COMPUTE_PRECISION_)
-                                    >= Tools::ps_round($fullTotal, _PS_PRICE_COMPUTE_PRECISION_);
-                                $total = $isFullyPaid ? $fullTotal : $capturedAmount;
+                                $isFullyPaid = $capturedAmount >= $fullTotal;
 
                                 // set order status
                                 if ($returnData['data']['status'] == 'COMPLETED') {
@@ -151,7 +149,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                 $this->module->validateOrder(
                                     $cart->id,
                                     $orderStatus,
-                                    $total,
+                                    $capturedAmount,
                                     $this->module->l('PayPal Checkout', 'payment'),
                                     null,
                                     $extraVars,
