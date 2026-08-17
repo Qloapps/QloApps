@@ -81,8 +81,8 @@ class OrderSlipCore extends ObjectModel
 
     const REDEEM_STATUS_ACTIVE = 1;
     const REDEEM_STATUS_REDEEMED = 2;
-    const REFUND_ORDER_SLIP_TYPE = 1;
-    const MANUAL_CREDIT_SLIP_TYPE = 2;
+    const ORDER_SLIP_TYPE_REFUND = 1;
+    const ORDER_SLIP_TYPE_MANUAL = 2;
 
     /**
      * @see ObjectModel::$definition
@@ -106,7 +106,7 @@ class OrderSlipCore extends ObjectModel
             'redeem_status' =>          array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'id_cart_rule' =>            array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'order_slip_type' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
-            'remark' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
+            'remark' =>                 array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'date_add' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>                array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
@@ -160,32 +160,28 @@ class OrderSlipCore extends ObjectModel
 		ORDER BY `date_add` DESC');
     }
 
-    public static function getTotalSlipAmountByOrder($id_order)
+    public static function getTotalOrderSlipAmountByOrder($id_order = false)
     {
-        return (float) Db::getInstance()->getValue('
-            SELECT SUM(`amount`)
-            FROM `'._DB_PREFIX_.'order_slip`
-            WHERE `id_order` = '.(int)$id_order
-        );
-    }
+        $sql = 'SELECT SUM(`amount`) FROM `'._DB_PREFIX_.'order_slip`';
 
-    public static function getSlipIdsByOrder($id_order)
-    {
-        $rows = Db::getInstance()->executeS('
-            SELECT `id_order_slip`
-            FROM `'._DB_PREFIX_.'order_slip`
-            WHERE `id_order` = '.(int)$id_order.'
-            ORDER BY `id_order_slip` ASC'
-        );
-
-        $slipIds = array();
-        if ($rows) {
-            foreach ($rows as $row) {
-                $slipIds[] = (int) $row['id_order_slip'];
-            }
+        if ($id_order) {
+            $sql .= ' WHERE `id_order` = '.(int)$id_order;
         }
 
-        return $slipIds;
+        return (float) Db::getInstance()->getValue($sql);
+    }
+
+    public static function getSlipIdsByOrder($id_order = false)
+    {
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'order_slip`';
+
+        if ($id_order) {
+            $sql .= ' WHERE `id_order` = '.(int)$id_order;
+        }
+
+        $sql .= ' ORDER BY `id_order_slip` ASC';
+
+        return Db::getInstance()->executeS($sql);
     }
 
     public static function getOrdersSlipDetail($id_order_slip = false, $id_order_detail = false)
@@ -309,6 +305,7 @@ class OrderSlipCore extends ObjectModel
 		SELECT `id_order_slip`
 		FROM `'._DB_PREFIX_.'order_slip` os
 		LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = os.`id_order`)
+        INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (o.id_order = hbd.id_order)
 		WHERE os.`date_add` BETWEEN \''.pSQL($dateFrom).' 00:00:00\' AND \''.pSQL($dateTo).' 23:59:59\'
 		'.Shop::addSqlRestriction(Shop::SHARE_ORDER, 'o'). ' ' .HotelBranchInformation::addHotelRestriction(false).'
 		ORDER BY os.`date_add` ASC');
@@ -398,17 +395,6 @@ class OrderSlipCore extends ObjectModel
             }
             $price = (float)$product_row['unit_price'];
 
-
-            $order_slip_resume = OrderSlip::getProductSlipResume((int)$order_detail->id);
-
-            if ($quantity + $order_slip_resume['product_quantity'] > $order_detail->product_quantity) {
-                $quantity = $order_detail->product_quantity - $order_slip_resume['product_quantity'];
-            }
-
-            if ($quantity == 0) {
-                continue;
-            }
-
             if (!Tools::isSubmit('cancelProduct') && $order->hasBeenPaid()) {
                 $order_detail->product_quantity_refunded += $quantity;
             }
@@ -475,11 +461,8 @@ class OrderSlipCore extends ObjectModel
         $order_slip->{'total_products_tax_'.$inc_or_ex_2} -= (float)$amount && !$amount_choosen ? (float)$amount : 0;
         $order_slip->amount = $amount_choosen ? (float)$amount : $order_slip->{'total_products_tax_'.$inc_or_ex_1};
 
-        if ((float)$amount && !$amount_choosen) {
-            $order_slip->order_slip_type = 1;
-        }
-        if (((float)$amount && $amount_choosen)) {
-            $order_slip->order_slip_type = 2;
+        if (isset($orderSlipType) && $orderSlipType) {
+            $order_slip->order_slip_type = $orderSlipType;
         }
         if (isset($remark) && $remark) {
             $order_slip->remark = $remark;

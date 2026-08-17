@@ -278,7 +278,7 @@ public function initPageHeaderToolbar()
             $remark = trim(Tools::getValue('remark'));
             if (empty($remark)) {
                 $this->errors[] = $this->l('Remark is required.');
-            } elseif (!Validate::isString($remark)) {
+            } elseif (!Validate::isString($remark) || !Validate::isMessage($remark) || !Validate::isCleanHtml($remark)) {
                 $this->errors[] = $this->l('Remark must be a valid text.');
             }
 
@@ -310,7 +310,7 @@ public function initPageHeaderToolbar()
                     );
                 }
 
-                if (!$idCreditSlip = OrderSlip::create($objOrder, $bookingList, 0, $creditAmount, $creditAmount, 0 , OrderSlip::MANUAL_CREDIT_SLIP_TYPE, $remark)) {
+                if (!$idCreditSlip = OrderSlip::create($objOrder, $bookingList, 0, $creditAmount, $creditAmount, 0 , OrderSlip::ORDER_SLIP_TYPE_MANUAL, $remark)) {
                     $this->errors[] = $this->l('A credit slip cannot be generated. ');
                 } else {
 
@@ -463,7 +463,6 @@ public function initPageHeaderToolbar()
     public function displayVoucherLink($idCartRule, $row)
     {
         $this->context->smarty->assign(array(
-            'id_order' => 0,
             'id_cart_rule' => (int) $idCartRule,
             'row' => $row
         ));
@@ -475,10 +474,9 @@ public function initPageHeaderToolbar()
     {
         $this->context->smarty->assign(array(
             'id_order' => (int) $idOrder,
-            'id_cart_rule' => 0,
         ));
 
-        return $this->createTemplate('_display_voucher_link.tpl')->fetch();
+        return $this->createTemplate('_display_order_link.tpl')->fetch();
     }
 
     public function displayRemark($remark, $row)
@@ -593,8 +591,8 @@ public function initPageHeaderToolbar()
         }
         unset($booking);
 
-        $totalSlipAmount = OrderSlip::getTotalSlipAmountByOrder($idOrder);
-        $slipIds = OrderSlip::getSlipIdsByOrder($idOrder);
+        $totalSlipAmount = OrderSlip::getTotalOrderSlipAmountByOrder($idOrder);
+        $slipIds = array_column(OrderSlip::getSlipIdsByOrder($idOrder), 'id_order_slip');
 
         die(Tools::jsonEncode(array(
             'bookings' => $bookingDetails,

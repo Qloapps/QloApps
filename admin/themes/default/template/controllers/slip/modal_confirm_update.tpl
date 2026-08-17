@@ -22,7 +22,11 @@
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal"><i class="icon-remove-sign"></i></button>
     <h4 class="modal-title"><i class="icon icon-exclamation-triangle"></i>&nbsp;{l s='Confirm Update'}</h4>
-    <p>{l s='You will not create a voucher. This action is irreversible. Are you sure you want to change the status?'}</p>
+    <p>
+    {l s='This action is irreversible. Once the status is changed, you will not be able to create a voucher.'}
+    <br>
+    {l s='Are you sure you want to change the status?'}
+    </p>
 </div>
 <div class="modal-body">
     <div class="row">
