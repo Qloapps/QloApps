@@ -63,23 +63,4 @@
             <hr class="hr_style" />
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-sm-6 indi_cont clearfix">
-            <span class="color_indicate bg-green"></span>
-            <span class="indi_label">{l s='Available Rooms' mod='hotelreservationsystem'}</span>
-        </div>
-        <div class="col-sm-6 indi_cont clearfix">
-            <span class="color_indicate bg-yellow"></span>
-            <span class="indi_label">{l s='Partially Available' mod='hotelreservationsystem'}</span>
-        </div>
-        <div class="col-sm-6 indi_cont clearfix">
-            <span class="color_indicate bg-red"></span>
-            <span class="indi_label">{l s='Unavailable Rooms' mod='hotelreservationsystem'}</span>
-        </div>
-        <div class="col-sm-6 indi_cont clearfix">
-            <span class="color_indicate bg-blue"></span>
-            <span class="indi_label">{l s='Booked Rooms' mod='hotelreservationsystem'}</span>
-        </div>
-    </div>
 </div>
