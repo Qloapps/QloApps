@@ -677,8 +677,14 @@ abstract class PaymentModuleCore extends Module
                             $orderTotals[$order->id]['excl'] -= $used['excl'];
                             $cart_rules[$key]['remaining'] -= $used['excl'];
                         }
-                        
-                        $order->addCartRule($cart_rule['obj']->id, $cart_rule['obj']->name, $values, 0, $cart_rule['obj']->free_shipping);
+
+                        $order->addCartRule(
+                            $cart_rule['obj']->id,
+                            $cart_rule['obj']->name,
+                            array('tax_incl' => $used['incl'], 'tax_excl' => $used['excl']),
+                            0,
+                            $cart_rule['obj']->free_shipping
+                        );
 
                         if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && !in_array($cart_rule['obj']->id, $cart_rule_used)) {
                             $cart_rule_used[] = $cart_rule['obj']->id;
@@ -691,7 +697,7 @@ abstract class PaymentModuleCore extends Module
 
                         $cart_rules_list[] = array(
                             'voucher_name' => $cart_rule['obj']->name,
-                            'voucher_reduction' => ($values['tax_incl'] != 0.00 ? '-' : '').Tools::displayPrice($values['tax_incl'], $this->context->currency, false)
+                            'voucher_reduction' => ($used['incl'] != 0.00 ? '-' : '').Tools::displayPrice($used['incl'], $this->context->currency, false)
                         );
                     }
 

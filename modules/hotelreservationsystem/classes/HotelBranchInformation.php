@@ -128,8 +128,8 @@ class HotelBranchInformation extends ObjectModel
                 'resource' => 'image',
                 'fields' => array('id' => array())
             ),
-            'hotel_features' => array(
-                'resource' => 'hotel_feature',
+            'hotel_amenities' => array(
+                'resource' => 'hotel_amenity',
                 'fields' => array('id' => array('required' => true))
             ),
             'hotel_refund_rules' => array(
@@ -506,31 +506,25 @@ class HotelBranchInformation extends ObjectModel
         $sql = 'SELECT hbi.`id`, hbl.`hotel_name` FROM `'._DB_PREFIX_.'htl_branch_info` hbi
             LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
             ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')
-            WHERE hbi.`id` NOT IN (SELECT DISTINCT id_hotel FROM `'._DB_PREFIX_.'htl_branch_features`)';
+            WHERE hbi.`id` NOT IN (SELECT DISTINCT id_hotel FROM `'._DB_PREFIX_.'htl_branch_amenity`)';
 
         return Db::getInstance()->executeS($sql);
     }
 
     /**
-     * [getFeaturesOfHotelByHotelId : To get assigned Features of a hotel by its id].
-     *
-     * @param [type] $id_hotel [id of the hotel]
-     *
-     * @return [array | false] [If no feature found then returns false otherwise returns array of all features assigned to the hotel]
+     * @param int $id_hotel
+     * @return array|false
      */
-    public function getFeaturesOfHotelByHotelId($id_hotel)
+    public function getAmenitiesOfHotelByHotelId($id_hotel)
     {
         return Db::getInstance()->executeS(
-            'SELECT feature_id FROM `'._DB_PREFIX_.'htl_branch_features` WHERE id_hotel='.(int)$id_hotel
+            'SELECT amenity_id FROM `'._DB_PREFIX_.'htl_branch_amenity` WHERE id_hotel='.(int)$id_hotel
         );
     }
 
     /**
-     * [getFeaturesOfHotelByHotelId : To get Hotel's id by its category id].
-     *
-     * @param [int] $id_category [id_category of the hotel]
-     *
-     * @return [array | int] [If no hotel found then returns false otherwise returns id of the hotel]
+     * @param int $id_category
+     * @return int|false
      */
     public static function getHotelIdByIdCategory($id_category)
     {
@@ -548,11 +542,8 @@ class HotelBranchInformation extends ObjectModel
     }
 
     /**
-     * [getFeaturesOfHotelByHotelId : To get Category Information by its id_category].
-     *
-     * @param [int] $id_category [id of the category , Which innformation is wanted]
-     *
-     * @return [array | false] [If no Category found then returns false otherwise returns array of information of that category]
+     * @param int $id_category
+     * @return array|false
      */
     public function getCategoryDataByIdCategory($id_category)
     {
@@ -802,11 +793,11 @@ class HotelBranchInformation extends ObjectModel
                     }
                 }
             }
-            $objHotelfeatures = new HotelBranchFeatures();
+            $objHotelAmenities = new HotelBranchAmenities();
             $objHotelImage = new HotelImage();
-            if (!$objHotelfeatures->deleteBranchFeaturesByHotelId($idHotel)) {
+            if (!$objHotelAmenities->saveBranchAmenities($idHotel, array())) {
                 $contextController->errors[] = $this->moduleInstance->l(
-                    'Some error has occurred while deleting hotel feature data.',
+                    'Some error has occurred while deleting hotel amenity data.',
                     'HotelBranchInformation'
                 );
             }
@@ -1003,25 +994,25 @@ class HotelBranchInformation extends ObjectModel
         return $ids;
     }
 
-    // Webservice:: function to prepare id parameter for hotel features in a hotel api
-    public function getWsHotelFeatures()
+    // Webservice:: function to prepare id parameter for hotel amenities in a hotel api
+    public function getWsHotelAmenities()
     {
         return Db::getInstance()->executeS(
-            'SELECT `feature_id` as `id` FROM `'._DB_PREFIX_.'htl_branch_features` WHERE `id_hotel` = '.(int)$this->id.
-            ' ORDER BY `feature_id` ASC'
+            'SELECT `amenity_id` as `id` FROM `'._DB_PREFIX_.'htl_branch_amenity` WHERE `id_hotel` = '.(int)$this->id.
+            ' ORDER BY `amenity_id` ASC'
         );
     }
 
-    // Webservice:: function to prepare id parameter for hotel features in a hotel api
-    public function setWsHotelFeatures($branchFeatures)
+    // Webservice:: function to set hotel amenities in a hotel api
+    public function setWsHotelAmenities($branchAmenities)
     {
         Db::getInstance()->execute('
-			DELETE FROM `'._DB_PREFIX_.'htl_branch_features`
+			DELETE FROM `'._DB_PREFIX_.'htl_branch_amenity`
 			WHERE `id_hotel` = '.(int)$this->id
         );
 
-        foreach ($branchFeatures as $feature) {
-            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_features` (`id_hotel`, `feature_id`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$feature['id'].', NOW(), NOW())');
+        foreach ($branchAmenities as $amenity) {
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_amenity` (`id_hotel`, `amenity_id`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$amenity['id'].', NOW(), NOW())');
         }
 
         return true;

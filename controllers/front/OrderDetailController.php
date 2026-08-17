@@ -523,8 +523,18 @@ class OrderDetailControllerCore extends FrontController
     {
         $response = array('extra_demands' => false);
 
+        $idOrder = (int) Tools::getValue('id_order');
+        $order = new Order($idOrder);
+
+        if (!Validate::isLoadedObject($order)
+            || $order->id_customer != $this->context->customer->id
+            || $order->secure_key != Tools::getValue('secure_key')
+        ) {
+            $this->ajaxDie(json_encode($response));
+        }
+
         if (($idProduct = Tools::getValue('id_product'))
-            && ($idOrder = Tools::getValue('id_order'))
+            && $idOrder
             && ($dateFrom = Tools::getValue('date_from'))
             && ($dateTo = Tools::getValue('date_to'))
         ) {
@@ -568,7 +578,7 @@ class OrderDetailControllerCore extends FrontController
             }
 
             $this->context->smarty->assign(array(
-                'objOrder' => new Order($idOrder),
+                'objOrder' => $order,
             ));
 
             $response['extra_demands'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');

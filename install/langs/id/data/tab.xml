@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="Nota kredit"/>
   <tab id="Statuses" name="Status"/>
   <tab id="Order_Messages" name="Pesan"/>
+  <tab id="Guest_Registration" name="Kartu Registrasi Tamu"/>
   <tab id="Customers_1" name="Pelanggan"/>
   <tab id="Addresses" name="Alamat"/>
   <tab id="Groups" name="Grup"/>
