@@ -129,9 +129,8 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                 // Order status/amount must reflect what PayPal actually captured,
                                 // not the cart's is_advance_payment flag (still editable by the
                                 // customer after payment, so it cannot be trusted here).
-                                $capturedAmount = isset(
-                                    $returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value']
-                                ) ? (float) $returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value'] : 0;
+                                $capturedAmount = isset($returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value']) ?
+                                 (float) $returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value'] : 0;
                                 $fullTotal = (float) $cart->getOrderTotal(true, Cart::BOTH);
                                 $isFullyPaid = $capturedAmount >= $fullTotal;
 
