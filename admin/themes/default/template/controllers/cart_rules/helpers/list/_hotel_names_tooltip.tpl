@@ -20,13 +20,22 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div id="qlo-hotel-names-tooltip" style="display:none">
-    <div class="bootstrap tooltip_cont">
-        <div class="tip_header">
-            <div>{l s='Selected Hotels'}</div>
-        </div>
-        <div class="tip-body">
-            <div class="qlo-hotel-names-list"></div>
-        </div>
-    </div>
-</div>
+{if $hotel_names_first}
+    <span>{$hotel_names_first|escape:'html':'UTF-8'}</span>
+    {if $hotel_names_remaining}
+        {capture name='hotel_names_tooltip'}
+            <div class="tooltip_cont">
+                <div class="tip_header"><div class="tip_date">{l s='Selected Hotels'}</div></div>
+                <div>
+                    {foreach from=$hotel_names_remaining item='hotel'}
+                        <div class="tip_element_value">{$hotel|escape:'html':'UTF-8'}</div>
+                    {/foreach}
+                </div>
+            </div>
+        {/capture}
+        <span class="badge tooltip-trigger">+{$hotel_names_remaining|@count}</span>
+        <div class="tooltip-content" style="display: none;">{$smarty.capture.hotel_names_tooltip}</div>
+    {/if}
+{else}
+    --
+{/if}

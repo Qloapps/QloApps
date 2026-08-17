@@ -89,14 +89,13 @@ class AdminCartRulesControllerCore extends AdminController
     public function formatHotelNames($hotelNames, $row)
     {
         $hotels = !empty($hotelNames) ? explode('|||', $hotelNames) : array();
-        $remaining = count($hotels) > 1 ? array_slice($hotels, 1) : array();
         $this->context->smarty->assign(array(
-            'hotel_names_first'          => !empty($hotels) ? $hotels[0] : null,
-            'hotel_names_remaining'      => $remaining,
-            'hotel_names_remaining_json' => htmlspecialchars(json_encode($remaining)),
+            'hotel_names_first'     => !empty($hotels) ? $hotels[0] : null,
+            'hotel_names_remaining' => count($hotels) > 1 ? array_slice($hotels, 1) : array(),
         ));
+
         return $this->context->smarty->fetch(
-            'controllers/cart_rules/helpers/list/_hotel_names_column.tpl'
+            'controllers/cart_rules/helpers/list/_hotel_names_tooltip.tpl'
         );
     }
 
@@ -280,17 +279,7 @@ class AdminCartRulesControllerCore extends AdminController
         );
         $this->addJqueryUI('ui.tooltip', 'base', true);
         $this->addJS(_PS_JS_DIR_.'admin/cart-rules.js');
-        $this->addJS(_PS_JS_DIR_.'admin/cart_rules_hotel_tooltip.js');
         $this->addJqueryPlugin(array('typewatch', 'fancybox', 'autocomplete'));
-    }
-
-    public function renderList()
-    {
-        $this->content .= $this->context->smarty->fetch(
-            'controllers/cart_rules/helpers/list/_hotel_names_tooltip.tpl'
-        );
-
-        return parent::renderList();
     }
 
     public function initPageHeaderToolbar()
