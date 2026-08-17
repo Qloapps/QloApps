@@ -163,24 +163,19 @@ class OrderSlipCore extends ObjectModel
     public static function getTotalOrderSlipAmountByOrder($id_order = false)
     {
         $sql = 'SELECT SUM(`amount`) FROM `'._DB_PREFIX_.'order_slip`';
-
         if ($id_order) {
             $sql .= ' WHERE `id_order` = '.(int)$id_order;
         }
-
         return (float) Db::getInstance()->getValue($sql);
     }
 
     public static function getSlipIdsByOrder($id_order = false)
     {
         $sql = 'SELECT * FROM `'._DB_PREFIX_.'order_slip`';
-
         if ($id_order) {
             $sql .= ' WHERE `id_order` = '.(int)$id_order;
         }
-
         $sql .= ' ORDER BY `id_order_slip` ASC';
-
         return Db::getInstance()->executeS($sql);
     }
 

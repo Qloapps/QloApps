@@ -19,6 +19,7 @@
 * @copyright Since 2010 Webkul
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
+
 {l s='Total room price:'} <strong><span id="booking-room-amount">-</span></strong><br>
 {l s='Total service price:'} <strong><span id="booking-service-amount">-</span></strong><br>
 {l s='Total order amount:'} <strong><span id="booking-amount">-</span></strong><br>
