@@ -37,5 +37,5 @@
             </div>
         </div>
     {/capture}
-    {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.connected_room_tooltip allow_html=true tooltip_icon_class='icon-random' tooltip_icon_style='color: #008abd;'}
+    {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.connected_room_tooltip tooltip_icon_class='icon-random' tooltip_icon_style='color: #008abd;' }
 {/if}

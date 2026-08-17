@@ -478,6 +478,7 @@ $(document).ready(function() {
 	$('.no-htl-access-option').on('click', function() {
 		$(this).prop('selected', false);
 	});
+	initTooltip();
 }); //end dom ready
 
 function initTooltip($target, contentFn, items) {
@@ -516,7 +517,3 @@ function initTooltip($target, contentFn, items) {
 		});
 	});
 }
-
-$(document).ready(function () {
-	initTooltip();
-});

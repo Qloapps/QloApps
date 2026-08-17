@@ -181,7 +181,7 @@
 															<span class="pull-right">{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</span>
 														</div>
 													{/capture}
-													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_total_tooltip allow_html=true}
+													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_total_tooltip}
 												</td>
 												<td>
 													{displayPrice price=($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount']) currency=$orderCurrency['id']}
@@ -195,7 +195,7 @@
 															<span class="pull-right">{displayPrice price=$booking['extra_service_total_paid_amount'] currency=$orderCurrency['id']}</span>
 														</div>
 													{/capture}
-													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_paid_tooltip allow_html=true}
+													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_paid_tooltip }
 												</td>
 												{if !$isRefundCompleted}
 													<td>
