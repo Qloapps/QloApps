@@ -282,7 +282,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $totalPrice['total_price_tax_excl'] = 0;
         $featureImpactPriceTE = 0;
         $featureImpactPriceTI = 0;
-        $isCartPriceOverridden = true;
+
         $productPriceTI = Product::getPriceStatic((int) $id_product, 1, 0, 6, null, 0, $use_reduc, 1, 0, null, null, null, $nothing, 1, 1, null, 1, 0, 0, $id_group);
         $productPriceTE = Product::getPriceStatic((int) $id_product, 0, 0, 6, null, 0, $use_reduc, 1, 0, null, null, null, $nothing, 1, 1, null, 1, 0, 0, $id_group);
         $id_address =  HotelRoomType::getHotelIdAddressByIdProduct($id_product);
@@ -318,9 +318,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $id_guest,
                 $id_room
             ))) {
-                if ((int)$featurePrice['id_cart'] === 0) {
-                    $isCartPriceOverridden = false;
-                }
+
                 if ($featurePrice['impact_type'] == self::IMPACT_TYPE_PERCENTAGE) {
                     //percentage
                     $featureImpactPriceTE = $productPriceTE * ($featurePrice['impact_value'] / 100);
@@ -348,10 +346,16 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $priceWithFeatureTI = 0;
                     $priceWithFeatureTE = 0;
                 }
+                if ((int)$featurePrice['id_cart'] == 0) {
+                    $priceWithFeatureTI = Product::applyGroupDiscount($priceWithFeatureTI, $id_product, $id_group);
+                    $priceWithFeatureTE = Product::applyGroupDiscount($priceWithFeatureTE, $id_product, $id_group);
+                }
                 $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI;
                 $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE;
             } else {
-                $isCartPriceOverridden = false;
+
+                $productPriceTI = Product::applyGroupDiscount($productPriceTI, $id_product, $id_group);
+                $productPriceTE = Product::applyGroupDiscount($productPriceTE, $id_product, $id_group);
                 $totalPrice['total_price_tax_incl'] += $productPriceTI;
                 $totalPrice['total_price_tax_excl'] += $productPriceTE;
             }
@@ -374,10 +378,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             )
         );
         
-        if (!$isCartPriceOverridden) {
-            $totalPrice['total_price_tax_incl'] = Product::applyGroupDiscount($totalPrice['total_price_tax_incl'], $id_product, $id_group);
-            $totalPrice['total_price_tax_excl'] = Product::applyGroupDiscount($totalPrice['total_price_tax_excl'], $id_product, $id_group);
-        }
 
         if ($with_auto_room_services) {
             if ($id_cart && $id_room) {
