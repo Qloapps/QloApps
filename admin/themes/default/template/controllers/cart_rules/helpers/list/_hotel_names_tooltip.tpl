@@ -26,11 +26,11 @@
         {capture name='hotel_names_tooltip'}
             <div class="tooltip_cont">
                 <div class="tip_header"><div class="tip_date">{l s='Selected Hotels'}</div></div>
-                <div>
+                <ul>
                     {foreach from=$hotel_names_remaining item='hotel'}
-                        <div class="tip_element_value">{$hotel|escape:'html':'UTF-8'}</div>
+                        <li class="tip_element_value">{$hotel|escape:'html':'UTF-8'}</li>
                     {/foreach}
-                </div>
+                </ul>
             </div>
         {/capture}
         <span class="badge tooltip-trigger">+{$hotel_names_remaining|@count}</span>
