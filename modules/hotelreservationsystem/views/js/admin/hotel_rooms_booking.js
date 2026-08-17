@@ -23,9 +23,9 @@
 $(document).ready(function() {
 
     // calender
-   
-     if ($('#fullcalendar').length) {
-        var calendar = new FullCalendar.Calendar($('#fullcalendar').get(0), {
+    var calendar;
+    function initBookingCalendar() {
+        calendar = new FullCalendar.Calendar($('#fullcalendar').get(0), {
             initialView: 'dayGridMonth',
             initialDate: initialDate,
             events: {
@@ -54,70 +54,66 @@ $(document).ready(function() {
                 if (info.event.extendedProps.is_notification) {
                     var $cell = $(info.el).closest('td');
                     $cell.css('background-color', info.event.backgroundColor);
-                    if (typeof initTooltip === 'function') {
-                        initTooltip($cell, function() {
-                            $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
-                            $.each(info.event.extendedProps.data.stats, function(elem, val) {
-                                if (elem == 'num_part_avai') {
-                                    $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
-                                } else {
-                                    $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
-                                }
-                            });
-                            return $('#date-stats-tooltop').html();
-                        }, 'td');
-                        $cell.tooltip('option', {
-                            position: {
-                                my: "left top",
-                                at: "left+50% bottom-50%",
-                                collision: "flipfit"
-                            },
-                            open: function(event, ui)
-                            {
-                                if(event.buttons == 1 || event.buttons == 3){
-                                    ui.tooltip.remove();
-                                }
-
-                                if (typeof(event.originalEvent) === 'undefined') {
-                                    return false;
-                                }
-
-                                // suppress cell tooltip when hovering the search result bar
-                                if ($(event.originalEvent.target).closest('.search-result-event').length) {
-                                    ui.tooltip.remove();
-                                    $(this).removeData('ui-tooltip-id').removeAttr('aria-describedby');
-                                    return false;
-                                }
-
-                                var $id = $(ui.tooltip).attr('id');
-
-                                // close any lingering tooltips
-                                if ($('div.ui-tooltip').not('#' + $id).length) {
-                                    return false;
-                                }
+                    initTooltip($cell, function() {
+                        $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
+                        $.each(info.event.extendedProps.data.stats, function(elem, val) {
+                            if (elem == 'num_part_avai') {
+                                $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
+                            } else {
+                                $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
                             }
                         });
-                    }
+                        return $('#date-stats-tooltop').html();
+                    }, 'td');
+                    $cell.tooltip('option', {
+                        position: {
+                            my: "left top",
+                            at: "left+50% bottom-50%",
+                            collision: "flipfit"
+                        },
+                        open: function(event, ui)
+                        {
+                            if(event.buttons == 1 || event.buttons == 3){
+                                ui.tooltip.remove();
+                            }
+
+                            if (typeof(event.originalEvent) === 'undefined') {
+                                return false;
+                            }
+
+                            // suppress cell tooltip when hovering the search result bar
+                            if ($(event.originalEvent.target).closest('.search-result-event').length) {
+                                ui.tooltip.remove();
+                                $(this).removeData('ui-tooltip-id').removeAttr('aria-describedby');
+                                return false;
+                            }
+
+                            var $id = $(ui.tooltip).attr('id');
+
+                            // close any lingering tooltips
+                            if ($('div.ui-tooltip').not('#' + $id).length) {
+                                return false;
+                            }
+                        }
+                    });
                 } else {
                     $(info.el).addClass('search-result-event');
-                    if (typeof initTooltip === 'function') {
-                        initTooltip($(info.el), function() {
-                            $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_from_format + ' - ' +info.event.extendedProps.data.date_to_format);
-                            $.each(info.event.extendedProps.data.stats, function(elem, val) {
-                                if (elem == 'num_part_avai') {
-                                    if (val > 0) {
-                                        $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
-                                    } else {
-                                        $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
-                                    }
+                    initTooltip($(info.el), function() {
+                        $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_from_format + ' - ' +info.event.extendedProps.data.date_to_format);
+                        $.each(info.event.extendedProps.data.stats, function(elem, val) {
+                            if (elem == 'num_part_avai') {
+                                if (val > 0) {
+                                    $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
                                 } else {
-                                    $('#date-stats-tooltop').find('.'+elem).find('.tip_element_value').text(val);
+                                    $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
                                 }
-                            });
-                            return $('#date-stats-tooltop').html();
-                        }, 'div');
-                        $(info.el).tooltip('option', 'track', true);
-                    }
+                            } else {
+                                $('#date-stats-tooltop').find('.'+elem).find('.tip_element_value').text(val);
+                            }
+                        });
+                        return $('#date-stats-tooltop').html();
+                    }, 'div');
+                    $(info.el).tooltip('option', 'track', true);
                     info.el.style.borderLeftColor = info.event.extendedProps.data.eventColor;
                     resizeSearchResultEventBar($(info.el));
                 }
@@ -139,6 +135,14 @@ $(document).ready(function() {
                 });
             }, 150);
         });
+    }
+
+    if ($('#fullcalendar').length) {
+        if (typeof initTooltip === 'function') {
+            initBookingCalendar();
+        } else {
+            $(document).on('QloApps:adminThemeReady', initBookingCalendar);
+        }
     }
 
     function resizeSearchResultEventBar($bar) {
