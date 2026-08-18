@@ -43,9 +43,9 @@ class HotelHelper
         Media::addJsDef($jsVars);
     }
 
-    public function insertHotelCommonFeatures()
+    public function insertHotelCommonAmenities()
     {
-        $parent_features_arr = array(
+        $parent_amenities_arr = array(
             'Business Services' => array(
                 'name' => array(
                     'en' => 'Business Services',
@@ -55,7 +55,7 @@ class HotelHelper
                     'ru' => 'Бизнес-услуги',
                     'es' => 'Servicios empresariales',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Business Center',
                         'nl' => 'Businesscentrum',
@@ -123,7 +123,7 @@ class HotelHelper
                     'ru' => 'Дополнительные услуги',
                     'es' => 'Servicios complementarios',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Internet Access Free',
                         'nl' => 'Gratis internettoegang',
@@ -175,7 +175,7 @@ class HotelHelper
                     'ru' => 'Развлечения',
                     'es' => 'Entretenimiento',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'DiscoTheatre',
                         'nl' => 'Discotheek/theater',
@@ -243,7 +243,7 @@ class HotelHelper
                     'ru' => 'Удобства',
                     'es' => 'Instalaciones',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Laundry Service',
                         'nl' => 'Wasservice',
@@ -359,7 +359,7 @@ class HotelHelper
                     'ru' => 'Общие услуги',
                     'es' => 'Servicios generales',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Room Service',
                         'nl' => 'Roomservice',
@@ -443,7 +443,7 @@ class HotelHelper
                     'ru' => 'В помещении',
                     'es' => 'Interior',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Parking',
                         'nl' => 'Parkeren',
@@ -479,7 +479,7 @@ class HotelHelper
                     'ru' => 'Интернет',
                     'es' => 'Internet',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Internet Access-Surcharge',
                         'nl' => 'Internettoegang - toeslag',
@@ -507,7 +507,7 @@ class HotelHelper
                     'ru' => 'На открытом воздухе',
                     'es' => 'Al aire libre',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Gardens',
                         'nl' => 'Tuinen',
@@ -591,7 +591,7 @@ class HotelHelper
                     'ru' => 'Парковка',
                     'es' => 'Aparcamiento',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Parking (Surcharge)',
                         'nl' => 'Parkeren (toeslag)',
@@ -627,7 +627,7 @@ class HotelHelper
                     'ru' => 'Спорт и отдых',
                     'es' => 'Deportes y recreación',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Health Club / Gym Facility Available',
                         'nl' => 'Health Club / Sportschool beschikbaar',
@@ -823,7 +823,7 @@ class HotelHelper
                     'ru' => 'Водные удобства',
                     'es' => 'Instalaciones acuáticas',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Swimming Pool',
                         'nl' => 'Zwembad',
@@ -875,7 +875,7 @@ class HotelHelper
                     'ru' => 'Вино и ужин',
                     'es' => 'Vino y cena',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Bar / Lounge',
                         'nl' => 'Bar / Lounge',
@@ -977,34 +977,46 @@ class HotelHelper
         );
         // lang fields
         $languages = Language::getLanguages(false);
+        $imgDir = dirname(__FILE__).'/../views/img/hotel_amenities/';
         $i = 1;
-        foreach ($parent_features_arr as $key => $value) {
-            $obj_feature = new HotelFeatures();
+        $defaultImageIndex = 0;
+        foreach ($parent_amenities_arr as $key => $value) {
+            $obj_amenity = new HotelAmenities();
             foreach ($languages as $lang) {
                 if (isset($value['name'][$lang['iso_code']])) {
-                    $obj_feature->name[$lang['id_lang']] = $value['name'][$lang['iso_code']];
+                    $obj_amenity->name[$lang['id_lang']] = $value['name'][$lang['iso_code']];
                 } else {
-                    $obj_feature->name[$lang['id_lang']] = $value['name']['en'];
+                    $obj_amenity->name[$lang['id_lang']] = $value['name']['en'];
                 }
             }
 
-            $obj_feature->active = 1;
-            $obj_feature->position = $i;
-            $obj_feature->parent_feature_id = 0;
-            $obj_feature->save();
-            $parent_feature_id = $obj_feature->id;
-            foreach ($value['features'] as $val) {
-                $obj_feature = new HotelFeatures();
+            $obj_amenity->active = 1;
+            $obj_amenity->position = $i;
+            $obj_amenity->id_parent = 0;
+            $obj_amenity->save();
+            $idParent = $obj_amenity->id;
+            foreach ($value['amenities'] as $val) {
+                ++$defaultImageIndex;
+                $obj_amenity = new HotelAmenities();
                 foreach ($languages as $lang) {
                     if (isset($val[$lang['iso_code']])) {
-                        $obj_feature->name[$lang['id_lang']] = $val[$lang['iso_code']];
+                        $obj_amenity->name[$lang['id_lang']] = $val[$lang['iso_code']];
                     } else {
-                        $obj_feature->name[$lang['id_lang']] = $val['en'];
+                        $obj_amenity->name[$lang['id_lang']] = $val['en'];
                     }
                 }
-                $obj_feature->active = 1;
-                $obj_feature->parent_feature_id = $parent_feature_id;
-                $obj_feature->save();
+                $obj_amenity->active            = 1;
+                $obj_amenity->id_parent = $idParent;
+                $obj_amenity->save();
+
+                $srcImg = $imgDir.'_default/'.$defaultImageIndex.'.jpg';
+                if (file_exists($srcImg)) {
+                    if (ImageManager::resize($srcImg, $imgDir.$obj_amenity->id.'.jpg')) {
+                        $obj_amenity->logo_type = 'image';
+                        $obj_amenity->logo      = $obj_amenity->id.'.jpg';
+                        $obj_amenity->save();
+                    }
+                }
             }
             ++$i;
         }
@@ -1139,233 +1151,57 @@ class HotelHelper
         return true;
     }
 
+    /**
+     * Seed default core room features and values used by room types.
+     *
+     * @return bool
+     */
     public function createHotelRoomDefaultFeatures()
     {
-        $htl_room_ftrs = array(
-            'Wi-Fi' => array(
-                'en' => 'Wi-Fi',
-                'nl' => 'Wi-Fi',
-                'fr' => 'Wi-Fi',
-                'de' => 'Wi-Fi',
-                'ru' => 'Wi-Fi',
-                'es' => 'Wi-Fi'
-            ),
-            'News Paper' => array(
-                'en' => 'News Paper',
-                'nl' => 'Krant',
-                'fr' => 'Journal',
-                'de' => 'Zeitung',
-                'ru' => 'Газета',
-                'es' => 'Periódico'
-            ),
-            'Power BackUp' => array(
-                'en' => 'Power BackUp',
-                'nl' => 'Stroomvoorziening',
-                'fr' => 'Alimentation de secours',
-                'de' => 'Notstromversorgung',
-                'ru' => 'Резервное электропитание',
-                'es' => 'Energía de respaldo'
-            ),
-            'Refrigerator' => array(
-                'en' => 'Refrigerator',
-                'nl' => 'Koelkast',
-                'fr' => 'Réfrigérateur',
-                'de' => 'Kühlschrank',
-                'ru' => 'Холодильник',
-                'es' => 'Refrigerador'
-            ),
-            'Restaurant' => array(
-                'en' => 'Restaurant',
-                'nl' => 'Restaurant',
-                'fr' => 'Restaurant',
-                'de' => 'Restaurant',
-                'ru' => 'Ресторан',
-                'es' => 'Restaurante'
-            ),
-            'Room Service' => array(
-                'en' => 'Room Service',
-                'nl' => 'Roomservice',
-                'fr' => 'Service de chambre',
-                'de' => 'Zimmerservice',
-                'ru' => 'Обслуживание номеров',
-                'es' => 'Servicio de habitaciones'
-            ),
-            'Gym' => array(
-                'en' => 'Gym',
-                'nl' => 'Fitnessruimte',
-                'fr' => 'Salle de sport',
-                'de' => 'Fitnessraum',
-                'ru' => 'Фитнес',
-                'es' => 'Gimnasio'
-            )
-        );
+        $idLang = (int) Configuration::get('PS_LANG_DEFAULT');
+        $position = 0;
 
-        // image value in rf/ folder
-        $pos = 1;
-        $languages = Language::getLanguages(true);
-        foreach ($htl_room_ftrs as $room_ftr_k => $room_ftr_v) {
-            $obj_feature = new Feature();
-            foreach ($languages as $lang) {
-                if (isset($room_ftr_v[$lang['iso_code']])) {
-                    $obj_feature->name[$lang['id_lang']] = $room_ftr_v[$lang['iso_code']];
-                } else {
-                    $obj_feature->name[$lang['id_lang']] = $room_ftr_v['en'];
-                }
+        foreach ($this->getDefaultRoomFeatures() as $featureName => $featureValues) {
+            $idFeature = (int) Feature::addFeatureImport($featureName, $position);
+            if (!$idFeature) {
+                return false;
             }
-            $obj_feature->position = $pos-1;
-            $obj_feature->save();
-            if ($obj_feature->id) {
-                $obj_feature_value = new FeatureValue();
-                $obj_feature_value->id_feature = $obj_feature->id;
 
-                foreach ($languages as $lang) {
-                    $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.jpg';
-                }
-
-                $obj_feature_value->save();
-                if ($obj_feature_value->id) {
-                    if (file_exists(_PS_IMG_DIR_.'rf/'.$pos.'.jpg')) {
-                        rename(_PS_IMG_DIR_.'rf/'.$pos.'.jpg', _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.jpg');
-                    }
+            foreach ($featureValues as $featureValue) {
+                $idFeatureValue = (int) FeatureValue::addFeatureValueImport($idFeature, $featureValue, null, $idLang, false);
+                if (!$idFeatureValue) {
+                    return false;
                 }
             }
 
-            $pos++;
+            ++$position;
         }
 
         return true;
     }
 
-    public function createHotelDefaultBedTypes()
+    /**
+     * Return the default room feature/value seed set.
+     *
+     * @return array
+     */
+    protected function getDefaultRoomFeatures()
     {
-        $htlBedTypes = array(
-            array(
-                'length' => '6.25',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Twin Bed',
-                    'nl' => 'Eenpersoonsbed',
-                    'fr' => 'Lit simple',
-                    'de' => 'Einzelbett',
-                    'ru' => 'Односпальная кровать',
-                    'es' => 'Cama individual',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Twin XL Bed',
-                    'nl' => 'Eenpersoonsbed XL',
-                    'fr' => 'Lit simple XL',
-                    'de' => 'Einzelbett XL',
-                    'ru' => 'Односпальная кровать XL',
-                    'es' => 'Cama individual XL',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '4.5',
-                'name' => array(
-                    'en' => 'Full Bed',
-                    'nl' => 'Tweepersoonsbed',
-                    'fr' => 'Lit double',
-                    'de' => 'Doppelbett',
-                    'ru' => 'Двуспальная кровать',
-                    'es' => 'Cama doble',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '5',
-                'name' => array(
-                    'en' => 'Queen Bed',
-                    'nl' => 'Queen size bed',
-                    'fr' => 'Lit Queen',
-                    'de' => 'Queen-Size-Bett',
-                    'ru' => 'Кровать Queen Size',
-                    'es' => 'Cama Queen',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '6.33',
-                'name' => array(
-                    'en' => 'King Bed',
-                    'nl' => 'King size bed',
-                    'fr' => 'Lit King',
-                    'de' => 'King-Size-Bett',
-                    'ru' => 'Кровать King Size',
-                    'es' => 'Cama King',
-                ),
-            ),
-            array(
-                'length' => '7',
-                'width'  => '6',
-                'name' => array(
-                    'en' => 'California King Bed',
-                    'nl' => 'California King bed',
-                    'fr' => 'Lit California King',
-                    'de' => 'California King-Bett',
-                    'ru' => 'Калифорнийская кровать King Size',
-                    'es' => 'Cama California King',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Bunk Bed',
-                    'nl' => 'Stapelbed',
-                    'fr' => 'Lit superposé',
-                    'de' => 'Etagenbett',
-                    'ru' => 'Двухъярусная кровать',
-                    'es' => 'Litera',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '4.5',
-                'name' => array(
-                    'en' => 'Sofa Bed',
-                    'nl' => 'Slaapbank',
-                    'fr' => 'Canapé-lit',
-                    'de' => 'Schlafsofa',
-                    'ru' => 'Диван-кровать',
-                    'es' => 'Sofá cama',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '5',
-                'name' => array(
-                    'en' => 'Murphy Bed',
-                    'nl' => 'Inklapbed',
-                    'fr' => 'Lit escamotable',
-                    'de' => 'Klappbett',
-                    'ru' => 'Откидная кровать',
-                    'es' => 'Cama abatible',
-                ),
-            ),
+        return array(
+            'Bed Type' => array('Single', 'Double', 'Queen', 'King', 'Super King', 'Twin', 'Bunk Bed', 'Sofa Bed', 'Futon', 'Murphy Bed', 'Water Bed'),
+            'Extra Bed Available' => array('Yes', 'No', 'On Request', 'Chargeable'),
+            'Crib/Cot Available' => array('Yes', 'No', 'On Request'),
+            'Room Size' => array('150 sq ft', '200 sq ft', '300 sq ft', '400 sq ft', '500 sq ft', '600 sq ft', '800 sq ft', '1000+ sq ft'),
+            'View' => array('Sea/Ocean View', 'Garden View', 'City View', 'Pool View', 'Mountain View', 'Lake View', 'River View', 'Park View', 'Courtyard View', 'Desert View', 'No View/Interior'),
+            'Balcony Type' => array('Private Balcony', 'Shared Terrace', 'Juliet Balcony', 'Rooftop Access', 'Patio', 'Veranda', 'None'),
+            'Bathroom Type' => array('Private/Ensuite', 'Shared', 'Jack and Jill (shared between 2 rooms)', 'Half Bath'),
+            'AC Type' => array('Split AC', 'Central AC', 'Window AC', 'No AC', 'Fan Only'),
+            'Heating Type' => array('Central Heating', 'Room Heater', 'Underfloor Heating', 'Fireplace', 'No Heating'),
+            'TV Type' => array('No TV', 'LED TV', 'Smart TV', 'OLED TV'),
+            'Wi-Fi Speed' => array('No Wi-Fi', 'Basic', 'High Speed', 'Premium/Fiber'),
+            'Smoke Detection' => array('Smoke Detector', 'Sprinkler', 'None'),
+            'Smoking Policy' => array('Smoking Not Allowed', 'Smoking Allowed'),
         );
-
-        $languages = Language::getLanguages(true);
-        foreach ($htlBedTypes as $htlBedType) {
-            $objBedType = new HotelBedType();
-            foreach ($languages as $lang) {
-                if (isset($htlBedType['name'][$lang['iso_code']])) {
-                    $objBedType->name[$lang['id_lang']] = $htlBedType['name'][$lang['iso_code']];
-                } else {
-                    $objBedType->name[$lang['id_lang']] = $htlBedType['name']['en'];
-                }
-
-                $objBedType->width = $htlBedType['width'];
-                $objBedType->length = $htlBedType['length'];
-                $objBedType->save();
-            }
-        }
-
-        return true;
     }
 
     public function createDefaultBookingStatuses()
@@ -1899,14 +1735,14 @@ class HotelHelper
         return $htl_id;
     }
 
-    public function saveDummyHotelFeatures($id_hotel)
+    public function saveDummyHotelAmenities($id_hotel)
     {
-        $branch_ftr_ids = array(1, 2, 4, 7, 8, 9, 11, 12, 14, 16, 17, 18, 21);
-        foreach ($branch_ftr_ids as $value_ftr) {
-            $htl_ftr_obj = new HotelBranchFeatures();
-            $htl_ftr_obj->id_hotel = $id_hotel;
-            $htl_ftr_obj->feature_id = $value_ftr;
-            $htl_ftr_obj->save();
+        $branch_amenity_ids = array(2, 4, 7, 8, 11, 12, 14, 16, 17, 18, 21);
+        foreach ($branch_amenity_ids as $amenityId) {
+            $objHotelAmenities = new HotelBranchAmenities();
+            $objHotelAmenities->id_hotel   = $id_hotel;
+            $objHotelAmenities->amenity_id = $amenityId;
+            $objHotelAmenities->save();
         }
     }
 
@@ -1915,7 +1751,6 @@ class HotelHelper
         $roomTypeDemoDataLang = array(
             array(
                 'price' => 1000,
-                'id_bed_types' => array(4),
                 'en' => array(
                     'name' => 'General Rooms',
                     'description_short' => 'Our General Rooms offer space and comfort with multiple bedrooms and a cozy living area. Enjoy flat-screen TVs, complimentary Wi-Fi, and a kitchenette for a perfect family getaway.',
@@ -1949,7 +1784,6 @@ class HotelHelper
             ),
             array(
                 'price' => 1500,
-                'id_bed_types' => array(4, 5),
                 'en' => array(
                     'name' => 'Delux Rooms',
                     'description_short' => 'Enjoy lake views from our Deluxe Rooms with a king-sized bed, elegant furnishings, and a spacious sitting area. Perfect for guests seeking comfort, luxury, and modern amenities.',
@@ -1983,7 +1817,6 @@ class HotelHelper
             ),
             array(
                 'price' => 2000,
-                'id_bed_types' => array(5, 6),
                 'en' => array(
                     'name' => 'Executive Rooms',
                     'description_short' => 'Indulge in our Executive Rooms, featuring separate living and sleeping areas, a luxurious bathroom, and exclusive lounge access. Ideal for business travelers seeking privacy',
@@ -2017,7 +1850,6 @@ class HotelHelper
             ),
             array(
                 'price' => 2500,
-                'id_bed_types' => array(6, 8),
                 'en' => array(
                     'name' => 'Luxury Rooms',
                     'description_short' => 'Retreat to tranquility in our Luxury Rooms with expansive views. Featuring a queen-sized bed, workspace, and serene decor, perfect for business and leisure travelers alike.',
@@ -2051,7 +1883,6 @@ class HotelHelper
             ),
         );
 
-        $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
         $languages = Language::getLanguages(true);
         foreach ($roomTypeDemoDataLang as $key => $roomTypeData) {
             // Add Product
@@ -2172,16 +2003,8 @@ class HotelHelper
 
             $htl_rm_type->save();
 
-            // Add features to the product
-            $ftr_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
-            $ftr_val_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
-            foreach ($ftr_arr as $key_htl_ftr => $val_htl_ftr) {
-                $product->addFeaturesToDB($val_htl_ftr, $ftr_val_arr[$key_htl_ftr]);
-            }
-
             // save advance payment information
             $this->saveAdvancedPaymentInfo($product_id);
-            $objHotelRoomTypeBedType->updateRoomTypeBedTypes($roomTypeData['id_bed_types'], $product_id);
         }
     }
 
@@ -2569,7 +2392,7 @@ class HotelHelper
     {
         $htl_id = $this->saveDummyHotelBranchInfo();
         $this->saveDummyHotelImages($htl_id);
-        $this->saveDummyHotelFeatures($htl_id);
+        $this->saveDummyHotelAmenities($htl_id);
         $this->saveDummyProductsAndRelatedInfo($htl_id);
         $this->saveDummyServiceProductsAndRelatedInfo();
 

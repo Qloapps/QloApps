@@ -149,7 +149,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
             ON (rtfpr.`id_feature_price` = rtfp.`id_feature_price` AND rtfp.`id_product`='.(int) $idRoomType.')
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` rtfpg
-            ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price` '.($groups ? ' AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).')' : ' ' ).')
+            ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price` '.($groups ? ' AND rtfpg.`id_group` IN ('.implode(', ', array_map('intval', $groups)).')' : ' ' ).')
             WHERE 1 '.( !is_null($active) ? ' AND rtfp.`active`= '.(int) $active: ' ').' ' .(!is_null($skipFeaturePriceId) ? ' AND rtfpr.`id_feature_price`!='.(int) $skipFeaturePriceId : ' ');
         $sqlWhere = '';
         if ($restrictions && is_array($restrictions)) {
@@ -409,7 +409,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $use_reduc
                 )) {
                     foreach($servicesWithTax as $service) {
-                        $totalPrice['total_price_tax_incl'] += Tools::processPriceRounding($service['price']);
+                        $totalPrice['total_price_tax_incl'] += $service['price'];
                     }
                 }
                 if ($servicesWithoutTax = RoomTypeServiceProduct::getAutoAddServices(
@@ -421,7 +421,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $use_reduc
                 )) {
                     foreach($servicesWithoutTax as $service) {
-                        $totalPrice['total_price_tax_excl'] += Tools::processPriceRounding($service['price']);
+                        $totalPrice['total_price_tax_excl'] += $service['price'];
                     }
                 }
             }
@@ -430,8 +430,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         if (!$quantity) {
             $quantity = 1;
         }
-        $totalPrice['total_price_tax_incl'] = Tools::processPriceRounding($totalPrice['total_price_tax_incl'], $quantity);
-        $totalPrice['total_price_tax_excl'] = Tools::processPriceRounding($totalPrice['total_price_tax_excl'], $quantity);
+        $totalPrice['total_price_tax_incl'] = $totalPrice['total_price_tax_incl'] * $quantity;
+        $totalPrice['total_price_tax_excl'] = $totalPrice['total_price_tax_excl'] * $quantity;
 
         return $totalPrice;
     }

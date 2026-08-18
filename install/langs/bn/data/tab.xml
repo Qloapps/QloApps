@@ -39,6 +39,7 @@
   <tab id='Credit_Slips' name='বকেয়া বিল'/>
   <tab id='Statuses' name='অবস্থা'/>
   <tab id='Order_Messages' name='অর্ডার এর মাসাআজ'/>
+  <tab id='Guest_Registration' name='অতিথি নিবন্ধন কার্ড'/>
   <tab id='Customers_1' name='গ্রাহকরা'/>
   <tab id='Addresses' name='ঠিকানা'/>
   <tab id='Groups' name='দল'/>

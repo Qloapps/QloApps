@@ -91,31 +91,49 @@ class HotelReservationSystemDb
                 PRIMARY KEY  (`id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_branch_features` (
-                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                `id_hotel` int(10) unsigned NOT NULL,
-                `feature_id` varchar(255) DEFAULT NULL,
-                `date_add` datetime NOT NULL,
-                `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_features` (
-                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                `parent_feature_id` int(10) unsigned NOT NULL,
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_amenity` (
+                `id_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `id_parent` int(10) unsigned NOT NULL,
                 `position` int(10) unsigned NOT NULL,
                 `active` int(2) NOT NULL DEFAULT '0',
+                `logo_type` varchar(10) NOT NULL DEFAULT 'icon',
+                `logo` varchar(255) NOT NULL DEFAULT '',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
-                PRIMARY KEY (`id`)
+                PRIMARY KEY (`id_amenity`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_features_lang` (
-                `id` int(10) unsigned NOT NULL,
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_amenity_lang` (
+                `id_amenity` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
                 `name` varchar(255) NOT NULL,
-                PRIMARY KEY (`id`, `id_lang`)
+                PRIMARY KEY (`id_amenity`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_branch_amenity` (
+                `id_branch_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `id_hotel` int(10) unsigned NOT NULL,
+                `amenity_id` int(10) unsigned NOT NULL,
+                `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_branch_amenity`),
+                CONSTRAINT `fk_htl_branch_amenity_amenity` FOREIGN KEY (`amenity_id`)
+                    REFERENCES `"._DB_PREFIX_."htl_amenity` (`id_amenity`) ON DELETE CASCADE
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_amenity` (
+                `id_room_type_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `id_product` int(10) unsigned NOT NULL,
+                `amenity_id` int(10) unsigned NOT NULL,
+                `is_featured` tinyint(1) NOT NULL DEFAULT '0',
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_room_type_amenity`),
+                KEY `id_product` (`id_product`),
+                CONSTRAINT `fk_htl_room_type_amenity_amenity` FOREIGN KEY (`amenity_id`)
+                    REFERENCES `"._DB_PREFIX_."htl_amenity` (`id_amenity`) ON DELETE CASCADE
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_cart_booking_data` (
                 `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -524,26 +542,7 @@ class HotelReservationSystemDb
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_settings_link`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_bed_type` (
-                `id_bed_type` INT(11) NOT NULL AUTO_INCREMENT,
-                `length` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                `width` DECIMAL(20,6) NOT NULL DEFAULT '0.000000',
-                PRIMARY KEY (`id_bed_type`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_bed_type_lang`(
-                `id_bed_type` INT(11) NOT NULL,
-                `name` VARCHAR(255) DEFAULT NULL,
-                `id_lang` INT(11) NOT NULL,
-                PRIMARY KEY (`id_bed_type`, `id_lang`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_bed_type` (
-                `id_room_type_bed_type` INT(11) NOT NULL AUTO_INCREMENT,
-                `id_product` INT(11) NOT NULL,
-                `id_bed_type` INT(11) NOT NULL,
-                PRIMARY KEY (`id_room_type_bed_type`)
-            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
-
-            "INSERT INTO `"._DB_PREFIX_."htl_settings_link` (`id_settings_link`, `icon`, `link`, `new_window`, `position`, `unremovable`, `active`, `date_add`, `date_upd`) VALUES
+            "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link` (`id_settings_link`, `icon`, `link`, `new_window`, `position`, `unremovable`, `active`, `date_add`, `date_upd`) VALUES
             (1, 'icon-cogs', 'index.php?controller=AdminHotelGeneralSettings', 0, 0, 1, 1, NOW(), NOW()),
             (2, 'icon-dollar', 'index.php?controller=AdminHotelFeaturePricesSettings', 0, 2, 1, 1, NOW(), NOW()),
             (3, 'icon-plus-square', 'index.php?controller=AdminRoomTypeGlobalDemand', 0, 3, 1, 1, NOW(), NOW()),
@@ -558,27 +557,27 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id_settings_link`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
-            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
             SELECT 1, `id_lang`, 'General Settings', 'Configure Your hotel general settings using this option.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
 
-            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
             SELECT 2, `id_lang`, 'Advanced Price Rules', 'Here set Advanced price rules for specific dates.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
 
-            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
             SELECT 3, `id_lang`, 'Additional Facilities', 'Here create Additional facilities and their prices for room types.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
 
-            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
             SELECT 4, `id_lang`, 'Hotel Interior Block', 'Configure Hotel Interior block. You can display hotel interior images using this block. This block will be displayed on home page.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
 
-            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
             SELECT 5, `id_lang`, 'Hotel Amenities Block', 'Configure Hotels Amenities settings. You can display hotel amenities images using this block. This block will be displayed on home page.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
@@ -619,9 +618,10 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_branch_info`,
             `'._DB_PREFIX_.'htl_branch_info_lang`,
             `'._DB_PREFIX_.'htl_image`,
-            `'._DB_PREFIX_.'htl_branch_features`,
-            `'._DB_PREFIX_.'htl_features`,
-            `'._DB_PREFIX_.'htl_features_lang`,
+            `'._DB_PREFIX_.'htl_branch_amenity`,
+            `'._DB_PREFIX_.'htl_room_type_amenity`,
+            `'._DB_PREFIX_.'htl_amenity`,
+            `'._DB_PREFIX_.'htl_amenity_lang`,
             `'._DB_PREFIX_.'htl_cart_booking_data`,
             `'._DB_PREFIX_.'htl_booking_detail`,
             `'._DB_PREFIX_.'htl_booking_status`,
