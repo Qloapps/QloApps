@@ -1211,10 +1211,25 @@ class AdminControllerCore extends Controller
         if (ob_get_level() && ob_get_length() > 0) {
             ob_clean();
         }
+        $fields_to_export = array();
+        if((int)Configuration::get('PS_EXPORT_FIELDS_TYPE') === HelperList::QLO_EXPORT_FIELDS_SELECTED){
+            $list_visibility = json_decode($this->context->cookie->{'list_visibility_'.$this->context->controller->controller_name});
+            foreach ($this->fields_list as $key => $field) {
+                if ((!isset($field['displayed']) || $field['displayed'])
+                    && (empty($field['optional'])
+                    || (!is_array($list_visibility) && !empty($field['visible_default']))
+                    || (is_array($list_visibility) && in_array($key, $list_visibility))
+                )) {
+                    $fields_to_export[$key] = $field;
+                }
+            }
+        }
+
         $this->getList($this->context->language->id, null, null, 0, false);
         if (!count($this->_list)) {
             return;
         }
+        $fields_to_export = (int)Configuration::get('PS_EXPORT_FIELDS_TYPE') === HelperList::QLO_EXPORT_FIELDS_SELECTED ? $fields_to_export : $this->fields_list;
 
         header('Content-type: text/csv');
         header('Content-Type: application/force-download; charset=UTF-8');
@@ -1223,9 +1238,9 @@ class AdminControllerCore extends Controller
 
         $fd = fopen('php://output', 'wb');
         $headers = array();
-        foreach ($this->fields_list as $key => $datas) {
+        foreach ($fields_to_export as $key => $datas) {
             if ('PDF' === $datas['title']) {
-                unset($this->fields_list[$key]);
+                unset($fields_to_export[$key]);
             } else {
                 if ('ID' === $datas['title']) {
                     $headers[] = strtolower(Tools::htmlentitiesDecodeUTF8($datas['title']));
@@ -1239,7 +1254,7 @@ class AdminControllerCore extends Controller
         foreach ($this->_list as $i => $row) {
             $content = array();
             $path_to_image = false;
-            foreach ($this->fields_list as $key => $params) {
+            foreach ($fields_to_export as $key => $params) {
                 $field_value = isset($row[$key]) ? Tools::htmlentitiesDecodeUTF8(Tools::nl2br($row[$key])) : '';
                 if ($key == 'image') {
                     if ($params['image'] != 'p' || Configuration::get('PS_LEGACY_IMAGES')) {
