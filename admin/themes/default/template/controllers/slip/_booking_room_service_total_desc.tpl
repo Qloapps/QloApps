@@ -20,5 +20,6 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{l s='Total credit slip amount for this order:'} <strong><span id="booking-total-slip-amount">-</span></strong><br>
-<span id="booking-slip-ids-wrapper" style="display:none;">{l s='Credit slip generated for this order: '} <strong><span id="booking-slip-ids"></span></strong></span>
+{l s='Total room price:'} <strong><span id="booking-room-amount">-</span></strong><br>
+{l s='Total service price:'} <strong><span id="booking-service-amount">-</span></strong><br>
+{l s='Total room booking price:'} <strong><span id="booking-amount">-</span></strong><br>

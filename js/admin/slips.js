@@ -137,6 +137,10 @@ $(document).ready(function() {
             $('#booking-total-slip-amount').text('-');
             $('#booking-slip-ids').html('');
             $('#booking-slip-ids-wrapper').hide();
+            $('#order-total-amount').text('-');
+            $('#order-total-amount-wrapper').hide();
+            $('#order-total-paid').text('-');
+            $('#order-total-paid-wrapper').hide();
             return;
         }
 
@@ -162,6 +166,14 @@ $(document).ready(function() {
                 currencySign = response.currency.sign;
                 var totalSlipAmount = parseFloat(response.total_slip_amount || 0);
                 $('#booking-total-slip-amount').text(currencySign + ' ' + totalSlipAmount.toFixed(2));
+
+                var orderTotalAmount = parseFloat(response.order_total_amount || 0);
+                $('#order-total-amount').text(currencySign + ' ' + orderTotalAmount.toFixed(2));
+                $('#order-total-amount-wrapper').show();
+
+                var orderTotalPaid = parseFloat(response.order_total_paid || 0);
+                $('#order-total-paid').text(currencySign + ' ' + orderTotalPaid.toFixed(2));
+                $('#order-total-paid-wrapper').show();
                 var slipIds = response.slip_ids || [];
                 if (slipIds.length) {
                     var links = slipIds.map(function (id) {

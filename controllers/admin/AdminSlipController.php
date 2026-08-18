@@ -189,6 +189,9 @@ public function initPageHeaderToolbar()
                         'required' => true,
                         'hint' => $this->l('Select a room to generate the credit slip for'),
                         'col' => 3,
+                        'desc' => $this->context->smarty->fetch(
+                            _PS_ADMIN_DIR_ . '/themes/default/template/controllers/slip/_booking_room_service_total_desc.tpl'
+                        ),
                         'options' => array(
                             'query' => array(),
                             'id' => 'id',
@@ -598,7 +601,9 @@ public function initPageHeaderToolbar()
             'bookings' => $bookingDetails,
             'currency' => $currency,
             'total_slip_amount' => $totalSlipAmount,
-            'slip_ids' => $slipIds
+            'slip_ids' => $slipIds,
+            'order_total_amount' => (float) $objOrder->total_paid,
+            'order_total_paid' => (float) $objOrder->total_paid_real
         )));
     }
 

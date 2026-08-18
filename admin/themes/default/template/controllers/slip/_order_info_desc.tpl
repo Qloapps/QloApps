@@ -24,3 +24,5 @@
 <a id="order-view-link" href="#" target="_blank" style="display:none;">
     {l s='View Order'} <i class="icon-external-link"></i>
 </a>
+<span id="order-total-amount-wrapper" style="display:none;"><br>{l s='Total order amount:'} <strong><span id="order-total-amount">-</span></strong></span>
+<span id="order-total-paid-wrapper" style="display:none;"><br>{l s='Total paid amount:'} <strong><span id="order-total-paid">-</span></strong></span>
