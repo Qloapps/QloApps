@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="Credit Slips"/>
   <tab id="Statuses" name="Statuses"/>
   <tab id="Order_Messages" name="Order Messages"/>
+  <tab id="Guest_Registration" name="Vendég regisztráció"/>
   <tab id="Customers_1" name="Vásárlók"/>
   <tab id="Addresses" name="Címek"/>
   <tab id="Groups" name="Csoportok"/>

@@ -149,7 +149,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
             ON (rtfpr.`id_feature_price` = rtfp.`id_feature_price` AND rtfp.`id_product`='.(int) $idRoomType.')
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` rtfpg
-            ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price` '.($groups ? ' AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).')' : ' ' ).')
+            ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price` '.($groups ? ' AND rtfpg.`id_group` IN ('.implode(', ', array_map('intval', $groups)).')' : ' ' ).')
             WHERE 1 '.( !is_null($active) ? ' AND rtfp.`active`= '.(int) $active: ' ').' ' .(!is_null($skipFeaturePriceId) ? ' AND rtfpr.`id_feature_price`!='.(int) $skipFeaturePriceId : ' ');
         $sqlWhere = '';
         if ($restrictions && is_array($restrictions)) {
