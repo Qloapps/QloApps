@@ -2677,7 +2677,7 @@ class OrderCore extends ObjectModel
                                 'unit_tax_base' => $autoAddedPriceExcl / $totalAutoAddedQty,
                                 'total_tax_base' => $autoAddedPriceExcl,
                                 'unit_amount' => $amount,
-                                'total_amount' => Tools::processPriceRounding($amount, $totalAutoAddedQty),
+                                'total_amount' => Tools::processPriceRounding($amount, $totalAutoAddedQty, $this->round_type, $this->round_mode),
                             );
                         }
                     } else {
@@ -2724,7 +2724,7 @@ class OrderCore extends ObjectModel
 
                 foreach ($tax_calculator->getTaxesAmount($unit_price_tax_excl) as $id_tax => $unit_amount) {
                     $total_tax_base = 0;
-                    $total_amount = Tools::processPriceRounding($unit_amount, $quantity);
+                    $total_amount = Tools::processPriceRounding($unit_amount, $quantity, $this->round_type, $this->round_mode);
 
                     if (!isset($groupedTaxDetails[$id_tax])) {
                         $groupedTaxDetails[$id_tax] = array(
