@@ -6,7 +6,7 @@ Modernizr.load([
 	{
 		load: ["themes/default/js/vendor/enquire.min.js", "themes/default/js/admin-theme.js"],
 		complete: function() {
-			$(document).trigger('QloApps:adminThemeReady');
+			$(document).trigger('admin-theme.js.ready');
 		}
 	}
 ]);

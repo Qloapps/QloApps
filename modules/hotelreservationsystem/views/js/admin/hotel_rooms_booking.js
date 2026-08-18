@@ -141,7 +141,7 @@ $(document).ready(function() {
         if (typeof initTooltip === 'function') {
             initBookingCalendar();
         } else {
-            $(document).on('QloApps:adminThemeReady', initBookingCalendar);
+            $(document).on('admin-theme.js.ready', initBookingCalendar);
         }
     }
 
