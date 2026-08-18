@@ -68,6 +68,7 @@ class WkHotelRoom extends Module
                         ImageType::getFormatedName('large')
                     );
                 }
+                $includeTourismTax = $useTax && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
                 $productPriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                     $idProduct,
                     $dateFrom,
@@ -78,15 +79,12 @@ class WkHotelRoom extends Module
                     0,
                     0,
                     1,
-                    0
+                    0,
+                    $includeTourismTax
                 );
 
                 if ($useTax) {
                     $priceWithoutReduction = $productPriceWithoutReduction['total_price_tax_incl'];
-                    if (TourismTax::isGrossedUp($productPriceWithoutReduction['tourism_tax_online'])) {
-                        $numDaysInDuration = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
-                        $priceWithoutReduction += $productPriceWithoutReduction['tourism_tax_online'] / $numDaysInDuration;
-                    }
                 } else {
                     $priceWithoutReduction = $productPriceWithoutReduction['total_price_tax_excl'];
                 }
