@@ -33,8 +33,8 @@
                 </ul>
             </div>
         {/capture}
-        <span class="badge tooltip-trigger">+{$hotel_names_remaining|@count}</span>
-        <div class="tooltip-content" style="display: none;">{$smarty.capture.hotel_names_tooltip}</div>
+        {capture name='hotel_names_tooltip_title'}<span class="badge tooltip-trigger">+{$hotel_names_remaining|@count}</span>{/capture}
+        {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.hotel_names_tooltip tooltip_title=$smarty.capture.hotel_names_tooltip_title}
     {/if}
 {else}
     --
