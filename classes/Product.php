@@ -6848,21 +6848,24 @@ class ProductCore extends ObjectModel
         $idAddress = null,
         $useReduc = 1,
         $idGroup = null,
-        $idCartBooking = 0
+        $idCartBooking = 0,
+        $includeTourismTax = false,
+        $numAdults = null,
+        $childrenAges = null
     ) {
         if ($useTax === null) {
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
         }
 
         $price = Product::getPriceStatic(
-            (int)$idProduct,
+            $idProduct,
             $useTax,
             $idProductOption,
             6,
             null,
             false,
             $useReduc,
-            (int)$quantity,
+            $quantity,
             false,
             null,
             $idCart,
@@ -6872,8 +6875,8 @@ class ProductCore extends ObjectModel
             true,
             null,
             true,
-            (int)$idHotel,
-            (int)$idProductRoomType,
+            $idHotel,
+            $idProductRoomType,
             $idGroup,
             $idCartBooking
         );
@@ -6894,12 +6897,56 @@ class ProductCore extends ObjectModel
             )
         );
 
-        if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY
-            && $dateFrom && $dateTo
-        ) {
+        $isPerDay = Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY
+            && $dateFrom && $dateTo;
+        if ($isPerDay) {
             $price = $price * HotelHelper::getNumberOfDays($dateFrom, $dateTo);
         }
 
-        return $price * (int)$quantity;
+        $price = $price * $quantity;
+
+        $tourismTaxHotelId = $idHotel;
+        if (!$tourismTaxHotelId && $idProductRoomType) {
+            $objRoomType = new HotelRoomType();
+            if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProductRoomType)) {
+                $tourismTaxHotelId = $roomTypeInfo['id_hotel'];
+            }
+        }
+
+        if ($includeTourismTax && $tourismTaxHotelId && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
+            $priceCalcNumDays = $isPerDay ? HotelHelper::getNumberOfDays($dateFrom, $dateTo) : 1;
+            $unitPriceExcl = ($useTax ? Product::getServiceProductPrice($idProduct, $idProductOption, $idHotel, $idProductRoomType, false, 1, $dateFrom, $dateTo, $idCart, $idAddress, $useReduc, $idGroup, $idCartBooking) : $price / (int) $quantity) / $priceCalcNumDays;
+
+            $fallbackAddress = new Address(Cart::getIdAddressForTaxCalculation($idProduct));
+            if ($numAdults === null) {
+                // no explicit occupancy override: derive it from the actual booking/cart-booking, same as every order-persistence caller
+                $taxContext = TaxConfiguration::resolveServiceLineTaxContext($tourismTaxHotelId, 0, $fallbackAddress, $idCartBooking);
+            } else {
+                // caller supplied its own occupancy (e.g. a live search form) — use it as-is, only resolve address/collection type
+                $hotelContext = TaxConfiguration::resolveHotelAddressAndCollectionType($tourismTaxHotelId, $fallbackAddress);
+                $taxContext = array(
+                    'address' => $hotelContext['address'],
+                    'collectionType' => $hotelContext['collectionType'],
+                    'checkInDate' => $dateFrom,
+                    'numNights' => max(1, HotelHelper::getNumberOfDays($dateFrom, $dateTo)),
+                    'numAdults' => $numAdults,
+                    'childrenAges' => $childrenAges ?: array(),
+                );
+            }
+
+            // no $idCurrency passed — TaxCalculator::getTaxesAmount() already resolves it from the current context when null
+            $taxCalculator = TaxManagerFactory::getManager($taxContext['address'], $idTourismTaxRulesGroup)->getTaxCalculator();
+            $price += $taxCalculator->getTaxesTotalAmount(
+                $unitPriceExcl,
+                $taxContext['checkInDate'],
+                $taxContext['numNights'],
+                $taxContext['numAdults'],
+                $taxContext['childrenAges'],
+                $taxContext['collectionType'],
+                $quantity
+            );
+        }
+
+        return $price;
     }
 }

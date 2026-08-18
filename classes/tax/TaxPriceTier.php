@@ -21,17 +21,17 @@
  * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
  */
 
-class TourismTaxTierCore extends ObjectModel
+class TaxPriceTierCore extends ObjectModel
 {
-    public $id_tier;
+    public $id_tax_price_tier;
     public $id_tax;
     public $min_amount;
     public $max_amount;
     public $tax_value;
 
     public static $definition = array(
-        'table' => 'tourism_tax_tier',
-        'primary' => 'id_tier',
+        'table' => 'tax_price_tier',
+        'primary' => 'id_tax_price_tier',
         'fields' => array(
             'id_tax' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'min_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isUnsignedFloat'),
@@ -41,7 +41,7 @@ class TourismTaxTierCore extends ObjectModel
     );
 
     /**
-     * All tiers for a tax in entry order (id_tier order), cached per request.
+     * All tiers for a tax in entry order (id_tax_price_tier order), cached per request.
      *
      * @param int $idTax
      * @return array
@@ -49,15 +49,15 @@ class TourismTaxTierCore extends ObjectModel
     public static function getByTaxId($idTax)
     {
         $idTax = (int) $idTax;
-        $cacheId = 'TourismTaxTier::getByTaxId-' . $idTax;
+        $cacheId = 'TaxPriceTier::getByTaxId-' . $idTax;
         if (Cache::isStored($cacheId)) {
             return Cache::retrieve($cacheId);
         }
 
         $tiers = Db::getInstance()->executeS(
-            'SELECT * FROM `' . _DB_PREFIX_ . 'tourism_tax_tier`
+            'SELECT * FROM `' . _DB_PREFIX_ . 'tax_price_tier`
              WHERE `id_tax` = ' . $idTax . '
-             ORDER BY `id_tier` ASC'
+             ORDER BY `id_tax_price_tier` ASC'
         );
         Cache::store($cacheId, $tiers);
 
@@ -79,7 +79,7 @@ class TourismTaxTierCore extends ObjectModel
         foreach ($tiers as $tier) {
             $maxAmount = (float) $tier['max_amount'];
             $inLower = ($unitPrice >= (float) $tier['min_amount']);
-            $inUpper = ($maxAmount == 0 || $unitPrice < $maxAmount);
+            $inUpper = ($maxAmount == 0 || $unitPrice <= $maxAmount);
             if ($inLower && $inUpper) {
                 return $tier;
             }
@@ -100,14 +100,14 @@ class TourismTaxTierCore extends ObjectModel
     {
         $idTax = (int) $idTax;
         Db::getInstance()->execute(
-            'DELETE FROM `' . _DB_PREFIX_ . 'tourism_tax_tier`
+            'DELETE FROM `' . _DB_PREFIX_ . 'tax_price_tier`
              WHERE `id_tax` = ' . $idTax
         );
         foreach ($values as $i => $value) {
             if ($value === '' || $value === false) {
                 continue;
             }
-            $tier = new TourismTaxTier();
+            $tier = new TaxPriceTier();
             $tier->id_tax = $idTax;
             $tier->min_amount = isset($mins[$i]) ? (float) $mins[$i] : 0;
             $tier->max_amount = isset($maxs[$i]) ? (float) $maxs[$i] : 0;

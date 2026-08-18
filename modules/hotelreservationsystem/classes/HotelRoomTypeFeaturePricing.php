@@ -275,7 +275,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_guest = 0,
         $id_room = 0,
         $with_auto_room_services = 1,
-        $use_reduc = 1
+        $use_reduc = 1,
+        $includeTourismTax = false
     ) {
         $totalPrice = array();
         $totalPrice['total_price_tax_incl'] = 0;
@@ -433,33 +434,24 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $totalPrice['total_price_tax_incl'] = $totalPrice['total_price_tax_incl'] * $quantity;
         $totalPrice['total_price_tax_excl'] = $totalPrice['total_price_tax_excl'] * $quantity;
 
-        $totalPrice['tourism_tax_online'] = 0.0;
-        if (Configuration::get('QLO_USE_TOURISM_TAX')
-            && is_array($occupancy) && !empty($occupancy) && isset($occupancy[0]['adults'])
-        ) {
-            $idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $id_product);
-            if ($idTourismTaxRulesGroup) {
+        if ($includeTourismTax && Configuration::get('QLO_USE_TOURISM_TAX') && is_array($occupancy) && !empty($occupancy) && isset($occupancy[0]['adults'])) {
+            if ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $id_product)) {
                 $hotelBranch = new HotelBranchInformation((int) $objAddress->id_hotel);
                 $collectionType = (int) $hotelBranch->tourism_tax_collection_type;
                 $numNights = max(1, (int) HotelHelper::getNumberOfDays($date_from, $date_to));
                 $unitPriceTe = (float) $totalPrice['total_price_tax_excl'] / $numNights;
-                $idLang = (int) Context::getContext()->language->id;
                 $taxCalculator = TaxManagerFactory::getManager($objAddress, $idTourismTaxRulesGroup)->getTaxCalculator();
-                foreach ($occupancy as $roomOcc) {
-                    $childAges = !empty($roomOcc['child_ages']) ? (array) $roomOcc['child_ages'] : array();
-                    $tourismTaxResult = $taxCalculator->getTourismTaxRows(
-                        $unitPriceTe,
-                        $date_from,
-                        $numNights,
-                        $roomOcc['adults'],
-                        $childAges,
-                        $id_currency,
-                        $collectionType,
-                        $idLang,
-                        1
-                    );
-                    $totalPrice['tourism_tax_online'] += $tourismTaxResult['tourism_tax_online'];
-                }
+                $childAges = !empty($occupancy[0]['child_ages']) ? (array) $occupancy[0]['child_ages'] : array();
+                $totalPrice['total_price_tax_incl'] += $taxCalculator->getTaxesTotalAmount(
+                    $unitPriceTe,
+                    $date_from,
+                    $numNights,
+                    $occupancy[0]['adults'],
+                    $childAges,
+                    $collectionType,
+                    1,
+                    $id_currency
+                );
             }
         }
 
@@ -488,6 +480,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
     ) {
         $dateFrom = date('Y-m-d H:i:s', strtotime($date_from));
         $dateTo = date('Y-m-d H:i:s', strtotime($date_to));
+        $includeTourismTax = $use_tax && Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
         $totalDurationPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
             $id_product,
             $dateFrom,
@@ -498,16 +491,14 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $id_guest,
             $id_room,
             $with_auto_room_services,
-            $use_reduc
+            $use_reduc,
+            $includeTourismTax
         );
 
         $totalDurationPriceTI = $totalDurationPrice['total_price_tax_incl'];
         $totalDurationPriceTE = $totalDurationPrice['total_price_tax_excl'];
         $numDaysInDuration = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
         if ($use_tax) {
-            if (TourismTax::isGrossedUp($totalDurationPrice['tourism_tax_online'])) {
-                $totalDurationPriceTI += $totalDurationPrice['tourism_tax_online'];
-            }
             $pricePerDay = $totalDurationPriceTI/$numDaysInDuration;
         } else {
             $pricePerDay = $totalDurationPriceTE/$numDaysInDuration;

@@ -1295,7 +1295,7 @@ var ajaxCart = {
 
         $('.ajax_cart_tax_cost').text(jsonData.tax_cost);
         $('.ajax_cart_tourism_tax_cost').text(jsonData.tourism_tax_cost);
-        if (parseFloat(jsonData.tourism_tax_online) > 0) {
+        if (parseFloat(jsonData.tourism_tax) > 0) {
             $('.ajax_cart_tourism_tax_line').show();
         } else {
             $('.ajax_cart_tourism_tax_line').hide();

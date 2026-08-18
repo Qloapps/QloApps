@@ -267,10 +267,11 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
         // if one of the order details use the tax computation method the display will be different
         return Db::getInstance()->getValue('
     		SELECT od.`tax_computation_method`
-    		FROM `' . _DB_PREFIX_ . 'order_detail_tax` odt
+    		FROM `' . _DB_PREFIX_ . 'order_tax_detail` odt
     		LEFT JOIN `' . _DB_PREFIX_ . 'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
     		WHERE od.`id_order` = ' . (int) $this->order->id . '
-    		AND od.`tax_computation_method` = ' . (int) TaxCalculator::ONE_AFTER_ANOTHER_METHOD)
+    		AND od.`tax_computation_method` = ' . (int) TaxCalculator::ONE_AFTER_ANOTHER_METHOD . '
+    		AND NOT EXISTS (SELECT 1 FROM `' . _DB_PREFIX_ . 'tax` tc WHERE tc.`id_tax` = odt.`id_tax` AND tc.`is_tourism_tax` = 1)')
             || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
     }
 

@@ -21,7 +21,7 @@
  * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
  */
 
-class OrderTourismTaxCore extends ObjectModel
+class OrderTaxDetailCore extends ObjectModel
 {
     const STATUS_NONE = 0;
     const STATUS_APPLIED = 1;
@@ -29,7 +29,6 @@ class OrderTourismTaxCore extends ObjectModel
 
     const APPLY_OK = 0;
     const APPLY_ERROR_RESTORE = 1;
-    const APPLY_ERROR_NO_RULE = 2;
     const APPLY_ERROR_REFUNDED = 3;
 
     const EXEMPT_OK = 0;
@@ -41,38 +40,31 @@ class OrderTourismTaxCore extends ObjectModel
     const SCOPE_ROOM_STATUS = 1;
     const SCOPE_SERVICE = 2;
 
-    public $id_order_tourism_tax;
+    const SCOPE_COLUMN_ROOM = 'id_htl_booking';
+    const SCOPE_COLUMN_SERVICE = 'id_service_product_order_detail';
+
+    public $id_order_tax_detail;
     public $id_order;
     public $id_order_detail;
     public $id_htl_booking;
     public $id_service_product_order_detail;
-    public $id_hotel;
     public $id_tax;
-    public $id_currency;
-    public $num_nights;
-    public $num_adults;
+    public $unit_amount;
     public $total_amount;
-    public $is_refunded;
     public $date_add;
-    public $date_upd;
 
     public static $definition = array(
-        'table' => 'order_tourism_tax',
-        'primary' => 'id_order_tourism_tax',
+        'table' => 'order_tax_detail',
+        'primary' => 'id_order_tax_detail',
         'fields' => array(
             'id_order' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_order_detail' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_htl_booking' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_service_product_order_detail' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_tax' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
-            'id_currency' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
-            'num_nights' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
-            'num_adults' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
+            'unit_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isUnsignedFloat'),
             'total_amount' => array('type' => self::TYPE_FLOAT, 'validate' => 'isUnsignedFloat'),
-            'is_refunded' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
     );
 
@@ -85,7 +77,7 @@ class OrderTourismTaxCore extends ObjectModel
     public static function isBookingExempted($idHtlBooking)
     {
         return (bool) Db::getInstance()->getValue(
-            'SELECT 1 FROM `' . _DB_PREFIX_ . 'order_tourism_tax_exemption`
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'order_tax_exemption`
              WHERE `id_htl_booking` = ' . (int) $idHtlBooking . '
                AND `id_service_product_order_detail` = 0'
         );
@@ -100,7 +92,7 @@ class OrderTourismTaxCore extends ObjectModel
     public static function isServiceLineExempted($idServiceProductOrderDetail)
     {
         return (bool) Db::getInstance()->getValue(
-            'SELECT 1 FROM `' . _DB_PREFIX_ . 'order_tourism_tax_exemption`
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'order_tax_exemption`
              WHERE `id_htl_booking` = 0
                AND `id_service_product_order_detail` = ' . (int) $idServiceProductOrderDetail
         );
@@ -118,7 +110,7 @@ class OrderTourismTaxCore extends ObjectModel
     protected static function deleteExemptionMarker($idHtlBooking, $idServiceProductOrderDetail)
     {
         return Db::getInstance()->execute(
-            'DELETE FROM `' . _DB_PREFIX_ . 'order_tourism_tax_exemption`
+            'DELETE FROM `' . _DB_PREFIX_ . 'order_tax_exemption`
              WHERE `id_htl_booking` = ' . (int) $idHtlBooking . '
                AND `id_service_product_order_detail` = ' . (int) $idServiceProductOrderDetail
         );
@@ -136,7 +128,7 @@ class OrderTourismTaxCore extends ObjectModel
     public static function getAppliedTourismTaxTotals($idOrder, $scope = self::SCOPE_ROOM)
     {
         $idOrder = (int) $idOrder;
-        $cacheId = 'OrderTourismTax::getAppliedTourismTaxTotals-' . $idOrder . '-' . $scope;
+        $cacheId = 'OrderTaxDetail::getAppliedTourismTaxTotals-' . $idOrder . '-' . $scope;
         if (Cache::isStored($cacheId)) {
             return Cache::retrieve($cacheId);
         }
@@ -144,16 +136,17 @@ class OrderTourismTaxCore extends ObjectModel
         $result = array();
         if ($scope === self::SCOPE_SERVICE) {
             $sql = 'SELECT spod.`id_htl_booking_detail`, SUM(tt.`total_amount`) AS total_amount
-                 FROM `' . _DB_PREFIX_ . 'order_tourism_tax` tt
+                 FROM `' . _DB_PREFIX_ . 'order_tax_detail` tt
+                 INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = tt.`id_tax` AND t.`is_tourism_tax` = 1
                  INNER JOIN `' . _DB_PREFIX_ . 'service_product_order_detail` spod
                     ON spod.`id_service_product_order_detail` = tt.`id_service_product_order_detail`
-                 LEFT JOIN `' . _DB_PREFIX_ . 'order_tourism_tax_exemption` ex
+                 LEFT JOIN `' . _DB_PREFIX_ . 'order_tax_exemption` ex
                     ON (spod.`id_htl_booking_detail` != 0 AND ex.`id_htl_booking` = spod.`id_htl_booking_detail`)
                     OR (spod.`id_htl_booking_detail` = 0 AND ex.`id_service_product_order_detail` = tt.`id_service_product_order_detail` AND ex.`id_htl_booking` = 0)
                  WHERE tt.`id_order` = ' . $idOrder . '
                    AND spod.`id_htl_booking_detail` != 0
-                   AND tt.`is_refunded` = 0
-                   AND ex.`id_exemption` IS NULL
+                   AND spod.`is_refunded` = 0
+                   AND ex.`id_order_tax_exemption` IS NULL
                  GROUP BY spod.`id_htl_booking_detail`';
             $rows = Db::getInstance()->executeS($sql);
             foreach ((array) $rows as $row) {
@@ -162,14 +155,17 @@ class OrderTourismTaxCore extends ObjectModel
         } else {
             $rows = Db::getInstance()->executeS(
                 'SELECT tt.`id_htl_booking`,
-                        SUM(CASE WHEN ex.`id_exemption` IS NULL THEN tt.`total_amount` ELSE 0 END) AS total_amount,
-                        MAX(CASE WHEN ex.`id_exemption` IS NULL THEN 1 ELSE 0 END) AS applied_count
-                 FROM `' . _DB_PREFIX_ . 'order_tourism_tax` tt
-                 LEFT JOIN `' . _DB_PREFIX_ . 'order_tourism_tax_exemption` ex
+                        SUM(CASE WHEN ex.`id_order_tax_exemption` IS NULL THEN tt.`total_amount` ELSE 0 END) AS total_amount,
+                        MAX(CASE WHEN ex.`id_order_tax_exemption` IS NULL THEN 1 ELSE 0 END) AS applied_count
+                 FROM `' . _DB_PREFIX_ . 'order_tax_detail` tt
+                 INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = tt.`id_tax` AND t.`is_tourism_tax` = 1
+                 LEFT JOIN `' . _DB_PREFIX_ . 'htl_booking_detail` hbd
+                    ON hbd.`id` = tt.`id_htl_booking`
+                 LEFT JOIN `' . _DB_PREFIX_ . 'order_tax_exemption` ex
                     ON ex.`id_htl_booking` = tt.`id_htl_booking`
                  WHERE tt.`id_order` = ' . $idOrder . '
                    AND tt.`id_htl_booking` != 0
-                   AND tt.`is_refunded` = 0
+                   AND hbd.`is_refunded` = 0
                  GROUP BY tt.`id_htl_booking`'
             );
             foreach ((array) $rows as $row) {
@@ -189,55 +185,37 @@ class OrderTourismTaxCore extends ObjectModel
     }
 
     /**
-     * Mark all rows for a booking as refunded (used on room cancellation).
-     *
-     * @param int $idHtlBooking
-     * @return bool
-     */
-    public static function setRefundedByHtlBooking($idHtlBooking)
-    {
-        return self::setRefundedForScope('id_htl_booking', (int) $idHtlBooking);
-    }
-
-    /**
-     * Mark all rows for a service-product order-detail line as refunded (used on service refund).
-     *
-     * @param int $idServiceProductOrderDetail
-     * @return bool
-     */
-    public static function setRefundedByServiceProductOrderDetail($idServiceProductOrderDetail)
-    {
-        return self::setRefundedForScope('id_service_product_order_detail', (int) $idServiceProductOrderDetail);
-    }
-
-    /**
-     * Shared core for setRefundedByHtlBooking()/setRefundedByServiceProductOrderDetail().
-     *
-     * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
-     * @param int    $scopeValue
-     * @return bool
-     */
-    protected static function setRefundedForScope($scopeColumn, $scopeValue)
-    {
-        return Db::getInstance()->execute(
-            'UPDATE `' . _DB_PREFIX_ . 'order_tourism_tax`
-             SET `is_refunded` = 1, `date_upd` = NOW()
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
-        );
-    }
-
-    /**
      * Delete all snapshot rows for a scope.
      *
-     * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
+     * @param string $scopeColumn  self::SCOPE_COLUMN_ROOM or self::SCOPE_COLUMN_SERVICE
      * @param int    $scopeValue
      * @return bool
      */
     protected static function deleteForScope($scopeColumn, $scopeValue)
     {
         return Db::getInstance()->execute(
-            'DELETE FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
+            'DELETE otd FROM `' . _DB_PREFIX_ . 'order_tax_detail` otd
+             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = otd.`id_tax` AND t.`is_tourism_tax` = 1
+             WHERE otd.`' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
+        );
+    }
+
+    /**
+     *
+     * @param int $idOrderDetail
+     * @param int $idHtlBooking                 0 for a service-line scope
+     * @param int $idServiceProductOrderDetail   0 for a room-booking scope
+     * @return bool
+     */
+    public static function updateVatScoping($idOrderDetail, $idHtlBooking, $idServiceProductOrderDetail)
+    {
+        return Db::getInstance()->execute(
+            'UPDATE `' . _DB_PREFIX_ . 'order_tax_detail`
+             SET `id_htl_booking` = ' . (int) $idHtlBooking . ',
+                 `id_service_product_order_detail` = ' . (int) $idServiceProductOrderDetail . '
+             WHERE `id_order_detail` = ' . (int) $idOrderDetail . '
+               AND `id_htl_booking` = 0
+               AND `id_service_product_order_detail` = 0'
         );
     }
 
@@ -252,9 +230,9 @@ class OrderTourismTaxCore extends ObjectModel
     public static function hardDeleteForBooking($idHtlBooking, array $serviceLineIds)
     {
         $idHtlBooking = (int) $idHtlBooking;
-        self::deleteForScope('id_htl_booking', $idHtlBooking);
+        self::deleteForScope(self::SCOPE_COLUMN_ROOM, $idHtlBooking);
         foreach ($serviceLineIds as $idServiceLine) {
-            self::deleteForScope('id_service_product_order_detail', (int) $idServiceLine);
+            self::deleteForScope(self::SCOPE_COLUMN_SERVICE, (int) $idServiceLine);
         }
         self::deleteExemptionMarker($idHtlBooking, 0);
     }
@@ -263,16 +241,17 @@ class OrderTourismTaxCore extends ObjectModel
      * Sum of total_amount for a booking/service-line scope (every row counts — exemption is never
      * stored on the row itself, it's derived from marker existence at read time).
      *
-     * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
+     * @param string $scopeColumn  self::SCOPE_COLUMN_ROOM or self::SCOPE_COLUMN_SERVICE
      * @param int    $scopeValue
      * @return float
      */
     protected static function getScopedTotal($scopeColumn, $scopeValue)
     {
         return (float) Db::getInstance()->getValue(
-            'SELECT COALESCE(SUM(`total_amount`), 0)
-             FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
+            'SELECT COALESCE(SUM(otd.`total_amount`), 0)
+             FROM `' . _DB_PREFIX_ . 'order_tax_detail` otd
+             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = otd.`id_tax` AND t.`is_tourism_tax` = 1
+             WHERE otd.`' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
         );
     }
 
@@ -281,7 +260,7 @@ class OrderTourismTaxCore extends ObjectModel
      * ever refunded either. True means a fresh compute (buildRoomTaxParams()/buildServiceLineTaxParams()
      * + saveTourismTaxFromParams()) is needed instead of restoring/reusing existing rows.
      *
-     * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
+     * @param string $scopeColumn  self::SCOPE_COLUMN_ROOM or self::SCOPE_COLUMN_SERVICE
      * @param int    $scopeValue
      * @return bool
      */
@@ -292,8 +271,9 @@ class OrderTourismTaxCore extends ObjectModel
         }
 
         return !(bool) Db::getInstance()->getValue(
-            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
+            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'order_tax_detail` otd
+             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = otd.`id_tax` AND t.`is_tourism_tax` = 1
+             WHERE otd.`' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
         );
     }
 
@@ -338,7 +318,6 @@ class OrderTourismTaxCore extends ObjectModel
      * @param int      $idOrderDetail
      * @param int      $idHtlBooking                 0 for service lines
      * @param int      $idServiceProductOrderDetail  0 for room bookings
-     * @param int      $idHotel
      * @return void
      */
     public static function saveTourismTax(
@@ -356,8 +335,7 @@ class OrderTourismTaxCore extends ObjectModel
         $idOrder,
         $idOrderDetail,
         $idHtlBooking,
-        $idServiceProductOrderDetail,
-        $idHotel
+        $idServiceProductOrderDetail
     ) {
         $idTaxRulesGroup = (int) $idTaxRulesGroup;
         $idOrderDetail = (int) $idOrderDetail;
@@ -366,49 +344,48 @@ class OrderTourismTaxCore extends ObjectModel
         }
 
         $taxCalculator = TaxManagerFactory::getManager($address, $idTaxRulesGroup)->getTaxCalculator();
-        $rows = $taxCalculator->getTourismTaxRows(
+        $taxAmounts = $taxCalculator->getTaxesAmount(
             $unitPriceTaxExcl,
             $checkInDate,
             $numNights,
             $numAdults,
             $childrenAges,
-            $idCurrency,
             $collectionType,
-            $idLang,
-            $quantity
-        )['rows'];
+            $quantity,
+            $idCurrency
+        );
 
         $idOrder = (int) $idOrder;
         $idHtlBooking = (int) $idHtlBooking;
-        $idHotel = (int) $idHotel;
-        $idCurrency = (int) $idCurrency;
         $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
-        $scopeColumn = $idServiceProductOrderDetail ? 'id_service_product_order_detail' : 'id_htl_booking';
+        $scopeColumn = $idServiceProductOrderDetail ? self::SCOPE_COLUMN_SERVICE : self::SCOPE_COLUMN_ROOM;
         $scopeValue = $idServiceProductOrderDetail ?: $idHtlBooking;
 
         $prevTotal = self::getScopedTotal($scopeColumn, $scopeValue);
         self::deleteForScope($scopeColumn, $scopeValue);
 
         $totalTourismTax = 0.0;
-        foreach ($rows as $row) {
-            $rowAmount = (float) $row['total_amount'];
+        foreach ($taxAmounts as $idTax => $rowAmount) {
+            $rowAmount = (float) $rowAmount;
 
-            $taxRow = new OrderTourismTax();
+            $taxRow = new OrderTaxDetail();
             $taxRow->id_order = $idOrder;
             $taxRow->id_order_detail = $idOrderDetail;
             $taxRow->id_htl_booking = $idHtlBooking;
             $taxRow->id_service_product_order_detail = $idServiceProductOrderDetail;
-            $taxRow->id_hotel = $idHotel;
-            $taxRow->id_tax = (int) $row['id_tax'];
-            $taxRow->id_currency = $idCurrency;
-            $taxRow->num_nights = (int) $row['num_nights'];
-            $taxRow->num_adults = (int) $row['num_adults'];
+            $taxRow->id_tax = (int) $idTax;
+            $taxRow->unit_amount = $quantity > 0 ? Tools::ps_round($rowAmount / $quantity, 6) : $rowAmount;
             $taxRow->total_amount = $rowAmount;
-            $taxRow->is_refunded = 0;
             $taxRow->add();
 
             $totalTourismTax += $rowAmount;
         }
+
+        Db::getInstance()->execute(
+            'UPDATE `' . _DB_PREFIX_ . 'order_detail`
+             SET `id_tourism_tax_rule_group` = ' . $idTaxRulesGroup . '
+             WHERE `id_order_detail` = ' . $idOrderDetail
+        );
 
         if (!self::isScopeExempted($idHtlBooking, $idServiceProductOrderDetail)) {
             self::adjustDependentTotals($idOrderDetail, $idHtlBooking, $idServiceProductOrderDetail, $prevTotal, $totalTourismTax);
@@ -437,10 +414,7 @@ class OrderTourismTaxCore extends ObjectModel
 
         $result = $db->execute(
             'UPDATE `' . _DB_PREFIX_ . 'order_detail`
-             SET `tourism_tax_amount` = GREATEST(0, `tourism_tax_amount`
-                                         - ' . $prevTotal . '
-                                         + ' . $newTotal . '),
-                 `total_price_tax_incl` = `total_price_tax_incl`
+             SET `total_price_tax_incl` = `total_price_tax_incl`
                                          - ' . $prevTotal . '
                                          + ' . $newTotal . ',
                  `unit_price_tax_incl` = `unit_price_tax_incl`
@@ -484,30 +458,76 @@ class OrderTourismTaxCore extends ObjectModel
     {
         $idOrder = (int) $idOrder;
         $idLang = $idLang !== null ? (int) $idLang : (int) Context::getContext()->language->id;
-        $cacheId = 'OrderTourismTax::getBreakdownForInvoice-' . $idOrder . '-' . $idLang;
+        $cacheId = 'OrderTaxDetail::getBreakdownForInvoice-' . $idOrder . '-' . $idLang;
         if (Cache::isStored($cacheId)) {
             return Cache::retrieve($cacheId);
         }
 
         $result = Db::getInstance()->executeS(
             'SELECT ott.`id_tax`, tl.`name` AS tax_name,
-                    SUM(ott.`num_nights`) AS num_nights,
-                    SUM(ott.`num_adults`) AS num_adults,
                     SUM(ott.`total_amount`) AS total_amount
-             FROM `' . _DB_PREFIX_ . 'order_tourism_tax` ott
+             FROM `' . _DB_PREFIX_ . 'order_tax_detail` ott
+             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = ott.`id_tax` AND t.`is_tourism_tax` = 1
              LEFT JOIN `' . _DB_PREFIX_ . 'service_product_order_detail` spod
                 ON spod.`id_service_product_order_detail` = ott.`id_service_product_order_detail`
-             LEFT JOIN `' . _DB_PREFIX_ . 'order_tourism_tax_exemption` ex
+             LEFT JOIN `' . _DB_PREFIX_ . 'htl_booking_detail` hbd
+                ON hbd.`id` = ott.`id_htl_booking`
+             LEFT JOIN `' . _DB_PREFIX_ . 'order_tax_exemption` ex
                 ON (ott.`id_htl_booking` != 0 AND ex.`id_htl_booking` = ott.`id_htl_booking`)
                 OR (ott.`id_htl_booking` = 0 AND spod.`id_htl_booking_detail` != 0 AND ex.`id_htl_booking` = spod.`id_htl_booking_detail`)
                 OR (ott.`id_htl_booking` = 0 AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL) AND ex.`id_service_product_order_detail` = ott.`id_service_product_order_detail` AND ex.`id_htl_booking` = 0)
              LEFT JOIN `' . _DB_PREFIX_ . 'tax_lang` tl
                 ON tl.`id_tax` = ott.`id_tax` AND tl.`id_lang` = ' . $idLang . '
              WHERE ott.`id_order` = ' . $idOrder . '
-               AND ott.`is_refunded` = 0
-               AND ex.`id_exemption` IS NULL
+               AND ((ott.`id_htl_booking` != 0 AND hbd.`is_refunded` = 0)
+                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0))
+               AND ex.`id_order_tax_exemption` IS NULL
              GROUP BY ott.`id_tax`, tl.`name`'
         );
+        Cache::store($cacheId, $result);
+
+        return $result;
+    }
+
+    /**
+     * Applied (non-exempted, non-refunded) tourism tax total per order_detail line. Same
+     * exemption/refund-aware join as getBreakdownForInvoice(), grouped by id_order_detail instead of
+     * id_tax.
+     *
+     * @param int $idOrder
+     * @return array  [id_order_detail => total_amount]
+     */
+    public static function getAmountsByOrderDetail($idOrder)
+    {
+        $idOrder = (int) $idOrder;
+        $cacheId = 'OrderTaxDetail::getAmountsByOrderDetail-' . $idOrder;
+        if (Cache::isStored($cacheId)) {
+            return Cache::retrieve($cacheId);
+        }
+
+        $rows = Db::getInstance()->executeS(
+            'SELECT ott.`id_order_detail`, SUM(ott.`total_amount`) AS total_amount
+             FROM `' . _DB_PREFIX_ . 'order_tax_detail` ott
+             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = ott.`id_tax` AND t.`is_tourism_tax` = 1
+             LEFT JOIN `' . _DB_PREFIX_ . 'service_product_order_detail` spod
+                ON spod.`id_service_product_order_detail` = ott.`id_service_product_order_detail`
+             LEFT JOIN `' . _DB_PREFIX_ . 'htl_booking_detail` hbd
+                ON hbd.`id` = ott.`id_htl_booking`
+             LEFT JOIN `' . _DB_PREFIX_ . 'order_tax_exemption` ex
+                ON (ott.`id_htl_booking` != 0 AND ex.`id_htl_booking` = ott.`id_htl_booking`)
+                OR (ott.`id_htl_booking` = 0 AND spod.`id_htl_booking_detail` != 0 AND ex.`id_htl_booking` = spod.`id_htl_booking_detail`)
+                OR (ott.`id_htl_booking` = 0 AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL) AND ex.`id_service_product_order_detail` = ott.`id_service_product_order_detail` AND ex.`id_htl_booking` = 0)
+             WHERE ott.`id_order` = ' . $idOrder . '
+               AND ((ott.`id_htl_booking` != 0 AND hbd.`is_refunded` = 0)
+                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0))
+               AND ex.`id_order_tax_exemption` IS NULL
+             GROUP BY ott.`id_order_detail`'
+        );
+
+        $result = array();
+        foreach ((array) $rows as $row) {
+            $result[(int) $row['id_order_detail']] = (float) $row['total_amount'];
+        }
         Cache::store($cacheId, $result);
 
         return $result;
@@ -525,17 +545,25 @@ class OrderTourismTaxCore extends ObjectModel
     }
 
     /**
-     * Whether a scope has any refunded tourism tax rows — apply/exempt must not touch a cancelled booking/service line.
+     * Whether a scope is refunded — apply/exempt must not touch a cancelled booking/service line.
+     * Reads the authoritative flag directly (htl_booking_detail/service_product_order_detail),
+     * not a stored copy on order_tax_detail.
      *
-     * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
+     * @param string $scopeColumn  self::SCOPE_COLUMN_ROOM or self::SCOPE_COLUMN_SERVICE
      * @param int    $scopeValue
      * @return bool
      */
     protected static function hasRefundedRowsForScope($scopeColumn, $scopeValue)
     {
+        $scopeValue = (int) $scopeValue;
+        if ($scopeColumn === self::SCOPE_COLUMN_ROOM) {
+            return (bool) Db::getInstance()->getValue(
+                'SELECT `is_refunded` FROM `' . _DB_PREFIX_ . 'htl_booking_detail` WHERE `id` = ' . $scopeValue
+            );
+        }
         return (bool) Db::getInstance()->getValue(
-            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'order_tourism_tax`
-             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue . ' AND `is_refunded` = 1'
+            'SELECT `is_refunded` FROM `' . _DB_PREFIX_ . 'service_product_order_detail`
+             WHERE `id_service_product_order_detail` = ' . $scopeValue
         );
     }
 
@@ -565,7 +593,7 @@ class OrderTourismTaxCore extends ObjectModel
         }
 
         $idHotel = (int) $booking->id_hotel;
-        $hotelContext = TourismTax::resolveHotelAddressAndCollectionType($idHotel, new Address((int) $order->id_address_tax));
+        $hotelContext = TaxConfiguration::resolveHotelAddressAndCollectionType($idHotel, new Address((int) $order->id_address_tax));
         $address = $hotelContext['address'];
         if (!Validate::isLoadedObject($address)) {
             return false;
@@ -603,7 +631,6 @@ class OrderTourismTaxCore extends ObjectModel
             'idOrderDetail' => (int) $booking->id_order_detail,
             'idHtlBooking' => $idHtlBooking,
             'idServiceProductOrderDetail' => 0,
-            'idHotel' => $idHotel,
         );
     }
 
@@ -632,7 +659,7 @@ class OrderTourismTaxCore extends ObjectModel
         }
 
         $idHotel = (int) $serviceLine->id_hotel;
-        $hotelContext = TourismTax::resolveHotelAddressAndCollectionType($idHotel, new Address((int) $order->id_address_tax));
+        $hotelContext = TaxConfiguration::resolveHotelAddressAndCollectionType($idHotel, new Address((int) $order->id_address_tax));
         $address = $hotelContext['address'];
         if (!Validate::isLoadedObject($address)) {
             return false;
@@ -675,7 +702,6 @@ class OrderTourismTaxCore extends ObjectModel
             'idOrderDetail' => (int) $serviceLine->id_order_detail,
             'idHtlBooking' => 0,
             'idServiceProductOrderDetail' => $idServiceProductOrderDetail,
-            'idHotel' => $idHotel,
         );
     }
 
@@ -702,8 +728,7 @@ class OrderTourismTaxCore extends ObjectModel
             $params['idOrder'],
             $params['idOrderDetail'],
             $params['idHtlBooking'],
-            $params['idServiceProductOrderDetail'],
-            $params['idHotel']
+            $params['idServiceProductOrderDetail']
         );
     }
 
@@ -722,7 +747,7 @@ class OrderTourismTaxCore extends ObjectModel
         if (self::isBookingExempted($idHtlBooking)) {
             return self::EXEMPT_OK;
         }
-        if (self::hasRefundedRowsForScope('id_htl_booking', $idHtlBooking)) {
+        if (self::hasRefundedRowsForScope(self::SCOPE_COLUMN_ROOM, $idHtlBooking)) {
             return self::EXEMPT_ERROR_REFUNDED;
         }
 
@@ -731,13 +756,13 @@ class OrderTourismTaxCore extends ObjectModel
             return self::EXEMPT_ERROR_NO_RULE;
         }
 
-        $objOrderTourismTaxExemption = new OrderTourismTaxExemption();
-        $objOrderTourismTaxExemption->id_htl_booking = $idHtlBooking;
-        $objOrderTourismTaxExemption->id_service_product_order_detail = 0;
-        $objOrderTourismTaxExemption->id_order = (int) $booking->id_order;
-        $objOrderTourismTaxExemption->id_employee = $idEmployee ? (int) $idEmployee : (int) Context::getContext()->employee->id;
-        $objOrderTourismTaxExemption->note = $note;
-        if (!$objOrderTourismTaxExemption->add()) {
+        $objOrderTaxExemption = new OrderTaxExemption();
+        $objOrderTaxExemption->id_htl_booking = $idHtlBooking;
+        $objOrderTaxExemption->id_service_product_order_detail = 0;
+        $objOrderTaxExemption->id_order = (int) $booking->id_order;
+        $objOrderTaxExemption->id_employee = $idEmployee ? (int) $idEmployee : (int) Context::getContext()->employee->id;
+        $objOrderTaxExemption->note = $note;
+        if (!$objOrderTaxExemption->add()) {
             return self::EXEMPT_ERROR_SAVE;
         }
 
@@ -761,7 +786,7 @@ class OrderTourismTaxCore extends ObjectModel
         $wasExempted = self::isBookingExempted($idHtlBooking);
 
         if ($wasExempted) {
-            if (self::hasRefundedRowsForScope('id_htl_booking', $idHtlBooking)) {
+            if (self::hasRefundedRowsForScope(self::SCOPE_COLUMN_ROOM, $idHtlBooking)) {
                 return self::APPLY_ERROR_REFUNDED;
             }
             if (!self::deleteExemptionMarker($idHtlBooking, 0)) {
@@ -769,22 +794,24 @@ class OrderTourismTaxCore extends ObjectModel
             }
         }
 
-        if (self::hasNeverBeenComputed('id_htl_booking', $idHtlBooking)) {
+        if (self::hasNeverBeenComputed(self::SCOPE_COLUMN_ROOM, $idHtlBooking)) {
             $params = self::buildRoomTaxParams($idHtlBooking);
             if ($params) {
+                $params['collectionType'] = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE;
                 self::saveTourismTaxFromParams($params);
-                self::adjustOrderTotalsForNewRows('id_htl_booking', $idHtlBooking, $params['idOrder']);
+                self::adjustOrderTotalsForNewRows(self::SCOPE_COLUMN_ROOM, $idHtlBooking, $params['idOrder']);
             }
         }
 
         foreach (ServiceProductOrderDetail::getActiveIdsByHtlBookingDetail($idHtlBooking) as $idServiceLine) {
-            if (!self::hasNeverBeenComputed('id_service_product_order_detail', $idServiceLine)) {
+            if (!self::hasNeverBeenComputed(self::SCOPE_COLUMN_SERVICE, $idServiceLine)) {
                 continue;
             }
             $svcParams = self::buildServiceLineTaxParams($idServiceLine);
             if ($svcParams) {
+                $svcParams['collectionType'] = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE;
                 self::saveTourismTaxFromParams($svcParams);
-                self::adjustOrderTotalsForNewRows('id_service_product_order_detail', $idServiceLine, $svcParams['idOrder']);
+                self::adjustOrderTotalsForNewRows(self::SCOPE_COLUMN_SERVICE, $idServiceLine, $svcParams['idOrder']);
             }
         }
 
@@ -810,27 +837,26 @@ class OrderTourismTaxCore extends ObjectModel
         if (self::isServiceLineExempted($idServiceProductOrderDetail)) {
             return self::EXEMPT_OK;
         }
-        if (self::hasRefundedRowsForScope('id_service_product_order_detail', $idServiceProductOrderDetail)) {
+        if (self::hasRefundedRowsForScope(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail)) {
             return self::EXEMPT_ERROR_REFUNDED;
         }
 
         $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
         if (!Validate::isLoadedObject($serviceLine) || $serviceLine->id_htl_booking_detail) {
-            // Room-attached lines must go through exemptBooking() instead.
             return self::EXEMPT_ERROR_NO_RULE;
         }
 
-        $objOrderTourismTaxExemption = new OrderTourismTaxExemption();
-        $objOrderTourismTaxExemption->id_htl_booking = 0;
-        $objOrderTourismTaxExemption->id_service_product_order_detail = $idServiceProductOrderDetail;
-        $objOrderTourismTaxExemption->id_order = (int) $serviceLine->id_order;
-        $objOrderTourismTaxExemption->id_employee = $idEmployee ? (int) $idEmployee : (int) Context::getContext()->employee->id;
-        $objOrderTourismTaxExemption->note = $note;
-        if (!$objOrderTourismTaxExemption->add()) {
+        $objOrderTaxExemption = new OrderTaxExemption();
+        $objOrderTaxExemption->id_htl_booking = 0;
+        $objOrderTaxExemption->id_service_product_order_detail = $idServiceProductOrderDetail;
+        $objOrderTaxExemption->id_order = (int) $serviceLine->id_order;
+        $objOrderTaxExemption->id_employee = $idEmployee ? (int) $idEmployee : (int) Context::getContext()->employee->id;
+        $objOrderTaxExemption->note = $note;
+        if (!$objOrderTaxExemption->add()) {
             return self::EXEMPT_ERROR_SAVE;
         }
 
-        $total = self::getScopedTotal('id_service_product_order_detail', $idServiceProductOrderDetail);
+        $total = self::getScopedTotal(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail);
         if ($total) {
             self::adjustDependentTotals((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail, $total, 0.0);
             self::adjustOrderAndInvoiceTotals((int) $serviceLine->id_order, -$total);
@@ -851,7 +877,7 @@ class OrderTourismTaxCore extends ObjectModel
         $wasExempted = self::isServiceLineExempted($idServiceProductOrderDetail);
 
         if ($wasExempted) {
-            if (self::hasRefundedRowsForScope('id_service_product_order_detail', $idServiceProductOrderDetail)) {
+            if (self::hasRefundedRowsForScope(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail)) {
                 return self::APPLY_ERROR_REFUNDED;
             }
             if (!self::deleteExemptionMarker(0, $idServiceProductOrderDetail)) {
@@ -859,16 +885,17 @@ class OrderTourismTaxCore extends ObjectModel
             }
         }
 
-        if (self::hasNeverBeenComputed('id_service_product_order_detail', $idServiceProductOrderDetail)) {
+        if (self::hasNeverBeenComputed(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail)) {
             $params = self::buildServiceLineTaxParams($idServiceProductOrderDetail);
             if ($params) {
+                $params['collectionType'] = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE;
                 self::saveTourismTaxFromParams($params);
-                self::adjustOrderTotalsForNewRows('id_service_product_order_detail', $idServiceProductOrderDetail, $params['idOrder']);
+                self::adjustOrderTotalsForNewRows(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail, $params['idOrder']);
             }
         }
 
         if ($wasExempted) {
-            $total = self::getScopedTotal('id_service_product_order_detail', $idServiceProductOrderDetail);
+            $total = self::getScopedTotal(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail);
             if ($total) {
                 $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
                 if (Validate::isLoadedObject($serviceLine)) {
@@ -934,7 +961,7 @@ class OrderTourismTaxCore extends ObjectModel
      * (called inside saveTourismTax()) only syncs order_detail/htl_booking_detail/service_product_order_detail,
      * never orders/order_invoice.
      *
-     * @param string $scopeColumn  'id_htl_booking' or 'id_service_product_order_detail'
+     * @param string $scopeColumn  self::SCOPE_COLUMN_ROOM or self::SCOPE_COLUMN_SERVICE
      * @param int    $scopeValue
      * @param int    $idOrder
      * @return void
@@ -963,7 +990,7 @@ class OrderTourismTaxCore extends ObjectModel
         }
         $totalDelta = 0.0;
 
-        $roomTotal = self::getScopedTotal('id_htl_booking', $idHtlBooking);
+        $roomTotal = self::getScopedTotal(self::SCOPE_COLUMN_ROOM, $idHtlBooking);
         if ($roomTotal) {
             $prev = $nowIncluded ? 0.0 : $roomTotal;
             $new = $nowIncluded ? $roomTotal : 0.0;
@@ -972,7 +999,7 @@ class OrderTourismTaxCore extends ObjectModel
         }
 
         foreach (ServiceProductOrderDetail::getActiveIdsByHtlBookingDetail($idHtlBooking) as $idServiceLine) {
-            $serviceTotal = self::getScopedTotal('id_service_product_order_detail', $idServiceLine);
+            $serviceTotal = self::getScopedTotal(self::SCOPE_COLUMN_SERVICE, $idServiceLine);
             if (!$serviceTotal) {
                 continue;
             }

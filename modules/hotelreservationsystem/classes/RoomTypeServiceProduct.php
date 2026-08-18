@@ -203,7 +203,6 @@ class RoomTypeServiceProduct extends ObjectModel
             $objHotelRoomType = new HotelRoomType();
             $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProductRoomType);
             $idHotel = $roomTypeInfo ? (int) $roomTypeInfo['id_hotel'] : 0;
-            $idCurrency = (int) $context->cart->id_currency ?: (int) Configuration::get('PS_CURRENCY_DEFAULT');
             foreach($serviceProducts as &$serviceProduct) {
                 $serviceProduct['price_tax_exc'] = Product::getServiceProductPrice(
                     (int)$serviceProduct['id_product'],
@@ -226,34 +225,13 @@ class RoomTypeServiceProduct extends ObjectModel
                     1,
                     null,
                     null,
-                    $context->cart->id
+                    $context->cart->id,
+                    null,
+                    1,
+                    null,
+                    0,
+                    Configuration::get('QLO_TOURISM_TAX_GROSSED_UP')
                 );
-
-                $serviceTourismTax = array('tourism_tax_online' => 0.0);
-                if ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $serviceProduct['id_product'])) {
-                    $tourismTaxContext = TourismTax::resolveServiceLineTaxContext(
-                        $idHotel,
-                        0,
-                        new Address((int) Cart::getIdAddressForTaxCalculation((int) $serviceProduct['id_product']))
-                    );
-                    $taxCalculator = TaxManagerFactory::getManager(
-                        $tourismTaxContext['address'],
-                        $idTourismTaxRulesGroup
-                    )->getTaxCalculator();
-                    $serviceTourismTax = $taxCalculator->getTourismTaxRows(
-                        (float) $serviceProduct['price_tax_exc'],
-                        $tourismTaxContext['checkInDate'],
-                        $tourismTaxContext['numNights'],
-                        $tourismTaxContext['numAdults'],
-                        $tourismTaxContext['childrenAges'],
-                        $idCurrency,
-                        $tourismTaxContext['collectionType'],
-                        $idLang
-                    );
-                }
-                if (TourismTax::isGrossedUp($serviceTourismTax['tourism_tax_online'])) {
-                    $serviceProduct['price_tax_incl'] += $serviceTourismTax['tourism_tax_online'];
-                }
 
                 $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
                 $serviceProduct['price_without_reduction'] = Product::getServiceProductPrice(

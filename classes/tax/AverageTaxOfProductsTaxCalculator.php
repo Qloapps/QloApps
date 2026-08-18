@@ -20,9 +20,10 @@ class AverageTaxOfProductsTaxCalculator
 
         $sql = 'SELECT t.id_tax, t.rate, od.total_price_tax_excl FROM '.$prefix.'orders o
                 INNER JOIN '.$prefix.'order_detail od ON od.id_order = o.id_order
-                INNER JOIN '.$prefix.'order_detail_tax odt ON odt.id_order_detail = od.id_order_detail
+                INNER JOIN '.$prefix.'order_tax_detail odt ON odt.id_order_detail = od.id_order_detail
                 INNER JOIN '.$prefix.'tax t ON t.id_tax = odt.id_tax
-                WHERE o.id_order = '.(int)$this->id_order;
+                WHERE o.id_order = '.(int)$this->id_order.'
+                AND NOT EXISTS (SELECT 1 FROM '.$prefix.'tax tc WHERE tc.id_tax = odt.id_tax AND tc.is_tourism_tax = 1)';
 
         return $this->db->select($sql);
     }

@@ -1001,12 +1001,12 @@ class OrderOpcControllerCore extends ParentOrderController
                         1
                     );
                     foreach ($cartBookingData['selected_service'] as &$selectedService) {
-                        if ($selectedService['tourism_tax_online'] > 0 && TourismTax::isGrossedUp($selectedService['tourism_tax_online'])) {
-                            $selectedService['total_price_tax_incl'] += $selectedService['tourism_tax_online'];
+                        if ($selectedService['tourism_tax'] > 0 && TaxConfiguration::isGrossedUp($selectedService['tourism_tax'])) {
+                            $selectedService['total_price_tax_incl'] += $selectedService['tourism_tax'];
                             $quantity = $selectedService['quantity'] ?: 1;
                             $impliedNumDays = $selectedService['unit_price_tax_excl'] > 0 ? $selectedService['total_price_tax_excl'] / ($selectedService['unit_price_tax_excl'] * $quantity) : 1;
                             $unitDivisor = $impliedNumDays * $quantity;
-                            $selectedService['unit_price_tax_incl'] += $unitDivisor > 0 ? ($selectedService['tourism_tax_online'] / $unitDivisor) : 0;
+                            $selectedService['unit_price_tax_incl'] += $unitDivisor > 0 ? ($selectedService['tourism_tax'] / $unitDivisor) : 0;
                         }
                     }
                     unset($selectedService);

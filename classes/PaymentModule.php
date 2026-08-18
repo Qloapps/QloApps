@@ -904,17 +904,16 @@ abstract class PaymentModuleCore extends Module
                                     }
                                 }
                                 if ($objBookingDetail->save()) {
+                                    OrderTaxDetail::updateVatScoping((int) $id_order_detail, (int) $objBookingDetail->id, 0);
+
                                     if ($useTourismTax && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
-                                        $hotelTaxContext = TourismTax::resolveHotelAddressAndCollectionType(
-                                            (int) $objCartBookingData->id_hotel,
-                                            new Address((int) Cart::getIdAddressForTaxCalculation($idProduct))
-                                        );
+                                        $hotelTaxContext = TaxConfiguration::resolveHotelAddressAndCollectionType($objCartBookingData->id_hotel, new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
                                         $numNights = max(1, (int) HotelHelper::getNumberOfDays($objBookingDetail->date_from, $objBookingDetail->date_to));
                                         $numAdults = (int) $objCartBookingData->adults;
                                         $childAges = !empty($objCartBookingData->child_ages) ? (array) json_decode($objCartBookingData->child_ages, true) : array();
                                         $unitPriceTaxExcl = (float) $total_price['total_price_tax_excl'] / $numNights;
 
-                                        OrderTourismTax::saveTourismTax(
+                                        OrderTaxDetail::saveTourismTax(
                                             $idTourismTaxRulesGroup,
                                             $hotelTaxContext['address'],
                                             $unitPriceTaxExcl,
@@ -929,8 +928,7 @@ abstract class PaymentModuleCore extends Module
                                             $order->id,
                                             (int) $id_order_detail,
                                             $objBookingDetail->id,
-                                            0,
-                                            (int) $objCartBookingData->id_hotel
+                                            0
                                         );
                                     }
 
@@ -1034,9 +1032,11 @@ abstract class PaymentModuleCore extends Module
                                         $objServiceProductOrderDetail->quantity = $roomTypeService['quantity'];
                                         $objServiceProductOrderDetail->auto_added = $product['auto_add_to_cart'];
                                         if ($objServiceProductOrderDetail->save()) {
+                                            OrderTaxDetail::updateVatScoping((int) $objServiceProductOrderDetail->id_order_detail, 0, (int) $objServiceProductOrderDetail->id);
+
                                             if ($useTourismTax && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
-                                                $tourismTaxContext = TourismTax::resolveServiceLineTaxContext($roomBookingDetail['id_hotel'], $roomBookingDetail['id'], new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
-                                                OrderTourismTax::saveTourismTax(
+                                                $tourismTaxContext = TaxConfiguration::resolveServiceLineTaxContext($roomBookingDetail['id_hotel'], $roomBookingDetail['id'], new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
+                                                OrderTaxDetail::saveTourismTax(
                                                     $idTourismTaxRulesGroup,
                                                     $tourismTaxContext['address'],
                                                     (float) $objServiceProductOrderDetail->unit_price_tax_excl,
@@ -1051,8 +1051,7 @@ abstract class PaymentModuleCore extends Module
                                                     $order->id,
                                                     (int) $objServiceProductOrderDetail->id_order_detail,
                                                     0,
-                                                    (int) $objServiceProductOrderDetail->id,
-                                                    (int) $roomBookingDetail['id_hotel']
+                                                    (int) $objServiceProductOrderDetail->id
                                                 );
                                             }
                                         }
@@ -1089,9 +1088,11 @@ abstract class PaymentModuleCore extends Module
                                         }
                                         $objServiceProductOrderDetail->quantity = $hotelProduct['quantity'];
                                         if ($objServiceProductOrderDetail->save()) {
+                                            OrderTaxDetail::updateVatScoping((int) $objServiceProductOrderDetail->id_order_detail, 0, (int) $objServiceProductOrderDetail->id);
+
                                             if ($useTourismTax && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
-                                                $tourismTaxContext = TourismTax::resolveServiceLineTaxContext($product['id_hotel'], 0, new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
-                                                OrderTourismTax::saveTourismTax(
+                                                $tourismTaxContext = TaxConfiguration::resolveServiceLineTaxContext($product['id_hotel'], 0, new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
+                                                OrderTaxDetail::saveTourismTax(
                                                     $idTourismTaxRulesGroup,
                                                     $tourismTaxContext['address'],
                                                     (float) $objServiceProductOrderDetail->unit_price_tax_excl,
@@ -1106,8 +1107,7 @@ abstract class PaymentModuleCore extends Module
                                                     $order->id,
                                                     (int) $objServiceProductOrderDetail->id_order_detail,
                                                     0,
-                                                    (int) $objServiceProductOrderDetail->id,
-                                                    (int) $product['id_hotel']
+                                                    (int) $objServiceProductOrderDetail->id
                                                 );
                                             }
                                         }
@@ -1139,9 +1139,11 @@ abstract class PaymentModuleCore extends Module
                                         $objServiceProductOrderDetail->option_name = $standaloneProduct['option_name'];
                                         $objServiceProductOrderDetail->quantity = $standaloneProduct['quantity'];
                                         if ($objServiceProductOrderDetail->save()) {
+                                            OrderTaxDetail::updateVatScoping((int) $objServiceProductOrderDetail->id_order_detail, 0, (int) $objServiceProductOrderDetail->id);
+
                                             if ($useTourismTax && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
-                                                $tourismTaxContext = TourismTax::resolveServiceLineTaxContext(0, 0, new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
-                                                OrderTourismTax::saveTourismTax(
+                                                $tourismTaxContext = TaxConfiguration::resolveServiceLineTaxContext(0, 0, new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
+                                                OrderTaxDetail::saveTourismTax(
                                                     $idTourismTaxRulesGroup,
                                                     $tourismTaxContext['address'],
                                                     (float) $objServiceProductOrderDetail->unit_price_tax_excl,
@@ -1156,8 +1158,7 @@ abstract class PaymentModuleCore extends Module
                                                     $order->id,
                                                     (int) $objServiceProductOrderDetail->id_order_detail,
                                                     0,
-                                                    (int) $objServiceProductOrderDetail->id,
-                                                    0
+                                                    (int) $objServiceProductOrderDetail->id
                                                 );
                                             }
                                         }
@@ -1218,11 +1219,13 @@ abstract class PaymentModuleCore extends Module
                                             $objServiceProductOrderDetail->auto_added = $product['auto_add_to_cart'];
                                         }
                                         if ($objServiceProductOrderDetail->save()) {
+                                            OrderTaxDetail::updateVatScoping((int) $objServiceProductOrderDetail->id_order_detail, 0, (int) $objServiceProductOrderDetail->id);
+
                                             $idHotel = $serviceProduct['id_hotel'] ? $serviceProduct['id_hotel'] : (isset($roomBookingDetail['id_hotel']) ? (int) $roomBookingDetail['id_hotel'] : 0);
                                             $idHtlBookingDetail = $serviceProduct['id_hotel'] ? 0 : (isset($roomBookingDetail['id']) ? (int) $roomBookingDetail['id'] : 0);
                                             if ($useTourismTax && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
-                                                $tourismTaxContext = TourismTax::resolveServiceLineTaxContext($idHotel, $idHtlBookingDetail, new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
-                                                OrderTourismTax::saveTourismTax(
+                                                $tourismTaxContext = TaxConfiguration::resolveServiceLineTaxContext($idHotel, $idHtlBookingDetail, new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
+                                                OrderTaxDetail::saveTourismTax(
                                                     $idTourismTaxRulesGroup,
                                                     $tourismTaxContext['address'],
                                                     (float) $objServiceProductOrderDetail->unit_price_tax_excl,
@@ -1237,8 +1240,7 @@ abstract class PaymentModuleCore extends Module
                                                     $order->id,
                                                     (int) $objServiceProductOrderDetail->id_order_detail,
                                                     0,
-                                                    (int) $objServiceProductOrderDetail->id,
-                                                    $idHotel
+                                                    (int) $objServiceProductOrderDetail->id
                                                 );
                                             }
                                         }
@@ -1377,7 +1379,7 @@ abstract class PaymentModuleCore extends Module
 
                         $service_products_tax = ($standalone_products_price_tax_incl + $hotel_standalone_products_price_tax_incl) - ($standalone_products_price_tax_excl + $hotel_standalone_products_price_tax_excl);
 
-                        $totalTourismTax = OrderTourismTax::getOrderTourismTaxTotal((int) $order->id);
+                        $totalTourismTax = OrderTaxDetail::getOrderTourismTaxTotal((int) $order->id);
                         $total_order_tax = max(0, $room_tax + $additional_service_tax + $total_convenience_fee_tax + $service_products_tax - $totalTourismTax);
 
                         $total_products = Tools::displayPrice(Product::getTaxCalculationMethod() == PS_TAX_EXC ? $order->total_products : $order->total_products_wt, $this->context->currency, false);

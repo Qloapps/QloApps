@@ -880,7 +880,7 @@
 
                             {assign var=order_total_price_tax_excl value=($total_rooms_price_tax_excl + $total_room_services_and_demands_tax_excl + $total_products_price_tax_excl)}
                             {assign var=order_total_price_tax_incl value=($total_rooms_price_tax_incl + $total_room_services_and_demands_tax_incl + $total_products_price_tax_incl)}
-                            {assign var=total_rooms_tax_only value=(($total_rooms_price_tax_incl - $total_rooms_price_tax_excl) - $tourism_tax_online_room)}
+                            {assign var=total_rooms_tax_only value=(($total_rooms_price_tax_incl - $total_rooms_price_tax_excl) - $tourism_tax_room)}
                             {assign var=total_services_tax_only value=(($total_room_services_and_demands_vat_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_vat_incl - $total_convenience_fee_tax_excl))}
                             {assign var=total_convenience_fee_tax_only value=($total_convenience_fee_vat_incl - $total_convenience_fee_tax_excl)}
 
@@ -966,11 +966,11 @@
                                                         </td>
                                                     </tr>
                                                 {/if}
-                                                {if $tourism_tax_online_room > 0}
+                                                {if $tourism_tax_room > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Tourism Tax on Room'}</td>
                                                         <td class="text-right">
-                                                            {displayPrice price=$tourism_tax_online_room currency=$currency->id}
+                                                            {displayPrice price=$tourism_tax_room currency=$currency->id}
                                                         </td>
                                                     </tr>
                                                 {/if}
@@ -983,11 +983,11 @@
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
                                                 {/if}
-                                                {if $tourism_tax_online_service > 0}
+                                                {if $tourism_tax_service > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Tourism Tax on Extra Services'}</td>
                                                         <td class="text-right nowrap">
-                                                            {displayPrice price=$tourism_tax_online_service currency=$currency->id}
+                                                            {displayPrice price=$tourism_tax_service currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>

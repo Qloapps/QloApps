@@ -588,7 +588,7 @@ class AdminNormalProductsControllerCore extends AdminController
             $context = $this->context->cloneContext();
             $context->shop = clone($context->shop);
             $useTourismTax = (bool) Configuration::get('QLO_USE_TOURISM_TAX');
-            $tourismTaxContext = $useTourismTax ? TourismTax::resolveServiceLineTaxContext(
+            $tourismTaxContext = $useTourismTax ? TaxConfiguration::resolveServiceLineTaxContext(
                 (int) Configuration::get('WK_PRIMARY_HOTEL'),
                 0,
                 new Address(0)
@@ -609,26 +609,25 @@ class AdminNormalProductsControllerCore extends AdminController
                     $unitPriceTaxExcl = Product::getPriceStatic($this->_list[$i]['id_product'], false, null,
                         6, null, false, true, 1, true, null, null, null, $nothing, true, true,
                         $context);
-                    $serviceTourismTax = array('tourism_tax_online' => 0.0);
+                    $serviceTourismTaxAmount = 0.0;
                     $idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $this->_list[$i]['id_product']);
                     if ($idTourismTaxRulesGroup) {
                         $taxCalculator = TaxManagerFactory::getManager(
                             $tourismTaxContext['address'],
                             $idTourismTaxRulesGroup
                         )->getTaxCalculator();
-                        $serviceTourismTax = $taxCalculator->getTourismTaxRows(
+                        $serviceTourismTaxAmount = $taxCalculator->getTaxesTotalAmount(
                             (float) $unitPriceTaxExcl,
                             $tourismTaxContext['checkInDate'],
                             $tourismTaxContext['numNights'],
                             $tourismTaxContext['numAdults'],
                             $tourismTaxContext['childrenAges'],
-                            (int) $this->context->currency->id,
                             $tourismTaxContext['collectionType'],
-                            (int) $id_lang,
-                            1
+                            1,
+                            $this->context->currency->id
                         );
                     }
-                    $this->_list[$i]['price_tmp'] += (float) $serviceTourismTax['tourism_tax_online'];
+                    $this->_list[$i]['price_tmp'] += $serviceTourismTaxAmount;
                 }
             }
         }
@@ -3416,7 +3415,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 if (!$idTourismTaxRulesGroup) {
                     continue;
                 }
-                $tourismTaxRates[$idTourismTaxRulesGroup] = TourismTax::getPreviewParams(
+                $tourismTaxRates[$idTourismTaxRulesGroup] = TaxConfiguration::getPreviewParams(
                     $idTourismTaxRulesGroup,
                     $address,
                     (int) $this->context->language->id

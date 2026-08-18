@@ -160,8 +160,8 @@
 											{/if}
 										</tr>
 										{foreach $refundReqBookings as $booking}
-											{assign var="tourismTaxAppliedAmount" value=(isset($booking['tourism_tax_applied_amount']) ? $booking['tourism_tax_applied_amount'] : 0)}
-											{assign var="tourismTaxPaidAmount" value=(isset($booking['tourism_tax_paid_amount']) ? $booking['tourism_tax_paid_amount'] : 0)}
+											{assign var="tourismTaxAppliedAmount" value=$booking['tourism_tax_applied_amount']|default:0}
+											{assign var="tourismTaxPaidAmount" value=$booking['tourism_tax_paid_amount']|default:0}
 											<tr>
 												{if !$isRefundCompleted}
 													<td><input type="checkbox" name="id_order_return_detail[]" value="{$booking['id_order_return_detail']|escape:'html':'UTF-8'}" checked/></td>

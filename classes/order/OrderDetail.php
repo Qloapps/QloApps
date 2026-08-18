@@ -131,9 +131,6 @@ class OrderDetailCore extends ObjectModel
     /** @var float */
     public $ecotax_tax_rate;
 
-    /** @var float Tourism tax charged online for this order detail line */
-    public $tourism_tax_amount = 0;
-
     /** @var int */
     public $discount_quantity_applied;
 
@@ -222,7 +219,6 @@ class OrderDetailCore extends ObjectModel
             'id_tax_rules_group' =>        array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'ecotax' =>                    array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'ecotax_tax_rate' =>           array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
-            'tourism_tax_amount' =>        array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
             'discount_quantity_applied' =>    array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'download_hash' =>                array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
             'download_nb' =>                array('type' => self::TYPE_INT, 'validate' => 'isInt'),
@@ -296,7 +292,11 @@ class OrderDetailCore extends ObjectModel
             return false;
         }
 
-        Db::getInstance()->delete('order_detail_tax', 'id_order_detail='.(int)$this->id);
+        Db::getInstance()->execute(
+            'DELETE otd FROM `'._DB_PREFIX_.'order_tax_detail` otd
+            WHERE otd.`id_order_detail` = '.(int)$this->id.'
+            AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'tax` tc WHERE tc.`id_tax` = otd.`id_tax` AND tc.`is_tourism_tax` = 1)'
+        );
 
         return $res;
     }
@@ -349,9 +349,10 @@ class OrderDetailCore extends ObjectModel
     public static function getTaxCalculatorStatic($id_order_detail)
     {
         $sql = 'SELECT t.*, d.`tax_computation_method`
-				FROM `'._DB_PREFIX_.'order_detail_tax` t
+				FROM `'._DB_PREFIX_.'order_tax_detail` t
 				LEFT JOIN `'._DB_PREFIX_.'order_detail` d ON (d.`id_order_detail` = t.`id_order_detail`)
-				WHERE d.`id_order_detail` = '.(int)$id_order_detail;
+				WHERE d.`id_order_detail` = '.(int)$id_order_detail.'
+				AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'tax` tc WHERE tc.`id_tax` = t.`id_tax` AND tc.`is_tourism_tax` = 1)';
 
         $computation_method = 1;
         $taxes = array();
@@ -516,7 +517,7 @@ class OrderDetailCore extends ObjectModel
 
                         $total_amount = Tools::processPriceRounding($amount, $quantity, $order->round_type, $order->round_mode);
 
-                        $values .= '('.(int)$this->id.','.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.'),';
+                        $values .= '('.(int)$order->id.','.(int)$this->id.',0,0,'.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.',NOW()),';
                     }
                 }
             }
@@ -550,7 +551,7 @@ class OrderDetailCore extends ObjectModel
 
                 $total_amount = Tools::processPriceRounding($amount, $this->product_quantity, $order->round_type, $order->round_mode);
 
-                $values .= '('.(int)$this->id.','.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.'),';
+                $values .= '('.(int)$order->id.','.(int)$this->id.',0,0,'.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.',NOW()),';
             }
         }
 
@@ -558,10 +559,15 @@ class OrderDetailCore extends ObjectModel
 
         if ($values) {
             if ($replace) {
-                Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'order_detail_tax` WHERE id_order_detail='.(int)$this->id);
+                Db::getInstance()->execute(
+                    'DELETE otd FROM `'._DB_PREFIX_.'order_tax_detail` otd
+                    WHERE otd.`id_order_detail` = '.(int)$this->id.'
+                    AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'tax` tc WHERE tc.`id_tax` = otd.`id_tax` AND tc.`is_tourism_tax` = 1)'
+                );
             }
 
-            $sql = 'INSERT INTO `'._DB_PREFIX_.'order_detail_tax` (id_order_detail, id_tax, unit_amount, total_amount)
+            $sql = 'INSERT INTO `'._DB_PREFIX_.'order_tax_detail`
+                (id_order, id_order_detail, id_htl_booking, id_service_product_order_detail, id_tax, unit_amount, total_amount, date_add)
                 VALUES '.$values;
 
             return Db::getInstance()->execute($sql);
@@ -597,8 +603,9 @@ class OrderDetailCore extends ObjectModel
 
     public static function getTaxListStatic($id_order_detail)
     {
-        $sql = 'SELECT * FROM `'._DB_PREFIX_.'order_detail_tax`
-					WHERE `id_order_detail` = '.(int)$id_order_detail;
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.'order_tax_detail` t
+					WHERE t.`id_order_detail` = '.(int)$id_order_detail.'
+					AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'tax` tc WHERE tc.`id_tax` = t.`id_tax` AND tc.`is_tourism_tax` = 1)';
         return Db::getInstance()->executeS($sql);
     }
 
@@ -905,10 +912,11 @@ class OrderDetailCore extends ObjectModel
     public function getWsTaxes()
     {
         $query = new DbQuery();
-        $query->select('id_tax as id');
-        $query->from('order_detail_tax', 'tax');
+        $query->select('tax.`id_tax` as id');
+        $query->from('order_tax_detail', 'tax');
         $query->leftJoin('order_detail', 'od', 'tax.`id_order_detail` = od.`id_order_detail`');
         $query->where('od.`id_order_detail` = '.(int)$this->id_order_detail);
+        $query->where('NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'tax` tc WHERE tc.`id_tax` = tax.`id_tax` AND tc.`is_tourism_tax` = 1)');
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($query);
     }
 

@@ -595,8 +595,6 @@ class ServiceProductOrderDetail extends ObjectModel
 
             $this->save();
 
-            OrderTourismTax::setRefundedByServiceProductOrderDetail((int) $this->id);
-
             return true;
         }
 

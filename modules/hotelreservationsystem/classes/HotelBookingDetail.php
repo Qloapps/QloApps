@@ -2518,35 +2518,6 @@ class HotelBookingDetail extends ObjectModel
             $data['is_cancelled'] = (int) $is_cancelled;
         }
 
-        $tourismBookingIds = array();
-        if ((int) $is_refunded) {
-            if ($id_rooms) {
-                foreach ($id_rooms as $val_rm) {
-                    $idHtlBooking = (int) Db::getInstance()->getValue(
-                        'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail`
-                         WHERE `id_order` = '.(int) $id_order.'
-                           AND `id_room` = '.(int) $val_rm['id_room'].'
-                           AND `date_from` = \''.pSQL($date_from).'\'
-                           AND `date_to` = \''.pSQL($date_to).'\'
-                           AND `is_refunded` = 0'
-                    );
-                    if ($idHtlBooking) {
-                        $tourismBookingIds[] = $idHtlBooking;
-                    }
-                }
-            } else {
-                $rows = Db::getInstance()->executeS(
-                    'SELECT `id` FROM `'._DB_PREFIX_.'htl_booking_detail`
-                     WHERE `id_order` = '.(int) $id_order.' AND `is_refunded` = 0'
-                );
-                if ($rows) {
-                    foreach ($rows as $row) {
-                        $tourismBookingIds[] = (int) $row['id'];
-                    }
-                }
-            }
-        }
-
         if ($id_rooms) {
             foreach ($id_rooms as $key_rm => $val_rm) {
                 $where = 'id_order='.(int)$id_order.' AND id_room = '.(int)$val_rm['id_room'].' AND `date_from`= \''.
@@ -2555,12 +2526,6 @@ class HotelBookingDetail extends ObjectModel
             }
         } else {
             $result = Db::getInstance()->update($table, $data, 'id_order='.(int)$id_order);
-        }
-
-        if ($result && $tourismBookingIds) {
-            foreach ($tourismBookingIds as $idHtlBooking) {
-                OrderTourismTax::setRefundedByHtlBooking($idHtlBooking);
-            }
         }
 
         // if automatic overbooking resolution is enabled
@@ -3638,8 +3603,6 @@ class HotelBookingDetail extends ObjectModel
             }
 
             $this->save();
-
-            OrderTourismTax::setRefundedByHtlBooking($this->id);
 
             return true;
         }

@@ -21,11 +21,8 @@
  * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
  */
 
-class TourismTaxCore extends ObjectModel
+class TaxConfigurationCore extends ObjectModel
 {
-    const COLLECTION_TYPE_ONLINE = 0;
-    const COLLECTION_TYPE_AT_HOTEL = 1;
-
     const DAY_KEYS = array('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun');
 
     public $id_tax;
@@ -42,7 +39,7 @@ class TourismTaxCore extends ObjectModel
     public $special_days;
 
     public static $definition = array(
-        'table' => 'tourism_tax',
+        'table' => 'tax_configuration',
         'primary' => 'id_tax',
         'fields' => array(
             'tax_calc_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
@@ -73,7 +70,7 @@ class TourismTaxCore extends ObjectModel
             return false;
         }
         $result = Db::getInstance()->insert(
-            'tourism_tax',
+            'tax_configuration',
             array(
                 'id_tax' => $idTax,
                 'tax_calc_type' => (int) $this->tax_calc_type,
@@ -99,17 +96,17 @@ class TourismTaxCore extends ObjectModel
      * Load a tourism tax subtype row by id_tax, cached per request.
      *
      * @param int $idTax
-     * @return TourismTax|false
+     * @return TaxConfiguration|false
      */
     public static function getByTaxId($idTax)
     {
         $idTax = (int) $idTax;
-        $cacheId = 'TourismTax::getByTaxId-' . $idTax;
+        $cacheId = 'TaxConfiguration::getByTaxId-' . $idTax;
         if (Cache::isStored($cacheId)) {
             return Cache::retrieve($cacheId);
         }
 
-        $obj = new TourismTax($idTax);
+        $obj = new TaxConfiguration($idTax);
         $result = Validate::isLoadedObject($obj) ? $obj : false;
         Cache::store($cacheId, $result);
 
@@ -190,11 +187,11 @@ class TourismTaxCore extends ObjectModel
         if (parent::delete()) {
             $idTax = (int) $this->id;
             Db::getInstance()->execute(
-                'DELETE FROM `' . _DB_PREFIX_ . 'tourism_tax_tier`
+                'DELETE FROM `' . _DB_PREFIX_ . 'tax_price_tier`
                  WHERE `id_tax` = ' . $idTax
             );
             Db::getInstance()->execute(
-                'DELETE FROM `' . _DB_PREFIX_ . 'tourism_tax_child_range`
+                'DELETE FROM `' . _DB_PREFIX_ . 'tax_child_range`
                  WHERE `id_tax` = ' . $idTax
             );
             return true;
@@ -205,12 +202,12 @@ class TourismTaxCore extends ObjectModel
     /**
      * Whether tourism tax should be visually folded into the displayed room/service price.
      *
-     * @param float $tourismTaxOnline
+     * @param float $tourismTax
      * @return bool
      */
-    public static function isGrossedUp($tourismTaxOnline)
+    public static function isGrossedUp($tourismTax)
     {
-        return (float) $tourismTaxOnline > 0 && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
+        return (float) $tourismTax > 0 && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
     }
 
     /**
@@ -235,7 +232,7 @@ class TourismTaxCore extends ObjectModel
             $address = $fallbackAddress;
         }
 
-        $collectionType = self::COLLECTION_TYPE_ONLINE;
+        $collectionType = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE;
         if ($idHotel && Validate::isLoadedObject($hotelBranch = new HotelBranchInformation($idHotel))) {
             $collectionType = (int) $hotelBranch->tourism_tax_collection_type;
         }
@@ -310,15 +307,18 @@ class TourismTaxCore extends ObjectModel
      * @param int    $idLang
      * @return array List of ['tax_calc_type','is_tiered','tax_value','tiers']
      */
-    public static function getPreviewParams($idTaxRulesGroup, Address $address, $idLang, $collectionType = self::COLLECTION_TYPE_ONLINE)
+    public static function getPreviewParams($idTaxRulesGroup, Address $address, $idLang, $collectionType = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE)
     {
         $idTaxRulesGroup = (int) $idTaxRulesGroup;
-        if (!$idTaxRulesGroup || Tax::excludeTaxeOption() || (int) $collectionType === self::COLLECTION_TYPE_AT_HOTEL) {
+        if (!$idTaxRulesGroup || Tax::excludeTaxeOption() || (int) $collectionType === HotelBranchInformation::TAX_COLLECTION_TYPE_AT_HOTEL) {
             return array();
         }
 
         $taxCalculator = TaxManagerFactory::getManager($address, $idTaxRulesGroup)->getTaxCalculator();
         $preview = array();
+
+        $today = new DateTime();
+        $todayDayKey = self::DAY_KEYS[$today->format('N') - 1];
 
         foreach ($taxCalculator->taxes as $tax) {
             $tourismTax = self::getByTaxId((int) $tax->id);
@@ -326,9 +326,26 @@ class TourismTaxCore extends ObjectModel
                 continue;
             }
 
+            if (!empty($tourismTax->valid_from) && $tourismTax->valid_from !== '0000-00-00'
+                && $today < new DateTime($tourismTax->valid_from)
+            ) {
+                continue;
+            }
+            if (!empty($tourismTax->valid_to) && $tourismTax->valid_to !== '0000-00-00'
+                && $today > new DateTime($tourismTax->valid_to)
+            ) {
+                continue;
+            }
+            if ($tourismTax->special_days) {
+                $specialDays = json_decode($tourismTax->special_days, true);
+                if (!is_array($specialDays) || !in_array($todayDayKey, $specialDays)) {
+                    continue;
+                }
+            }
+
             $tiers = array();
             if ((bool) $tourismTax->is_tiered) {
-                foreach (TourismTaxTier::getByTaxId((int) $tax->id) as $tier) {
+                foreach (TaxPriceTier::getByTaxId((int) $tax->id) as $tier) {
                     $tiers[] = array(
                         'min_amount' => (float) $tier['min_amount'],
                         'max_amount' => (float) $tier['max_amount'],

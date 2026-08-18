@@ -738,19 +738,23 @@ class AdminProductsControllerCore extends AdminController
                 $idTourismTaxRulesGroup = (int) $this->_list[$i]['id_tourism_tax_rules_group'];
                 $idHotel = (int) $this->_list[$i]['id_hotel'];
                 if ($useTourismTax && $idTourismTaxRulesGroup && $idHotel) {
-                    $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
-                        $this->_list[$i]['id_product'],
+                    $idProduct = $this->_list[$i]['id_product'];
+                    $vatAddress = new Address(HotelRoomType::getHotelIdAddressByIdProduct($idProduct));
+                    $vatCalculator = TaxManagerFactory::getManager($vatAddress, Product::getIdTaxRulesGroupByIdProduct($idProduct))->getTaxCalculator();
+                    $unitPriceTaxExcl = $vatCalculator->removeTaxes($this->_list[$i]['price_tmp']);
+
+                    $hotelTaxContext = TaxConfiguration::resolveHotelAddressAndCollectionType($idHotel, $vatAddress);
+                    $taxCalculator = TaxManagerFactory::getManager($hotelTaxContext['address'], $idTourismTaxRulesGroup)->getTaxCalculator();
+                    $this->_list[$i]['price_tmp'] += $taxCalculator->getTaxesTotalAmount(
+                        $unitPriceTaxExcl,
                         $todayDate,
-                        $tomorrowDate,
-                        array(array('adults' => 1, 'children' => 0, 'child_ages' => array())),
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        1
+                        1,
+                        1,
+                        array(),
+                        $hotelTaxContext['collectionType'],
+                        1,
+                        $this->context->currency->id
                     );
-                    $this->_list[$i]['price_tmp'] += (float) $roomTotalPrice['tourism_tax_online'];
                 }
             }
         }
@@ -4192,26 +4196,16 @@ class AdminProductsControllerCore extends AdminController
             $data->assign('tourismTaxRulesGroups', $tourismTaxRulesGroups);
             $data->assign('id_tourism_tax_rules_group', isset($product->id_tourism_tax_rules_group) ? (int) $product->id_tourism_tax_rules_group : 0);
 
-            // Same "no matching rule -> naturally empty" pattern as the VAT rates loop above
-            // (TaxManagerFactory::getManager($address, $trg)->taxes coming back empty for a
-            // non-matching country) — here the mismatch is the hotel's collection type instead
-            // of the address, so getPreviewParams() is handed it to resolve the same way.
             $roomTypeInfo = (new HotelRoomType())->getRoomTypeInfoByIdProduct((int) $product->id);
             $idHotel = $roomTypeInfo ? (int) $roomTypeInfo['id_hotel'] : 0;
-            $collectionType = TourismTax::resolveHotelAddressAndCollectionType($idHotel, $address)['collectionType'];
+            $collectionType = TaxConfiguration::resolveHotelAddressAndCollectionType($idHotel, $address)['collectionType'];
 
             $tourismTaxRates = array();
             foreach ($tourismTaxRulesGroups as $tourismTaxRulesGroup) {
-                $idTourismTaxRulesGroup = (int) $tourismTaxRulesGroup['id_tax_rules_group'];
-                if (!$idTourismTaxRulesGroup) {
+                if (!$tourismTaxRulesGroup['id_tax_rules_group']) {
                     continue;
                 }
-                $tourismTaxRates[$idTourismTaxRulesGroup] = TourismTax::getPreviewParams(
-                    $idTourismTaxRulesGroup,
-                    $address,
-                    (int) $this->context->language->id,
-                    $collectionType
-                );
+                $tourismTaxRates[$tourismTaxRulesGroup['id_tax_rules_group']] = TaxConfiguration::getPreviewParams($tourismTaxRulesGroup['id_tax_rules_group'], $address, $this->context->language->id, $collectionType);
             }
             $data->assign('tourismTaxRatesByGroup', $tourismTaxRates);
         }

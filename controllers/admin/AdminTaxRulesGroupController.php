@@ -126,7 +126,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         $sql->from('tax', 't');
         $sql->leftJoin('tax_lang', 'tl', 't.`id_tax` = tl.`id_tax` AND tl.`id_lang` = ' . $idLang);
         if ($isTourism) {
-            $sql->leftJoin('tourism_tax', 'tourism_tax', 'tourism_tax.`id_tax` = t.`id_tax`');
+            $sql->leftJoin('tax_configuration', 'tourism_tax', 'tourism_tax.`id_tax` = t.`id_tax`');
         }
         $sql->where('t.`deleted` != 1 AND t.`active` = 1');
         $sql->where('t.`is_tourism_tax` = ' . ($isTourism ? 1 : 0));
@@ -209,7 +209,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 				ON (a.`id_state` = s.`id_state`)
 			LEFT JOIN `'._DB_PREFIX_.'tax` t
 				ON (a.`id_tax` = t.`id_tax`)
-			LEFT JOIN `'._DB_PREFIX_.'tourism_tax` tourism_tax
+			LEFT JOIN `'._DB_PREFIX_.'tax_configuration` tourism_tax
 				ON (tourism_tax.`id_tax` = t.`id_tax`)';
         $this->_where = 'AND `id_tax_rules_group` = '.(int)$id_group;
         $this->_use_found_rows = false;
@@ -457,7 +457,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
      */
     public function displayTaxRuleRate($value, $row)
     {
-        return TourismTax::getFormattedRateForDisplay($value, $row, $this->context->currency);
+        return TaxConfiguration::getFormattedRateForDisplay($value, $row, $this->context->currency);
     }
 
     public function postProcess()

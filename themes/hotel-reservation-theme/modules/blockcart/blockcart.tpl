@@ -144,7 +144,7 @@
 											{/block}
 											{block name='blockcart_shopping_cart_total_tourism_tax'}
 												{if $show_tax && $use_tax}
-													<div class="cart-prices-line ajax_cart_tourism_tax_line"{if !isset($tourism_tax_online) || $tourism_tax_online <= 0} style="display:none"{/if}>
+													<div class="cart-prices-line ajax_cart_tourism_tax_line"{if !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
 														<span class="price cart_block_tourism_tax_cost ajax_cart_tourism_tax_cost">{$tourism_tax_cost}</span>
 														<span>{l s='Total Tourism Tax' mod='blockcart'}</span>
 													</div>
@@ -361,7 +361,7 @@
 								{if $show_tax && $use_tax}
 									{* Always rendered — see the matching dropdown block above for why a value-gated
 									   {if} would break on later AJAX-only cart updates. *}
-									<div class="layer_cart_row ajax_cart_tourism_tax_line"{if !isset($tourism_tax_online) || $tourism_tax_online <= 0} style="display:none"{/if}>
+									<div class="layer_cart_row ajax_cart_tourism_tax_line"{if !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
 										<strong class="dark">{l s='Total Tourism Tax' mod='blockcart'}</strong>
 										<span class="price cart_block_tourism_tax_cost ajax_cart_tourism_tax_cost pull-right">{$tourism_tax_cost}</span>
 									</div>

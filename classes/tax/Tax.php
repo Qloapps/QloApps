@@ -137,11 +137,7 @@ class TaxCore extends ObjectModel
     {
         return Db::getInstance()->getValue('
 		SELECT `id_tax`
-		FROM `'._DB_PREFIX_.'order_detail_tax`
-		WHERE `id_tax` = '.(int)$this->id
-        ) || Db::getInstance()->getValue('
-		SELECT `id_tax`
-		FROM `'._DB_PREFIX_.'order_tourism_tax`
+		FROM `'._DB_PREFIX_.'order_tax_detail`
 		WHERE `id_tax` = '.(int)$this->id
         );
     }

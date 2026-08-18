@@ -21,17 +21,17 @@
  * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
  */
 
-class TourismTaxChildRangeCore extends ObjectModel
+class TaxChildRangeCore extends ObjectModel
 {
-    public $id_child_range;
+    public $id_tax_child_range;
     public $id_tax;
     public $min_age;
     public $max_age;
     public $tax_value;
 
     public static $definition = array(
-        'table' => 'tourism_tax_child_range',
-        'primary' => 'id_child_range',
+        'table' => 'tax_child_range',
+        'primary' => 'id_tax_child_range',
         'fields' => array(
             'id_tax' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'min_age' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
@@ -41,7 +41,7 @@ class TourismTaxChildRangeCore extends ObjectModel
     );
 
     /**
-     * All child age ranges for a tax in entry order (id_child_range order), cached per request.
+     * All child age ranges for a tax in entry order (id_tax_child_range order), cached per request.
      *
      * @param int $idTax
      * @return array
@@ -49,15 +49,15 @@ class TourismTaxChildRangeCore extends ObjectModel
     public static function getByTaxId($idTax)
     {
         $idTax = (int) $idTax;
-        $cacheId = 'TourismTaxChildRange::getByTaxId-' . $idTax;
+        $cacheId = 'TaxChildRange::getByTaxId-' . $idTax;
         if (Cache::isStored($cacheId)) {
             return Cache::retrieve($cacheId);
         }
 
         $ranges = Db::getInstance()->executeS(
-            'SELECT * FROM `' . _DB_PREFIX_ . 'tourism_tax_child_range`
+            'SELECT * FROM `' . _DB_PREFIX_ . 'tax_child_range`
              WHERE `id_tax` = ' . $idTax . '
-             ORDER BY `id_child_range` ASC'
+             ORDER BY `id_tax_child_range` ASC'
         );
         Cache::store($cacheId, $ranges);
 
@@ -76,14 +76,14 @@ class TourismTaxChildRangeCore extends ObjectModel
     public static function saveAll($idTax, array $mins, array $maxs, array $values)
     {
         Db::getInstance()->execute(
-            'DELETE FROM `' . _DB_PREFIX_ . 'tourism_tax_child_range`
+            'DELETE FROM `' . _DB_PREFIX_ . 'tax_child_range`
              WHERE `id_tax` = ' . (int) $idTax
         );
         foreach ($values as $i => $value) {
             if ($value === '' || $value === false) {
                 continue;
             }
-            $range = new TourismTaxChildRange();
+            $range = new TaxChildRange();
             $range->id_tax = (int) $idTax;
             $range->min_age = isset($mins[$i]) ? (int) $mins[$i] : 0;
             $range->max_age = isset($maxs[$i]) ? (int) $maxs[$i] : 0;

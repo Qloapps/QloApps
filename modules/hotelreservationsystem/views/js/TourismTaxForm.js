@@ -25,13 +25,14 @@ $(document).ready(function () {
     var childIdx = $('#tourism-tax-child-body tr').length;
 
     $('#valid_from').datepicker({
+        dateFormat: 'yy-mm-dd',
         onSelect: function () {
             $('#valid_to').datepicker('option', 'minDate', $(this).datepicker('getDate'));
             validateDates();
         }
     });
 
-    $('#valid_to').datepicker({ onSelect: validateDates });
+    $('#valid_to').datepicker({ dateFormat: 'yy-mm-dd', onSelect: validateDates });
 
     function validateDates() {
         var from = $('#valid_from').val();

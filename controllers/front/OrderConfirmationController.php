@@ -155,7 +155,7 @@ class OrderConfirmationControllerCore extends FrontController
                     $idOrder = $cartOrder['id_order'];
                     $objCartOrder = new Order($idOrder);
                     $orderProducts = $objCartOrder->getProducts();
-                    $roomTourismTaxByBooking = OrderTourismTax::getAppliedTourismTaxTotals($idOrder, OrderTourismTax::SCOPE_ROOM);
+                    $roomTourismTaxByBooking = OrderTaxDetail::getAppliedTourismTaxTotals($idOrder, OrderTaxDetail::SCOPE_ROOM);
 
                     if (!empty($orderProducts)) {
                         foreach ($orderProducts as $type_key => $type_value) {
@@ -436,7 +436,7 @@ class OrderConfirmationControllerCore extends FrontController
                     $orderTotalInfo['total_paid'] += $objCartOrder->total_paid;
                     $orderTotalInfo['total_paid_real'] += $objCartOrder->total_paid_real;
 
-                    $orderTotalInfo['total_tourism_tax'] += OrderTourismTax::getOrderTourismTaxTotal($idOrder);
+                    $orderTotalInfo['total_tourism_tax'] += OrderTaxDetail::getOrderTourismTaxTotal($idOrder);
                 }
 
                 $totalTaxIncl = $orderTotalInfo['total_rooms_ti'] + $orderTotalInfo['total_services_ti'] + $orderTotalInfo['total_convenience_fee_ti'] + $orderTotalInfo['total_auto_add_services_ti'] + $orderTotalInfo['total_demands_price_ti'] + $orderTotalInfo['total_standalone_products_ti'];

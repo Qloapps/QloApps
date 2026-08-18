@@ -21,9 +21,9 @@
  * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
  */
 
-class OrderTourismTaxExemptionCore extends ObjectModel
+class OrderTaxExemptionCore extends ObjectModel
 {
-    public $id_exemption;
+    public $id_order_tax_exemption;
     public $id_htl_booking;
     public $id_service_product_order_detail;
     public $id_order;
@@ -32,8 +32,8 @@ class OrderTourismTaxExemptionCore extends ObjectModel
     public $date_add;
 
     public static $definition = array(
-        'table' => 'order_tourism_tax_exemption',
-        'primary' => 'id_exemption',
+        'table' => 'order_tax_exemption',
+        'primary' => 'id_order_tax_exemption',
         'fields' => array(
             'id_htl_booking' => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedId'),
             'id_service_product_order_detail' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),

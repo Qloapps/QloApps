@@ -122,7 +122,7 @@ function getTourismTaxIncluded(priceTE)
 		if (t.is_tiered) {
 			for (var j = 0; j < t.tiers.length; j++) {
 				var tier = t.tiers[j];
-				if (priceTE >= tier.min_amount && (tier.max_amount == 0 || priceTE < tier.max_amount)) {
+				if (priceTE >= tier.min_amount && (tier.max_amount == 0 || priceTE <= tier.max_amount)) {
 					baseValue = tier.tax_value;
 					break;
 				}

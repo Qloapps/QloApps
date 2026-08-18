@@ -148,7 +148,7 @@ class AdminTaxesControllerCore extends AdminController
         parent::__construct();
 
         $this->_where .= ' AND a.deleted = 0';
-        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'tourism_tax` tourism_tax ON tourism_tax.`id_tax` = a.`id_tax`';
+        $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'tax_configuration` tourism_tax ON tourism_tax.`id_tax` = a.`id_tax`';
         $extraSelect = 'IFNULL(tourism_tax.`tax_calc_type`, 0) AS `tourism_tax_calc_type`, IFNULL(tourism_tax.`tax_value`, 0) AS `tourism_tax_value`';
         $this->_select = ($this->_select ? $this->_select . ', ' : '') . $extraSelect;
     }
@@ -244,7 +244,7 @@ class AdminTaxesControllerCore extends AdminController
         $isAnySubmit = Tools::isSubmit('submitAdd' . $this->table) || Tools::isSubmit('submitAdd' . $this->table . 'AndStay');
 
         if ($idTax && !$isAnySubmit) {
-            $subtype = TourismTax::getByTaxId($idTax);
+            $subtype = TaxConfiguration::getByTaxId($idTax);
             if ($subtype) {
                 if ($subtype->valid_from === '0000-00-00') {
                     $subtype->valid_from = null;
@@ -262,8 +262,8 @@ class AdminTaxesControllerCore extends AdminController
                 $_POST['valid_from'] = $subtype->valid_from ?: '';
                 $_POST['valid_to'] = $subtype->valid_to ?: '';
 
-                $tiers = TourismTaxTier::getByTaxId($idTax);
-                $childRanges = TourismTaxChildRange::getByTaxId($idTax);
+                $tiers = TaxPriceTier::getByTaxId($idTax);
+                $childRanges = TaxChildRange::getByTaxId($idTax);
             }
         } elseif ($isAnySubmit) {
             $postTierIds = (array) Tools::getValue('tier_id', array());
@@ -295,7 +295,7 @@ class AdminTaxesControllerCore extends AdminController
 
         $taxType = (int) Tools::getValue('tax_calc_type', 0);
         $baseTaxValue = Tools::getValue('tax_value', $subtype ? $subtype->tax_value : 0);
-        $allDayKeys = TourismTax::DAY_KEYS;
+        $allDayKeys = TaxConfiguration::DAY_KEYS;
         if ($subtype && $subtype->special_days) {
             $defaultSpecialDays = json_decode($subtype->special_days, true) ?: $allDayKeys;
         } else {
@@ -751,7 +751,7 @@ class AdminTaxesControllerCore extends AdminController
      */
     public function displayRate($value, $row)
     {
-        return TourismTax::getFormattedRateForDisplay($value, $row, $this->context->currency);
+        return TaxConfiguration::getFormattedRateForDisplay($value, $row, $this->context->currency);
     }
 
     public function postProcess()
@@ -784,6 +784,10 @@ class AdminTaxesControllerCore extends AdminController
                             }
                             if ($wasTourismTax && !$isTourismTax) {
                                 $this->cleanTaxFromTourismTaxRulesGroups($object->id);
+                                $tourismTax = TaxConfiguration::getByTaxId($object->id);
+                                if ($tourismTax) {
+                                    $tourismTax->delete();
+                                }
                             }
                             if (!$wasTourismTax && $isTourismTax) {
                                 $this->cleanTaxFromVatTaxRulesGroups($object->id);
@@ -1008,10 +1012,10 @@ class AdminTaxesControllerCore extends AdminController
     protected function saveTourismTaxSubtype($idTax)
     {
         $idTax = (int) $idTax;
-        $tourismTax = TourismTax::getByTaxId($idTax);
+        $tourismTax = TaxConfiguration::getByTaxId($idTax);
         $tourismTaxExists = (bool) $tourismTax;
         if (!$tourismTax) {
-            $tourismTax = new TourismTax();
+            $tourismTax = new TaxConfiguration();
             $tourismTax->id = $idTax;
         }
         $tourismTax->tax_calc_type = (int) Tools::getValue('tax_calc_type', 0);
@@ -1030,7 +1034,7 @@ class AdminTaxesControllerCore extends AdminController
         if (!is_array($submittedDays)) {
             $submittedDays = array();
         }
-        $submittedDays = array_values(array_intersect(TourismTax::DAY_KEYS, $submittedDays));
+        $submittedDays = array_values(array_intersect(TaxConfiguration::DAY_KEYS, $submittedDays));
         if (empty($submittedDays) || count($submittedDays) === 7) {
             $tourismTax->special_days = null;
         } else {
@@ -1043,13 +1047,13 @@ class AdminTaxesControllerCore extends AdminController
             $tourismTax->add();
         }
 
-        TourismTaxTier::saveAll(
+        TaxPriceTier::saveAll(
             $idTax,
             Tools::getValue('tier_min', array()),
             Tools::getValue('tier_max', array()),
             Tools::getValue('tier_value', array())
         );
-        TourismTaxChildRange::saveAll(
+        TaxChildRange::saveAll(
             $idTax,
             Tools::getValue('child_min', array()),
             Tools::getValue('child_max', array()),
@@ -1065,7 +1069,7 @@ class AdminTaxesControllerCore extends AdminController
      */
     protected function cleanTaxFromTourismTaxRulesGroups($idTax)
     {
-        $count = TourismTax::cleanFromTourismTaxRulesGroups((int) $idTax);
+        $count = TaxConfiguration::cleanFromTourismTaxRulesGroups($idTax);
         if ($count) {
             $this->warnings[] = sprintf(
                 $this->l('This tax was removed from %d tourism tax rules group(s) because it is no longer marked as a tourism tax.'),
@@ -1082,7 +1086,7 @@ class AdminTaxesControllerCore extends AdminController
      */
     protected function cleanTaxFromVatTaxRulesGroups($idTax)
     {
-        $count = TourismTax::cleanFromVatTaxRulesGroups((int) $idTax);
+        $count = TaxConfiguration::cleanFromVatTaxRulesGroups($idTax);
         if ($count) {
             $this->warnings[] = sprintf(
                 $this->l('This tax was removed from %d standard tax rules group(s) because it is now marked as a tourism tax.'),

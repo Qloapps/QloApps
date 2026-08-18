@@ -89,7 +89,7 @@ class OrderDetailControllerCore extends FrontController
                 $objRoomType = new HotelRoomType();
                 $objBookingDemand = new HotelBookingDemands();
                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-                $roomTourismTaxByBooking = OrderTourismTax::getAppliedTourismTaxTotals($order->id, OrderTourismTax::SCOPE_ROOM);
+                $roomTourismTaxByBooking = OrderTaxDetail::getAppliedTourismTaxTotals($order->id, OrderTaxDetail::SCOPE_ROOM);
                 $anyBackOrder = 0;
                 $processedProducts = array();
                 $cartHotelData = array();
@@ -425,7 +425,7 @@ class OrderDetailControllerCore extends FrontController
                     }
                 }
 
-                $totalTourismTax = OrderTourismTax::getOrderTourismTaxTotal((int) $id_order);
+                $totalTourismTax = OrderTaxDetail::getOrderTourismTaxTotal((int) $id_order);
 
                 $this->context->smarty->assign(
                     array(

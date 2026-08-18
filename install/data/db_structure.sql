@@ -1196,16 +1196,7 @@ CREATE TABLE `PREFIX_orders` (
   INDEX `date_add`(`date_add`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
-CREATE TABLE `PREFIX_order_detail_tax` (
-  `id_order_detail` int(11) NOT NULL,
-  `id_tax` int(11) NOT NULL,
-  `unit_amount` DECIMAL(16, 6) NOT NULL DEFAULT '0.00',
-  `total_amount` DECIMAL(16, 6) NOT NULL DEFAULT '0.00',
-   KEY (`id_order_detail`),
-   KEY `id_tax` (`id_tax`)
-) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
-
-CREATE TABLE `PREFIX_tourism_tax` (
+CREATE TABLE `PREFIX_tax_configuration` (
   `id_tax` int(11) unsigned NOT NULL,
   `tax_calc_type` tinyint(1) NOT NULL DEFAULT '0',
   `is_per_night` tinyint(1) NOT NULL DEFAULT '1',
@@ -1221,58 +1212,52 @@ CREATE TABLE `PREFIX_tourism_tax` (
   PRIMARY KEY (`id_tax`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
-CREATE TABLE `PREFIX_tourism_tax_tier` (
-  `id_tier` int(11) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `PREFIX_tax_price_tier` (
+  `id_tax_price_tier` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `id_tax` int(11) unsigned NOT NULL,
   `min_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `max_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `tax_value` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  PRIMARY KEY (`id_tier`),
+  PRIMARY KEY (`id_tax_price_tier`),
   KEY `id_tax` (`id_tax`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
-CREATE TABLE `PREFIX_tourism_tax_child_range` (
-  `id_child_range` int(11) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `PREFIX_tax_child_range` (
+  `id_tax_child_range` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `id_tax` int(11) unsigned NOT NULL,
   `min_age` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `max_age` tinyint(3) unsigned NOT NULL DEFAULT '17',
   `tax_value` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  PRIMARY KEY (`id_child_range`),
+  PRIMARY KEY (`id_tax_child_range`),
   KEY `id_tax` (`id_tax`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
-CREATE TABLE `PREFIX_order_tourism_tax` (
-  `id_order_tourism_tax` int(11) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `PREFIX_order_tax_detail` (
+  `id_order_tax_detail` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `id_order` int(11) unsigned NOT NULL,
   `id_order_detail` int(11) unsigned NOT NULL,
   `id_htl_booking` int(11) unsigned NOT NULL,
   `id_service_product_order_detail` int(11) unsigned NOT NULL DEFAULT '0',
-  `id_hotel` int(11) unsigned NOT NULL,
   `id_tax` int(11) unsigned NOT NULL,
-  `id_currency` int(11) unsigned NOT NULL,
-  `num_nights` smallint(5) unsigned NOT NULL DEFAULT '1',
-  `num_adults` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `unit_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `total_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `is_refunded` tinyint(1) NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
-  `date_upd` datetime NOT NULL,
-  PRIMARY KEY (`id_order_tourism_tax`),
+  PRIMARY KEY (`id_order_tax_detail`),
   KEY `id_order` (`id_order`),
   KEY `id_order_detail` (`id_order_detail`),
-  KEY `id_hotel` (`id_hotel`),
   KEY `id_htl_booking` (`id_htl_booking`),
   KEY `id_service_product_order_detail` (`id_service_product_order_detail`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
-CREATE TABLE `PREFIX_order_tourism_tax_exemption` (
-  `id_exemption` int(11) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `PREFIX_order_tax_exemption` (
+  `id_order_tax_exemption` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `id_htl_booking` int(11) unsigned NOT NULL DEFAULT '0',
   `id_service_product_order_detail` int(11) unsigned NOT NULL DEFAULT '0',
   `id_order` int(11) unsigned NOT NULL,
   `id_employee` int(11) unsigned NOT NULL,
   `note` text,
   `date_add` datetime NOT NULL,
-  PRIMARY KEY (`id_exemption`),
+  PRIMARY KEY (`id_order_tax_exemption`),
   KEY `id_htl_booking` (`id_htl_booking`),
   KEY `id_service_product_order_detail` (`id_service_product_order_detail`),
   KEY `id_order` (`id_order`)
@@ -1345,12 +1330,12 @@ CREATE TABLE `PREFIX_order_detail` (
   `product_supplier_reference` varchar(32) DEFAULT NULL,
   `product_weight` DECIMAL(20,6) NOT NULL,
   `id_tax_rules_group` INT(11) UNSIGNED DEFAULT '0',
+  `id_tourism_tax_rule_group` INT(11) UNSIGNED DEFAULT '0',
   `tax_computation_method` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `tax_name` varchar(16) NOT NULL,
   `tax_rate` DECIMAL(10,3) NOT NULL DEFAULT '0.000',
   `ecotax` decimal(21,6) NOT NULL DEFAULT '0.00',
   `ecotax_tax_rate` DECIMAL(5,3) NOT NULL DEFAULT '0.000',
-  `tourism_tax_amount` DECIMAL(21,6) NOT NULL DEFAULT '0.000000',
   `discount_quantity_applied` TINYINT(1) NOT NULL DEFAULT '0',
   `download_hash` varchar(255) DEFAULT NULL,
   `download_nb` int(10) unsigned DEFAULT '0',

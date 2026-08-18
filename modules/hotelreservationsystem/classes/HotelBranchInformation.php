@@ -23,6 +23,9 @@
 
 class HotelBranchInformation extends ObjectModel
 {
+    const TAX_COLLECTION_TYPE_ONLINE = 0;
+    const TAX_COLLECTION_TYPE_AT_HOTEL = 1;
+
     public $id_category;
     public $hotel_name;
     public $email;
