@@ -43,5 +43,5 @@
         </table>
     </div>
 {/capture}
-<span class="badge tooltip-trigger">+{$extra_stay_periods_count}</span>
-<div class="tooltip-content" style="display: none;">{$smarty.capture.stay_periods_tooltip nofilter}</div>
+{capture name='stay_periods_tooltip_title'}<span class="badge tooltip-trigger">+{$extra_stay_periods_count}</span>{/capture}
+{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.stay_periods_tooltip tooltip_title=$smarty.capture.stay_periods_tooltip_title}
