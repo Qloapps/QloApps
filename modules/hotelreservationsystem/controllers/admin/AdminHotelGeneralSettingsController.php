@@ -398,13 +398,15 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     'PS_API_KEY' => array(
                         'title' => $this->l('Google Maps API Key'),
                         'hint' => $this->l('Unique API key for Google Maps.'),
+                        'validation' => 'isGenericName',
                         'type' => 'text',
                     ),
                     'PS_MAP_ID' => array(
                         'title' => $this->l('Google Map ID'),
-                        'hint' => $this->l('Map Id for Google Maps.'),
+                        'hint' => $this->l('Map Id for Google Maps (optional).'),
+                        'validation' => 'isGenericName',
                         'type' => 'text',
-                        'desc' => $this->l('Google Maps API Key and Google Map ID is required to display Google Maps.')
+                        'desc' => $this->l('Google Maps API Key is required to display Google Maps. Google Map ID is optional.')
                     ),
                     'WK_GOOGLE_ACTIVE_MAP' => array(
                         'title' => $this->l('Display Google Maps For Hotel Location'),
@@ -620,9 +622,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             if (Tools::getValue('WK_GOOGLE_ACTIVE_MAP')) {
                 if (!Tools::getValue('PS_API_KEY')) {
                     $this->errors[] = $this->l('Please enter Google API key.');
-                }
-                if (!Tools::getValue('PS_MAP_ID')) {
-                    $this->errors[] = $this->l('Please enter Google Map Id.');
                 }
             }
             if (!trim(Tools::getValue('PS_SHOP_NAME'))) {
