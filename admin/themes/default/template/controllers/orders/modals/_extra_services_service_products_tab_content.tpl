@@ -60,24 +60,9 @@
                                             <div class="tooltip-cont">
                                                 <div class="tooltip-row"><label>{l s='Applied on:'}</label></div>
                                                 <ul class="tooltip-days">
-                                                    {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
-                                                        <li>{l s='Check-in day'}</li>
-                                                    {/if}
-                                                    {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
-                                                        <li>{l s='During-stay days'}</li>
-                                                    {/if}
-                                                    {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
-                                                        <li>{l s='Check-out day'}</li>
-                                                    {/if}
+                                                    {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                                        <li>{$pcmDayLabel}</li>
+                                                    {/foreach}
                                                 </ul>
                                             </div>
                                             {/capture}
@@ -170,24 +155,9 @@
                                             <div class="tooltip-cont">
                                                 <div class="tooltip-row"><label>{l s='Applied on:'}</label></div>
                                                 <ul class="tooltip-days">
-                                                    {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
-                                                        <li>{l s='Check-in day'}</li>
-                                                    {/if}
-                                                    {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
-                                                        <li>{l s='During-stay days'}</li>
-                                                    {/if}
-                                                    {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
-                                                        || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
-                                                        <li>{l s='Check-out day'}</li>
-                                                    {/if}
+                                                    {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                                        <li>{$pcmDayLabel}</li>
+                                                    {/foreach}
                                                 </ul>
                                             </div>
                                         {/capture}
@@ -256,22 +226,21 @@
                 <div class="row form-group">
                     <div class="col-sm-6">
                         <label class="control-label required">{l s='Price calculation method'}</label>
-                        <input type="hidden" name="new_service_price_calc_method" id="price_calculation_method" value="{$product->price_calculation_method|intval}">
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" id="pcm_checkin">
+                                <input type="checkbox" id="pcm_checkin" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY|intval}">
                                 {l s='Check-in day'}
                             </label>
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" id="pcm_checkout">
+                                <input type="checkbox" id="pcm_checkout" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY|intval}">
                                 {l s='Check-out day'}
                             </label>
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" id="pcm_duringstay"/>
+                                <input type="checkbox" id="pcm_duringstay" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY|intval}"/>
                                 {l s='During-stay days'}
                             </label>
                         </div>
@@ -356,24 +325,9 @@
                                     <div class="tooltip-cont">
                                         <div class="tooltip-row"><label>{l s='Applied on:'}</label></div>
                                         <ul class="tooltip-days">
-                                            {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY
-                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
-                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
-                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
-                                                <li>{l s='Check-in day'}</li>
-                                            {/if}
-                                            {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY
-                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
-                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
-                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
-                                                <li>{l s='During-stay days'}</li>
-                                            {/if}
-                                            {if $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY
-                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
-                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
-                                                || $priceCalcMethod == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}
-                                                <li>{l s='Check-out day'}</li>
-                                            {/if}
+                                            {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                                <li>{$pcmDayLabel}</li>
+                                            {/foreach}
                                         </ul>
                                     </div>
                                 {/capture}

@@ -213,34 +213,24 @@ $(document).ready(function () {
 				</span>
 			</label>
 			<div class="col-lg-9">
-				<input type="hidden" name="price_calculation_method" id="price_calculation_method" value="{$product->price_calculation_method|intval}">
 				<div class="checkbox">
 					<label>
-						<input type="checkbox" id="pcm_checkin"
-							{if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY
-							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
-							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
-							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}checked="checked"{/if}>
+						<input type="checkbox" id="pcm_checkin" name="price_calculation_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY|intval}"
+							{if $product->price_calculation_method & Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY}checked="checked"{/if}>
 						{l s='Check-in day'}
 					</label>
 				</div>
 				<div class="checkbox">
 					<label>
-						<input type="checkbox" id="pcm_checkout"
-							{if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY
-							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY
-							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
-							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}checked="checked"{/if}>
+						<input type="checkbox" id="pcm_checkout" name="price_calculation_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY|intval}"
+							{if $product->price_calculation_method & Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY}checked="checked"{/if}>
 						{l s='Check-out day'}
 					</label>
 				</div>
 				<div class="checkbox">
 					<label>
-						<input type="checkbox" id="pcm_duringstay"
-							{if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY
-							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY
-							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY
-							 || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY}checked="checked"{/if}>
+						<input type="checkbox" id="pcm_duringstay" name="price_calculation_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY|intval}"
+							{if $product->price_calculation_method & Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY}checked="checked"{/if}>
 						{l s='During-stay days'}
 					</label>
 				</div>

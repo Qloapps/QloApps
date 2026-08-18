@@ -433,32 +433,23 @@ class AdminNormalProductsControllerCore extends AdminController
 
     public function getBuyingOption($selling_preference_type, $row)
     {
-        $list = $this->fields_list['selling_preference_type']['list'];
-
-        if (empty($list[$selling_preference_type])) {
-            return '--';
-        }
-
-        $options = array_map('trim', explode('|', $list[$selling_preference_type]));
-
-        $this->context->smarty->assign(array(
-            'tooltip_items' => $options,
-        ));
-
-        $tooltip = $this->context->smarty->fetch('helpers/tooltip.tpl');
-
-        return count($options) . ' ' . $this->l('Selected') . ' ' . $tooltip;
+        return $this->renderMultiSelectTooltip('selling_preference_type', $selling_preference_type);
     }
 
     public function getPriceCalculationMethod($price_calculation_method, $row)
     {
-        $list = $this->fields_list['price_calculation_method']['list'];
+        return $this->renderMultiSelectTooltip('price_calculation_method', $price_calculation_method);
+    }
 
-        if (empty($list[$price_calculation_method])) {
+    private function renderMultiSelectTooltip($fieldKey, $value)
+    {
+        $list = $this->fields_list[$fieldKey]['list'];
+
+        if (empty($list[$value])) {
             return '--';
         }
 
-        $options = array_map('trim', explode('|', $list[$price_calculation_method]));
+        $options = array_map('trim', explode('|', $list[$value]));
 
         $this->context->smarty->assign(array(
             'tooltip_items' => $options,
@@ -531,6 +522,9 @@ class AdminNormalProductsControllerCore extends AdminController
      */
     protected function copyFromPost(&$object, $table)
     {
+        if (is_array(Tools::getValue('price_calculation_method'))) {
+            $_POST['price_calculation_method'] = array_sum(array_map('intval', Tools::getValue('price_calculation_method')));
+        }
         parent::copyFromPost($object, $table);
         if (get_class($object) != 'Product') {
             return;
@@ -2229,6 +2223,10 @@ class AdminNormalProductsControllerCore extends AdminController
      */
     public function checkProduct()
     {
+        if (is_array(Tools::getValue('price_calculation_method'))) {
+            $_POST['price_calculation_method'] = array_sum(array_map('intval', Tools::getValue('price_calculation_method')));
+        }
+
         $className = 'Product';
         // @todo : the call_user_func seems to contains only statics values (className = 'Product')
         $rules = call_user_func(array($this->className, 'getValidationRules'), $this->className);
@@ -2384,10 +2382,7 @@ class AdminNormalProductsControllerCore extends AdminController
             $this->errors[] = $this->l('Please select at least one buying option.');
         }
 
-        $priceCalculationMethod = Tools::getValue('price_calculation_method');
-        $id = Tools::getValue('id_'.$this->table);
-
-        if (isset($priceCalculationMethod, $id) && empty($priceCalculationMethod) && !empty($id)) {
+        if (!Tools::getValue('price_calculation_method')) {
             $this->errors[] = $this->l('Please select at least one price calculation method.');
         }
 

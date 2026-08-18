@@ -6931,7 +6931,28 @@ class ProductCore extends ObjectModel
                 return $numNights;
         }
     }
-    
+
+    public static function getPriceCalculationMethodDaysLabel($priceCalculationMethod)
+    {
+        $priceCalculationMethod = (int) $priceCalculationMethod;
+        $labels = array();
+        static $module = null;
+        if (is_null($module)) {
+            $module = Module::getInstanceByName('hotelreservationsystem');
+        }   
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY) {
+            $labels[] = $module->l('Check-in day');
+        }
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_DURING_STAY) {
+            $labels[] = $module->l('During-stay days');
+        }
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY) {
+            $labels[] = $module->l('Check-out day');
+        }
+
+        return $labels;
+    }
+
     public static function isSellableWithRoomType($idProduct)
     {
         return in_array((int) self::getSellingPreferenceType($idProduct), [
