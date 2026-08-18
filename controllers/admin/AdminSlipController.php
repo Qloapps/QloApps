@@ -271,11 +271,11 @@ public function initPageHeaderToolbar()
         if (Tools::getValue('submitCreditSlip')) {
             $creditSlipAmount = trim(Tools::getValue('credit_slip_amount'));
             if (empty($creditSlipAmount)) {
-                $this->errors[] = $this->l('Credit slip Amount is required for the generate credit slip');
+                $this->errors[] = $this->l('Credit slip amount is required.');
             } elseif (!is_numeric($creditSlipAmount)) {
-                $this->errors[] = $this->l('Credit slip Amount must be a valid number');
+                $this->errors[] = $this->l('Credit slip amount is not valid');
             } elseif ((float) $creditSlipAmount <= 0) {
-                $this->errors[] = $this->l('Credit slip Amount must be greater than 0');
+                $this->errors[] = $this->l('Credit slip amount must be greater than 0');
             }
 
             $remark = trim(Tools::getValue('remark'));
