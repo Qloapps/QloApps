@@ -1882,29 +1882,29 @@ CREATE TABLE `PREFIX_search_word` (
 ) ENGINE=ENGINE_TYPE  DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_business_source` (
-  `id_source_type` int(10) unsigned NOT NULL auto_increment,
-  `source_type_code` varchar(64) NOT NULL,
+  `id_business_source` int(10) unsigned NOT NULL auto_increment,
+  `code` varchar(64) NOT NULL,
   `position` int(10) unsigned NOT NULL DEFAULT '0',
   `unremovable` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `active` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
   `deleted` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
-  PRIMARY KEY (`id_source_type`),
-  UNIQUE KEY `source_type_code` (`source_type_code`)
+  PRIMARY KEY (`id_business_source`),
+  UNIQUE KEY `code` (`code`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_business_source_lang` (
-  `id_source_type` int(10) unsigned NOT NULL,
+  `id_business_source` int(10) unsigned NOT NULL,
   `id_lang` int(10) unsigned NOT NULL,
   `name` varchar(64) NOT NULL,
-  PRIMARY KEY (`id_source_type`,`id_lang`)
+  PRIMARY KEY (`id_business_source`,`id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_source` (
   `id_source` int(10) unsigned NOT NULL auto_increment,
-  `id_source_type` int(10) unsigned NOT NULL,
-  `source_code` varchar(64) NOT NULL,
+  `id_business_source` int(10) unsigned NOT NULL,
+  `code` varchar(64) NOT NULL,
   `position` int(10) unsigned NOT NULL DEFAULT '0',
   `unremovable` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
   `active` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
@@ -1912,8 +1912,8 @@ CREATE TABLE `PREFIX_source` (
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_source`),
-  UNIQUE KEY `source_code` (`source_code`),
-  KEY `id_source_type` (`id_source_type`)
+  UNIQUE KEY `code` (`code`),
+  KEY `id_business_source` (`id_business_source`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_source_lang` (

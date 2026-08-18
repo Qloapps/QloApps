@@ -24,17 +24,16 @@
 
 class AdminSourcesControllerCore extends AdminController
 {
-    protected $position_identifier = 'id_source_type';
-
-    /** @var int Total order count, cached once per list render for the Orders % column */
+    protected $position_identifier = 'id_business_source';
     protected $ordersTotal = 0;
+    protected $viewBusinessSource;
 
     public function __construct()
     {
         $this->bootstrap = true;
         $this->table = 'business_source';
         $this->className = 'BusinessSource';
-        $this->identifier = 'id_source_type';
+        $this->identifier = 'id_business_source';
         $this->list_id = 'business_source';
         $this->lang = true;
         $this->deleted = false;
@@ -72,7 +71,7 @@ class AdminSourcesControllerCore extends AdminController
             $this->display = Tools::getValue('id_source') ? 'edit' : 'add';
         }
         if (Tools::isSubmit('submitAddbusiness_source') || Tools::isSubmit('submitAddbusiness_sourceAndStay')) {
-            $this->display = Tools::getValue('id_source_type') ? 'edit' : 'add';
+            $this->display = Tools::getValue('id_business_source') ? 'edit' : 'add';
         }
 
         return parent::init();
@@ -84,14 +83,15 @@ class AdminSourcesControllerCore extends AdminController
             $this->list_id = 'source';
             $this->display = 'view';
             
-            $idSourceType = (int) Tools::getValue('id_source_type');
-            self::$currentIndex .= '&id_source_type=' . $idSourceType . '&viewbusiness_source';
+            $idBusinessSource = (int) Tools::getValue('id_business_source');
+            self::$currentIndex .= '&id_business_source=' . $idBusinessSource . '&viewbusiness_source';
             if (Tools::isSubmit('submitResetsource')) {
                 $this->processResetFilters('source');
             }
         }
         parent::initContent();
     }
+
     /**
      * @see AdminController::initPageHeaderToolbar()
      */
@@ -104,10 +104,10 @@ class AdminSourcesControllerCore extends AdminController
                 'icon' => 'process-icon-new'
             );
         } elseif ($this->display == 'view') {
-            $idSourceType = (int)Tools::getValue('id_source_type');
-            if ($idSourceType) {
+            $idBusinessSource = (int)Tools::getValue('id_business_source');
+            if ($idBusinessSource) {
                 $this->page_header_toolbar_btn['new_source'] = array(
-                    'href' => self::$currentIndex.'&addsource&id_source_type='.$idSourceType.'&token='.$this->token,
+                    'href' => self::$currentIndex.'&addsource&id_business_source='.$idBusinessSource.'&token='.$this->token,
                     'desc' => $this->l('Add new Booking Source', null, null, false),
                     'icon' => 'process-icon-new'
                 );
@@ -128,7 +128,7 @@ class AdminSourcesControllerCore extends AdminController
     protected function initBusinessSourcesList()
     {
         $this->fields_list = array(
-            'id_source_type' => array(
+            'id_business_source' => array(
                 'title' => $this->l('ID'),
                 'align' => 'text-center',
                 'class' => 'fixed-width-xs'
@@ -138,7 +138,7 @@ class AdminSourcesControllerCore extends AdminController
                 'width' => 'auto',
                 'filter_key' => 'b!name'
             ),
-            'source_type_code' => array(
+            'code' => array(
                 'title' => $this->l('Code'),
                 'align' => 'text-center'
             ),
@@ -185,7 +185,7 @@ class AdminSourcesControllerCore extends AdminController
                 'orderby' => false,
                 'search' => false,
             ),
-            'source_code' => array(
+            'code' => array(
                 'title' => $this->l('Code'),
                 'align' => 'text-center'
             ),
@@ -224,7 +224,7 @@ class AdminSourcesControllerCore extends AdminController
         $this->_where = 'AND a.`deleted` = 0';
         $this->_select = '(SELECT COUNT(*) FROM `'._DB_PREFIX_.'orders` o
             INNER JOIN `'._DB_PREFIX_.'source` s ON s.`id_source` = o.`id_source`
-            WHERE s.`id_source_type` = a.`id_source_type`) AS `orders_count`';
+            WHERE s.`id_business_source` = a.`id_business_source`) AS `orders_count`';
         $this->ordersTotal = Source::getTotalOrderCount();
         $this->initBusinessSourcesList();
         $this->toolbar_title = $this->l('Business Source');
@@ -234,11 +234,12 @@ class AdminSourcesControllerCore extends AdminController
 
     public function renderView()
     {
-        $idSourceType = (int)Tools::getValue('id_source_type');
-        $objBusinessSource = new BusinessSource($idSourceType, (int)$this->context->language->id);
+        $idBusinessSource = (int)Tools::getValue('id_business_source');
+        $objBusinessSource = new BusinessSource($idBusinessSource, (int)$this->context->language->id);
         if (!Validate::isLoadedObject($objBusinessSource)) {
             Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token);
         }
+        $this->viewBusinessSource = $objBusinessSource;
 
         $this->addRowAction('edit');
         $this->addRowAction('merge');
@@ -252,14 +253,38 @@ class AdminSourcesControllerCore extends AdminController
         $this->_select = 'bsl.`name` AS `source_type_name`,
             (SELECT COUNT(*) FROM `'._DB_PREFIX_.'orders` o WHERE o.`id_source` = a.`id_source`) AS `orders_count`';
         $this->ordersTotal = $objBusinessSource->getOrderCount();
-        $this->_join = 'LEFT JOIN `'._DB_PREFIX_.'business_source` bs ON (bs.`id_source_type` = a.`id_source_type`)';
-        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'business_source_lang` bsl ON (bsl.`id_source_type` = bs.`id_source_type` AND bsl.`id_lang` = '.(int)$this->context->language->id.')';
-        $this->_where = 'AND a.`deleted` = 0 AND a.`id_source_type` = '.(int)$objBusinessSource->id;
+        $this->_join = 'LEFT JOIN `'._DB_PREFIX_.'business_source` bs ON (bs.`id_business_source` = a.`id_business_source`)';
+        $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'business_source_lang` bsl ON (bsl.`id_business_source` = bs.`id_business_source` AND bsl.`id_lang` = '.(int)$this->context->language->id.')';
+        $this->_where = 'AND a.`deleted` = 0 AND a.`id_business_source` = '.(int)$objBusinessSource->id;
         $this->initSourcesList();
 
-        $this->toolbar_title = sprintf($this->l('Booking Source - %s'),$objBusinessSource->name);
         $this->processFilter();
-        return parent::renderList();
+        $list = parent::renderList();
+
+        $this->page_header_toolbar_title = $this->l('Business Source:').' '.$objBusinessSource->name;
+        $this->toolbar_title = $this->getSourcesListTitle();
+
+        return $list;
+    }
+
+    protected function getSourcesListTitle()
+    {
+        if (!Validate::isLoadedObject($this->viewBusinessSource)) {
+            return $this->l('Booking Sources');
+        }
+
+        return $this->viewBusinessSource->name.' <span class="badge">'.$this->_listTotal.'</span>';
+    }
+
+    public function getTemplateListVars()
+    {
+        $vars = parent::getTemplateListVars();
+
+        if ($this->display == 'view' && $this->table == 'source') {
+            $vars['title'] = $this->getSourcesListTitle();
+        }
+
+        return $vars;
     }
 
     public function renderForm()
@@ -298,9 +323,13 @@ class AdminSourcesControllerCore extends AdminController
                 array(
                     'type' => 'text',
                     'label' => $this->l('Code'),
-                    'name' => 'source_type_code',
+                    'name' => 'code',
                     'required' => true,
-                    'hint' => $this->l('A short unique machine code, e.g. "OTA". Letters, numbers, underscores and hyphens only.')
+                    'class' => 'fixed-width-xl',
+                    'readonly' => (bool)$objBusinessSource->id,
+                    'hint' => $objBusinessSource->id
+                        ? $this->l('The code cannot be changed after creation.')
+                        : $this->l('A short unique machine code, e.g. "OTA". Letters, numbers, underscores and hyphens only.')
                 ),
                 array(
                     'type' => 'switch',
@@ -346,6 +375,7 @@ class AdminSourcesControllerCore extends AdminController
         }
 
         $businessSources = BusinessSource::getActiveList((int)$this->context->language->id);
+        $isUnremovableSource = $objSource->id && in_array($objSource->id, Source::getUnremovableIds());
 
         $this->fields_form = array(
             'legend' => array(
@@ -364,20 +394,24 @@ class AdminSourcesControllerCore extends AdminController
                 array(
                     'type' => 'select',
                     'label' => $this->l('Business Source'),
-                    'name' => 'id_source_type',
+                    'name' => 'id_business_source',
                     'required' => true,
                     'options' => array(
                         'query' => $businessSources,
-                        'id' => 'id_source_type',
+                        'id' => 'id_business_source',
                         'name' => 'name',
                     ),
                 ),
                 array(
                     'type' => 'text',
                     'label' => $this->l('Source Code'),
-                    'name' => 'source_code',
+                    'name' => 'code',
                     'required' => true,
-                    'hint' => $this->l('A short unique machine code, e.g. "BOOKING_COM". Letters, numbers, underscores and hyphens only.')
+                    'class' => 'fixed-width-xl',
+                    'readonly' => (bool)$objSource->id,
+                    'hint' => $objSource->id
+                        ? $this->l('The code cannot be changed after creation.')
+                        : $this->l('A short unique machine code, e.g. "BOOKING_COM". Letters, numbers, underscores and hyphens only.')
                 ),
                 array(
                     'type' => 'switch',
@@ -387,6 +421,8 @@ class AdminSourcesControllerCore extends AdminController
                     'class' => 't',
                     'is_bool' => true,
                     'default_value' => 1,
+                    'disabled' => $isUnremovableSource,
+                    'hint' => $isUnremovableSource ? $this->l('Built-in Booking Sources cannot be disabled.') : null,
                     'values' => array(
                         array('id' => 'active_on', 'value' => 1, 'label' => $this->l('Enabled')),
                         array('id' => 'active_off', 'value' => 0, 'label' => $this->l('Disabled')),
@@ -447,22 +483,22 @@ class AdminSourcesControllerCore extends AdminController
         } elseif (!$objSource->delete()) {
             $this->errors[] = Tools::displayError('An error occurred while deleting the Booking Source.');
         } else {
-            Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$objSource->id_source_type.'&conf=1&token='.$this->token);
+            Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_business_source='.(int)$objSource->id_business_source.'&conf=1&token='.$this->token);
         }
     }
 
     protected function postProcessStatusSource()
     {
         if (Validate::isLoadedObject($objSource = new Source((int)Tools::getValue('id_source')))) {
-            $idSourceType = $objSource->id_source_type;
+            $idBusinessSource = $objSource->id_business_source;
             $newActive = !$objSource->active;
-            $objBusinessSource = new BusinessSource($idSourceType);
+            $objBusinessSource = new BusinessSource($idBusinessSource);
             if ($newActive && (!Validate::isLoadedObject($objBusinessSource) || !$objBusinessSource->active)) {
                 $this->errors[] = $this->l('You cannot enable this Booking Source because its Business Source is disabled.');
             } else {
                 $objSource->active = $newActive;
                 if ($objSource->save()) {
-                    $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&conf=5&token='.$this->token;
+                    $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_business_source='.(int)$idBusinessSource.'&conf=5&token='.$this->token;
                 }
             }
         }
@@ -470,10 +506,10 @@ class AdminSourcesControllerCore extends AdminController
 
     protected function postProcessBulkDeleteSource()
     {
-        $idSourceType = 0;
+        $idBusinessSource = 0;
         foreach (Tools::getValue('sourceBox') as $selection) {
             $objSource = new Source((int)$selection);
-            $idSourceType = $objSource->id_source_type;
+            $idBusinessSource = $objSource->id_business_source;
             if (!$objSource->isRemovable()) {
                 $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Booking Source.');
                 break;
@@ -485,13 +521,13 @@ class AdminSourcesControllerCore extends AdminController
             $this->table = 'source';
             $this->boxes = Tools::getValue('sourceBox');
             parent::processBulkDelete();
-            $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&conf=1&token='.$this->token;
+            $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_business_source='.(int)$idBusinessSource.'&conf=1&token='.$this->token;
         }
     }
 
     protected function postProcessDeleteBusinessSource()
     {
-        $objBusinessSource = new BusinessSource((int)Tools::getValue('id_source_type'));
+        $objBusinessSource = new BusinessSource((int)Tools::getValue('id_business_source'));
         if (!$objBusinessSource->isRemovable()) {
             $this->errors[] = $this->l('For security reasons, you cannot delete a built-in Business Source.');
         } else {
@@ -516,7 +552,7 @@ class AdminSourcesControllerCore extends AdminController
 
     protected function processUpdateStatusBulk($status = 1)
     {
-        $idSourceType = (int)Tools::getValue('id_source_type');
+        $idBusinessSource = (int)Tools::getValue('id_business_source');
         $this->className = 'Source';
         $this->table = 'source';
         $this->boxes = Tools::getValue('sourceBox');
@@ -525,7 +561,7 @@ class AdminSourcesControllerCore extends AdminController
         } elseif ($status) {
             foreach ($this->boxes as $selection) {
                 $objSource = new Source((int)$selection);
-                $objBusinessSource = new BusinessSource($objSource->id_source_type);
+                $objBusinessSource = new BusinessSource($objSource->id_business_source);
                 if (!Validate::isLoadedObject($objBusinessSource) || !$objBusinessSource->active) {
                     $this->errors[] = $this->l('You cannot enable a Booking Source whose Business Source is disabled.');
                     break;
@@ -535,15 +571,17 @@ class AdminSourcesControllerCore extends AdminController
         $this->display = 'view';
         if(!$this->errors){
             parent::processBulkStatusSelection($status);
-            $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_source_type='.(int)$idSourceType.'&conf=5&token='.$this->token;
+            $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_business_source='.(int)$idBusinessSource.'&conf=5&token='.$this->token;
         }
     }
 
     protected function postProcessSource()
     {
         $idSource = (int)Tools::getValue('id_source');
-        $idSourceType = (int)Tools::getValue('id_source_type');
-        $sourceCode = trim(Tools::getValue('source_code'));
+        $idBusinessSource = (int)Tools::getValue('id_business_source');
+        $objSource = new Source($idSource);
+        $sourceCode = $idSource ? $objSource->code : trim(Tools::getValue('code'));
+        $isUnremovableSource = $idSource && in_array($idSource, Source::getUnremovableIds());
 
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
         $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
@@ -561,17 +599,19 @@ class AdminSourcesControllerCore extends AdminController
             }
         }
 
-        $objBusinessSource = new BusinessSource($idSourceType);
+        $objBusinessSource = new BusinessSource($idBusinessSource);
         if (!Validate::isLoadedObject($objBusinessSource) || $objBusinessSource->deleted) {
             $this->errors[] = $this->l('Please select a valid Business Source.');
-        } elseif ((int)Tools::getValue('active') && !$objBusinessSource->active) {
+        } elseif (!$isUnremovableSource && (int)Tools::getValue('active') && !$objBusinessSource->active) {
             $this->errors[] = $this->l('You cannot enable this Booking Source because its Business Source is disabled.');
         }
 
-        if (!$sourceCode || !Validate::isModuleName($sourceCode)) {
-            $this->errors[] = $this->l('Source Code is invalid. Only letters, numbers, underscores and hyphens are allowed.');
-        } elseif (Source::codeExists($sourceCode, $idSource)) {
-            $this->errors[] = $this->l('This Source Code is already used by another Booking Source.');
+        if (!$idSource) {
+            if (!$sourceCode || !Validate::isModuleName($sourceCode)) {
+                $this->errors[] = $this->l('Source Code is invalid. Only letters, numbers, underscores and hyphens are allowed.');
+            } elseif (Source::codeExists($sourceCode, $idSource)) {
+                $this->errors[] = $this->l('This Source Code is already used by another Booking Source.');
+            }
         }
 
         if (count($this->errors)) {
@@ -579,10 +619,9 @@ class AdminSourcesControllerCore extends AdminController
             return false;
         }
 
-        $objSource = new Source($idSource);
-        $objSource->id_source_type = $idSourceType;
-        $objSource->source_code = $sourceCode;
-        $objSource->active = (int)Tools::getValue('active');
+        $objSource->id_business_source = $idBusinessSource;
+        $objSource->code = $sourceCode;
+        $objSource->active = $isUnremovableSource ? $objSource->active : (int)Tools::getValue('active');
         $objSource->name = array();
         foreach (Language::getIDs(false) as $idLang) {
             $objSource->name[$idLang] = Tools::getValue('name_'.$idLang);
@@ -598,12 +637,12 @@ class AdminSourcesControllerCore extends AdminController
             Tools::redirectAdmin(self::$currentIndex.'&updatesource&id_source='.$objSource->id.'&conf='.($idSource ? 4 : 3).'&token='.$this->token);
         }
 
-        Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_source_type='.$idSourceType.'&conf='.($idSource ? 4 : 3).'&token='.$this->token);
+        Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_business_source='.$idBusinessSource.'&conf='.($idSource ? 4 : 3).'&token='.$this->token);
     }
 
     protected function postProcessMergeSource()
     {
-        $idSourceType = (int)Tools::getValue('id_source_type');
+        $idBusinessSource = (int)Tools::getValue('id_business_source');
         $idCurrentSource = (int)Tools::getValue('current_source');
         $idTargetSource = (int)Tools::getValue('target_source');
 
@@ -611,7 +650,7 @@ class AdminSourcesControllerCore extends AdminController
         $objTarget = new Source($idTargetSource);
 
         if (!Validate::isLoadedObject($objCurrent) || !Validate::isLoadedObject($objTarget)
-            || (int)$objCurrent->id_source_type !== $idSourceType || (int)$objTarget->id_source_type !== $idSourceType
+            || (int)$objCurrent->id_business_source !== $idBusinessSource || (int)$objTarget->id_business_source !== $idBusinessSource
         ) {
             $this->errors[] = $this->l('Please select valid Current and Target Booking Sources.');
         } elseif ($idCurrentSource === $idTargetSource) {
@@ -621,14 +660,19 @@ class AdminSourcesControllerCore extends AdminController
         }
         $this->display = 'view';
         if (!count($this->errors)) {
-            Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_source_type='.$idSourceType.'&conf=4&token='.$this->token);
+            Tools::redirectAdmin(self::$currentIndex.'&viewbusiness_source&id_business_source='.$idBusinessSource.'&conf=4&token='.$this->token);
         }
     }
 
     protected function postProcessBusinessSource()
     {
-        $idSourceType = (int)Tools::getValue('id_source_type');
-        $sourceTypeCode = trim(Tools::getValue('source_type_code'));
+        $idBusinessSource = (int)Tools::getValue('id_business_source');
+        if ($idBusinessSource) {
+            $sourceTypeCode = (new BusinessSource($idBusinessSource))->code;
+            $_POST['code'] = $sourceTypeCode;
+        } else {
+            $sourceTypeCode = trim(Tools::getValue('code'));
+        }
 
         $defaultLangId = Configuration::get('PS_LANG_DEFAULT');
         $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
@@ -645,14 +689,16 @@ class AdminSourcesControllerCore extends AdminController
                 }
             }
         }
-        if (!$sourceTypeCode || !Validate::isModuleName($sourceTypeCode)) {
-            $this->errors[] = $this->l('Code is invalid. Only letters, numbers, underscores and hyphens are allowed.');
-        } elseif (BusinessSource::codeExists($sourceTypeCode, $idSourceType)) {
-            $this->errors[] = $this->l('This Code is already used by another Business Source.');
+        if (!$idBusinessSource) {
+            if (!$sourceTypeCode || !Validate::isModuleName($sourceTypeCode)) {
+                $this->errors[] = $this->l('Code is invalid. Only letters, numbers, underscores and hyphens are allowed.');
+            } elseif (BusinessSource::codeExists($sourceTypeCode, $idBusinessSource)) {
+                $this->errors[] = $this->l('This Code is already used by another Business Source.');
+            }
         }
 
         if (count($this->errors)) {
-            $this->display = $idSourceType ? 'edit' : 'add';
+            $this->display = $idBusinessSource ? 'edit' : 'add';
             return false;
         }
 
@@ -665,15 +711,32 @@ class AdminSourcesControllerCore extends AdminController
         return $percentage.'%';
     }
 
+    public function displayEnableLink($token, $id, $value, $active, $id_category = null, $id_product = null, $ajax = false)
+    {
+        if ($this->table == 'source' && in_array((int)$id, Source::getUnremovableIds())) {
+            return '<span class="list-action-enable action-enabled" title="'.$this->l('Built-in Booking Sources cannot be disabled.').'">
+                <i class="icon-check"></i>
+            </span>';
+        }
+
+        $helper = new HelperList();
+        $helper->token = $this->token;
+        $helper->currentIndex = self::$currentIndex;
+        $helper->table = $this->table;
+        $helper->identifier = $this->identifier;
+
+        return $helper->displayEnableLink($token, $id, $value, $active, $id_category, $id_product, $ajax);
+    }
+
     public function displayMergeLink($token, $id, $name = null)
     {
-        $idSourceType = (int) Tools::getValue('id_source_type');
+        $idBusinessSource = (int) Tools::getValue('id_business_source');
 
         return '<a href="#"
                 class="merge-source-btn"
                 title="' . $this->l('Merge') . '"
                 data-id-source="' . (int) $id . '"
-                data-id-source-type="' . $idSourceType . '"
+                data-id-business-source="' . $idBusinessSource . '"
                 data-ajax-url="' . self::$currentIndex . '&token=' . ($token ?: $this->token) . '">
                 <i class="icon-random"></i> ' . $this->l('Merge') . '
             </a>';
@@ -684,14 +747,14 @@ class AdminSourcesControllerCore extends AdminController
         $response = array('hasError' => 1);
 
         if ($this->tabAccess['edit'] === 1) {
-            $idSourceType = (int)Tools::getValue('id_source_type');
+            $idBusinessSource = (int)Tools::getValue('id_business_source');
             $idSource = (int)Tools::getValue('id_source');
             $objSource = new Source($idSource,(int)$this->context->language->id);
-            if (Validate::isLoadedObject($objSource) && (int)$objSource->id_source_type === $idSourceType) {
+            if (Validate::isLoadedObject($objSource) && (int)$objSource->id_business_source === $idBusinessSource) {
                 $this->context->smarty->assign(array(
-                    'sources' => Source::getActiveSource($idSourceType, $idSource, (int)$this->context->language->id),
+                    'sources' => Source::getActiveSource($idBusinessSource, $idSource, (int)$this->context->language->id),
                     'current_source' => $objSource,
-                    'id_source_type' => $idSourceType,
+                    'id_business_source' => $idBusinessSource,
                     'current_index' => self::$currentIndex,
                     'token' => $this->token,
                 ));

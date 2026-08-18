@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <entity_source>
   <source id="Direct_Website">
-    <name>Direct Website</name>
+    <name>Tiesioginė Svetainė</name>
   </source>
   <source id="Walk_in">
-    <name>Walk-in</name>
+    <name>Be Rezervacijos</name>
   </source>
   <source id="Phone">
-    <name>Phone</name>
+    <name>Telefonas</name>
   </source>
   <source id="Email">
-    <name>Email</name>
+    <name>El. Paštas</name>
   </source>
   <source id="Social_Media">
-    <name>Social Media</name>
+    <name>Socialiniai Tinklai</name>
   </source>
   <source id="WhatsApp">
     <name>WhatsApp</name>
@@ -52,6 +52,6 @@
     <name>HyperGuest</name>
   </source>
   <source id="Api_Order">
-    <name>API Order</name>
+    <name>API užsakymas</name>
   </source>
 </entity_source>

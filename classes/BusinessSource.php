@@ -24,7 +24,7 @@
 class BusinessSourceCore extends ObjectModel
 {
     public $name;
-    public $source_type_code;
+    public $code;
     public $position;
     public $unremovable;
     public $active;
@@ -34,10 +34,10 @@ class BusinessSourceCore extends ObjectModel
 
     public static $definition = array(
         'table' => 'business_source',
-        'primary' => 'id_source_type',
+        'primary' => 'id_business_source',
         'multilang' => true,
         'fields' => array(
-            'source_type_code' => array('type' => self::TYPE_STRING, 'validate' => 'isModuleName', 'required' => true, 'size' => 64),
+            'code' =>             array('type' => self::TYPE_STRING, 'validate' => 'isModuleName', 'required' => true, 'size' => 64),
             'position' =>        array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'unremovable' =>      array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'active' =>           array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
@@ -72,7 +72,7 @@ class BusinessSourceCore extends ObjectModel
     {
         return (bool)Db::getInstance()->execute(
             'UPDATE `'._DB_PREFIX_.'source` SET `active` = 0
-            WHERE `id_source_type` = '.(int)$this->id.' AND `deleted` = 0'
+            WHERE `id_business_source` = '.(int)$this->id.' AND `deleted` = 0'
         );
     }
 
@@ -88,7 +88,7 @@ class BusinessSourceCore extends ObjectModel
     public function updatePosition($way, $position)
     {
         if (!$res = Db::getInstance()->executeS('
-            SELECT `position`, `id_source_type`
+            SELECT `position`, `id_business_source`
             FROM `'._DB_PREFIX_.'business_source`
             WHERE `deleted` = 0
             ORDER BY `position` ASC'
@@ -98,7 +98,7 @@ class BusinessSourceCore extends ObjectModel
 
         $moved_item = null;
         foreach ($res as $row) {
-            if ((int)$row['id_source_type'] == (int)$this->id) {
+            if ((int)$row['id_business_source'] == (int)$this->id) {
                 $moved_item = $row;
             }
         }
@@ -117,7 +117,7 @@ class BusinessSourceCore extends ObjectModel
         ) && Db::getInstance()->execute('
             UPDATE `'._DB_PREFIX_.'business_source`
             SET `position` = '.(int)$position.'
-            WHERE `id_source_type` = '.(int)$moved_item['id_source_type']));
+            WHERE `id_business_source` = '.(int)$moved_item['id_business_source']));
     }
 
     public static function cleanPositions()
@@ -125,7 +125,7 @@ class BusinessSourceCore extends ObjectModel
         $return = true;
 
         $result = Db::getInstance()->executeS('
-            SELECT `id_source_type`
+            SELECT `id_business_source`
             FROM `'._DB_PREFIX_.'business_source`
             WHERE `deleted` = 0
             ORDER BY `position` ASC'
@@ -136,7 +136,7 @@ class BusinessSourceCore extends ObjectModel
             $return = Db::getInstance()->execute('
                 UPDATE `'._DB_PREFIX_.'business_source`
                 SET `position` = '.(int)$i++.'
-                WHERE `id_source_type` = '.(int)$row['id_source_type']
+                WHERE `id_business_source` = '.(int)$row['id_business_source']
             ) && $return;
         }
 
@@ -146,27 +146,27 @@ class BusinessSourceCore extends ObjectModel
     public static function codeExists($code, $idExclude = 0)
     {
         return (bool)Db::getInstance()->getValue(
-            'SELECT `id_source_type` FROM `'._DB_PREFIX_.'business_source`
-            WHERE `source_type_code` = \''.pSQL($code).'\' AND `id_source_type` != '.(int)$idExclude
+            'SELECT `id_business_source` FROM `'._DB_PREFIX_.'business_source`
+            WHERE `code` = \''.pSQL($code).'\' AND `id_business_source` != '.(int)$idExclude
         );
     }
 
     public static function getUnremovableIds()
     {
         $rows = Db::getInstance()->executeS(
-            'SELECT `id_source_type` FROM `'._DB_PREFIX_.'business_source` WHERE `unremovable` = 1 AND `deleted` = 0'
+            'SELECT `id_business_source` FROM `'._DB_PREFIX_.'business_source` WHERE `unremovable` = 1 AND `deleted` = 0'
         );
 
-        return array_map('intval', array_column($rows, 'id_source_type'));
+        return array_map('intval', array_column($rows, 'id_business_source'));
     }
 
     public static function getActiveList($idLang)
     {
         return Db::getInstance()->executeS('
-            SELECT bs.`id_source_type`, bsl.`name`
+            SELECT bs.`id_business_source`, bsl.`name`
             FROM `'._DB_PREFIX_.'business_source` bs
             LEFT JOIN `'._DB_PREFIX_.'business_source_lang` bsl
-                ON (bsl.`id_source_type` = bs.`id_source_type` AND bsl.`id_lang` = '.(int)$idLang.')
+                ON (bsl.`id_business_source` = bs.`id_business_source` AND bsl.`id_lang` = '.(int)$idLang.')
             WHERE bs.`deleted` = 0
             ORDER BY bs.`position` ASC
         ');
@@ -187,7 +187,7 @@ class BusinessSourceCore extends ObjectModel
         return (bool)Db::getInstance()->getValue(
             'SELECT COUNT(*) FROM `'._DB_PREFIX_.'source` s
             INNER JOIN `'._DB_PREFIX_.'orders` o ON o.`id_source` = s.`id_source`
-            WHERE s.`id_source_type` = '.(int)$this->id
+            WHERE s.`id_business_source` = '.(int)$this->id
         );
     }
 
@@ -201,7 +201,7 @@ class BusinessSourceCore extends ObjectModel
         return (int)Db::getInstance()->getValue(
             'SELECT COUNT(*) FROM `'._DB_PREFIX_.'source` s
             INNER JOIN `'._DB_PREFIX_.'orders` o ON o.`id_source` = s.`id_source`
-            WHERE s.`id_source_type` = '.(int)$this->id
+            WHERE s.`id_business_source` = '.(int)$this->id
         );
     }
 
@@ -220,7 +220,7 @@ class BusinessSourceCore extends ObjectModel
         $keepSoft = $this->hasSourceUsedByOrder();
 
         $sources = Db::getInstance()->executeS(
-            'SELECT `id_source` FROM `'._DB_PREFIX_.'source` WHERE `id_source_type` = '.(int)$this->id.' AND `deleted` = 0'
+            'SELECT `id_source` FROM `'._DB_PREFIX_.'source` WHERE `id_business_source` = '.(int)$this->id.' AND `deleted` = 0'
         );
         foreach ($sources as $row) {
             $objSource = new Source((int)$row['id_source']);

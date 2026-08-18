@@ -24,8 +24,8 @@
 class SourceCore extends ObjectModel
 {
     public $name;
-    public $id_source_type;
-    public $source_code;
+    public $id_business_source;
+    public $code;
     public $position;
     public $unremovable;
     public $active;
@@ -38,8 +38,8 @@ class SourceCore extends ObjectModel
         'primary' => 'id_source',
         'multilang' => true,
         'fields' => array(
-            'id_source_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
-            'source_code' =>   array('type' => self::TYPE_STRING, 'validate' => 'isModuleName', 'required' => true, 'size' => 64),
+            'id_business_source' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
+            'code' =>          array('type' => self::TYPE_STRING, 'validate' => 'isModuleName', 'required' => true, 'size' => 64),
             'position' =>      array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'unremovable' =>   array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'active' =>        array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
@@ -53,17 +53,17 @@ class SourceCore extends ObjectModel
     public function add($autodate = true, $nullValues = false)
     {
         if ($this->position <= 0) {
-            $this->position = Source::getHigherPosition($this->id_source_type) + 1;
+            $this->position = Source::getHigherPosition($this->id_business_source) + 1;
         }
 
         return parent::add($autodate, $nullValues);
     }
 
-    public static function getHigherPosition($idSourceType)
+    public static function getHigherPosition($idBusinessSource)
     {
         $position = Db::getInstance()->getValue(
             'SELECT MAX(`position`) FROM `'._DB_PREFIX_.'source`
-            WHERE `id_source_type` = '.(int)$idSourceType.' AND `deleted` = 0'
+            WHERE `id_business_source` = '.(int)$idBusinessSource.' AND `deleted` = 0'
         );
 
         return is_numeric($position) ? (int)$position : -1;
@@ -74,7 +74,7 @@ class SourceCore extends ObjectModel
         if (!$res = Db::getInstance()->executeS('
             SELECT `position`, `id_source`
             FROM `'._DB_PREFIX_.'source`
-            WHERE `id_source_type` = '.(int)$this->id_source_type.' AND `deleted` = 0
+            WHERE `id_business_source` = '.(int)$this->id_business_source.' AND `deleted` = 0
             ORDER BY `position` ASC'
         )) {
             return false;
@@ -94,7 +94,7 @@ class SourceCore extends ObjectModel
         return (Db::getInstance()->execute('
             UPDATE `'._DB_PREFIX_.'source`
             SET `position` = `position` '.($way ? '- 1' : '+ 1').'
-            WHERE `id_source_type` = '.(int)$this->id_source_type.' AND `deleted` = 0 AND `position`
+            WHERE `id_business_source` = '.(int)$this->id_business_source.' AND `deleted` = 0 AND `position`
             '.($way
                 ? '> '.(int)$moved_item['position'].' AND `position` <= '.(int)$position
                 : '< '.(int)$moved_item['position'].' AND `position` >= '.(int)$position)
@@ -108,7 +108,7 @@ class SourceCore extends ObjectModel
     {
         return (bool)Db::getInstance()->getValue(
             'SELECT `id_source` FROM `'._DB_PREFIX_.'source`
-            WHERE `source_code` = \''.pSQL($code).'\' AND `id_source` != '.(int)$idExclude
+            WHERE `code` = \''.pSQL($code).'\' AND `id_source` != '.(int)$idExclude
         );
     }
 
@@ -116,7 +116,7 @@ class SourceCore extends ObjectModel
     {
         return (int)Db::getInstance()->getValue(
             'SELECT `id_source` FROM `'._DB_PREFIX_.'source`
-            WHERE `source_code` = \''.pSQL($code).'\' AND `deleted` = 0'
+            WHERE `code` = \''.pSQL($code).'\' AND `deleted` = 0'
         );
     }
 
@@ -129,14 +129,33 @@ class SourceCore extends ObjectModel
         return array_map('intval', array_column($rows, 'id_source'));
     }
 
-    public static function getActiveSource($idSourceType, $idSource, $idLang)
+    public static function getActiveSource($idBusinessSource, $idSource, $idLang)
     {
         return Db::getInstance()->executeS('
             SELECT a.`id_source`, al.`name`
             FROM `'._DB_PREFIX_.'source` a
             LEFT JOIN `'._DB_PREFIX_.'source_lang` al ON (al.`id_source` = a.`id_source` AND al.`id_lang` = '.(int)$idLang.')
-            WHERE a.`id_source_type` = '.(int)$idSourceType.' AND a.`deleted` = 0 AND a.`id_source` NOT IN ('.(int)$idSource.') AND a.`active` = 1
+            WHERE a.`id_business_source` = '.(int)$idBusinessSource.' AND a.`deleted` = 0 AND a.`id_source` NOT IN ('.(int)$idSource.') AND a.`active` = 1
             ORDER BY a.`position` ASC
+        ');
+    }
+
+    public static function getAllSource($active = null, $idLang = null)
+    {
+        $idLang = $idLang ?: (int)Context::getContext()->language->id;
+
+        $where = ' WHERE a.`deleted` = 0';
+        if ($active !== null) {
+            $where .= ' AND a.`active` = '.(int)(bool)$active;
+        }
+
+        return Db::getInstance()->executeS('
+            SELECT a.`id_source`, a.`id_business_source`, al.`name`, bsl.`name` AS `business_source_name`
+            FROM `'._DB_PREFIX_.'source` a
+            LEFT JOIN `'._DB_PREFIX_.'source_lang` al ON (al.`id_source` = a.`id_source` AND al.`id_lang` = '.(int)$idLang.')
+            LEFT JOIN `'._DB_PREFIX_.'business_source_lang` bsl ON (bsl.`id_business_source` = a.`id_business_source` AND bsl.`id_lang` = '.(int)$idLang.')
+            '.$where.'
+            ORDER BY a.`id_business_source` ASC, a.`position` ASC
         ');
     }
 
@@ -150,14 +169,14 @@ class SourceCore extends ObjectModel
         ');
     }
 
-    public static function cleanPositions($idSourceType)
+    public static function cleanPositions($idBusinessSource)
     {
         $return = true;
 
         $result = Db::getInstance()->executeS('
             SELECT `id_source`
             FROM `'._DB_PREFIX_.'source`
-            WHERE `id_source_type` = '.(int)$idSourceType.' AND `deleted` = 0
+            WHERE `id_business_source` = '.(int)$idBusinessSource.' AND `deleted` = 0
             ORDER BY `position` ASC'
         );
 
@@ -212,7 +231,7 @@ class SourceCore extends ObjectModel
             return false;
         }
 
-        return Source::cleanPositions($this->id_source_type);
+        return Source::cleanPositions($this->id_business_source);
     }
 
     public static function getDefaultSourceId()

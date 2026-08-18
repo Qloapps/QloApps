@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <entity_source>
   <source id="Direct_Website">
-    <name>Direct Website</name>
+    <name>Sitio Web Directo</name>
   </source>
   <source id="Walk_in">
-    <name>Walk-in</name>
+    <name>Sin reserva</name>
   </source>
   <source id="Phone">
-    <name>Phone</name>
+    <name>Teléfono</name>
   </source>
   <source id="Email">
-    <name>Email</name>
+    <name>Correo electrónico</name>
   </source>
   <source id="Social_Media">
-    <name>Social Media</name>
+    <name>Redes Sociales</name>
   </source>
   <source id="WhatsApp">
     <name>WhatsApp</name>
@@ -52,6 +52,6 @@
     <name>HyperGuest</name>
   </source>
   <source id="Api_Order">
-    <name>API Order</name>
+    <name>Pedido API</name>
   </source>
 </entity_source>

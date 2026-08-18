@@ -77,7 +77,7 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->_select .= ',
         (SELECT sl.`name` FROM `'._DB_PREFIX_.'source` s LEFT JOIN `'._DB_PREFIX_.'source_lang` sl ON (sl.`id_source` = s.`id_source` AND sl.`id_lang` = '.(int)$this->context->language->id.') WHERE s.`id_source` = a.`id_source`) AS `booking_source_name`,
-        (SELECT s.`source_code` FROM `'._DB_PREFIX_.'source` s WHERE s.`id_source` = a.`id_source`) AS `booking_source_code`';
+        (SELECT s.`code` FROM `'._DB_PREFIX_.'source` s WHERE s.`id_source` = a.`id_source`) AS `booking_source_code`';
 
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
@@ -537,6 +537,7 @@ class AdminOrdersControllerCore extends AdminController
                     'currency' => new Currency((int)$cart->id_currency),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
                     'occupancy_required_for_booking' => $occupancyRequiredForBooking,
+                    'booking_sources' => Source::getAllSource(true, (int)$this->context->language->id),
                 ));
 
             } else {
@@ -2196,6 +2197,14 @@ class AdminOrdersControllerCore extends AdminController
                         $advancePaymentAmount = $objCart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
                     }
 
+                    $idBookingSource = (int)Tools::getValue('id_booking_source');
+                    if ($idBookingSource) {
+                        $objBookingSource = new Source($idBookingSource);
+                        if (!Validate::isLoadedObject($objBookingSource) || !$objBookingSource->active) {
+                            $this->errors[] = Tools::displayError('Please select a valid Booking Source.');
+                        }
+                    }
+
                     // Validate data if required
                     if ($orderTotal > 0) {
                         $moduleName = trim(Tools::getValue('payment_module_name'));
@@ -2282,6 +2291,10 @@ class AdminOrdersControllerCore extends AdminController
 
                             // Set transaction ID
                             $extraVars = null;
+                        }
+
+                        if ($idBookingSource) {
+                            $objPaymentModule->idBookingSource = $idBookingSource;
                         }
 
                         $amountPaid = Tools::ps_round($amountPaid, 6);

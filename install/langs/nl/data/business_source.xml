@@ -7,13 +7,13 @@
     <name>OTA</name>
   </business_source>
   <business_source id="Corporate">
-    <name>Corporate</name>
+    <name>Zakelijk</name>
   </business_source>
   <business_source id="Travel_Agent">
-    <name>Travel Agent</name>
+    <name>Reisbureau</name>
   </business_source>
   <business_source id="Group">
-    <name>Group</name>
+    <name>Groep</name>
   </business_source>
   <business_source id="Api">
     <name>API</name>

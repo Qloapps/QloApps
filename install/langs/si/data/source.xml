@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <entity_source>
   <source id="Direct_Website">
-    <name>Direct Website</name>
+    <name>සෘජු වෙබ් අඩවිය</name>
   </source>
   <source id="Walk_in">
-    <name>Walk-in</name>
+    <name>වෙන් කිරීමකින් තොරව</name>
   </source>
   <source id="Phone">
-    <name>Phone</name>
+    <name>දුරකථනය</name>
   </source>
   <source id="Email">
-    <name>Email</name>
+    <name>විද්‍යුත් තැපෑල</name>
   </source>
   <source id="Social_Media">
-    <name>Social Media</name>
+    <name>සමාජ මාධ්‍ය</name>
   </source>
   <source id="WhatsApp">
     <name>WhatsApp</name>
@@ -52,6 +52,6 @@
     <name>HyperGuest</name>
   </source>
   <source id="Api_Order">
-    <name>API Order</name>
+    <name>API ඇණවුම</name>
   </source>
 </entity_source>

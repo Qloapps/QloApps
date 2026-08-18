@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <entity_source>
   <source id="Direct_Website">
-    <name>Direct Website</name>
+    <name>وب‌سایت مستقیم</name>
   </source>
   <source id="Walk_in">
-    <name>Walk-in</name>
+    <name>مراجعه حضوری</name>
   </source>
   <source id="Phone">
-    <name>Phone</name>
+    <name>تلفن</name>
   </source>
   <source id="Email">
-    <name>Email</name>
+    <name>ایمیل</name>
   </source>
   <source id="Social_Media">
-    <name>Social Media</name>
+    <name>رسانه‌های اجتماعی</name>
   </source>
   <source id="WhatsApp">
     <name>WhatsApp</name>
@@ -52,6 +52,6 @@
     <name>HyperGuest</name>
   </source>
   <source id="Api_Order">
-    <name>API Order</name>
+    <name>سفارش API</name>
   </source>
 </entity_source>

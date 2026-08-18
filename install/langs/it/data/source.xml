@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <entity_source>
   <source id="Direct_Website">
-    <name>Direct Website</name>
+    <name>Sito Web Diretto</name>
   </source>
   <source id="Walk_in">
-    <name>Walk-in</name>
+    <name>Senza prenotazione</name>
   </source>
   <source id="Phone">
-    <name>Phone</name>
+    <name>Telefono</name>
   </source>
   <source id="Email">
     <name>Email</name>
@@ -52,6 +52,6 @@
     <name>HyperGuest</name>
   </source>
   <source id="Api_Order">
-    <name>API Order</name>
+    <name>Ordine API</name>
   </source>
 </entity_source>

@@ -539,7 +539,7 @@ class InstallModelInstall extends InstallAbstractModel
 
         // Set the default Booking Source (Direct Website)
         $id_default_source = (int)Db::getInstance()->getValue(
-            'SELECT `id_source` FROM '._DB_PREFIX_.'source WHERE `source_code` = \'DIRECT_WEBSITE\''
+            'SELECT `id_source` FROM '._DB_PREFIX_.'source WHERE `code` = \'DIRECT_WEBSITE\''
         );
         if ($id_default_source) {
             Configuration::updateGlobalValue('PS_DEFAULT_BOOKING_SOURCE', $id_default_source);

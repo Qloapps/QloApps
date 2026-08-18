@@ -26,7 +26,7 @@ $(document).on('click', '.merge-source-btn', function (e) {
             ajax: true,
             action: 'InitMergeSourceModal',
             id_source: $btn.data('id-source'),
-            id_source_type: $btn.data('id-source-type')
+            id_business_source: $btn.data('id-business-source')
         },
         success: function (result) {
             if (!result.hasError && result.modalHtml) {

@@ -12,7 +12,7 @@
 *}
 {extends file="helpers/list/list_header.tpl"}
 {block name="override_form_extra"}
-	{if isset($smarty.get.id_source_type)}
-		<input type="hidden" name="id_source_type" value="{$smarty.get.id_source_type|intval}" />
+	{if isset($smarty.get.id_business_source)}
+		<input type="hidden" name="id_business_source" value="{$smarty.get.id_business_source|intval}" />
 	{/if}
 {/block}

@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <entity_source>
   <source id="Direct_Website">
-    <name>Direct Website</name>
+    <name>Közvetlen Weboldal</name>
   </source>
   <source id="Walk_in">
-    <name>Walk-in</name>
+    <name>Foglalás Nélküli</name>
   </source>
   <source id="Phone">
-    <name>Phone</name>
+    <name>Telefon</name>
   </source>
   <source id="Email">
-    <name>Email</name>
+    <name>E-mail</name>
   </source>
   <source id="Social_Media">
-    <name>Social Media</name>
+    <name>Közösségi Média</name>
   </source>
   <source id="WhatsApp">
     <name>WhatsApp</name>
@@ -52,6 +52,6 @@
     <name>HyperGuest</name>
   </source>
   <source id="Api_Order">
-    <name>API Order</name>
+    <name>API rendelés</name>
   </source>
 </entity_source>

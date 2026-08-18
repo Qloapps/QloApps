@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <entity_source>
   <source id="Direct_Website">
-    <name>Direct Website</name>
+    <name>Директна Веб Страница</name>
   </source>
   <source id="Walk_in">
-    <name>Walk-in</name>
+    <name>Без Резервације</name>
   </source>
   <source id="Phone">
-    <name>Phone</name>
+    <name>Телефон</name>
   </source>
   <source id="Email">
-    <name>Email</name>
+    <name>Е-пошта</name>
   </source>
   <source id="Social_Media">
-    <name>Social Media</name>
+    <name>Друштвени Медији</name>
   </source>
   <source id="WhatsApp">
     <name>WhatsApp</name>
@@ -52,6 +52,6 @@
     <name>HyperGuest</name>
   </source>
   <source id="Api_Order">
-    <name>API Order</name>
+    <name>API наруџбина</name>
   </source>
 </entity_source>

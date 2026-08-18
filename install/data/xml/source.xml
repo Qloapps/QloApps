@@ -1,34 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <entity_source>
   <fields id="name" class="Source">
-    <field name="id_source_type" relation="business_source"/>
-    <field name="source_code"/>
+    <field name="id_business_source" relation="business_source"/>
+    <field name="code"/>
     <field name="position"/>
     <field name="unremovable"/>
     <field name="active"/>
   </fields>
   <entities>
-    <source id="Direct_Website" id_source_type="Direct" source_code="DIRECT_WEBSITE" position="0" unremovable="1" active="1">
+    <source id="Direct_Website" id_business_source="Direct" code="DIRECT_WEBSITE" position="0" unremovable="1" active="1">
     </source>
-    <source id="Walk_in" id_source_type="Direct" source_code="WALKIN" position="1" unremovable="1" active="1">
+    <source id="Walk_in" id_business_source="Direct" code="WALKIN" position="1" unremovable="1" active="1">
     </source>
-    <source id="Phone" id_source_type="Direct" source_code="PHONE" position="2" unremovable="0" active="1">
+    <source id="Phone" id_business_source="Direct" code="PHONE" position="2" unremovable="0" active="1">
     </source>
-    <source id="Email" id_source_type="Direct" source_code="EMAIL" position="3" unremovable="0" active="1">
+    <source id="Email" id_business_source="Direct" code="EMAIL" position="3" unremovable="0" active="1">
     </source>
-    <source id="Social_Media" id_source_type="Direct" source_code="SOCIAL_MEDIA" position="4" unremovable="0" active="1">
+    <source id="Social_Media" id_business_source="Direct" code="SOCIAL_MEDIA" position="4" unremovable="0" active="1">
     </source>
-    <source id="WhatsApp" id_source_type="Direct" source_code="WHATSAPP" position="5" unremovable="0" active="1">
+    <source id="WhatsApp" id_business_source="Direct" code="WHATSAPP" position="5" unremovable="0" active="1">
     </source>
-    <source id="Booking_com" id_source_type="OTA" source_code="BOOKING_COM" position="0" unremovable="0" active="1">
+    <source id="Booking_com" id_business_source="OTA" code="BOOKING_COM" position="0" unremovable="0" active="1">
     </source>
-    <source id="Expedia" id_source_type="OTA" source_code="EXPEDIA" position="1" unremovable="0" active="1">
+    <source id="Expedia" id_business_source="OTA" code="EXPEDIA" position="1" unremovable="0" active="1">
     </source>
-    <source id="GoMMT" id_source_type="OTA" source_code="GOMMT" position="2" unremovable="0" active="1">
+    <source id="GoMMT" id_business_source="OTA" code="GOMMT" position="2" unremovable="0" active="1">
     </source>
-    <source id="Agoda" id_source_type="OTA" source_code="AGODA" position="3" unremovable="0" active="1">
+    <source id="Agoda" id_business_source="OTA" code="AGODA" position="3" unremovable="0" active="1">
     </source>
-    <source id="Airbnb" id_source_type="OTA" source_code="AIRBNB" position="4" unremovable="0" active="1">
+    <source id="Airbnb" id_business_source="OTA" code="AIRBNB" position="4" unremovable="0" active="1">
+    </source>
+    <source id="Trip_com" id_business_source="OTA" code="TRIP_COM" position="5" unremovable="0" active="1">
+    </source>
+    <source id="Bakuun" id_business_source="OTA" code="BAKUUN" position="6" unremovable="0" active="1">
+    </source>
+    <source id="Despegar" id_business_source="OTA" code="DESPEGAR" position="7" unremovable="0" active="1">
+    </source>
+    <source id="Yatra" id_business_source="OTA" code="YATRA" position="8" unremovable="0" active="1">
+    </source>
+    <source id="Hostelworld" id_business_source="OTA" code="HOSTELWORLD" position="9" unremovable="0" active="1">
+    </source>
+    <source id="HyperGuest" id_business_source="OTA" code="HYPERGUEST" position="10" unremovable="0" active="1">
+    </source>
+    <source id="Api_Order" id_business_source="Api" code="API_ORDER" position="0" unremovable="1" active="1">
     </source>
   </entities>
 </entity_source>

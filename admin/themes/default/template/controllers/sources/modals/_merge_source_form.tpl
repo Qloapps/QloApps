@@ -23,7 +23,7 @@
 			</select>
 		</div>
 		<p class="help-block">{l s='Every order currently attributed to Current Source will be reattributed to Target Source. Current Source itself is left as-is.'}</p>
-		<input type="hidden" name="id_source_type" value="{$id_source_type|intval}" />
+		<input type="hidden" name="id_business_source" value="{$id_business_source|intval}" />
 		<input type="hidden" name="current_source" value="{$current_source->id|intval}" />
 	</div>
 	<div class="modal-footer">
