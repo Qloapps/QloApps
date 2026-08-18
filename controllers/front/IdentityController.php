@@ -63,6 +63,10 @@ class IdentityControllerCore extends FrontController
                 }
             }
 
+            if (Configuration::get('PS_CUSTOMER_NATIONALITY') && Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY') && !Tools::getValue('id_nationality')) {
+                $this->errors[] = Tools::displayError('Nationality is required.');
+            }
+
             if (Tools::getIsset('old_passwd')) {
                 $old_passwd = trim(Tools::getValue('old_passwd'));
             }
@@ -167,6 +171,9 @@ class IdentityControllerCore extends FrontController
 
         $newsletter = Configuration::get('PS_CUSTOMER_NWSL') || (Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active);
         $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
+        $this->context->smarty->assign('nationality', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY'));
+        $this->context->smarty->assign('nationality_mandatory', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY'));
+        $this->context->smarty->assign('nationality_countries', Country::getCountries($this->context->language->id));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
 

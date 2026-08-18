@@ -911,6 +911,12 @@
 	<configuration id="PS_CUSTOMER_BIRTHDATE" name="PS_CUSTOMER_BIRTHDATE">
 		<value>1</value>
 	</configuration>
+	<configuration id="PS_CUSTOMER_NATIONALITY" name="PS_CUSTOMER_NATIONALITY">
+		<value>1</value>
+	</configuration>
+	<configuration id="PS_CUSTOMER_NATIONALITY_MANDATORY" name="PS_CUSTOMER_NATIONALITY_MANDATORY">
+		<value>0</value>
+	</configuration>
 	<configuration id="PS_CUSTOMER_NWSL" name="PS_CUSTOMER_NWSL">
 		<value>1</value>
 	</configuration>

@@ -41,6 +41,9 @@ class CustomerCore extends ObjectModel
     /** @var int Gender ID */
     public $id_gender = 0;
 
+    /** @var int Nationality (Country) ID */
+    public $id_nationality = 0;
+
     /** @var int Default group ID */
     public $id_default_group;
 
@@ -170,6 +173,7 @@ class CustomerCore extends ObjectModel
             'passwd' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isPasswd', 'required' => true, 'size' => 60),
             'last_passwd_gen' =>            array('type' => self::TYPE_STRING, 'copy_post' => false),
             'id_gender' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'id_nationality' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'birthday' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isBirthDate'),
             'newsletter' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'newsletter_date_add' =>        array('type' => self::TYPE_DATE,'copy_post' => false),
@@ -208,6 +212,10 @@ class CustomerCore extends ObjectModel
 
         if (Configuration::get('PS_ONE_PHONE_AT_LEAST')) {
             self::$definition['fields']['phone']['required'] = true;
+        }
+
+        if (Configuration::get('PS_CUSTOMER_NATIONALITY') && Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY')) {
+            self::$definition['fields']['id_nationality']['required'] = true;
         }
     }
 

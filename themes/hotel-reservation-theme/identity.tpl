@@ -95,6 +95,22 @@
                             </label>
                             <input class="is_required validate form-control" data-validate="isPhoneNumber" type="phone" name="phone" id="phone" value="{$smarty.post.phone}" />
                         </div>
+                        {if isset($nationality) && $nationality}
+                            <div class="form-group">
+                                <label for="id_nationality">
+                                    {l s='Nationality'}
+                                    {if isset($nationality_mandatory) && $nationality_mandatory}
+                                        <sup>*</sup>
+                                    {/if}
+                                </label>
+                                <select name="id_nationality" id="id_nationality" class="form-control">
+                                    <option value="">-</option>
+                                    {foreach from=$nationality_countries item=c}
+                                        <option value="{$c.id_country}" {if isset($smarty.post.id_nationality) && $smarty.post.id_nationality == $c.id_country} selected="selected"{/if}>{$c.name}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        {/if}
                         {if isset($birthday) && $birthday}
                             <div class="form-group">
                                 <label>
