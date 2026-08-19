@@ -2382,7 +2382,7 @@ class AdminNormalProductsControllerCore extends AdminController
             $this->errors[] = $this->l('Please select at least one buying option.');
         }
 
-        if (!Tools::getValue('price_calculation_method')) {
+        if (Tools::getValue('id_product') && !Tools::getValue('price_calculation_method')) {
             $this->errors[] = $this->l('Please select at least one price calculation method.');
         }
 
