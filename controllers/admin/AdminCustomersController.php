@@ -996,6 +996,14 @@ class AdminCustomersControllerCore extends AdminController
         $gender = new Gender($customer->id_gender, $this->context->language->id);
         $gender_image = $gender->getImage();
 
+        $nationality = '';
+        if ($customer->id_nationality) {
+            $nationalityCountry = new Country($customer->id_nationality, $this->context->language->id);
+            if (Validate::isLoadedObject($nationalityCountry)) {
+                $nationality = $nationalityCountry->name;
+            }
+        }
+
         $customer_stats = $customer->getStats();
         $sql = 'SELECT SUM(total_paid_real) FROM '._DB_PREFIX_.'orders WHERE id_customer = %d AND valid = 1';
         if ($total_customer = Db::getInstance()->getValue(sprintf($sql, $customer->id))) {
@@ -1145,6 +1153,7 @@ class AdminCustomersControllerCore extends AdminController
             'shop_is_feature_active' => Shop::isFeatureActive(),
             'name_shop' => $shop->name,
             'customer_birthday' => Tools::displayDate($customer->birthday),
+            'nationality' => $nationality,
             'last_update' => Tools::displayDate($customer->date_upd, null, true),
             'customer_exists' => Customer::customerExists($customer->email),
             'id_lang' => $customer->id_lang,
