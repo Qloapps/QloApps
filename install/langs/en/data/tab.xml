@@ -39,6 +39,7 @@
   <tab id="Statuses" name="Statuses"/>
   <tab id="Sources" name="Business Sources"/>
   <tab id="Order_Messages" name="Order Messages"/>
+  <tab id="Guest_Registration" name="Guest Registration Card"/>
   <tab id="Customers_1" name="Customers"/>
   <tab id="Addresses" name="Addresses"/>
   <tab id="Groups" name="Groups"/>

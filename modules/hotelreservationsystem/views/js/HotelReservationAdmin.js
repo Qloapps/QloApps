@@ -954,3 +954,60 @@ function showLangField(select_lang_name, id_lang)
 $(function() {
     $('[data-toggle="popover"]').popover()
 });
+
+/* ---- Hotel Featured Amenities (AdminAddHotelController) ---- */
+(function ($) {
+    var featuredIds = [];
+    var $select;
+    var chosenReady = false;
+
+    function syncAmenitiesToFeatured() {
+        if (!$select || !$select.length) {
+            return;
+        }
+        var existing = {};
+        $select.find('option').each(function () {
+            existing[$(this).val()] = true;
+        });
+        $('input[name="id_amenities[]"]').each(function () {
+            var $checkbox = $(this);
+            var id = $checkbox.val();
+            var name = $checkbox.siblings('label.tree-toggler').text().trim();
+            if ($checkbox.is(':checked')) {
+                if (!existing[id]) {
+                    var selected = featuredIds.indexOf(parseInt(id)) !== -1;
+                    $select.append($('<option></option>').val(id).text(name).prop('selected', selected));
+                }
+            } else {
+                $select.find('option[value="' + id + '"]').remove();
+            }
+        });
+        if (chosenReady) {
+            $select.trigger('chosen:updated');
+        }
+    }
+
+    $(document).on('click', '#hotel-amenities-tree :input[type="checkbox"]', function () {
+        setTimeout(syncAmenitiesToFeatured, 0);
+    });
+
+    $(document).on('click', '#check-all-hotel-amenities-tree, #uncheck-all-hotel-amenities-tree', function () {
+        setTimeout(syncAmenitiesToFeatured, 0);
+    });
+
+    $(document).ready(function () {
+        featuredIds = (typeof htlFeaturedAmenityIds !== 'undefined') ? htlFeaturedAmenityIds : [];
+        $select = $('#htl_featured_amenities');
+        syncAmenitiesToFeatured();
+
+        $('a[href="#hotel-features"]').on('shown.bs.tab', function () {
+            syncAmenitiesToFeatured();
+            if (!chosenReady) {
+                $select.chosen({ disable_search_threshold: 5, search_contains: true });
+                chosenReady = true;
+            } else {
+                $select.trigger('chosen:updated');
+            }
+        });
+    });
+}(jQuery));

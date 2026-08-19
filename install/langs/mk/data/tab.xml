@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="Кредитни исечоци"/>
   <tab id="Statuses" name="Состојби"/>
   <tab id="Order_Messages" name="Пораки за нарачки"/>
+  <tab id="Guest_Registration" name="Картичка за регистрација на гостин"/>
   <tab id="Customers_1" name="Клиенти"/>
   <tab id="Addresses" name="Адреси"/>
   <tab id="Groups" name="Групи"/>
