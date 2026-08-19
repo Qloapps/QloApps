@@ -559,6 +559,9 @@ class OrderOpcControllerCore extends ParentOrderController
 
         $newsletter = Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active && Configuration::get('PS_CUSTOMER_NWSL');
         $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
+        $this->context->smarty->assign('nationality', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY'));
+        $this->context->smarty->assign('nationality_mandatory', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY'));
+        $this->context->smarty->assign('nationality_countries', Country::getCountries($this->context->language->id));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
         $this->context->smarty->assign('field_required', $this->context->customer->validateFieldsRequiredDatabase());
@@ -645,6 +648,7 @@ class OrderOpcControllerCore extends ParentOrderController
             'id_country' => (int)$address_delivery->id_country,
             'id_state' => (int)$address_delivery->id_state,
             'id_gender' => (int)$customer->id_gender,
+            'id_nationality' => (int)$customer->id_nationality,
             'phone' => $customer->phone,
             'sl_year' => $birthday[0],
             'sl_month' => $birthday[1],

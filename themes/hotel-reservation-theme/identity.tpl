@@ -96,12 +96,9 @@
                             <input class="is_required validate form-control" data-validate="isPhoneNumber" type="phone" name="phone" id="phone" value="{$smarty.post.phone}" />
                         </div>
                         {if isset($nationality) && $nationality}
-                            <div class="form-group">
-                                <label for="id_nationality">
+                            <div class="{if isset($nationality_mandatory) && $nationality_mandatory}required {/if}form-group">
+                                <label for="id_nationality"{if isset($nationality_mandatory) && $nationality_mandatory} class="required"{/if}>
                                     {l s='Nationality'}
-                                    {if isset($nationality_mandatory) && $nationality_mandatory}
-                                        <sup>*</sup>
-                                    {/if}
                                 </label>
                                 <select name="id_nationality" id="id_nationality" class="form-control">
                                     <option value="">-</option>

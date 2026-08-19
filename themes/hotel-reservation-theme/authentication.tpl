@@ -157,7 +157,7 @@
 								<input type="text" class="is_required validate form-control" data-validate="isName" id="lastname" name="lastname" value="{if isset($smarty.post.lastname)}{$smarty.post.lastname}{/if}" />
 							</div>
 							{if isset($nationality) && $nationality}
-								<div class="form-group">
+								<div class="{if isset($nationality_mandatory) && $nationality_mandatory}required {/if}form-group">
 									<label for="id_nationality">{l s='Nationality'}{if isset($nationality_mandatory) && $nationality_mandatory} <sup>*</sup>{/if}</label>
 									<select name="id_nationality" id="id_nationality" class="form-control">
 										<option value="">-</option>
@@ -509,7 +509,7 @@
 						<span class="form_info">{l s='(Five characters minimum)'}</span>
 					</div>
 					{if isset($nationality) && $nationality}
-						<div class="form-group">
+						<div class="{if isset($nationality_mandatory) && $nationality_mandatory}required {/if}form-group">
 							<label for="id_nationality">{l s='Nationality'}{if isset($nationality_mandatory) && $nationality_mandatory} <sup>*</sup>{/if}</label>
 							<select name="id_nationality" id="id_nationality" class="form-control">
 								<option value="">-</option>
