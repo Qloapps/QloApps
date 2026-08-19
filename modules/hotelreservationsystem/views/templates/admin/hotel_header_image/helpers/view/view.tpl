@@ -78,7 +78,7 @@
 						<div class="input-group fixed-width-lg">
 							<input type="text" name="QLO_HEADER_SLIDER_INTERVAL"
 								   class="form-control"
-								   value="{$config.QLO_HEADER_SLIDER_INTERVAL|intval}">
+								   value="{$config.QLO_HEADER_SLIDER_INTERVAL|escape:'html':'UTF-8'}">
 							<span class="input-group-addon">ms</span>
 						</div>
 						<p class="help-block">{l s='Milliseconds between slides. Min: 500. Example: 5000 = 5 s.' mod='hotelreservationsystem'}</p>
@@ -128,19 +128,17 @@
 
 			<div id="qlo-video-settings"{if $config.QLO_HEADER_MEDIA_TYPE != HotelHeaderImage::MEDIA_TYPE_VIDEO} style="display:none"{/if}>
 
-				{if $videoItem}{assign var="currentSourceType" value=$videoItem.source_type}{else}{assign var="currentSourceType" value='upload'}{/if}
-
 				<div class="form-group">
 					<label class="control-label col-lg-3">{l s='Video Source' mod='hotelreservationsystem'}</label>
 					<div class="col-lg-9">
 						<select name="source_type" id="qlo-source-type" class="fixed-width-lg">
-							<option value="upload"{if $currentSourceType != 'url'} selected{/if}>{l s='Upload video file' mod='hotelreservationsystem'}</option>
-							<option value="url"{if $currentSourceType == 'url'} selected{/if}>{l s='External video URL' mod='hotelreservationsystem'}</option>
+							<option value="upload"{if $sourceType != 'url'} selected{/if}>{l s='Upload video file' mod='hotelreservationsystem'}</option>
+							<option value="url"{if $sourceType == 'url'} selected{/if}>{l s='External video URL' mod='hotelreservationsystem'}</option>
 						</select>
 					</div>
 				</div>
 
-				<div id="qlo-vid-file-wrap"{if $currentSourceType == 'url'} style="display:none"{/if}>
+				<div id="qlo-vid-file-wrap"{if $sourceType == 'url'} style="display:none"{/if}>
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Video File' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-6">
@@ -161,21 +159,21 @@
 					</div>
 				</div>
 
-				<div id="qlo-vid-url-wrap"{if $currentSourceType != 'url'} style="display:none"{/if}>
+				<div id="qlo-vid-url-wrap"{if $sourceType != 'url'} style="display:none"{/if}>
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='External Video URL' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							<input type="text" name="video_url" id="qlo-video-url-input" class="form-control"
 								   placeholder="https://example.com/video.mp4"
-								   value="{if $videoItem && $videoItem.source_type == 'url'}{$videoItem.name|escape:'html':'UTF-8'}{/if}">
+								   value="{$videoUrlValue|escape:'html':'UTF-8'}">
 							<p class="help-block">{l s='Enter a direct URL to an MP4, WebM, or OGG video file (server-hosted only). Streaming links (e.g., YouTube, Vimeo) are not supported.' mod='hotelreservationsystem'}</p>
 							{if $videoItem && $videoItem.source_type == 'url'}
 							<p class="help-block">{l s='Entering a new URL will replace the current video.' mod='hotelreservationsystem'}</p>
 							{/if}
-							<div class="qlo-video-preview-card" id="qlo-video-url-preview-wrap"{if !($videoItem && $videoItem.source_type == 'url')} style="display:none"{/if}>
+							<div class="qlo-video-preview-card" id="qlo-video-url-preview-wrap"{if !$showVideoUrlPreview} style="display:none"{/if}>
 								<video controls muted preload="metadata" class="qlo-video-preview-player" id="qlo-video-url-preview-player">
 									<source id="qlo-video-url-preview-source"
-											src="{if $videoItem && $videoItem.source_type == 'url'}{$videoItem.name|escape:'html':'UTF-8'}{/if}"
+											src="{$videoUrlValue|escape:'html':'UTF-8'}"
 											type="{$videoMimeType|escape:'html':'UTF-8'}">
 									{l s='Your browser does not support the video tag.' mod='hotelreservationsystem'}
 								</video>
@@ -185,7 +183,7 @@
 				</div>
 
 				{if $videoItem && $videoItem.source_type == 'upload'}
-				<div id="qlo-current-video-wrap">
+				<div id="qlo-current-video-wrap"{if $sourceType != 'upload'} style="display:none"{/if}>
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Current Video' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
@@ -227,6 +225,7 @@
 				<p>{l s='Switching to Video will delete all images except the first one. This cannot be undone. Continue?' mod='hotelreservationsystem'}</p>
 			</div>
 			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-close" data-dismiss="modal">{l s='Close' mod='hotelreservationsystem'}</button>
 				<button type="button" class="btn btn-primary" id="qlo-confirm-switch-video-btn">{l s='Continue' mod='hotelreservationsystem'}</button>
 			</div>
 		</div>
@@ -249,6 +248,7 @@
 				<p>{l s='Delete selected images? This cannot be undone.' mod='hotelreservationsystem'}</p>
 			</div>
 			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-close" data-dismiss="modal">{l s='Close' mod='hotelreservationsystem'}</button>
 				<button type="button" class="btn btn-primary" id="qlo-confirm-bulk-delete-btn">{l s='Delete' mod='hotelreservationsystem'}</button>
 			</div>
 		</div>
@@ -261,12 +261,9 @@
 			<i class="icon-picture"></i>&nbsp;{l s='Header Images' mod='hotelreservationsystem'}
 			&nbsp;<span class="badge" id="qlo-image-count">{$imageItems|count}</span>
 			<span class="panel-heading-action">
-			    <a id="qlo-add-image-btn" class="btn btn-primary" href="javascript:void(0);" style="margin-right:170px;">
+			    <a id="qlo-add-image-btn" class="btn btn-primary" href="javascript:void(0);">
 					<i class="icon-plus-sign"></i>&nbsp;{l s='Add Images' mod='hotelreservationsystem'}
 				</a>
-				<button type="button" class="btn btn-default" data-toggle="modal" data-target="#qlo-bulk-tagline-modal" style="margin-right:15px;">
-					<i class="icon-pencil"></i>&nbsp;{l s='Set tag line for all images' mod='hotelreservationsystem'}
-				</button>
 			</span>
 		</div>
 
@@ -293,57 +290,7 @@
 				</thead>
 				<tbody id="qlo-image-tbody">
 					{foreach from=$imageItems item=img}
-					<tr class="qlo-img-row" id="qlo_img_{$img.id_header_image|intval}"
-						data-id="{$img.id_header_image|intval}"
-						data-thumb-src="{$imgBaseUrl|escape:'htmlall':'UTF-8'}{$img.name|escape:'htmlall':'UTF-8'}"
-						data-tag-lines="{$img.tag_lines_json|escape:'htmlall':'UTF-8'}"
-						data-tag-line-color="{$img.tag_line_color|default:'#ffffff'|escape:'htmlall':'UTF-8'}"
-						data-tag-line-font-size="{$img.tag_line_font_size|default:16|intval}"
-						data-tag-line-font-weight="{$img.tag_line_font_weight|default:'400'|escape:'htmlall':'UTF-8'}">
-						<td class="row-selector text-center">
-							<input type="checkbox" name="htl_header_imageBox[]" class="noborder qlo-img-checkbox" value="{$img.id_header_image|intval}">
-						</td>
-						<td>
-							{if $img.thumb}{$img.thumb nofilter}{else}<img src="{$imgBaseUrl|escape:'html':'UTF-8'}{$img.name|escape:'html':'UTF-8'}" class="imgm img-thumbnail" alt="">{/if}
-						</td>
-						<td class="qlo-img-tagline-cell">
-							{if $img.tag_line}{$img.tag_line|truncate:50:'...'|escape:'html':'UTF-8'}{else}&mdash;{/if}
-						</td>
-						<td class="pointer dragHandle center positionImage" id="td_qlo_img_{$img.id_header_image|intval}">
-							<div class="dragGroup">
-								<div class="positions">{$img@iteration}</div>
-							</div>
-						</td>
-						<td class="center">
-							<a class="list-action-enable ajax_table_link {if $img.active}action-enabled{else}action-disabled{/if}"
-							   href="{$current|escape:'html':'UTF-8'}&amp;ajax=1&amp;action=toggle_image_active&amp;id_header_image={$img.id_header_image|intval}&amp;active={if $img.active}0{else}1{/if}&amp;token={$token|escape:'html':'UTF-8'}"
-							   title="{if $img.active}{l s='Enabled' mod='hotelreservationsystem'}{else}{l s='Disabled' mod='hotelreservationsystem'}{/if}">
-								<i class="icon-check{if !$img.active} hidden{/if}"></i>
-								<i class="icon-remove{if $img.active} hidden{/if}"></i>
-							</a>
-						</td>
-						<td class="text-right">
-							<div class="btn-group-action">
-								<div class="btn-group pull-right">
-									<button type="button" class="btn btn-default btn qlo-edit-img"
-											data-id="{$img.id_header_image|intval}">
-										<i class="icon-pencil"></i>&nbsp;{l s='Edit' mod='hotelreservationsystem'}
-									</button>
-									<button class="btn btn-default btn dropdown-toggle" data-toggle="dropdown">
-										<i class="icon-caret-down"></i>&nbsp;
-									</button>
-									<ul class="dropdown-menu">
-										<li>
-											<a href="javascript:void(0);" class="qlo-delete-img"
-											   data-id="{$img.id_header_image|intval}">
-												<i class="icon-trash"></i>&nbsp;{l s='Delete image' mod='hotelreservationsystem'}
-											</a>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</td>
-					</tr>
+					{include file="../../_partials/htl-header-image-row.tpl" img=$img position=$img@iteration}
 					{foreachelse}
 					<tr class="list-empty-tr" id="qlo-no-images">
 						<td class="list-empty" colspan="6">
@@ -366,24 +313,19 @@
 					</button>
 					<ul class="dropdown-menu">
 						<li>
-							<a href="#" onclick="javascript:checkDelBoxes($(this).closest('form').get(0), 'htl_header_imageBox[]', true);return false;">
+							<a href="#" class="qlo-select-all-images" onclick="javascript:checkDelBoxes($(this).closest('form').get(0), 'htl_header_imageBox[]', true);return false;">
 								<i class="icon-check-sign"></i>&nbsp;{l s='Select all' mod='hotelreservationsystem'}
 							</a>
 						</li>
 						<li>
-							<a href="#" onclick="javascript:checkDelBoxes($(this).closest('form').get(0), 'htl_header_imageBox[]', false);return false;">
+							<a href="#" class="qlo-unselect-all-images" onclick="javascript:checkDelBoxes($(this).closest('form').get(0), 'htl_header_imageBox[]', false);return false;">
 								<i class="icon-check-empty"></i>&nbsp;{l s='Unselect all' mod='hotelreservationsystem'}
 							</a>
 						</li>
 						<li class="divider"></li>
 						<li>
-							<a href="#" onclick="sendBulkAction($(this).closest('form').get(0), 'submitBulkenableSelectionhtl_header_image');return false;">
-								<i class="icon-power-off text-success"></i>&nbsp;{l s='Enable selection' mod='hotelreservationsystem'}
-							</a>
-						</li>
-						<li>
-							<a href="#" onclick="sendBulkAction($(this).closest('form').get(0), 'submitBulkdisableSelectionhtl_header_image');return false;">
-								<i class="icon-power-off text-danger"></i>&nbsp;{l s='Disable selection' mod='hotelreservationsystem'}
+							<a href="#" id="qlo-bulk-update-trigger" data-toggle="modal" data-target="#qlo-bulk-update-modal" disabled>
+								<i class="icon-edit"></i>&nbsp;{l s='Update selection' mod='hotelreservationsystem'}
 							</a>
 						</li>
 						<li class="divider"></li>
@@ -402,22 +344,48 @@
 	</div>
 </div>
 
-{* Bulk tag line modal — triggered by the "Set tag line for all images" button above *}
-<div class="modal fade" id="qlo-bulk-tagline-modal" tabindex="-1" role="dialog" aria-labelledby="qloBulkTaglineModalLabel">
+{* Bulk update modal — triggered by the "Bulk update" bulk action; only touches fields the admin actually sets *}
+<div class="modal fade" id="qlo-bulk-update-modal" tabindex="-1" role="dialog" aria-labelledby="qloBulkUpdateModalLabel">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
-				<h4 class="modal-title" id="qloBulkTaglineModalLabel">
-					<i class="icon-pencil"></i>&nbsp;{l s='Set tag line for all images' mod='hotelreservationsystem'}
+				<h4 class="modal-title" id="qloBulkUpdateModalLabel">
+					<i class="icon-edit"></i>&nbsp;{l s='Bulk Update Images' mod='hotelreservationsystem'}
 				</h4>
 			</div>
 			<div class="modal-body">
 				<div class="form-horizontal">
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Tag Line (All Images)' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Enable Image' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-9">
+							<select id="qlo-bulk-active" class="fixed-width-lg">
+								<option value="" selected="selected">{l s='Select status' mod='hotelreservationsystem'}</option>
+								<option value="1">{l s='Yes' mod='hotelreservationsystem'}</option>
+								<option value="0">{l s='No' mod='hotelreservationsystem'}</option>
+							</select>
+							<p class="help-block">{l s='Leave as "Select status" to keep each image\'s current active status unchanged.' mod='hotelreservationsystem'}</p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-lg-3">{l s='Update Tag Line' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-9">
+							<span class="switch prestashop-switch fixed-width-lg">
+								<input type="radio" name="qlo_bulk_update_tagline" id="qlo_bulk_update_tagline_on" value="1">
+								<label for="qlo_bulk_update_tagline_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+								<input type="radio" name="qlo_bulk_update_tagline" id="qlo_bulk_update_tagline_off" value="0" checked="checked">
+								<label for="qlo_bulk_update_tagline_off">{l s='No' mod='hotelreservationsystem'}</label>
+								<a class="slide-button btn"></a>
+							</span>
+							<p class="help-block">{l s='Turn on to overwrite the tag line text for all selected images.' mod='hotelreservationsystem'}</p>
+						</div>
+					</div>
+
+					<div class="form-group" id="qlo-bulk-tagline-fields-wrap" style="display:none">
+						<label class="control-label col-lg-3">{l s='Tag Line' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							{foreach from=$languages item=lang}
 							{if count($languages) > 1}
@@ -427,7 +395,7 @@
 									<input type="text"
 										   class="form-control qlo-bulk-tagline-field"
 										   data-lang="{$lang.id_lang}"
-										   placeholder="{l s='Tag line for all images...' mod='hotelreservationsystem'}" />
+										   placeholder="{l s='Tag line...' mod='hotelreservationsystem'}" />
 							{if count($languages) > 1}
 								</div>
 								<div class="col-lg-2">
@@ -443,13 +411,46 @@
 							</div>
 							{/if}
 							{/foreach}
-							<p class="help-block">{l s='This will overwrite the tag line for all images in every language.' mod='hotelreservationsystem'}</p>
+							<p class="help-block">{l s='Leave empty to clear the tag line for all selected images.' mod='hotelreservationsystem'}</p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-lg-3">{l s='Tag Line Color' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-9">
+							<input type="text" id="qlo-bulk-tl-color" class="form-control" placeholder="#ffffff" maxlength="7">
+							<p class="help-block">{l s='6-digit hex value. Leave empty to keep each image\'s current color unchanged.' mod='hotelreservationsystem'}</p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-lg-3">{l s='Tag Line Font Size' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-3">
+							<div class="input-group">
+								<input type="number" id="qlo-bulk-tl-font-size" class="form-control" value="0" min="0" max="72">
+								<span class="input-group-addon">px</span>
+							</div>
+							<p class="help-block">{l s='0 = keep each image\'s current font size unchanged.' mod='hotelreservationsystem'}</p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-lg-3">{l s='Tag Line Font Weight' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-3">
+							<select id="qlo-bulk-tl-font-weight" class="fixed-width-lg">
+								<option value="" selected="selected">{l s='Select font weight' mod='hotelreservationsystem'}</option>
+								<option value="300">{l s='300 (Light)' mod='hotelreservationsystem'}</option>
+								<option value="400">{l s='400 (Normal)' mod='hotelreservationsystem'}</option>
+								<option value="600">{l s='600 (Semi-Bold)' mod='hotelreservationsystem'}</option>
+								<option value="700">{l s='700 (Bold)' mod='hotelreservationsystem'}</option>
+							</select>
+							<p class="help-block">{l s='Leave unselected to keep each image\'s current font weight unchanged.' mod='hotelreservationsystem'}</p>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" id="qlo-bulk-tagline-apply">{l s='Apply to All' mod='hotelreservationsystem'}</button>
+				<button type="button" class="btn btn-primary" id="qlo-bulk-update-apply">{l s='Submit' mod='hotelreservationsystem'}</button>
 			</div>
 		</div>
 	</div>
@@ -469,7 +470,7 @@
 			<div class="modal-body">
 				<div class="form-horizontal">
 					<div class="form-group" id="qlo-img-edit-preview-group" style="display:none">
-						<label class="control-label col-lg-3">{l s='Editing Image' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Image' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							<img id="qlo-img-edit-thumb" src="" class="img-thumbnail" alt=""
 								 style="max-width:160px;max-height:100px;object-fit:cover;">
@@ -478,17 +479,20 @@
 
 					<div class="form-group" id="qlo-img-form-file-group">
 						<label class="control-label col-lg-3 file_upload_label">
-							{l s='Add Images' mod='hotelreservationsystem'}
+							{l s='Images' mod='hotelreservationsystem'}
 						</label>
 						<div class="col-lg-9">
 							<input type="file" id="qlo-img-form-file" multiple
-								   accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
-								   style="width:0;height:0;overflow:hidden;position:absolute;">
-							<button class="btn btn-default" data-style="expand-right" data-size="s"
-									type="button" id="qlo-img-file-add-btn">
-								<i class="icon-folder-open"></i> {l s='Add files...' mod='hotelreservationsystem'}
-							</button>
-							<ul id="qlo-img-files-list" class="qlo-files-list" style="display:none"></ul>
+								   accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" class="hide">
+							<div class="dummyfile input-group">
+								<span class="input-group-addon"><i class="icon-file"></i></span>
+								<input id="qlo-img-form-file-name" type="text" readonly>
+								<span class="input-group-btn">
+									<button id="qlo-img-form-file-selectbutton" type="button" class="btn btn-default">
+										<i class="icon-folder-open"></i> {l s='Add file' mod='hotelreservationsystem'}
+									</button>
+								</span>
+							</div>
 							<p class="help-block">
 								{l s='Formats: .jpg, .jpeg, .png, .webp, .gif' mod='hotelreservationsystem'}
 								&mdash; {l s='Recommended: 1920×600 px' mod='hotelreservationsystem'}
@@ -558,7 +562,7 @@
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Tag Line Color' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
-							<div class="input-group fixed-width-lg">
+							<div class="input-group col-lg-4">
 								<input type="color" id="qlo-img-tl-color" name="tag_line_color"
 									   class="color mColorPickerInput" data-hex="true" value="#ffffff">
 							</div>
@@ -568,8 +572,8 @@
 
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Tag Line Font Size' mod='hotelreservationsystem'}</label>
-						<div class="col-lg-3">
-							<div class="input-group">
+						<div class="col-lg-9">
+							<div class="input-group col-lg-4">
 								<input type="number" id="qlo-img-tl-font-size" name="tag_line_font_size"
 									   class="form-control" value="16" min="8" max="72">
 								<span class="input-group-addon">px</span>
@@ -580,8 +584,8 @@
 
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Tag Line Font Weight' mod='hotelreservationsystem'}</label>
-						<div class="col-lg-3">
-							<select id="qlo-img-tl-font-weight" name="tag_line_font_weight" class="fixed-width-lg">
+						<div class="col-lg-9">
+							<select id="qlo-img-tl-font-weight" name="tag_line_font_weight" class="col-lg-4">
 								<option value="300">{l s='300 (Light)' mod='hotelreservationsystem'}</option>
 								<option value="400" selected="selected">{l s='400 (Normal)' mod='hotelreservationsystem'}</option>
 								<option value="600">{l s='600 (Semi-Bold)' mod='hotelreservationsystem'}</option>
@@ -603,10 +607,10 @@
 				</div>
 			</div>
 			<div class="modal-footer" id="qlo-img-add-footer">
-				<button type="button" id="qlo-img-form-upload-btn" class="btn btn-primary">{l s='Upload' mod='hotelreservationsystem'}</button>
+				<button type="button" id="qlo-img-form-upload-btn" class="btn btn-primary"><i class="icon-upload"></i>&nbsp;{l s='Upload' mod='hotelreservationsystem'}</button>
 			</div>
 			<div class="modal-footer" id="qlo-img-edit-footer" style="display:none">
-				<button type="button" id="qlo-img-form-save-btn" class="btn btn-primary">{l s='Save' mod='hotelreservationsystem'}</button>
+				<button type="button" id="qlo-img-form-save-btn" class="btn btn-primary"><i class="icon-save"></i>&nbsp;{l s='Save' mod='hotelreservationsystem'}</button>
 			</div>
 		</div>
 	</div>
