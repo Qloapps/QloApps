@@ -466,6 +466,8 @@ class AdminSourcesControllerCore extends AdminController
             return $this->postProcessBulkDeleteSource();
         } elseif (Tools::isSubmit('submitAddbusiness_source') || Tools::isSubmit('submitAddbusiness_sourceAndStay')) {
             return $this->postProcessBusinessSource();
+        } elseif (Tools::isSubmit('status'.$this->table)) {
+            return $this->postProcessStatusBusinessSource();
         } elseif (Tools::isSubmit('delete'.$this->table)) {
             return $this->postProcessDeleteBusinessSource();
         } elseif (Tools::isSubmit('submitBulkdelete'.$this->table)) {
@@ -499,6 +501,21 @@ class AdminSourcesControllerCore extends AdminController
                 $objSource->active = $newActive;
                 if ($objSource->save()) {
                     $this->redirect_after = self::$currentIndex.'&viewbusiness_source&id_business_source='.(int)$idBusinessSource.'&conf=5&token='.$this->token;
+                }
+            }
+        }
+    }
+
+    protected function postProcessStatusBusinessSource()
+    {
+        if (Validate::isLoadedObject($objBusinessSource = new BusinessSource((int)Tools::getValue('id_business_source')))) {
+            $newActive = !$objBusinessSource->active;
+            if (!$newActive && $objBusinessSource->hasUnremovableSource()) {
+                $this->errors[] = $this->l('You cannot disable this Business Source because it has one or more permanent (built-in) Booking Sources under it.');
+            } else {
+                $objBusinessSource->active = $newActive;
+                if ($objBusinessSource->save()) {
+                    $this->redirect_after = self::$currentIndex.'&token='.$this->token.'&conf=5';
                 }
             }
         }
@@ -694,6 +711,13 @@ class AdminSourcesControllerCore extends AdminController
                 $this->errors[] = $this->l('Code is invalid. Only letters, numbers, underscores and hyphens are allowed.');
             } elseif (BusinessSource::codeExists($sourceTypeCode, $idBusinessSource)) {
                 $this->errors[] = $this->l('This Code is already used by another Business Source.');
+            }
+        }
+
+        if ($idBusinessSource && !(int)Tools::getValue('active')) {
+            $objBusinessSource = new BusinessSource($idBusinessSource);
+            if ($objBusinessSource->hasUnremovableSource()) {
+                $this->errors[] = $this->l('You cannot disable this Business Source because it has one or more permanent (built-in) Booking Sources under it.');
             }
         }
 

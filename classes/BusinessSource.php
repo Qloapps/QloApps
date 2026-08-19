@@ -59,6 +59,10 @@ class BusinessSourceCore extends ObjectModel
 
     public function update($nullValues = false)
     {
+        if (!$this->active && $this->hasUnremovableSource()) {
+            return false;
+        }
+
         $result = parent::update($nullValues);
 
         if ($result && !$this->active) {
@@ -177,11 +181,14 @@ class BusinessSourceCore extends ObjectModel
         return !$this->unremovable;
     }
 
-    /**
-     * @return bool True if any Booking Source under this Business Source — deleted or not —
-     * is referenced by an order. A soft-deleted Booking Source still referenced by a historical
-     * order must keep resolving to a Business Source name too, so this still blocks deletion.
-     */
+    public function hasUnremovableSource()
+    {
+        return (bool)Db::getInstance()->getValue(
+            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'source`
+            WHERE `id_business_source` = '.(int)$this->id.' AND `unremovable` = 1 AND `deleted` = 0'
+        );
+    }
+
     public function hasSourceUsedByOrder()
     {
         return (bool)Db::getInstance()->getValue(
@@ -191,11 +198,6 @@ class BusinessSourceCore extends ObjectModel
         );
     }
 
-    /**
-     * @return int Total orders placed across every Booking Source under this Business Source —
-     * the denominator for each Booking Source's own percentage within this category's
-     * drill-down list (as opposed to a share of every order in the system).
-     */
     public function getOrderCount()
     {
         return (int)Db::getInstance()->getValue(
@@ -205,12 +207,6 @@ class BusinessSourceCore extends ObjectModel
         );
     }
 
-    /**
-     * Deleting a Business Source deletes every Booking Source under it (each through its own
-     * delete() rule — soft-deleted if order-linked, hard-deleted otherwise). If any of them
-     * turns out to be order-linked, this Business Source is soft-deleted too, the same way, so
-     * historical orders keep resolving a category name; otherwise it hard-deletes for real.
-     */
     public function delete()
     {
         if (!$this->isRemovable()) {
