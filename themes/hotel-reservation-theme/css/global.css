@@ -9400,8 +9400,7 @@ div a.our_properties_link{
 .htl-tooltip {
     cursor: pointer;
     display: inline-block;
-    vertical-align: middle;
-    margin-left: 4px;
+    vertical-align: text-bottom;
 }
 
 .ui-tooltip.htl-tooltip-popup {
