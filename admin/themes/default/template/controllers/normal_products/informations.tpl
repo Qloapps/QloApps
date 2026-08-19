@@ -237,24 +237,23 @@
 			</span>
 		</label>
 		<div class="col-lg-9">
-			<input type="hidden" name="selling_preference_type" id="selling_preference_type" value="{$product->selling_preference_type|intval}">
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" id="sp_with_room_type"
+					<input type="checkbox" id="sp_with_room_type" name="selling_preference_type[]" value="{Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}"
 						{if Product::isSellableWithRoomType($product->id) }checked="checked"{/if}>
 					{l s='Sell With Room Type'}
 				</label>
 			</div>
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" id="sp_with_hotel"
+					<input type="checkbox" id="sp_with_hotel" name="selling_preference_type[]" value="{Product::SELLING_PREFERENCE_WITH_HOTEL}"
 						{if Product::isSellableWithHotel($product->id)}checked="checked"{/if}>
 					{l s='Sell With Hotel'}
 				</label>
 			</div>
 			<div class="checkbox">
 				<label>
-					<input type="checkbox" id="sp_standalone"
+					<input type="checkbox" id="sp_standalone" name="selling_preference_type[]" value="{Product::SELLING_PREFERENCE_WITH_STANDALONE}"
 						{if Product::isSellableAsStandalone($product->id) }checked="checked"{/if}>
 					{l s='Sell With Standalone'}
 				</label>

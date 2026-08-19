@@ -2227,6 +2227,10 @@ class AdminNormalProductsControllerCore extends AdminController
             $_POST['price_calculation_method'] = array_sum(array_map('intval', Tools::getValue('price_calculation_method')));
         }
 
+        if (is_array(Tools::getValue('selling_preference_type'))) {
+            $_POST['selling_preference_type'] = array_sum(array_map('intval', Tools::getValue('selling_preference_type')));
+        }
+
         $className = 'Product';
         // @todo : the call_user_func seems to contains only statics values (className = 'Product')
         $rules = call_user_func(array($this->className, 'getValidationRules'), $this->className);

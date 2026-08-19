@@ -573,12 +573,6 @@ product_tabs['Informations'] = new function(){
 			var withRoomType = $('#sp_with_room_type').is(':checked');
 			var withHotel = $('#sp_with_hotel').is(':checked');
 			var standalone = $('#sp_standalone').is(':checked');
-			const sellingPreference =
-				(withRoomType ? SELLING_PREFERENCE_WITH_ROOM_TYPE : 0) |
-				(withHotel ? SELLING_PREFERENCE_WITH_HOTEL : 0) |
-				(standalone ? SELLING_PREFERENCE_WITH_STANDALONE : 0);
-
-			$('#selling_preference_type').val(sellingPreference);			
 
 			var $autoAddOff = $('#auto_add_to_cart_off');
 			var $autoAddCheckedInput;
