@@ -2062,7 +2062,7 @@ class HotelCartBookingData extends ObjectModel
             $this->extra_demands = json_encode(array());
         }
 
-        $this->validateCheckInCheckOutDate();
+        $this->formatCheckInCheckOutDate();
 
         return parent::update($null_values);
     }
@@ -2073,18 +2073,18 @@ class HotelCartBookingData extends ObjectModel
             $this->extra_demands = json_encode(array());
         }
 
-        $this->validateCheckInCheckOutDate();
+        $this->formatCheckInCheckOutDate();
 
         return parent::add($auto_date, $null_values);
     }
 
-    protected function validateCheckInCheckOutDate()
+    protected function formatCheckInCheckOutDate()
     {
         if (!$this->date_from || !$this->date_to) {
             return;
         }
 
-        $dateRange = HotelHelper::validateCheckInCheckOutDate(
+        $dateRange = HotelHelper::formatCheckInCheckOutDate(
             $this->date_from,
             $this->date_to,
             (int)$this->id_hotel

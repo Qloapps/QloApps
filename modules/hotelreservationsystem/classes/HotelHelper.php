@@ -2766,7 +2766,7 @@ class HotelHelper
         return (int)floor(($endTime - $startTime) / 3600);
     }
 
-    public static function validateCheckInCheckOutDate($dateFrom, $dateTo, $idHotel = 0)
+    public static function formatCheckInCheckOutDate($dateFrom, $dateTo, $idHotel = 0)
     {
         static $hotelCheckInOutTimesCache = array();
 

@@ -160,7 +160,7 @@ class CartControllerCore extends FrontController
             $objRoomType = new HotelRoomType();
             if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
                 if ($id_hotel = $roomTypeInfo['id_hotel']) {
-                    $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $id_hotel);
+                    $bookingDateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $id_hotel);
                     $date_from = $bookingDateRange['date_from'];
                     $date_to = $bookingDateRange['date_to'];
 
@@ -341,7 +341,7 @@ class CartControllerCore extends FrontController
                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
                     $date_from = Tools::getValue('dateFrom');
                     $date_to = Tools::getValue('dateTo');
-                    $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $roomTypeInfo['id_hotel']);
+                    $bookingDateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $roomTypeInfo['id_hotel']);
                     $date_from = $bookingDateRange['date_from'];
                     $date_to = $bookingDateRange['date_to'];
                     $serviceProducts = json_decode(Tools::getValue('serviceProducts'),true);

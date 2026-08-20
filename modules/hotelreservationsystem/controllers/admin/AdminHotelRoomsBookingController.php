@@ -161,7 +161,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $occupancy = array();
             }
 
-            $booking_date_range = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $id_hotel);
+            $booking_date_range = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $id_hotel);
             $date_from = $booking_date_range['date_from'];
             $date_to = $booking_date_range['date_to'];
 
@@ -694,7 +694,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
         }
 
-        $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $id_hotel);
+        $bookingDateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $id_hotel);
         $date_from = $bookingDateRange['date_from'];
         $date_to = $bookingDateRange['date_to'];
 

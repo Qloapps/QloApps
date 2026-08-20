@@ -376,7 +376,7 @@ class ProductControllerCore extends FrontController
                         $date_to = date('Y-m-d', strtotime('+'.$los['min_los'].' day', strtotime($date_from)));
                     }
                     
-                    $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($date_from, $date_to, $hotel_id);
+                    $bookingDateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $hotel_id);
                     $date_from = $bookingDateRange['date_from'];
                     $date_to = $bookingDateRange['date_to'];
 
@@ -1469,7 +1469,7 @@ class ProductControllerCore extends FrontController
             $roomTypeInfo = (new HotelRoomType())->getRoomTypeInfoByIdProduct($idProduct);
             $idHotel = $roomTypeInfo ? $roomTypeInfo['id_hotel'] : 0;
 
-            $bookingDateRange = HotelHelper::validateCheckInCheckOutDate($dateFrom, $dateTo, $idHotel);
+            $bookingDateRange = HotelHelper::formatCheckInCheckOutDate($dateFrom, $dateTo, $idHotel);
             $dateFrom = $bookingDateRange['date_from'];
             $dateTo = $bookingDateRange['date_to'];
             $this->assignRoomServiceProductVars();
