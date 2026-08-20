@@ -108,7 +108,8 @@
 												data-tagline="{$imgItem.tag_line|escape:'html':'UTF-8'}"
 												data-tl-color="{$imgItem.tag_line_color|default:'#ffffff'|escape:'html':'UTF-8'}"
 												data-tl-font-size="{$imgItem.tag_line_font_size|default:16|intval}"
-												data-tl-font-weight="{$imgItem.tag_line_font_weight|default:'400'|escape:'html':'UTF-8'}">
+												data-tl-font-weight="{$imgItem.tag_line_font_weight|default:'400'|escape:'html':'UTF-8'}"
+												data-show-hotel-name="{$imgItem.show_hotel_name|intval}">
 											</div>
 										{/foreach}
 									</div>

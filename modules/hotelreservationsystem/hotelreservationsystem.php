@@ -375,6 +375,7 @@ class HotelReservationSystem extends Module
                 'QLO_HOTEL_NAME_ENABLE'      => !empty($firstItem['show_hotel_name']),
                 'wkHeaderContentAlign'       => (int)(Configuration::get('QLO_HEADER_CONTENT_ALIGN') ?: HotelHeaderImage::CONTENT_ALIGN_CENTER),
                 'QLO_HEADER_MEDIA_TYPE'      => (int)(Configuration::get('QLO_HEADER_MEDIA_TYPE') ?: HotelHeaderImage::MEDIA_TYPE_IMAGE),
+                'QLO_HEADER_MEDIA_TYPE_IMAGE' => HotelHeaderImage::MEDIA_TYPE_IMAGE,
                 'QLO_HEADER_MEDIA_TYPE_VIDEO' => HotelHeaderImage::MEDIA_TYPE_VIDEO,
             ));
             return $this->display(__FILE__, 'headerHotelDescBlock.tpl');

@@ -42,7 +42,7 @@
 		</div>
 	</td>
 	<td class="center">
-		<a class="list-action-enable ajax_table_link {if $img.active}action-enabled{else}action-disabled{/if}"
+		<a class="list-action-enable ajax_table_link js-toggle-active {if $img.active}action-enabled{else}action-disabled{/if}"
 		   href="{$current|escape:'html':'UTF-8'}&amp;ajax=1&amp;action=toggle_image_active&amp;id_header_image={$img.id_header_image|intval}&amp;active={if $img.active}0{else}1{/if}&amp;token={$token|escape:'html':'UTF-8'}"
 		   title="{if $img.active}{l s='Enabled' mod='hotelreservationsystem'}{else}{l s='Disabled' mod='hotelreservationsystem'}{/if}">
 			<i class="icon-check{if !$img.active} hidden{/if}"></i>
