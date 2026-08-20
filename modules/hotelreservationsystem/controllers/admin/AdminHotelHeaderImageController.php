@@ -133,8 +133,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
                 'QLO_HEADER_SLIDER_NAV_TYPE' => (int)Tools::getValue('QLO_HEADER_SLIDER_NAV_TYPE', (int)(Configuration::get('QLO_HEADER_SLIDER_NAV_TYPE') ?: HotelHeaderImage::NAV_TYPE_DOTS)),
                 'QLO_HEADER_SLIDER_AUTO_PLAY' => (int)Tools::getValue('QLO_HEADER_SLIDER_AUTO_PLAY', (int)Configuration::get('QLO_HEADER_SLIDER_AUTO_PLAY')),
                 'QLO_HEADER_SLIDER_INTERVAL' => Tools::getValue('QLO_HEADER_SLIDER_INTERVAL', (int)Configuration::get('QLO_HEADER_SLIDER_INTERVAL') ?: 5000),
-                'QLO_HEADER_SLIDER_ANIM_TYPE' => (int)Tools::getValue('QLO_HEADER_SLIDER_ANIM_TYPE', (int)(Configuration::get('QLO_HEADER_SLIDER_ANIM_TYPE') ?: HotelHeaderImage::ANIM_TYPE_SLIDE)),
-                'QLO_HOTEL_NAME_ENABLE' => (int)Tools::getValue('QLO_HOTEL_NAME_ENABLE', (int)Configuration::get('QLO_HOTEL_NAME_ENABLE')),
+                'QLO_HEADER_SLIDER_ANIM_TYPE' => (int)Tools::getValue('QLO_HEADER_SLIDER_ANIM_TYPE', (int)(Configuration::get('QLO_HEADER_SLIDER_ANIM_TYPE') ?: HotelHeaderImage::ANIMATION_TYPE_SLIDE)),
                 'QLO_HEADER_CONTENT_ALIGN' => (int)Tools::getValue('QLO_HEADER_CONTENT_ALIGN', (int)(Configuration::get('QLO_HEADER_CONTENT_ALIGN') ?: HotelHeaderImage::CONTENT_ALIGN_CENTER)),
             ),
             'languages' => $languages,
@@ -197,7 +196,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $autoPlay = 0;
         $interval = 0;
         $navType = HotelHeaderImage::NAV_TYPE_DOTS;
-        $animType = HotelHeaderImage::ANIM_TYPE_SLIDE;
+        $animType = HotelHeaderImage::ANIMATION_TYPE_SLIDE;
         $contentAlign = HotelHeaderImage::CONTENT_ALIGN_CENTER;
 
         if ($mediaType === HotelHeaderImage::MEDIA_TYPE_IMAGE) {
@@ -215,9 +214,9 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             if (!in_array($navType, array(HotelHeaderImage::NAV_TYPE_DOTS, HotelHeaderImage::NAV_TYPE_ARROWS, HotelHeaderImage::NAV_TYPE_BOTH))) {
                 $navType = HotelHeaderImage::NAV_TYPE_DOTS;
             }
-            $animType = (int)Tools::getValue('QLO_HEADER_SLIDER_ANIM_TYPE', HotelHeaderImage::ANIM_TYPE_SLIDE);
-            if (!in_array($animType, array(HotelHeaderImage::ANIM_TYPE_SLIDE, HotelHeaderImage::ANIM_TYPE_FADE, HotelHeaderImage::ANIM_TYPE_ZOOM, HotelHeaderImage::ANIM_TYPE_BLUR))) {
-                $animType = HotelHeaderImage::ANIM_TYPE_SLIDE;
+            $animType = (int)Tools::getValue('QLO_HEADER_SLIDER_ANIM_TYPE', HotelHeaderImage::ANIMATION_TYPE_SLIDE);
+            if (!in_array($animType, array(HotelHeaderImage::ANIMATION_TYPE_SLIDE, HotelHeaderImage::ANIMATION_TYPE_FADE, HotelHeaderImage::ANIMATION_TYPE_ZOOM, HotelHeaderImage::ANIMATION_TYPE_BLUR))) {
+                $animType = HotelHeaderImage::ANIMATION_TYPE_SLIDE;
             }
             $contentAlign = (int)Tools::getValue('QLO_HEADER_CONTENT_ALIGN', HotelHeaderImage::CONTENT_ALIGN_CENTER);
             if (!in_array($contentAlign, array(HotelHeaderImage::CONTENT_ALIGN_LEFT, HotelHeaderImage::CONTENT_ALIGN_CENTER, HotelHeaderImage::CONTENT_ALIGN_RIGHT))) {
@@ -252,7 +251,6 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             Configuration::updateValue('QLO_HEADER_MEDIA_TYPE', $mediaType);
 
             if ($mediaType === HotelHeaderImage::MEDIA_TYPE_IMAGE) {
-                Configuration::updateValue('QLO_HOTEL_NAME_ENABLE', (int)(bool)Tools::getValue('QLO_HOTEL_NAME_ENABLE', 0));
                 Configuration::updateValue('QLO_HEADER_CONTENT_ALIGN', $contentAlign);
                 Configuration::updateValue('QLO_HEADER_SLIDER_NAV_TYPE', $navType);
                 Configuration::updateValue('QLO_HEADER_SLIDER_AUTO_PLAY', $autoPlay);
@@ -396,6 +394,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $objImage->name = $uniqueName;
         $objImage->position = $objImage->getHigherPosition();
         $objImage->active = (int)(bool)Tools::getValue('active', 1);
+        $objImage->show_hotel_name = (int)(bool)Tools::getValue('show_hotel_name', 1);
         $objImage->tag_line = $tagLineByLang;
         $objImage->tag_line_color = $tagLineColor;
         $objImage->tag_line_font_size = $tagLineFontSize;
@@ -420,6 +419,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
                 'tag_line_font_size' => $tagLineFontSize,
                 'tag_line_font_weight' => $tagLineFontWeight,
                 'active' => (int)$objImage->active,
+                'show_hotel_name' => (int)$objImage->show_hotel_name,
             ),
             'position' => count(HotelHeaderImage::getItems(null)),
             'current' => self::$currentIndex,
@@ -468,6 +468,11 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             $objImage->active = $newActive;
         }
 
+        $showHotelNameVal = Tools::getValue('show_hotel_name');
+        if ($showHotelNameVal !== false) {
+            $objImage->show_hotel_name = (int)(bool)$showHotelNameVal;
+        }
+
         $tagLineColor = Tools::getValue('tag_line_color', $objImage->tag_line_color);
         if (!preg_match('/^#[0-9a-fA-F]{6}$/', $tagLineColor)) {
             $response['errors'][] = $this->l('Invalid tag line color. Use a 6-digit hex value (e.g. #ffffff).');
@@ -484,24 +489,78 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             $this->ajaxDie(json_encode($response));
         }
 
+        $replacementFile = isset($_FILES['header_image_file']) ? $_FILES['header_image_file'] : null;
+        $hasReplacementFile = ($replacementFile && isset($replacementFile['error']) && $replacementFile['error'] === UPLOAD_ERR_OK && $replacementFile['size'] > 0);
+        $newImageName = null;
+
+        if ($hasReplacementFile) {
+            if ($error = ImageManager::validateUpload($replacementFile, Tools::getMaxUploadSize((int)Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024))) {
+                $response['errors'][] = $error;
+                $this->ajaxDie(json_encode($response));
+            }
+            if (!HotelHeaderImage::createMediaDirectory()) {
+                $response['errors'][] = $this->l('Could not create the media directory.');
+                $this->ajaxDie(json_encode($response));
+            }
+
+            $ext = strtolower(pathinfo($replacementFile['name'], PATHINFO_EXTENSION));
+            $isGif = ($ext === 'gif');
+            $outExt = $isGif ? 'gif' : 'jpg';
+            do {
+                $newImageName = bin2hex(random_bytes(16)).'.'.$outExt;
+            } while (file_exists(_PS_IMG_DIR_.'hotel_header_media/'.$newImageName));
+
+            $destPath = _PS_IMG_DIR_.'hotel_header_media/'.$newImageName;
+            $saved = $isGif ? (bool)move_uploaded_file($replacementFile['tmp_name'], $destPath) : (bool)ImageManager::resize($replacementFile['tmp_name'], $destPath);
+
+            if (!$saved) {
+                $response['errors'][] = $this->l('Failed to save image file.');
+                $this->ajaxDie(json_encode($response));
+            }
+        }
+
+        $oldImageName = $objImage->name;
         $objImage->tag_line = $tagLineByLang;
         $objImage->tag_line_color = $tagLineColor;
         $objImage->tag_line_font_size = $tagLineFontSize;
         $objImage->tag_line_font_weight = $tagLineFontWeight;
+        if ($newImageName) {
+            $objImage->name = $newImageName;
+        }
         if (!$objImage->save()) {
+            if ($newImageName && file_exists($destPath)) {
+                unlink($destPath);
+            }
             $response['errors'][] = $this->l('Failed to update image.');
             $this->ajaxDie(json_encode($response));
+        }
+
+        if ($newImageName) {
+            $oldPath = _PS_IMG_DIR_.'hotel_header_media/'.$oldImageName;
+            if (file_exists($oldPath)) {
+                unlink($oldPath);
+            }
         }
 
         $defaultLangId = (int)Configuration::get('PS_LANG_DEFAULT');
         $response['success'] = true;
         $response['active'] = (int)$objImage->active;
+        $response['show_hotel_name'] = (int)$objImage->show_hotel_name;
         $response['confirmations'] = $this->l('Image updated successfully.');
         $response['tag_line'] = isset($tagLineByLang[$defaultLangId]) ? $tagLineByLang[$defaultLangId] : '';
         $response['tag_lines_json'] = json_encode((object)$tagLineByLang);
         $response['tag_line_color'] = $tagLineColor;
         $response['tag_line_font_size'] = $tagLineFontSize;
         $response['tag_line_font_weight'] = $tagLineFontWeight;
+
+        if ($newImageName) {
+            $shopId = (int)$this->context->shop->id;
+            $srcPath = _PS_IMG_DIR_.'hotel_header_media/'.$newImageName;
+            $cacheName = 'htl_header_image_mini_'.$id.'_'.$shopId.'.jpg';
+            $response['thumb'] = ImageManager::thumbnail($srcPath, $cacheName, 45, 'jpg', true, true);
+            $response['thumb_src'] = $this->context->link->getMediaLink(_PS_IMG_.'hotel_header_media/'.$newImageName).'?'.time();
+        }
+
         $this->ajaxDie(json_encode($response));
     }
 
@@ -590,6 +649,34 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $this->ajaxDie(json_encode($response));
     }
 
+    public function ajaxProcessToggleImageHotelName()
+    {
+        $response = array('errors' => array(), 'success' => false);
+        $id = (int)Tools::getValue('id_header_image');
+        $showHotelName = (int)(bool)Tools::getValue('show_hotel_name');
+
+        if (!$id) {
+            $response['errors'][] = $this->l('Invalid item ID.');
+            $this->ajaxDie(json_encode($response));
+        }
+
+        $objImage = new HotelHeaderImage($id);
+        if (!Validate::isLoadedObject($objImage)) {
+            $response['errors'][] = $this->l('Image not found.');
+            $this->ajaxDie(json_encode($response));
+        }
+
+        $objImage->show_hotel_name = $showHotelName;
+        if (!$objImage->save()) {
+            $response['errors'][] = $this->l('Unable to update hotel name status.');
+            $this->ajaxDie(json_encode($response));
+        }
+
+        $response['success'] = true;
+        $response['confirmations'] = $this->l('The status has been successfully updated.');
+        $this->ajaxDie(json_encode($response));
+    }
+
     public function ajaxProcessSaveImagePositions()
     {
         $ids = Tools::getValue('image_ids', array());
@@ -637,6 +724,12 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             }
         }
 
+        $showHotelNameVal = Tools::getValue('show_hotel_name', '');
+        if ($showHotelNameVal !== '' && !in_array($showHotelNameVal, array('0', '1'))) {
+            $response['errors'][] = $this->l('Invalid hotel name status selected.');
+            $this->ajaxDie(json_encode($response));
+        }
+
         $updateTagline = (bool)Tools::getValue('update_tagline', false);
         $tagLineByLang = array();
         if ($updateTagline) {
@@ -680,6 +773,9 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             if ($activeVal !== '') {
                 $objImage->active = (int)$activeVal;
             }
+            if ($showHotelNameVal !== '') {
+                $objImage->show_hotel_name = (int)$showHotelNameVal;
+            }
             if ($updateTagline) {
                 $objImage->tag_line = $tagLineByLang;
             }
@@ -698,6 +794,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             $updatedRows[] = array(
                 'id' => (int)$objImage->id,
                 'active' => (int)$objImage->active,
+                'show_hotel_name' => (int)$objImage->show_hotel_name,
                 'tag_line' => isset($currentTagLines[$defaultLangId]) ? $currentTagLines[$defaultLangId] : '',
                 'tag_lines_json' => json_encode((object)$currentTagLines),
                 'tag_line_color' => $objImage->tag_line_color,
@@ -722,7 +819,9 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         parent::setMedia();
         $this->addJqueryPlugin('tablednd');
         $this->addJqueryPlugin('colorpicker');
-        $this->addJS(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelHeaderImageAdmin.js');
+        $adminJsPath = _PS_MODULE_DIR_.'hotelreservationsystem/views/js/admin/qhrs_hotel_header_image_admin.js';
+        $this->addJS(_MODULE_DIR_.'hotelreservationsystem/views/js/admin/qhrs_hotel_header_image_admin.js?'.@filemtime($adminJsPath));
         $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css');
+        $this->addCSS(_MODULE_DIR_.'hotelreservationsystem/views/css/admin/qhrs_header_media.css');
     }
 }

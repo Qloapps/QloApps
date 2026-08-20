@@ -521,6 +521,7 @@ class HotelReservationSystemDb
                 `tag_line_font_weight` VARCHAR(10) NOT NULL DEFAULT '400',
                 `position` INT(10) UNSIGNED NOT NULL DEFAULT '0',
                 `active` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
+                `show_hotel_name` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
                 `date_add` DATETIME NOT NULL,
                 `date_upd` DATETIME NOT NULL,
                 PRIMARY KEY (`id_header_image`)

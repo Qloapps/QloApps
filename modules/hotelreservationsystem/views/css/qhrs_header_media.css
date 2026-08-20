@@ -22,7 +22,7 @@
 
 .header-ext-dots {
     position: absolute;
-    bottom: 14px;
+    bottom: 120px;
     left: 0;
     right: 0;
     text-align: center;
@@ -54,15 +54,9 @@
 .header-align-2 { text-align: center; }
 .header-align-3 { text-align: right; }
 
-.header-align-1 .heasder-desc-hr-first,
 .header-align-1 .heasder-desc-hr-second { margin-left: 0; margin-right: auto; }
-.header-align-3 .heasder-desc-hr-first,
 .header-align-3 .heasder-desc-hr-second { margin-left: auto; margin-right: 0; }
 
-@media (max-width: 767px) {
-    .header-align-1,
-    .header-align-3 { text-align: center; }
-}
 
 /* ===== headerHotelDescBlock.tpl ===== */
 .header-desc-container {
@@ -73,6 +67,10 @@
     top: 0;
     z-index: -10;
     /*height: 100%;*/
+}
+
+.header-bg-video {
+    min-height: 100%;
 }
 .header-desc-wrapper  {
 	display: table;
@@ -85,19 +83,8 @@
     text-align: center;
     color: #FFFFFF;
 }
-.header-desc-welcome{
-	font-size: 18px;
-	font-weight: 300;
-	margin: 0;
-}
-
 .header-desc-primary hr {
     margin-bottom: 10px;
-}
-
-.heasder-desc-hr-first {
-    width: 42px;
-    margin-top: 10px;
 }
 
 .header-hotel-name {
@@ -115,85 +102,6 @@
 
 .heasder-desc-hr-second {
     display: none;
-}
-
-@media (max-width: 767px) {
-.topSubSecondaryBlock {
-    margin-top: 0px; }
-
-/* ===== Mobile header responsive ===== */
-
-/*
- * The index page sets height:100% via inline style on html/body/#page/.header-container/<header>.
- * On mobile portrait this makes the header fill the full viewport (~750px+), causing
- * landscape hotel images to be cropped and zoomed beyond recognition.
- * Reset ancestors to auto and lock the header to a landscape-ish fixed height.
- */
-html, body {
-    height: auto !important;
-}
-#page, .header-container {
-    height: auto !important;
-}
-body#index #header {
-    height: 60vw !important;
-    min-height: 240px !important;
-    max-height: 420px !important;
-}
-
-/* Force the full owl carousel height chain — owl JS sets inline height on
-   stage/items during responsive recalc, collapsing the background images. */
-body#index .header-media-layer,
-body#index .header-media-layer .owl-carousel,
-body#index .header-media-layer .owl-stage-outer,
-body#index .header-media-layer .owl-stage,
-body#index .header-media-layer .owl-item {
-    height: 100% !important;
-}
-
-/* Keep background images filling the now-landscape slot */
-body#index .header-media-layer,
-body#index .header-slide-img {
-    background-size: cover !important;
-    background-position: center center !important;
-}
-
-/* Scale down oversized text */
-.header-hotel-name {
-    font-size: 22px !important;
-    margin-top: 0;
-    margin-bottom: 8px;
-}
-.js-header-tagline {
-    font-size: 13px !important;
-    line-height: 18px;
-}
-.header-desc-inner-wrapper {
-    padding-left: 10px;
-    padding-right: 10px;
-}
-/* Prev/next buttons — touch-friendly on mobile */
-.header-media-btn {
-    padding: 5px 9px;
-    font-size: 15px;
-}
-.js-header-media-prev { left: 6px; }
-.js-header-media-next { right: 6px; }
-
-/* Dots clear from bottom edge */
-.header-ext-dots {
-    bottom: 10px;
-}
-}
-
-/* ==== Header Media (front-end) ==== */
-
-#header {
-    background: transparent;
-}
-
-body#index #header {
-    position: relative;
 }
 
 /* Owl carousel slide animation classes */
@@ -268,60 +176,6 @@ body#index #header {
     background-repeat: no-repeat;
 }
 
-.header-video-layer {
-    background-color: #000;
-}
-
-.header-bg-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
-}
-
-.header-slide-video {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.header-slide-video .header-bg-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
-}
-
-.header-media-nav-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    pointer-events: none;
-}
-
-@media (min-width: 768px) {
-    .header-media-nav-wrapper {
-        z-index: 11;
-    }
-    /* Push dots above the search panel (which sits at bottom:0, ~90px tall) */
-    .header-ext-dots {
-        bottom: 120px;
-    }
-}
 
 .header-media-btn {
     position: absolute;
@@ -345,35 +199,10 @@ body#index #header {
     color: #fff;
 }
 
-.js-header-media-prev {
+.header-media-prev {
     left: 15px;
 }
 
-.js-header-media-next {
+.header-media-next {
     right: 15px;
 }
-
-/* ===== headerHotelDescBlock.tpl ===== */
-
-.copyRightWrapper {
-    background-color: #242424;
-    padding: 30px;
-}
-.copyRightWrapper p {
-    color: #868686;
-    font-size: 16px;
-    font-weight: 400;
-    margin: 0;
-    text-align: center;
-}
-
-.copyRightWrapper {
-    background-color: #242424;
-    padding: 30px;
-    width: 100%; }
-    .copyRightWrapper .copyRight {
-        color: #868686;
-        font-size: 16px;
-        margin: 0;
-        text-align: center;
-        line-height: 23px; }

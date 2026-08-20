@@ -39,10 +39,10 @@ class HotelHeaderImage extends ObjectModel
     const NAV_TYPE_ARROWS = 2;
     const NAV_TYPE_BOTH   = 3;
 
-    const ANIM_TYPE_SLIDE = 1;
-    const ANIM_TYPE_FADE  = 2;
-    const ANIM_TYPE_ZOOM  = 3;
-    const ANIM_TYPE_BLUR  = 4;
+    const ANIMATION_TYPE_SLIDE = 1;
+    const ANIMATION_TYPE_FADE  = 2;
+    const ANIMATION_TYPE_ZOOM  = 3;
+    const ANIMATION_TYPE_BLUR  = 4;
 
     const CONTENT_ALIGN_LEFT   = 1;
     const CONTENT_ALIGN_CENTER = 2;
@@ -55,6 +55,7 @@ class HotelHeaderImage extends ObjectModel
     public $tag_line_font_size   = 16;
     public $tag_line_font_weight = '400';
     public $active;
+    public $show_hotel_name = 1;
     public $date_add;
     public $date_upd;
 
@@ -70,6 +71,7 @@ class HotelHeaderImage extends ObjectModel
             'tag_line_font_weight' => array('type' => self::TYPE_STRING, 'size' => 10),
             'position'             => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedInt'),
             'active'               => array('type' => self::TYPE_BOOL,   'validate' => 'isBool'),
+            'show_hotel_name'      => array('type' => self::TYPE_BOOL,   'validate' => 'isBool'),
             'date_add'             => array('type' => self::TYPE_DATE,   'validate' => 'isDate'),
             'date_upd'             => array('type' => self::TYPE_DATE,   'validate' => 'isDate'),
         ),

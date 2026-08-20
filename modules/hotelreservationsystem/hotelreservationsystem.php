@@ -75,9 +75,44 @@ class HotelReservationSystem extends Module
         }
         //End
         if (Tools::getValue('controller') == 'index') {
-            $this->context->controller->addJS($this->_path.'views/js/HotelHeaderMediaFront.js');
+            $headerMediaFrontJs = _PS_MODULE_DIR_.'hotelreservationsystem/views/js/qhrs_hotel_header_media_front.js';
+            $this->context->controller->addJS($this->_path.'views/js/qhrs_hotel_header_media_front.js?'.@filemtime($headerMediaFrontJs));
+
+            $mediaTypeInt = (int)(Configuration::get('QLO_HEADER_MEDIA_TYPE') ?: HotelHeaderImage::MEDIA_TYPE_IMAGE);
+            if ($mediaTypeInt === HotelHeaderImage::MEDIA_TYPE_VIDEO) {
+                $videoConfig = HotelHeaderImage::getVideoConfig();
+                if ($videoConfig) {
+                    $mimeMap = array('mp4' => 'video/mp4', 'webm' => 'video/webm', 'ogg' => 'video/ogg');
+                    if ($videoConfig['source_type'] === 'upload') {
+                        $ext = strtolower(pathinfo($videoConfig['name'], PATHINFO_EXTENSION));
+                    } else {
+                        $urlPath = parse_url($videoConfig['name'], PHP_URL_PATH);
+                        $ext = strtolower(pathinfo($urlPath ?: '', PATHINFO_EXTENSION));
+                    }
+                    $videoConfig['mime_type'] = isset($mimeMap[$ext]) ? $mimeMap[$ext] : 'video/mp4';
+                    $headerMediaItems = array($videoConfig);
+                } else {
+                    $headerMediaItems = array();
+                }
+            } else {
+                $headerMediaItems = HotelHeaderImage::getItems();
+            }
+            $this->context->smarty->assign(array(
+                'QLO_HEADER_MEDIA_TYPE'         => $mediaTypeInt,
+                'QLO_HEADER_MEDIA_TYPE_IMAGE'   => HotelHeaderImage::MEDIA_TYPE_IMAGE,
+                'QLO_HEADER_MEDIA_TYPE_VIDEO'   => HotelHeaderImage::MEDIA_TYPE_VIDEO,
+                'WK_HEADER_NAV_TYPE_DOTS'       => HotelHeaderImage::NAV_TYPE_DOTS,
+                'QLO_HEADER_ANIM_TYPE_SLIDE'    => HotelHeaderImage::ANIMATION_TYPE_SLIDE,
+                'headerMediaItems'              => $headerMediaItems,
+                'headerSliderConfig'            => array(
+                    'nav_type'  => (int)(Configuration::get('QLO_HEADER_SLIDER_NAV_TYPE') ?: HotelHeaderImage::NAV_TYPE_DOTS),
+                    'auto_play' => (int)Configuration::get('QLO_HEADER_SLIDER_AUTO_PLAY'),
+                    'interval'  => (int)Configuration::get('QLO_HEADER_SLIDER_INTERVAL'),
+                    'anim_type' => (int)(Configuration::get('QLO_HEADER_SLIDER_ANIM_TYPE') ?: HotelHeaderImage::ANIMATION_TYPE_SLIDE),
+                ),
+            ));
         }
-        $this->context->controller->addCSS($this->_path.'/views/css/HotelReservationFront.css');
+        $this->context->controller->addCSS($this->_path.'/views/css/qhrs_header_media.css');
         $this->context->controller->addJS($this->_path.'/views/js/HotelReservationFront.js');
     }
 
@@ -337,7 +372,7 @@ class HotelReservationSystem extends Module
                 'wkTagLineColor'             => !empty($firstItem['tag_line_color'])       ? $firstItem['tag_line_color']       : '#ffffff',
                 'wkTagLineFontSize'          => !empty($firstItem['tag_line_font_size'])   ? (int)$firstItem['tag_line_font_size']   : 16,
                 'wkTagLineFontWeight'        => !empty($firstItem['tag_line_font_weight']) ? $firstItem['tag_line_font_weight'] : '400',
-                'QLO_HOTEL_NAME_ENABLE'      => (int)Configuration::get('QLO_HOTEL_NAME_ENABLE'),
+                'wkShowHotelName'            => !empty($firstItem['show_hotel_name']),
                 'wkHeaderContentAlign'       => (int)(Configuration::get('QLO_HEADER_CONTENT_ALIGN') ?: HotelHeaderImage::CONTENT_ALIGN_CENTER),
                 'QLO_HEADER_MEDIA_TYPE'      => (int)(Configuration::get('QLO_HEADER_MEDIA_TYPE') ?: HotelHeaderImage::MEDIA_TYPE_IMAGE),
                 'QLO_HEADER_MEDIA_TYPE_VIDEO' => HotelHeaderImage::MEDIA_TYPE_VIDEO,
@@ -662,7 +697,6 @@ class HotelReservationSystem extends Module
             'WK_CUSTOMER_SUPPORT_EMAIL',
             'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST',
             'QLO_HEADER_MEDIA_TYPE',
-            'QLO_HOTEL_NAME_ENABLE',
             'QLO_HEADER_CONTENT_ALIGN',
             'QLO_HEADER_VIDEO_SOURCE_TYPE',
             'QLO_HEADER_VIDEO_NAME',

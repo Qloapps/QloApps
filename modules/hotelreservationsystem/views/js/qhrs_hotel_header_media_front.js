@@ -75,9 +75,10 @@ $(document).ready(function () {
     };
 
 
-    var $taglineEl  = $('.js-header-tagline');
-    var _fadeTimer  = null;
-    var _shownIndex = -1;
+    var $taglineEl   = $('.js-header-tagline');
+    var $hotelNameEl = $('.js-header-hotel-name');
+    var _fadeTimer   = null;
+    var _shownIndex  = -1;
 
     var $slides = $imgCarousel.find('.owl-item:not(.cloned) .header-slide-img');
     var taglines = $slides.map(function () { return $(this).data('tagline') || ''; }).get();
@@ -88,8 +89,13 @@ $(document).ready(function () {
             fontWeight: $(this).data('tl-font-weight') || '400'
         };
     }).get();
+    var showHotelNames = $slides.map(function () { return $(this).data('show-hotel-name') == 1; }).get();
 
-    function showTagline(tag, style) {
+    function showTagline(tag, style, showHotelName) {
+        if ($hotelNameEl.length) {
+            $hotelNameEl.toggle(!!showHotelName);
+        }
+
         if (!$taglineEl.length) { return; }
         if (_fadeTimer) { clearTimeout(_fadeTimer); _fadeTimer = null; }
 
@@ -113,13 +119,13 @@ $(document).ready(function () {
     }
 
     _shownIndex = owl.relative(owl.current());
-    showTagline(taglines[_shownIndex] || '', tlStyles[_shownIndex]);
+    showTagline(taglines[_shownIndex] || '', tlStyles[_shownIndex], showHotelNames[_shownIndex]);
 
     $imgCarousel.on('changed.owl.carousel', function () {
         var realIndex = owl.relative(owl.current());
         if (realIndex === _shownIndex) { return; } // loop-snap second fire — no-op
         _shownIndex = realIndex;
-        showTagline(taglines[realIndex] || '', tlStyles[realIndex]);
+        showTagline(taglines[realIndex] || '', tlStyles[realIndex], showHotelNames[realIndex]);
     });
 
 
