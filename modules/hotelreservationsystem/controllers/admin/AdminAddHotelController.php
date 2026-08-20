@@ -176,35 +176,15 @@ class AdminAddHotelController extends ModuleAdminController
             }
 
             $smartyVars['order_restrict_date_info'] = HotelOrderRestrictDate::getDataByHotelId($idHotel);
-            $objHotelFeatures = new HotelFeatures();
-            $hotelFeatures = $this->object->getFeaturesOfHotelByHotelId($this->object->id);
-            if ($features = $objHotelFeatures->HotelBranchSelectedFeaturesArray($hotelFeatures)) {
-                foreach ($features as $idFeature => $feature) {
-                    $features[$idFeature]['value'] = $idFeature;
-                    $features[$idFeature]['input_name'] = 'id_feature_parents';
-                    if (isset($feature['children']) && $feature['children']) {
-                        $selectedChildFeatures = 0;
-                        foreach ($feature['children'] as $childKey => $childFeature) {
-                            $features[$idFeature]['children'][$childKey]['value'] = $childFeature['id'];
-                            $features[$idFeature]['children'][$childKey]['input_name'] = 'id_features';
-                            if (isset($childFeature['selected']) && $childFeature['selected']) {
-                                $selectedChildFeatures++;
-                            }
-                        }
-
-                        if ($selectedChildFeatures == count($feature['children'])) {
-                            $features[$idFeature]['selected'] = true;
-                        }
-                    }
-                }
-
-                $tree = new HelperTree('hotel-features-tree', $features);
+            if ($amenities = HotelBranchAmenities::getBranchAmenitiesTreeData((int)$idHotel)) {
+                $tree = new HelperTree('hotel-amenities-tree', $amenities);
                 $tree->setShowCollapseExpandButton(true)
                     ->setUseCheckBox(true)
                     ->setAutoSelectChildren(true)
-                    ->setUseBulkActions(true);
-                $treeContent = $tree->render();
-                $smartyVars['hotel_feature_tree'] = $treeContent;
+                    ->setUseBulkActions(true)
+                    ->setUseSearch(true);
+                $smartyVars['hotel_amenity_tree'] = $tree->render();
+                $smartyVars['hotel_featured_amenity_ids'] = array_column(HotelBranchAmenities::getAmenities((int)$idHotel, 0, true), 'id');
             }
 
             $smartyVars['rewrite_url'] = [];
@@ -282,7 +262,8 @@ class AdminAddHotelController extends ModuleAdminController
         $longitude = Tools::getValue('loclongitude');
         $map_formated_address = Tools::getValue('locformatedAddr');
         $map_input_text = Tools::getValue('googleInputField');
-        $hotelFeatures = Tools::getValue('id_features', array());
+        $hotelAmenities = Tools::getValue('id_amenities', array());
+        $hotelFeaturedAmenities = Tools::getValue('hotel_featured_amenities', array());
         $shortDescriptionMaxChar = Configuration::get('PS_SHORT_DESC_LIMIT') ? Configuration::get('PS_SHORT_DESC_LIMIT') : Configuration::PS_SHORT_DESC_LIMIT;
 
         // check if field is atleast in default language. Not available in default prestashop
@@ -494,6 +475,11 @@ class AdminAddHotelController extends ModuleAdminController
                     }
                 }
             }
+        }
+
+        $amenityCategories = HotelAmenities::getCategories();
+        if ($amenityCategories && !HotelAmenities::getAmenities()) {
+            $this->errors[] = $this->l('No amenities have been created. Please add amenities to at least one category before assigning them.');
         }
 
         if (!count($this->errors)) {
@@ -819,10 +805,9 @@ class AdminAddHotelController extends ModuleAdminController
 
                 $objHotelOrderRestrictDate->save();
 
-                $objHotelFeatures = new HotelBranchFeatures();
-                $objHotelFeatures->deleteBranchFeaturesByHotelId($idHotel);
-                if (!$objHotelFeatures->assignFeaturesToHotel($idHotel, $hotelFeatures)) {
-                    $this->errors[] = $this->l('Some problem occurred while assigning features to the hotel.');
+                $objHotelAmenities = new HotelBranchAmenities();
+                if (!$objHotelAmenities->saveBranchAmenities($idHotel, $hotelAmenities, $hotelFeaturedAmenities)) {
+                    $this->errors[] = $this->l('Some problem occurred while assigning amenities to the hotel.');
                 }
             }
 
