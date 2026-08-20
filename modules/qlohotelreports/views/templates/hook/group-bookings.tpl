@@ -218,7 +218,6 @@
                         <th>{l s='Check-in Date' mod='qlohotelreports'}</th>
                         <th>{l s='Cancellation Date' mod='qlohotelreports'}</th>
                         <th>{l s='Cancellation Reason' mod='qlohotelreports'}</th>
-                        <th>{l s='Cancellation Remark' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Refund Amount' mod='qlohotelreports'}</th>
                         <th>{l s='Refund Status' mod='qlohotelreports'}</th>
                         <th>{l s='Booking Date' mod='qlohotelreports'}</th>
@@ -235,7 +234,6 @@
                                 <td>{$cancellation.hotel_check_in|escape:'html':'UTF-8'}</td>
                                 <td>{if $cancellation.cancellation_date}{$cancellation.cancellation_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $cancellation.cancellation_reason}{$cancellation.cancellation_reason|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
-                                <td><span class="text-muted">—</span></td>
                                 <td class="text-right">{displayPrice price=$cancellation.refunded_amount currency=$cancellation.id_currency}</td>
                                 <td>{if $cancellation.refund_status}{$cancellation.refund_status|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $cancellation.booking_date}{$cancellation.booking_date|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
@@ -243,7 +241,7 @@
                         {/foreach}
                     {else}
                         <tr>
-                            <td class="list-empty" colspan="11">
+                            <td class="list-empty" colspan="10">
                                 <div class="list-empty-msg">
                                     <i class="icon-warning-sign list-empty-icon"></i>
                                     {l s='No cancellations found for the selected date range.' mod='qlohotelreports'}
@@ -258,62 +256,6 @@
                         <td colspan="8"><strong>{l s='Totals' mod='qlohotelreports'}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$total_refunded currency=$id_currency}</strong></td>
                         <td colspan="2"></td>
-                    </tr>
-                </tfoot>
-                {/if}
-            </table>
-        </div>
-        </div>
-        </div>
-    {/if}
-
-    {* ── No-Show Report ──────────────────────────────────────────────── *}
-    {if $active_report == 'no-show'}
-        <div class="row">
-        <div class="col-lg-12">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
-                        <th>{l s='Room Type' mod='qlohotelreports'}</th>
-                        <th>{l s='Room No.' mod='qlohotelreports'}</th>
-                        <th>{l s='Check-in Date' mod='qlohotelreports'}</th>
-                        <th class="text-right">{l s='Total Amount' mod='qlohotelreports'}</th>
-                        <th class="text-right">{l s='Penalty Charged' mod='qlohotelreports'}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {if $no_shows}
-                        {foreach $no_shows as $noShow}
-                            <tr>
-                                <td>{$noShow.id_order|intval}</td>
-                                <td>{$noShow.customer_name|escape:'html':'UTF-8'}</td>
-                                <td>{$noShow.room_type_name|escape:'html':'UTF-8'}</td>
-                                <td>{$noShow.room_num|escape:'html':'UTF-8'}</td>
-                                <td>{$noShow.actual_checkin|escape:'html':'UTF-8'}</td>
-                                <td class="text-right">{displayPrice price=$noShow.total_price_tax_incl currency=$noShow.id_currency}</td>
-                                <td class="text-right"><span class="text-muted">—</span></td>
-                            </tr>
-                        {/foreach}
-                    {else}
-                        <tr>
-                            <td class="list-empty" colspan="7">
-                                <div class="list-empty-msg">
-                                    <i class="icon-warning-sign list-empty-icon"></i>
-                                    {l s='No no-shows found for the selected date range.' mod='qlohotelreports'}
-                                </div>
-                            </td>
-                        </tr>
-                    {/if}
-                </tbody>
-                {if $no_shows}
-                <tfoot>
-                    <tr class="qlo-report-totals">
-                        <td colspan="5"><strong>{l s='Totals' mod='qlohotelreports'}</strong></td>
-                        <td class="text-right"><strong>{displayPrice price=$no_show_totals.total_price_tax_incl currency=$id_currency}</strong></td>
-                        <td></td>
                     </tr>
                 </tfoot>
                 {/if}

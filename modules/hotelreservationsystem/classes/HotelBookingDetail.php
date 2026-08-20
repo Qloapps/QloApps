@@ -3953,8 +3953,7 @@ class HotelBookingDetail extends ObjectModel
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
 
-        $loopEnd = ($dateFrom === $dateTo) ? $dateTo : date('Y-m-d', strtotime('-1 day', strtotime($dateTo)));
-        while ($current <= $loopEnd) {
+        while ($current <= $dateTo) {
             $nextDay = date('Y-m-d', strtotime('+1 day', strtotime($current)));
             $ts  = strtotime($current);
             $row = Db::getInstance()->getRow(
@@ -4302,15 +4301,16 @@ class HotelBookingDetail extends ObjectModel
             self::ALLOTMENT_AUTO   => $moduleInstance->l('Online / Direct', 'hotelreservationsystem'),
             self::ALLOTMENT_MANUAL => $moduleInstance->l('Walk-in / Admin', 'hotelreservationsystem'),
         );
-        $totalBookings = array_sum(array_column($rows, 'bookings'));
+        $totalRevExcl = array_sum(array_column($rows, 'revenue_excl'));
         foreach ($rows as &$row) {
             $type = (int) $row['booking_type'];
             $row['channel_label']    = isset($labels[$type]) ? $labels[$type] : $moduleInstance->l('Other', 'hotelreservationsystem');
             $row['tax_amount']       = (float) $row['revenue_incl'] - (float) $row['revenue_excl'];
+            $row['net_revenue']      = (float) $row['revenue_excl'] - (float) $row['discount_amount'];
             $row['adr']              = (float) $row['room_nights'] > 0
                 ? (float) $row['revenue_excl'] / (float) $row['room_nights'] : 0.0;
-            $row['contribution_pct'] = $totalBookings > 0
-                ? round((float) $row['bookings'] / $totalBookings * 100, 1) : 0.0;
+            $row['contribution_pct'] = $totalRevExcl > 0
+                ? round((float) $row['revenue_excl'] / $totalRevExcl * 100, 1) : 0.0;
             $row['cancel_rate_pct']  = (int) $row['bookings'] > 0
                 ? round((float) $row['cancellations'] / (int) $row['bookings'] * 100, 1) : 0.0;
         }
@@ -4595,8 +4595,12 @@ class HotelBookingDetail extends ObjectModel
             return $result;
         }
 
+        $countExpr = (isset($params['count_rows']) && $params['count_rows'])
+            ? 'hbd.`id`'
+            : 'DISTINCT hbd.`id_order`';
+
         return (int) Db::getInstance()->getValue(
-            'SELECT COUNT(DISTINCT hbd.`id_order`)
+            'SELECT COUNT('.$countExpr.')
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
@@ -4628,37 +4632,6 @@ class HotelBookingDetail extends ObjectModel
             AND hbd.`is_refunded` = 0
             AND hbd.`is_cancelled` = 0
             AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
-        );
-    }
-
-    /**
-     * Total no-shows: rooms expected to arrive (date_from in range) never checked in and past arrival.
-     *
-     * @param array $params date_from, date_to, id_hotel, id_product
-     * @return int
-     */
-    public static function getTotalNoShows(array $params)
-    {
-        $dateFrom  = pSQL($params['date_from']);
-        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
-        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
-
-        return (int) Db::getInstance()->getValue(
-            'SELECT COUNT(hbd.`id`)
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
-            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-            WHERE p.`active` = 1
-            AND o.`valid` = 1
-            AND hbd.`is_cancelled` = 0
-            AND hbd.`is_refunded` = 0
-            AND hbd.`id_status` = '.(int) self::STATUS_ALLOTED.'
-            AND hbd.`date_from` < CURDATE()
-            AND hbd.`date_from` >= "'.$dateFrom.'"
-            AND hbd.`date_from` <= "'.$dateTo.'"'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
         );
@@ -4742,7 +4715,7 @@ class HotelBookingDetail extends ObjectModel
         $dateTo   = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
         $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
 
-        $numNights  = max(1, (int)(new DateTime($dateTo))->diff(new DateTime($dateFrom))->days);
+        $numNights  = max(1, (int)(new DateTime($dateTo))->diff(new DateTime($dateFrom))->days + 1);
         $totalRooms = (int) AdminStatsController::getTotalRooms($idHotel !== false ? $idHotel : null, 1);
 
         if (!$totalRooms) {
@@ -4767,7 +4740,7 @@ class HotelBookingDetail extends ObjectModel
         $dateTo   = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
         $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
 
-        $numNights  = max(1, (int)(new DateTime($dateTo))->diff(new DateTime($dateFrom))->days);
+        $numNights  = max(1, (int)(new DateTime($dateTo))->diff(new DateTime($dateFrom))->days + 1);
         $totalRooms = (int) AdminStatsController::getTotalRooms($idHotel !== false ? $idHotel : null, 1);
 
         if (!$totalRooms || !$numNights) {
@@ -4810,21 +4783,24 @@ class HotelBookingDetail extends ObjectModel
      */
     public static function getOccupiedRoomsForDiscreteDates(array $params)
     {
-        $dateFrom = $params['date_from'];
-        $dateTo   = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : null;
-        $idStatus = isset($params['id_status']) ? (int) $params['id_status'] : null;
+        $dateFrom  = $params['date_from'];
+        $dateTo    = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : null;
+        $idStatus  = isset($params['id_status'])  ? (int) $params['id_status']   : null;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product']  : 0;
 
-        // ponytail: no-status case handled by AdminStatsController to reuse its cache
-        if ($idStatus === null) {
+        // Delegate to AdminStatsController only when no additional filters need own SQL
+        if ($idStatus === null && !$idProduct) {
             return AdminStatsController::getOccupiedRoomsForDiscreteDates($dateFrom, $dateTo, $idHotel ?: null);
         }
 
-        $hotelFilter = HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
-        $result      = array();
-        $dateTemp    = $dateFrom;
+        $hotelFilter   = HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+        $statusFilter  = $idStatus !== null ? ' AND hbd.`id_status` = '.$idStatus : '';
+        $productFilter = $idProduct ? ' AND hri.`id_product` = '.$idProduct : '';
+        $result        = array();
+        $dateTemp      = $dateFrom;
         while ($dateTemp <= $dateTo) {
-            $dateNext    = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
+            $dateNext = date('Y-m-d', strtotime('+1 day', strtotime($dateTemp)));
             $result[strtotime($dateTemp)] = (int) Db::getInstance()->getValue(
                 'SELECT COUNT(DISTINCT hbd.`id_room`)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -4832,9 +4808,10 @@ class HotelBookingDetail extends ObjectModel
                 INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
                 WHERE p.`active` = 1
                 AND hbd.`is_cancelled` = 0
-                AND hbd.`id_status` = '.$idStatus.'
                 AND hbd.`date_from` < "'.pSQL($dateNext).' 00:00:00"
                 AND hbd.`date_to` > "'.pSQL($dateTemp).' 00:00:00"'
+                .$statusFilter
+                .$productFilter
                 .$hotelFilter
             );
             $dateTemp = $dateNext;

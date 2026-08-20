@@ -201,10 +201,17 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
             'stats_tabs' => &$statsTabs
         ));
 
+        $currentModuleName = Tools::getValue('module') ?: array_key_first($statsTabs);
+        $currentTab = Tools::getValue('tab', '');
+        if (!$currentTab && isset($statsTabs[$currentModuleName]['tabs'])) {
+            $firstTab = reset($statsTabs[$currentModuleName]['tabs']);
+            $currentTab = $firstTab['key'];
+        }
+
         $tpl->assign(array(
             'current' => self::$currentIndex,
-            'current_module_name' => Tools::getValue('module', 'statsforecast'),
-            'current_tab' => Tools::getValue('tab', ''), // active sub-tab key
+            'current_module_name' => $currentModuleName,
+            'current_tab' => $currentTab,
             'token' => $this->token,
             'module_tabs' => $statsTabs,
         ));
@@ -225,12 +232,30 @@ abstract class AdminStatsTabControllerCore extends AdminPreferencesControllerCor
         return Db::getInstance()->executeS($sql);
     }
 
+    protected function getDefaultModuleName()
+    {
+        $modules = $this->getModules();
+        if (empty($modules)) {
+            return '';
+        }
+        $sorted = [];
+        foreach ($modules as $mod) {
+            $instance = Module::getInstanceByName($mod['name']);
+            $pos = ($instance && property_exists($instance, 'stats_position'))
+                ? (int) $instance->stats_position
+                : PHP_INT_MAX;
+            $sorted[] = ['name' => $mod['name'], 'pos' => $pos];
+        }
+        usort($sorted, fn($a, $b) => $a['pos'] <=> $b['pos']);
+        return $sorted[0]['name'];
+    }
+
     public function displayStats()
     {
         $tpl = $this->createTemplate('stats.tpl');
 
-        if ((!($module_name = Tools::getValue('module')) || !Validate::isModuleName($module_name)) && ($module_instance = Module::getInstanceByName('statsforecast')) && $module_instance->active) {
-            $module_name = 'statsforecast';
+        if (!($module_name = Tools::getValue('module')) || !Validate::isModuleName($module_name)) {
+            $module_name = $this->getDefaultModuleName();
         }
 
         if ($module_name) {

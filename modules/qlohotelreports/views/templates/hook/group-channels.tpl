@@ -78,7 +78,6 @@
                     <th class="text-center">{l s='Total Bookings' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Nights Sold' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='Room Revenue (excl. Tax)' mod='qlohotelreports'}</th>
-                    <th class="text-right">{l s='Extra Services Revenue' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='Discount Amount' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='Refund Amount' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='Tax Amount' mod='qlohotelreports'}</th>
@@ -98,12 +97,11 @@
                         <td class="text-center">{$sourceRow.bookings|intval}</td>
                         <td class="text-center">{$sourceRow.room_nights|intval}</td>
                         <td class="text-right">{displayPrice price=$sourceRow.revenue_excl currency=$id_currency}</td>
-                        <td class="text-right">{displayPrice price=0 currency=$id_currency}</td>
                         <td class="text-right">{displayPrice price=$sourceRow.discount_amount currency=$id_currency}</td>
                         <td class="text-right">{displayPrice price=$sourceRow.refund_amount currency=$id_currency}</td>
                         <td class="text-right">{displayPrice price=$sourceRow.tax_amount currency=$id_currency}</td>
                         <td class="text-right">{displayPrice price=$sourceRow.revenue_incl currency=$id_currency}</td>
-                        <td class="text-right">{displayPrice price=$sourceRow.revenue_excl currency=$id_currency}</td>
+                        <td class="text-right">{displayPrice price=$sourceRow.net_revenue currency=$id_currency}</td>
                         <td class="text-center">{$sourceRow.cancellations|intval}</td>
                         <td class="text-center">{$sourceRow.cancel_rate_pct|string_format:'%.1f'}%</td>
                         <td class="text-right">{displayPrice price=$sourceRow.adr currency=$id_currency}</td>
@@ -112,7 +110,7 @@
                     {/foreach}
                 {else}
                     <tr>
-                        <td class="list-empty" colspan="14">
+                        <td class="list-empty" colspan="13">
                             <div class="list-empty-msg">
                                 <i class="icon-warning-sign list-empty-icon"></i>
                                 {l s='No bookings found for the selected period.' mod='qlohotelreports'}
@@ -128,12 +126,11 @@
                     <td class="text-center"><strong>{$source_totals.bookings|intval}</strong></td>
                     <td class="text-center"><strong>{$source_totals.room_nights|intval}</strong></td>
                     <td class="text-right"><strong>{displayPrice price=$source_totals.revenue_excl currency=$id_currency}</strong></td>
-                    <td class="text-right"><strong>{displayPrice price=0 currency=$id_currency}</strong></td>
                     <td class="text-right"><strong>{displayPrice price=$source_totals.discount_amount currency=$id_currency}</strong></td>
                     <td class="text-right"><strong>{displayPrice price=$source_totals.refund_amount currency=$id_currency}</strong></td>
                     <td class="text-right"><strong>{displayPrice price=$source_totals.tax_amount currency=$id_currency}</strong></td>
                     <td class="text-right"><strong>{displayPrice price=$source_totals.revenue_incl currency=$id_currency}</strong></td>
-                    <td class="text-right"><strong>{displayPrice price=$source_totals.revenue_excl currency=$id_currency}</strong></td>
+                    <td class="text-right"><strong>{displayPrice price=$source_totals.net_revenue currency=$id_currency}</strong></td>
                     <td class="text-center"><strong>{$source_totals.cancellations|intval}</strong></td>
                     <td colspan="3"></td>
                 </tr>

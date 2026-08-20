@@ -1370,15 +1370,16 @@ class AdminStatsControllerCore extends AdminStatsTabController
         );
     }
 
-    public static function getTotalRooms($idHotel = null, $active = null)
+    public static function getTotalRooms($idHotel = null, $active = null, $idProduct = null)
     {
         $sql = 'SELECT COUNT(hri.`id`)
         FROM `'._DB_PREFIX_.'htl_room_information` hri
         INNER JOIN `'._DB_PREFIX_.'product` p
         ON (p.`id_product` = hri.`id_product`)
         WHERE p.`booking_product` = 1 '.
-        (!is_null($active) ? ' AND p.`active` ='.(int) $active : ' ').
-        (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '');
+        (!is_null($active)    ? ' AND p.`active` = '.(int) $active              : '').
+        (!is_null($idProduct) ? ' AND hri.`id_product` = '.(int) $idProduct     : '').
+        (!is_null($idHotel)   ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '');
 
         return Db::getInstance()->getValue($sql);
     }

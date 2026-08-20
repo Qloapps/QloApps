@@ -490,8 +490,7 @@ class HotelRoomType extends ObjectModel
             IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END), 0) AS room_nights,
             IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 THEN hbd.`total_price_tax_excl` / o.`conversion_rate` ELSE 0 END), 0) AS room_revenue,
             IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 THEN (hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate` ELSE 0 END), 0) AS tax_amount,
-            COUNT(CASE WHEN hbd.`is_cancelled` = 1 THEN hbd.`id` END) AS cancel_count,
-            COUNT(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`id_status` = 1 AND hbd.`date_from` < CURDATE() THEN hbd.`id` END) AS no_show_count
+            COUNT(CASE WHEN hbd.`is_cancelled` = 1 THEN hbd.`id` END) AS cancel_count
             FROM `'._DB_PREFIX_.'htl_room_type` hrt
             INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hrt.`id_product`)
             INNER JOIN `'._DB_PREFIX_.'product_lang` pl

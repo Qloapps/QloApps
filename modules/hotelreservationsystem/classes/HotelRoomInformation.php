@@ -391,12 +391,13 @@ class HotelRoomInformation extends ObjectModel
             return array();
         }
 
+        $dateToNext = pSQL(date('Y-m-d', strtotime('+1 day', strtotime($dateTo))));
         $bookingsRaw = Db::getInstance()->executeS(
             'SELECT hbd.`id_product`, hbd.`id_room`, hbd.`date_from`, hbd.`date_to`
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
             WHERE hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
-            AND hbd.`date_from` < "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'"'
+            AND hbd.`date_from` < "'.$dateToNext.'" AND hbd.`date_to` > "'.$dateFrom.'"'
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
         );
@@ -408,7 +409,7 @@ class HotelRoomInformation extends ObjectModel
 
         $result  = array();
         $current = $dateFrom;
-        while ($current < $dateTo) {
+        while ($current <= $dateTo) {
             $next = date('Y-m-d', strtotime('+1 day', strtotime($current)));
             foreach ($roomTypes as $rt) {
                 $idProd      = $rt['id_product'];
@@ -451,6 +452,7 @@ class HotelRoomInformation extends ObjectModel
     {
         $dateFrom              = pSQL($params['date_from']);
         $dateTo                = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $dateToNext            = pSQL(date('Y-m-d', strtotime('+1 day', strtotime($dateTo))));
         $idHotel               = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
         $idProduct             = isset($params['id_product']) ? (int) $params['id_product'] : 0;
         $idLang                = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
@@ -481,7 +483,7 @@ class HotelRoomInformation extends ObjectModel
             LEFT JOIN (
                 SELECT `id_room`
                 FROM `'._DB_PREFIX_.'htl_room_disable_dates`
-                WHERE `date_from` < "'.$dateTo.'" AND `date_to` > "'.$dateFrom.'"
+                WHERE `date_from` < "'.$dateToNext.'" AND `date_to` > "'.$dateFrom.'"
                 GROUP BY `id_room`
             ) hrdd ON (hrdd.`id_room` = hri.`id`)
             LEFT JOIN (
@@ -493,7 +495,7 @@ class HotelRoomInformation extends ObjectModel
                     MIN(hbd.`id_customer`) AS `id_customer`
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 WHERE hbd.`is_refunded` = 0
-                AND hbd.`date_from` < "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'"
+                AND hbd.`date_from` < "'.$dateToNext.'" AND hbd.`date_to` > "'.$dateFrom.'"
                 GROUP BY hbd.`id_room`
             ) bkgs ON (bkgs.`id_room` = hri.`id`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = bkgs.`id_customer`)

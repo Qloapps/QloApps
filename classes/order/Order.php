@@ -3201,22 +3201,36 @@ class OrderCore extends ObjectModel
             'SELECT o.`id_order`, o.`reference`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             c.`email`, a.`phone`,
-            hbd.`room_type_name`, hbd.`room_num`,
-            hbd.`date_from`, hbd.`date_to`, hbd.`id_status`,
+            MIN(hbd.`room_type_name`) AS room_type_name,
+            MIN(hbd.`room_num`) AS room_num,
+            MIN(hbd.`date_from`) AS date_from,
+            MAX(hbd.`date_to`) AS date_to,
+            MIN(hbd.`id_status`) AS id_status,
             o.`total_paid_tax_incl` / o.`conversion_rate` AS total_charges,
-            IFNULL(SUM(op.`amount`), 0) / o.`conversion_rate` AS total_paid,
-            (o.`total_paid_tax_incl` - IFNULL(SUM(op.`amount`), 0)) / o.`conversion_rate` AS balance_due,
-            GREATEST(0, DATEDIFF(CURDATE(), hbd.`date_to`)) AS days_overdue,
-            MAX(op.`date_add`) AS last_payment_date
+            IFNULL((
+                SELECT SUM(op.`amount`)
+                FROM `'._DB_PREFIX_.'order_payment` op
+                WHERE op.`order_reference` = o.`reference`
+            ), 0) / o.`conversion_rate` AS total_paid,
+            (o.`total_paid_tax_incl` - IFNULL((
+                SELECT SUM(op.`amount`)
+                FROM `'._DB_PREFIX_.'order_payment` op
+                WHERE op.`order_reference` = o.`reference`
+            ), 0)) / o.`conversion_rate` AS balance_due,
+            GREATEST(0, DATEDIFF(CURDATE(), MAX(hbd.`date_to`))) AS days_overdue,
+            (
+                SELECT MAX(op.`date_add`)
+                FROM `'._DB_PREFIX_.'order_payment` op
+                WHERE op.`order_reference` = o.`reference`
+            ) AS last_payment_date
             FROM `'._DB_PREFIX_.'orders` o
             INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
                 ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0)
             INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
             LEFT JOIN `'._DB_PREFIX_.'address` a ON (a.`id_address` = o.`id_address_invoice`)
-            LEFT JOIN `'._DB_PREFIX_.'order_payment` op ON (op.`order_reference` = o.`reference`)
             WHERE o.`valid` = 1
-            AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            AND hbd.`date_from` BETWEEN "'.$dateFrom.'" AND "'.$dateTo.'"'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
             .($idStatus  ? ' AND hbd.`id_status` = '.$idStatus   : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'

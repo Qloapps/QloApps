@@ -169,7 +169,7 @@
                                 <td class="text-right">{displayPrice price=$revenueRow.service_revenue currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.discounts currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.tax_amount currency=$id_currency}</td>
-                                <td class="text-right">{displayPrice price=0 currency=$id_currency}</td>
+                                <td class="text-right">{displayPrice price=$revenueRow.refund_amount currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.total_collection currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.net_revenue currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.adr currency=$id_currency}</td>
@@ -198,7 +198,7 @@
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.service_revenue currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.discounts currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.tax_amount currency=$id_currency}</strong></td>
-                        <td class="text-right"><strong>{displayPrice price=0 currency=$id_currency}</strong></td>
+                        <td class="text-right"><strong>{displayPrice price=$revenue_totals.refund_amount currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.total_collection currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.net_revenue currency=$id_currency}</strong></td>
                         <td colspan="3"></td>
@@ -227,10 +227,7 @@
                         <th class="text-right">{l s='Refund Amount' mod='qlohotelreports'}</th>
                         <th>{l s='Refund Method' mod='qlohotelreports'}</th>
                         <th>{l s='Refund Status' mod='qlohotelreports'}</th>
-                        <th>{l s='Processed Date' mod='qlohotelreports'}</th>
-                        <th>{l s='Processed By' mod='qlohotelreports'}</th>
-                        <th>{l s='Refund Reason' mod='qlohotelreports'}</th>
-                        <th>{l s='Remarks' mod='qlohotelreports'}</th>
+                        <th>{l s='Refund Remark' mod='qlohotelreports'}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -245,15 +242,12 @@
                                 <td class="text-right">{displayPrice price=$refund.refunded_amount currency=$refund.id_currency}</td>
                                 <td>{if $refund.refund_method}{$refund.refund_method|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $refund.refund_status}{$refund.refund_status|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
-                                <td>{if $refund.processed_date}{$refund.processed_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
-                                <td>{if $refund.processed_by}{$refund.processed_by|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $refund.cancellation_reason}{$refund.cancellation_reason|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
-                                <td><span class="text-muted">—</span></td>
                             </tr>
                         {/foreach}
                     {else}
                         <tr>
-                            <td class="list-empty" colspan="12">
+                            <td class="list-empty" colspan="9">
                                 <div class="list-empty-msg">
                                     <i class="icon-warning-sign list-empty-icon"></i>
                                     {l s='No refunds found for the selected date range.' mod='qlohotelreports'}
@@ -267,7 +261,7 @@
                     <tr class="qlo-report-totals">
                         <td colspan="5"><strong>{l s='Total Refunded' mod='qlohotelreports'}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$total_refunded currency=$id_currency}</strong></td>
-                        <td colspan="6"></td>
+                        <td colspan="3"></td>
                     </tr>
                 </tfoot>
                 {/if}
@@ -295,7 +289,6 @@
                         <th class="text-right">{l s='Amount' mod='qlohotelreports'}</th>
                         <th>{l s='Payment Status' mod='qlohotelreports'}</th>
                         <th>{l s='Transaction Reference' mod='qlohotelreports'}</th>
-                        <th>{l s='Received By' mod='qlohotelreports'}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -314,12 +307,11 @@
                                 <td class="text-right">{displayPrice price=$payment.amount currency=$payment.id_currency}</td>
                                 <td>{l s='Success' mod='qlohotelreports'}</td>
                                 <td>{if $payment.transaction_id}{$payment.transaction_id|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
-                                <td><span class="text-muted">—</span></td>
                             </tr>
                         {/foreach}
                     {else}
                         <tr>
-                            <td class="list-empty" colspan="11">
+                            <td class="list-empty" colspan="10">
                                 <div class="list-empty-msg">
                                     <i class="icon-warning-sign list-empty-icon"></i>
                                     {l s='No payments found for the selected date range.' mod='qlohotelreports'}
@@ -333,7 +325,7 @@
                     <tr class="qlo-report-totals">
                         <td colspan="7"><strong>{l s='Total Collected' mod='qlohotelreports'}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$total_payments currency=$id_currency}</strong></td>
-                        <td colspan="3"></td>
+                        <td colspan="2"></td>
                     </tr>
                 </tfoot>
                 {/if}

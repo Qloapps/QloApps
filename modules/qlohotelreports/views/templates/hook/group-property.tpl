@@ -105,7 +105,6 @@
                     <th class="text-center">{l s='Departures' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='In-house Guests' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Cancellations' mod='qlohotelreports'}</th>
-                    <th class="text-center">{l s='No-Shows' mod='qlohotelreports'}</th>
                 </tr>
             </thead>
             <tbody>
@@ -123,12 +122,11 @@
                         <td class="text-center">{$dailySummaryRow.departures|intval}</td>
                         <td class="text-center">{$dailySummaryRow.inhouse_guests|intval}</td>
                         <td class="text-center">{$dailySummaryRow.cancels|intval}</td>
-                        <td class="text-center">&mdash;</td>
                     </tr>
                     {/foreach}
                 {else}
                     <tr>
-                        <td class="list-empty" colspan="12">
+                        <td class="list-empty" colspan="11">
                             <div class="list-empty-msg">
                                 <i class="icon-warning-sign list-empty-icon"></i>
                                 {l s='No data for the selected period.' mod='qlohotelreports'}
@@ -162,12 +160,11 @@
                     <th class="text-right">{l s='Gross Revenue' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='ADR (Avg. Daily Rate)' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='RevPAR (Rev. Per Avail. Room)' mod='qlohotelreports'}</th>
-                    <th class="text-center">{l s='Total Bookings' mod='qlohotelreports'}</th>
+                    <th class="text-center">{l s='Total Room Bookings' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Total Cancellations' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Cancel Rate %' mod='qlohotelreports'}</th>
-                    <th class="text-center">{l s='No-Shows' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Avg LOS' mod='qlohotelreports'}</th>
-                    <th class="text-right">{l s='Outstanding Balance' mod='qlohotelreports'}</th>
+                    <th class="text-right">{l s='Due Amount' mod='qlohotelreports'}</th>
                 </tr>
             </thead>
             <tbody>
@@ -186,14 +183,13 @@
                         <td class="text-center">{$hotelRow.bookings|intval}</td>
                         <td class="text-center">{$hotelRow.cancellations|intval}</td>
                         <td class="text-center">{$hotelRow.cancel_rate_pct|string_format:'%.1f'}%</td>
-                        <td class="text-center">{$hotelRow.no_shows|intval}</td>
                         <td class="text-center">{$hotelRow.avg_los|string_format:'%.1f'}</td>
                         <td class="text-right">{displayPrice price=$hotelRow.outstanding_balance currency=$id_currency}</td>
                     </tr>
                     {/foreach}
                 {else}
                     <tr>
-                        <td class="list-empty" colspan="15">
+                        <td class="list-empty" colspan="14">
                             <div class="list-empty-msg">
                                 <i class="icon-warning-sign list-empty-icon"></i>
                                 {l s='No hotels found.' mod='qlohotelreports'}
@@ -224,13 +220,9 @@
                     <th class="text-center">{l s='OOO Status' mod='qlohotelreports'}</th>
                     <th>{l s='Reason' mod='qlohotelreports'}</th>
                     <th>{l s='Start Date' mod='qlohotelreports'}</th>
-                    <th>{l s='Expected End Date' mod='qlohotelreports'}</th>
-                    <th>{l s='Actual End Date' mod='qlohotelreports'}</th>
+                    <th>{l s='End Date' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Duration (Days)' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Current Status' mod='qlohotelreports'}</th>
-                    <th>{l s='Marked By' mod='qlohotelreports'}</th>
-                    <th>{l s='Resolved By' mod='qlohotelreports'}</th>
-                    <th class="text-right">{l s='Est. Revenue Loss' mod='qlohotelreports'}</th>
                 </tr>
             </thead>
             <tbody>
@@ -249,7 +241,6 @@
                         <td>{if $outOfOrderRow.reason}{$outOfOrderRow.reason|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
                         <td>{if $outOfOrderRow.disabled_from}{$outOfOrderRow.disabled_from|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
                         <td>{if $outOfOrderRow.disabled_to}{$outOfOrderRow.disabled_to|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>
-                        <td>&mdash;</td>
                         <td class="text-center">{if $outOfOrderRow.disabled_days}{$outOfOrderRow.disabled_days|intval}{else}&mdash;{/if}</td>
                         <td class="text-center">
                             {if !$outOfOrderRow.disabled_to || $outOfOrderRow.disabled_to >= $today}
@@ -258,14 +249,11 @@
                                 <span class="label label-success">{l s='Resolved' mod='qlohotelreports'}</span>
                             {/if}
                         </td>
-                        <td>&mdash;</td>
-                        <td>&mdash;</td>
-                        <td class="text-right">&mdash;</td>
                     </tr>
                     {/foreach}
                 {else}
                     <tr>
-                        <td class="list-empty" colspan="13">
+                        <td class="list-empty" colspan="9">
                             <div class="list-empty-msg">
                                 <i class="icon-warning-sign list-empty-icon"></i>
                                 {l s='No out of order rooms for the selected period.' mod='qlohotelreports'}

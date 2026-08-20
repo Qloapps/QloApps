@@ -99,7 +99,6 @@
                     <th class="text-center">{l s='Rooms Booked' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Rooms Occupied' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Out of Order' mod='qlohotelreports'}</th>
-                    <th class="text-center">{l s='Complimentary' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Occupancy Rate %' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='ADR (Avg. Daily Rate)' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='RevPAR (Rev. Per Avail. Room)' mod='qlohotelreports'}</th>
@@ -116,7 +115,6 @@
                         <td class="text-center">{$occupancyRow.rooms_booked|intval}</td>
                         <td class="text-center">{$occupancyRow.rooms_occupied|intval}</td>
                         <td class="text-center">{$occupancyRow.out_of_order|intval}</td>
-                        <td class="text-center">&mdash;</td>
                         <td class="text-center">{$occupancyRow.occupancy_pct|string_format:'%.1f'}%</td>
                         <td class="text-right">{displayPrice price=$occupancyRow.adr currency=$id_currency}</td>
                         <td class="text-right">{displayPrice price=$occupancyRow.revpar currency=$id_currency}</td>
@@ -125,7 +123,7 @@
                     {/foreach}
                 {else}
                     <tr>
-                        <td class="list-empty" colspan="11">
+                        <td class="list-empty" colspan="10">
                             <div class="list-empty-msg">
                                 <i class="icon-warning-sign list-empty-icon"></i>
                                 {l s='No data for the selected period.' mod='qlohotelreports'}
@@ -391,7 +389,6 @@
                     <th class="text-right">{l s='ADR (Avg. Daily Rate)' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='RevPAR (Rev. Per Avail. Room)' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Cancellation Count' mod='qlohotelreports'}</th>
-                    <th class="text-center">{l s='No-Show Count' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Avg. Length of Stay' mod='qlohotelreports'}</th>
                 </tr>
             </thead>
@@ -411,13 +408,12 @@
                         <td class="text-right">{displayPrice price=$perfRow.adr currency=$id_currency}</td>
                         <td class="text-right">{displayPrice price=$perfRow.revpar currency=$id_currency}</td>
                         <td class="text-center">{$perfRow.cancel_count|intval}</td>
-                        <td class="text-center">{$perfRow.no_show_count|intval}</td>
                         <td class="text-center">{$perfRow.avg_los|string_format:'%.1f'}</td>
                     </tr>
                     {/foreach}
                 {else}
                     <tr>
-                        <td class="list-empty" colspan="14">
+                        <td class="list-empty" colspan="13">
                             <div class="list-empty-msg">
                                 <i class="icon-warning-sign list-empty-icon"></i>
                                 {l s='No data for the selected period.' mod='qlohotelreports'}
@@ -435,7 +431,6 @@
                 {assign var="tot_tax" value=0}
                 {assign var="tot_total_rev" value=0}
                 {assign var="tot_cancels" value=0}
-                {assign var="tot_noshows" value=0}
                 {foreach $roomTypePerformance_rows as $perfRow}
                     {assign var="tot_rooms" value=$tot_rooms+$perfRow.total_rooms}
                     {assign var="tot_nights_avail" value=$tot_nights_avail+$perfRow.total_nights_available}
@@ -444,7 +439,6 @@
                     {assign var="tot_tax" value=$tot_tax+$perfRow.tax_amount}
                     {assign var="tot_total_rev" value=$tot_total_rev+$perfRow.total_revenue}
                     {assign var="tot_cancels" value=$tot_cancels+$perfRow.cancel_count}
-                    {assign var="tot_noshows" value=$tot_noshows+$perfRow.no_show_count}
                 {/foreach}
                 <tr>
                     <td colspan="2"><strong>{l s='Total' mod='qlohotelreports'}</strong></td>
@@ -458,7 +452,6 @@
                     <td class="text-right">&mdash;</td>
                     <td class="text-right">&mdash;</td>
                     <td class="text-center"><strong>{$tot_cancels|intval}</strong></td>
-                    <td class="text-center"><strong>{$tot_noshows|intval}</strong></td>
                     <td class="text-center">&mdash;</td>
                 </tr>
             </tfoot>
