@@ -147,6 +147,36 @@ class OrderInvoiceCore extends ObjectModel
 		'.($this->id && $this->number ? ' AND od.`id_order_invoice` = '.(int)$this->id : '').' ORDER BY od.`product_name`');
     }
 
+    /**
+     * Recompute this invoice's totals live from its own order_detail lines, instead of trusting
+     * accumulated deltas. Mirrors Order::getOrderTotal()'s formula, scoped to this invoice only.
+     *
+     * @return bool
+     */
+    public function recomputeTotalsFromLines()
+    {
+        $order = new Order((int) $this->id_order);
+        $invoiceProducts = $this->getProductsDetail();
+
+        $totalProductsTe = $order->getTotalProductsWithoutTaxes($invoiceProducts);
+        $totalProductsTi = $order->getTotalProductsWithTaxes($invoiceProducts);
+
+        $objBookingDemand = new HotelBookingDemands();
+        $totalDemandsTe = 0.0;
+        $totalDemandsTi = 0.0;
+        foreach (array_column($invoiceProducts, 'id_order_detail') as $idOrderDetail) {
+            $totalDemandsTe += (float) $objBookingDemand->getRoomTypeBookingExtraDemands($this->id_order, 0, 0, 0, 0, 0, 1, false, 0, (int) $idOrderDetail);
+            $totalDemandsTi += (float) $objBookingDemand->getRoomTypeBookingExtraDemands($this->id_order, 0, 0, 0, 0, 0, 1, true, 0, (int) $idOrderDetail);
+        }
+
+        $this->total_products = $totalProductsTe;
+        $this->total_products_wt = $totalProductsTi;
+        $this->total_paid_tax_excl = max(0, $totalProductsTe + $totalDemandsTe + $this->total_shipping_tax_excl + $this->total_wrapping_tax_excl - $this->total_discount_tax_excl);
+        $this->total_paid_tax_incl = max(0, $totalProductsTi + $totalDemandsTi + $this->total_shipping_tax_incl + $this->total_wrapping_tax_incl - $this->total_discount_tax_incl);
+
+        return $this->update();
+    }
+
     public static function getInvoiceByNumber($id_invoice)
     {
         if (is_numeric($id_invoice)) {

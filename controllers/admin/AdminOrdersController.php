@@ -437,6 +437,7 @@ class AdminOrdersControllerCore extends AdminController
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
                 $this->context->currency = new Currency((int)$cart->id_currency);
+                $this->context->smarty->assign('info_icon_path', $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icon-info.svg'));
 
                 // validate cart for removing invalid data from cart before new order creation
                 // remove not linked services with room types from cart if not allowed to book them
@@ -2648,6 +2649,10 @@ class AdminOrdersControllerCore extends AdminController
                             _PS_PRICE_COMPUTE_PRECISION_
                         );
                         $order->update();
+
+                        if (isset($order_invoice) && $order_invoice->id) {
+                            $order_invoice->recomputeTotalsFromLines();
+                        }
                     }
 
                     Tools::redirectAdmin(self::$currentIndex.'&id_order='.$order->id.'&vieworder&conf=4&token='.$this->token);
@@ -2816,6 +2821,11 @@ class AdminOrdersControllerCore extends AdminController
                                 $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
                                 $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
                                 $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
+
+                                $loopOrderInvoice = new OrderInvoice((int) $id_order_invoice);
+                                if (Validate::isLoadedObject($loopOrderInvoice)) {
+                                    $loopOrderInvoice->recomputeTotalsFromLines();
+                                }
                             }
 
                             // Update Order
@@ -4711,6 +4721,7 @@ class AdminOrdersControllerCore extends AdminController
         $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
         if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
+            $order_invoice->recomputeTotalsFromLines();
             $order->total_shipping = $order_invoice->total_shipping_tax_incl;
             $order->total_shipping_tax_incl = $order_invoice->total_shipping_tax_incl;
             $order->total_shipping_tax_excl = $order_invoice->total_shipping_tax_excl;
@@ -5291,6 +5302,7 @@ class AdminOrdersControllerCore extends AdminController
         $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
         if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
+            $order_invoice->recomputeTotalsFromLines();
             $order->total_shipping = $order_invoice->total_shipping_tax_incl;
             $order->total_shipping_tax_incl = $order_invoice->total_shipping_tax_incl;
             $order->total_shipping_tax_excl = $order_invoice->total_shipping_tax_excl;
@@ -5920,6 +5932,7 @@ class AdminOrdersControllerCore extends AdminController
                     $objOrder->total_paid_tax_excl = Tools::ps_round($objOrder->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
                     if (isset($objOrderInvoice) && Validate::isLoadedObject($objOrderInvoice)) {
+                        $objOrderInvoice->recomputeTotalsFromLines();
                         $objOrder->total_shipping = $objOrderInvoice->total_shipping_tax_incl;
                         $objOrder->total_shipping_tax_incl = $objOrderInvoice->total_shipping_tax_incl;
                         $objOrder->total_shipping_tax_excl = $objOrderInvoice->total_shipping_tax_excl;
@@ -6508,6 +6521,10 @@ class AdminOrdersControllerCore extends AdminController
         $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
         $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
         $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
+
+        if (isset($order_invoice) && $order_invoice->id) {
+            $order_invoice->recomputeTotalsFromLines();
+        }
         if($order->save()){
             $roomType = Product::getProductName($id_product, null, $this->context->language->id);
             $oldDateFromFormatted = date('d/m/Y', strtotime($old_date_from));
@@ -6645,6 +6662,29 @@ class AdminOrdersControllerCore extends AdminController
             $objServiceProductOrderDetail->quantity += $updateQty;
             $result &= $objServiceProductOrderDetail->update();
 
+            if (Configuration::get('QLO_USE_TOURISM_TAX')) {
+                $serviceTourismTaxParams = OrderTaxDetail::buildServiceLineTaxParams((int) $objServiceProductOrderDetail->id);
+                if ($serviceTourismTaxParams) {
+                    OrderTaxDetail::saveTourismTax(
+                        $serviceTourismTaxParams['idTaxRulesGroup'],
+                        $serviceTourismTaxParams['address'],
+                        $serviceTourismTaxParams['unitPriceTaxExcl'],
+                        $serviceTourismTaxParams['checkInDate'],
+                        $serviceTourismTaxParams['numNights'],
+                        $serviceTourismTaxParams['numAdults'],
+                        $serviceTourismTaxParams['childrenAges'],
+                        $serviceTourismTaxParams['idCurrency'],
+                        $serviceTourismTaxParams['collectionType'],
+                        $serviceTourismTaxParams['idLang'],
+                        $serviceTourismTaxParams['quantity'],
+                        $serviceTourismTaxParams['idOrder'],
+                        $serviceTourismTaxParams['idOrderDetail'],
+                        $serviceTourismTaxParams['idHtlBooking'],
+                        $serviceTourismTaxParams['idServiceProductOrderDetail']
+                    );
+                }
+            }
+
             // Apply changes on Order
             $objOrder = new Order($objOrderDetail->id_order);
             $objOrder->total_products += $diffPriceTaxExcl;
@@ -6664,6 +6704,7 @@ class AdminOrdersControllerCore extends AdminController
                 $objOrderInvoice->total_paid_tax_excl += $diffPriceTaxExcl;
                 $objOrderInvoice->total_paid_tax_incl += $diffPriceTaxIncl;
                 $result &= $objOrderInvoice->update();
+                $objOrderInvoice->recomputeTotalsFromLines();
             }
 
             // Update product available quantity
@@ -6950,12 +6991,10 @@ class AdminOrdersControllerCore extends AdminController
         // delete the demands od this booking
         $objBookingDemand->deleteBookingDemands($idHotelBooking);
 
-        if (Configuration::get('QLO_USE_TOURISM_TAX')) {
-            OrderTaxDetail::hardDeleteForBooking(
-                $idHotelBooking,
-                ServiceProductOrderDetail::getActiveIdsByHtlBookingDetail($idHotelBooking)
-            );
-        }
+        OrderTaxDetail::hardDeleteForBooking(
+            $idHotelBooking,
+            ServiceProductOrderDetail::getActiveIdsByHtlBookingDetail($idHotelBooking)
+        );
 
         $objServiceProductOrderDetail->deleteSeviceProducts(0, $idHotelBooking);
 
@@ -7020,6 +7059,10 @@ class AdminOrdersControllerCore extends AdminController
             $order->total_paid_tax_incl = 0;
             $order->total_paid_tax_excl = 0;
             $order->update();
+        }
+
+        if (isset($order_invoice) && $order_invoice->id) {
+            $order_invoice->recomputeTotalsFromLines();
         }
 
         // Assign to smarty informations in order to show the new product line
@@ -7114,6 +7157,10 @@ class AdminOrdersControllerCore extends AdminController
                 $objOrder->total_products_wt = $objOrder->total_products_wt > 0 ? $objOrder->total_products_wt : 0;
 
                 $result &= $objOrder->update();
+
+                if (isset($objOrderInvoice) && $objOrderInvoice->id) {
+                    $objOrderInvoice->recomputeTotalsFromLines();
+                }
             }
 
             if (!$result) {
@@ -7914,6 +7961,29 @@ class AdminOrdersControllerCore extends AdminController
 
                             $result &= $objOrderDetail->update();
 
+                            if (Configuration::get('QLO_USE_TOURISM_TAX')) {
+                                $serviceTourismTaxParams = OrderTaxDetail::buildServiceLineTaxParams((int) $objServiceProductOrderDetail->id);
+                                if ($serviceTourismTaxParams) {
+                                    OrderTaxDetail::saveTourismTax(
+                                        $serviceTourismTaxParams['idTaxRulesGroup'],
+                                        $serviceTourismTaxParams['address'],
+                                        $serviceTourismTaxParams['unitPriceTaxExcl'],
+                                        $serviceTourismTaxParams['checkInDate'],
+                                        $serviceTourismTaxParams['numNights'],
+                                        $serviceTourismTaxParams['numAdults'],
+                                        $serviceTourismTaxParams['childrenAges'],
+                                        $serviceTourismTaxParams['idCurrency'],
+                                        $serviceTourismTaxParams['collectionType'],
+                                        $serviceTourismTaxParams['idLang'],
+                                        $serviceTourismTaxParams['quantity'],
+                                        $serviceTourismTaxParams['idOrder'],
+                                        $serviceTourismTaxParams['idOrderDetail'],
+                                        $serviceTourismTaxParams['idHtlBooking'],
+                                        $serviceTourismTaxParams['idServiceProductOrderDetail']
+                                    );
+                                }
+                            }
+
                             if ($objOrderDetail->id_order_invoice != 0) {
                                 // values changes as values are calculated accoding to the quantity of the product by webkul
                                 $order_invoice = new OrderInvoice($objOrderDetail->id_order_invoice);
@@ -7933,6 +8003,10 @@ class AdminOrdersControllerCore extends AdminController
                             $objOrder->total_paid_tax_excl = Tools::ps_round($objOrder->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
                             $result &= $objOrder->update();
+
+                            if (isset($order_invoice) && $order_invoice->id) {
+                                $order_invoice->recomputeTotalsFromLines();
+                            }
                         }
                     }
 
@@ -8204,6 +8278,7 @@ class AdminOrdersControllerCore extends AdminController
                                 $objOrderInvoice->total_paid_tax_excl += Tools::ps_round((float)$totalPriceChangeTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
                                 $objOrderInvoice->total_paid_tax_incl += Tools::ps_round((float)$totalPriceChangeTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                                 $objOrderInvoice->save();
+                                $objOrderInvoice->recomputeTotalsFromLines();
                             }
 
                             // discount
@@ -8516,6 +8591,7 @@ class AdminOrdersControllerCore extends AdminController
                                                     $objOrderInvoice->total_paid_tax_excl += Tools::ps_round((float)$totalPriceChangeTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
                                                     $objOrderInvoice->total_paid_tax_incl += Tools::ps_round((float)$totalPriceChangeTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                                                     $objOrderInvoice->save();
+                                                    $objOrderInvoice->recomputeTotalsFromLines();
                                                 }
 
                                                 // discounts calculation for order
@@ -8629,6 +8705,8 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if ($res &= $objServiceProductOrderDetail->delete()) {
+                    OrderTaxDetail::hardDeleteForBooking(0, array((int) $objServiceProductOrderDetail->id));
+
                     $order = new Order($objServiceProductOrderDetail->id_order);
                     if ($objOrderDetail->product_price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
                         $numDays = HotelHelper::getNumberOfDays(
@@ -8679,6 +8757,10 @@ class AdminOrdersControllerCore extends AdminController
                     $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
 
                     $res &= $order->update();
+
+                    if (isset($objOrderInvoice) && $objOrderInvoice->id) {
+                        $objOrderInvoice->recomputeTotalsFromLines();
+                    }
                 }
                 if ($res) {
                     $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(
@@ -8820,6 +8902,9 @@ class AdminOrdersControllerCore extends AdminController
                             $order->total_paid = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
                             $order->total_paid_tax_incl = Tools::ps_round($order->getOrderTotal(), _PS_PRICE_COMPUTE_PRECISION_);
                             $order->total_paid_tax_excl = Tools::ps_round($order->getOrderTotal(false), _PS_PRICE_COMPUTE_PRECISION_);
+                            if (isset($order_invoice) && $order_invoice->id) {
+                                $order_invoice->recomputeTotalsFromLines();
+                            }
                             if ($order->save()) {
                                 $response['facilities_panel'] = $this->processRenderFacilitiesBlock(
                                     $order->id,
@@ -8969,6 +9054,7 @@ class AdminOrdersControllerCore extends AdminController
                                     $order_invoice->total_paid_tax_excl = Tools::ps_round((float)($order_invoice->total_paid_tax_excl - $objBookingDemand->total_price_tax_excl), _PS_PRICE_COMPUTE_PRECISION_);
                                     $order_invoice->total_paid_tax_incl = Tools::ps_round((float)($order_invoice->total_paid_tax_incl - $objBookingDemand->total_price_tax_incl), _PS_PRICE_COMPUTE_PRECISION_);
                                     $res &= $order_invoice->update();
+                                    $order_invoice->recomputeTotalsFromLines();
                                 }
                                 if ($res) {
                                     $response['facilities_panel'] = $this->processRenderFacilitiesBlock(

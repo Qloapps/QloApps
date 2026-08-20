@@ -26,14 +26,13 @@ class TaxConfigurationCore extends ObjectModel
     const DAY_KEYS = array('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun');
 
     public $id_tax;
-    public $tax_calc_type;
-    public $is_per_night;
-    public $is_per_person;
     public $tax_value;
-    public $is_tiered;
-    public $has_child_rate;
+    public $calculation_type;
+    public $per_night;
+    public $per_person;
+    public $has_tiered_pricing;
+    public $apply_on_child;
     public $has_child_age_range;
-    public $child_tax_value;
     public $valid_from;
     public $valid_to;
     public $special_days;
@@ -42,14 +41,13 @@ class TaxConfigurationCore extends ObjectModel
         'table' => 'tax_configuration',
         'primary' => 'id_tax',
         'fields' => array(
-            'tax_calc_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
-            'is_per_night' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'is_per_person' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'tax_value' => array('type' => self::TYPE_FLOAT, 'validate' => 'isUnsignedFloat'),
-            'is_tiered' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'has_child_rate' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'calculation_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
+            'per_night' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'per_person' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'has_tiered_pricing' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'apply_on_child' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'has_child_age_range' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'child_tax_value' => array('type' => self::TYPE_FLOAT, 'validate' => 'isUnsignedFloat'),
             'valid_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'allow_null' => true),
             'valid_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'allow_null' => true),
             'special_days' => array('type' => self::TYPE_STRING),
@@ -73,14 +71,13 @@ class TaxConfigurationCore extends ObjectModel
             'tax_configuration',
             array(
                 'id_tax' => $idTax,
-                'tax_calc_type' => (int) $this->tax_calc_type,
-                'is_per_night' => (int) $this->is_per_night,
-                'is_per_person' => (int) $this->is_per_person,
                 'tax_value' => (float) $this->tax_value,
-                'is_tiered' => (int) $this->is_tiered,
-                'has_child_rate' => (int) $this->has_child_rate,
+                'calculation_type' => (int) $this->calculation_type,
+                'per_night' => (int) $this->per_night,
+                'per_person' => (int) $this->per_person,
+                'has_tiered_pricing' => (int) $this->has_tiered_pricing,
+                'apply_on_child' => (int) $this->apply_on_child,
                 'has_child_age_range' => (int) $this->has_child_age_range,
-                'child_tax_value' => (float) $this->child_tax_value,
                 'valid_from' => $this->valid_from ? pSQL($this->valid_from) : null,
                 'valid_to' => $this->valid_to ? pSQL($this->valid_to) : null,
                 'special_days' => $this->special_days ? pSQL($this->special_days) : null,
@@ -129,7 +126,7 @@ class TaxConfigurationCore extends ObjectModel
              INNER JOIN `' . _DB_PREFIX_ . 'tax_rules_group` trg
                  ON trg.`id_tax_rules_group` = tr.`id_tax_rules_group`
              WHERE tr.`id_tax` = ' . (int) $idTax . '
-             AND trg.`is_tourism_tax_rule` = ' . $flag
+             AND trg.`is_tourism_tax_rule_group` = ' . $flag
         );
         return $db->Affected_Rows();
     }
@@ -344,7 +341,7 @@ class TaxConfigurationCore extends ObjectModel
             }
 
             $tiers = array();
-            if ((bool) $tourismTax->is_tiered) {
+            if ((bool) $tourismTax->has_tiered_pricing) {
                 foreach (TaxPriceTier::getByTaxId((int) $tax->id) as $tier) {
                     $tiers[] = array(
                         'min_amount' => (float) $tier['min_amount'],
@@ -354,8 +351,8 @@ class TaxConfigurationCore extends ObjectModel
                 }
             }
             $preview[] = array(
-                'tax_calc_type' => (int) $tourismTax->tax_calc_type,
-                'is_tiered' => (bool) $tourismTax->is_tiered,
+                'tax_calc_type' => (int) $tourismTax->calculation_type,
+                'is_tiered' => (bool) $tourismTax->has_tiered_pricing,
                 'tax_value' => (float) $tourismTax->tax_value,
                 'tiers' => $tiers,
             );

@@ -201,6 +201,23 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
+     * Delete every row (VAT and tourism alike) for a scope — used only when the booking/service line
+     * itself is being permanently removed, unlike deleteForScope() which must stay tourism-only since
+     * it runs mid-lifecycle while VAT rows for the same scope still need to survive.
+     *
+     * @param string $scopeColumn  self::SCOPE_COLUMN_ROOM or self::SCOPE_COLUMN_SERVICE
+     * @param int    $scopeValue
+     * @return bool
+     */
+    protected static function deleteAllForScope($scopeColumn, $scopeValue)
+    {
+        return Db::getInstance()->execute(
+            'DELETE FROM `' . _DB_PREFIX_ . 'order_tax_detail`
+             WHERE `' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
+        );
+    }
+
+    /**
      *
      * @param int $idOrderDetail
      * @param int $idHtlBooking                 0 for a service-line scope
@@ -220,8 +237,8 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
-     * Hard-delete every tourism tax row for a booking and its attached service lines (room removed from an already-placed order),
-     * plus the exemption marker if one exists.
+     * Hard-delete every tax row — VAT and tourism alike — for a booking and its attached service
+     * lines (room removed from an already-placed order), plus the exemption marker if one exists.
      *
      * @param int   $idHtlBooking
      * @param int[] $serviceLineIds  ServiceProductOrderDetail ids attached to this booking
@@ -230,9 +247,9 @@ class OrderTaxDetailCore extends ObjectModel
     public static function hardDeleteForBooking($idHtlBooking, array $serviceLineIds)
     {
         $idHtlBooking = (int) $idHtlBooking;
-        self::deleteForScope(self::SCOPE_COLUMN_ROOM, $idHtlBooking);
+        self::deleteAllForScope(self::SCOPE_COLUMN_ROOM, $idHtlBooking);
         foreach ($serviceLineIds as $idServiceLine) {
-            self::deleteForScope(self::SCOPE_COLUMN_SERVICE, (int) $idServiceLine);
+            self::deleteAllForScope(self::SCOPE_COLUMN_SERVICE, (int) $idServiceLine);
         }
         self::deleteExemptionMarker($idHtlBooking, 0);
     }
@@ -339,34 +356,48 @@ class OrderTaxDetailCore extends ObjectModel
     ) {
         $idTaxRulesGroup = (int) $idTaxRulesGroup;
         $idOrderDetail = (int) $idOrderDetail;
+        $idOrder = (int) $idOrder;
+        $idHtlBooking = (int) $idHtlBooking;
+        $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
         if (!Configuration::get('QLO_USE_TOURISM_TAX') || !$idTaxRulesGroup || !$idOrderDetail) {
             return;
         }
 
-        $taxCalculator = TaxManagerFactory::getManager($address, $idTaxRulesGroup)->getTaxCalculator();
-        $taxAmounts = $taxCalculator->getTaxesAmount(
-            $unitPriceTaxExcl,
-            $checkInDate,
-            $numNights,
-            $numAdults,
-            $childrenAges,
-            $collectionType,
-            $quantity,
-            $idCurrency
-        );
+        if ($idServiceProductOrderDetail) {
+            $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
+            if (Validate::isLoadedObject($serviceLine) && $serviceLine->id_htl_booking_detail) {
+                $roomBooking = new HotelBookingDetail((int) $serviceLine->id_htl_booking_detail);
+                if (Validate::isLoadedObject($roomBooking) && !Product::getIdTourismTaxRulesGroupByIdProduct((int) $roomBooking->id_product)) {
+                    $idTaxRulesGroup = 0;
+                }
+            }
+        }
 
-        $idOrder = (int) $idOrder;
-        $idHtlBooking = (int) $idHtlBooking;
-        $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
+        $taxAmounts = array();
+        if ($idTaxRulesGroup) {
+            $taxCalculator = TaxManagerFactory::getManager($address, $idTaxRulesGroup)->getTaxCalculator();
+            $taxAmounts = $taxCalculator->getTaxesAmount(
+                $unitPriceTaxExcl,
+                $checkInDate,
+                $numNights,
+                $numAdults,
+                $childrenAges,
+                $collectionType,
+                $quantity,
+                $idCurrency
+            );
+        }
+
         $scopeColumn = $idServiceProductOrderDetail ? self::SCOPE_COLUMN_SERVICE : self::SCOPE_COLUMN_ROOM;
         $scopeValue = $idServiceProductOrderDetail ?: $idHtlBooking;
 
-        $prevTotal = self::getScopedTotal($scopeColumn, $scopeValue);
         self::deleteForScope($scopeColumn, $scopeValue);
 
-        $totalTourismTax = 0.0;
         foreach ($taxAmounts as $idTax => $rowAmount) {
             $rowAmount = (float) $rowAmount;
+
+            $tourismTax = TaxConfiguration::getByTaxId((int) $idTax);
+            $divisor = ($tourismTax && $tourismTax->per_night) ? max(1, (int) $numNights) : max(1, (int) $quantity);
 
             $taxRow = new OrderTaxDetail();
             $taxRow->id_order = $idOrder;
@@ -374,11 +405,9 @@ class OrderTaxDetailCore extends ObjectModel
             $taxRow->id_htl_booking = $idHtlBooking;
             $taxRow->id_service_product_order_detail = $idServiceProductOrderDetail;
             $taxRow->id_tax = (int) $idTax;
-            $taxRow->unit_amount = $quantity > 0 ? Tools::ps_round($rowAmount / $quantity, 6) : $rowAmount;
+            $taxRow->unit_amount = Tools::ps_round($rowAmount / $divisor, 6);
             $taxRow->total_amount = $rowAmount;
             $taxRow->add();
-
-            $totalTourismTax += $rowAmount;
         }
 
         Db::getInstance()->execute(
@@ -387,47 +416,91 @@ class OrderTaxDetailCore extends ObjectModel
              WHERE `id_order_detail` = ' . $idOrderDetail
         );
 
-        if (!self::isScopeExempted($idHtlBooking, $idServiceProductOrderDetail)) {
-            self::adjustDependentTotals($idOrderDetail, $idHtlBooking, $idServiceProductOrderDetail, $prevTotal, $totalTourismTax);
-        }
+        self::recomputeInclusivePrice($idOrderDetail, $idHtlBooking, $idServiceProductOrderDetail);
     }
 
     /**
-     * Delta-adjust order_detail's (and, when relevant, htl_booking_detail's/service_product_order_detail's)
-     * own denormalized tourism tax totals after (re)computing or including/excluding a booking/service line.
+     * Recompute order_detail.total_price_tax_incl and unit_price_tax_incl from the sum of VAT + tourism tax rows for a scope.
      *
-     * @param int   $idOrderDetail
-     * @param int   $idHtlBooking                 0 for a service-line scope (no room booking row)
-     * @param int   $idServiceProductOrderDetail  0 for a room-booking scope (no service line row)
-     * @param float $prevTotal  Previously-synced total_amount for this scope
-     * @param float $newTotal   Newly-synced total_amount for this scope
+     * @param int $idOrderDetail
+     * @param int $idHtlBooking                 0 for a service-line scope (no room booking row)
+     * @param int $idServiceProductOrderDetail  0 for a room-booking scope (no service line row)
      * @return bool
      */
-    protected static function adjustDependentTotals($idOrderDetail, $idHtlBooking, $idServiceProductOrderDetail, $prevTotal, $newTotal)
+    protected static function recomputeInclusivePrice($idOrderDetail, $idHtlBooking, $idServiceProductOrderDetail)
     {
         $idOrderDetail = (int) $idOrderDetail;
         $idHtlBooking = (int) $idHtlBooking;
         $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
-        $prevTotal = (float) $prevTotal;
-        $newTotal = (float) $newTotal;
         $db = Db::getInstance();
+
+        $orderDetailRow = $db->getRow(
+            'SELECT `total_price_tax_excl`, `product_auto_add`, `product_price_addition_type`, `id_order`
+             FROM `' . _DB_PREFIX_ . 'order_detail`
+             WHERE `id_order_detail` = ' . $idOrderDetail
+        );
+        $totalPriceTaxExcl = (float) $orderDetailRow['total_price_tax_excl'];
+
+        $phantomVat = 0.0;
+        if ($idServiceProductOrderDetail
+            && $orderDetailRow['product_auto_add']
+            && (int) $orderDetailRow['product_price_addition_type'] === Product::PRICE_ADDITION_TYPE_WITH_ROOM
+        ) {
+            $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
+            if (Validate::isLoadedObject($serviceLine) && $serviceLine->id_htl_booking_detail) {
+                $roomBooking = new HotelBookingDetail((int) $serviceLine->id_htl_booking_detail);
+                if (Validate::isLoadedObject($roomBooking)) {
+                    $priceInfo = RoomTypeServiceProductPrice::getProductRoomTypePriceAndTax(
+                        (int) $serviceLine->id_product,
+                        (int) $roomBooking->id_product,
+                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
+                    );
+                    if ($priceInfo && isset($priceInfo['id_tax_rules_group'])) {
+                        $order = new Order((int) $orderDetailRow['id_order']);
+                        $hotelContext = TaxConfiguration::resolveHotelAddressAndCollectionType(
+                            (int) $roomBooking->id_hotel,
+                            new Address((int) $order->id_address_tax)
+                        );
+                        $address = $hotelContext['address'];
+                        if (Validate::isLoadedObject($address)) {
+                            $taxCalculator = TaxManagerFactory::getManager($address, (int) $priceInfo['id_tax_rules_group'])->getTaxCalculator();
+                            $phantomVat = $taxCalculator->addTaxes($totalPriceTaxExcl) - $totalPriceTaxExcl;
+                        }
+                    }
+                }
+            }
+        }
+
+        $taxSum = (float) $db->getValue(
+            'SELECT COALESCE(SUM(
+                    CASE WHEN t.`is_tourism_tax` = 1 AND ex.`id_order_tax_exemption` IS NOT NULL THEN 0
+                         ELSE ott.`total_amount`
+                    END
+                ), 0)
+             FROM `' . _DB_PREFIX_ . 'order_tax_detail` ott
+             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = ott.`id_tax`
+             LEFT JOIN `' . _DB_PREFIX_ . 'service_product_order_detail` spod
+                ON spod.`id_service_product_order_detail` = ott.`id_service_product_order_detail`
+             LEFT JOIN `' . _DB_PREFIX_ . 'order_tax_exemption` ex
+                ON (ott.`id_htl_booking` != 0 AND ex.`id_htl_booking` = ott.`id_htl_booking`)
+                OR (ott.`id_htl_booking` = 0 AND spod.`id_htl_booking_detail` != 0 AND ex.`id_htl_booking` = spod.`id_htl_booking_detail`)
+                OR (ott.`id_htl_booking` = 0 AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL) AND ex.`id_service_product_order_detail` = ott.`id_service_product_order_detail` AND ex.`id_htl_booking` = 0)
+             WHERE ott.`id_order_detail` = ' . $idOrderDetail
+        );
+
+        $totalPriceTaxIncl = $totalPriceTaxExcl + $taxSum + $phantomVat;
 
         $result = $db->execute(
             'UPDATE `' . _DB_PREFIX_ . 'order_detail`
-             SET `total_price_tax_incl` = `total_price_tax_incl`
-                                         - ' . $prevTotal . '
-                                         + ' . $newTotal . ',
-                 `unit_price_tax_incl` = `unit_price_tax_incl`
-                                         + COALESCE((' . $newTotal . ' - ' . $prevTotal . ') / NULLIF(`product_quantity`, 0), 0)
+             SET `total_price_tax_incl` = ' . $totalPriceTaxIncl . ',
+                 `unit_price_tax_incl` = COALESCE(' . $totalPriceTaxIncl . ' / NULLIF(`product_quantity`, 0), 0)
              WHERE `id_order_detail` = ' . $idOrderDetail
         );
 
         if ($idHtlBooking) {
             $result = $db->execute(
                 'UPDATE `' . _DB_PREFIX_ . 'htl_booking_detail`
-                 SET `total_price_tax_incl` = `total_price_tax_incl`
-                                             - ' . $prevTotal . '
-                                             + ' . $newTotal . '
+                 SET `total_price_tax_incl` = ' . $totalPriceTaxIncl . '
                  WHERE `id` = ' . $idHtlBooking
             ) && $result;
         }
@@ -435,11 +508,8 @@ class OrderTaxDetailCore extends ObjectModel
         if ($idServiceProductOrderDetail) {
             $result = $db->execute(
                 'UPDATE `' . _DB_PREFIX_ . 'service_product_order_detail`
-                 SET `total_price_tax_incl` = `total_price_tax_incl`
-                                             - ' . $prevTotal . '
-                                             + ' . $newTotal . ',
-                     `unit_price_tax_incl` = `unit_price_tax_incl`
-                                             + COALESCE((' . $newTotal . ' - ' . $prevTotal . ') / NULLIF(`quantity`, 0), 0)
+                 SET `total_price_tax_incl` = ' . $totalPriceTaxIncl . ',
+                     `unit_price_tax_incl` = COALESCE(' . $totalPriceTaxIncl . ' / NULLIF(`quantity`, 0), 0)
                  WHERE `id_service_product_order_detail` = ' . $idServiceProductOrderDetail
             ) && $result;
         }
@@ -858,7 +928,7 @@ class OrderTaxDetailCore extends ObjectModel
 
         $total = self::getScopedTotal(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail);
         if ($total) {
-            self::adjustDependentTotals((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail, $total, 0.0);
+            self::recomputeInclusivePrice((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail);
             self::adjustOrderAndInvoiceTotals((int) $serviceLine->id_order, -$total);
         }
 
@@ -899,7 +969,7 @@ class OrderTaxDetailCore extends ObjectModel
             if ($total) {
                 $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
                 if (Validate::isLoadedObject($serviceLine)) {
-                    self::adjustDependentTotals((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail, 0.0, $total);
+                    self::recomputeInclusivePrice((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail);
                     self::adjustOrderAndInvoiceTotals((int) $serviceLine->id_order, $total);
                 }
             }
@@ -957,7 +1027,7 @@ class OrderTaxDetailCore extends ObjectModel
 
     /**
      * After fresh-computing tourism tax for a scope that had no prior rows (e.g. config was off at
-     * order time), fold the newly-applied total into the order's own totals — adjustDependentTotals()
+     * order time), fold the newly-applied total into the order's own totals — recomputeInclusivePrice()
      * (called inside saveTourismTax()) only syncs order_detail/htl_booking_detail/service_product_order_detail,
      * never orders/order_invoice.
      *
@@ -994,7 +1064,7 @@ class OrderTaxDetailCore extends ObjectModel
         if ($roomTotal) {
             $prev = $nowIncluded ? 0.0 : $roomTotal;
             $new = $nowIncluded ? $roomTotal : 0.0;
-            self::adjustDependentTotals((int) $booking->id_order_detail, $idHtlBooking, 0, $prev, $new);
+            self::recomputeInclusivePrice((int) $booking->id_order_detail, $idHtlBooking, 0);
             $totalDelta += ($new - $prev);
         }
 
@@ -1009,7 +1079,7 @@ class OrderTaxDetailCore extends ObjectModel
             }
             $prev = $nowIncluded ? 0.0 : $serviceTotal;
             $new = $nowIncluded ? $serviceTotal : 0.0;
-            self::adjustDependentTotals((int) $serviceLine->id_order_detail, 0, $idServiceLine, $prev, $new);
+            self::recomputeInclusivePrice((int) $serviceLine->id_order_detail, 0, $idServiceLine);
             $totalDelta += ($new - $prev);
         }
 
@@ -1032,15 +1102,15 @@ class OrderTaxDetailCore extends ObjectModel
         $idOrder = (int) $idOrder;
         Db::getInstance()->execute(
             'UPDATE `' . _DB_PREFIX_ . 'orders`
-             SET `total_paid_tax_incl` = `total_paid_tax_incl` + ' . $delta . ',
-                 `total_paid_tax_excl` = `total_paid_tax_excl` + ' . $delta . ',
-                 `total_paid` = `total_paid` + ' . $delta . '
+             SET `total_paid_tax_incl` = GREATEST(0, `total_paid_tax_incl` + ' . $delta . '),
+                 `total_paid_tax_excl` = GREATEST(0, `total_paid_tax_excl` + ' . $delta . '),
+                 `total_paid` = GREATEST(0, `total_paid` + ' . $delta . ')
              WHERE `id_order` = ' . $idOrder
         );
         Db::getInstance()->execute(
             'UPDATE `' . _DB_PREFIX_ . 'order_invoice`
-             SET `total_paid_tax_incl` = `total_paid_tax_incl` + ' . $delta . ',
-                 `total_paid_tax_excl` = `total_paid_tax_excl` + ' . $delta . '
+             SET `total_paid_tax_incl` = GREATEST(0, `total_paid_tax_incl` + ' . $delta . '),
+                 `total_paid_tax_excl` = GREATEST(0, `total_paid_tax_excl` + ' . $delta . ')
              WHERE `id_order` = ' . $idOrder
         );
     }

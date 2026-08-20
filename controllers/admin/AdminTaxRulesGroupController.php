@@ -108,7 +108,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         if ($idTaxRulesGroup) {
             $trg = new TaxRulesGroup($idTaxRulesGroup);
             if (Validate::isLoadedObject($trg)) {
-                $isTourism = (bool) $trg->is_tourism_tax_rule;
+                $isTourism = (bool) $trg->is_tourism_tax_rule_group;
             }
         }
 
@@ -117,7 +117,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         if ($isTourism) {
             $sql->select(
                 't.`id_tax`, tl.`name`,'
-                . ' IFNULL(tourism_tax.`tax_calc_type`, 0) AS tourism_tax_calc_type,'
+                . ' IFNULL(tourism_tax.`calculation_type`, 0) AS tourism_tax_calc_type,'
                 . ' IFNULL(tourism_tax.`tax_value`, 0) AS tourism_tax_value'
             );
         } else {
@@ -199,7 +199,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 			CONCAT_WS(" - ", a.`zipcode_from`, a.`zipcode_to`) AS zipcode,
 			t.`rate`,
 			t.`is_tourism_tax`,
-			IFNULL(tourism_tax.`tax_calc_type`, 0) AS tourism_tax_calc_type,
+			IFNULL(tourism_tax.`calculation_type`, 0) AS tourism_tax_calc_type,
 			IFNULL(tourism_tax.`tax_value`, 0) AS tourism_tax_value';
 
         $this->_join = '
@@ -259,7 +259,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Tourism tax rule group'),
-                    'name' => 'is_tourism_tax_rule',
+                    'name' => 'is_tourism_tax_rule_group',
                     'required' => false,
                     'is_bool' => true,
                     'hint' => $this->l('Mark this group as tourism-only. All tax rules added here must reference tourism taxes.'),
@@ -464,12 +464,12 @@ class AdminTaxRulesGroupControllerCore extends AdminController
     {
         if ($this->action == 'save') {
             $idGroup = (int) Tools::getValue('id_tax_rules_group');
-            $newIsTourism = (int) Tools::getValue('is_tourism_tax_rule');
+            $newIsTourism = (int) Tools::getValue('is_tourism_tax_rule_group');
 
             if ($idGroup) {
                 $trg = new TaxRulesGroup($idGroup);
                 if (Validate::isLoadedObject($trg)) {
-                    $oldIsTourism = (int) $trg->is_tourism_tax_rule;
+                    $oldIsTourism = (int) $trg->is_tourism_tax_rule_group;
 
                     // Tourism → VAT: block while tourism tax rules still exist in this group.
                     if ($oldIsTourism === 1 && $newIsTourism === 0) {
@@ -486,7 +486,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                             // Reset POST to DB state: getFieldValue() prefers $_POST over the DB
                             // object, so without this reset the toggle, behavior dropdown, and tax
                             // dropdown would render inconsistently (toggle=NO, sub-forms=tourism state).
-                            $_POST['is_tourism_tax_rule'] = $oldIsTourism;
+                            $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
                             $this->display = 'edit';
                             return;
                         }
@@ -499,7 +499,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                             $this->errors[] = $this->l(
                                 'Cannot convert this to a VAT group: one or more products still use it as their tourism tax rule. Reassign them first.'
                             );
-                            $_POST['is_tourism_tax_rule'] = $oldIsTourism;
+                            $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
                             $this->display = 'edit';
                             return;
                         }
@@ -520,7 +520,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                                 'Cannot convert this to a tourism group: it still contains VAT taxes. Remove the VAT tax rules first.'
                             );
                             // Same reason: reset POST to DB state so the whole form is consistent.
-                            $_POST['is_tourism_tax_rule'] = $oldIsTourism;
+                            $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
                             $this->display = 'edit';
                             return;
                         }
@@ -537,7 +537,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                             $this->errors[] = $this->l(
                                 'Cannot convert this to a tourism group: one or more products or services still use it as their regular tax rule. Reassign them first.'
                             );
-                            $_POST['is_tourism_tax_rule'] = $oldIsTourism;
+                            $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
                             $this->display = 'edit';
                             return;
                         }

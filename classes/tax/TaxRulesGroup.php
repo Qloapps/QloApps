@@ -41,7 +41,7 @@ class TaxRulesGroupCore extends ObjectModel
     public $date_upd;
 
     /** @var int 1 = all rules in this TRG reference tourism taxes only */
-    public $is_tourism_tax_rule = 0;
+    public $is_tourism_tax_rule_group = 0;
 
     /**
      * @see ObjectModel::$definition
@@ -53,7 +53,7 @@ class TaxRulesGroupCore extends ObjectModel
             'name' =>                   array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true, 'size' => 64),
             'active' =>                 array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'deleted' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'is_tourism_tax_rule' =>    array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'is_tourism_tax_rule_group' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'date_add' =>               array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' =>               array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
@@ -154,7 +154,7 @@ class TaxRulesGroupCore extends ObjectModel
 			SELECT DISTINCT g.id_tax_rules_group, g.name, g.active
 			FROM `'._DB_PREFIX_.'tax_rules_group` g'
             .Shop::addSqlAssociation('tax_rules_group', 'g').' WHERE deleted = 0
-			AND g.`is_tourism_tax_rule` = '.($isTourismTax ? 1 : 0)
+			AND g.`is_tourism_tax_rule_group` = '.($isTourismTax ? 1 : 0)
             .($only_active ? ' AND g.`active` = 1' : '').'
 			ORDER BY name ASC');
     }

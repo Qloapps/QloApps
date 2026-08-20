@@ -149,7 +149,7 @@ class AdminTaxesControllerCore extends AdminController
 
         $this->_where .= ' AND a.deleted = 0';
         $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'tax_configuration` tourism_tax ON tourism_tax.`id_tax` = a.`id_tax`';
-        $extraSelect = 'IFNULL(tourism_tax.`tax_calc_type`, 0) AS `tourism_tax_calc_type`, IFNULL(tourism_tax.`tax_value`, 0) AS `tourism_tax_value`';
+        $extraSelect = 'IFNULL(tourism_tax.`calculation_type`, 0) AS `tourism_tax_calc_type`, IFNULL(tourism_tax.`tax_value`, 0) AS `tourism_tax_value`';
         $this->_select = ($this->_select ? $this->_select . ', ' : '') . $extraSelect;
     }
 
@@ -252,12 +252,12 @@ class AdminTaxesControllerCore extends AdminController
                 if ($subtype->valid_to === '0000-00-00') {
                     $subtype->valid_to = null;
                 }
-                $_POST['tax_calc_type'] = $subtype->tax_calc_type;
-                $_POST['is_per_night'] = $subtype->is_per_night;
-                $_POST['is_per_person'] = $subtype->is_per_person;
+                $_POST['tax_calc_type'] = $subtype->calculation_type;
+                $_POST['is_per_night'] = $subtype->per_night;
+                $_POST['is_per_person'] = $subtype->per_person;
                 $_POST['tax_value'] = $subtype->tax_value;
-                $_POST['is_tiered'] = $subtype->is_tiered;
-                $_POST['has_child_rate'] = $subtype->has_child_rate;
+                $_POST['is_tiered'] = $subtype->has_tiered_pricing;
+                $_POST['has_child_rate'] = $subtype->apply_on_child;
                 $_POST['has_child_age_range'] = $subtype->has_child_age_range;
                 $_POST['valid_from'] = $subtype->valid_from ?: '';
                 $_POST['valid_to'] = $subtype->valid_to ?: '';
@@ -1018,12 +1018,12 @@ class AdminTaxesControllerCore extends AdminController
             $tourismTax = new TaxConfiguration();
             $tourismTax->id = $idTax;
         }
-        $tourismTax->tax_calc_type = (int) Tools::getValue('tax_calc_type', 0);
-        $tourismTax->is_per_night = (int) Tools::getValue('is_per_night', 1);
-        $tourismTax->is_per_person = (int) Tools::getValue('is_per_person', 0);
+        $tourismTax->calculation_type = (int) Tools::getValue('tax_calc_type', 0);
+        $tourismTax->per_night = (int) Tools::getValue('is_per_night', 1);
+        $tourismTax->per_person = (int) Tools::getValue('is_per_person', 0);
         $tourismTax->tax_value = (float) Tools::getValue('tax_value', 0);
-        $tourismTax->is_tiered = (int) Tools::getValue('is_tiered', 0);
-        $tourismTax->has_child_rate = (int) Tools::getValue('has_child_rate', 0);
+        $tourismTax->has_tiered_pricing = (int) Tools::getValue('is_tiered', 0);
+        $tourismTax->apply_on_child = (int) Tools::getValue('has_child_rate', 0);
         $tourismTax->has_child_age_range = (int) Tools::getValue('has_child_age_range', 0);
         $validFromRaw = trim(Tools::getValue('valid_from', ''));
         $validToRaw = trim(Tools::getValue('valid_to', ''));

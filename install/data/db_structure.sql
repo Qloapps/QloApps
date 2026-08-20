@@ -1198,14 +1198,13 @@ CREATE TABLE `PREFIX_orders` (
 
 CREATE TABLE `PREFIX_tax_configuration` (
   `id_tax` int(11) unsigned NOT NULL,
-  `tax_calc_type` tinyint(1) NOT NULL DEFAULT '0',
-  `is_per_night` tinyint(1) NOT NULL DEFAULT '1',
-  `is_per_person` tinyint(1) NOT NULL DEFAULT '0',
   `tax_value` decimal(20,6) NOT NULL DEFAULT '0.000000',
-  `is_tiered` tinyint(1) NOT NULL DEFAULT '0',
-  `has_child_rate` tinyint(1) NOT NULL DEFAULT '0',
+  `calculation_type` tinyint(1) NOT NULL DEFAULT '0',
+  `per_night` tinyint(1) NOT NULL DEFAULT '1',
+  `per_person` tinyint(1) NOT NULL DEFAULT '0',
+  `has_tiered_pricing` tinyint(1) NOT NULL DEFAULT '0',
+  `apply_on_child` tinyint(1) NOT NULL DEFAULT '0',
   `has_child_age_range` tinyint(1) NOT NULL DEFAULT '0',
-  `child_tax_value` decimal(20,6) NOT NULL DEFAULT '0.000000',
   `valid_from` date DEFAULT NULL,
   `valid_to` date DEFAULT NULL,
   `special_days` text,
@@ -2175,7 +2174,7 @@ CREATE TABLE `PREFIX_tax_rules_group` (
 `id_tax_rules_group` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 `name` VARCHAR( 50 ) NOT NULL,
 `active` INT NOT NULL,
-`is_tourism_tax_rule` TINYINT(1) NOT NULL DEFAULT '0',
+`is_tourism_tax_rule_group` TINYINT(1) NOT NULL DEFAULT '0',
 `deleted` TINYINT(1) UNSIGNED NOT NULL,
 `date_add` DATETIME NOT NULL,
 `date_upd` DATETIME NOT NULL

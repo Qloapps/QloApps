@@ -2201,6 +2201,31 @@ class HotelBookingDetail extends ObjectModel
                         if ($result &= $objBookingDetail->save()) {
                             $reallocatedBookingId = $objBookingDetail->id;
                             $objectHotelBookingTo = $objBookingDetail;
+
+                            OrderTaxDetail::updateVatScoping((int) $idNewOrderDetail, (int) $objBookingDetail->id, 0);
+
+                            if (Configuration::get('QLO_USE_TOURISM_TAX')) {
+                                $roomTourismTaxParams = OrderTaxDetail::buildRoomTaxParams((int) $objBookingDetail->id);
+                                if ($roomTourismTaxParams) {
+                                    OrderTaxDetail::saveTourismTax(
+                                        $roomTourismTaxParams['idTaxRulesGroup'],
+                                        $roomTourismTaxParams['address'],
+                                        $roomTourismTaxParams['unitPriceTaxExcl'],
+                                        $roomTourismTaxParams['checkInDate'],
+                                        $roomTourismTaxParams['numNights'],
+                                        $roomTourismTaxParams['numAdults'],
+                                        $roomTourismTaxParams['childrenAges'],
+                                        $roomTourismTaxParams['idCurrency'],
+                                        $roomTourismTaxParams['collectionType'],
+                                        $roomTourismTaxParams['idLang'],
+                                        $roomTourismTaxParams['quantity'],
+                                        $roomTourismTaxParams['idOrder'],
+                                        $roomTourismTaxParams['idOrderDetail'],
+                                        $roomTourismTaxParams['idHtlBooking'],
+                                        $roomTourismTaxParams['idServiceProductOrderDetail']
+                                    );
+                                }
+                            }
                             // Get Booking Demands of the old booking to add in the new booking creation
                             $objBookingDemand = new HotelBookingDemands();
                             if ($oldBookingDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
@@ -2241,6 +2266,29 @@ class HotelBookingDetail extends ObjectModel
                                         $objServiceProductOrderDetail = new ServiceProductOrderDetail($service['id_service_product_order_detail']);
                                         $objServiceProductOrderDetail->id_htl_booking_detail = $objBookingDetail->id;
                                         $objServiceProductOrderDetail->save();
+
+                                        if (Configuration::get('QLO_USE_TOURISM_TAX')) {
+                                            $serviceTourismTaxParams = OrderTaxDetail::buildServiceLineTaxParams((int) $objServiceProductOrderDetail->id);
+                                            if ($serviceTourismTaxParams) {
+                                                OrderTaxDetail::saveTourismTax(
+                                                    $serviceTourismTaxParams['idTaxRulesGroup'],
+                                                    $serviceTourismTaxParams['address'],
+                                                    $serviceTourismTaxParams['unitPriceTaxExcl'],
+                                                    $serviceTourismTaxParams['checkInDate'],
+                                                    $serviceTourismTaxParams['numNights'],
+                                                    $serviceTourismTaxParams['numAdults'],
+                                                    $serviceTourismTaxParams['childrenAges'],
+                                                    $serviceTourismTaxParams['idCurrency'],
+                                                    $serviceTourismTaxParams['collectionType'],
+                                                    $serviceTourismTaxParams['idLang'],
+                                                    $serviceTourismTaxParams['quantity'],
+                                                    $serviceTourismTaxParams['idOrder'],
+                                                    $serviceTourismTaxParams['idOrderDetail'],
+                                                    $serviceTourismTaxParams['idHtlBooking'],
+                                                    $serviceTourismTaxParams['idServiceProductOrderDetail']
+                                                );
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -2389,6 +2437,10 @@ class HotelBookingDetail extends ObjectModel
                 if ($objOldHotelBooking->delete()) {
                     // delete refund request of the room if exists.
                     OrderReturnDetail::deleteReturnDetailByIdBookingDetail($objOldHotelBooking->id_order, $idHotelBooking);
+
+                    // attached services were already re-pointed to the new booking above, so only
+                    // the room's own tax rows belong to this scope now.
+                    OrderTaxDetail::hardDeleteForBooking($idHotelBooking, array());
                 }
 
                 $totalPaid  = (float)$objOrder->getTotalPaid();
@@ -2601,6 +2653,7 @@ class HotelBookingDetail extends ObjectModel
             }
         } else {
             $result = Db::getInstance()->update($table, $data, 'id_order='.(int)$id_order);
+            Db::getInstance()->update('service_product_order_detail', array('is_refunded' => (int) $is_refunded), 'id_order='.(int)$id_order);
         }
 
         // if automatic overbooking resolution is enabled

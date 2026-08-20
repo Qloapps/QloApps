@@ -155,6 +155,12 @@ class TaxCalculatorCore
         $taxes_amounts = array();
         $tourismTaxIds = array();
 
+        foreach ($this->taxes as $tax) {
+            if (TaxConfiguration::getByTaxId((int) $tax->id)) {
+                $tourismTaxIds[] = $tax->id;
+            }
+        }
+
         if ($checkInDate !== null && $collectionType !== null && Configuration::get('QLO_USE_TOURISM_TAX') && $collectionType !== HotelBranchInformation::TAX_COLLECTION_TYPE_AT_HOTEL) {
             if (!$idCurrency) {
                 $context = Context::getContext();
@@ -177,7 +183,6 @@ class TaxCalculatorCore
                 if (!$tourismTax) {
                     continue;
                 }
-                $tourismTaxIds[] = $tax->id;
 
                 if (!empty($tourismTax->valid_from) && $tourismTax->valid_from !== '0000-00-00') {
                     $validFrom = new DateTime($tourismTax->valid_from);
@@ -198,11 +203,11 @@ class TaxCalculatorCore
                     }
                 }
 
-                $taxType = (int) $tourismTax->tax_calc_type;
-                $isPerNight = (bool) $tourismTax->is_per_night;
+                $taxType = (int) $tourismTax->calculation_type;
+                $isPerNight = (bool) $tourismTax->per_night;
 
                 $baseValue = (float) $tourismTax->tax_value;
-                if ($tourismTax->is_tiered) {
+                if ($tourismTax->has_tiered_pricing) {
                     $tier = TaxPriceTier::getMatchingTier((int) $tax->id, $runningPriceExcl);
                     if ($tier) {
                         $baseValue = (float) $tier['tax_value'];
@@ -213,7 +218,7 @@ class TaxCalculatorCore
                 if ($isPerNight) {
                     $adultMultiplier *= $numNights;
                 }
-                if ($tourismTax->is_per_person) {
+                if ($tourismTax->per_person) {
                     $adultMultiplier *= $numAdults;
                 }
 
@@ -226,7 +231,7 @@ class TaxCalculatorCore
                 }
 
                 $totalAmountChild = 0.0;
-                if ($tourismTax->has_child_rate && !empty($eligibleChildAges)) {
+                if ($tourismTax->apply_on_child && !empty($eligibleChildAges)) {
                     $contribution = TaxChildRange::getChildContribution(
                         $tax->id,
                         $eligibleChildAges,

@@ -3331,7 +3331,7 @@ class AdminProductsControllerCore extends AdminController
                             if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
                                 $serviceProductPriceInfo['id_tax_rules_group'],
                                 $this->context->language->id
-                            )) && !$objTaxRuleGroup->is_tourism_tax_rule) {
+                            )) && !$objTaxRuleGroup->is_tourism_tax_rule_group) {
                                 $associationInfo['tax_rules_group_name'] = $objTaxRuleGroup->name;
                             }
                             $associationInfo['id_room_type_service_product_price'] = $serviceProductPriceInfo['id_room_type_service_product_price'];
@@ -3341,7 +3341,7 @@ class AdminProductsControllerCore extends AdminController
                         if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
                             $objProduct->id_tax_rules_group,
                             $this->context->language->id
-                        )) && !$objTaxRuleGroup->is_tourism_tax_rule) {
+                        )) && !$objTaxRuleGroup->is_tourism_tax_rule_group) {
                             $associationInfo['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
                         }
 
@@ -3355,7 +3355,7 @@ class AdminProductsControllerCore extends AdminController
                         if (Validate::isLoadedObject($objTaxRulesGroup = new TaxRulesGroup(
                             $serviceProduct['id_tax_rules_group'],
                             $this->context->language->id
-                        )) && !$objTaxRulesGroup->is_tourism_tax_rule) {
+                        )) && !$objTaxRulesGroup->is_tourism_tax_rule_group) {
                             $serviceProduct['tax_rules_group_name'] = $objTaxRulesGroup->name;
                         }
 

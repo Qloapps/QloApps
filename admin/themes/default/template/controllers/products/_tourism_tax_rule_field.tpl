@@ -15,7 +15,7 @@
 				</select>
 			</div>
 			<div class="col-lg-2">
-				<a class="btn btn-link confirm_leave" href="{$link->getAdminLink('AdminTaxRulesGroup')|escape:'html':'UTF-8'}&amp;addtax_rules_group&amp;id_product={$product->id}&amp;is_tourism_tax_rule=1">
+				<a class="btn btn-link confirm_leave" href="{$link->getAdminLink('AdminTaxRulesGroup')|escape:'html':'UTF-8'}&amp;addtax_rules_group&amp;id_product={$product->id}&amp;is_tourism_tax_rule_group=1">
 					<i class="icon-plus-sign"></i> {l s='Create new tax'} <i class="icon-external-link-sign"></i>
 				</a>
 			</div>
