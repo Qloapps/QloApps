@@ -400,13 +400,13 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('Unique API key for Google Maps.'),
                         'validation' => 'isGenericName',
                         'type' => 'text',
+                        'desc' => $this->l('Google Maps API Key is required to display Google Maps.')
                     ),
                     'PS_MAP_ID' => array(
                         'title' => $this->l('Google Map ID'),
                         'hint' => $this->l('Map Id for Google Maps (optional).'),
                         'validation' => 'isGenericName',
-                        'type' => 'text',
-                        'desc' => $this->l('Google Maps API Key is required to display Google Maps. Google Map ID is optional.')
+                        'type' => 'text'
                     ),
                     'WK_GOOGLE_ACTIVE_MAP' => array(
                         'title' => $this->l('Display Google Maps For Hotel Location'),
