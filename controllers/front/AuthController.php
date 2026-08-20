@@ -468,6 +468,7 @@ class AuthControllerCore extends FrontController
 
                     if (!count($this->errors)) {
                         $customer->phone = Tools::getValue('phone');
+                        $customer->id_country = (int)Tools::getValue('id_nationality');
                         if ($customer->add()) {
                             if (!$customer->is_guest) {
                                 if (!$this->sendConfirmationMail($customer)) {
@@ -614,6 +615,7 @@ class AuthControllerCore extends FrontController
                         $customer->is_guest = 0;
                     }
                     $customer->phone = Tools::getValue('phone');
+                    $customer->id_country = (int)Tools::getValue('id_nationality');
                     if (!$customer->save()) {
                         $this->errors[] = Tools::displayError('An error occurred while creating your account.');
                     } else {

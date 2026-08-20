@@ -126,6 +126,7 @@ class OrderOpcControllerCore extends ParentOrderController
                             }
 
                             $this->context->customer->phone = $phone;
+                            $this->context->customer->id_country = (int)Tools::getValue('id_nationality');
                             $_POST['lastname'] = $_POST['customer_lastname'];
                             $_POST['firstname'] = $_POST['customer_firstname'];
                             $this->errors = array_merge($this->errors, $this->context->customer->validateController());
@@ -648,7 +649,7 @@ class OrderOpcControllerCore extends ParentOrderController
             'id_country' => (int)$address_delivery->id_country,
             'id_state' => (int)$address_delivery->id_state,
             'id_gender' => (int)$customer->id_gender,
-            'id_nationality' => (int)$customer->id_nationality,
+            'id_nationality' => (int)$customer->id_country,
             'phone' => $customer->phone,
             'sl_year' => $birthday[0],
             'sl_month' => $birthday[1],

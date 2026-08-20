@@ -95,6 +95,7 @@ class IdentityControllerCore extends FrontController
 
             if (!count($this->errors)) {
                 $this->customer->phone = $phone;
+                $this->customer->id_country = (int)Tools::getValue('id_nationality');
                 $this->customer->id_default_group = (int)$prev_id_default_group;
                 $this->customer->firstname = Tools::ucwords($this->customer->firstname);
 
@@ -131,6 +132,7 @@ class IdentityControllerCore extends FrontController
         } else {
             $_POST = array_map('stripslashes', $this->customer->getFields());
             $_POST['phone'] = $this->customer->phone;
+            $_POST['id_nationality'] = $this->customer->id_country;
         }
 
         return $this->customer;

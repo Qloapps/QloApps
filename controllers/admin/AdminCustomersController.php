@@ -81,8 +81,8 @@ class AdminCustomersControllerCore extends AdminController
         $nationalities_result = Db::getInstance()->executeS('
             SELECT DISTINCT cl.id_country, cl.name
             FROM '._DB_PREFIX_.'customer c
-            INNER JOIN '._DB_PREFIX_.'country_lang cl ON (cl.id_country = c.id_nationality AND cl.id_lang = '.(int)$this->context->language->id.')
-            WHERE c.id_nationality != 0 AND c.deleted = 0
+            INNER JOIN '._DB_PREFIX_.'country_lang cl ON (cl.id_country = c.id_country AND cl.id_lang = '.(int)$this->context->language->id.')
+            WHERE c.id_country != 0 AND c.deleted = 0
             ORDER BY cl.name ASC
         ');
         foreach ($nationalities_result as $row) {
@@ -107,7 +107,7 @@ class AdminCustomersControllerCore extends AdminController
         $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'address ad ON (ad.id_customer = a.id_customer AND ad.deleted = 0)';
         $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'state adstate ON (adstate.id_state = ad.id_state)';
         $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'country_lang adcountry ON (adcountry.id_country = ad.id_country AND adcountry.id_lang = '.(int)$this->context->language->id.')';
-        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'country_lang natcountry ON (natcountry.id_country = a.id_nationality AND natcountry.id_lang = '.(int)$this->context->language->id.')';
+        $this->_join .= ' LEFT JOIN '._DB_PREFIX_.'country_lang natcountry ON (natcountry.id_country = a.id_country AND natcountry.id_lang = '.(int)$this->context->language->id.')';
         $this->_group = 'GROUP BY a.`id_customer`';
 
         $this->fields_list = array(
@@ -165,7 +165,7 @@ class AdminCustomersControllerCore extends AdminController
                 'visible_default' => false,
                 'type' => 'select',
                 'list' => $selected_nationalities,
-                'filter_key' => 'a!id_nationality',
+                'filter_key' => 'a!id_country',
                 'filter_type' => 'int',
                 'orderby' => false,
             ),
@@ -626,7 +626,7 @@ class AdminCustomersControllerCore extends AdminController
                 array(
                     'type' => 'select',
                     'label' => $this->l('Nationality'),
-                    'name' => 'id_nationality',
+                    'name' => 'id_country',
                     'required' => (bool)(Configuration::get('PS_CUSTOMER_NATIONALITY') && Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY')),
                     'col' => '4',
                     'options' => array(
@@ -997,8 +997,8 @@ class AdminCustomersControllerCore extends AdminController
         $gender_image = $gender->getImage();
 
         $nationality = '';
-        if ($customer->id_nationality) {
-            $nationalityCountry = new Country($customer->id_nationality, $this->context->language->id);
+        if ($customer->id_country) {
+            $nationalityCountry = new Country($customer->id_country, $this->context->language->id);
             if (Validate::isLoadedObject($nationalityCountry)) {
                 $nationality = $nationalityCountry->name;
             }
@@ -1389,7 +1389,7 @@ class AdminCustomersControllerCore extends AdminController
             }
         }
 
-        if (Configuration::get('PS_CUSTOMER_NATIONALITY') && Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY') && !Tools::getValue('id_nationality')) {
+        if (Configuration::get('PS_CUSTOMER_NATIONALITY') && Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY') && !Tools::getValue('id_country')) {
             $this->errors[] = Tools::displayError('Nationality is required.');
         }
 
