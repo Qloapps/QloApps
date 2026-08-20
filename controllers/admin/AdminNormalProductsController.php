@@ -106,8 +106,8 @@ class AdminNormalProductsControllerCore extends AdminController
             // 'Seo' => $this->l('SEO'),
             'Images' => $this->l('Images'),
             'Associations' => $this->l('Associations'),
-            'Quantities' => $this->l('Quantities'), // Code For Standard product working
-            'Options' => $this->l('Options'),// Code For Standard product working
+            // 'Quantities' => $this->l('Quantities'), // Code For Standard product working
+            // 'Options' => $this->l('Options'),// Code For Standard product working
         );
 
         if ($this->context->shop->getContext() != Shop::CONTEXT_GROUP) {
@@ -117,8 +117,8 @@ class AdminNormalProductsControllerCore extends AdminController
                 // 'Seo' => 2,
                 'Associations' => 3,
                 'Images' => 4,
-                'Quantities' => 5, // Code For Standard product working
-                'Options' => 6// Code For Standard product working
+                // 'Quantities' => 5, // Code For Standard product working
+                // 'Options' => 6// Code For Standard product working
             ));
         }
 
@@ -241,7 +241,7 @@ class AdminNormalProductsControllerCore extends AdminController
         $this->_where .= ' AND a.`booking_product` = 0';
 
         // Code For Standard product working
-        //$this->_where .= ' AND a.`selling_preference_type` = '.(int)Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
+        $this->_where .= ' AND a.`selling_preference_type` = '.(int)Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
 
         $this->_group = 'GROUP BY a.`id_product`';
 
@@ -329,22 +329,22 @@ class AdminNormalProductsControllerCore extends AdminController
         );
 
         // Code For Standard product working
-        $sellingPreferenceTypes = array(
-            Product::SELLING_PREFERENCE_WITH_ROOM_TYPE => $this->l('With room type'),
-            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE => $this->l('With hotel | With room type'),
-            Product::SELLING_PREFERENCE_WITH_STANDALONE => $this->l('With Standalone'),
-            Product::SELLING_PREFERENCE_WITH_HOTEL => $this->l('With hotel'),
-            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE => $this->l('With hotel | With standalone'),
-            Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With room type | With standalone'),
-            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE => $this->l('With hotel | With room type | With standalone'),
-        );
-        $this->fields_list['selling_preference_type'] = array(
-            'type' => 'select',
-            'list' => $sellingPreferenceTypes,
-            'title' => $this->l('Buying option'),
-            'filter_key' => 'a!selling_preference_type',
-            'callback' => 'getBuyingOption'
-        );
+        // $sellingPreferenceTypes = array(
+        //     Product::SELLING_PREFERENCE_WITH_ROOM_TYPE => $this->l('With room type'),
+        //     Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE => $this->l('With hotel | With room type'),
+        //     Product::SELLING_PREFERENCE_WITH_STANDALONE => $this->l('With Standalone'),
+        //     Product::SELLING_PREFERENCE_WITH_HOTEL => $this->l('With hotel'),
+        //     Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE => $this->l('With hotel | With standalone'),
+        //     Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With room type | With standalone'),
+        //     Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE => $this->l('With hotel | With room type | With standalone'),
+        // );
+        // $this->fields_list['selling_preference_type'] = array(
+        //     'type' => 'select',
+        //     'list' => $sellingPreferenceTypes,
+        //     'title' => $this->l('Buying option'),
+        //     'filter_key' => 'a!selling_preference_type',
+        //     'callback' => 'getBuyingOption'
+        // );
 
         if (Shop::isFeatureActive() && Shop::getContext() != Shop::CONTEXT_SHOP) {
             $this->fields_list['shopname'] = array(
@@ -1942,7 +1942,7 @@ class AdminNormalProductsControllerCore extends AdminController
         }
 
         // Code For Standard product working
-        //$_POST['selling_preference_type'] = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
+        $_POST['selling_preference_type'] = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
 
         $this->copyFromPost($this->object, $this->table);
 
@@ -2090,7 +2090,7 @@ class AdminNormalProductsControllerCore extends AdminController
                 $product_type_before = $object->getType();
 
                 // Code For Standard product working
-                //$_POST['selling_preference_type'] = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
+                $_POST['selling_preference_type'] = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
 
                 $this->copyFromPost($object, $this->table);
                 $object->indexed = 0;
@@ -2227,9 +2227,10 @@ class AdminNormalProductsControllerCore extends AdminController
             $_POST['price_calculation_method'] = array_sum(array_map('intval', Tools::getValue('price_calculation_method')));
         }
 
-        if (is_array(Tools::getValue('selling_preference_type'))) {
-            $_POST['selling_preference_type'] = array_sum(array_map('intval', Tools::getValue('selling_preference_type')));
-        }
+        // Code For Standard product working
+        // if (is_array(Tools::getValue('selling_preference_type'))) {
+        //     $_POST['selling_preference_type'] = array_sum(array_map('intval', Tools::getValue('selling_preference_type')));
+        // }
 
         $className = 'Product';
         // @todo : the call_user_func seems to contains only statics values (className = 'Product')
@@ -2382,9 +2383,10 @@ class AdminNormalProductsControllerCore extends AdminController
             $this->errors[] = $this->l('This product must be in the default category.');
         }
 
-        if (!Tools::getValue('selling_preference_type')) {
-            $this->errors[] = $this->l('Please select at least one buying option.');
-        }
+        // code for standard product working
+        // if (!Tools::getValue('selling_preference_type')) {
+        //     $this->errors[] = $this->l('Please select at least one buying option.');
+        // }
 
         if (Tools::getValue('id_product') && !Tools::getValue('price_calculation_method')) {
             $this->errors[] = $this->l('Please select at least one price calculation method.');

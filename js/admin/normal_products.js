@@ -602,7 +602,8 @@ product_tabs['Informations'] = new function(){
 				applySellingPreferenceUIState();
 			}, 0);
 		});
-		applySellingPreferenceUIState();
+		// Code For Standard product working
+		///applySellingPreferenceUIState();
 		$('#simple_product').attr('checked', true);
 
 		$('input[name="type_product"]').on('click', function(e)
