@@ -177,6 +177,16 @@
 }
 
 
+.header-media-nav-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 15;
+    pointer-events: none;
+}
+
 .header-media-btn {
     position: absolute;
     top: 50%;
@@ -199,10 +209,10 @@
     color: #fff;
 }
 
-.header-media-prev {
+.js-header-media-prev {
     left: 15px;
 }
 
-.header-media-next {
+.js-header-media-next {
     right: 15px;
 }

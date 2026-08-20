@@ -89,26 +89,12 @@
 					<label class="control-label col-lg-3">{l s='Slide Animation' mod='hotelreservationsystem'}</label>
 					<div class="col-lg-9">
 						<select name="QLO_HEADER_SLIDER_ANIM_TYPE" class="fixed-width-lg">
-							<option value="{HotelHeaderImage::ANIM_TYPE_SLIDE}"{if $config.QLO_HEADER_SLIDER_ANIM_TYPE == HotelHeaderImage::ANIM_TYPE_SLIDE} selected{/if}>{l s='Slide' mod='hotelreservationsystem'}</option>
-							<option value="{HotelHeaderImage::ANIM_TYPE_FADE}"{if $config.QLO_HEADER_SLIDER_ANIM_TYPE == HotelHeaderImage::ANIM_TYPE_FADE} selected{/if}>{l s='Fade' mod='hotelreservationsystem'}</option>
-							<option value="{HotelHeaderImage::ANIM_TYPE_ZOOM}"{if $config.QLO_HEADER_SLIDER_ANIM_TYPE == HotelHeaderImage::ANIM_TYPE_ZOOM} selected{/if}>{l s='Zoom' mod='hotelreservationsystem'}</option>
-							<option value="{HotelHeaderImage::ANIM_TYPE_BLUR}"{if $config.QLO_HEADER_SLIDER_ANIM_TYPE == HotelHeaderImage::ANIM_TYPE_BLUR} selected{/if}>{l s='Blur' mod='hotelreservationsystem'}</option>
+							<option value="{HotelHeaderImage::ANIMATION_TYPE_SLIDE}"{if $config.QLO_HEADER_SLIDER_ANIM_TYPE == HotelHeaderImage::ANIMATION_TYPE_SLIDE} selected{/if}>{l s='Slide' mod='hotelreservationsystem'}</option>
+							<option value="{HotelHeaderImage::ANIMATION_TYPE_FADE}"{if $config.QLO_HEADER_SLIDER_ANIM_TYPE == HotelHeaderImage::ANIMATION_TYPE_FADE} selected{/if}>{l s='Fade' mod='hotelreservationsystem'}</option>
+							<option value="{HotelHeaderImage::ANIMATION_TYPE_ZOOM}"{if $config.QLO_HEADER_SLIDER_ANIM_TYPE == HotelHeaderImage::ANIMATION_TYPE_ZOOM} selected{/if}>{l s='Zoom' mod='hotelreservationsystem'}</option>
+							<option value="{HotelHeaderImage::ANIMATION_TYPE_BLUR}"{if $config.QLO_HEADER_SLIDER_ANIM_TYPE == HotelHeaderImage::ANIMATION_TYPE_BLUR} selected{/if}>{l s='Blur' mod='hotelreservationsystem'}</option>
 						</select>
 						<p class="help-block">{l s='Transition effect between slides.' mod='hotelreservationsystem'}</p>
-					</div>
-				</div>
-
-				<div class="form-group">
-					<label class="control-label col-lg-3">{l s='Show Hotel Name' mod='hotelreservationsystem'}</label>
-					<div class="col-lg-9">
-						<span class="switch prestashop-switch fixed-width-lg">
-							<input type="radio" name="QLO_HOTEL_NAME_ENABLE" id="hotel_name_on" value="1"{if $config.QLO_HOTEL_NAME_ENABLE} checked{/if}>
-							<label for="hotel_name_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-							<input type="radio" name="QLO_HOTEL_NAME_ENABLE" id="hotel_name_off" value="0"{if !$config.QLO_HOTEL_NAME_ENABLE} checked{/if}>
-							<label for="hotel_name_off">{l s='No' mod='hotelreservationsystem'}</label>
-							<a class="slide-button btn"></a>
-						</span>
-						<p class="help-block">{l s='Display the hotel name on the header image slideshow.' mod='hotelreservationsystem'}</p>
 					</div>
 				</div>
 
@@ -285,6 +271,7 @@
 						<th>{l s='Tag Line' mod='hotelreservationsystem'}</th>
 						<th class="center fixed-width-xs">{l s='Position' mod='hotelreservationsystem'}</th>
 						<th class="center">{l s='Active' mod='hotelreservationsystem'}</th>
+						<th class="center">{l s='Hotel Name' mod='hotelreservationsystem'}</th>
 						<th></th>
 					</tr>
 				</thead>
@@ -293,7 +280,7 @@
 					{include file="../../_partials/htl-header-image-row.tpl" img=$img position=$img@iteration}
 					{foreachelse}
 					<tr class="list-empty-tr" id="qlo-no-images">
-						<td class="list-empty" colspan="6">
+						<td class="list-empty" colspan="7">
 							<div class="list-empty-msg">
 								<i class="icon-warning-sign list-empty-icon"></i>
 								{l s='No Image Found' mod='hotelreservationsystem'}
@@ -366,7 +353,19 @@
 								<option value="1">{l s='Yes' mod='hotelreservationsystem'}</option>
 								<option value="0">{l s='No' mod='hotelreservationsystem'}</option>
 							</select>
-							<p class="help-block">{l s='Leave as "Select status" to keep each image\'s current active status unchanged.' mod='hotelreservationsystem'}</p>
+							<p class="help-block">{l s='Leave \'Select status\' to keep the current status.' mod='hotelreservationsystem'}</p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-lg-3">{l s='Hotel Name' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-9">
+							<select id="qlo-bulk-hotelname" class="fixed-width-lg">
+								<option value="" selected="selected">{l s='Select status' mod='hotelreservationsystem'}</option>
+								<option value="1">{l s='Yes' mod='hotelreservationsystem'}</option>
+								<option value="0">{l s='No' mod='hotelreservationsystem'}</option>
+							</select>
+							<p class="help-block">{l s='Leave \'Select status\' to keep the current status.' mod='hotelreservationsystem'}</p>
 						</div>
 					</div>
 
@@ -418,19 +417,22 @@
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Tag Line Color' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
-							<input type="text" id="qlo-bulk-tl-color" class="form-control" placeholder="#ffffff" maxlength="7">
-							<p class="help-block">{l s='6-digit hex value. Leave empty to keep each image\'s current color unchanged.' mod='hotelreservationsystem'}</p>
+							<div class="input-group fixed-width-lg">
+								<input type="color" id="qlo-bulk-tl-color" name="bulk_tag_line_color"
+									   class="color mColorPickerInput" data-hex="true" value="">
+							</div>
+							<p class="help-block">{l s='Leave empty to keep each image\'s current color unchanged.' mod='hotelreservationsystem'}</p>
 						</div>
 					</div>
 
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Tag Line Font Size' mod='hotelreservationsystem'}</label>
-						<div class="col-lg-3">
-							<div class="input-group">
+						<div class="col-lg-9">
+							<div class="input-group fixed-width-lg">
 								<input type="number" id="qlo-bulk-tl-font-size" class="form-control" value="0" min="0" max="72">
 								<span class="input-group-addon">px</span>
 							</div>
-							<p class="help-block">{l s='0 = keep each image\'s current font size unchanged.' mod='hotelreservationsystem'}</p>
+							<p class="help-block">{l s='Leave as 0 to keep the current size.' mod='hotelreservationsystem'}</p>
 						</div>
 					</div>
 
@@ -444,7 +446,9 @@
 								<option value="600">{l s='600 (Semi-Bold)' mod='hotelreservationsystem'}</option>
 								<option value="700">{l s='700 (Bold)' mod='hotelreservationsystem'}</option>
 							</select>
-							<p class="help-block">{l s='Leave unselected to keep each image\'s current font weight unchanged.' mod='hotelreservationsystem'}</p>
+						</div>
+						<div class="col-lg-9 col-lg-offset-3">
+							<p class="help-block">{l s='Leave \'Select font weight\' to keep the current weight.' mod='hotelreservationsystem'}</p>
 						</div>
 					</div>
 				</div>
@@ -477,6 +481,24 @@
 						</div>
 					</div>
 
+					<div class="form-group" id="qlo-img-edit-file-group" style="display:none">
+						<label class="control-label col-lg-3 file_upload_label">
+							{l s='Update Image' mod='hotelreservationsystem'}
+						</label>
+						<div class="col-lg-9">
+							<input type="file" id="qlo-img-edit-file"
+								   accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" class="hide">
+							<div class="dummyfile input-group">
+								<span class="input-group-addon"><i class="icon-file"></i></span>
+								<input id="qlo-img-edit-file-name" type="text" readonly>
+								<span class="input-group-btn">
+									<button id="qlo-img-edit-file-selectbutton" type="button" class="btn btn-default">
+										<i class="icon-folder-open"></i> {l s='Update image' mod='hotelreservationsystem'}
+									</button>
+								</span>
+							</div>
+						</div>
+					</div>
 					<div class="form-group" id="qlo-img-form-file-group">
 						<label class="control-label col-lg-3 file_upload_label">
 							{l s='Images' mod='hotelreservationsystem'}
@@ -514,6 +536,19 @@
 						</div>
 					</div>
 
+					<div class="form-group" id="qlo-img-form-add-hotelname-group">
+						<label class="control-label col-lg-3">{l s='Show Hotel Name' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-6">
+							<span class="switch prestashop-switch fixed-width-lg">
+								<input type="radio" name="qlo_img_hotelname_add" id="qlo_img_hotelname_add_on" value="1" checked>
+								<label for="qlo_img_hotelname_add_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+								<input type="radio" name="qlo_img_hotelname_add" id="qlo_img_hotelname_add_off" value="0">
+								<label for="qlo_img_hotelname_add_off">{l s='No' mod='hotelreservationsystem'}</label>
+								<a class="slide-button btn"></a>
+							</span>
+						</div>
+					</div>
+
 					<div class="form-group" id="qlo-img-form-edit-group" style="display:none">
 						<label class="control-label col-lg-3">{l s='Enable Image' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
@@ -522,6 +557,19 @@
 								<label for="qlo_img_active_edit_on">{l s='Yes' mod='hotelreservationsystem'}</label>
 								<input type="radio" name="qlo_img_active_edit" id="qlo_img_active_edit_off" value="0">
 								<label for="qlo_img_active_edit_off">{l s='No' mod='hotelreservationsystem'}</label>
+								<a class="slide-button btn"></a>
+							</span>
+						</div>
+					</div>
+
+					<div class="form-group" id="qlo-img-form-edit-hotelname-group" style="display:none">
+						<label class="control-label col-lg-3">{l s='Show Hotel Name' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-9">
+							<span class="switch prestashop-switch fixed-width-lg">
+								<input type="radio" name="qlo_img_hotelname_edit" id="qlo_img_hotelname_edit_on" value="1">
+								<label for="qlo_img_hotelname_edit_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+								<input type="radio" name="qlo_img_hotelname_edit" id="qlo_img_hotelname_edit_off" value="0">
+								<label for="qlo_img_hotelname_edit_off">{l s='No' mod='hotelreservationsystem'}</label>
 								<a class="slide-button btn"></a>
 							</span>
 						</div>
@@ -562,7 +610,7 @@
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Tag Line Color' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
-							<div class="input-group col-lg-4">
+							<div class="input-group fixed-width-lg">
 								<input type="color" id="qlo-img-tl-color" name="tag_line_color"
 									   class="color mColorPickerInput" data-hex="true" value="#ffffff">
 							</div>
@@ -573,7 +621,7 @@
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Tag Line Font Size' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
-							<div class="input-group col-lg-4">
+							<div class="input-group fixed-width-lg">
 								<input type="number" id="qlo-img-tl-font-size" name="tag_line_font_size"
 									   class="form-control" value="16" min="8" max="72">
 								<span class="input-group-addon">px</span>
@@ -585,7 +633,7 @@
 					<div class="form-group">
 						<label class="control-label col-lg-3">{l s='Tag Line Font Weight' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
-							<select id="qlo-img-tl-font-weight" name="tag_line_font_weight" class="col-lg-4">
+							<select id="qlo-img-tl-font-weight" name="tag_line_font_weight" class="fixed-width-lg">
 								<option value="300">{l s='300 (Light)' mod='hotelreservationsystem'}</option>
 								<option value="400" selected="selected">{l s='400 (Normal)' mod='hotelreservationsystem'}</option>
 								<option value="600">{l s='600 (Semi-Bold)' mod='hotelreservationsystem'}</option>

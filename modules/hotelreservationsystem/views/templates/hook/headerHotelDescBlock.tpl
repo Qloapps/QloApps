@@ -28,9 +28,9 @@
 					<div class="row">
 						<div class="col-md-offset-1 col-md-10 col-lg-offset-0 col-lg-12">
 							<div class="header-desc-inner-wrapper">
-								{if $QLO_HOTEL_NAME_ENABLE && $QLO_HEADER_MEDIA_TYPE == $QLO_HEADER_MEDIA_TYPE_IMAGE}
+								{if $QLO_HEADER_MEDIA_TYPE == $QLO_HEADER_MEDIA_TYPE_IMAGE}
 								{block name='header_hotel_chain_name'}
-									<h1 class="header-hotel-name">{$WK_HTL_CHAIN_NAME|escape:'htmlall':'UTF-8'}</h1>
+									<h1 class="header-hotel-name js-header-hotel-name"{if !$QLO_HOTEL_NAME_ENABLE} style="display:none"{/if}>{$WK_HTL_CHAIN_NAME|escape:'htmlall':'UTF-8'}</h1>
 								{/block}
 								{/if}
 								{block name='header_hotel_description'}

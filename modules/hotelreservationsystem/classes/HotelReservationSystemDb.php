@@ -537,7 +537,8 @@ class HotelReservationSystemDb
             (2, 'icon-dollar', 'index.php?controller=AdminHotelFeaturePricesSettings', 0, 2, 1, 1, NOW(), NOW()),
             (3, 'icon-plus-square', 'index.php?controller=AdminRoomTypeGlobalDemand', 0, 3, 1, 1, NOW(), NOW()),
             (4, 'icon-file-text', 'index.php?controller=AdminAboutHotelBlockSetting', 0, 4, 0, 1, NOW(), NOW()),
-            (5, 'icon-th-list', 'index.php?controller=AdminFeaturesModuleSetting', 0, 5, 0, 1, NOW(), NOW());",
+            (5, 'icon-th-list', 'index.php?controller=AdminFeaturesModuleSetting', 0, 5, 0, 1, NOW(), NOW()),
+            (6, 'icon-picture', 'index.php?controller=AdminHotelHeaderImage', 0, 6, 0, 1, NOW(), NOW());",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_settings_link_lang` (
                 `id_settings_link` int(10) unsigned NOT NULL,
@@ -572,7 +573,7 @@ class HotelReservationSystemDb
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
 
-            "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
             SELECT 6, `id_lang`, 'Landing Page Header Media', 'Configure and manage header images or videos displayed on the home page.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",

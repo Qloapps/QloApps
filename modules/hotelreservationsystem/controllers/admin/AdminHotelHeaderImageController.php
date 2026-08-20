@@ -409,10 +409,14 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         }
 
         $defaultLangId = (int)Configuration::get('PS_LANG_DEFAULT');
+        $shopId = (int)$this->context->shop->id;
+        $cacheName = 'htl_header_image_mini_'.(int)$objImage->id.'_'.$shopId.'.jpg';
+        $thumb = ImageManager::thumbnail($destPath, $cacheName, 45, 'jpg', true, true);
         $this->context->smarty->assign(array(
             'img' => array(
                 'id_header_image' => (int)$objImage->id,
                 'name' => $uniqueName,
+                'thumb' => $thumb,
                 'tag_line' => isset($tagLineByLang[$defaultLangId]) ? $tagLineByLang[$defaultLangId] : '',
                 'tag_lines_json' => json_encode((object)$tagLineByLang),
                 'tag_line_color' => $tagLineColor,

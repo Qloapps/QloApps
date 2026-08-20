@@ -49,6 +49,14 @@
 			<i class="icon-remove{if $img.active} hidden{/if}"></i>
 		</a>
 	</td>
+	<td class="center">
+		<a class="list-action-enable ajax_table_link js-toggle-hotel-name {if $img.show_hotel_name}action-enabled{else}action-disabled{/if}"
+		   href="{$current|escape:'html':'UTF-8'}&amp;ajax=1&amp;action=toggle_image_hotel_name&amp;id_header_image={$img.id_header_image|intval}&amp;show_hotel_name={if $img.show_hotel_name}0{else}1{/if}&amp;token={$token|escape:'html':'UTF-8'}"
+		   title="{if $img.show_hotel_name}{l s='Enabled' mod='hotelreservationsystem'}{else}{l s='Disabled' mod='hotelreservationsystem'}{/if}">
+			<i class="icon-check{if !$img.show_hotel_name} hidden{/if}"></i>
+			<i class="icon-remove{if $img.show_hotel_name} hidden{/if}"></i>
+		</a>
+	</td>
 	<td class="text-right">
 		<div class="btn-group-action">
 			<div class="btn-group pull-right">
