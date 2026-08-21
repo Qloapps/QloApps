@@ -33,6 +33,7 @@ class AdminRoomStatusesController extends ModuleAdminController
         $this->lang = true;
 
         parent::__construct();
+        $this->_new_list_header_design = true;
 
         // edit only — the 5 statuses are fixed (their IDs are the
         // HotelBookingDetail::STATUS_* constants used everywhere), no add/delete
@@ -122,7 +123,7 @@ class AdminRoomStatusesController extends ModuleAdminController
                     'type' => 'switch',
                     'label' => $this->l('Terminal (final) status'),
                     'name' => 'is_terminal_display',
-                    'hint' => $this->l('A terminal status is final — once a room reaches it, it can\'t move to any other status. Fixed per status, cannot be changed here.'),
+                    'hint' => $this->l('If set to Yes, a room with this status cannot be edited, only deleted. If No, the room can still be edited. This setting is fixed for each status, so it is disabled here.'),
                     'disabled' => true,
                     'values' => array(
                         array(

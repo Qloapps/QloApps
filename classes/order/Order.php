@@ -3057,6 +3057,14 @@ class OrderCore extends ObjectModel
 
     public function getOrderCompleteRefundStatus()
     {
+        $objHotelBooking = new HotelBookingdetail();
+        foreach ($objHotelBooking->getOrderCurrentDataByOrderId($this->id) as $booking) {
+            if ($booking['id_status'] != HotelBookingDetail::STATUS_CANCELLED
+                && $booking['id_status'] != HotelBookingDetail::STATUS_NO_SHOW
+            ) {
+                return 0;
+            }
+        }
         // any completed refund anywhere in the order takes priority over
         // No-show/Cancelled and is sticky (a refund never un-completes)
         if ((new OrderReturn())->hasAnyCompletedRefund($this->id)) {

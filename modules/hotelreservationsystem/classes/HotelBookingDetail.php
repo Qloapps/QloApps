@@ -1720,10 +1720,7 @@ class HotelBookingDetail extends ObjectModel
         $objHistory->id_status_to = $newStatus;
         $objHistory->id_employee = isset($params['id_employee']) ? (int) $params['id_employee'] : null;
         $objHistory->id_customer = isset($params['id_customer']) ? (int) $params['id_customer'] : null;
-        $remark = isset($params['remark']) ? $params['remark'] : '';
-        foreach (Language::getLanguages(true) as $lang) {
-            $objHistory->remark[$lang['id_lang']] = $remark;
-        }
+        $objHistory->remark = isset($params['remark']) ? $params['remark'] : '';
         $objHistory->save();
 
         Hook::exec('actionBookingStatusAfter', array(

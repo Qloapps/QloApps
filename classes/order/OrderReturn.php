@@ -356,7 +356,7 @@ class OrderReturnCore extends ObjectModel
             }
 
             if ($onlyBookingIds) {
-                return array_column($returnDetails, 'id_htl_booking');
+                return array_values(array_unique(array_column($returnDetails, 'id_htl_booking')));
             }
 
             if ($customerView) {

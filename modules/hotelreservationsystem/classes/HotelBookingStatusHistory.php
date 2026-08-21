@@ -37,34 +37,26 @@ class HotelBookingStatusHistory extends ObjectModel
     public static $definition = array(
         'table' => 'htl_booking_status_history',
         'primary' => 'id_booking_status_history',
-        'multilang' => true,
         'fields' => array(
             'id_htl_booking' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_status_from' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'allow_null' => true),
             'id_status_to' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_employee' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'allow_null' => true),
             'id_customer' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'allow_null' => true),
+            'remark' => array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
-            // lang fields
-            'remark' => array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isCleanHtml'),
         ),
     );
 
     /**
      * @param int $idHtlBooking
-     * @param int $idLang
      * @return array history rows for one booking, oldest first
      */
-    public function getHistoryByBooking($idHtlBooking, $idLang = 0)
+    public function getHistoryByBooking($idHtlBooking)
     {
-        if (!$idLang) {
-            $idLang = Context::getContext()->language->id;
-        }
-
-        $sql = 'SELECT hbsh.*, hbshl.`remark` FROM `'._DB_PREFIX_.$this->table.'` hbsh
-            LEFT JOIN `'._DB_PREFIX_.$this->table.'_lang` hbshl ON hbsh.`id_booking_status_history` = hbshl.`id_booking_status_history` AND hbshl.`id_lang` = '.(int) $idLang.'
-            WHERE hbsh.`id_htl_booking` = '.(int) $idHtlBooking.'
-            ORDER BY hbsh.`id_booking_status_history` ASC';
+        $sql = 'SELECT * FROM `'._DB_PREFIX_.$this->table.'`
+            WHERE `id_htl_booking` = '.(int) $idHtlBooking.'
+            ORDER BY `id_booking_status_history` ASC';
 
         return Db::getInstance()->executeS($sql);
     }
