@@ -372,7 +372,7 @@ class HotelReservationSystem extends Module
                 'wkTagLineColor'             => !empty($firstItem['tag_line_color'])       ? $firstItem['tag_line_color']       : '#ffffff',
                 'wkTagLineFontSize'          => !empty($firstItem['tag_line_font_size'])   ? (int)$firstItem['tag_line_font_size']   : 16,
                 'wkTagLineFontWeight'        => !empty($firstItem['tag_line_font_weight']) ? $firstItem['tag_line_font_weight'] : '400',
-                'QLO_HOTEL_NAME_ENABLE'      => !empty($firstItem['show_hotel_name']),
+                'QLO_HOTEL_NAME_ENABLE'      => !empty($firstItem['show_hotel_chain_name']),
                 'wkHeaderContentAlign'       => (int)(Configuration::get('QLO_HEADER_CONTENT_ALIGN') ?: HotelHeaderImage::CONTENT_ALIGN_CENTER),
                 'QLO_HEADER_MEDIA_TYPE'      => (int)(Configuration::get('QLO_HEADER_MEDIA_TYPE') ?: HotelHeaderImage::MEDIA_TYPE_IMAGE),
                 'QLO_HEADER_MEDIA_TYPE_IMAGE' => HotelHeaderImage::MEDIA_TYPE_IMAGE,

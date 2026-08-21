@@ -125,7 +125,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 'title' => $this->l('Website Configuration'),
                 'fields' => array(
                     'WK_HTL_CHAIN_NAME' => array(
-                        'title' => $this->l('Hotel Name'),
+                        'title' => $this->l('Hotel Brand Name'),
                         'type' => 'textLang',
                         'lang' => true,
                         'required' => true,

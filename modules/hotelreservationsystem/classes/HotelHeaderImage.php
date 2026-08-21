@@ -55,7 +55,7 @@ class HotelHeaderImage extends ObjectModel
     public $tag_line_font_size   = 16;
     public $tag_line_font_weight = '400';
     public $active;
-    public $show_hotel_name = 1;
+    public $show_hotel_chain_name = 1;
     public $date_add;
     public $date_upd;
 
@@ -71,7 +71,7 @@ class HotelHeaderImage extends ObjectModel
             'tag_line_font_weight' => array('type' => self::TYPE_STRING, 'size' => 10),
             'position'             => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedInt'),
             'active'               => array('type' => self::TYPE_BOOL,   'validate' => 'isBool'),
-            'show_hotel_name'      => array('type' => self::TYPE_BOOL,   'validate' => 'isBool'),
+            'show_hotel_chain_name' => array('type' => self::TYPE_BOOL,   'validate' => 'isBool'),
             'date_add'             => array('type' => self::TYPE_DATE,   'validate' => 'isDate'),
             'date_upd'             => array('type' => self::TYPE_DATE,   'validate' => 'isDate'),
         ),

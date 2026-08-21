@@ -394,7 +394,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $objImage->name = $uniqueName;
         $objImage->position = $objImage->getHigherPosition();
         $objImage->active = (int)(bool)Tools::getValue('active', 1);
-        $objImage->show_hotel_name = (int)(bool)Tools::getValue('show_hotel_name', 1);
+        $objImage->show_hotel_chain_name = (int)(bool)Tools::getValue('show_hotel_chain_name', 1);
         $objImage->tag_line = $tagLineByLang;
         $objImage->tag_line_color = $tagLineColor;
         $objImage->tag_line_font_size = $tagLineFontSize;
@@ -423,7 +423,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
                 'tag_line_font_size' => $tagLineFontSize,
                 'tag_line_font_weight' => $tagLineFontWeight,
                 'active' => (int)$objImage->active,
-                'show_hotel_name' => (int)$objImage->show_hotel_name,
+                'show_hotel_chain_name' => (int)$objImage->show_hotel_chain_name,
             ),
             'position' => count(HotelHeaderImage::getItems(null)),
             'current' => self::$currentIndex,
@@ -472,9 +472,9 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             $objImage->active = $newActive;
         }
 
-        $showHotelNameVal = Tools::getValue('show_hotel_name');
-        if ($showHotelNameVal !== false) {
-            $objImage->show_hotel_name = (int)(bool)$showHotelNameVal;
+        $showHotelChainNameVal = Tools::getValue('show_hotel_chain_name');
+        if ($showHotelChainNameVal !== false) {
+            $objImage->show_hotel_chain_name = (int)(bool)$showHotelChainNameVal;
         }
 
         $tagLineColor = Tools::getValue('tag_line_color', $objImage->tag_line_color);
@@ -549,7 +549,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $defaultLangId = (int)Configuration::get('PS_LANG_DEFAULT');
         $response['success'] = true;
         $response['active'] = (int)$objImage->active;
-        $response['show_hotel_name'] = (int)$objImage->show_hotel_name;
+        $response['show_hotel_chain_name'] = (int)$objImage->show_hotel_chain_name;
         $response['confirmations'] = $this->l('Image updated successfully.');
         $response['tag_line'] = isset($tagLineByLang[$defaultLangId]) ? $tagLineByLang[$defaultLangId] : '';
         $response['tag_lines_json'] = json_encode((object)$tagLineByLang);
@@ -657,7 +657,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
     {
         $response = array('errors' => array(), 'success' => false);
         $id = (int)Tools::getValue('id_header_image');
-        $showHotelName = (int)(bool)Tools::getValue('show_hotel_name');
+        $showHotelChainName = (int)(bool)Tools::getValue('show_hotel_chain_name');
 
         if (!$id) {
             $response['errors'][] = $this->l('Invalid item ID.');
@@ -670,7 +670,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             $this->ajaxDie(json_encode($response));
         }
 
-        $objImage->show_hotel_name = $showHotelName;
+        $objImage->show_hotel_chain_name = $showHotelChainName;
         if (!$objImage->save()) {
             $response['errors'][] = $this->l('Unable to update hotel name status.');
             $this->ajaxDie(json_encode($response));
@@ -728,8 +728,8 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             }
         }
 
-        $showHotelNameVal = Tools::getValue('show_hotel_name', '');
-        if ($showHotelNameVal !== '' && !in_array($showHotelNameVal, array('0', '1'))) {
+        $showHotelChainNameVal = Tools::getValue('show_hotel_chain_name', '');
+        if ($showHotelChainNameVal !== '' && !in_array($showHotelChainNameVal, array('0', '1'))) {
             $response['errors'][] = $this->l('Invalid hotel name status selected.');
             $this->ajaxDie(json_encode($response));
         }
@@ -777,8 +777,8 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             if ($activeVal !== '') {
                 $objImage->active = (int)$activeVal;
             }
-            if ($showHotelNameVal !== '') {
-                $objImage->show_hotel_name = (int)$showHotelNameVal;
+            if ($showHotelChainNameVal !== '') {
+                $objImage->show_hotel_chain_name = (int)$showHotelChainNameVal;
             }
             if ($updateTagline) {
                 $objImage->tag_line = $tagLineByLang;
@@ -798,7 +798,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             $updatedRows[] = array(
                 'id' => (int)$objImage->id,
                 'active' => (int)$objImage->active,
-                'show_hotel_name' => (int)$objImage->show_hotel_name,
+                'show_hotel_chain_name' => (int)$objImage->show_hotel_chain_name,
                 'tag_line' => isset($currentTagLines[$defaultLangId]) ? $currentTagLines[$defaultLangId] : '',
                 'tag_lines_json' => json_encode((object)$currentTagLines),
                 'tag_line_color' => $objImage->tag_line_color,

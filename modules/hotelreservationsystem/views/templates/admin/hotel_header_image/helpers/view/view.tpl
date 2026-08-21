@@ -271,7 +271,7 @@
 						<th>{l s='Tag Line' mod='hotelreservationsystem'}</th>
 						<th class="center fixed-width-xs">{l s='Position' mod='hotelreservationsystem'}</th>
 						<th class="center">{l s='Active' mod='hotelreservationsystem'}</th>
-						<th class="center">{l s='Hotel Name' mod='hotelreservationsystem'}</th>
+						<th class="center">{l s='Hotel Brand Name' mod='hotelreservationsystem'}</th>
 						<th></th>
 					</tr>
 				</thead>
@@ -358,7 +358,7 @@
 					</div>
 
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Hotel Name' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Hotel Brand Name' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							<select id="qlo-bulk-hotelname" class="fixed-width-lg">
 								<option value="" selected="selected">{l s='Select status' mod='hotelreservationsystem'}</option>
@@ -537,7 +537,7 @@
 					</div>
 
 					<div class="form-group" id="qlo-img-form-add-hotelname-group">
-						<label class="control-label col-lg-3">{l s='Show Hotel Name' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Hotel Brand Name' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-6">
 							<span class="switch prestashop-switch fixed-width-lg">
 								<input type="radio" name="qlo_img_hotelname_add" id="qlo_img_hotelname_add_on" value="1" checked>
@@ -563,7 +563,7 @@
 					</div>
 
 					<div class="form-group" id="qlo-img-form-edit-hotelname-group" style="display:none">
-						<label class="control-label col-lg-3">{l s='Show Hotel Name' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Hotel Brand Name' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							<span class="switch prestashop-switch fixed-width-lg">
 								<input type="radio" name="qlo_img_hotelname_edit" id="qlo_img_hotelname_edit_on" value="1">
