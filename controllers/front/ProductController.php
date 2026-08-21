@@ -480,7 +480,6 @@ class ProductControllerCore extends FrontController
                             );
                         }
                     }
-
                     $this->assignBookingFormVars($this->product->id, $date_from, $date_to, $occupancy_value);
                     $this->assignRoomServiceProductVars();
 
@@ -977,43 +976,75 @@ class ProductControllerCore extends FrontController
                     }
                 }
                 $smartyVars['associated_hotels'] = $associatedHotels;
+                if (!$idHotel) {
+                    // no hotel picked yet (e.g. initial page load) — price/tourism tax must match
+                    // the hotel the dropdown defaults to, which is simply its first option
+                    $idHotel = reset($associatedHotels)['id_hotel'];
+                }
             }
         }
         if ($idHotel) {
             $smartyVars['service_id_hotel'] = $idHotel;
         }
         $useTax = HotelBookingDetail::useTax();
+        $includeTourismTax = $useTax && Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
         $objServiceProductOption = new ServiceProductOption();
         if ($serviceProductOptions = $objServiceProductOption->getProductOptions($this->product->id)) {
             foreach ($serviceProductOptions as &$serviceProductOption) {
                 if ($idProductOption == null) {
                     $idProductOption = $serviceProductOption['id_product_option'];
                 }
-                $serviceProductOption['price'] = RoomTypeServiceProductPrice::getPrice(
+                $serviceProductOption['price'] = Product::getServiceProductPrice(
                     $this->product->id,
-                    $idHotel,
                     $serviceProductOption['id_product_option'],
+                    $idHotel,
+                    false,
                     $useTax,
-                    1
+                    1,
+                    null,
+                    null,
+                    false,
+                    null,
+                    1,
+                    null,
+                    0,
+                    $includeTourismTax
                 );
             }
 
         }
         $smartyVars['product_option'] = $serviceProductOptions;
-        $smartyVars['service_price']  = RoomTypeServiceProductPrice::getPrice(
+        $smartyVars['service_price']  = Product::getServiceProductPrice(
             $this->product->id,
-            $idHotel,
             $idProductOption,
-            $useTax,
-            $quantity
-        );
-        $smartyVars['service_price_without_reduction']  = RoomTypeServiceProductPrice::getPrice(
-            $this->product->id,
             $idHotel,
-            $idProductOption,
+            false,
             $useTax,
             $quantity,
-            false
+            null,
+            null,
+            false,
+            null,
+            1,
+            null,
+            0,
+            $includeTourismTax
+        );
+        $smartyVars['service_price_without_reduction']  = Product::getServiceProductPrice(
+            $this->product->id,
+            $idProductOption,
+            $idHotel,
+            false,
+            $useTax,
+            $quantity,
+            null,
+            null,
+            false,
+            null,
+            false,
+            null,
+            0,
+            $includeTourismTax
         );
         if ($quantity) {
             $smartyVars['quantity']  = $quantity;

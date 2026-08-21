@@ -1549,7 +1549,7 @@ class CartCore extends ObjectModel
         $compute_precision = $configuration->get('_PS_PRICE_COMPUTE_PRECISION_');
 
         if (!$this->id) {
-            return $type == Cart::ONLY_TOURISM_TAX ? array('tourism_tax' => 0.0, 'tourism_tax_room' => 0.0, 'tourism_tax_service' => 0.0, 'tourism_tax_convenience_fee' => 0.0) : 0;
+            return $type == Cart::ONLY_TOURISM_TAX ? array('tourism_tax' => 0.0, 'tourism_tax_room' => 0.0, 'tourism_tax_service' => 0.0, 'tourism_tax_standalone_products' => 0.0, 'tourism_tax_convenience_fee' => 0.0) : 0;
         }
 
         $type = (int)$type;
@@ -1642,6 +1642,7 @@ class CartCore extends ObjectModel
         $tourism_tax_total = 0.0;
         $tourism_tax_room = 0.0;
         $tourism_tax_service = 0.0;
+        $tourism_tax_standalone_products = 0.0;
         $tourism_tax_convenience_fee = 0.0;
         $totalDemandsPrice = 0;
         $objCartBookingData = new HotelCartBookingData();
@@ -1782,7 +1783,7 @@ class CartCore extends ObjectModel
 
                             if ($with_taxes && in_array($type, array(Cart::BOTH, Cart::BOTH_WITHOUT_SHIPPING, Cart::ONLY_TOURISM_TAX))) {
                                 $tourism_tax_total += $servicePorduct['tourism_tax'];
-                                $tourism_tax_service += $servicePorduct['tourism_tax'];
+                                $tourism_tax_standalone_products += $servicePorduct['tourism_tax'];
                             }
                         }
                     }
@@ -1840,7 +1841,7 @@ class CartCore extends ObjectModel
 
                             if ($with_taxes && in_array($type, array(Cart::BOTH, Cart::BOTH_WITHOUT_SHIPPING, Cart::ONLY_TOURISM_TAX))) {
                                 $tourism_tax_total += $servicePorduct['tourism_tax'];
-                                $tourism_tax_service += $servicePorduct['tourism_tax'];
+                                $tourism_tax_standalone_products += $servicePorduct['tourism_tax'];
                             }
                         }
                     }
@@ -1972,6 +1973,7 @@ class CartCore extends ObjectModel
                 'tourism_tax' => $tourism_tax_total,
                 'tourism_tax_room' => $tourism_tax_room,
                 'tourism_tax_service' => $tourism_tax_service,
+                'tourism_tax_standalone_products' => $tourism_tax_standalone_products,
                 'tourism_tax_convenience_fee' => $tourism_tax_convenience_fee,
             );
         }
@@ -3225,8 +3227,20 @@ class CartCore extends ObjectModel
                     }
                 }
             } elseif ($sellingPreferenceType == Product::SELLING_PREFERENCE_STANDALONE) {
-                if (isset($id_customer)) {
-                    $id_address = (int)Address::getFirstCustomerAddressId($id_customer);
+                $addressPreferenceType = Configuration::get('PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE');
+                if ($addressPreferenceType == Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_HOTEL) {
+                    if (($primaryHotel = Configuration::get('WK_PRIMARY_HOTEL'))
+                        && ($htlAddress = HotelBranchInformation::getAddress($primaryHotel))
+                    ) {
+                        $id_address = $htlAddress['id_address'];
+                    }
+                } elseif ($addressPreferenceType == Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOM) {
+                    $id_address = (int) Configuration::get('PS_STANDARD_PRODUCT_ORDER_ADDRESS_ID');
+                } else {
+                    $customer = Context::getContext()->customer;
+                    if (Validate::isLoadedObject($customer) && ($idCustomerAddress = Address::getFirstCustomerAddressId($customer->id))) {
+                        $id_address = $idCustomerAddress;
+                    }
                 }
             }
         }
@@ -4010,14 +4024,17 @@ class CartCore extends ObjectModel
         $tourism_tax_convenience_fee = $tourismTaxTotals['tourism_tax_convenience_fee'];
         $tourism_tax_service = $tourismTaxTotals['tourism_tax_service'];
         $tourism_tax_room = $tourismTaxTotals['tourism_tax_room'];
+        $tourism_tax_standalone_products = $tourismTaxTotals['tourism_tax_standalone_products'];
 
         $roomGrossUpAmount = TaxConfiguration::isGrossedUp($tourism_tax_room) ? $tourism_tax_room : 0.0;
         $serviceGrossUpAmount = TaxConfiguration::isGrossedUp($tourism_tax_service) ? $tourism_tax_service : 0.0;
+        $standaloneProductsGrossUpAmount = TaxConfiguration::isGrossedUp($tourism_tax_standalone_products) ? $tourism_tax_standalone_products : 0.0;
         $convenienceFeeGrossUpAmount = TaxConfiguration::isGrossedUp($tourism_tax_convenience_fee) ? $tourism_tax_convenience_fee : 0.0;
         $total_rooms_wt += $roomGrossUpAmount;
         $total_additional_services_wt += $serviceGrossUpAmount;
+        $total_standalone_service_products_wt += $standaloneProductsGrossUpAmount;
         $convenience_fee_wt += $convenienceFeeGrossUpAmount;
-        $total_rooms_with_services_without_discount_ti += $roomGrossUpAmount + $serviceGrossUpAmount + $convenienceFeeGrossUpAmount;
+        $total_rooms_with_services_without_discount_ti += $roomGrossUpAmount + $serviceGrossUpAmount + $standaloneProductsGrossUpAmount + $convenienceFeeGrossUpAmount;
 
         $summary = array(
             'delivery' => $delivery,

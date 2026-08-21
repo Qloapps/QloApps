@@ -664,7 +664,7 @@
 				<div class="tab-pane" id="hotel-tourism-tax">
 					<div class="form-group">
 						<label class="control-label col-lg-3">
-							{l s='Collection Time' mod='hotelreservationsystem'}
+							{l s='Collection Type' mod='hotelreservationsystem'}
 						</label>
 						<div class="col-lg-4">
 							<select name="tourism_tax_collection_type" id="tourism_tax_collection_type">
@@ -672,7 +672,7 @@
 									{l s='At time of booking' mod='hotelreservationsystem'}
 								</option>
 								<option value="1" {if isset($tourism_tax_collection_type) && $tourism_tax_collection_type == 1}selected="selected"{/if}>
-									{l s='Manual After arrival' mod='hotelreservationsystem'}
+									{l s='At time of arrival' mod='hotelreservationsystem'}
 								</option>
 							</select>
 						</div>

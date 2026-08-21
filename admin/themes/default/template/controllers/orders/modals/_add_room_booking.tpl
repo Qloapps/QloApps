@@ -131,10 +131,20 @@
             {if isset($use_tourism_tax) && $use_tourism_tax}
                 <div class="form-group row">
                     <div class="col-sm-12">
-                        <label class="control-label">
-                            <input type="checkbox" name="add_product[apply_tourism_tax]" value="1" checked="checked" />
-                            {l s='Apply tourism tax to this room'}
-                        </label>
+                        <label class="control-label">{l s='Apply tourism tax'}</label>
+                        <div>
+                            <span class="switch prestashop-switch fixed-width-lg">
+                                <input type="radio" name="add_product[apply_tourism_tax]" id="add_product_apply_tourism_tax_on" value="1" checked="checked"/>
+                                <label for="add_product_apply_tourism_tax_on" class="radioCheck">
+                                    {l s='Yes'}
+                                </label>
+                                <input type="radio" name="add_product[apply_tourism_tax]" id="add_product_apply_tourism_tax_off" value="0"/>
+                                <label for="add_product_apply_tourism_tax_off" class="radioCheck">
+                                    {l s='No'}
+                                </label>
+                                <a class="slide-button btn"></a>
+                            </span>
+                        </div>
                     </div>
                 </div>
             {/if}

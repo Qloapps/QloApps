@@ -802,6 +802,18 @@
                                             <i class="icon-plus-sign"></i> {l s='Add Product'}
                                         </button>
                                     {/if}
+                                    {if isset($use_tourism_tax) && $use_tourism_tax && $hotel_service_products}
+                                        {if isset($products_tourism_tax_has_applied) && $products_tourism_tax_has_applied}
+                                            <button type="button" class="btn btn-default pull-right tt-exempt-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px; text-transform:uppercase">
+                                                <i class="icon-ban"></i> {l s='Exempt Tourism Tax'}
+                                            </button>
+                                        {/if}
+                                        {if isset($products_tourism_tax_has_unapplied) && $products_tourism_tax_has_unapplied}
+                                            <button type="button" class="btn btn-default pull-right tt-apply-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px; text-transform:uppercase">
+                                                <i class="icon-check"></i> {l s='Apply Tourism Tax'}
+                                            </button>
+                                        {/if}
+                                    {/if}
                                 </div>
                                 {include file='controllers/orders/_hotel_service_products_table.tpl'}
 
@@ -822,8 +834,21 @@
                                             <i class="icon-plus-sign"></i> {l s='Add Product'}
                                         </button>
                                     {/if}
+                                    {if isset($use_tourism_tax) && $use_tourism_tax && $standalone_service_products}
+                                        {if isset($products_tourism_tax_has_applied) && $products_tourism_tax_has_applied}
+                                            <button type="button" class="btn btn-default pull-right tt-exempt-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px; text-transform:uppercase">
+                                                <i class="icon-ban"></i> {l s='Exempt Tourism Tax'}
+                                            </button>
+                                        {/if}
+                                        {if isset($products_tourism_tax_has_unapplied) && $products_tourism_tax_has_unapplied}
+                                            <button type="button" class="btn btn-default pull-right tt-apply-all-bookings" data-id_order="{$order->id|intval}" style="margin-right:5px; text-transform:uppercase">
+                                                <i class="icon-check"></i> {l s='Apply Tourism Tax'}
+                                            </button>
+                                        {/if}
+                                    {/if}
                                 </div>
                                 {include file='controllers/orders/_standalone_service_products_table.tpl'}
+                                {include file='controllers/orders/_tourism_tax_actions.tpl'}
 
                                 {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
                                     <input type="hidden" name="TaxMethod" value="0">
@@ -883,6 +908,7 @@
                             {assign var=total_rooms_tax_only value=(($total_rooms_price_tax_incl - $total_rooms_price_tax_excl) - $tourism_tax_room)}
                             {assign var=total_services_tax_only value=(($total_room_services_and_demands_vat_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_vat_incl - $total_convenience_fee_tax_excl))}
                             {assign var=total_convenience_fee_tax_only value=($total_convenience_fee_vat_incl - $total_convenience_fee_tax_excl)}
+                            {assign var=total_products_tax_only value=(($total_products_price_tax_incl - $total_products_price_tax_excl) - $tourism_tax_products)}
 
                             {if $total_rooms_price_tax_excl}
                                 <tr id="total_products">
@@ -992,11 +1018,20 @@
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
                                                 {/if}
-                                                {if ($total_products_price_tax_incl - $total_products_price_tax_excl) > 0}
+                                                {if $total_products_tax_only > 0}
                                                     <tr id="total_products">
                                                         <td class="text-left">{l s='Products Tax'}</td>
                                                         <td class="amount text-right nowrap">
-                                                            {displayPrice price=($total_products_price_tax_incl - $total_products_price_tax_excl) currency=$currency->id}
+                                                            {displayPrice price=$total_products_tax_only currency=$currency->id}
+                                                        </td>
+                                                        <td class="partial_refund_fields current-edit" style="display:none;"></td>
+                                                    </tr>
+                                                {/if}
+                                                {if $tourism_tax_products > 0}
+                                                    <tr id="total_products">
+                                                        <td class="text-left">{l s='Tourism Tax on Products'}</td>
+                                                        <td class="amount text-right nowrap">
+                                                            {displayPrice price=$tourism_tax_products currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>

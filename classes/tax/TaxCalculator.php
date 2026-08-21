@@ -150,7 +150,8 @@ class TaxCalculatorCore
         $childrenAges = array(),
         $collectionType = null,
         $quantity = 1,
-        $idCurrency = null
+        $idCurrency = null,
+        &$validNightsByTax = null
     ) {
         $taxes_amounts = array();
         $tourismTaxIds = array();
@@ -184,27 +185,59 @@ class TaxCalculatorCore
                     continue;
                 }
 
+                $validFrom = null;
                 if (!empty($tourismTax->valid_from) && $tourismTax->valid_from !== '0000-00-00') {
                     $validFrom = new DateTime($tourismTax->valid_from);
-                    if ($checkIn < $validFrom) {
-                        continue;
-                    }
                 }
+                $validTo = null;
                 if (!empty($tourismTax->valid_to) && $tourismTax->valid_to !== '0000-00-00') {
                     $validTo = new DateTime($tourismTax->valid_to);
-                    if ($checkIn > $validTo) {
-                        continue;
-                    }
                 }
+                $specialDays = null;
                 if ($tourismTax->special_days) {
-                    $specialDays = json_decode($tourismTax->special_days, true);
-                    if (!is_array($specialDays) || !in_array(TaxConfiguration::DAY_KEYS[$isoDayIndex], $specialDays)) {
+                    $decoded = json_decode($tourismTax->special_days, true);
+                    $specialDays = is_array($decoded) ? $decoded : array();
+                }
+
+                $isPerNight = (bool) $tourismTax->per_night;
+
+                if ($isPerNight) {
+                    $validNights = 0;
+                    for ($i = 0; $i < $numNights; $i++) {
+                        $night = clone $checkIn;
+                        $night->modify('+' . $i . ' days');
+                        if ($validFrom && $night < $validFrom) {
+                            continue;
+                        }
+                        if ($validTo && $night > $validTo) {
+                            continue;
+                        }
+                        if ($specialDays !== null && !in_array(TaxConfiguration::DAY_KEYS[$night->format('N') - 1], $specialDays)) {
+                            continue;
+                        }
+                        $validNights++;
+                    }
+                    if ($validNights === 0) {
                         continue;
                     }
+                } else {
+                    if ($validFrom && $checkIn < $validFrom) {
+                        continue;
+                    }
+                    if ($validTo && $checkIn > $validTo) {
+                        continue;
+                    }
+                    if ($specialDays !== null && !in_array(TaxConfiguration::DAY_KEYS[$isoDayIndex], $specialDays)) {
+                        continue;
+                    }
+                    $validNights = $numNights;
+                }
+
+                if ($validNightsByTax !== null) {
+                    $validNightsByTax[$tax->id] = $validNights;
                 }
 
                 $taxType = (int) $tourismTax->calculation_type;
-                $isPerNight = (bool) $tourismTax->per_night;
 
                 $baseValue = (float) $tourismTax->tax_value;
                 if ($tourismTax->has_tiered_pricing) {
@@ -216,7 +249,7 @@ class TaxCalculatorCore
 
                 $adultMultiplier = 1;
                 if ($isPerNight) {
-                    $adultMultiplier *= $numNights;
+                    $adultMultiplier *= $validNights;
                 }
                 if ($tourismTax->per_person) {
                     $adultMultiplier *= $numAdults;
@@ -241,7 +274,7 @@ class TaxCalculatorCore
                         $tourismTax->has_child_age_range
                     );
                     if ($contribution['count'] > 0) {
-                        $nightMultiplier = $isPerNight ? $numNights : 1;
+                        $nightMultiplier = $isPerNight ? $validNights : 1;
                         $totalAmountChild = $contribution['total'] * $nightMultiplier;
                     }
                 }

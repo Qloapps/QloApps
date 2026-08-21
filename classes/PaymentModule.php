@@ -914,7 +914,7 @@ abstract class PaymentModuleCore extends Module
 
                                     if ($useTourismTax && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
                                         $hotelTaxContext = TaxConfiguration::resolveHotelAddressAndCollectionType($objCartBookingData->id_hotel, new Address((int) Cart::getIdAddressForTaxCalculation($idProduct)));
-                                        $numNights = max(1, (int) HotelHelper::getNumberOfDays($objBookingDetail->date_from, $objBookingDetail->date_to));
+                                        $numNights = max(1, HotelHelper::getNumberOfDays($objBookingDetail->date_from, $objBookingDetail->date_to));
                                         $numAdults = (int) $objCartBookingData->adults;
                                         $childAges = !empty($objCartBookingData->child_ages) ? (array) json_decode($objCartBookingData->child_ages, true) : array();
                                         $unitPriceTaxExcl = (float) $total_price['total_price_tax_excl'] / $numNights;

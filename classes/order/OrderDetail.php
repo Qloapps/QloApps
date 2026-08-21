@@ -356,9 +356,16 @@ class OrderDetailCore extends ObjectModel
 
         $computation_method = 1;
         $taxes = array();
+        $seenTaxIds = array();
         if ($results = Db::getInstance()->executeS($sql)) {
             foreach ($results as $result) {
-                $taxes[] = new Tax((int)$result['id_tax']);
+                $idTax = (int) $result['id_tax'];
+                if (isset($seenTaxIds[$idTax])) {
+
+                    continue;
+                }
+                $seenTaxIds[$idTax] = true;
+                $taxes[] = new Tax($idTax);
             }
 
             $computation_method = $result['tax_computation_method'];
@@ -454,26 +461,30 @@ class OrderDetailCore extends ObjectModel
                         0,
                         $taxGroupInfo['id_room_type'],
                 )) {
-                    $serviceProductData = array_shift($serviceProductData);
-                    $numDays = 1;
-                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
-                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
-                    ) {
-                        $numDays = 1;
+                    $quantity = 0;
+                    $totalPriceTaxExcl = 0.0;
+                    $firstServiceProduct = null;
+                    foreach ($serviceProductData as $bookingServiceData) {
+                        $bookingNumDays = 1;
+                        if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method) {
+                            $bookingNumDays = HotelHelper::getNumberOfDays($bookingServiceData['date_from'], $bookingServiceData['date_to']) ?: 1;
+                        }
+                        foreach ($bookingServiceData['additional_services'] as $item) {
+                            $itemQuantity = (isset($item['quantity']) ? $item['quantity'] : 0) * $bookingNumDays;
+                            $quantity += $itemQuantity;
+                            $totalPriceTaxExcl += $itemQuantity * (isset($item['unit_price_tax_excl']) ? $item['unit_price_tax_excl'] : 0);
+                            if ($firstServiceProduct === null) {
+                                $firstServiceProduct = $item;
+                            }
+                        }
                     }
 
-                    $quantity = array_reduce($serviceProductData['additional_services'], function ($totalQty, $item) {
-                        return $totalQty + (isset($item['quantity']) ? $item['quantity'] : 0);
-                    }, 0);
+                    $unit_price_tax_excl = $quantity > 0 ? ($totalPriceTaxExcl / $quantity) : 0;
 
-                    $firstServiceProduct = array_shift($serviceProductData['additional_services']);
-
-                    $unit_price_tax_excl = isset($firstServiceProduct['unit_price_tax_excl']) ? $firstServiceProduct['unit_price_tax_excl'] : 0;
-
-                    $quantity = $quantity * $numDays;
-
-                    $tax_manager = TaxManagerFactory::getManager($this->vat_address, (int)$firstServiceProduct['id_tax_rules_group']);
-                    $this->tax_calculator = $tax_manager->getTaxCalculator();
+                    if ($firstServiceProduct) {
+                        $tax_manager = TaxManagerFactory::getManager($this->vat_address, (int)$firstServiceProduct['id_tax_rules_group']);
+                        $this->tax_calculator = $tax_manager->getTaxCalculator();
+                    }
                 } elseif ($serviceProductData = $objServiceProductCartDetail->getServiceProductsInCart(
                     $idCart,
                     array(),
@@ -482,22 +493,21 @@ class OrderDetailCore extends ObjectModel
                     $taxGroupInfo['id_room_type'],
                     $this->product_id
                 )) {
-
-                    $quantity = array_reduce($serviceProductData, function ($totalQty, $item) {
-                        return $totalQty + (isset($item['quantity']) ? $item['quantity'] : 0);
-                    }, 0);
-
-                    $serviceProductData = array_shift($serviceProductData);
-                    $unit_price_tax_excl = isset($serviceProductData['unit_price_tax_excl']) ? $serviceProductData['unit_price_tax_excl'] : 0;
-
-                    $numDays = 1;
-                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
-                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
-                    ) {
-                        $numDays = 1;
+                    // Same sum-across-every-row fix as above, cart-side: don't let array_shift() collapse
+                    // the representative unit price/day-count down to just the first cart row.
+                    $quantity = 0;
+                    $totalPriceTaxExcl = 0.0;
+                    foreach ($serviceProductData as $cartServiceItem) {
+                        $itemNumDays = 1;
+                        if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method) {
+                            $itemNumDays = HotelHelper::getNumberOfDays($cartServiceItem['date_from'], $cartServiceItem['date_to']) ?: 1;
+                        }
+                        $itemQuantity = (isset($cartServiceItem['quantity']) ? $cartServiceItem['quantity'] : 0) * $itemNumDays;
+                        $quantity += $itemQuantity;
+                        $totalPriceTaxExcl += $itemQuantity * (isset($cartServiceItem['unit_price_tax_excl']) ? $cartServiceItem['unit_price_tax_excl'] : 0);
                     }
 
-                    $quantity = $quantity * $numDays;
+                    $unit_price_tax_excl = $quantity > 0 ? ($totalPriceTaxExcl / $quantity) : 0;
                 }
 
                 if ($this->tax_calculator == null) {
@@ -583,7 +593,10 @@ class OrderDetailCore extends ObjectModel
         $tax_manager = TaxManagerFactory::getManager($address, (int)Product::getIdTaxRulesGroupByIdProduct((int)$this->product_id, $this->context));
         $this->tax_calculator = $tax_manager->getTaxCalculator();
 
-        return $this->saveTaxCalculator($order, true);
+        $result = $this->saveTaxCalculator($order, true);
+        OrderTaxDetail::rescopeVatAfterReset((int) $this->id);
+
+        return $result;
     }
 
     /**
@@ -606,7 +619,22 @@ class OrderDetailCore extends ObjectModel
         $sql = 'SELECT * FROM `'._DB_PREFIX_.'order_tax_detail` t
 					WHERE t.`id_order_detail` = '.(int)$id_order_detail.'
 					AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'tax` tc WHERE tc.`id_tax` = t.`id_tax` AND tc.`is_tourism_tax` = 1)';
-        return Db::getInstance()->executeS($sql);
+        $rows = Db::getInstance()->executeS($sql);
+        if (!$rows) {
+            return $rows;
+        }
+
+        $seenTaxIds = array();
+        $deduped = array();
+        foreach ($rows as $row) {
+            if (isset($seenTaxIds[$row['id_tax']])) {
+                continue;
+            }
+            $seenTaxIds[$row['id_tax']] = true;
+            $deduped[] = $row;
+        }
+
+        return $deduped;
     }
 
     /*

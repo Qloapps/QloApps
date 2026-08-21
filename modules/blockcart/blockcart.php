@@ -334,10 +334,11 @@ class Blockcart extends Module
                 $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to'], null, $fullDate);
             } else {
                 if ($objProduct->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
-                    $addedProduct['unit_price'] = RoomTypeServiceProductPrice::getPrice(
+                    $addedProduct['unit_price'] = Product::getServiceProductPrice(
                         $objProduct->id,
-                        0,
                         isset($addedProduct['id_product_option']) ? $addedProduct['id_product_option'] : null,
+                        0,
+                        false,
                         $useTax,
                         $addedProduct['qty']
                     );
@@ -351,10 +352,11 @@ class Blockcart extends Module
                 } elseif ($objProduct->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
                     || $objProduct->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
                 ) {
-                    $addedProduct['unit_price'] = RoomTypeServiceProductPrice::getPrice(
+                    $addedProduct['unit_price'] = Product::getServiceProductPrice(
                         $objProduct->id,
-                        $addedProduct['id_hotel'],
                         isset($addedProduct['id_product_option']) ? $addedProduct['id_product_option'] : null,
+                        $addedProduct['id_hotel'],
+                        false,
                         $useTax,
                         $addedProduct['qty']
                     );

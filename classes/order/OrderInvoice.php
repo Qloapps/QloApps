@@ -892,13 +892,25 @@ class OrderInvoiceCore extends ObjectModel
     }
 
     /**
-     * Return tourism tax breakdown grouped by id_tax for invoice display.
+     * Return tourism tax breakdown grouped by id_tax for invoice display. Collapsed into a single
+     * combined row when the invoice's tax breakdown display is off — same rule every other tax
+     * category (rooms, services, ...) already applies via useOneAfterAnotherTaxComputationMethod().
      *
      * @return array  [['tax_name' => string, 'total_amount' => float], ...]
      */
     public function getTourismTaxBreakdown()
     {
-        return OrderTaxDetail::getBreakdownForInvoice((int) $this->id_order);
+        $breakdown = OrderTaxDetail::getBreakdownForInvoice((int) $this->id_order);
+        if (!$breakdown || $this->useOneAfterAnotherTaxComputationMethod()) {
+            return $breakdown;
+        }
+
+        $total = 0.0;
+        foreach ($breakdown as $row) {
+            $total += (float) $row['total_amount'];
+        }
+
+        return array(array('id_tax' => 0, 'tax_name' => '', 'total_amount' => $total));
     }
 
     /**
