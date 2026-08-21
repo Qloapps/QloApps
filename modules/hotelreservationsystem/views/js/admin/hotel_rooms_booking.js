@@ -45,22 +45,15 @@ $(document).ready(function() {
 
             },
             eventContent: function(info) {
-                if (info.event.extendedProps.is_notification) {
-                    return false;
+                if (!info.event.extendedProps.is_notification) {
+                    return { html: '<div class="fc-event-title">' + info.event.title.replace(/^(\S+)/, '<strong>$1</strong>') + '</div>' };
                 }
             },
             eventDidMount: function(info) {
                 if (info.event.extendedProps.is_notification) {
-                    if (info.event.extendedProps.data.stats.num_avail > 0) {
-                        $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#7EC77B');
-                    } else if (info.event.extendedProps.data.stats.num_part_avai > 0) {
-                        $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#FFC224');
-                    } else if ((info.event.extendedProps.data.stats.num_booked == info.event.extendedProps.data.stats.total_rooms) && info.event.extendedProps.data.stats.total_rooms != 0) {
-                        $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#00AFF0');
-                    } else {
-                        $(info.el).closest('td').find('.day-info svg circle').attr('fill', '#FF3838');
-                    }
-                    $(info.el).closest('td').find('.day-info').tooltip({
+                    var $cell = $(info.el).closest('td');
+                    $cell.css('background-color', info.event.backgroundColor);
+                    $cell.tooltip({
                         content: function()
                         {
                             $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
@@ -73,8 +66,13 @@ $(document).ready(function() {
                             });
                             return $('#date-stats-tooltop').html();
                         },
-                        items: "div",
+                        items: "td",
                         trigger : 'hover',
+                        position: {
+                            my: "left top",
+                            at: "left+50% bottom-50%",
+                            collision: "flipfit"
+                        },
                         show: {
                             delay: 100,
                         },
@@ -88,6 +86,13 @@ $(document).ready(function() {
                             }
 
                             if (typeof(event.originalEvent) === 'undefined') {
+                                return false;
+                            }
+
+                            // suppress cell tooltip when hovering the search result bar
+                            if ($(event.originalEvent.target).closest('.search-result-event').length) {
+                                ui.tooltip.remove();
+                                $(this).removeData('ui-tooltip-id').removeAttr('aria-describedby');
                                 return false;
                             }
 
@@ -113,8 +118,8 @@ $(document).ready(function() {
                         });
                     }
                 });
-                info.event.remove();
             } else {
+                $(info.el).addClass('search-result-event');
                 $(info.el).tooltip({
                     content: function()
                     {
@@ -134,6 +139,7 @@ $(document).ready(function() {
                     },
                     items: "div",
                     trigger : 'hover',
+                    track: true,
                     show: {
                         delay: 100,
                     },
@@ -172,12 +178,9 @@ $(document).ready(function() {
                             });
                         }
                     });
+                    info.el.style.borderLeftColor = info.event.extendedProps.data.eventColor;
+                    resizeSearchResultEventBar($(info.el));
                 }
-            },
-            dayCellDidMount: (arg)  => {
-
-                let svg = $('#svg-icon').html();
-                $(arg.el).find('.fc-daygrid-day-top').append('<a class="day-info">'+svg+'</a>');
             },
             datesSet: function(arg) {
                 if($('.fc-event').tooltip()) {
@@ -186,10 +189,40 @@ $(document).ready(function() {
             }
         });
         calendar.render();
+
+        var searchResultResizeTimer;
+        $(window).on('resize', function() {
+            clearTimeout(searchResultResizeTimer);
+            searchResultResizeTimer = setTimeout(function() {
+                $('#fullcalendar .fc-event.search-result-event').each(function() {
+                    resizeSearchResultEventBar($(this));
+                });
+            }, 150);
+        });
+    }
+
+    function resizeSearchResultEventBar($bar) {
+        requestAnimationFrame(function() {
+            var $td = $bar.closest('td');
+            if (!$td.length) {
+                return;
+            }
+            var cellHeight = $td.outerHeight();
+            if (!cellHeight) {
+                return;
+            }
+            $bar.css('transform', '');
+            $bar.css('height', (cellHeight * 0.35) + 'px');
+            var cellRect = $td.get(0).getBoundingClientRect();
+            var barRect = $bar.get(0).getBoundingClientRect();
+            var desiredTop = cellRect.top + (cellRect.height - barRect.height) / 2;
+            var delta = desiredTop - barRect.top;
+            $bar.css('transform', 'translateY(' + delta + 'px)');
+        });
     }
 
     function removeInitializedTooltips() {
-        $('#fullcalendar a.day-info, #fullcalendar .fc-daygrid-event').each(function () {
+        $('#fullcalendar td.fc-daygrid-day, #fullcalendar .fc-daygrid-event').each(function () {
             if ($(this).data('ui-tooltip')) {
                 $(this).tooltip('destroy');
             }
@@ -753,6 +786,7 @@ $(document).ready(function() {
         e.preventDefault();
 
         var booking_occupancy_wrapper = $(this).closest('.booking_occupancy_wrapper');
+        var max_child_in_room = $(booking_occupancy_wrapper).find('.max_children').val();
         var occupancy_block = '';
         var roomBlockIndex = parseInt($(booking_occupancy_wrapper).find(".occupancy_info_block").last().attr('occ_block_index'));
         roomBlockIndex += 1;

@@ -39,6 +39,7 @@
   <tab id="Credit_Slips" name="折讓單"/>
   <tab id="Statuses" name="狀態"/>
   <tab id="Order_Messages" name="訂單訊息"/>
+  <tab id="Guest_Registration" name="住客登記表"/>
   <tab id="Customers_1" name="客戶"/>
   <tab id="Addresses" name="地址"/>
   <tab id="Groups" name="群組"/>

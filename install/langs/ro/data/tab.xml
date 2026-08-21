@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="Note de credit"/>
   <tab id="Statuses" name="Stadii"/>
   <tab id="Order_Messages" name="Mesaje la comenzi"/>
+  <tab id="Guest_Registration" name="Card de înregistrare a oaspeților"/>
   <tab id="Customers_1" name="Clienți"/>
   <tab id="Addresses" name="Adrese"/>
   <tab id="Groups" name="Grupuri"/>

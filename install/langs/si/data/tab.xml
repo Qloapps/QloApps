@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="Dobropisi"/>
   <tab id="Statuses" name="Statusi"/>
   <tab id="Order_Messages" name="Sporočila ob naročilu"/>
+  <tab id="Guest_Registration" name="Kartica za registracijo gosta"/>
   <tab id="Customers_1" name="Kupci"/>
   <tab id="Addresses" name="Naslovi"/>
   <tab id="Groups" name="Skupine"/>
