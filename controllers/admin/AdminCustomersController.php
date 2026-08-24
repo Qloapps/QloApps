@@ -88,6 +88,7 @@ class AdminCustomersControllerCore extends AdminController
         foreach ($nationalities_result as $row) {
             $selected_nationalities[$row['id_country']] = $row['name'];
         }
+        $selected_nationalities[-1] = $this->l('Other');
 
         $selected_countries = array();
         $countries_result = Db::getInstance()->executeS('
@@ -337,7 +338,8 @@ class AdminCustomersControllerCore extends AdminController
         ad.company as address_company, ad.vat_number,
         ad.address1, ad.address2, ad.city, adstate.name as state,
         ad.postcode, adcountry.name as country, ad.phone as address_phone,
-        ad.phone_mobile, ad.dni, natcountry.name as nationality';
+        ad.phone_mobile, ad.dni,
+        (CASE WHEN a.id_country = -1 THEN \''.pSQL($this->l('Other')).'\' ELSE natcountry.name END) as nationality';
 
         // Check if we can add a customer
         if (Shop::isFeatureActive() && (Shop::getContext() == Shop::CONTEXT_ALL || Shop::getContext() == Shop::CONTEXT_GROUP)) {
@@ -630,7 +632,7 @@ class AdminCustomersControllerCore extends AdminController
                     'required' => (bool)(Configuration::get('PS_CUSTOMER_NATIONALITY') && Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY')),
                     'col' => '4',
                     'options' => array(
-                        'query' => Country::getCountries($this->context->language->id),
+                        'query' => Customer::getNationalities($this->context->language->id),
                         'id' => 'id_country',
                         'name' => 'name',
                         'default' => array(
@@ -997,7 +999,9 @@ class AdminCustomersControllerCore extends AdminController
         $gender_image = $gender->getImage();
 
         $nationality = '';
-        if ($customer->id_country) {
+        if ($customer->id_country == -1) {
+            $nationality = Translate::getAdminTranslation('Other', 'AdminCustomersController');
+        } elseif ($customer->id_country) {
             $nationalityCountry = new Country($customer->id_country, $this->context->language->id);
             if (Validate::isLoadedObject($nationalityCountry)) {
                 $nationality = $nationalityCountry->name;

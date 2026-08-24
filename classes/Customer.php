@@ -173,7 +173,7 @@ class CustomerCore extends ObjectModel
             'passwd' =>                    array('type' => self::TYPE_STRING, 'validate' => 'isPasswd', 'required' => true, 'size' => 60),
             'last_passwd_gen' =>            array('type' => self::TYPE_STRING, 'copy_post' => false),
             'id_gender' =>                    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
-            'id_country' =>                array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'copy_post' => false),
+            'id_country' =>                array('type' => self::TYPE_INT, 'validate' => 'isInt', 'copy_post' => false),
             'birthday' =>                    array('type' => self::TYPE_DATE, 'validate' => 'isBirthDate'),
             'newsletter' =>                array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'newsletter_date_add' =>        array('type' => self::TYPE_DATE,'copy_post' => false),
@@ -837,6 +837,16 @@ class CustomerCore extends ObjectModel
         }
 
         return (int) Configuration::get('PS_COUNTRY_DEFAULT');
+    }
+    public static function getNationalities($id_lang)
+    {
+        $nationalities = Country::getCountries((int) $id_lang);
+        $nationalities[-1] = array(
+            'id_country' => -1,
+            'name' => Translate::getAdminTranslation('Other', 'AdminCustomersController'),
+        );
+
+        return $nationalities;
     }
 
     public function toggleStatus()

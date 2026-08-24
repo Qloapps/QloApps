@@ -562,7 +562,7 @@ class OrderOpcControllerCore extends ParentOrderController
         $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
         $this->context->smarty->assign('nationality', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY'));
         $this->context->smarty->assign('nationality_mandatory', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY'));
-        $this->context->smarty->assign('nationality_countries', Country::getCountries($this->context->language->id));
+        $this->context->smarty->assign('nationality_countries', Customer::getNationalities($this->context->language->id));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
         $this->context->smarty->assign('field_required', $this->context->customer->validateFieldsRequiredDatabase());

@@ -75,7 +75,7 @@
 					<div class="row">
 						<label class="control-label col-lg-3">{l s='Nationality'}</label>
 						<div class="col-lg-9">
-							<p class="form-control-static">{if $nationality}{$nationality}{else}{l s='Unknown'}{/if}</p>
+							<p class="form-control-static">{if $nationality}{$nationality}{else}--{/if}</p>
 						</div>
 					</div>
 					<div class="row">
