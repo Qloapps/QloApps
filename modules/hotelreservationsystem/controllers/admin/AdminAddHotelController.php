@@ -211,7 +211,7 @@ class AdminAddHotelController extends ModuleAdminController
         }
 
         $smartyVars['state_var'] = $stateOptions;
-        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('PS_MAP_ID') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
+        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
         $smartyVars['PS_MAX_CHECKOUT_OFFSET'] = (int) Configuration::get('PS_MAX_CHECKOUT_OFFSET');
         $smartyVars['PS_MIN_BOOKING_OFFSET'] = (int) Configuration::get('PS_MIN_BOOKING_OFFSET');
@@ -260,8 +260,8 @@ class AdminAddHotelController extends ModuleAdminController
         $maxCheckoutOffset = trim(Tools::getValue('max_checkout_offset'));
         $enableUseGlobalMinBookingOffset = Tools::getValue('enable_use_global_min_booking_offset');
         $minBookingOffset = trim(Tools::getValue('min_booking_offset'));
-        $latitude = Tools::getValue('loclatitude');
-        $longitude = Tools::getValue('loclongitude');
+        $latitude = number_format((float) Tools::getValue('loclatitude'), 8, '.', '');
+        $longitude = number_format((float) Tools::getValue('loclongitude'), 8, '.', '');
         $map_formated_address = Tools::getValue('locformatedAddr');
         $map_input_text = Tools::getValue('googleInputField');
         $hotelAmenities = Tools::getValue('id_amenities', array());
@@ -613,8 +613,8 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelBranch->check_in = $check_in;
             $objHotelBranch->check_out = $check_out;
             $objHotelBranch->rating = $rating;
-            $objHotelBranch->latitude = Validate::isFloat($latitude) ? Tools::ps_round($latitude, 8) : $latitude;
-            $objHotelBranch->longitude = Validate::isFloat($longitude) ? Tools::ps_round($longitude, 8) : $longitude;
+            $objHotelBranch->latitude = Validate::isCoordinate($latitude) ? Tools::ps_round($latitude, 8) : $latitude;
+            $objHotelBranch->longitude = Validate::isCoordinate($longitude) ? Tools::ps_round($longitude, 8) : $longitude;
             $objHotelBranch->map_formated_address = $map_formated_address;
             $objHotelBranch->map_input_text = $map_input_text;
             $objHotelBranch->save();
@@ -997,7 +997,7 @@ class AdminAddHotelController extends ModuleAdminController
         // GOOGLE MAP
         $language = $this->context->language;
         $country = $this->context->country;
-        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && $PS_MAP_ID) {
+        if ($PS_API_KEY = Configuration::get('PS_API_KEY')) {
             $this->addJS(
                 'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places,marker&loading=async&language='.
                 $language->iso_code.'&region='.$country->iso_code.'&callback=initGoogleMaps'

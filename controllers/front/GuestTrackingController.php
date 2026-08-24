@@ -641,7 +641,6 @@ class GuestTrackingControllerCore extends FrontController
                             if (Validate::isLoadedObject($objHotelBranchInformation)) {
                                 if (($apiKey = Configuration::get('PS_API_KEY'))
                                     && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
-                                    && ($PS_MAP_ID = Configuration::get('PS_MAP_ID'))
                                 ) {
                                     if (floatval($objHotelBranchInformation->latitude) != 0
                                         && floatval($objHotelBranchInformation->longitude) != 0
@@ -649,7 +648,7 @@ class GuestTrackingControllerCore extends FrontController
                                         Media::addJsDef(array(
                                             'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
                                             'initiateMap' => 1,
-                                            'PS_MAP_ID' => $PS_MAP_ID,
+                                            'PS_MAP_ID' => Configuration::get('PS_MAP_ID'),
                                         ));
 
                                         $this->addJS(
