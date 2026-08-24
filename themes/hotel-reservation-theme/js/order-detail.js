@@ -139,25 +139,38 @@ function initMap() {
             lat: Number($(this).attr('latitude')),
             lng: Number($(this).attr('longitude')),
         };
-        const map = new google.maps.Map(element, {
+        const mapOptions = {
             zoom: 10,
             center: hotelLocation,
             disableDefaultUI: true,
             fullscreenControl: true,
-            mapId: PS_MAP_ID
-        });
+        };
+        if (PS_MAP_ID) {
+            mapOptions.mapId = PS_MAP_ID;
+        }
+        const map = new google.maps.Map(element, mapOptions);
 
         let icon = document.createElement('img');
         icon.src = PS_STORES_ICON;
         icon.style.width = '24px';
         icon.style.height = '24px';
 
-        const marker = new google.maps.marker.AdvancedMarkerElement({
-            position: hotelLocation,
-            map: map,
-            title: location.hotel_name,
-            content: icon,
-        });
+        let marker;
+        if (PS_MAP_ID) {
+            marker = new google.maps.marker.AdvancedMarkerElement({
+                position: hotelLocation,
+                map: map,
+                title: location.hotel_name,
+                content: icon,
+            });
+        } else {
+            marker = new google.maps.Marker({
+                position: hotelLocation,
+                map: map,
+                title: location.hotel_name,
+                icon: PS_STORES_ICON,
+            });
+        }
 
         marker.query = location.query || null;
         marker.latitude = hotelLocation.lat;
@@ -338,6 +351,7 @@ $(document).on('click', '.btn-view-extra-services', function(e) {
 
     let idProduct = $(this).data('id_product');
     let idOrder = $(this).data('id_order');
+    let secureKey = $(this).data('secure_key');
     let dateFrom = $(this).data('date_from');
     let dateTo = $(this).data('date_to');
 
@@ -354,6 +368,7 @@ $(document).on('click', '.btn-view-extra-services', function(e) {
             date_to: dateTo,
             id_product: idProduct,
             id_order: idOrder,
+            secure_key: secureKey,
             action: 'getRoomTypeBookingDemands',
             ajax: true,
             token: static_token,

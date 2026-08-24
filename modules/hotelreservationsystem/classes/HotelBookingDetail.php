@@ -1779,19 +1779,15 @@ class HotelBookingDetail extends ObjectModel
         if (!$only_search_data) {
             if (!empty($bookingData)) {
                 foreach ($bookingData['rm_data'] as $key => $value) {
-                    $product_feature = Product::getFrontFeaturesStatic($context->language->id, $value['id_product']);
-                    $prod_amen = array();
+                    // featured amenities for display in room type list
+                    $product_feature = HotelRoomTypeAmenities::getAmenities(
+                        $value['id_product'],
+                        $context->language->id,
+                        true
+                    );
                     if (!empty($amenities) && $amenities) {
-                        $prod_amen = $amenities;
-                        foreach ($product_feature as $a_key => $a_val) {
-                            if (($pa_key = array_search($a_val['id_feature'], $prod_amen)) !== false) {
-                                unset($prod_amen[$pa_key]);
-                                if (empty($prod_amen)) {
-                                    break;
-                                }
-                            }
-                        }
-                        if (!empty($prod_amen)) {
+                        $roomAmenityIds = array_column(HotelRoomTypeAmenities::getAmenities($value['id_product']), 'id');
+                        if (array_diff($amenities, $roomAmenityIds)) {
                             unset($bookingData['rm_data'][$key]);
                             continue;
                         }
