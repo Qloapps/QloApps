@@ -84,11 +84,15 @@ var GoogleMapsManager = {
         if (!this.map) {
             var that = this;
             that.setDefaultLatLng(function() {
-                that.map = new google.maps.Map($(that.mapDiv).get(0), {
+                var mapOptions = {
                     zoom: that.defaultZoom,
                     clickableIcons: true,
-                    mapId: PS_MAP_ID
-                });
+                };
+                if (PS_MAP_ID) {
+                    mapOptions.mapId = PS_MAP_ID;
+                }
+                that.map = new google.maps.Map($(that.mapDiv).get(0), mapOptions);
+                google.maps.event.trigger(that.map, 'resize');
                 that.map.setCenter(that.defaultLatLng);
                 if (that.defaultLatLng && that.formattedAddress) {
                     that.addMarker(that.defaultLatLng, null, that.formattedAddress);
@@ -171,12 +175,22 @@ var GoogleMapsManager = {
         icon.style.width = '24px';
         icon.style.height = '24px';
 
-        var marker = new google.maps.marker.AdvancedMarkerElement({
-            position: latLng,
-            map: that.map,
-            content: icon,
-            draggable: true,
-        });
+        var marker;
+        if (PS_MAP_ID) {
+            marker = new google.maps.marker.AdvancedMarkerElement({
+                position: latLng,
+                map: that.map,
+                content: icon,
+                draggable: true,
+            });
+        } else {
+            marker = new google.maps.Marker({
+                position: latLng,
+                map: that.map,
+                icon: PS_STORES_ICON,
+                draggable: true,
+            });
+        }
         that.markers.push(marker);
         marker.addListener('dragend', function(e) {
             var latLng = {
@@ -234,10 +248,10 @@ var GoogleMapsManager = {
                 that.clearAllMarkers();
             });
 
-            var latLng = marker.position;
+            var latLng = marker.position ? marker.position : marker.getPosition();
             that.setFormVars({
-                lat: latLng.lat,
-                lng: latLng.lng,
+                lat: typeof latLng.lat === 'function' ? latLng.lat() : latLng.lat,
+                lng: typeof latLng.lng === 'function' ? latLng.lng() : latLng.lng,
                 formattedAddress: content,
                 inputText: $('#pac-input').val(),
             });
