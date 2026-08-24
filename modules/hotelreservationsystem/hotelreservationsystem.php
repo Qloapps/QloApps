@@ -326,8 +326,8 @@ class HotelReservationSystem extends Module
         if (Tools::getValue('controller') == 'category') {
             if (($apiKey = Configuration::get('PS_API_KEY'))
                 && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
-                && ($PS_MAP_ID = Configuration::get('PS_MAP_ID'))
             ) {
+                $PS_MAP_ID = Configuration::get('PS_MAP_ID');
                 $idCategory = Tools::getValue('id_category');
                 $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idCategory);
                 $objHotel = new HotelBranchInformation($idHotel, $this->context->language->id);
