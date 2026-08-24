@@ -95,7 +95,7 @@
 				<li>
 					<a href="#hotel-features" data-toggle="tab">
 						<i class="icon-list-alt"></i>
-						{l s='Features' mod='hotelreservationsystem'}
+						{l s='Amenities' mod='hotelreservationsystem'}
 					</a>
 				</li>
 				{hook h='displayAdminAddHotelFormTab' id_hotel=$hook_arg_id_hotel}
@@ -610,22 +610,43 @@
 				</div>
 				<div class="tab-pane" id="hotel-features">
 					{hook h='displayAdminAddHotelFormFeaturesTabBefore' id_hotel=$hook_arg_id_hotel}
-					{if isset($hotel_feature_tree)}
+					<div class="alert alert-info">
+						<p>{l s='If you want to add a new amenity, please use the following link.'}
+							<a href="{$link->getAdminLink('AdminHotelAmenities')|escape:'html':'UTF-8'}" class="btn btn-link button" target="_blank">
+								<i class="icon-plus-sign"></i> {l s='Manage amenities'} <i class="icon-external-link-sign"></i>
+							</a>
+						</p>
+					</div>
+					{if isset($hotel_amenity_tree)}
 						<div class="form-group">
-							<label for="hotel_feature" class="control-label col-sm-3">
-								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select features for this hotel.' mod='hotelreservationsystem'}'>{l s='Select feature' mod='hotelreservationsystem'}</span>
+							<label for="hotel_amenity" class="control-label col-sm-3">
+								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select amenities for this hotel.' mod='hotelreservationsystem'}'>{l s='Select amenities' mod='hotelreservationsystem'}</span>
 							</label>
-							<div class="col-xs-7 hotel_features_tree">
-								{$hotel_feature_tree}
+							<div class="col-xs-7 hotel_amenities_tree">
+								{$hotel_amenity_tree}
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label class="control-label col-sm-3">
+								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select which of the chosen amenities should be featured for this hotel.' mod='hotelreservationsystem'}'>{l s='Featured amenities' mod='hotelreservationsystem'}</span>
+							</label>
+							<div class="col-sm-7">
+								<select name="hotel_featured_amenities[]" id="htl_featured_amenities" class="form-control" multiple>
+								</select>
+							</div>
+						</div>
+
+						<script type="text/javascript">
+						var htlFeaturedAmenityIds = {if isset($hotel_featured_amenity_ids)}{$hotel_featured_amenity_ids|json_encode}{else}[]{/if};
+						</script>
 					{elseif isset($hotel_info.id) && $hotel_info.id}
 						<div class="alert alert-warning">
-							{l s='No features created yet.' mod='hotelreservationsystem'} {l s='You can create features by visiting ' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminHotelFeatures')}">{l s='manage hotel features.' mod='hotelreservationsystem'}</a>
+							{l s='No amenities created yet.' mod='hotelreservationsystem'} {l s='You can create amenities by visiting ' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminHotelAmenities')}">{l s='manage hotel amenities.' mod='hotelreservationsystem'}</a>
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save hotel information before assigning hotel features.' mod='hotelreservationsystem'}
+							{l s='Please save hotel information before assigning hotel amenities.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 

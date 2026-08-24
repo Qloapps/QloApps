@@ -72,6 +72,7 @@ class AdminOrdersControllerCore extends AdminController
         ) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests,
         (SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as los,
         hbd.`id_room` AS id_room_information,
+        (SELECT GROUP_CONCAT(CONCAT(ps.period, \'~\', ps.cnt) ORDER BY ps.period SEPARATOR \'::\') FROM (SELECT CONCAT(hbd.`date_from`, \'|\', hbd.`date_to`) AS period, COUNT(*) AS cnt FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order` GROUP BY hbd.`date_from`, hbd.`date_to`) AS ps) AS stay_periods,
         (SELECT COUNT(spod.`id_service_product_order_detail`) FROM `'._DB_PREFIX_.'service_product_order_detail` spod WHERE spod.`id_order` = a.`id_order` AND spod.`id_htl_booking_detail`=0) as num_products';
 
         $this->_join = '
@@ -196,6 +197,15 @@ class AdminOrdersControllerCore extends AdminController
                 'type'=>'date',
                 'displayed' => false,
             ),
+            'stay_periods' => array(
+                'title' => $this->l('Stay Periods'),
+                'type' => 'text',
+                'callback' => 'formatStayPeriods',
+                'optional' => true,
+                'search' => false,
+                'displayed' => true,
+                'visible_default' => true,
+            ),
             'total_guests' => array(
                 'title' => $this->l('Guests'),
                 'type' => 'range',
@@ -212,7 +222,7 @@ class AdminOrdersControllerCore extends AdminController
                 'visible_default' => true
             ),
             'los' => array(
-                'title' => $this->l('Stay period'),
+                'title' => $this->l('Stay duration'),
                 'align' => 'text-center',
                 'type' => 'range',
                 'havingFilter' => true,
@@ -359,6 +369,43 @@ class AdminOrdersControllerCore extends AdminController
         return Tools::displayPrice($echo, (int)$idCurrency);
     }
 
+    public function formatStayPeriods($value, $row)
+    {
+        if (empty($value)) {
+            return '--';
+        }
+
+        $stayPeriods = array();
+        foreach (explode('::', $value) as $stays) {
+            $countStays = explode('~', $stays);
+            $stayDates  = explode('|', $countStays[0]);
+            if (count($stayDates) === 2) {
+                $stayPeriods[] = array(
+                    'from'  => Tools::displayDate(trim($stayDates[0])),
+                    'to'    => Tools::displayDate(trim($stayDates[1])),
+                    'count' => isset($countStays[1]) ? (int)$countStays[1] : 1,
+                );
+            }
+        }
+
+        $datesDisplay = array();
+        foreach (array_slice($stayPeriods, 0, 1) as $stayPeriod) {
+            $datesDisplay[] = $stayPeriod['from'].' - '.$stayPeriod['to'];
+        }
+
+        $stayPeriodHtml = implode('<br>', $datesDisplay);
+        $uniqueStayPeriods = count($stayPeriods);
+
+        if ($uniqueStayPeriods > 1) {
+            $this->context->smarty->assign(array(
+                'stay_periods' => $stayPeriods,
+                'extra_stay_periods_count' => $uniqueStayPeriods - 1,
+            ));
+            $stayPeriodHtml .= ' '.$this->createTemplate('_stay_periods_tooltip.tpl')->fetch();
+        }
+        return $stayPeriodHtml;
+    }
+
     public function initPageHeaderToolbar()
     {
         if (empty($this->display)) {
@@ -484,6 +531,22 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 $objHotelAdvancedPayment = new HotelAdvancedPayment();
+                $adminCartsAccess = Profile::getProfileAccess(
+                    (int) $this->context->employee->id_profile,
+                    (int) Tab::getIdFromClassName('AdminCarts')
+                );
+                $adminCustomersAccess = Profile::getProfileAccess(
+                    (int) $this->context->employee->id_profile,
+                    (int) Tab::getIdFromClassName('AdminCustomers')
+                );
+                $adminCartRulesAccess = Profile::getProfileAccess(
+                    (int) $this->context->employee->id_profile,
+                    (int) Tab::getIdFromClassName('AdminCartRules')
+                );
+                $adminAddressesAccess = Profile::getProfileAccess(
+                    (int) $this->context->employee->id_profile,
+                    (int) Tab::getIdFromClassName('AdminAddresses')
+                );
                 $this->context->smarty->assign(array(
                     'order_total' => $cart->getOrderTotal(true),
                     'is_advance_payment_active' => $objHotelAdvancedPayment->isAdvancePaymentAvailableForCurrentCart(),
@@ -497,6 +560,11 @@ class AdminOrdersControllerCore extends AdminController
                     'payment_types' => $paymentTypes,
                     'PAYMENT_TYPE_PAY_AT_HOTEL' => OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL,
                     'currency' => new Currency((int)$cart->id_currency),
+                    'can_edit_booking_carts' => (!empty($adminCartsAccess['edit']) && (int) $adminCartsAccess['edit'] === 1),
+                    'can_add_customers' => (!empty($adminCustomersAccess['add']) && (int) $adminCustomersAccess['add'] === 1),
+                    'can_add_vouchers' => (!empty($adminCartRulesAccess['add']) && (int) $adminCartRulesAccess['add'] === 1),
+                    'can_add_addresses' => (!empty($adminAddressesAccess['add']) && (int) $adminAddressesAccess['add'] === 1),
+                    'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
                     'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 ));
@@ -1354,7 +1422,6 @@ class AdminOrdersControllerCore extends AdminController
 
         $this->addJqueryUI('ui.datepicker');
         $this->addJqueryUI('ui.tooltip', 'base', true);
-
         $this->addJS(_PS_JS_DIR_.'vendor/d3.v3.min.js');
 
         if ($this->display == 'view') {
@@ -3950,10 +4017,11 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = $this->l('Please select a file to upload.');
             } elseif ($objHotelBookingDocument->fileInfo['size'] > Tools::getMaxUploadSize()) {
                 $this->errors[] = $this->l('Uploaded file size is too large.');
-            } elseif(!(ImageManager::isRealImage($objHotelBookingDocument->fileInfo['tmp_name'])
-                || $objHotelBookingDocument->fileInfo['mime'] == 'application/pdf')
-            ) {
-                $this->errors[] = $this->l('Please upload an image or a PDF file only. Allowed image formats: .gif, .jpg, .jpeg and .png');
+            } else {
+                $objHotelBookingDocument->setFileType();
+                if (!$objHotelBookingDocument->file_type) {
+                    $this->errors[] = $this->l('Please upload an image or a PDF file only. Allowed image formats: .gif, .jpg, .jpeg and .png');
+                }
             }
         } else {
             $this->errors[] = Tools::displayError('You do not have permission to edit this order.');
