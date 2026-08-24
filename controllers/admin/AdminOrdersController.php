@@ -3969,10 +3969,11 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = $this->l('Please select a file to upload.');
             } elseif ($objHotelBookingDocument->fileInfo['size'] > Tools::getMaxUploadSize()) {
                 $this->errors[] = $this->l('Uploaded file size is too large.');
-            } elseif(!(ImageManager::isRealImage($objHotelBookingDocument->fileInfo['tmp_name'])
-                || $objHotelBookingDocument->fileInfo['mime'] == 'application/pdf')
-            ) {
-                $this->errors[] = $this->l('Please upload an image or a PDF file only. Allowed image formats: .gif, .jpg, .jpeg and .png');
+            } else {
+                $objHotelBookingDocument->setFileType();
+                if (!$objHotelBookingDocument->file_type) {
+                    $this->errors[] = $this->l('Please upload an image or a PDF file only. Allowed image formats: .gif, .jpg, .jpeg and .png');
+                }
             }
         } else {
             $this->errors[] = Tools::displayError('You do not have permission to edit this order.');
