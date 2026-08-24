@@ -60,7 +60,13 @@
 											{if !empty($room_v['feature'])}
 												<p class="rm_amenities_cont">
 													{foreach from=$room_v['feature'] key=feat_k item=feat_v}
-														<img title="{$feat_v.name|escape:'htmlall':'UTF-8'}" src="{$link->getMediaLink("`$feat_img_dir`{$feat_v.value}")|escape:'htmlall':'UTF-8'}" class="rm_amen">
+														{if $feat_v.logo_type == 'icon' && $feat_v.logo}
+															<i class="{$feat_v.logo|escape:'htmlall':'UTF-8'} rm_amen" title="{$feat_v.name|escape:'htmlall':'UTF-8'}"></i>
+														{elseif $feat_v.logo_type == 'image' && $feat_v.logo}
+															<img title="{$feat_v.name|escape:'htmlall':'UTF-8'}"
+																 src="{$amenity_img_dir|escape:'htmlall':'UTF-8'}{$feat_v.id|intval}.jpg"
+																 class="rm_amen" />
+														{/if}
 													{/foreach}
 												</p>
 											{/if}
