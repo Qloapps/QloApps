@@ -97,11 +97,13 @@ class WkPaypalCommerceWebhook
                     if ($eventData['event_type'] == 'CHECKOUT.ORDER.COMPLETED') {
                         $cartID = $transactionData['id_cart'];
                         $objCart = new Cart($cartID);
-                        if ($objCart->is_advance_payment) {
-                            $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-                        } else {
-                            $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
-                        }
+                        $capturedAmount = isset($purchase['payments']['captures'][0]['amount']['value'])
+                            ? (float)$purchase['payments']['captures'][0]['amount']['value']
+                            : 0;
+                        $fullTotal = (float)$objCart->getOrderTotal(true, Cart::BOTH);
+                        $orderStatus = $capturedAmount >= $fullTotal
+                            ? Configuration::get('PS_OS_PAYMENT_ACCEPTED')
+                            : Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                         if ($orders = WkPaypalCommerceHelper::getOrdersByCartId($cartID)) {
                             foreach ($orders as $order) {
                                 $this->updatePaymentStatus(
@@ -127,11 +129,13 @@ class WkPaypalCommerceWebhook
         )) {
             $cartID = $transactionData['id_cart'];
             $objCart = new Cart($cartID);
-            if ($objCart->is_advance_payment) {
-                $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-            } else {
-                $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
-            }
+            $capturedAmount = isset($eventData['resource']['amount']['value'])
+                ? (float)$eventData['resource']['amount']['value']
+                : 0;
+            $fullTotal = (float)$objCart->getOrderTotal(true, Cart::BOTH);
+            $orderStatus = $capturedAmount >= $fullTotal
+                ? Configuration::get('PS_OS_PAYMENT_ACCEPTED')
+                : Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
             if ($orders = WkPaypalCommerceHelper::getOrdersByCartId($cartID)) {
                 foreach ($orders as $order) {
                     $this->updatePaymentStatus(
