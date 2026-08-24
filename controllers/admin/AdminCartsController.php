@@ -695,6 +695,7 @@ class AdminCartsControllerCore extends AdminController
                 'cart_detail_data' => $cart_detail_data,
                 'cart' => $objCart,
                 'currency' => new Currency((int)$this->context->cart->id_currency),
+                'can_edit_booking_carts' => ($this->tabAccess['edit'] === 1),
                 'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 'ajax' => true
             ));
@@ -1265,7 +1266,8 @@ class AdminCartsControllerCore extends AdminController
                 'serviceProducts' => $serviceProducts,
                 'selectedRoomServiceProduct' => $selectedRoomServiceProduct,
                 'customServiceAllowed' => Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING'),
-                'loaderImg' => $this->context->link->getMediaLink(_PS_IMG_.'admin/ajax-loader.gif')
+                'loaderImg' => $this->context->link->getMediaLink(_PS_IMG_.'admin/ajax-loader.gif'),
+                'can_edit' => $this->tabAccess['edit'],
             ));
 
             $response['html_exta_demands'] = $this->context->smarty->fetch(
@@ -1574,6 +1576,7 @@ class AdminCartsControllerCore extends AdminController
                 'serviceProducts' => $serviceProducts,
                 'selectedRoomServiceProduct' => $selectedRoomServiceProduct,
                 'customServiceAllowed' => Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING'),
+                'can_edit' => $this->tabAccess['edit'],
             ));
 
             $servicesTpl = $this->context->smarty->fetch(
@@ -1589,7 +1592,9 @@ class AdminCartsControllerCore extends AdminController
     {
         $response = array('hasError' => false);
         // Check tab access is allowed to edit
-        if ($this->tabAccess['add'] === 1) {
+        $canAdd = ($this->tabAccess['add'] === 1);
+        $canEdit = ($this->tabAccess['edit'] === 1);
+        if ($canAdd || $canEdit) {
             $idCartBooking = Tools::getValue('id_hotel_cart_booking');
             if (Validate::isLoadedObject($objHotelCartBookingData = new HotelCartBookingData($idCartBooking))) {
                 $objCart = new Cart($objHotelCartBookingData->id_cart);
@@ -1667,7 +1672,7 @@ class AdminCartsControllerCore extends AdminController
                             ))) {
                                 $originalPrice = Product::getPriceStatic($idServiceProduct, false);
                                 // if price is different than the original service price then update the price
-                                if ($operator == 'up' && $originalPrice != $unitPrice) {
+                                if ($canEdit && $operator == 'up' && $originalPrice != $unitPrice) {
                                     if ($specificPriceInfo = SpecificPrice::getSpecificPrice(
                                         (int)$idServiceProduct,
                                         0,

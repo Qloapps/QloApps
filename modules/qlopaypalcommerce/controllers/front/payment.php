@@ -126,20 +126,19 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                             $transaction_id = $this->saveOrderData($returnData);
                             if ($paypalOrderID) {
                                 $currency = $this->context->currency;
-                                $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
-                                if ($cart->is_advance_payment) {
-                                    $total = (float)$cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
-                                } else {
-                                    $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
-                                }
+                                // Order status/amount must reflect what PayPal actually captured,
+                                // not the cart's is_advance_payment flag (still editable by the
+                                // customer after payment, so it cannot be trusted here).
+                                $capturedAmount = isset($returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value']) ?
+                                 (float) $returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['value'] : 0;
+                                $fullTotal = (float) $cart->getOrderTotal(true, Cart::BOTH);
+                                $isFullyPaid = $capturedAmount >= $fullTotal;
 
                                 // set order status
                                 if ($returnData['data']['status'] == 'COMPLETED') {
-                                    if ($cart->is_advance_payment) {
-                                        $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-                                    } else {
-                                        $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
-                                    }
+                                    $orderStatus = $isFullyPaid
+                                        ? Configuration::get('PS_OS_PAYMENT_ACCEPTED')
+                                        : Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                                 } else {
                                     $orderStatus = Configuration::get('PS_OS_AWAITING_PAYMENT');
                                 }
@@ -149,7 +148,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                 $this->module->validateOrder(
                                     $cart->id,
                                     $orderStatus,
-                                    $total,
+                                    $capturedAmount,
                                     $this->module->l('PayPal Checkout', 'payment'),
                                     null,
                                     $extraVars,

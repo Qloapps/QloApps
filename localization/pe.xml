@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <localizationPack name="Peru">
   <currencies>
-    <currency name="Nuevo Sol" iso_code="PEN" iso_code_num="604" sign="S/." blank="1" conversion_rate="2.784499" format="1" decimals="0"/>
+    <currency name="Nuevo Sol" iso_code="PEN" iso_code_num="604" sign="S/." blank="1" format="1" decimals="0"/>
   </currencies>
   <languages>
+    <language iso_code="pe"/>
     <language iso_code="es"/>
   </languages>
   <taxes>
@@ -11,9 +12,36 @@
       <taxRule iso_code_country="pe" behavior="1" id_tax="53"/>
       <taxRule iso_code_country="pe" behavior="1" id_tax="54"/>
     </taxRulesGroup>
-    <tax id="53" name="Impuesto General a la Ventas" rate="18.000"/>
+    <tax id="53" name="Impuesto General a la Ventas" rate="16.000"/>
     <tax id="54" name="Impuesto de Promocion Municipal" rate="2.000"/>
   </taxes>
+	<states>
+		<state name="Amazonas" iso_code="AMA" country="PE" zone="South America" />
+		<state name="Ancash" iso_code="ANC" country="PE" zone="South America" />
+		<state name="Apurímac" iso_code="APU" country="PE" zone="South America" />
+		<state name="Arequipa" iso_code="ARE" country="PE" zone="South America" />
+		<state name="Ayacucho" iso_code="AYA" country="PE" zone="South America" />
+		<state name="Cajamarca" iso_code="CAJ" country="PE" zone="South America" />
+		<state name="Callao" iso_code="CAL" country="PE" zone="South America" />
+		<state name="Cusco" iso_code="CUS" country="PE" zone="South America" />
+		<state name="Huancavelica" iso_code="HUV" country="PE" zone="South America" />
+		<state name="Huánuco" iso_code="HUC" country="PE" zone="South America" />
+		<state name="Ica" iso_code="ICA" country="PE" zone="South America" />
+		<state name="Junín" iso_code="JUN" country="PE" zone="South America" />
+		<state name="La Libertad" iso_code="LAL" country="PE" zone="South America" />
+		<state name="Lambayeque" iso_code="LAM" country="PE" zone="South America" />
+		<state name="Lima" iso_code="LIM" country="PE" zone="South America" />
+		<state name="Loreto" iso_code="LOR" country="PE" zone="South America" />
+		<state name="Madre de Dios" iso_code="MDD" country="PE" zone="South America" />
+		<state name="Moquegua" iso_code="MOQ" country="PE" zone="South America" />
+		<state name="Pasco" iso_code="PAS" country="PE" zone="South America" />
+		<state name="Piura" iso_code="PIU" country="PE" zone="South America" />
+		<state name="Puno" iso_code="PUN" country="PE" zone="South America" />
+		<state name="San Martín" iso_code="SAM" country="PE" zone="South America" />
+		<state name="Tacna" iso_code="TAC" country="PE" zone="South America" />
+		<state name="Tumbes" iso_code="TUM" country="PE" zone="South America" />
+		<state name="Ucayali" iso_code="UCA" country="PE" zone="South America" />
+	</states>
   <units>
     <unit type="weight" value="kg"/>
     <unit type="volume" value="L"/>

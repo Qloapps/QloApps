@@ -249,9 +249,9 @@ p.room_cat_data
 
 .indi_cont
 {
-    margin: 10px 0px;
+    display: flex;
+    align-items: center;
 }
-
 
 .cart-table-thead
 {
@@ -549,9 +549,6 @@ p.room_cat_data
 
 
 /* book now full calender */
-.fc .fc-daygrid-day.fc-day-today {
-    background-color: unset;
-}
 .fc-daygrid-day-top {
     justify-content: space-between;}
     .fc a.fc-daygrid-day-number {
@@ -563,7 +560,8 @@ p.room_cat_data
         color: #FFFFFF;
         line-height: 1;
         border-radius: 50%;
-        padding: 5px 8px;
+        padding: 4px;
+        margin: 2px 2px 0px 0px;
     }
     .fc-daygrid-day-top .day-info {
 
@@ -577,6 +575,57 @@ p.room_cat_data
         .fc-today-button:disabled {
             display: none;
         }
+#fullcalendar .fc-daygrid-day-events {
+    height: 0 ;
+    min-height: 0;
+    overflow: visible;
+}
+#fullcalendar .fc-event.search-result-event:not(.fc-event-start) .fc-event-main {
+    visibility: hidden;
+}
+#fullcalendar .fc-event.search-result-event {
+    background-color: #FFFFFF;
+    border: none;
+    border-left: 5px solid;
+    border-radius: 3px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+    margin: 1px 4px;
+    padding: 2px 4px;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+#fullcalendar .fc-event.search-result-event .fc-event-main {
+    overflow: hidden;
+}
+#fullcalendar .fc-event.search-result-event .fc-event-title {
+    font-size: 14px;
+    font-weight: 400;
+    color: #333333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#fullcalendar .fc-event.search-result-event:not(.fc-event-start) {
+    border-left: none;
+    padding-left: 13px;
+    margin-left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+#fullcalendar .fc-event.search-result-event:not(.fc-event-end) {
+    margin-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.calendar-legend {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: nowrap;
+    padding-top: 14px;
+}
 
 #room-reallocation-modal .modal-footer {
 	padding: 15px 0px 0px 0px
