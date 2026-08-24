@@ -95,7 +95,7 @@ var GoogleMapsManager = {
                 google.maps.event.trigger(that.map, 'resize');
                 that.map.setCenter(that.defaultLatLng);
                 if (that.defaultLatLng && that.formattedAddress) {
-                    that.addMarker(that.defaultLatLng, null, that.formattedAddress);
+                    that.addMarker(that.defaultLatLng, null, that.formattedAddress, false);
                 }
                 // register marker events
                 that.map.addListener('click', function (e) {
@@ -263,10 +263,27 @@ var GoogleMapsManager = {
         $('#locformatedAddr').val(params.formattedAddress);
         $('#googleInputField').val(params.inputText);
     },
+    updateMarkerFromInputs: function() {
+        if (!this.map) {
+            return;
+        }
+        var latitude = Number($('#loclatitude').val());
+        var longitude = Number($('#loclongitude').val());
+        if (!latitude || !longitude) {
+            return;
+        }
+        var latLng = {lat: latitude, lng: longitude};
+        this.map.setCenter(latLng);
+        this.addMarker(latLng, null, null, false);
+    },
 }
 
 $(document).on('click', 'button.gm-ui-hover-effect', function () {
     GoogleMapsManager.clearAllMarkers();
+});
+
+$(document).on('change', '#loclatitude, #loclongitude', function () {
+    GoogleMapsManager.updateMarkerFromInputs();
 });
 
 function initGoogleMaps() {

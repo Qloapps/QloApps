@@ -413,6 +413,19 @@ class AdminAddHotelController extends ModuleAdminController
             $this->errors[] = $this->l('Enter a valid city name.');
         }
 
+        if (Tools::getValue('loclatitude') !== '' && !Validate::isCoordinate(Tools::getValue('loclatitude'))) {
+            $this->errors[] = $this->l('Latitude is invalid.');
+        }
+        if (Tools::getValue('loclongitude') !== '' && !Validate::isCoordinate(Tools::getValue('loclongitude'))) {
+            $this->errors[] = $this->l('Longitude is invalid.');
+        }
+        if ($map_formated_address && !Validate::isCleanHtml(html_entity_decode($map_formated_address))) {
+            $this->errors[] = $this->l('Map formatted address is invalid.');
+        }
+        if ($map_input_text && !Validate::isString($map_input_text)) {
+            $this->errors[] = $this->l('Map location text is invalid.');
+        }
+
         //Since the address for the hotel is saved in the address table. We are validating the hotel address here manually.
         $addressValidation = Address::getValidationRules('Address');
         foreach ($addressValidation['size'] as $field => $maxSize) {
@@ -610,8 +623,8 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelBranch->check_in = $check_in;
             $objHotelBranch->check_out = $check_out;
             $objHotelBranch->rating = $rating;
-            $objHotelBranch->latitude = Validate::isCoordinate($latitude) ? Tools::ps_round($latitude, 8) : $latitude;
-            $objHotelBranch->longitude = Validate::isCoordinate($longitude) ? Tools::ps_round($longitude, 8) : $longitude;
+            $objHotelBranch->latitude = $latitude;
+            $objHotelBranch->longitude = $longitude;
             $objHotelBranch->map_formated_address = $map_formated_address;
             $objHotelBranch->map_input_text = $map_input_text;
             $objHotelBranch->save();

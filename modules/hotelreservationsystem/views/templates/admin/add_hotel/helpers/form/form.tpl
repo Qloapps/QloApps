@@ -287,6 +287,18 @@
 						</div>
 					</div>
 					<div class="form-group">
+						<label class="control-label col-sm-3" for="loclatitude">{l s='Latitude :' mod='hotelreservationsystem'}</label>
+						<div class="col-sm-6">
+							<input class="form-control" type="text" id="loclatitude" name="loclatitude" value="{if isset($smarty.post.loclatitude)}{$smarty.post.loclatitude|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.latitude|string_format:'%.8f'|escape:'htmlall':'UTF-8'}{/if}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-3" for="loclongitude">{l s='Longitude :' mod='hotelreservationsystem'}</label>
+						<div class="col-sm-6">
+							<input class="form-control" type="text" id="loclongitude" name="loclongitude" value="{if isset($smarty.post.loclongitude)}{$smarty.post.loclongitude|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.longitude|string_format:'%.8f'|escape:'htmlall':'UTF-8'}{/if}" />
+						</div>
+					</div>
+					<div class="form-group">
 						<label class="col-sm-3 control-label">
 							{l s='Hotel Policies :' mod='hotelreservationsystem'}
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
@@ -308,8 +320,6 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{l s='Map:' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-6" id="googleMapContainer">
-								<input type="hidden" id="loclatitude" name="loclatitude" value="{if isset($edit)}{$hotel_info.latitude|escape:'htmlall':'UTF-8'}{/if}" />
-								<input type="hidden" id="loclongitude" name="loclongitude" value="{if isset($edit)}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
 								<input type="hidden" id="locformatedAddr" name="locformatedAddr" value="{if isset($edit)}{$hotel_info.map_formated_address}{/if}" />
 								<input type="hidden" id="googleInputField" name="googleInputField" value="{if isset($edit)}{$hotel_info.map_input_text}{/if}" />
 								<div id="pac-input" class="controls" type="text"></div>
