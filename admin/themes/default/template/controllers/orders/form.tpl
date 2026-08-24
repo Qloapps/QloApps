@@ -1404,6 +1404,7 @@
 			{
 				$("#customer_cart_details").empty();
 				$("#customer_cart_details").append(res.cart_detail_html);
+				initTooltip();
 
 				displaySummary(res);
 			}
