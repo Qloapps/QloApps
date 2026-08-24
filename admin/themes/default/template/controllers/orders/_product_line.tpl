@@ -196,7 +196,7 @@
                                 {l s='Delete'}
                             </a>
                         </li>
-                        {if isset($use_tourism_tax) && $use_tourism_tax && isset($data.tourism_tax_status)}
+                        {if isset($use_tourism_tax) && $use_tourism_tax && isset($data.tourism_tax_status) && $data.tourism_tax_status != $tourism_tax_status_not_applicable}
                             {if $data.tourism_tax_status == $tourism_tax_status_applied}
                                 <li>
                                     <a href="#" class="tt-exempt-booking" data-id_htl_booking="{$data.id|intval}">

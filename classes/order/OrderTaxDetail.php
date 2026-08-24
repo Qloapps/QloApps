@@ -26,6 +26,7 @@ class OrderTaxDetailCore extends ObjectModel
     const STATUS_NONE = 0;
     const STATUS_APPLIED = 1;
     const STATUS_EXEMPTED = 2;
+    const STATUS_NOT_APPLICABLE = 3;
 
     const APPLY_OK = 0;
     const APPLY_ERROR_RESTORE = 1;
@@ -1307,7 +1308,9 @@ class OrderTaxDetailCore extends ObjectModel
 
     /**
      * Apply tourism tax for every booking and every standalone service line of an order; returns only
-     * the failing entries.
+     * the failing entries. A booking/line with nothing applicable (neither the room nor any attached
+     * service, or the standalone line itself, has a tourism tax rule) is not a failure — it's silently
+     * skipped, same as if it had simply been left alone.
      *
      * @param int $idOrder
      * @return array  [{'id_htl_booking' => int, 'result' => int}, ...] plus
@@ -1322,14 +1325,14 @@ class OrderTaxDetailCore extends ObjectModel
         if ($bookings) {
             foreach ($bookings as $booking) {
                 $result = self::applyBooking($booking['id']);
-                if ($result !== self::APPLY_OK) {
+                if ($result !== self::APPLY_OK && $result !== self::APPLY_ERROR_NOT_APPLICABLE) {
                     $failures[] = array('id_htl_booking' => (int) $booking['id'], 'result' => $result);
                 }
             }
         }
         foreach (ServiceProductOrderDetail::getActiveStandaloneIdsByOrder($idOrder) as $idServiceLine) {
             $result = self::applyServiceLine($idServiceLine);
-            if ($result !== self::APPLY_OK) {
+            if ($result !== self::APPLY_OK && $result !== self::APPLY_ERROR_NOT_APPLICABLE) {
                 $failures[] = array('id_service_product_order_detail' => $idServiceLine, 'result' => $result);
             }
         }

@@ -139,7 +139,7 @@ class RoomTypeServiceProduct extends ObjectModel
         return Db::getInstance()->getValue($sql);
     }
 
-    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $use_reduc = 1)
+    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $use_reduc = 1, $includeTourismTax = false)
     {
         if (Product::isBookingProduct($idProduct)) {
             $context = Context::getContext();
@@ -168,7 +168,10 @@ class RoomTypeServiceProduct extends ObjectModel
                         $dateTo,
                         false,
                         null,
-                        $use_reduc
+                        $use_reduc,
+                        null,
+                        0,
+                        $includeTourismTax
                     );
                 }
 

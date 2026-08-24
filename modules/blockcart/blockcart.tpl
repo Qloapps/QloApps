@@ -266,7 +266,7 @@
 									</strong>
 									<span class="ajax_block_room_total pull-right">
 										{if $cart_qties > 0}
-											{convertPrice price=$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS)}
+											{convertPrice price=$cart->getOrderTotal(($priceDisplay != 1), Cart::ONLY_ROOMS)}
 										{/if}
 									</span>
 								</div>
@@ -285,7 +285,7 @@
 									</strong>
 									<span class="ajax_block_product_total pull-right">
 										{if $cart_qties > 0}
-											{convertPrice price=$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS)}
+											{convertPrice price=$cart->getOrderTotal(($priceDisplay != 1), Cart::ONLY_STANDALONE_PRODUCTS)}
 										{/if}
 									</span>
 								</div>

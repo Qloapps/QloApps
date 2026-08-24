@@ -333,6 +333,7 @@ class Blockcart extends Module
                 $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from'], null, $fullDate);
                 $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to'], null, $fullDate);
             } else {
+                $includeTourismTax = $useTax && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
                 if ($objProduct->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
                     $addedProduct['unit_price'] = Product::getServiceProductPrice(
                         $objProduct->id,
@@ -340,7 +341,15 @@ class Blockcart extends Module
                         0,
                         false,
                         $useTax,
-                        $addedProduct['qty']
+                        1,
+                        null,
+                        null,
+                        false,
+                        null,
+                        1,
+                        null,
+                        0,
+                        $includeTourismTax
                     );
 
                     if (isset($addedProduct['id_product_option'])
@@ -358,7 +367,15 @@ class Blockcart extends Module
                         $addedProduct['id_hotel'],
                         false,
                         $useTax,
-                        $addedProduct['qty']
+                        1,
+                        null,
+                        null,
+                        false,
+                        null,
+                        1,
+                        null,
+                        0,
+                        $includeTourismTax
                     );
                     $objHotel = new HotelBranchInformation($addedProduct['id_hotel'], $this->context->language->id);
                     $addedProduct['hotel_name'] = $objHotel->hotel_name;

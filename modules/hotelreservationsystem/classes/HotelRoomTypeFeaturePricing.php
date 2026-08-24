@@ -369,6 +369,28 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 'occupancy' => $occupancy
             )
         );
+        
+        if ($includeTourismTax && Configuration::get('QLO_USE_TOURISM_TAX') && is_array($occupancy) && !empty($occupancy) && isset($occupancy[0]['adults'])) {
+            if ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $id_product)) {
+                $hotelBranch = new HotelBranchInformation((int) $objAddress->id_hotel);
+                $collectionType = (int) $hotelBranch->tourism_tax_collection_type;
+                $numNights = max(1, (int) HotelHelper::getNumberOfDays($date_from, $date_to));
+                $unitPriceTe = (float) $totalPrice['total_price_tax_excl'] / $numNights;
+                $taxCalculator = TaxManagerFactory::getManager($objAddress, $idTourismTaxRulesGroup)->getTaxCalculator();
+                $childAges = !empty($occupancy[0]['child_ages']) ? (array) $occupancy[0]['child_ages'] : array();
+                $totalPrice['total_price_tax_incl'] += $taxCalculator->getTaxesTotalAmount(
+                    $unitPriceTe,
+                    $date_from,
+                    $numNights,
+                    $occupancy[0]['adults'],
+                    $childAges,
+                    $collectionType,
+                    1,
+                    $id_currency
+                );
+            }
+        }
+
         if ($with_auto_room_services) {
             if ($id_cart && $id_room) {
                 $objHotelCartBookingData = new HotelCartBookingData();
@@ -396,6 +418,9 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                         foreach($roomServicesServices as $selectedService) {
                             $totalPrice['total_price_tax_incl'] += $selectedService['total_price_tax_incl'];
                             $totalPrice['total_price_tax_excl'] += $selectedService['total_price_tax_excl'];
+                            if ($includeTourismTax && isset($selectedService['tourism_tax'])) {
+                                $totalPrice['total_price_tax_incl'] += $selectedService['tourism_tax'];
+                            }
                         }
                     }
                 }
@@ -407,7 +432,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $date_to,
                     Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                     true,
-                    $use_reduc
+                    $use_reduc,
+                    $includeTourismTax
                 )) {
                     foreach($servicesWithTax as $service) {
                         $totalPrice['total_price_tax_incl'] += $service['price'];
@@ -433,27 +459,6 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         }
         $totalPrice['total_price_tax_incl'] = $totalPrice['total_price_tax_incl'] * $quantity;
         $totalPrice['total_price_tax_excl'] = $totalPrice['total_price_tax_excl'] * $quantity;
-
-        if ($includeTourismTax && Configuration::get('QLO_USE_TOURISM_TAX') && is_array($occupancy) && !empty($occupancy) && isset($occupancy[0]['adults'])) {
-            if ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $id_product)) {
-                $hotelBranch = new HotelBranchInformation((int) $objAddress->id_hotel);
-                $collectionType = (int) $hotelBranch->tourism_tax_collection_type;
-                $numNights = max(1, (int) HotelHelper::getNumberOfDays($date_from, $date_to));
-                $unitPriceTe = (float) $totalPrice['total_price_tax_excl'] / $numNights;
-                $taxCalculator = TaxManagerFactory::getManager($objAddress, $idTourismTaxRulesGroup)->getTaxCalculator();
-                $childAges = !empty($occupancy[0]['child_ages']) ? (array) $occupancy[0]['child_ages'] : array();
-                $totalPrice['total_price_tax_incl'] += $taxCalculator->getTaxesTotalAmount(
-                    $unitPriceTe,
-                    $date_from,
-                    $numNights,
-                    $occupancy[0]['adults'],
-                    $childAges,
-                    $collectionType,
-                    1,
-                    $id_currency
-                );
-            }
-        }
 
         return $totalPrice;
     }

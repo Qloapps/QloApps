@@ -3228,19 +3228,16 @@ class CartCore extends ObjectModel
                 }
             } elseif ($sellingPreferenceType == Product::SELLING_PREFERENCE_STANDALONE) {
                 $addressPreferenceType = Configuration::get('PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE');
-                if ($addressPreferenceType == Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_HOTEL) {
-                    if (($primaryHotel = Configuration::get('WK_PRIMARY_HOTEL'))
-                        && ($htlAddress = HotelBranchInformation::getAddress($primaryHotel))
-                    ) {
-                        $id_address = $htlAddress['id_address'];
-                    }
-                } elseif ($addressPreferenceType == Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOM) {
+                if ($addressPreferenceType == Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOM) {
                     $id_address = (int) Configuration::get('PS_STANDARD_PRODUCT_ORDER_ADDRESS_ID');
-                } else {
+                } elseif ($addressPreferenceType != Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_HOTEL) {
                     $customer = Context::getContext()->customer;
                     if (Validate::isLoadedObject($customer) && ($idCustomerAddress = Address::getFirstCustomerAddressId($customer->id))) {
                         $id_address = $idCustomerAddress;
                     }
+                }
+                if (!$id_address && ($htlAddress = HotelBranchInformation::getAddress(Configuration::get('WK_PRIMARY_HOTEL')))) {
+                    $id_address = $htlAddress['id_address'];
                 }
             }
         }

@@ -6917,7 +6917,6 @@ class ProductCore extends ObjectModel
 
             $fallbackAddress = new Address(Cart::getIdAddressForTaxCalculation($idProduct));
             if ($numAdults === null) {
-                // no explicit occupancy override: derive it from the actual booking/cart-booking, same as every order-persistence caller
                 $taxContext = TaxConfiguration::resolveServiceLineTaxContext($tourismTaxHotelId, 0, $fallbackAddress, $idCartBooking);
             } else {
                 // caller supplied its own occupancy (e.g. a live search form) — use it as-is, only resolve address/collection type

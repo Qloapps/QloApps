@@ -3403,7 +3403,13 @@ class AdminOrdersControllerCore extends AdminController
                     $tourismTaxStatus = isset($standaloneServiceTourismTaxStatusMap[$hotelProduct['id_service_product_order_detail']])
                         ? $standaloneServiceTourismTaxStatusMap[$hotelProduct['id_service_product_order_detail']]
                         : null;
-                    $hotelProduct['tourism_tax_status'] = $tourismTaxStatus ? $tourismTaxStatus['status'] : OrderTaxDetail::STATUS_NONE;
+                    if ($tourismTaxStatus) {
+                        $hotelProduct['tourism_tax_status'] = $tourismTaxStatus['status'];
+                    } else {
+                        $hotelProduct['tourism_tax_status'] = Product::getIdTourismTaxRulesGroupByIdProduct((int) $hotelProduct['id_product'])
+                            ? OrderTaxDetail::STATUS_NONE
+                            : OrderTaxDetail::STATUS_NOT_APPLICABLE;
+                    }
                     $hotelProduct['tourism_tax_total'] = $tourismTaxStatus ? $tourismTaxStatus['total'] : 0.0;
                     $hotelProduct['total_service_tax'] = $hotelProduct['total_price_tax_incl'] - $hotelProduct['total_price_tax_excl'];
                     $hotelProduct['total_service_tax_only'] = $hotelProduct['total_service_tax'] - $hotelProduct['tourism_tax_total'];
@@ -3416,7 +3422,13 @@ class AdminOrdersControllerCore extends AdminController
                     $tourismTaxStatus = isset($standaloneServiceTourismTaxStatusMap[$standaloneProduct['id_service_product_order_detail']])
                         ? $standaloneServiceTourismTaxStatusMap[$standaloneProduct['id_service_product_order_detail']]
                         : null;
-                    $standaloneProduct['tourism_tax_status'] = $tourismTaxStatus ? $tourismTaxStatus['status'] : OrderTaxDetail::STATUS_NONE;
+                    if ($tourismTaxStatus) {
+                        $standaloneProduct['tourism_tax_status'] = $tourismTaxStatus['status'];
+                    } else {
+                        $standaloneProduct['tourism_tax_status'] = Product::getIdTourismTaxRulesGroupByIdProduct((int) $standaloneProduct['id_product'])
+                            ? OrderTaxDetail::STATUS_NONE
+                            : OrderTaxDetail::STATUS_NOT_APPLICABLE;
+                    }
                     $standaloneProduct['tourism_tax_total'] = $tourismTaxStatus ? $tourismTaxStatus['total'] : 0.0;
                     $standaloneProduct['total_service_tax'] = $standaloneProduct['total_price_tax_incl'] - $standaloneProduct['total_price_tax_excl'];
                     $standaloneProduct['total_service_tax_only'] = $standaloneProduct['total_service_tax'] - $standaloneProduct['tourism_tax_total'];
@@ -3642,9 +3654,9 @@ class AdminOrdersControllerCore extends AdminController
                 $order_detail_data[$key]['room_type_info'] = $objHotelRoomType->getRoomTypeInfoByIdProduct($value['id_product']);
                 $order_detail_data[$key]['total_room_tax'] = $order_detail_data[$key]['total_room_price_ti'] - $order_detail_data[$key]['total_room_price_te'];
                 $bookingTourismTaxStatus = isset($bookingTourismTaxStatusMap[$value['id']]) ? $bookingTourismTaxStatusMap[$value['id']] : null;
-                $order_detail_data[$key]['tourism_tax_status'] = $bookingTourismTaxStatus ? $bookingTourismTaxStatus['status'] : OrderTaxDetail::STATUS_NONE;
                 $roomTourismTaxTotal = $bookingTourismTaxStatus ? $bookingTourismTaxStatus['total'] : 0.0;
                 $serviceTourismTaxTotal = isset($serviceTourismTaxMap[$value['id']]) ? $serviceTourismTaxMap[$value['id']] : 0.0;
+                $order_detail_data[$key]['tourism_tax_status'] = $this->combinedRoomTourismTaxStatus($value['id'], $value['id_product'], $bookingTourismTaxStatus, $serviceTourismTaxTotal);
                 $order_detail_data[$key]['tourism_tax_total'] = $roomTourismTaxTotal + $serviceTourismTaxTotal;
                 $order_detail_data[$key]['total_room_service_tax_only'] = $order_detail_data[$key]['total_room_tax'] - $roomTourismTaxTotal - $serviceTourismTaxTotal;
                 $order_detail_data[$key]['num_checkin_documents'] = HotelBookingDocument::getCountByIdHtlBooking($value['id']);
@@ -3827,7 +3839,7 @@ class AdminOrdersControllerCore extends AdminController
             'tourism_tax_products' => array_sum(array_column($standaloneServiceTourismTaxStatusMap, 'total')),
             'info_icon_path' => $this->context->link->getMediaLink(_MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icon-info.svg'),
             'tourism_tax_status_applied'  => OrderTaxDetail::STATUS_APPLIED,
-            'tourism_tax_status_exempted' => OrderTaxDetail::STATUS_EXEMPTED,
+            'tourism_tax_status_not_applicable' => OrderTaxDetail::STATUS_NOT_APPLICABLE,
             'order_tourism_tax_has_applied' => $orderTourismTaxHasApplied,
             'order_tourism_tax_has_unapplied' => $orderTourismTaxHasUnapplied,
             'products_tourism_tax_has_applied' => $productsTourismTaxHasApplied,
@@ -5554,6 +5566,8 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if ($objBookingDetail->save()) {
+                    OrderTaxDetail::updateVatScoping((int) $objBookingDetail->id_order_detail, (int) $objBookingDetail->id, 0);
+
                     if (Configuration::get('QLO_USE_TOURISM_TAX')) {
                         $idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct);
                         if ($idTourismTaxRulesGroup) {
@@ -5678,6 +5692,8 @@ class AdminOrdersControllerCore extends AdminController
                             $objServiceProductOrderDetail->name = $service['name'];
                             $objServiceProductOrderDetail->quantity = 1;
                             if ($objServiceProductOrderDetail->save()) {
+                                OrderTaxDetail::updateVatScoping((int) $objServiceProductOrderDetail->id_order_detail, 0, (int) $objServiceProductOrderDetail->id);
+
                                 if (Configuration::get('QLO_USE_TOURISM_TAX')) {
                                     $idServiceTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $service['id_product']);
                                     if ($idServiceTourismTaxRulesGroup) {
@@ -5715,6 +5731,11 @@ class AdminOrdersControllerCore extends AdminController
                 }
             }
         }
+
+        $order->total_paid = $order->getOrderTotal();
+        $order->total_paid_tax_incl = $order->total_paid;
+        $order->total_paid_tax_excl = $order->getOrderTotal(false);
+        $order->update();
 
         // delete cart feature prices after room addition success
         HotelRoomTypeFeaturePricing::deleteFeaturePrices($this->context->cart->id);
@@ -6048,6 +6069,11 @@ class AdminOrdersControllerCore extends AdminController
                                 }
                             }
                         }
+
+                        $objOrder->total_paid = $objOrder->getOrderTotal();
+                        $objOrder->total_paid_tax_incl = $objOrder->total_paid;
+                        $objOrder->total_paid_tax_excl = $objOrder->getOrderTotal(false);
+                        $objOrder->update();
 
                         $response['status'] = true;
                     } else {
@@ -6710,14 +6736,10 @@ class AdminOrdersControllerCore extends AdminController
             }
             $objOrderDetail->total_price_tax_incl += $diffPriceTaxIncl;
             $objOrderDetail->total_price_tax_excl += $diffPriceTaxExcl;
+            $objOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
+            $objOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
             $objOrderDetail->product_quantity += $updateQty;
             $objOrderDetail->reduction_percent = 0;
-
-            // update taxes
-            $result &= $objOrderDetail->updateTaxAmount($objOrder);
-
-            // Save order detail
-            $result &= $objOrderDetail->update();
 
             $objServiceProductOrderDetail->unit_price_tax_excl = $unitPriceTaxExcl;
             $objServiceProductOrderDetail->unit_price_tax_incl = $unitPriceTaxIncl;
@@ -6725,6 +6747,12 @@ class AdminOrdersControllerCore extends AdminController
             $objServiceProductOrderDetail->total_price_tax_incl = $totalProductsTaxIncl;
             $objServiceProductOrderDetail->quantity += $updateQty;
             $result &= $objServiceProductOrderDetail->update();
+
+            // update taxes
+            $result &= $objOrderDetail->updateTaxAmount($objOrder);
+
+            // Save order detail
+            $result &= $objOrderDetail->update();
 
             if (Configuration::get('QLO_USE_TOURISM_TAX')) {
                 $serviceTourismTaxParams = OrderTaxDetail::buildServiceLineTaxParams((int) $objServiceProductOrderDetail->id);
@@ -9354,6 +9382,33 @@ class AdminOrdersControllerCore extends AdminController
     }
 
     /**
+     *
+     * @param int        $idHtlBooking
+     * @param int        $idRoomProduct
+     * @param array|null $bookingTourismTaxStatus
+     * @return int  OrderTaxDetail::STATUS_APPLIED|STATUS_NOT_APPLICABLE|STATUS_NONE
+     */
+    protected function combinedRoomTourismTaxStatus($idHtlBooking, $idRoomProduct, $bookingTourismTaxStatus, $serviceTourismTaxTotal)
+    {
+        $roomApplied = $bookingTourismTaxStatus && $bookingTourismTaxStatus['status'] === OrderTaxDetail::STATUS_APPLIED;
+        if ($roomApplied || $serviceTourismTaxTotal > 0) {
+            return OrderTaxDetail::STATUS_APPLIED;
+        }
+
+        $roomHasRule = (bool) Product::getIdTourismTaxRulesGroupByIdProduct((int) $idRoomProduct);
+        $serviceHasRule = false;
+        foreach (ServiceProductOrderDetail::getActiveIdsByHtlBookingDetail((int) $idHtlBooking) as $idServiceLine) {
+            $serviceLine = new ServiceProductOrderDetail($idServiceLine);
+            if (Validate::isLoadedObject($serviceLine) && Product::getIdTourismTaxRulesGroupByIdProduct((int) $serviceLine->id_product)) {
+                $serviceHasRule = true;
+                break;
+            }
+        }
+
+        return ($roomHasRule || $serviceHasRule) ? OrderTaxDetail::STATUS_NONE : OrderTaxDetail::STATUS_NOT_APPLICABLE;
+    }
+
+    /**
      * Map per-booking tourism tax apply/exempt failures (whole-order bulk case) to deduplicated messages.
      *
      * @param array $failures
@@ -9426,6 +9481,7 @@ class AdminOrdersControllerCore extends AdminController
         $note = ($note !== '') ? $note : null;
         $errors = array();
         $messagesByResult = array(
+            OrderTaxDetail::EXEMPT_ERROR_NO_RULE => $this->l('Tourism tax exemption is not applicable for this line.'),
             OrderTaxDetail::EXEMPT_ERROR_SAVE => $this->l('Could not exempt tourism tax.'),
             OrderTaxDetail::EXEMPT_ERROR_REFUNDED => $this->l('Tourism tax cannot be exempted, this was refunded.'),
         );
