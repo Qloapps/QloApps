@@ -124,8 +124,15 @@
 								{/if}
 								<td id="cart_detail_data_unit_price_{$data.id|escape:'html':'UTF-8'}">
 									{assign var=shown_room_type_price value=$data.feature_price_tax_excl}
+									{if isset($can_edit_booking_carts)}
+										{assign var=can_edit_booking_cart_price value=$can_edit_booking_carts}
+									{elseif isset($can_edit)}
+										{assign var=can_edit_booking_cart_price value=$can_edit}
+									{else}
+										{assign var=can_edit_booking_cart_price value=0}
+									{/if}
 									<div class="input-group">
-										<input type="text" class="room_unit_price" value="{Tools::ps_round($shown_room_type_price, $smarty.const._PS_PRICE_DISPLAY_PRECISION_)|escape:'html':'UTF-8'}">
+										<input type="text" class="room_unit_price" value="{Tools::ps_round($shown_room_type_price, $smarty.const._PS_PRICE_DISPLAY_PRECISION_)|escape:'html':'UTF-8'}"{if !$can_edit_booking_cart_price} readonly="readonly"{/if}>
 										<span class="input-group-addon">{$currency->prefix}{$currency->suffix}</span>
 									</div>
 								</td>

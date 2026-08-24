@@ -229,11 +229,17 @@ abstract class PaymentModuleCore extends Module
             $this->currentOrderReference = $reference;
 
             $order_creation_failed = false;
-            $cart_total_paid = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH), _PS_PRICE_COMPUTE_PRECISION_);
 
-            if ($this->context->cart->is_advance_payment) {
+            $full_cart_total = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH), _PS_PRICE_COMPUTE_PRECISION_);
+            $amount_paid = !$dont_touch_amount ? Tools::ps_round((float)$amount_paid, _PS_PRICE_COMPUTE_PRECISION_) : $amount_paid;
+
+            if ($amount_paid >= $full_cart_total) {
+                $is_advance_payment = false;
+                $cart_total_paid = $full_cart_total;
+            } else {
+                $is_advance_payment = true;
                 $cart_total_paid = (float)Tools::ps_round(
-                    (float)$this->context->cart->getOrderTotal(true, CART::ADVANCE_PAYMENT),
+                    (float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
                     _PS_PRICE_COMPUTE_PRECISION_
                 );
             }
@@ -314,7 +320,6 @@ abstract class PaymentModuleCore extends Module
                     $order->gift_message = $this->context->cart->gift_message;
                     $order->mobile_theme = $this->context->cart->mobile_theme;
                     $order->conversion_rate = $this->context->currency->conversion_rate;
-                    $amount_paid = !$dont_touch_amount ? Tools::ps_round((float)$amount_paid, _PS_PRICE_COMPUTE_PRECISION_) : $amount_paid;
                     $order->total_paid_real = 0;
 
                     $order->total_products = (float)$this->context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS, $order->product_list, $id_carrier);
@@ -371,7 +376,7 @@ abstract class PaymentModuleCore extends Module
                     }
 
                     // advance payment information
-                    $order->is_advance_payment = $this->context->cart->is_advance_payment;
+                    $order->is_advance_payment = (int)$is_advance_payment;
                     $order->amount_paid = 0;
                     if ($order->is_advance_payment) {
                         $order->advance_paid_amount = (float)Tools::ps_round(
@@ -677,8 +682,14 @@ abstract class PaymentModuleCore extends Module
                             $orderTotals[$order->id]['excl'] -= $used['excl'];
                             $cart_rules[$key]['remaining'] -= $used['excl'];
                         }
-                        
-                        $order->addCartRule($cart_rule['obj']->id, $cart_rule['obj']->name, $values, 0, $cart_rule['obj']->free_shipping);
+
+                        $order->addCartRule(
+                            $cart_rule['obj']->id,
+                            $cart_rule['obj']->name,
+                            array('tax_incl' => $used['incl'], 'tax_excl' => $used['excl']),
+                            0,
+                            $cart_rule['obj']->free_shipping
+                        );
 
                         if ($id_order_state != Configuration::get('PS_OS_ERROR') && $id_order_state != Configuration::get('PS_OS_CANCELED') && !in_array($cart_rule['obj']->id, $cart_rule_used)) {
                             $cart_rule_used[] = $cart_rule['obj']->id;
@@ -691,7 +702,7 @@ abstract class PaymentModuleCore extends Module
 
                         $cart_rules_list[] = array(
                             'voucher_name' => $cart_rule['obj']->name,
-                            'voucher_reduction' => ($values['tax_incl'] != 0.00 ? '-' : '').Tools::displayPrice($values['tax_incl'], $this->context->currency, false)
+                            'voucher_reduction' => ($used['incl'] != 0.00 ? '-' : '').Tools::displayPrice($used['incl'], $this->context->currency, false)
                         );
                     }
 
@@ -895,7 +906,7 @@ abstract class PaymentModuleCore extends Module
 
                                 /*for saving details of the advance payment product wise*/
                                 $objBookingDetail->total_paid_amount = $total_price['total_price_tax_incl'];
-                                if ($this->context->cart->is_advance_payment) {
+                                if ($is_advance_payment) {
                                     $prod_adv_payment = $objAdvancedPayment->getIdAdvPaymentByIdProduct($idProduct);
                                     if (!$prod_adv_payment
                                         || (isset($prod_adv_payment['payment_type']) && $prod_adv_payment['payment_type'])

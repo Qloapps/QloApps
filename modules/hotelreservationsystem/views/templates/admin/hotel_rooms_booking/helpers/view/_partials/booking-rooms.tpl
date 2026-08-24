@@ -34,7 +34,9 @@
                                             {if $occupancy_required_for_booking}
                                                 <th class="fixed-width-xxl"><span class="title_box">{l s='Guests' mod='hotelreservationsystem'}</span></th>
                                             {/if}
+                                            {if isset($can_add_booking_carts) && $can_add_booking_carts}
                                             <th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
+                                            {/if}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -105,7 +107,9 @@
                                                     </td>
                                                 {/if}
                                                 <td>
+                                                    {if isset($can_add_booking_carts) && $can_add_booking_carts}
                                                     <button type="button" data-id-cart="" data-id-cart-book-data="" data-id-product="{$avai_v['id_product']|escape:'htmlall':'UTF-8'}" data-id-room="{$avai_v['id_room']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$avai_v['id_hotel']}" data-date-from="{$date_from|escape:'htmlall':'UTF-8'}" data-date-to ="{$date_to|escape:'htmlall':'UTF-8'}" class="btn btn-primary avai_add_cart">{l s='Add To Cart' mod='hotelreservationsystem'}</button>
+                                                    {/if}
                                                 </td>
                                             </tr>
                                         {/foreach}
@@ -124,7 +128,7 @@
                                             {if $occupancy_required_for_booking}
                                                 <th class="fixed-width-xxl"><span class="title_box">{l s='Guests' mod='hotelreservationsystem'}</span></th>
                                             {/if}
-                                            <th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>
+                                            {if isset($can_add_booking_carts) && $can_add_booking_carts}<th><span class="title_box">{l s='Action' mod='hotelreservationsystem'}</span></th>{/if}
                                         </tr>
                                     </thead>
                                     <tbody>

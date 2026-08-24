@@ -184,35 +184,15 @@ class AdminAddHotelController extends ModuleAdminController
             }
 
             $smartyVars['order_restrict_date_info'] = HotelOrderRestrictDate::getDataByHotelId($idHotel);
-            $objHotelFeatures = new HotelFeatures();
-            $hotelFeatures = $this->object->getFeaturesOfHotelByHotelId($this->object->id);
-            if ($features = $objHotelFeatures->HotelBranchSelectedFeaturesArray($hotelFeatures)) {
-                foreach ($features as $idFeature => $feature) {
-                    $features[$idFeature]['value'] = $idFeature;
-                    $features[$idFeature]['input_name'] = 'id_feature_parents';
-                    if (isset($feature['children']) && $feature['children']) {
-                        $selectedChildFeatures = 0;
-                        foreach ($feature['children'] as $childKey => $childFeature) {
-                            $features[$idFeature]['children'][$childKey]['value'] = $childFeature['id'];
-                            $features[$idFeature]['children'][$childKey]['input_name'] = 'id_features';
-                            if (isset($childFeature['selected']) && $childFeature['selected']) {
-                                $selectedChildFeatures++;
-                            }
-                        }
-
-                        if ($selectedChildFeatures == count($feature['children'])) {
-                            $features[$idFeature]['selected'] = true;
-                        }
-                    }
-                }
-
-                $tree = new HelperTree('hotel-features-tree', $features);
+            if ($amenities = HotelBranchAmenities::getBranchAmenitiesTreeData((int)$idHotel)) {
+                $tree = new HelperTree('hotel-amenities-tree', $amenities);
                 $tree->setShowCollapseExpandButton(true)
                     ->setUseCheckBox(true)
                     ->setAutoSelectChildren(true)
-                    ->setUseBulkActions(true);
-                $treeContent = $tree->render();
-                $smartyVars['hotel_feature_tree'] = $treeContent;
+                    ->setUseBulkActions(true)
+                    ->setUseSearch(true);
+                $smartyVars['hotel_amenity_tree'] = $tree->render();
+                $smartyVars['hotel_featured_amenity_ids'] = array_column(HotelBranchAmenities::getAmenities((int)$idHotel, 0, true), 'id');
             }
 
             $smartyVars['rewrite_url'] = [];
@@ -239,7 +219,7 @@ class AdminAddHotelController extends ModuleAdminController
         }
 
         $smartyVars['state_var'] = $stateOptions;
-        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('PS_MAP_ID') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
+        $smartyVars['enabledDisplayMap'] = Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP');
         $smartyVars['ps_img_dir'] = _PS_IMG_.'l/';
         $smartyVars['PS_MAX_CHECKOUT_OFFSET'] = (int) Configuration::get('PS_MAX_CHECKOUT_OFFSET');
         $smartyVars['PS_MIN_BOOKING_OFFSET'] = (int) Configuration::get('PS_MIN_BOOKING_OFFSET');
@@ -294,11 +274,12 @@ class AdminAddHotelController extends ModuleAdminController
         $maxCheckoutOffset = trim(Tools::getValue('max_checkout_offset'));
         $enableUseGlobalMinBookingOffset = Tools::getValue('enable_use_global_min_booking_offset');
         $minBookingOffset = trim(Tools::getValue('min_booking_offset'));
-        $latitude = Tools::getValue('loclatitude');
-        $longitude = Tools::getValue('loclongitude');
+        $latitude = number_format((float) Tools::getValue('loclatitude'), 8, '.', '');
+        $longitude = number_format((float) Tools::getValue('loclongitude'), 8, '.', '');
         $map_formated_address = Tools::getValue('locformatedAddr');
         $map_input_text = Tools::getValue('googleInputField');
-        $hotelFeatures = Tools::getValue('id_features', array());
+        $hotelAmenities = Tools::getValue('id_amenities', array());
+        $hotelFeaturedAmenities = Tools::getValue('hotel_featured_amenities', array());
         $shortDescriptionMaxChar = Configuration::get('PS_SHORT_DESC_LIMIT') ? Configuration::get('PS_SHORT_DESC_LIMIT') : Configuration::PS_SHORT_DESC_LIMIT;
 
         // check if field is atleast in default language. Not available in default prestashop
@@ -512,6 +493,11 @@ class AdminAddHotelController extends ModuleAdminController
             }
         }
 
+        $amenityCategories = HotelAmenities::getCategories();
+        if ($amenityCategories && !HotelAmenities::getAmenities()) {
+            $this->errors[] = $this->l('No amenities have been created. Please add amenities to at least one category before assigning them.');
+        }
+
         if (!count($this->errors)) {
             if ($idHotel) {
                 $objHotelBranch = new HotelBranchInformation($idHotel);
@@ -641,8 +627,8 @@ class AdminAddHotelController extends ModuleAdminController
             $objHotelBranch->check_in = $check_in;
             $objHotelBranch->check_out = $check_out;
             $objHotelBranch->rating = $rating;
-            $objHotelBranch->latitude = Validate::isFloat($latitude) ? Tools::ps_round($latitude, 8) : $latitude;
-            $objHotelBranch->longitude = Validate::isFloat($longitude) ? Tools::ps_round($longitude, 8) : $longitude;
+            $objHotelBranch->latitude = Validate::isCoordinate($latitude) ? Tools::ps_round($latitude, 8) : $latitude;
+            $objHotelBranch->longitude = Validate::isCoordinate($longitude) ? Tools::ps_round($longitude, 8) : $longitude;
             $objHotelBranch->map_formated_address = $map_formated_address;
             $objHotelBranch->map_input_text = $map_input_text;
             $objHotelBranch->save();
@@ -836,10 +822,9 @@ class AdminAddHotelController extends ModuleAdminController
 
                 $objHotelOrderRestrictDate->save();
 
-                $objHotelFeatures = new HotelBranchFeatures();
-                $objHotelFeatures->deleteBranchFeaturesByHotelId($idHotel);
-                if (!$objHotelFeatures->assignFeaturesToHotel($idHotel, $hotelFeatures)) {
-                    $this->errors[] = $this->l('Some problem occurred while assigning features to the hotel.');
+                $objHotelAmenities = new HotelBranchAmenities();
+                if (!$objHotelAmenities->saveBranchAmenities($idHotel, $hotelAmenities, $hotelFeaturedAmenities)) {
+                    $this->errors[] = $this->l('Some problem occurred while assigning amenities to the hotel.');
                 }
             }
 
@@ -1026,7 +1011,7 @@ class AdminAddHotelController extends ModuleAdminController
         // GOOGLE MAP
         $language = $this->context->language;
         $country = $this->context->country;
-        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && $PS_MAP_ID) {
+        if ($PS_API_KEY = Configuration::get('PS_API_KEY')) {
             $this->addJS(
                 'https://maps.googleapis.com/maps/api/js?key='.$PS_API_KEY.'&libraries=places,marker&loading=async&language='.
                 $language->iso_code.'&region='.$country->iso_code.'&callback=initGoogleMaps'

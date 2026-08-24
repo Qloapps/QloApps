@@ -28,10 +28,30 @@
 	<input type="hidden" name="submitted_tabs[]" value="Features" />
 	<h3>{l s='Assign features to this room type'}</h3>
 
+	{if isset($room_type_features_tree) && $room_type_features_tree}
 	<div class="alert alert-info">
-		{l s='You can specify a value for each relevant feature regarding this room type. Empty fields will not be displayed.'}<br/>
-		{l s='You can either create a specific value, or select among the existing pre-defined values you\'ve previously added.'}
+		
+		<p>{l s='If you want to add a new feature, please use the following link.'}
+			<a href="{$link->getAdminLink('AdminFeatures')|escape:'html':'UTF-8'}" class="btn btn-link button" target="_blank">
+				<i class="icon-plus-sign"></i> {l s='Add a new feature'} <i class="icon-external-link-sign"></i>
+			</a>
+		</p>
 	</div>
+		<div class="form-group">
+			<label for="room-type-features-tree" class="control-label col-sm-3">
+				<span class="label-tooltip" data-toggle="tooltip" data-original-title="{l s='Select the feature values available for this room type.'}">
+					{l s='Select feature values'}
+				</span>
+			</label>
+			<div class="col-sm-7 room_features_tree">
+				{$room_type_features_tree}
+			</div>
+		</div>
+	{else}
+		<div class="alert alert-warning">
+			<i class="icon-warning-sign"></i> {l s='No features have been defined'}
+		</div>
+	{/if}
 
 	<table class="table">
 		<thead>
@@ -152,38 +172,4 @@
 		<button type="submit" name="submitAddproductAndStay" class="btn btn-default pull-right" disabled="disabled"><i class="process-icon-loading"></i> {l s='Save and stay'}</button>
 	</div>
 </div>
-<script type="text/javascript">
-	if (tabs_manager.allow_hide_other_languages)
-		hideOtherLanguage({$default_form_language});
-{literal}
-	$(".textarea-autosize").autosize();
-
-	function all_languages(pos)
-	{
-{/literal}
-{if isset($languages) && is_array($languages)}
-	{foreach from=$languages key=k item=language}
-			pos.parents('td').find('.lang-{$language.id_lang}').addClass('nolang-{$language.id_lang}').removeClass('lang-{$language.id_lang}');
-	{/foreach}
-{/if}
-		pos.parents('td').find('.translatable-field').hide();
-		pos.parents('td').find('.lang-0').show();
-{literal}
-	}
-
-	function restore_lng(pos,i)
-	{
-{/literal}
-{if isset($languages) && is_array($languages)}
-	{foreach from=$languages key=k item=language}
-			pos.parents('td').find('.nolang-{$language.id_lang}').addClass('lang-{$language.id_lang}').removeClass('nolang-{$language.id_lang}');
-	{/foreach}
-{/if}
-{literal}
-		pos.parents('td').find('.lang-0').hide();
-		hideOtherLanguage(i);
-	}
-</script>
-{/literal}
-
 {/if}

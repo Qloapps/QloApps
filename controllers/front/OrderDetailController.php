@@ -533,8 +533,18 @@ class OrderDetailControllerCore extends FrontController
     {
         $response = array('extra_demands' => false);
 
+        $idOrder = (int) Tools::getValue('id_order');
+        $order = new Order($idOrder);
+
+        if (!Validate::isLoadedObject($order)
+            || $order->id_customer != $this->context->customer->id
+            || $order->secure_key != Tools::getValue('secure_key')
+        ) {
+            $this->ajaxDie(json_encode($response));
+        }
+
         if (($idProduct = Tools::getValue('id_product'))
-            && ($idOrder = Tools::getValue('id_order'))
+            && $idOrder
             && ($dateFrom = Tools::getValue('date_from'))
             && ($dateTo = Tools::getValue('date_to'))
         ) {
@@ -888,7 +898,6 @@ class OrderDetailControllerCore extends FrontController
                 if (Validate::isLoadedObject($objHotelBranchInformation)) {
                     if (($apiKey = Configuration::get('PS_API_KEY'))
                         && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
-                        && ($PS_MAP_ID = Configuration::get('PS_MAP_ID'))
                     ) {
                         if (floatval($objHotelBranchInformation->latitude) != 0
                             && floatval($objHotelBranchInformation->longitude) != 0
@@ -896,7 +905,7 @@ class OrderDetailControllerCore extends FrontController
                             Media::addJsDef(array(
                                 'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
                                 'initiateMap' => 1,
-                                'PS_MAP_ID' => $PS_MAP_ID,
+                                'PS_MAP_ID' => Configuration::get('PS_MAP_ID'),
                             ));
                             $this->addJS(
                                 'https://maps.googleapis.com/maps/api/js?key='.$apiKey.'&libraries=places,marker&loading=async&callback=initMap&language='.
