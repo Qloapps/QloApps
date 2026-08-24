@@ -1,17 +1,29 @@
 <?xml version="1.0"?>
 <localizationPack name="Tunisia">
   <currencies>
-    <currency name="Tunisian Dinar" iso_code="TND" iso_code_num="788" sign="DT" blank="0" conversion_rate="1.000000" format="2" decimals="1"/>
+    <currency name="Tunisian Dinar" iso_code="TND" iso_code_num="788" sign="DT" blank="0" format="2" decimals="1"/>
   </currencies>
   <languages>
     <language iso_code="ar"/>
-    <language iso_code="fr"/>
   </languages>
   <taxes>
-    <taxRulesGroup name="TVA Tunisie">
-      <taxRule iso_code_country="tn" behavior="0" id_tax="55"/>
+    <tax id="1" name="TN TVA 19%" rate="19"/>
+    <tax id="2" name="TN TVA 13%" rate="13"/>
+    <tax id="3" name="TN TVA 7%" rate="7"/>
+    <tax id="4" name="TN TVA 0%" rate="0"/>
+    <taxRulesGroup name="TN TVA Standard Rate (19%)">
+      <taxRule iso_code_country="tn" behavior="0" id_tax="1"/>
     </taxRulesGroup>
-    <tax id="55" name="TVA" rate="18.000"/>
+    <taxRulesGroup name="TN TVA Reduced Rate (13%)">
+      <taxRule iso_code_country="tn" behavior="0" id_tax="2"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="TN TVA Reduced Rate (7%)">
+      <taxRule iso_code_country="tn" behavior="0" id_tax="3"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="TN TVA Zero Rate (0%)">
+      <taxRule iso_code_country="tn" behavior="0" id_tax="4"/>
+    </taxRulesGroup>
+
   </taxes>
   <units>
     <unit type="weight" value="kg"/>
