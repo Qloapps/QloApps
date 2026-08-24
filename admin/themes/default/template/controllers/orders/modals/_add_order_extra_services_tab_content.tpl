@@ -66,7 +66,7 @@
                                                     {capture name='room_type_service_tooltip_content'}
                                                     {assign var="priceCalcMethod" value=$product['price_calculation_method']|default:0}
                                                     <div class="tooltip-cont">
-                                                        <div class="tooltip-row"><label>{l s='Applied on:'}</label></div>
+                                                        <div class="tooltip-popup-row"><label>{l s='Applied on:'}</label></div>
                                                         <ul class="tooltip-days">
                                                             {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
                                                                 <li>{$pcmDayLabel}</li>

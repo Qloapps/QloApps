@@ -67,9 +67,7 @@ class ProductControllerCore extends FrontController
             $this->addJqueryPlugin('jqzoom');
         }
 
-        if (($PS_API_KEY = Configuration::get('PS_API_KEY'))
-            && ($PS_MAP_ID = Configuration::get('PS_MAP_ID'))
-        ) {
+        if ($PS_API_KEY = Configuration::get('PS_API_KEY')) {
             $objHotelRoomType = new HotelRoomType();
             if ($roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($this->product->id)) {
                 $objHotelBranchInformation = new HotelBranchInformation($roomTypeInfo['id_hotel']);
@@ -82,7 +80,7 @@ class ProductControllerCore extends FrontController
                             'longitude' => $objHotelBranchInformation->longitude,
                         ),
                         'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
-                        'PS_MAP_ID' => $PS_MAP_ID
+                        'PS_MAP_ID' => Configuration::get('PS_MAP_ID')
                     ));
 
                     $this->addJS(

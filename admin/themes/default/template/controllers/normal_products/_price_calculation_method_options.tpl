@@ -1,4 +1,4 @@
-/**
+{*
 * NOTICE OF LICENSE
 *
 * This source file is subject to the Open Software License version 3.0
@@ -18,15 +18,13 @@
 * @author Webkul IN
 * @copyright Since 2010 Webkul
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
-*/
-body.adminorderrefundrequests .ui-tooltip {
-    border: unset;
-    padding: 10px;
-    box-shadow: 0px 0px 15px 0px #00000026;
-}
-.ui-tooltip.tooltip-popup span {
-    margin-left: 15px;
-}
-.ui-tooltip.tooltip-popup label {
-    font-weight: 600;
-}
+*}
+
+{capture name='tooltip_list_content'}
+	<ul>
+		{foreach $tooltip_items as $tooltip_item}
+			<li>{$tooltip_item|escape:'html':'UTF-8'}</li>
+		{/foreach}
+	</ul>
+{/capture}
+{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.tooltip_list_content allow_html=true}

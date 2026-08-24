@@ -455,7 +455,7 @@ class AdminNormalProductsControllerCore extends AdminController
             'tooltip_items' => $options,
         ));
 
-        $tooltip = $this->context->smarty->fetch('helpers/tooltip.tpl');
+        $tooltip = $this->context->smarty->fetch('controllers/normal_products/_price_calculation_method_options.tpl');
 
         return count($options) . ' ' . $this->l('Selected') . ' ' . $tooltip;
     }

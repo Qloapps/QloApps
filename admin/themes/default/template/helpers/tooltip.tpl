@@ -20,21 +20,19 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-
 <span class="tooltip-trigger{if isset($tooltip_class) && $tooltip_class} {$tooltip_class|escape:'html':'UTF-8'}{/if}">
-   <img src="themes/default/img/icon-info.svg" />
+	{if isset($tooltip_title) && $tooltip_title}
+		{$tooltip_title nofilter}
+	{elseif isset($tooltip_icon_class) && $tooltip_icon_class}
+		<i class="{$tooltip_icon_class|escape:'html':'UTF-8'}"{if isset($tooltip_icon_style) && $tooltip_icon_style} style="{$tooltip_icon_style|escape:'html':'UTF-8'}"{/if}></i>
+	{else}
+		<img src="themes/default/img/icon-info.svg" alt="" />
+	{/if}
 </span>
-
 <div class="tooltip-content" style="display: none;">
-    {if isset($tooltip_items) && $tooltip_items|@count}
-		<ul class="tooltip-days">
-            {foreach $tooltip_items as $item}
-                <li>{$item|escape:'html':'UTF-8'}</li>
-            {/foreach}
-        </ul>
-    {elseif isset($allow_html) && $allow_html}
-        {$tooltip_content nofilter}
-    {else}
-        {$tooltip_content|escape:'html':'UTF-8'}
-    {/if}
+	{if isset($allow_html) && !$allow_html}
+		{$tooltip_content|escape:'html':'UTF-8'}
+	{else}
+		{$tooltip_content nofilter}
+	{/if}
 </div>

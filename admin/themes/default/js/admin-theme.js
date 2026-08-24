@@ -478,41 +478,42 @@ $(document).ready(function() {
 	$('.no-htl-access-option').on('click', function() {
 		$(this).prop('selected', false);
 	});
+	initTooltip();
 }); //end dom ready
 
-
-function initTooltip() {
-    if (!$('.tooltip-trigger').length) {
-        return;
-    }
-    $('.tooltip-trigger').each(function () {
-        if ($(this).data('ui-tooltip')) {
-            return;
-        }
-        $(this).tooltip({
-            content: $(this).siblings('.tooltip-content').html(),
-            items: 'span',
-            trigger: 'hover',
-            tooltipClass: 'tooltip-popup',
-            open: function (event, ui) {
-                if (typeof event.originalEvent === 'undefined') {
-                    return false;
-                }
-                var $id = $(ui.tooltip).attr('id');
-                if ($('div.ui-tooltip').not('#' + $id).length) {
-                    return false;
-                }
-            },
-            close: function (event, ui) {
-                ui.tooltip.hover(
-                    function () { $(this).stop(true).fadeTo(400, 1); },
-                    function () { $(this).fadeOut(400, function () { $(this).remove(); }); }
-                );
-            }
-        });
-    });
+function initTooltip($target, contentFn, items) {
+	var $elements = $target || $('.tooltip-trigger');
+	if (!$elements.length) {
+		return;
+	}
+	$elements.each(function () {
+		var $this = $(this);
+		if (!contentFn && $this.data('ui-tooltip')) {
+			return;
+		}
+		$this.tooltip({
+			content: contentFn || $this.next('.tooltip-content').html(),
+			items: items || 'span',
+			trigger: 'hover',
+			tooltipClass: 'tooltip-popup',
+			open: function (event, ui) {
+				if (event.buttons == 1 || event.buttons == 3) {
+					ui.tooltip.remove();
+				}
+				if (typeof event.originalEvent === 'undefined') {
+					return false;
+				}
+				var $id = $(ui.tooltip).attr('id');
+				if ($('div.ui-tooltip').not('#' + $id).length) {
+					return false;
+				}
+			},
+			close: function (event, ui) {
+				ui.tooltip.hover(
+					function () { $(this).stop(true).fadeTo(300, 1); },
+					function () { $(this).fadeOut(300, function () { $(this).remove(); }); }
+				);
+			}
+		});
+	});
 }
-
-$(document).ready(function () {
-    initTooltip();
-});

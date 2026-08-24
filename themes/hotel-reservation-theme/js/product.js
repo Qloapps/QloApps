@@ -1311,11 +1311,14 @@ function updateRoomServiceQuantity(that) {
 
 
 function initMap() {
-    const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), {
+    const mapOptions = {
         zoom: 10,
         streetViewControl: false,
-        mapId: PS_MAP_ID
-    });
+    };
+    if (PS_MAP_ID) {
+        mapOptions.mapId = PS_MAP_ID;
+    }
+    const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), mapOptions);
 
     const hotelLatLng = {
         lat: Number(hotel_location.latitude),
@@ -1327,11 +1330,20 @@ function initMap() {
     icon.src = PS_STORES_ICON;
     icon.style.width = '24px';
     icon.style.height = '24px';
-    let marker = new google.maps.marker.AdvancedMarkerElement({
-        position: hotelLatLng,
-        map: map,
-        content: icon,
-    });
+    let marker;
+    if (PS_MAP_ID) {
+        marker = new google.maps.marker.AdvancedMarkerElement({
+            position: hotelLatLng,
+            map: map,
+            content: icon,
+        });
+    } else {
+        marker = new google.maps.Marker({
+            position: hotelLatLng,
+            map: map,
+            icon: PS_STORES_ICON,
+        });
+    }
 
     const uiContent = $('#room-info-map-ui-content .hotel-info-wrap').get(0);
     map.controls[google.maps.ControlPosition.LEFT_TOP].push(uiContent);
