@@ -27,6 +27,8 @@
 		var id_cart = {$cart->id|intval};
 	{/if}
 	var id_customer = 0;
+	var can_edit_booking_carts = {if isset($can_edit_booking_carts) && $can_edit_booking_carts}true{else}false{/if};
+	var can_add_addresses = {if isset($can_add_addresses) && $can_add_addresses}true{else}false{/if};
 	var admin_order_tab_link = "{$link->getAdminLink('AdminOrders')|addslashes}";
 	var changed_shipping_price = false;
 	var shipping_price_selected_carrier = '';
@@ -620,6 +622,10 @@
 			$(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
 		}
 		{/literal}
+
+		if (!can_edit_booking_carts || !can_add_addresses) {
+			$('#address_part').hide();
+		}
 	});
 
 	function resetBind()
@@ -953,7 +959,9 @@
 		{if isset($cart->id) && $cart->id}
 			id_cart = "{$cart->id}";
 		{/if}
-		$('#new_address').attr('href', address_link.replace(/id_customer=[0-9]+/, 'id_customer='+id_customer));
+		if (address_link) {
+			$('#new_address').attr('href', address_link.replace(/id_customer=[0-9]+/, 'id_customer='+id_customer));
+		}
 		$.ajax({
 			type:"POST",
 			url : "{$link->getAdminLink('AdminCarts')|addslashes}",
@@ -1505,13 +1513,20 @@
 		if (addresses.length == 0)
 		{
 			$('#address_delivery, #address_invoice').hide();
-			$("#new_address").show();
+			if (can_edit_booking_carts && can_add_addresses) {
+				$('#address_part').show();
+				$("#new_address").show();
+			} else {
+				$('#address_part').hide();
+			}
 		}
 		else
 		{
 			$('#addresses_err').hide();
 			$("#new_address").hide();
 			$('#address_delivery, #address_invoice').show();
+			$('#address_part').show();
+			$('#address_part .panel-heading').show();
 		}
 
 		$('#id_address_delivery').html(addresses_delivery_options).hide();
@@ -1894,13 +1909,15 @@
                             </span>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <span class="form-control-static">{l s='Or'}&nbsp;</span>
-                        <a class="fancybox_customer btn btn-default" href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;addcustomer&amp;liteDisplaying=1&amp;submitFormAjax=1#">
-                            <i class="icon-plus-sign-alt"></i>
-                            {l s='Add new customer'}
-                        </a>
-                    </div>
+					{if isset($can_edit_booking_carts) && $can_edit_booking_carts && isset($can_add_customers) && $can_add_customers}
+						<div class="col-lg-6">
+							<span class="form-control-static">{l s='Or'}&nbsp;</span>
+							<a class="fancybox_customer btn btn-default" href="{$link->getAdminLink('AdminCustomers')|escape:'html':'UTF-8'}&amp;addcustomer&amp;liteDisplaying=1&amp;submitFormAjax=1#">
+								<i class="icon-plus-sign-alt"></i>
+								{l s='Add new customer'}
+							</a>
+						</div>
+					{/if}
                 </div>
             </div>
         </div>
@@ -1918,7 +1935,7 @@
 							<a href="{$link->getAdminLink('AdminCustomers')}&id_customer={$customer->id}&viewcustomer&liteDisplaying=1" class="btn btn-default fancybox">
 								<i class="icon-search"></i> Details </a>
 								<button type="button" data-id_cart="6" data-customer="2" class="btn btn-default pull-right change-customer">
-									<i class="icon-refresh"></i>&nbsp;Change 
+									<i class="icon-refresh"></i>&nbsp;Change
 								</button>
 							</div>
 						</div>
@@ -2127,13 +2144,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6">
-                            <span class="form-control-static">{l s='Or'}&nbsp;</span>
-                            <a class="fancybox btn btn-default" href="{$link->getAdminLink('AdminCartRules')|escape:'html':'UTF-8'}&amp;addcart_rule&amp;liteDisplaying=1&amp;submitFormAjax=1#">
-                                <i class="icon-plus-sign-alt"></i>
-                                {l s='Add new voucher'}
-                            </a>
-                        </div>
+						{if isset($can_edit_booking_carts) && $can_edit_booking_carts && isset($can_add_vouchers) && $can_add_vouchers}
+							<div class="col-lg-6">
+								<span class="form-control-static">{l s='Or'}&nbsp;</span>
+								<a class="fancybox btn btn-default" href="{$link->getAdminLink('AdminCartRules')|escape:'html':'UTF-8'}&amp;addcart_rule&amp;liteDisplaying=1&amp;submitFormAjax=1#">
+									<i class="icon-plus-sign-alt"></i>
+									{l s='Add new voucher'}
+								</a>
+							</div>
+						{/if}
                     </div>
                 </div>
             </div>
@@ -2155,7 +2174,7 @@
         </div>
 
         <div class="panel" id="address_part" style="">
-            <div class="panel-heading">
+            <div class="panel-heading" id="address_panel_heading">
                 <i class="icon-envelope"></i>
                 {l s='Addresses'}
             </div>
@@ -2189,6 +2208,7 @@
                     </div>
                 </div>
             </div>
+			{if isset($can_edit_booking_carts) && $can_edit_booking_carts && isset($can_add_addresses) && $can_add_addresses}
             <div class="row">
                 <div class="col-lg-12">
                     <a class="fancybox btn btn-default" id="new_address" href="{$link->getAdminLink('AdminAddresses')|escape:'html':'UTF-8'}&amp;addaddress&amp;id_customer=42&amp;liteDisplaying=1&amp;submitFormAjax=1#">
@@ -2197,6 +2217,7 @@
                     </a>
                 </div>
             </div>
+			{/if}
         </div>
         <div class="panel" id="carriers_part" style="display:none;">
             <div class="panel-heading">

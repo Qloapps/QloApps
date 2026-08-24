@@ -38,7 +38,7 @@ class AdminSearchControllerCore extends AdminController
             'AdminOrderRefundRules' => 1,
             'AdminRoomTypeGlobalDemand' => 1,
             'AdminGroups' => 1,
-            'AdminHotelFeatures' => 1,
+            'AdminHotelAmenities' => 1,
             'AdminCustomers' => 1,
             'AdminAddHotel' => 1,
             'AdminNormalProducts' => 1,
@@ -190,7 +190,7 @@ class AdminSearchControllerCore extends AdminController
 
             if (!$searchType) {
                 $this->searchAddress();
-                $this->searchHotelFeatures();
+                $this->searchHotelAmenities();
                 $this->searchAdditionalFacilities();
                 $this->searchRefundRules();
             }
@@ -428,23 +428,23 @@ class AdminSearchControllerCore extends AdminController
         }
     }
 
-    public function searchHotelFeatures()
+    public function searchHotelAmenities()
     {
-        if (class_exists('HotelFeatures')) {
-            if (isset($this->controllerAccess['AdminHotelFeatures']) && $this->controllerAccess['AdminHotelFeatures']) {
-                $objHotelFeatures = new HotelFeatures();
-                if ($hotelFeatures = $objHotelFeatures->searchByName($this->query, $this->context->language->id)) {
-                    $features = array();
-                    foreach ($hotelFeatures as $key => $hotelFeature) {
-                        $features[$hotelFeature['id']]['name'] = $hotelFeature['name'];
-                        if ($hotelFeature['parent_feature_id']) {
-                            $features[$hotelFeature['id']]['id'] = $hotelFeature['parent_feature_id'];
+        if (class_exists('HotelAmenities')) {
+            if (isset($this->controllerAccess['AdminHotelAmenities']) && $this->controllerAccess['AdminHotelAmenities']) {
+                $objHotelAmenities = new HotelAmenities();
+                if ($hotelAmenities = $objHotelAmenities->searchByName($this->query, $this->context->language->id)) {
+                    $amenities = array();
+                    foreach ($hotelAmenities as $key => $hotelAmenity) {
+                        $amenities[$hotelAmenity['id_amenity']]['name'] = $hotelAmenity['name'];
+                        if ($hotelAmenity['id_parent']) {
+                            $amenities[$hotelAmenity['id_amenity']]['id'] = $hotelAmenity['id_parent'];
                         } else {
-                            $features[$hotelFeature['id']]['id'] = $hotelFeature['id'];
+                            $amenities[$hotelAmenity['id_amenity']]['id'] = $hotelAmenity['id_amenity'];
                         }
                     }
 
-                    $this->_list['hotel_features'] = $features;
+                    $this->_list['hotel_amenities'] = $amenities;
                 }
             }
         }
@@ -681,10 +681,10 @@ class AdminSearchControllerCore extends AdminController
         );
     }
 
-    protected function initHotelFeatureList()
+    protected function initHotelAmenityList()
     {
         $this->show_toolbar = false;
-        $this->fields_list['hotel_features'] = array(
+        $this->fields_list['hotel_amenities'] = array(
             'name' => array('title' => $this->l('name'), 'width' => 'auto'),
         );
     }
@@ -929,26 +929,26 @@ class AdminSearchControllerCore extends AdminController
                 $this->tpl_view_vars['customers'] = $view;
             }
 
-            if (isset($this->_list['hotel_features']) && count($this->_list['hotel_features'])) {
+            if (isset($this->_list['hotel_amenities']) && count($this->_list['hotel_amenities'])) {
                 $view = '';
-                $this->initHotelFeatureList();
+                $this->initHotelAmenityList();
 
                 $helper = new HelperList();
                 $helper->shopLinkType = '';
                 $helper->simple_header = true;
-                $helper->identifier = 'id';
+                $helper->identifier = 'id_amenity';
                 $helper->actions = array('edit', 'view');
                 $helper->show_toolbar = false;
-                $helper->table = 'htl_features';
-                $helper->currentIndex = $this->context->link->getAdminLink('AdminHotelFeatures', false);
-                $helper->token = Tools::getAdminTokenLite('AdminHotelFeatures');
+                $helper->table = 'htl_amenity';
+                $helper->currentIndex = $this->context->link->getAdminLink('AdminHotelAmenities', false);
+                $helper->token = Tools::getAdminTokenLite('AdminHotelAmenities');
 
-                if ($this->_list['hotel_features']) {
-                    $view = $helper->generateList($this->_list['hotel_features'], $this->fields_list['hotel_features']);
+                if ($this->_list['hotel_amenities']) {
+                    $view = $helper->generateList($this->_list['hotel_amenities'], $this->fields_list['hotel_amenities']);
                 }
 
-                $this->tpl_view_vars['num_hotel_features'] = count($this->_list['hotel_features']);
-                $this->tpl_view_vars['hotel_features'] = $view;
+                $this->tpl_view_vars['num_hotel_amenities'] = count($this->_list['hotel_amenities']);
+                $this->tpl_view_vars['hotel_amenities'] = $view;
             }
             if (isset($this->_list['groups']) && count($this->_list['groups'])) {
                 $view = '';
