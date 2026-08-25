@@ -62,7 +62,7 @@
 															<div class="card-header" id="shopping-cart-summary-head">
 																{block name='order_opc_rooms_summary_heading'}
 																	<h5 class="accordion-header" data-toggle="collapse" data-target="#collapse-shopping-cart" aria-expanded="true" aria-controls="collapse-shopping-cart">
-																		<span>{l s='Stays & Price Summary'}</span>
+																		<span>{l s='Summary'}</span>
 																		<i class="icon-angle-left pull-right accordion-left-arrow {if $step->step_is_current}hidden{/if}"></i>
 																	</h5>
 																{/block}

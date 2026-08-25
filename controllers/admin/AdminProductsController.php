@@ -4637,15 +4637,6 @@ class AdminProductsControllerCore extends AdminController
             $data->assign('htl_full_info', $hotelFullInfo);
         }
 
-        $objHotelBedType = new HotelBedType();
-        $bedTypes = $objHotelBedType->getAllBedTypes($this->context->language->id);
-        $data->assign('bed_types_info', $bedTypes);
-        $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-        if ($selectedBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($product->id)) {
-            $selectedBedTypes = array_column($selectedBedTypes, 'id_bed_type');
-            $data->assign('selected_bed_types', $selectedBedTypes);
-        }
-
         $roomTypeSellingObjects = RoomTypeSellingObject::getRoomTypeSellingObjects($this->context->language->id);
         $data->assign('selling_object_info', $roomTypeSellingObjects);
         if (!empty($product->id_selling_object)) {
