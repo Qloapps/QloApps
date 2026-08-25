@@ -32,7 +32,7 @@
                     <th><span class="title_box">{l s='Total Tax'}</span></th>
                     <th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
                     {if isset($refundReqProducts) && $refundReqProducts}
-                        <th><span class="title_box">{l s='No. of Refunds'}</span></th>
+                        <th><span class="title_box"><div>{l s='Refund'}</div><div>{l s='Refund requests'}</div></span></th>
                     {/if}
                     {if ($can_edit && !$order->hasBeenDelivered())}
                         <th class="fixed-width-md center"><span class="title_box">{l s='Actions'}</span></th>
@@ -74,17 +74,14 @@
                             </td>
                             {if (isset($refundReqProducts) && $refundReqProducts)}
                                 <td>
-                                    <p>
-                                        {if $product.refund_count}
-                                            <a href="{$link->getAdminLink('AdminOrderRefundRequests')|escape:'html':'UTF-8'}&id_order={$order->id|intval}&id_service_product_order_detail={$product.id_service_product_order_detail|intval}" target="_blank">{$product.refund_count}</a>
-                                        {else}
-                                            <span>--</span>
+                                    {if $product.refund_count}
+                                        {if $product.refund_amount}
+                                            <p class="refunded_amount">
+                                                {convertPriceWithCurrency price=$product.refund_amount currency=$currency->id}
+                                            </p>
                                         {/if}
-                                    </p>
-                                    {if $product.refund_amount}
-                                        <p class="badge badge-success refunded_amount">
-                                            {convertPriceWithCurrency price=$product.refund_amount currency=$currency->id}
-                                        </p>
+                                        <p>
+                                        <a href="{$link->getAdminLink('AdminOrderRefundRequests')|escape:'html':'UTF-8'}&id_order={$order->id|intval}&id_service_product_order_detail={$product.id_service_product_order_detail|intval}" target="_blank" class="badge badge-danger">{$product.refund_count}</a>
                                     {else}
                                         <p>--</p>
                                     {/if}

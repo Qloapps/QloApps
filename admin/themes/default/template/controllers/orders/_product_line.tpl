@@ -116,20 +116,16 @@
 	</td>
 	{if (isset($refundReqBookings) && $refundReqBookings)}
 		<td class="center">
-			<p>
-				{if $data.refund_count}
-					<a href="{$link->getAdminLink('AdminOrderRefundRequests')|escape:'html':'UTF-8'}&id_order={$order->id|intval}&id_htl_booking={$data.id|intval}" target="_blank">{$data.refund_count}</a>
-				{else}
-					<span>--</span>
-				{/if}
-			</p>
+		{if $data.refund_count}
 			{if $data.refund_amount}
-				<p class="badge badge-success refunded_amount">
+				<p class="refunded_amount">
 					{convertPriceWithCurrency price=$data.refund_amount currency=$currency->id}
 				</p>
-			{else}
-				<p>--</p>
 			{/if}
+				<a href="{$link->getAdminLink('AdminOrderRefundRequests')|escape:'html':'UTF-8'}&id_order={$order->id|intval}&id_htl_booking={$data.id|intval}" target="_blank" class="badge badge-danger">{$data.refund_count}</a>
+		{else}
+			<p>--</p>
+		{/if}
 		</td>
 	{/if}
 	{if ($can_edit && !$order->hasBeenDelivered())}

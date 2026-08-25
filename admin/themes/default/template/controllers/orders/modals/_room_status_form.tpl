@@ -26,7 +26,7 @@
             <label class="control-label">{l s='Status'}</label>
             <select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
                 {foreach from=$hotel_order_status item=state}
-                    <option value="{$state['id_status']|intval}">{$state.name|escape}</option>
+                    <option value="{$state['id_status']|intval}" {if $state['id_status'] != $current_room_status && !($state['id_status']|in_array:$allowed_room_status_transitions)}disabled="disabled"{/if}>{$state.name|escape}</option>
                 {/foreach}
             </select>
         </div>
@@ -47,8 +47,8 @@
         </div>
 
         <div class="form-group">
-            <label class="control-label">{l s='Note'}</label>
-            <textarea name="status_remark" class="form-control" rows="2" required="required"></textarea>
+            <label class="control-label">{l s='Remark'}</label>
+            <textarea name="status_remark" class="form-control" rows="2"></textarea>
         </div>
 
         <button class="btn btn-primary" type="submit" name="submitbookingOrderStatus" style="display:none" id="submitbookingOrderStatus"></button>
