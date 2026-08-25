@@ -92,6 +92,7 @@ class AdminCartRulesControllerCore extends AdminController
         $this->context->smarty->assign(array(
             'hotel_names_first'     => !empty($hotels) ? $hotels[0] : null,
             'hotel_names_remaining' => count($hotels) > 1 ? array_slice($hotels, 1) : array(),
+            'selected_hotels'       => $hotels,
         ));
 
         return $this->context->smarty->fetch(
