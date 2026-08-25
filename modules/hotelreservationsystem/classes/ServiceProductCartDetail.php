@@ -374,6 +374,7 @@ class ServiceProductCartDetail extends ObjectModel
                             'auto_add_to_cart' => $product['auto_add_to_cart'],
                             'price_addition_type' => $product['price_addition_type'],
                             'total_price' => ($useTax ? $priceTaxIncl : $priceTaxExcl) * $numDays * (int)$product['quantity'],
+                            'tourism_tax_amount' => $tourismTaxAmount,
                         );
 
                         if ($objHotelCartBooking) {

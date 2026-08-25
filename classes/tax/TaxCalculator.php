@@ -255,7 +255,7 @@ class TaxCalculatorCore
                     $adultMultiplier *= $numAdults;
                 }
 
-                if ($taxType === 0) {
+                if ($taxType === TaxConfiguration::CALCULATION_TYPE_FIXED) {
                     $unitAmountAdult = $baseValue;
                     $totalAmountAdult = $baseValue * $adultMultiplier;
                 } else {
@@ -355,7 +355,7 @@ class TaxCalculatorCore
      * @param int    $numNights
      * @param int    $numAdults
      * @param int[]  $childrenAges    Ages at check-in date
-     * @param int    $collectionType  TaxConfiguration::COLLECTION_TYPE_*
+     * @param int    $collectionType  HotelBranchInformation::TAX_COLLECTION_TYPE_*
      * @param int    $quantity        Line quantity multiplier
      * @return float price without tourism tax
      */

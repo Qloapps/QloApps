@@ -138,9 +138,12 @@ class Blockcart extends Module
                         foreach ($serviceProducts as $key => $serviceProduct) {
                             if ($serviceProduct['id_product'] == $product['id_product']) {
                                 $product['options'][] = $serviceProduct;
-                                $product['total_price_tax_incl'] += $serviceProduct['total_price_tax_incl'];
+                                $tourismTaxGrossUp = ($useTax && TaxConfiguration::isGrossedUp($serviceProduct['tourism_tax_amount']))
+                                    ? $serviceProduct['tourism_tax_amount']
+                                    : 0.0;
+                                $product['total_price_tax_incl'] += $serviceProduct['total_price_tax_incl'] + $tourismTaxGrossUp;
                                 $product['total_price_tax_excl'] += $serviceProduct['total_price_tax_excl'];
-                                $product['amount'] += $useTax ? $serviceProduct['total_price_tax_incl'] : $serviceProduct['total_price_tax_excl'];
+                                $product['amount'] += $useTax ? ($serviceProduct['total_price_tax_incl'] + $tourismTaxGrossUp) : $serviceProduct['total_price_tax_excl'];
                             }
                         }
                     }
@@ -405,6 +408,10 @@ class Blockcart extends Module
             $totalConvenienceFee += $tourismTaxConvenienceFee;
         }
         $totalNormalProductPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_STANDALONE_PRODUCTS);
+        $tourismTaxStandaloneProducts = (float) $tourismTaxTotals['tourism_tax_standalone_products'];
+        if ($useTax && TaxConfiguration::isGrossedUp($tourismTaxStandaloneProducts)) {
+            $totalNormalProductPrice += $tourismTaxStandaloneProducts;
+        }
 
         $response = array(
             'products' => $products,

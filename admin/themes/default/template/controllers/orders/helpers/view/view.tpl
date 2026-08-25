@@ -992,7 +992,7 @@
                                                         </td>
                                                     </tr>
                                                 {/if}
-                                                {if $tourism_tax_room > 0}
+                                                {if isset($tourism_tax_room) && $tourism_tax_room > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Tourism Tax on Room'}</td>
                                                         <td class="text-right">
@@ -1009,7 +1009,7 @@
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
                                                 {/if}
-                                                {if $tourism_tax_service > 0}
+                                                {if isset($tourism_tax_service) && $tourism_tax_service > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Tourism Tax on Extra Services'}</td>
                                                         <td class="text-right nowrap">
@@ -1027,7 +1027,7 @@
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
                                                 {/if}
-                                                {if $tourism_tax_products > 0}
+                                                {if isset($tourism_tax_products) && $tourism_tax_products > 0}
                                                     <tr id="total_products">
                                                         <td class="text-left">{l s='Tourism Tax on Products'}</td>
                                                         <td class="amount text-right nowrap">

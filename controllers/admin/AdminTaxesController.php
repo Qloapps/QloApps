@@ -306,7 +306,7 @@ class AdminTaxesControllerCore extends AdminController
             $specialDaysChecked = $allDayKeys;
         }
 
-        $initialTypeSign = ($taxType == 1) ? '%' : $currencySign;
+        $initialTypeSign = ($taxType == TaxConfiguration::CALCULATION_TYPE_PERCENTAGE) ? '%' : $currencySign;
         $taxValueInputHtml = '
             <div class="input-group col-lg-5">
                 <span class="input-group-addon" id="tourism-tax-type-sign" data-currency="' . htmlspecialchars($currencySign) . '">' . $initialTypeSign . '</span>
@@ -348,7 +348,38 @@ class AdminTaxesControllerCore extends AdminController
                 </tr></thead>
                 <tbody id="tourism-tax-tiers-body">';
         foreach ($tiers as $tierRowIndex => $tier) {
-            $priceBracketsHtml .= $this->buildTierRow($tierRowIndex, $tier);
+            $tierMinRaw = isset($tier['min_amount']) ? $tier['min_amount'] : '';
+            $tierMin = (is_numeric($tierMinRaw) && (float) $tierMinRaw == 0) ? '' : $tierMinRaw;
+            $tierMaxRaw = isset($tier['max_amount']) ? $tier['max_amount'] : '';
+            $tierMax = (is_numeric($tierMaxRaw) && (float) $tierMaxRaw == 0) ? '' : $tierMaxRaw;
+            $tierVal = isset($tier['tax_value']) ? $tier['tax_value'] : '';
+            $tierId = isset($tier['id_tier']) ? (int) $tier['id_tier'] : 0;
+            $tierRowErrors = isset($this->invalidTierFields[$tierRowIndex]) ? $this->invalidTierFields[$tierRowIndex] : array();
+
+            $priceBracketsHtml .= '
+                <tr class="tourism-tax-tier-row nodrag nodrop">
+                    <td class="col-sm-4 center">
+                        <input type="text" name="tier_min[' . $tierRowIndex . ']"
+                            value="' . htmlspecialchars($tierMin) . '" class="form-control' . (!empty($tierRowErrors['min']) ? ' error-border' : '') . '" placeholder="0" />
+                    </td>
+                    <td class="col-sm-4 center">
+                        <input type="text" name="tier_max[' . $tierRowIndex . ']"
+                            value="' . htmlspecialchars($tierMax) . '" class="form-control' . (!empty($tierRowErrors['max']) ? ' error-border' : '') . '" placeholder="' . $this->l('No cap') . '" />
+                    </td>
+                    <td class="col-sm-3 center">
+                        <div class="input-group">
+                            <span class="input-group-addon tourism-tax-row-type-sign"></span>
+                            <input type="text" name="tier_value[' . $tierRowIndex . ']"
+                                value="' . htmlspecialchars($tierVal) . '" class="form-control' . (!empty($tierRowErrors['value']) ? ' error-border' : '') . '" />
+                        </div>
+                    </td>
+                    <td class="col-sm-1 center">
+                        <input type="hidden" name="tier_id[' . $tierRowIndex . ']" value="' . $tierId . '" />
+                        <a href="#" class="btn btn-default tourism-tax-remove-row">
+                            <i class="icon-trash"></i>
+                        </a>
+                    </td>
+                </tr>';
         }
         $priceBracketsHtml .= '
                 </tbody>
@@ -360,9 +391,28 @@ class AdminTaxesControllerCore extends AdminController
                     </button>
                 </div>
             </div>
-            <script type="text/x-template" id="tourism-tax-tier-row-tpl">'
-                . $this->buildTierRow('__IDX__', array())
-            . '</script>';
+            <script type="text/x-template" id="tourism-tax-tier-row-tpl">
+                <tr class="tourism-tax-tier-row nodrag nodrop">
+                    <td class="col-sm-4 center">
+                        <input type="text" name="tier_min[__IDX__]" value="" class="form-control" placeholder="0" />
+                    </td>
+                    <td class="col-sm-4 center">
+                        <input type="text" name="tier_max[__IDX__]" value="" class="form-control" placeholder="' . $this->l('No cap') . '" />
+                    </td>
+                    <td class="col-sm-3 center">
+                        <div class="input-group">
+                            <span class="input-group-addon tourism-tax-row-type-sign"></span>
+                            <input type="text" name="tier_value[__IDX__]" value="" class="form-control" />
+                        </div>
+                    </td>
+                    <td class="col-sm-1 center">
+                        <input type="hidden" name="tier_id[__IDX__]" value="0" />
+                        <a href="#" class="btn btn-default tourism-tax-remove-row">
+                            <i class="icon-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            </script>';
 
         $infantMaxAge = (int) Configuration::get('QLO_GLOBAL_MAX_INFANT_AGE');
         $childMaxAge = (int) Configuration::get('WK_GLOBAL_CHILD_MAX_AGE');
@@ -395,7 +445,38 @@ class AdminTaxesControllerCore extends AdminController
                 </tr></thead>
                 <tbody id="tourism-tax-child-body">';
         foreach ($childRanges as $rangeRowIndex => $range) {
-            $ageBandsHtml .= $this->buildChildRangeRow($rangeRowIndex, $range);
+            $rangeMinRaw = isset($range['min_age']) ? $range['min_age'] : '';
+            $rangeMin = (is_numeric($rangeMinRaw) && (int) $rangeMinRaw == 0) ? '' : $rangeMinRaw;
+            $rangeMaxRaw = isset($range['max_age']) ? $range['max_age'] : '';
+            $rangeMax = (is_numeric($rangeMaxRaw) && (int) $rangeMaxRaw == 0) ? '' : $rangeMaxRaw;
+            $rangeVal = isset($range['tax_value']) ? $range['tax_value'] : '';
+            $rangeId = isset($range['id_child_range']) ? (int) $range['id_child_range'] : 0;
+            $rangeRowErrors = isset($this->invalidChildFields[$rangeRowIndex]) ? $this->invalidChildFields[$rangeRowIndex] : array();
+
+            $ageBandsHtml .= '
+                <tr class="tourism-tax-child-row nodrag nodrop">
+                    <td class="col-sm-4 center">
+                        <input type="text" name="child_min[' . $rangeRowIndex . ']"
+                            value="' . htmlspecialchars($rangeMin) . '" class="form-control' . (!empty($rangeRowErrors['min']) ? ' error-border' : '') . '" placeholder="0" />
+                    </td>
+                    <td class="col-sm-4 center">
+                        <input type="text" name="child_max[' . $rangeRowIndex . ']"
+                            value="' . htmlspecialchars($rangeMax) . '" class="form-control' . (!empty($rangeRowErrors['max']) ? ' error-border' : '') . '" placeholder="' . $this->l('No cap') . '" />
+                    </td>
+                    <td class="col-sm-3 center">
+                        <div class="input-group">
+                            <span class="input-group-addon tourism-tax-row-type-sign"></span>
+                            <input type="text" name="child_value[' . $rangeRowIndex . ']"
+                                value="' . htmlspecialchars($rangeVal) . '" class="form-control' . (!empty($rangeRowErrors['value']) ? ' error-border' : '') . '" />
+                        </div>
+                    </td>
+                    <td class="col-sm-1 center">
+                        <input type="hidden" name="child_id[' . $rangeRowIndex . ']" value="' . $rangeId . '" />
+                        <a href="#" class="btn btn-default tourism-tax-remove-row">
+                            <i class="icon-trash"></i>
+                        </a>
+                    </td>
+                </tr>';
         }
         $ageBandsHtml .= '
                 </tbody>
@@ -407,9 +488,28 @@ class AdminTaxesControllerCore extends AdminController
                     </button>
                 </div>
             </div>
-            <script type="text/x-template" id="tourism-tax-child-row-tpl">'
-                . $this->buildChildRangeRow('__IDX__', array())
-            . '</script>';
+            <script type="text/x-template" id="tourism-tax-child-row-tpl">
+                <tr class="tourism-tax-child-row nodrag nodrop">
+                    <td class="col-sm-4 center">
+                        <input type="text" name="child_min[__IDX__]" value="" class="form-control" placeholder="0" />
+                    </td>
+                    <td class="col-sm-4 center">
+                        <input type="text" name="child_max[__IDX__]" value="" class="form-control" placeholder="' . $this->l('No cap') . '" />
+                    </td>
+                    <td class="col-sm-3 center">
+                        <div class="input-group">
+                            <span class="input-group-addon tourism-tax-row-type-sign"></span>
+                            <input type="text" name="child_value[__IDX__]" value="" class="form-control" />
+                        </div>
+                    </td>
+                    <td class="col-sm-1 center">
+                        <input type="hidden" name="child_id[__IDX__]" value="0" />
+                        <a href="#" class="btn btn-default tourism-tax-remove-row">
+                            <i class="icon-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            </script>';
 
         $validFromValue = Tools::getValue('valid_from', $subtype ? ($subtype->valid_from ?: '') : '');
         $validToValue = Tools::getValue('valid_to', $subtype ? ($subtype->valid_to ?: '') : '');
@@ -645,88 +745,6 @@ class AdminTaxesControllerCore extends AdminController
     }
 
     /**
-     * @param int|string $idx  Row index or '__IDX__' for JS template
-     * @param array      $tier
-     * @return string
-     */
-    protected function buildTierRow($idx, array $tier)
-    {
-        $minRaw = isset($tier['min_amount']) ? $tier['min_amount'] : '';
-        $min = (is_numeric($minRaw) && (float) $minRaw == 0) ? '' : $minRaw;
-        $maxRaw = isset($tier['max_amount']) ? $tier['max_amount'] : '';
-        $max = (is_numeric($maxRaw) && (float) $maxRaw == 0) ? '' : $maxRaw;
-        $val = isset($tier['tax_value']) ? $tier['tax_value'] : '';
-        $id = isset($tier['id_tier']) ? (int) $tier['id_tier'] : 0;
-        $rowErrors = isset($this->invalidTierFields[$idx]) ? $this->invalidTierFields[$idx] : array();
-
-        return '
-            <tr class="tourism-tax-tier-row nodrag nodrop">
-                <td class="col-sm-4 center">
-                    <input type="text" name="tier_min[' . $idx . ']"
-                        value="' . htmlspecialchars($min) . '" class="form-control' . (!empty($rowErrors['min']) ? ' error-border' : '') . '" placeholder="0" />
-                </td>
-                <td class="col-sm-4 center">
-                    <input type="text" name="tier_max[' . $idx . ']"
-                        value="' . htmlspecialchars($max) . '" class="form-control' . (!empty($rowErrors['max']) ? ' error-border' : '') . '" placeholder="' . $this->l('No cap') . '" />
-                </td>
-                <td class="col-sm-3 center">
-                    <div class="input-group">
-                        <span class="input-group-addon tourism-tax-row-type-sign"></span>
-                        <input type="text" name="tier_value[' . $idx . ']"
-                            value="' . htmlspecialchars($val) . '" class="form-control' . (!empty($rowErrors['value']) ? ' error-border' : '') . '" />
-                    </div>
-                </td>
-                <td class="col-sm-1 center">
-                    <input type="hidden" name="tier_id[' . $idx . ']" value="' . $id . '" />
-                    <a href="#" class="btn btn-default tourism-tax-remove-row">
-                        <i class="icon-trash"></i>
-                    </a>
-                </td>
-            </tr>';
-    }
-
-    /**
-     * @param int|string $idx  Row index or '__IDX__' for JS template
-     * @param array      $range
-     * @return string
-     */
-    protected function buildChildRangeRow($idx, array $range)
-    {
-        $minRaw = isset($range['min_age']) ? $range['min_age'] : '';
-        $min = (is_numeric($minRaw) && (int) $minRaw == 0) ? '' : $minRaw;
-        $maxRaw = isset($range['max_age']) ? $range['max_age'] : '';
-        $max = (is_numeric($maxRaw) && (int) $maxRaw == 0) ? '' : $maxRaw;
-        $val = isset($range['tax_value']) ? $range['tax_value'] : '';
-        $id = isset($range['id_child_range']) ? (int) $range['id_child_range'] : 0;
-        $rowErrors = isset($this->invalidChildFields[$idx]) ? $this->invalidChildFields[$idx] : array();
-
-        return '
-            <tr class="tourism-tax-child-row nodrag nodrop">
-                <td class="col-sm-4 center">
-                    <input type="text" name="child_min[' . $idx . ']"
-                        value="' . htmlspecialchars($min) . '" class="form-control' . (!empty($rowErrors['min']) ? ' error-border' : '') . '" placeholder="0" />
-                </td>
-                <td class="col-sm-4 center">
-                    <input type="text" name="child_max[' . $idx . ']"
-                        value="' . htmlspecialchars($max) . '" class="form-control' . (!empty($rowErrors['max']) ? ' error-border' : '') . '" placeholder="' . $this->l('No cap') . '" />
-                </td>
-                <td class="col-sm-3 center">
-                    <div class="input-group">
-                        <span class="input-group-addon tourism-tax-row-type-sign"></span>
-                        <input type="text" name="child_value[' . $idx . ']"
-                            value="' . htmlspecialchars($val) . '" class="form-control' . (!empty($rowErrors['value']) ? ' error-border' : '') . '" />
-                    </div>
-                </td>
-                <td class="col-sm-1 center">
-                    <input type="hidden" name="child_id[' . $idx . ']" value="' . $id . '" />
-                    <a href="#" class="btn btn-default tourism-tax-remove-row">
-                        <i class="icon-trash"></i>
-                    </a>
-                </td>
-            </tr>';
-    }
-
-    /**
      * List column callback: display a Yes/No badge for is_tourism_tax.
      *
      * @param mixed $value  1 or 0
@@ -780,7 +798,7 @@ class AdminTaxesControllerCore extends AdminController
                             $this->errors[] = Tools::displayError('An error occurred while updating an object.').' <b>'.$this->table.'</b>';
                         } elseif ($this->postImage($object->id)) {
                             if ($isTourismTax) {
-                                $this->saveTourismTaxSubtype($object->id);
+                                self::saveTourismTaxSubtype($object->id);
                             }
                             if ($wasTourismTax && !$isTourismTax) {
                                 $this->cleanTaxFromTourismTaxRulesGroups($object->id);
@@ -812,7 +830,7 @@ class AdminTaxesControllerCore extends AdminController
                         $this->errors[] = Tools::displayError('An error occurred while creating an object.').' <b>'.$this->table.'</b>';
                     } elseif ($this->postImage($object->id)) {
                         if ($isTourismTax) {
-                            $this->saveTourismTaxSubtype($object->id);
+                            self::saveTourismTaxSubtype($object->id);
                         }
                         if (Tools::isSubmit('submitAdd'.$this->table.'AndStay')) {
                             Tools::redirectAdmin(self::$currentIndex.'&update'.$this->table.'&id_'.$this->table.'='.$object->id.'&conf=3'.'&token='.$this->token);
@@ -1009,7 +1027,7 @@ class AdminTaxesControllerCore extends AdminController
     /**
      * @param int $idTax
      */
-    protected function saveTourismTaxSubtype($idTax)
+    protected static function saveTourismTaxSubtype($idTax)
     {
         $idTax = (int) $idTax;
         $tourismTax = TaxConfiguration::getByTaxId($idTax);

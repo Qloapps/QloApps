@@ -153,7 +153,7 @@
                                                         {l s='Delete'}
                                                     </a>
                                                 </li>
-                                                {if isset($use_tourism_tax) && $use_tourism_tax && isset($product.tourism_tax_status) && $product.tourism_tax_status != $tourism_tax_status_not_applicable}
+                                                {if isset($use_tourism_tax) && $use_tourism_tax && isset($product.tourism_tax_status) && $product.tourism_tax_status != $tourism_tax_status_not_applicable && !$product.is_cancelled && !$product.is_refunded}
                                                     {if $product.tourism_tax_status == $tourism_tax_status_applied}
                                                         <li>
                                                             <a href="#" class="tt-exempt-service-line" data-id_service_product_order_detail="{$product.id_service_product_order_detail|intval}">

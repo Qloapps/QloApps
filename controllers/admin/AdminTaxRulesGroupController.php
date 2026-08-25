@@ -106,9 +106,9 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         $idTaxRulesGroup = (int) Tools::getValue('id_tax_rules_group');
         $isTourism = false;
         if ($idTaxRulesGroup) {
-            $trg = new TaxRulesGroup($idTaxRulesGroup);
-            if (Validate::isLoadedObject($trg)) {
-                $isTourism = (bool) $trg->is_tourism_tax_rule_group;
+            $taxRulesGroup = new TaxRulesGroup($idTaxRulesGroup);
+            if (Validate::isLoadedObject($taxRulesGroup)) {
+                $isTourism = (bool) $taxRulesGroup->is_tourism_tax_rule_group;
             }
         }
 
@@ -138,7 +138,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
             $currency = $this->context->currency;
             $currencySign = Tools::safeOutput(trim($currency->prefix . $currency->suffix));
             foreach ($rows as &$row) {
-                $typeLabel = ((int) $row['tourism_tax_calc_type'] === 1)
+                $typeLabel = ((int) $row['tourism_tax_calc_type'] === TaxConfiguration::CALCULATION_TYPE_PERCENTAGE)
                     ? (float) $row['tourism_tax_value'] . '%'
                     : $currencySign . ' ' . (float) $row['tourism_tax_value'];
                 $row['name'] = $row['name'] . ' (' . $typeLabel . ')';
@@ -467,35 +467,21 @@ class AdminTaxRulesGroupControllerCore extends AdminController
             $newIsTourism = (int) Tools::getValue('is_tourism_tax_rule_group');
 
             if ($idGroup) {
-                $trg = new TaxRulesGroup($idGroup);
-                if (Validate::isLoadedObject($trg)) {
-                    $oldIsTourism = (int) $trg->is_tourism_tax_rule_group;
+                $taxRulesGroup = new TaxRulesGroup($idGroup);
+                if (Validate::isLoadedObject($taxRulesGroup)) {
+                    $oldIsTourism = (int) $taxRulesGroup->is_tourism_tax_rule_group;
 
-                    // Tourism → VAT: block while tourism tax rules still exist in this group.
-                    if ($oldIsTourism === 1 && $newIsTourism === 0) {
-                        $hasConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'tax_rule` tr
-                             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = tr.`id_tax`
-                             WHERE tr.`id_tax_rules_group` = ' . $idGroup . '
-                             AND t.`is_tourism_tax` = 1'
-                        );
-                        if ($hasConflict) {
+                    if ($oldIsTourism && !$newIsTourism) {
+                        if ($taxRulesGroup->hasTourismTaxRules()) {
                             $this->errors[] = $this->l(
                                 'Cannot convert this to a VAT group: it still contains tourism taxes. Remove the tourism tax rules first.'
                             );
-                            // Reset POST to DB state: getFieldValue() prefers $_POST over the DB
-                            // object, so without this reset the toggle, behavior dropdown, and tax
-                            // dropdown would render inconsistently (toggle=NO, sub-forms=tourism state).
                             $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
                             $this->display = 'edit';
                             return;
                         }
 
-                        $hasTourismProductConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'product_shop`
-                             WHERE `id_tourism_tax_rules_group` = ' . $idGroup
-                        );
-                        if ($hasTourismProductConflict) {
+                        if ($taxRulesGroup->hasProductsUsingAsTourismGroup()) {
                             $this->errors[] = $this->l(
                                 'Cannot convert this to a VAT group: one or more products still use it as their tourism tax rule. Reassign them first.'
                             );
@@ -505,35 +491,17 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                         }
                     }
 
-                    // VAT → Tourism: block while regular VAT tax rules still exist in this group.
-                    // "No Tax" rules (id_tax = 0) are type-neutral and are excluded from the check.
-                    if ($oldIsTourism === 0 && $newIsTourism === 1) {
-                        $hasConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'tax_rule` tr
-                             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = tr.`id_tax`
-                             WHERE tr.`id_tax_rules_group` = ' . $idGroup . '
-                             AND tr.`id_tax` != 0
-                             AND t.`is_tourism_tax` = 0'
-                        );
-                        if ($hasConflict) {
+                    if (!$oldIsTourism && $newIsTourism) {
+                        if ($taxRulesGroup->hasVatTaxRules()) {
                             $this->errors[] = $this->l(
                                 'Cannot convert this to a tourism group: it still contains VAT taxes. Remove the VAT tax rules first.'
                             );
-                            // Same reason: reset POST to DB state so the whole form is consistent.
                             $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
                             $this->display = 'edit';
                             return;
                         }
 
-                        $hasRegularProductConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'product_shop`
-                             WHERE `id_tax_rules_group` = ' . $idGroup
-                        );
-                        $hasServicePriceConflict = (int) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'htl_room_type_service_product_price`
-                             WHERE `id_tax_rules_group` = ' . $idGroup
-                        );
-                        if ($hasRegularProductConflict || $hasServicePriceConflict) {
+                        if ($taxRulesGroup->hasProductsUsingAsVatGroup()) {
                             $this->errors[] = $this->l(
                                 'Cannot convert this to a tourism group: one or more products or services still use it as their regular tax rule. Reassign them first.'
                             );
@@ -604,27 +572,27 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('A tax rule already exists for this country/state with tax only behavior.');
                     continue;
                 }
-                $tr = new TaxRule();
+                $taxRule = new TaxRule();
 
                 // update or creation?
                 if (isset($id_rule) && $first) {
-                    $tr->id = $id_rule;
+                    $taxRule->id = $id_rule;
                     $first = false;
                 }
 
-                $tr->id_tax = $id_tax;
+                $taxRule->id_tax = $id_tax;
                 $tax_rules_group = new TaxRulesGroup((int)$id_tax_rules_group);
-                $tr->id_tax_rules_group = (int)$tax_rules_group->id;
-                $tr->id_country = (int)$id_country;
-                $tr->id_state = (int)$id_state;
-                list($tr->zipcode_from, $tr->zipcode_to) = $tr->breakDownZipCode($zip_code);
+                $taxRule->id_tax_rules_group = (int)$tax_rules_group->id;
+                $taxRule->id_country = (int)$id_country;
+                $taxRule->id_state = (int)$id_state;
+                list($taxRule->zipcode_from, $taxRule->zipcode_to) = $taxRule->breakDownZipCode($zip_code);
 
                 // Construct Object Country
                 $country = new Country((int)$id_country, (int)$this->context->language->id);
 
                 if ($zip_code && $country->need_zip_code) {
                     if ($country->zip_code_format) {
-                        foreach (array($tr->zipcode_from, $tr->zipcode_to) as $zip_code) {
+                        foreach (array($taxRule->zipcode_from, $taxRule->zipcode_to) as $zip_code) {
                             if ($zip_code) {
                                 if (!$country->checkZipCode($zip_code)) {
                                     $this->errors[] = sprintf(
@@ -637,19 +605,19 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                     }
                 }
 
-                $tr->behavior = (int)$behavior;
-                $tr->description = $description;
-                $this->tax_rule = $tr;
-                $_POST['id_state'] = $tr->id_state;
+                $taxRule->behavior = (int)$behavior;
+                $taxRule->description = $description;
+                $this->tax_rule = $taxRule;
+                $_POST['id_state'] = $taxRule->id_state;
 
-                $this->errors = array_merge($this->errors, $this->validateTaxRule($tr));
+                $this->errors = array_merge($this->errors, $this->validateTaxRule($taxRule));
 
                 if (count($this->errors) == 0) {
                     $tax_rules_group = $this->updateTaxRulesGroup($tax_rules_group);
-                    $tr->id = (int)$tax_rules_group->getIdTaxRuleGroupFromHistorizedId((int)$tr->id);
-                    $tr->id_tax_rules_group = (int)$tax_rules_group->id;
+                    $taxRule->id = (int)$tax_rules_group->getIdTaxRuleGroupFromHistorizedId((int)$taxRule->id);
+                    $taxRule->id_tax_rules_group = (int)$tax_rules_group->id;
 
-                    if (!$tr->save()) {
+                    if (!$taxRule->save()) {
                         $this->errors[] = Tools::displayError('An error has occurred: Cannot save the current tax rule.');
                     }
                 }
@@ -699,14 +667,14 @@ class AdminTaxRulesGroupControllerCore extends AdminController
     /**
      * Check if the tax rule could be added in the database
      *
-     * @param TaxRule $tr
+     * @param TaxRule $taxRule
      *
      * @return array
      */
-    protected function validateTaxRule(TaxRule $tr)
+    protected function validateTaxRule(TaxRule $taxRule)
     {
         // @TODO: check if the rule already exists
-        return $tr->validateController();
+        return $taxRule->validateController();
     }
 
     protected function displayAjaxUpdateTaxRule()

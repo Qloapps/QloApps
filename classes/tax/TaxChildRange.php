@@ -119,7 +119,7 @@ class TaxChildRangeCore extends ObjectModel
                 $inUpper = ($maxAge == 0 || $age <= $maxAge);
                 if ($inLower && $inUpper) {
                     $bandValue = (float) $range['tax_value'];
-                    $total += ($taxType === 0) ? $bandValue : ($unitPrice * ($bandValue / 100));
+                    $total += ($taxType === TaxConfiguration::CALCULATION_TYPE_FIXED) ? $bandValue : ($unitPrice * ($bandValue / 100));
                     $count++;
                     $matched = true;
                     break;
@@ -127,7 +127,7 @@ class TaxChildRangeCore extends ObjectModel
             }
             if (!$matched && $adultBaseValue !== null) {
                 $adultBaseValue = (float) $adultBaseValue;
-                $total += ($taxType === 0) ? $adultBaseValue : ($unitPrice * ($adultBaseValue / 100));
+                $total += ($taxType === TaxConfiguration::CALCULATION_TYPE_FIXED) ? $adultBaseValue : ($unitPrice * ($adultBaseValue / 100));
                 $count++;
             }
         }

@@ -203,9 +203,6 @@ class RoomTypeServiceProduct extends ObjectModel
             $subCategory
         )) {
             $serviceProducts = Product::getProductsProperties($idLang, $serviceProducts);
-            $objHotelRoomType = new HotelRoomType();
-            $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idProductRoomType);
-            $idHotel = $roomTypeInfo ? (int) $roomTypeInfo['id_hotel'] : 0;
             foreach($serviceProducts as &$serviceProduct) {
                 $serviceProduct['price_tax_exc'] = Product::getServiceProductPrice(
                     (int)$serviceProduct['id_product'],

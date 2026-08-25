@@ -235,6 +235,61 @@ class TaxRulesGroupCore extends ObjectModel
     }
 
     /**
+     * @return bool true if any of this group's tax rules reference a tourism tax
+     */
+    public function hasTourismTaxRules()
+    {
+        return (bool) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT tr.`id_tax_rule` FROM `'._DB_PREFIX_.'tax_rule` tr
+            INNER JOIN `'._DB_PREFIX_.'tax` t ON t.`id_tax` = tr.`id_tax`
+            WHERE tr.`id_tax_rules_group` = '.(int) $this->id.'
+            AND t.`is_tourism_tax` = 1'
+        );
+    }
+
+    /**
+     * @return bool true if any product currently uses this group as its tourism tax rule
+     */
+    public function hasProductsUsingAsTourismGroup()
+    {
+        return (bool) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT `id_product` FROM `'._DB_PREFIX_.'product_shop`
+            WHERE `id_tourism_tax_rules_group` = '.(int) $this->id
+        );
+    }
+
+    /**
+     * @return bool true if any of this group's tax rules reference a non-tourism (VAT) tax
+     */
+    public function hasVatTaxRules()
+    {
+        return (bool) Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT tr.`id_tax_rule` FROM `'._DB_PREFIX_.'tax_rule` tr
+            INNER JOIN `'._DB_PREFIX_.'tax` t ON t.`id_tax` = tr.`id_tax`
+            WHERE tr.`id_tax_rules_group` = '.(int) $this->id.'
+            AND tr.`id_tax` != 0
+            AND t.`is_tourism_tax` = 0'
+        );
+    }
+
+    /**
+     * @return bool true if any product or service price currently uses this group as its regular (VAT) tax rule
+     */
+    public function hasProductsUsingAsVatGroup()
+    {
+        $hasRegularProductConflict = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT `id_product` FROM `'._DB_PREFIX_.'product_shop`
+            WHERE `id_tax_rules_group` = '.(int) $this->id
+        );
+        $hasServicePriceConflict = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+            SELECT `id_room_type_service_product_price` FROM `'._DB_PREFIX_.'htl_room_type_service_product_price`
+            WHERE `id_tax_rules_group` = '.(int) $this->id
+        );
+
+        return (bool) ($hasRegularProductConflict || $hasServicePriceConflict);
+    }
+
+    /**
     * @deprecated since 1.5
     */
     public static function getTaxesRate($id_tax_rules_group, $id_country, $id_state, $zipcode)

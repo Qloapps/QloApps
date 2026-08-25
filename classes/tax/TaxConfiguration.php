@@ -25,6 +25,9 @@ class TaxConfigurationCore extends ObjectModel
 {
     const DAY_KEYS = array('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun');
 
+    const CALCULATION_TYPE_FIXED = 0;
+    const CALCULATION_TYPE_PERCENTAGE = 1;
+
     public $id_tax;
     public $tax_value;
     public $calculation_type;
@@ -167,7 +170,7 @@ class TaxConfigurationCore extends ObjectModel
             return Tools::safeOutput($value) . '%';
         }
         $displayValue = Tools::safeOutput((float) $row['tourism_tax_value']);
-        if ((int) $row['tourism_tax_calc_type'] === 1) {
+        if ((int) $row['tourism_tax_calc_type'] === self::CALCULATION_TYPE_PERCENTAGE) {
             return $displayValue . '%';
         }
         $currencySign = Tools::safeOutput(trim($currency->prefix . $currency->suffix));

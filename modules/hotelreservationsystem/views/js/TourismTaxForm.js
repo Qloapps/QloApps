@@ -21,6 +21,8 @@
  */
 
 $(document).ready(function () {
+    var CALCULATION_TYPE_PERCENTAGE = 1;
+
     var tierIdx  = $('#tourism-tax-tiers-body tr').length;
     var childIdx = $('#tourism-tax-child-body tr').length;
 
@@ -109,7 +111,7 @@ $(document).ready(function () {
 
     function currentTypeSign() {
         var $sign = $('#tourism-tax-type-sign');
-        return $('select[name="tax_calc_type"]').val() == 1 ? '%' : $sign.data('currency');
+        return $('select[name="tax_calc_type"]').val() == CALCULATION_TYPE_PERCENTAGE ? '%' : $sign.data('currency');
     }
 
     function updateTypeSign() {

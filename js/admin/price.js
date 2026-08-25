@@ -103,6 +103,8 @@ function getEcotaxTaxIncluded()
 
 function getTourismTaxIncluded(priceTE)
 {
+	var CALCULATION_TYPE_PERCENTAGE = 1;
+
 	if (typeof tourismTaxRatesByGroup === 'undefined' || isNaN(priceTE)) {
 		return 0;
 	}
@@ -134,7 +136,7 @@ function getTourismTaxIncluded(priceTE)
 			baseValue = t.tax_value;
 		}
 
-		tourismAmount += (t.tax_calc_type == 1) ? (priceTE * baseValue / 100) : baseValue;
+		tourismAmount += (t.tax_calc_type == CALCULATION_TYPE_PERCENTAGE) ? (priceTE * baseValue / 100) : baseValue;
 	}
 
 	return tourismAmount;

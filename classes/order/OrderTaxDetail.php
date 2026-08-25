@@ -30,13 +30,11 @@ class OrderTaxDetailCore extends ObjectModel
 
     const APPLY_OK = 0;
     const APPLY_ERROR_RESTORE = 1;
-    const APPLY_ERROR_REFUNDED = 3;
     const APPLY_ERROR_NOT_APPLICABLE = 4;
 
     const EXEMPT_OK = 0;
     const EXEMPT_ERROR_NO_RULE = 1;
     const EXEMPT_ERROR_SAVE = 2;
-    const EXEMPT_ERROR_REFUNDED = 3;
 
     const SCOPE_ROOM = 0;
     const SCOPE_ROOM_STATUS = 1;
@@ -232,25 +230,9 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
-     * Delete all snapshot rows for a scope.
-     *
-     * @param string $scopeColumn  self::SCOPE_COLUMN_ROOM or self::SCOPE_COLUMN_SERVICE
-     * @param int    $scopeValue
-     * @return bool
-     */
-    protected static function deleteForScope($scopeColumn, $scopeValue)
-    {
-        return Db::getInstance()->execute(
-            'DELETE otd FROM `' . _DB_PREFIX_ . 'order_tax_detail` otd
-             INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = otd.`id_tax` AND t.`is_tourism_tax` = 1
-             WHERE otd.`' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
-        );
-    }
-
-    /**
      * Delete every row (VAT and tourism alike) for a scope — used only when the booking/service line
-     * itself is being permanently removed, unlike deleteForScope() which must stay tourism-only since
-     * it runs mid-lifecycle while VAT rows for the same scope still need to survive.
+     * itself is being permanently removed. Unlike the tourism-only delete in saveTourismTax() (which
+     * runs mid-lifecycle while VAT rows for the same scope still need to survive), this clears everything.
      *
      * @param string $scopeColumn  self::SCOPE_COLUMN_ROOM or self::SCOPE_COLUMN_SERVICE
      * @param int    $scopeValue
@@ -283,28 +265,6 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
-     * Give this instance (room booking or service line) its own, independently-computed share of the
-     * order_detail's not-yet-scoped VAT rows (id_htl_booking = 0 AND id_service_product_order_detail = 0).
-     * OrderDetail::saveTaxCalculator() computes VAT once for the whole order_detail's blended-average
-     * quantity/price and inserts it unscoped; when the same room type or service product is booked more
-     * than once in one order, several instances share that one order_detail row and each calls this once
-     * as it's created.
-     *
-     * The tax RATE is always static per product/hotel-address (never date-dependent — confirmed via
-     * Product::getIdTaxRulesGroupByIdProduct() + TaxManagerFactory::getManager(), both keyed only on
-     * product/address, no date param anywhere in that chain). But the taxable PRICE is not: QloApps has
-     * live seasonal/day-of-week feature pricing (htl_room_type_feature_pricing) that can make two bookings
-     * of the same room type carry genuinely different per-night rates in one order. So the unscoped row's
-     * `unit_amount` (tax on order_detail's blended-average price) is not safe to split proportionally by
-     * quantity share — that would misattribute VAT between bookings whenever their prices differ, even
-     * though the order's total would still come out right by coincidence of summing to the same total.
-     *
-     * Instead: reconstruct the exact same tax rates via OrderDetail::getTaxCalculatorStatic() (rebuilds
-     * the TaxCalculator from the Tax rows already present on this order_detail) and run it fresh on THIS
-     * instance's own total_price_tax_excl — the true amount for this specific booking/line, independent
-     * of what any sibling instance's price happens to be. The unscoped row is then decremented by that
-     * amount (deleted once fully claimed), so the sum across every instance always lands exactly on the
-     * original aggregate regardless of call order or price variation.
      *
      * @param int $idOrderDetail
      * @param int $idHtlBooking                 0 for a service-line scope
@@ -386,14 +346,6 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
-     * OrderDetail::updateTaxAmount() (17+ call sites: editing a booking's dates/price, adding/removing
-     * rooms or services, refunds, cancellations, the webservice API — anywhere a line's VAT needs
-     * recomputing after the fact) resets an order_detail's VAT by deleting every existing VAT row for it
-     * and inserting one fresh unscoped aggregate row, exactly like the original order-creation insert this
-     * whole scoping mechanism exists for. But unlike order creation, none of those 17+ callers go on to
-     * call updateVatScoping() for the bookings/services that already existed before the edit — so that
-     * fresh row sits unclaimed forever and every sibling's VAT silently drops to zero, not just the one
-     * being edited. Call this once, right here, instead of re-deriving that follow-up at each call site.
      *
      * @param int $idOrderDetail
      * @return bool
@@ -477,7 +429,7 @@ class OrderTaxDetailCore extends ObjectModel
         }
 
         return !(bool) Db::getInstance()->getValue(
-            'SELECT COUNT(*) FROM `' . _DB_PREFIX_ . 'order_tax_detail` otd
+            'SELECT otd.`id_order_tax_detail` FROM `' . _DB_PREFIX_ . 'order_tax_detail` otd
              INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = otd.`id_tax` AND t.`is_tourism_tax` = 1
              WHERE otd.`' . bqSQL($scopeColumn) . '` = ' . (int) $scopeValue
         );
@@ -572,7 +524,7 @@ class OrderTaxDetailCore extends ObjectModel
         $scopeColumn = $idServiceProductOrderDetail ? self::SCOPE_COLUMN_SERVICE : self::SCOPE_COLUMN_ROOM;
         $scopeValue = $idServiceProductOrderDetail ?: $idHtlBooking;
 
-        self::deleteForScope($scopeColumn, $scopeValue);
+        self::deleteTourismRowsForScope($scopeColumn, $scopeValue);
 
         foreach ($taxAmounts as $idTax => $rowAmount) {
             $rowAmount = (float) $rowAmount;
@@ -721,12 +673,6 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
-     * Recompute total_price_tax_incl for every instance sharing this order_detail row — every
-     * htl_booking_detail or service_product_order_detail row under it, not just the one that triggered
-     * this call — plus the order_detail row itself as their exact sum. Multiple instances share one
-     * order_detail whenever the same room type or service product is booked more than once in one order
-     * (same or different dates); recomputing every sibling here, from each one's own scoped tax rows,
-     * keeps them correct regardless of call order instead of one instance's total overwriting another's.
      *
      * @param int $idOrderDetail
      * @param int $idHtlBooking                 unused; kept for call-site compatibility
@@ -1077,16 +1023,13 @@ class OrderTaxDetailCore extends ObjectModel
      * @param int         $idHtlBooking
      * @param int         $idEmployee   PS employee id (0 = resolved from Context)
      * @param string|null $note         Reason for exemption, entered by the employee
-     * @return int EXEMPT_OK | EXEMPT_ERROR_NO_RULE | EXEMPT_ERROR_SAVE | EXEMPT_ERROR_REFUNDED
+     * @return int EXEMPT_OK | EXEMPT_ERROR_NO_RULE | EXEMPT_ERROR_SAVE
      */
     public static function exemptBooking($idHtlBooking, $idEmployee = 0, $note = null)
     {
         $idHtlBooking = (int) $idHtlBooking;
         if (self::isBookingExempted($idHtlBooking)) {
             return self::EXEMPT_OK;
-        }
-        if (self::hasRefundedRowsForScope(self::SCOPE_COLUMN_ROOM, $idHtlBooking)) {
-            return self::EXEMPT_ERROR_REFUNDED;
         }
 
         $booking = new HotelBookingDetail($idHtlBooking);
@@ -1116,15 +1059,11 @@ class OrderTaxDetailCore extends ObjectModel
      * at order time), computes it fresh instead.
      *
      * @param int $idHtlBooking
-     * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_REFUNDED | APPLY_ERROR_NOT_APPLICABLE
+     * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_NOT_APPLICABLE
      */
     public static function applyBooking($idHtlBooking)
     {
         $idHtlBooking = (int) $idHtlBooking;
-        if (self::hasRefundedRowsForScope(self::SCOPE_COLUMN_ROOM, $idHtlBooking)) {
-            return self::APPLY_ERROR_REFUNDED;
-        }
-
         $wasExempted = self::isBookingExempted($idHtlBooking);
         if ($wasExempted) {
             if (!self::deleteExemptionMarker($idHtlBooking, 0)) {
@@ -1187,16 +1126,13 @@ class OrderTaxDetailCore extends ObjectModel
      * @param int         $idServiceProductOrderDetail
      * @param int         $idEmployee
      * @param string|null $note
-     * @return int EXEMPT_OK | EXEMPT_ERROR_NO_RULE | EXEMPT_ERROR_SAVE | EXEMPT_ERROR_REFUNDED
+     * @return int EXEMPT_OK | EXEMPT_ERROR_NO_RULE | EXEMPT_ERROR_SAVE
      */
     public static function exemptServiceLine($idServiceProductOrderDetail, $idEmployee = 0, $note = null)
     {
         $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
         if (self::isServiceLineExempted($idServiceProductOrderDetail)) {
             return self::EXEMPT_OK;
-        }
-        if (self::hasRefundedRowsForScope(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail)) {
-            return self::EXEMPT_ERROR_REFUNDED;
         }
 
         $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
@@ -1227,15 +1163,11 @@ class OrderTaxDetailCore extends ObjectModel
      * Apply (or re-apply) tourism tax for a single standalone service line.
      *
      * @param int $idServiceProductOrderDetail
-     * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_REFUNDED | APPLY_ERROR_NOT_APPLICABLE
+     * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_NOT_APPLICABLE
      */
     public static function applyServiceLine($idServiceProductOrderDetail)
     {
         $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
-        if (self::hasRefundedRowsForScope(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail)) {
-            return self::APPLY_ERROR_REFUNDED;
-        }
-
         $wasExempted = self::isServiceLineExempted($idServiceProductOrderDetail);
         if ($wasExempted) {
             if (!self::deleteExemptionMarker(0, $idServiceProductOrderDetail)) {
@@ -1291,6 +1223,9 @@ class OrderTaxDetailCore extends ObjectModel
         $bookings = $objBookingDetail->getBookingDataByOrderId($idOrder);
         if ($bookings) {
             foreach ($bookings as $booking) {
+                if (!empty($booking['is_refunded']) || !empty($booking['is_cancelled'])) {
+                    continue;
+                }
                 $result = self::exemptBooking($booking['id'], $idEmployee, $note);
                 if ($result !== self::EXEMPT_OK) {
                     $failures[] = array('id_htl_booking' => (int) $booking['id'], 'result' => $result);
@@ -1324,6 +1259,9 @@ class OrderTaxDetailCore extends ObjectModel
         $bookings = $objBookingDetail->getBookingDataByOrderId($idOrder);
         if ($bookings) {
             foreach ($bookings as $booking) {
+                if (!empty($booking['is_refunded']) || !empty($booking['is_cancelled'])) {
+                    continue;
+                }
                 $result = self::applyBooking($booking['id']);
                 if ($result !== self::APPLY_OK && $result !== self::APPLY_ERROR_NOT_APPLICABLE) {
                     $failures[] = array('id_htl_booking' => (int) $booking['id'], 'result' => $result);

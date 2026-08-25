@@ -293,7 +293,7 @@
 									</strong>
 									<span class="ajax_block_product_total pull-right">
 										{if $cart_qties > 0}
-											{convertPrice price=$cart->getOrderTotal(($priceDisplay != 1), Cart::ONLY_STANDALONE_PRODUCTS)}
+											{convertPrice price=$normal_products_total}
 										{/if}
 									</span>
 								</div>
