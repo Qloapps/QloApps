@@ -737,6 +737,7 @@ class MediaCore
                     } else {
                         $content .= Media::packJS($tmp_content);
                     }
+                    $content .= ";\n";
                 } else {
                     $compressed_js_files_not_found[] = $file_infos['path'];
                 }
