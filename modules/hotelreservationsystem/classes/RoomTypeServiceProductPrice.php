@@ -144,7 +144,8 @@ class RoomTypeServiceProductPrice extends ObjectModel
             $idHotelAddress
         );
 
-        return $price * (int)$quantity;
+        $price = $price * (int)$quantity;
+        return Product::applyGroupDiscount($price, $idProduct, (int)Group::getCurrent()->id);
     }
 }
 
