@@ -300,8 +300,8 @@
 															{if $params.type == 'range'}
 																{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
 																<div class="input_range">
-																	<input type="text" class="filter form-control" name="{$field_name}[0]" placeholder="{l s='From'}" value="{if isset($smarty.post[$field_name][0]) && $smarty.post[$field_name][0]}{$smarty.post[$field_name][0]}{elseif isset($params.value.0)}{$params.value.0}{/if}">
-																	<input type="text" class="filter form-control" name="{$field_name}[1]" placeholder="{l s='To'}" value="{if isset($smarty.post[$field_name][1]) && $smarty.post[$field_name][1]}{$smarty.post[$field_name][1]}{elseif isset($params.value.1)}{$params.value.1}{/if}">
+																	<input type="text" class="filter form-control" name="{$field_name}[0]" placeholder="{l s='From'}" value="{if isset($smarty.post[$field_name][0]) && $smarty.post[$field_name][0]}{$smarty.post[$field_name][0]|escape:'html':'UTF-8'}{elseif isset($params.value.0)}{$params.value.0}{/if}">
+																	<input type="text" class="filter form-control" name="{$field_name}[1]" placeholder="{l s='To'}" value="{if isset($smarty.post[$field_name][1]) && $smarty.post[$field_name][1]}{$smarty.post[$field_name][1]|escape:'html':'UTF-8'}{elseif isset($params.value.1)}{$params.value.1}{/if}">
 																</div>
 															{elseif $params.type == 'bool'}
 																{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
@@ -314,14 +314,14 @@
 																<div class="date_range">
 																	<div class="input-group center">
 																		<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_0" name="local_{$params.name_date}[0]"  placeholder="{l s='From'}" autocomplete="off"/>
-																		<input type="hidden" id="{$params.id_date}_0" name="{$params.name_date}[0]" value="{if isset($smarty.post[$params.name_date][0]) && $smarty.post[$params.name_date][0]}{$smarty.post[$params.name_date][0]}{elseif isset($params.value.0)}{$params.value.0}{/if}">
+																		<input type="hidden" id="{$params.id_date}_0" name="{$params.name_date}[0]" value="{if isset($smarty.post[$params.name_date][0]) && $smarty.post[$params.name_date][0]}{$smarty.post[$params.name_date][0]|escape:'html':'UTF-8'}{elseif isset($params.value.0)}{$params.value.0}{/if}">
 																		<span class="input-group-addon">
 																			<i class="icon-calendar"></i>
 																		</span>
 																	</div>
 																	<div class="input-group center">
 																		<input type="text" class="filter datepicker date-input form-control" id="local_{$params.id_date}_1" name="local_{$params.name_date}[1]"  placeholder="{l s='To'}"  autocomplete="off"/>
-																		<input type="hidden" id="{$params.id_date}_1" name="{$params.name_date}[1]" value="{if isset($smarty.post[$params.name_date][1]) && $smarty.post[$params.name_date][1]}{$smarty.post[$params.name_date][1]}{elseif isset($params.value.1)}{$params.value.1}{/if}">
+																		<input type="hidden" id="{$params.id_date}_1" name="{$params.name_date}[1]" value="{if isset($smarty.post[$params.name_date][1]) && $smarty.post[$params.name_date][1]}{$smarty.post[$params.name_date][1]|escape:'html':'UTF-8'}{elseif isset($params.value.1)}{$params.value.1}{/if}">
 																		<span class="input-group-addon">
 																			<i class="icon-calendar"></i>
 																		</span>
@@ -398,7 +398,7 @@
 																{/if}
 															{else}
 																{$field_name="`$list_id`Filter_{if isset($params.filter_key)}`$params.filter_key`{else}`$key`{/if}"}
-																<input type="text" id="filter_input_{$key}" class="filter" name="{$field_name}" value="{if isset($smarty.post.$field_name) && $smarty.post.$field_name}{$smarty.post.$field_name}{else}{$params.value|escape:'html':'UTF-8'}{/if}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
+																<input type="text" id="filter_input_{$key}" class="filter" name="{$field_name}" value="{if isset($smarty.post.$field_name) && $smarty.post.$field_name}{$smarty.post.$field_name|escape:'html':'UTF-8'}{else}{$params.value|escape:'html':'UTF-8'}{/if}" {if isset($params.width) && $params.width != 'auto'} style="width:{$params.width}px"{/if} />
 															{/if}
 														</div>
 													</div>
