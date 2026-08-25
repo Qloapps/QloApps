@@ -141,6 +141,8 @@ $(document).ready(function() {
             $('#order-total-amount-wrapper').hide();
             $('#order-total-paid').text('-');
             $('#order-total-paid-wrapper').hide();
+            $('#order-total-return').text('-');
+            $('#order-total-return-wrapper').hide();
             return;
         }
 
@@ -174,6 +176,10 @@ $(document).ready(function() {
                 var orderTotalPaid = parseFloat(response.order_total_paid || 0);
                 $('#order-total-paid').text(currencySign + ' ' + orderTotalPaid.toFixed(2));
                 $('#order-total-paid-wrapper').show();
+
+                var orderRefundedAmount = parseFloat(response.order_refunded_amount || 0);
+                $('#order-total-return').text(currencySign + ' ' + orderRefundedAmount.toFixed(2));
+                $('#order-total-return-wrapper').show();
                 var slipIds = response.slip_ids || [];
                 if (slipIds.length) {
                     var links = slipIds.map(function (id) {

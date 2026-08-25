@@ -26,3 +26,4 @@
 </a>
 <span id="order-total-amount-wrapper" style="display:none;"><br>{l s='Total order amount:'} <strong><span id="order-total-amount">-</span></strong></span>
 <span id="order-total-paid-wrapper" style="display:none;"><br>{l s='Total paid amount:'} <strong><span id="order-total-paid">-</span></strong></span>
+<span id="order-total-return-wrapper" style="display:none;"><br>{l s='Total return amount (Refund + Credit Slip):'} <strong><span id="order-total-return">-</span></strong></span>

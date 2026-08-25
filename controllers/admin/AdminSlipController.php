@@ -596,6 +596,8 @@ public function initPageHeaderToolbar()
 
         $totalSlipAmount = OrderSlip::getTotalOrderSlipAmountByOrder($idOrder);
         $slipIds = array_column(OrderSlip::getSlipIdsByOrder($idOrder), 'id_order_slip');
+        $objOrderReturn = new OrderReturn();
+        $refundedAmount = $objOrderReturn->getRefundedAmount($idOrder);
 
         die(Tools::jsonEncode(array(
             'bookings' => $bookingDetails,
@@ -603,7 +605,8 @@ public function initPageHeaderToolbar()
             'total_slip_amount' => $totalSlipAmount,
             'slip_ids' => $slipIds,
             'order_total_amount' => (float) $objOrder->total_paid,
-            'order_total_paid' => (float) $objOrder->total_paid_real
+            'order_total_paid' => (float) $objOrder->total_paid_real,
+            'order_refunded_amount' => (float) $refundedAmount
         )));
     }
 
