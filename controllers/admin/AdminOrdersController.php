@@ -387,11 +387,7 @@ class AdminOrdersControllerCore extends AdminController
         return Tools::displayPrice($echo, (int)$idCurrency);
     }
 
-    /**
-     * fields_list callback for the Booking Source column — shows the Booking Source name and,
-     * only for the built-in "Direct Website" source, a link to the storefront alongside it.
-     */
-    public static function formatBookingSource($echo, $row)
+    public function formatBookingSource($echo, $row)
     {
         if (!$echo) {
             return '--';
