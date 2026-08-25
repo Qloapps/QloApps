@@ -61,6 +61,5 @@ require_once 'classes/ServiceProductOption.php';
 require_once 'classes/HotelSettingsLink.php';
 require_once 'classes/HotelBookingDocument.php';
 
-
 // Web services classes
 require_once 'classes/WebserviceSpecificManagementHotelAri.php';

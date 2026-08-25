@@ -3035,7 +3035,8 @@ class ProductCore extends ObjectModel
      * @param null     $specific_price_output If a specific price applies regarding the previous parameters,
      *                                        this variable is filled with the corresponding SpecificPrice object
      * @param bool     $with_ecotax           Insert ecotax in price output.
-     * @param bool     $use_group_reduction
+     * @param bool     $use_group_reduction   @deprecated no longer applied here; call
+     *                                        Product::applyGroupDiscount() explicitly on your final total.
      * @param Context  $context
      * @param bool     $use_customer_price
      * @return float                          Product price
@@ -3204,7 +3205,8 @@ class ProductCore extends ObjectModel
      * @param bool   $with_ecotax insert ecotax in price output.
      * @param null   $specific_price If a specific price applies regarding the previous parameters,
      *                               this variable is filled with the corresponding SpecificPrice object
-     * @param bool   $use_group_reduction
+     * @param bool   $use_group_reduction @deprecated no longer applied here; call
+     *                                    Product::applyGroupDiscount() explicitly on your final total.
      * @param int    $id_customer
      * @param bool   $use_customer_price
      * @param int    $id_cart
@@ -3458,18 +3460,6 @@ class ProductCore extends ObjectModel
             $price -= $specific_price_reduction;
         }
 
-        // Group reduction
-        if ($use_group_reduction) {
-            $reduction_from_category = GroupReduction::getValueForProduct($id_product, $id_group);
-            if ($reduction_from_category !== false) {
-                $group_reduction = $price * (float)$reduction_from_category;
-            } else { // apply group reduction if there is no group reduction for this category
-                $group_reduction = (($reduc = Group::getReductionByIdGroup($id_group)) != 0) ? ($price * $reduc / 100) : 0;
-            }
-
-            $price -= $group_reduction;
-        }
-
         if ($only_reduc) {
             return Tools::ps_round($specific_price_reduction, $decimals);
         }
@@ -3482,6 +3472,32 @@ class ProductCore extends ObjectModel
 
         self::$_prices[$cache_id] = $price;
         return self::$_prices[$cache_id];
+    }
+
+    /**
+     * Applies the group discount to an already-computed price. 
+     * @param float $price The price to discount (tax-incl. or tax-excl., either works).
+     * @param int $id_product
+     * @param int $id_group
+     * @param bool $use_group_reduction
+     * @return float
+     */
+    public static function applyGroupDiscount($price, $id_product, $id_group, $use_group_reduction = true)
+    {
+        if (!$use_group_reduction) {
+            return $price;
+        }
+
+        $reduction_from_category = GroupReduction::getValueForProduct($id_product, $id_group);
+        if ($reduction_from_category !== false) {
+            $group_reduction = $price * (float)$reduction_from_category;
+        } else { // apply group reduction if there is no group reduction for this category
+            $group_reduction = (($reduc = Group::getReductionByIdGroup($id_group)) != 0) ? ($price * $reduc / 100) : 0;
+        }
+
+        $price -= $group_reduction;
+
+        return $price < 0 ? 0 : $price;
     }
 
     public static function convertAndFormatPrice($price, $currency = false, ?Context $context = null)
