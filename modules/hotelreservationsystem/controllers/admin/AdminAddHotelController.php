@@ -412,11 +412,10 @@ class AdminAddHotelController extends ModuleAdminController
         } elseif (!Validate::isCityName($city)) {
             $this->errors[] = $this->l('Enter a valid city name.');
         }
-
-        if (Tools::getValue('loclatitude') !== '' && !Validate::isCoordinate(Tools::getValue('loclatitude'))) {
+        if (Tools::getValue('loclatitude') !== '' && (!is_numeric(Tools::getValue('loclatitude')) || !Validate::isCoordinate($latitude))) {
             $this->errors[] = $this->l('Latitude is invalid.');
         }
-        if (Tools::getValue('loclongitude') !== '' && !Validate::isCoordinate(Tools::getValue('loclongitude'))) {
+        if (Tools::getValue('loclongitude') !== '' && (!is_numeric(Tools::getValue('loclongitude')) || !Validate::isCoordinate($longitude))) {
             $this->errors[] = $this->l('Longitude is invalid.');
         }
         if ($map_formated_address && !Validate::isCleanHtml(html_entity_decode($map_formated_address))) {

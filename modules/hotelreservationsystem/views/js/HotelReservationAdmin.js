@@ -95,7 +95,7 @@ var GoogleMapsManager = {
                 google.maps.event.trigger(that.map, 'resize');
                 that.map.setCenter(that.defaultLatLng);
                 if (that.defaultLatLng && that.formattedAddress) {
-                    that.addMarker(that.defaultLatLng, null, that.formattedAddress, false);
+                    that.addMarker(that.defaultLatLng, null, that.formattedAddress);
                 }
                 // register marker events
                 that.map.addListener('click', function (e) {
