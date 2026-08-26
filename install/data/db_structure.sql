@@ -1416,6 +1416,7 @@ CREATE TABLE `PREFIX_order_slip` (
   `redeem_status` TINYINT(1) NOT NULL DEFAULT '0',
   `id_cart_rule` int(10) unsigned NOT NULL DEFAULT '0',
   `order_slip_type` TINYINT(1) unsigned NOT NULL DEFAULT '0',
+  `remark` text,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_order_slip`),
