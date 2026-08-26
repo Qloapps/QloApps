@@ -226,6 +226,7 @@ CREATE TABLE `PREFIX_cart_rule` (
 	`cart_rule_restriction` tinyint(1) unsigned NOT NULL DEFAULT '0',
 	`product_restriction` tinyint(1) unsigned NOT NULL DEFAULT '0',
 	`shop_restriction` tinyint(1) unsigned NOT NULL DEFAULT '0',
+	`hotel_restriction` tinyint(1) unsigned NOT NULL DEFAULT '0',
 	`free_shipping` tinyint(1) NOT NULL DEFAULT '0',
 	`reduction_percent` decimal(5,2) NOT NULL DEFAULT '0',
 	`reduction_amount` decimal(17,2) NOT NULL DEFAULT '0',
@@ -262,6 +263,12 @@ CREATE TABLE `PREFIX_cart_rule_group` (
 	`id_cart_rule` int(10) unsigned NOT NULL,
 	`id_group` int(10) unsigned NOT NULL,
 	PRIMARY KEY (`id_cart_rule`, `id_group`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_cart_rule_hotel` (
+	`id_cart_rule` int(10) unsigned NOT NULL,
+	`id_hotel` int(10) unsigned NOT NULL,
+	PRIMARY KEY (`id_cart_rule`, `id_hotel`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_cart_rule_carrier` (
@@ -1411,6 +1418,7 @@ CREATE TABLE `PREFIX_order_slip` (
   `redeem_status` TINYINT(1) NOT NULL DEFAULT '0',
   `id_cart_rule` int(10) unsigned NOT NULL DEFAULT '0',
   `order_slip_type` TINYINT(1) unsigned NOT NULL DEFAULT '0',
+  `remark` text,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_order_slip`),

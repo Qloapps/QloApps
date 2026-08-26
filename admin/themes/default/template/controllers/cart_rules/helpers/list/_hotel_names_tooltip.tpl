@@ -20,14 +20,22 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
- {if $id_cart_rule}
-    <a class="btn btn-link" href="{$link->getAdminLink('AdminCartRules')|escape:'html':'UTF-8'}&updatecart_rule&id_cart_rule={$id_cart_rule}" target="_blank">
-        #{$id_cart_rule}
-    </a>
-{elseif $row['redeem_status'] == OrderSlip::REDEEM_STATUS_REDEEMED}
-    --
+{if $hotel_names_first}
+    <span>{$hotel_names_first|escape:'html':'UTF-8'}</span>
+    {if $hotel_names_remaining}
+        {capture name='hotel_names_tooltip'}
+            <div class="tooltip_cont">
+                <div class="tip_header"><div class="tip_date">{l s='Selected Hotels'}</div></div>
+                <ul>
+                    {foreach from=$selected_hotels item='hotel'}
+                        <li class="tip_element_value">{$hotel|escape:'html':'UTF-8'}</li>
+                    {/foreach}
+                </ul>
+            </div>
+        {/capture}
+        {capture name='hotel_names_tooltip_title'}<span class="badge tooltip-trigger">+{$hotel_names_remaining|@count}</span>{/capture}
+        {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.hotel_names_tooltip tooltip_title=$smarty.capture.hotel_names_tooltip_title}
+    {/if}
 {else}
-    <a href="{$link->getAdminLink('AdminSlip')|escape:'html':'UTF-8'}&generateVoucher=1&id_order_slip={$row['id_order_slip']}" class="btn btn-default" title="{l s='Generate voucher for credit slip'}">
-        <i class="icon-refresh"></i> {l s='Generate Voucher'}
-    </a>
+    --
 {/if}
