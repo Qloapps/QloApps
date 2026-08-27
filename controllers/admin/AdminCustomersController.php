@@ -1000,7 +1000,7 @@ class AdminCustomersControllerCore extends AdminController
 
         $nationality = '';
         if ($customer->id_country == -1) {
-            $nationality = Translate::getAdminTranslation('Other', 'AdminCustomersController');
+            $nationality = Translate::getAdminTranslation('Other', 'AdminCustomers');
         } elseif ($customer->id_country) {
             $nationalityCountry = new Country($customer->id_country, $this->context->language->id);
             if (Validate::isLoadedObject($nationalityCountry)) {

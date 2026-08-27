@@ -843,7 +843,7 @@ class CustomerCore extends ObjectModel
         $nationalities = Country::getCountries((int) $id_lang);
         $nationalities[-1] = array(
             'id_country' => -1,
-            'name' => Translate::getAdminTranslation('Other', 'AdminCustomersController'),
+            'name' => Translate::getAdminTranslation('Other', 'AdminCustomers'),
         );
 
         return $nationalities;
