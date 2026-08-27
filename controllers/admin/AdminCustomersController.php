@@ -89,6 +89,7 @@ class AdminCustomersControllerCore extends AdminController
             $selected_nationalities[$row['id_country']] = $row['name'];
         }
         $selected_nationalities[-1] = $this->l('Other');
+        $selected_nationalities[0] = $this->l('None');
 
         $selected_countries = array();
         $countries_result = Db::getInstance()->executeS('
