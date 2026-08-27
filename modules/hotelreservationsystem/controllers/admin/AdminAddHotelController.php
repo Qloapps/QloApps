@@ -881,13 +881,14 @@ class AdminAddHotelController extends ModuleAdminController
 
         if ($idHotel) {
             if ($file && $file['size']) {
-                if ($idHtlImageCategory && !Validate::isLoadedObject(new HotelImageCategory($idHtlImageCategory))) {
+                $objCategory = $idHtlImageCategory ? new HotelImageCategory($idHtlImageCategory, $this->context->language->id) : null;
+                if ($idHtlImageCategory && !Validate::isLoadedObject($objCategory)) {
                     $response['errors'][] = $this->l('Selected image category is invalid.');
                 } elseif ($error = ImageManager::validateUpload($file, Tools::getMaxUploadSize())) {
                     $response['errors'][] = $error;
                 } else {
                     $objHotelImage = new HotelImage();
-                    $imageDetail = $objHotelImage->uploadHotelImages($file, $idHotel, $idHtlImageCategory);
+                    $imageDetail = $objHotelImage->uploadHotelImages($file, $idHotel, $idHtlImageCategory, $objCategory);
                     if ($imageDetail) {
                         $imageDetail['image_link'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'], ImageType::getFormatedName('large')));
                         $imageDetail['image_link_small'] = $this->context->link->getMediaLink($objHotelImage->getImageLink($imageDetail['id'], ImageType::getFormatedName('small')));
@@ -913,7 +914,7 @@ class AdminAddHotelController extends ModuleAdminController
         $idHotel = (int) Tools::getValue('id_hotel');
         $response = array('status' => false);
 
-        if ($idImage && $idHotel && Validate::isLoadedObject($objHtlImage = new HotelImage($idImage))) {
+        if ($idImage && $idHotel && Validate::isLoadedObject($objHtlImage = new HotelImage($idImage)) && (int) $objHtlImage->id_hotel === $idHotel) {
             $oldCoverId = null;
             $affectedCoverImage = null;
             if ($coverImg = HotelImage::getCover($idHotel)) {
@@ -948,8 +949,9 @@ class AdminAddHotelController extends ModuleAdminController
         $idHtlImageCategory = (int) Tools::getValue('id_htl_image_category');
         $setCover = (bool) Tools::getValue('cover');
 
-        if ($idImage && $idHotel && Validate::isLoadedObject($objHtlImage = new HotelImage($idImage))) {
-            if ($idHtlImageCategory && !Validate::isLoadedObject(new HotelImageCategory($idHtlImageCategory))) {
+        if ($idImage && $idHotel && Validate::isLoadedObject($objHtlImage = new HotelImage($idImage)) && (int) $objHtlImage->id_hotel === $idHotel) {
+            $objCategory = $idHtlImageCategory ? new HotelImageCategory($idHtlImageCategory, $this->context->language->id) : null;
+            if ($idHtlImageCategory && !Validate::isLoadedObject($objCategory)) {
                 $response['errors'][] = $this->l('Selected image category is invalid.');
                 $this->ajaxDie(json_encode($response));
             }
@@ -969,7 +971,6 @@ class AdminAddHotelController extends ModuleAdminController
             }
 
             $objHtlImage->id_htl_image_category = $idHtlImageCategory ?: null;
-            $objHtlImage->update();
 
             $oldCoverId = null;
             $affectedCoverImage = null;
@@ -982,10 +983,8 @@ class AdminAddHotelController extends ModuleAdminController
                 }
 
                 $objHtlImage->cover = 1;
-                $objHtlImage->update();
             } elseif ($otherImage) {
                 $objHtlImage->cover = 0;
-                $objHtlImage->save();
 
                 $affectedCoverImage = new HotelImage($otherImage['id']);
                 $affectedCoverImage->cover = 1;
@@ -993,8 +992,10 @@ class AdminAddHotelController extends ModuleAdminController
                 $oldCoverId = (int) $affectedCoverImage->id;
             }
 
+            $objHtlImage->update();
+
             $response['status'] = true;
-            $response['image_row'] = $this->renderHotelImageRow($this->getHotelImageRowData($objHtlImage), $idHotel);
+            $response['image_row'] = $this->renderHotelImageRow($this->getHotelImageRowData($objHtlImage, $objCategory), $idHotel);
 
             if ($oldCoverId) {
                 $response['old_cover_id'] = $oldCoverId;
@@ -1010,13 +1011,18 @@ class AdminAddHotelController extends ModuleAdminController
         $this->ajaxDie(json_encode($response));
     }
 
-    private function getHotelImageRowData($objHtlImage)
+    private function getHotelImageRowData($objHtlImage, ?HotelImageCategory $objCategory = null)
     {
+        $idHtlImageCategory = (int) $objHtlImage->id_htl_image_category;
+        if (!$objCategory || (int) $objCategory->id !== $idHtlImageCategory) {
+            $objCategory = new HotelImageCategory($idHtlImageCategory, $this->context->language->id);
+        }
+
         return array(
             'id' => $objHtlImage->id,
             'cover' => $objHtlImage->cover,
-            'id_htl_image_category' => (int) $objHtlImage->id_htl_image_category,
-            'category_name' => (string) (new HotelImageCategory((int) $objHtlImage->id_htl_image_category, $this->context->language->id))->name,
+            'id_htl_image_category' => $idHtlImageCategory,
+            'category_name' => (string) $objCategory->name,
             'image_link' => $this->context->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id, ImageType::getFormatedName('large'))),
             'image_link_small' => $this->context->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id, ImageType::getFormatedName('small'))),
         );
@@ -1040,12 +1046,13 @@ class AdminAddHotelController extends ModuleAdminController
         $imageIds = array_filter(array_map('intval', (array) Tools::getValue('image_ids', array())));
 
         if ($idHotel && $imageIds) {
-            if ($idHtlImageCategory && !Validate::isLoadedObject(new HotelImageCategory($idHtlImageCategory))) {
+            $objCategory = $idHtlImageCategory ? new HotelImageCategory($idHtlImageCategory, $this->context->language->id) : null;
+            if ($idHtlImageCategory && !Validate::isLoadedObject($objCategory)) {
                 $response['errors'][] = $this->l('Selected image category is invalid.');
             } else {
                 foreach ($imageIds as $idImage) {
                     $objHtlImage = new HotelImage($idImage);
-                    if (Validate::isLoadedObject($objHtlImage)) {
+                    if (Validate::isLoadedObject($objHtlImage) && (int) $objHtlImage->id_hotel === $idHotel) {
                         $objHtlImage->id_htl_image_category = $idHtlImageCategory ?: null;
                         $objHtlImage->update();
                     }
@@ -1053,7 +1060,7 @@ class AdminAddHotelController extends ModuleAdminController
 
                 $response['status'] = true;
                 $response['image_ids'] = $imageIds;
-                $response['category_name'] = (string) (new HotelImageCategory($idHtlImageCategory, $this->context->language->id))->name;
+                $response['category_name'] = $objCategory ? (string) $objCategory->name : '';
             }
         } else {
             $response['errors'][] = $this->l('No images selected.');
@@ -1067,7 +1074,7 @@ class AdminAddHotelController extends ModuleAdminController
         $response = array('status' => false);
         if ($idImage = Tools::getValue('id_image')) {
             if ($idHotel = Tools::getValue('id_hotel')) {
-                if (Validate::isLoadedObject($objHtlImage = new HotelImage((int) $idImage))) {
+                if (Validate::isLoadedObject($objHtlImage = new HotelImage((int) $idImage)) && (int) $objHtlImage->id_hotel === (int) $idHotel) {
                     if ($objHtlImage->delete()) {
                         if (!HotelImage::getCover($idHotel)) {
                             $images = $objHtlImage->getImagesByHotelId($idHotel, 1, 1);
@@ -1102,7 +1109,7 @@ class AdminAddHotelController extends ModuleAdminController
         $deletedIds = array();
         foreach ($imageIds as $idImage) {
             $objHtlImage = new HotelImage($idImage);
-            if (Validate::isLoadedObject($objHtlImage) && $objHtlImage->delete()) {
+            if (Validate::isLoadedObject($objHtlImage) && (int) $objHtlImage->id_hotel === $idHotel && $objHtlImage->delete()) {
                 $deletedIds[] = $idImage;
             }
         }

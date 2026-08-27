@@ -183,7 +183,7 @@ class HotelImage extends ObjectModel
         );
     }
 
-    public function uploadHotelImages($images, $idHotel, $idHtlImageCategory = 0)
+    public function uploadHotelImages($images, $idHotel, $idHtlImageCategory = 0, $objCategory = null)
     {
         if (!isset($images['tmp_name']) || !$idHotel) {
             return false;
@@ -238,11 +238,15 @@ class HotelImage extends ObjectModel
             }
 
             if (!$isMultiple) {
+                if (!$objCategory || (int) $objCategory->id !== $idHtlImageCategory) {
+                    $objCategory = new HotelImageCategory($idHtlImageCategory, Context::getContext()->language->id);
+                }
+
                 $addedImage = array(
                     'id' => $objHtlImage->id,
                     'cover' => $objHtlImage->cover,
                     'id_htl_image_category' => $idHtlImageCategory,
-                    'category_name' => (string) (new HotelImageCategory($idHtlImageCategory, Context::getContext()->language->id))->name,
+                    'category_name' => (string) $objCategory->name,
                     'image_link' => Context::getContext()->link->getMediaLink($objHtlImage->getImageLink($objHtlImage->id)),
                 );
             }

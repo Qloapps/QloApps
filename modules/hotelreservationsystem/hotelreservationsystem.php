@@ -522,7 +522,6 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelAmenities', 'Manage Amenities', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRules', 'Manage Order Refund Rules', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRequests', 'Manage Order Refund Requests', 'AdminHotelReservationSystemManagement');
-        $this->installTab('AdminHotelImageCategory', 'Hotel Image Category', 'AdminHotelReservationSystemManagement');
 
         $this->installTab('AdminHotelConfigurationSetting', 'General Settings', 'AdminHotelReservationSystemManagement');
         // Controllers without tabs
@@ -530,6 +529,7 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminBookingDocument', 'Booking Documents', false, false);
+        $this->installTab('AdminHotelImageCategory', 'Hotel Image Category', false, false);
 
         return true;
     }

@@ -440,6 +440,9 @@
 					{if isset($hotel_info.id) && $hotel_info.id}
 						<div class="row">
 							<div class="col-sm-12 text-right">
+								<a href="{$link->getAdminLink('AdminHotelImageCategory')|escape:'html':'UTF-8'}" class="btn btn-default">
+									<i class="icon-plus-sign"></i> {l s='ADD CATEGORY' mod='hotelreservationsystem'}
+								</a>
 								<button type="button" class="btn btn-primary" id="open-add-hotel-images-modal">
 									<i class="icon-plus-sign"></i> {l s='Add images' mod='hotelreservationsystem'}
 								</button>
@@ -727,7 +730,7 @@
 
 		// Restore active tab from controller redirect param
 		var _htlActiveTab = '{if !empty($smarty.get.htl_active_tab)}{$smarty.get.htl_active_tab|escape:'javascript':'UTF-8'}{/if}';
-		if (_htlActiveTab && $('a[href="' + _htlActiveTab + '"]').length) {
+		if (/^#[\w-]+$/.test(_htlActiveTab) && $('a[href="' + _htlActiveTab + '"]').length) {
 			$('a[href="' + _htlActiveTab + '"]').tab('show');
 		}
 

@@ -34,7 +34,6 @@ class AdminHotelImageCategoryController extends ModuleAdminController
 
         parent::__construct();
 
-        $this->_new_list_header_design = true;
         $this->addRowAction('edit');
         $this->addRowAction('delete');
 
@@ -50,8 +49,8 @@ class AdminHotelImageCategoryController extends ModuleAdminController
             ),
             'date_add' => array(
                 'title' => $this->l('Created On'),
-                'type' => 'datetime',
-                'align' => 'center',
+                'type' => 'date',
+                'align' => 'right'
             ),
         );
 
@@ -137,4 +136,18 @@ class AdminHotelImageCategoryController extends ModuleAdminController
 
         return parent::processSave();
     }
+
+    public function initPageHeaderToolbar()
+    {
+        if (!$this->display || $this->display == 'list') {
+            $back = $this->context->link->getAdminLink('AdminAddHotel');
+            $this->page_header_toolbar_btn['back_to_list'] = array(
+                'href' => $back,
+                'desc' => $this->l('Back to hotel list'),
+                'icon' => 'process-icon-back'
+            );
+        }
+        parent::initPageHeaderToolbar();
+    }
+
 }
