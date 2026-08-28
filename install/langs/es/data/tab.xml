@@ -36,6 +36,7 @@
   <tab id="Credit_Slips" name="Factura de abonos"/>
   <tab id="Statuses" name="Estados"/>
   <tab id="Order_Messages" name="Mensajes predefinidos"/>
+  <tab id="Guest_Registration" name="Tarjeta de Registro de Huésped"/>
   <tab id="Customers_1" name="Clientes"/>
   <tab id="Addresses" name="Direcciones"/>
   <tab id="Groups" name="Grupos"/>

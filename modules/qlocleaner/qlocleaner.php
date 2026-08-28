@@ -695,7 +695,8 @@ class QloCleaner extends Module
                 array('htl_booking_detail', 'id_order', 'orders', 'id_order'),
                 array('htl_cart_booking_data', 'id_order', 'orders', 'id_order'),
                 array('htl_cart_booking_data', 'id_customer', 'customer', 'id_customer'),
-                array('htl_branch_features', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_branch_amenity', 'id_hotel', 'htl_branch_info', 'id'),
+                array('htl_branch_amenity', 'amenity_id', 'htl_amenity', 'id_amenity'),
                 array('htl_image', 'id_hotel', 'htl_branch_info', 'id'),
                 array('htl_branch_info', 'id_category', 'category', 'id_category'),
                 array('htl_room_information', 'id_product', 'product', 'id_product'),
@@ -718,9 +719,8 @@ class QloCleaner extends Module
                 array('htl_room_type_service_product', 'id_element', 'product', 'id_product'),
                 array('htl_room_type_service_product_price', 'id_product', 'product', 'id_product'),
                 array('htl_room_type_service_product_price', 'id_element', 'product', 'id_product'),
-                array('htl_bed_type_lang', 'id_lang', 'lang', 'id_lang'),
-                array('htl_room_type_bed_type', 'id_product', 'product', 'id_product'),
-                array('htl_room_type_bed_type', 'id_bed_type', 'htl_bed_type', 'id_bed_type'),
+                array('htl_room_type_amenity', 'id_product', 'product', 'id_product'),
+                array('htl_room_type_amenity', 'amenity_id', 'htl_amenity', 'id_amenity'),
 
             )
         );
@@ -804,7 +804,7 @@ class QloCleaner extends Module
                 'htl_branch_info',
                 'htl_branch_info_lang',
                 'htl_image',
-                'htl_branch_features',
+                'htl_branch_amenity',
                 'htl_advance_payment',
                 'htl_branch_refund_rules',
                 'htl_order_restrict_date',
@@ -819,9 +819,7 @@ class QloCleaner extends Module
                 'htl_testimonials_block_data',
                 'htl_room_type_service_product',
                 'htl_room_type_service_product_price',
-                'htl_bed_type',
-                'htl_bed_type_lang',
-                'htl_room_type_bed_type',
+                'htl_room_type_amenity',
             )
         );
     }

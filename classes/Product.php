@@ -1065,9 +1065,6 @@ class ProductCore extends ObjectModel
             if (!$this->deleteServiceInfo()) {
                 return false;
             }
-        } else {
-            $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-            $objHotelRoomTypeBedType->deleteRoomTypeBedTypes(false, $this->id);
         }
 
         Hook::exec('actionProductDelete', array('id_product' => (int)$this->id, 'product' => $this));
@@ -1075,6 +1072,7 @@ class ProductCore extends ObjectModel
             !GroupReduction::deleteProductReduction($this->id) ||
             !$this->deleteCategories(true) ||
             !$this->deleteProductFeatures() ||
+            !HotelRoomTypeAmenities::deleteByProduct((int)$this->id) ||
             !$this->deleteTags() ||
             !$this->deleteAttributesImpacts() ||
             !$this->deleteAttachments(false) ||
@@ -3025,7 +3023,8 @@ class ProductCore extends ObjectModel
      * @param null     $specific_price_output If a specific price applies regarding the previous parameters,
      *                                        this variable is filled with the corresponding SpecificPrice object
      * @param bool     $with_ecotax           Insert ecotax in price output.
-     * @param bool     $use_group_reduction
+     * @param bool     $use_group_reduction   @deprecated no longer applied here; call
+     *                                        Product::applyGroupDiscount() explicitly on your final total.
      * @param Context  $context
      * @param bool     $use_customer_price
      * @return float                          Product price
@@ -3194,7 +3193,8 @@ class ProductCore extends ObjectModel
      * @param bool   $with_ecotax insert ecotax in price output.
      * @param null   $specific_price If a specific price applies regarding the previous parameters,
      *                               this variable is filled with the corresponding SpecificPrice object
-     * @param bool   $use_group_reduction
+     * @param bool   $use_group_reduction @deprecated no longer applied here; call
+     *                                    Product::applyGroupDiscount() explicitly on your final total.
      * @param int    $id_customer
      * @param bool   $use_customer_price
      * @param int    $id_cart
@@ -3448,18 +3448,6 @@ class ProductCore extends ObjectModel
             $price -= $specific_price_reduction;
         }
 
-        // Group reduction
-        if ($use_group_reduction) {
-            $reduction_from_category = GroupReduction::getValueForProduct($id_product, $id_group);
-            if ($reduction_from_category !== false) {
-                $group_reduction = $price * (float)$reduction_from_category;
-            } else { // apply group reduction if there is no group reduction for this category
-                $group_reduction = (($reduc = Group::getReductionByIdGroup($id_group)) != 0) ? ($price * $reduc / 100) : 0;
-            }
-
-            $price -= $group_reduction;
-        }
-
         if ($only_reduc) {
             return Tools::ps_round($specific_price_reduction, $decimals);
         }
@@ -3472,6 +3460,32 @@ class ProductCore extends ObjectModel
 
         self::$_prices[$cache_id] = $price;
         return self::$_prices[$cache_id];
+    }
+
+    /**
+     * Applies the group discount to an already-computed price. 
+     * @param float $price The price to discount (tax-incl. or tax-excl., either works).
+     * @param int $id_product
+     * @param int $id_group
+     * @param bool $use_group_reduction
+     * @return float
+     */
+    public static function applyGroupDiscount($price, $id_product, $id_group, $use_group_reduction = true)
+    {
+        if (!$use_group_reduction) {
+            return $price;
+        }
+
+        $reduction_from_category = GroupReduction::getValueForProduct($id_product, $id_group);
+        if ($reduction_from_category !== false) {
+            $group_reduction = $price * (float)$reduction_from_category;
+        } else { // apply group reduction if there is no group reduction for this category
+            $group_reduction = (($reduc = Group::getReductionByIdGroup($id_group)) != 0) ? ($price * $reduc / 100) : 0;
+        }
+
+        $price -= $group_reduction;
+
+        return $price < 0 ? 0 : $price;
     }
 
     public static function convertAndFormatPrice($price, $currency = false, ?Context $context = null)
@@ -6781,6 +6795,66 @@ class ProductCore extends ObjectModel
             $price = $price * HotelHelper::getNumberOfDays($dateFrom, $dateTo);
         }
 
-        return $price * (int)$quantity;
+        $price = $price * (int)$quantity;
+
+        if (!$specificPrice || ($specificPrice['id_cart'] == 0 && $specificPrice['id_htl_cart_booking'] == 0)) {
+            if (!$idGroup || !Validate::isLoadedObject(new Group((int)$idGroup))) {
+                $idGroup = (int)Group::getCurrent()->id;
+            }
+            $price =  Product::applyGroupDiscount($price, $idProduct, $idGroup);
+        }
+        return $price;
+        
+    }
+
+    /**
+     * Prepare grouped core features and values for a room type, with selection state.
+     *
+     * @param int $idProduct
+     * @param int $idLang defaults to current context language
+     * @return array
+     */
+    public static function getRoomTypeFeatureTreeData($idProduct, $idLang = 0)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $product = new self((int) $idProduct);
+        $features = Feature::getFeatures(
+            $idLang,
+            (Shop::isFeatureActive() && Shop::getContext() == Shop::CONTEXT_SHOP)
+        );
+        $selectedFeatureValues = array();
+        foreach ($product->getFeatures() as $productFeature) {
+            $selectedFeatureValues[(int) $productFeature['id_feature']][] = (int) $productFeature['id_feature_value'];
+        }
+
+        foreach ($features as &$feature) {
+            $featureValues = FeatureValue::getFeatureValuesWithLang(
+                $idLang,
+                (int) $feature['id_feature']
+            );
+            $feature['value'] = (int) $feature['id_feature'];
+            $feature['input_name'] = 'feature_value_parents';
+            $feature['children'] = array();
+            $selectedValues = isset($selectedFeatureValues[(int) $feature['id_feature']])
+                ? $selectedFeatureValues[(int) $feature['id_feature']]
+                : array();
+
+            foreach ($featureValues as $featureValue) {
+                $featureValue['name'] = $featureValue['value'];
+                $featureValue['value'] = (int) $featureValue['id_feature_value'];
+                $featureValue['input_name'] = 'feature_values['.(int) $feature['id_feature'].']';
+                $featureValue['selected'] = in_array((int) $featureValue['id_feature_value'], $selectedValues);
+                $feature['children'][] = $featureValue;
+            }
+
+            if ($feature['children'] && count($selectedValues) === count($feature['children'])) {
+                $feature['selected'] = true;
+            }
+        }
+
+        return $features;
     }
 }

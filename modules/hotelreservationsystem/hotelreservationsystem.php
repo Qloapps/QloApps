@@ -33,7 +33,7 @@ class HotelReservationSystem extends Module
     {
         $this->name = 'hotelreservationsystem';
         $this->tab = 'administration';
-        $this->version = '1.7.0';
+        $this->version = '1.7.1';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -48,7 +48,7 @@ class HotelReservationSystem extends Module
         $resources = array(
             'hotels' => array('description' => 'Hotel Branch Information','class' => 'HotelBranchInformation'),
             'hotel_room_types' => array('description' => 'Hotel room types','class' => 'HotelRoomType'),
-            'hotel_features' => array('description' => 'The hotel features','class' => 'HotelFeatures'),
+            'hotel_amenities' => array('description' => 'The hotel amenities', 'class' => 'HotelAmenities'),
             'hotel_refund_rules' => array('description' => 'The hotel refund rules','class' => 'HotelOrderRefundRules'),
             'hotel_rooms' => array('description' => 'The hotel rooms','class' => 'HotelRoomInformation'),
             'feature_prices' => array('description' => 'Feature prices', 'class' => 'HotelRoomTypeFeaturePricing'),
@@ -224,8 +224,8 @@ class HotelReservationSystem extends Module
         if (Tools::getValue('controller') == 'category') {
             if (($apiKey = Configuration::get('PS_API_KEY'))
                 && Configuration::get('WK_GOOGLE_ACTIVE_MAP')
-                && ($PS_MAP_ID = Configuration::get('PS_MAP_ID'))
             ) {
+                $PS_MAP_ID = Configuration::get('PS_MAP_ID');
                 $idCategory = Tools::getValue('id_category');
                 $idHotel = HotelBranchInformation::getHotelIdByIdCategory($idCategory);
                 $objHotel = new HotelBranchInformation($idHotel, $this->context->language->id);
@@ -404,9 +404,9 @@ class HotelReservationSystem extends Module
                 'htl_room_type_feature_pricing',
                 'htl_branch_info',
                 'htl_features',
+                'htl_amenity',
                 'htl_order_refund_rules',
-                'htl_settings_link',
-                'htl_bed_type'
+                'htl_settings_link'
             );
             //If Admin update new language when we do entry in module all lang tables.
             HotelHelper::updateLangTables($newIdLang, $langTables);
@@ -440,12 +440,11 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelReservationSystemManagement', 'Hotel Reservation System');
         $this->installTab('AdminAddHotel', 'Manage Hotel', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelRoomsBooking', 'Book Now', 'AdminHotelReservationSystemManagement');
-        $this->installTab('AdminHotelFeatures', 'Manage Hotel Features', 'AdminHotelReservationSystemManagement');
+        $this->installTab('AdminHotelAmenities', 'Manage Amenities', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRules', 'Manage Order Refund Rules', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRequests', 'Manage Order Refund Requests', 'AdminHotelReservationSystemManagement');
 
         $this->installTab('AdminHotelConfigurationSetting', 'General Settings', 'AdminHotelReservationSystemManagement');
-        $this->installTab('AdminHotelBedTypes', 'Bed Types', 'AdminCatalog');
         // Controllers without tabs
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
@@ -494,8 +493,7 @@ class HotelReservationSystem extends Module
             || !$this->callInstallTab()
             || !$objHtlHelper->insertDefaultHotelEntries()
             || !$objHtlHelper->createHotelRoomDefaultFeatures()
-            || !$objHtlHelper->createHotelDefaultBedTypes()
-            || !$objHtlHelper->insertHotelCommonFeatures()
+            || !$objHtlHelper->insertHotelCommonAmenities()
         ) {
             return false;
         }

@@ -1038,10 +1038,19 @@ class OrderCore extends ObjectModel
         return $orders;
     }
 
-    public static function getOrdersWithInformations($limit = null, ?Context $context = null)
+    public static function getOrdersWithInformations($limit = null, ?Context $context = null, $applyHotelRestriction = false)
     {
         if (!$context) {
             $context = Context::getContext();
+        }
+
+        $hotelJoin = '';
+        $hotelRestriction = '';
+        $groupBy = '';
+        if ($applyHotelRestriction) {
+            $hotelJoin = ' INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = o.`id_order`)';
+            $hotelRestriction = HotelBranchInformation::addHotelRestriction(false, 'hbd');
+            $groupBy = ' GROUP BY o.`id_order`';
         }
 
         $sql = 'SELECT *, (
@@ -1053,8 +1062,11 @@ class OrderCore extends ObjectModel
 				) AS `state_name`, o.`date_add` AS `date_add`, o.`date_upd` AS `date_upd`
 				FROM `'._DB_PREFIX_.'orders` o
 				LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
+				'.$hotelJoin.'
 				WHERE 1
 					'.Shop::addSqlRestriction(false, 'o').'
+					'.$hotelRestriction.'
+				'.$groupBy.'
 				ORDER BY o.`date_add` DESC
 				'.((int)$limit ? 'LIMIT 0, '.(int)$limit : '');
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
@@ -2677,7 +2689,7 @@ class OrderCore extends ObjectModel
                                 'unit_tax_base' => $autoAddedPriceExcl / $totalAutoAddedQty,
                                 'total_tax_base' => $autoAddedPriceExcl,
                                 'unit_amount' => $amount,
-                                'total_amount' => Tools::processPriceRounding($amount, $totalAutoAddedQty),
+                                'total_amount' => Tools::processPriceRounding($amount, $totalAutoAddedQty, $this->round_type, $this->round_mode),
                             );
                         }
                     } else {
@@ -2724,7 +2736,7 @@ class OrderCore extends ObjectModel
 
                 foreach ($tax_calculator->getTaxesAmount($unit_price_tax_excl) as $id_tax => $unit_amount) {
                     $total_tax_base = 0;
-                    $total_amount = Tools::processPriceRounding($unit_amount, $quantity);
+                    $total_amount = Tools::processPriceRounding($unit_amount, $quantity, $this->round_type, $this->round_mode);
 
                     if (!isset($groupedTaxDetails[$id_tax])) {
                         $groupedTaxDetails[$id_tax] = array(
