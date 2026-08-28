@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<entity_quick_access>
-  <quick_access id="Home" name="Acasă"/>
-  <quick_access id="My_Shop" name="Magazinul meu"/>
-  <quick_access id="New_category" name="Categorie nouă"/>
-  <quick_access id="New_product" name="Produs nou"/>
-  <quick_access id="New_voucher" name="Cupon nou"/>
-</entity_quick_access>

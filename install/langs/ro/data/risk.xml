@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<entity_risk>
-  <risk id="None" name="Deloc"/>
-  <risk id="Low" name="Mic"/>
-  <risk id="Medium" name="Mediu"/>
-  <risk id="High" name="Mare"/>
-</entity_risk>

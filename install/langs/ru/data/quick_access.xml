@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<entity_quick_access>
-  <quick_access id="Home" name="Главная"/>
-  <quick_access id="My_Shop" name="Мой магазин"/>
-  <quick_access id="New_category" name="Новая категория"/>
-  <quick_access id="New_product" name="Новый товар"/>
-  <quick_access id="New_voucher" name="Новый купон"/>
-</entity_quick_access>

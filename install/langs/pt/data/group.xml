@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<entity_group>
-  <group id="Visitor" name="Visitante"/>
-  <group id="Guest" name="Cliente n&#227;o registado"/>
-  <group id="Customer" name="Cliente"/>
-  <group id="Reseller" name="Revendedor"/>
-</entity_group>

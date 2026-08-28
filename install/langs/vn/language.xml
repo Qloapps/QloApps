@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<language>
-	<name><![CDATA[tiếng Việt (Vietnamese)]]></name>
-	<language_code>vi-vn</language_code>
-	<date_format_lite>d/m/Y</date_format_lite>
-	<date_format_full>H:i:s d/m/Y </date_format_full>
-	<is_rtl>false</is_rtl>
-</language>
