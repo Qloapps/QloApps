@@ -20,14 +20,5 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
- {if $id_cart_rule}
-    <a class="btn btn-link" href="{$link->getAdminLink('AdminCartRules')|escape:'html':'UTF-8'}&updatecart_rule&id_cart_rule={$id_cart_rule}" target="_blank">
-        #{$id_cart_rule}
-    </a>
-{elseif $row['redeem_status'] == OrderSlip::REDEEM_STATUS_REDEEMED}
-    --
-{else}
-    <a href="{$link->getAdminLink('AdminSlip')|escape:'html':'UTF-8'}&generateVoucher=1&id_order_slip={$row['id_order_slip']}" class="btn btn-default" title="{l s='Generate voucher for credit slip'}">
-        <i class="icon-refresh"></i> {l s='Generate Voucher'}
-    </a>
-{/if}
+{l s='Total credit slip amount for this order:'} <strong><span id="booking-total-slip-amount">-</span></strong><br>
+<span id="booking-slip-ids-wrapper" style="display:none;">{l s='Credit slip generated for this order: '} <strong><span id="booking-slip-ids"></span></strong></span>
