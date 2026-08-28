@@ -3034,7 +3034,6 @@ class AdminControllerCore extends Controller
             'host_mode' => defined('_PS_HOST_MODE_') ? 1 : 0,
             'stock_management' => (int)Configuration::get('PS_STOCK_MANAGEMENT'),
             'language_is_rtl' => $this->context->language->is_rtl,
-            'show_full_date' => $this->show_full_date,
         ));
 
         if ($this->display_header) {

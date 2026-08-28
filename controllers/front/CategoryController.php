@@ -196,6 +196,10 @@ class CategoryControllerCore extends FrontController
                 }
             }
 
+            $bookingDateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $id_hotel);
+            $date_from = $bookingDateRange['date_from'];
+            $date_to = $bookingDateRange['date_to'];
+
             $objBookingDetail = new HotelBookingDetail();
             $bookingParams = array(
                 'date_from' => $date_from,

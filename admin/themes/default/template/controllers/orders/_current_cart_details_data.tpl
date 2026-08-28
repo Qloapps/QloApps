@@ -61,8 +61,7 @@
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
 								</td>
-								{assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
-								<td>{dateFormat date=$data.date_from full=$is_full_date} - {dateFormat date=$data.date_to full=$is_full_date}</td>
+								<td>{dateFormat date=$data.date_from full=true} - {dateFormat date=$data.date_to full=true}</td>
 								{if $occupancy_required_for_booking}
 									<td>
 										<div class="dropdown">

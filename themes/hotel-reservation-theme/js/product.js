@@ -1415,9 +1415,9 @@ var BookingForm = {
         if (min_booking_offset) {
             start_date.setDate(start_date.getDate() + parseInt(min_booking_offset));
             start_date.setHours(0, 0, 0, 0);
-            if (dateFrom && new Date(dateFrom + ' 00:00:00') < start_date) {
+            if (dateFrom && $.datepicker.parseDate('yy-mm-dd', dateFrom) < start_date) {
                 dateFrom = $.datepicker.formatDate('yy-mm-dd', start_date);
-                if (new Date(dateTo + ' 00:00:00') <= start_date) {
+                if ($.datepicker.parseDate('yy-mm-dd', dateTo) <= start_date) {
                     dateTo = new Date(start_date);
                     dateTo.setDate(start_date.getDate() + 1);
                     dateTo = $.datepicker.formatDate('yy-mm-dd', dateTo);

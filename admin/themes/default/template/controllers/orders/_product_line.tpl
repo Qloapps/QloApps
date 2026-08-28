@@ -36,10 +36,9 @@
     </td>
 	<td class="center"><img width="80px" src="{$data.image_link}" title="{l s='Room image'}"></td>
 	<td class="center">
-		{assign var="is_full_date" value=($show_full_date && ($data['date_from']|date_format:'%D' == $data['date_to']|date_format:'%D'))}
-		<p>{dateFormat date=$data.date_from full=$is_full_date}</p>
+		<p>{dateFormat date=$data.date_from full=true}</p>
 		<p>{l s='to'}</p>
-		<p>{dateFormat date=$data.date_to full=$is_full_date}</p>
+		<p>{dateFormat date=$data.date_to full=true}</p>
 	</td>
 	<td class="center">
 		<p>{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}</p>

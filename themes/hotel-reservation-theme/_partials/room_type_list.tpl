@@ -124,7 +124,12 @@
 														{/if}
 														{block name='room_type_list_room_book_now_button'}
 															<div>
-																<a cat_rm_check_in="{$booking_date_from|escape:'htmlall':'UTF-8'}" cat_rm_check_out="{$booking_date_to|escape:'htmlall':'UTF-8'}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days|escape:'htmlall':'UTF-8'}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button"><span>{l s='Book Now'}</span></a>
+																<input type="hidden" class="rm_book_check_in" value="{$booking_date_from|escape:'htmlall':'UTF-8'}">
+																<input type="hidden" class="rm_book_check_out" value="{$booking_date_to|escape:'htmlall':'UTF-8'}">
+																<input type="hidden" class="rm_book_num_days" value="{$num_days|escape:'htmlall':'UTF-8'}">
+																<input type="hidden" class="rm_book_id_product" value="{$room_v['id_product']|intval}">
+																<input type="hidden" class="rm_book_id_product_attribute" value="0">
+																<a href="" class="btn btn-default button button-medium ajax_add_to_cart_button"><span>{l s='Book Now'}</span></a>
 															</div>
 														{/block}
 													</div>

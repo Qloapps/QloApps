@@ -473,7 +473,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $num_days = HotelHelper::getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
-                                $fullDate = (isset($context->controller->show_full_date) && $context->controller->show_full_date && (date('Y-m-d', strtotime($data_v['date_from'])) == date('Y-m-d', strtotime($data_v['date_to'])))) ? true : false;
                                 $display_date_from = $data_v['date_from'];
                                 $display_date_to = $data_v['date_to'];
                                 if ((int)$data_v['id_status'] === HotelBookingDetail::STATUS_CHECKED_OUT) {

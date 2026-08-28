@@ -99,17 +99,16 @@
 																</div>
 
 																<div class="row">
-																	{assign var="is_full_date" value=($show_full_date && ($rm_v['data_form']|date_format:'%D' == $rm_v['data_to']|date_format:'%D'))}
 																	<div class="col-xs-12 col-md-6">
 																		<div class="row">
 																			<dt class="col-xs-5">{l s='Check-in'}</dt>
-																			<dd class="col-xs-7">{dateFormat date=$rm_v.data_form full=$is_full_date}</dd>
+																			<dd class="col-xs-7">{dateFormat date=$rm_v.data_form full=true}</dd>
 																		</div>
 																	</div>
 																	<div class="col-xs-12 col-md-6">
 																		<div class="row">
 																			<dt class="col-xs-5">{l s='Check-out'}</dt>
-																			<dd class="col-xs-7">{dateFormat date=$rm_v.data_to full=$is_full_date}</dd>
+																			<dd class="col-xs-7">{dateFormat date=$rm_v.data_to full=true}</dd>
 																		</div>
 																	</div>
 																</div>

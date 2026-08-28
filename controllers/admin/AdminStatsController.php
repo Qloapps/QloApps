@@ -778,7 +778,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             LEFT JOIN `'._DB_PREFIX_.'orders` o
             ON (o.`id_order` = hbd.`id_order`)
             WHERE hbd.`id_product` = p.`id_product` AND o.`valid` = 1
-            AND hbd.`date_to` >= "'.pSQL($dateFrom).'" AND hbd.`date_from` <= "'.pSQL($dateTo).'"
+            AND hbd.`date_to` >= "'.pSQL($dateFrom).' 00:00:00" AND hbd.`date_from` <= "'.pSQL($dateTo).' 23:59:59"
         ) as total_booked FROM `'._DB_PREFIX_.'product` p
         INNER JOIN `'._DB_PREFIX_.'htl_room_type` hrt
         ON (hrt.`id_product` = p.`id_product`)
@@ -1338,7 +1338,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0
             AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
-            AND hbd.`date_to` > "'.pSQL($date).' 00:00:00"'.
+            AND hbd.`date_to` > "'.pSQL($date).' 23:59:59"'.
             HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
         );
     }
@@ -1403,36 +1403,55 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $occupancyData['count_total'] = (int)$countTotal;
 
         // Occupied are booked room-nights (non-refunded) in the date range.
-        $countOccupied = (int)Db::getInstance()->getValue(
-            'SELECT IFNULL(SUM(
-                GREATEST(
-                    0,
-                    DATEDIFF(
+        $countOccupied = (int) Db::getInstance()->getValue(
+            'WITH RECURSIVE booking_dates AS (
+                SELECT
+                    hbd.id_room,
+                    DATE(
+                        GREATEST(
+                            hbd.date_from,
+                            "'.pSQL($dateFrom).' 00:00:00"
+                        )
+                    ) AS occupied_date,
+                    DATE(
                         LEAST(
-                            IF(hbd.`id_status` = '.(int)HotelBookingDetail::STATUS_CHECKED_OUT.',
-                                DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"),
-                                hbd.`date_to`
+                            IF(
+                                hbd.id_status = '.(int)HotelBookingDetail::STATUS_CHECKED_OUT.',
+                                hbd.check_out,
+                                hbd.date_to
                             ),
-                            "'.pSQL($dateTo).'"
-                        ),
-                        GREATEST(hbd.`date_from`, "'.pSQL($dateFrom).'")
-                    )
-                )
-            ), 0)
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri
-                ON (hri.`id` = hbd.`id_room`)
-            LEFT JOIN `'._DB_PREFIX_.'product` p
-                ON (p.`id_product` = hri.`id_product`)
-            WHERE p.`active` = 1
-            AND p.`booking_product` = 1
-            AND hbd.`is_refunded` = 0
-            AND hbd.`date_from` < "'.pSQL($dateTo).'"
-            AND IF(hbd.`id_status` = '.(int)HotelBookingDetail::STATUS_CHECKED_OUT.',
-                DATE_FORMAT(hbd.`check_out`, "%Y-%m-%d"),
-                hbd.`date_to`
-            ) > "'.pSQL($dateFrom).'"'.
-            HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
+                            "'.pSQL($dateTo).' 23:59:59"
+                        )
+                    ) AS end_date
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                LEFT JOIN `'._DB_PREFIX_.'htl_room_information` hri
+                    ON hri.`id` = hbd.`id_room`
+                LEFT JOIN `'._DB_PREFIX_.'product` p
+                    ON p.`id_product` = hri.`id_product`
+                WHERE
+                    p.`active` = 1
+                    AND p.`booking_product` = 1
+                    AND hbd.`is_refunded` = 0
+                    AND hbd.`date_from` < "'.pSQL($dateTo).' 23:59:59"
+                    AND IF(
+                        hbd.`id_status` = '.(int)HotelBookingDetail::STATUS_CHECKED_OUT.',
+                        hbd.`check_out`,
+                        hbd.`date_to`
+                    ) > "'.pSQL($dateFrom).' 00:00:00"
+                    '.HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
+
+                UNION ALL
+
+                SELECT
+                    id_room,
+                    DATE_ADD(occupied_date, INTERVAL 1 DAY),
+                    end_date
+                FROM booking_dates
+                WHERE DATE_ADD(occupied_date, INTERVAL 1 DAY) < end_date
+            )
+
+            SELECT COUNT(DISTINCT id_room, occupied_date)
+            FROM booking_dates'
         );
         $occupancyData['count_occupied'] = $countOccupied;
 
@@ -1708,7 +1727,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
-        WHERE hbd.`is_refunded` = 0 AND hbd.`date_from` = "'.pSQL($date).' 00:00:00"
+        WHERE hbd.`is_refunded` = 0 AND hbd.`date_from` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"
         AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
         AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
@@ -1725,7 +1744,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
-        WHERE hbd.`is_refunded` = 0 AND hbd.`date_to` = "'.pSQL($date).' 00:00:00"
+        WHERE hbd.`is_refunded` = 0 AND hbd.`date_to` BETWEEN "'.pSQL($date).' 00:00:00" AND "'.pSQL($date).' 23:59:59"
         AND hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
         $result = Db::getInstance()->executeS($sql);
@@ -1736,6 +1755,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     // In-House or Stay Over: The guest is not expected to check out today and will remain at least one more night.
     public static function getInHousesInfo($idHotel = null)
     {
+        $today = date('Y-m-d');
         $sql = 'SELECT hbd.*, o.`with_occupancy`, CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
         DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -1743,8 +1763,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
         WHERE hbd.`is_refunded` = 0
         AND (hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_IN.'
-        OR (hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.' AND hbd.`check_out` > "'.pSQL(date('Y-m-d')).' 00:00:00"))
-        AND hbd.`date_to` != "'.pSQL(date('Y-m-d')).' 00:00:00"'.
+        OR (hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.' AND hbd.`check_out` > "'.pSQL($today).' 00:00:00"))
+        AND hbd.`date_to` NOT BETWEEN "'.pSQL($today).' 00:00:00" AND "'.pSQL($today).' 23:59:59"'.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
         $result = Db::getInstance()->executeS($sql);
 
@@ -1804,7 +1824,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         WHERE p.`active` = 1
         AND hbd.`is_refunded` = 0
         AND hbd.`is_cancelled` = 0 '.
-        (($dateFrom && $dateTo) ? ' AND hbd.`date_from` <= "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00" ': ' ').
+        (($dateFrom && $dateTo) ? ' AND hbd.`date_from` <= "'.pSQL($dateTo).' 23:59:59" AND hbd.`date_to` > "'.pSQL($dateFrom).' 23:59:59" ': ' ').
         (!is_null($roomBookingStatus) ? ' AND hbd.`id_status` = '.(int) $roomBookingStatus : ' ').
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
         $result = Db::getInstance()->getValue($sql);
@@ -1818,7 +1838,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $sql = 'SELECT COUNT(hbd.`id_room`)
         FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
         WHERE hbd.`is_refunded` = 0
-        AND hbd.`date_from` <= "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+        AND hbd.`date_from` <= "'.pSQL($dateTo).' 23:59:59" AND hbd.`date_to` > "'.pSQL($dateFrom).' 23:59:59"'.
         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
         $result = Db::getInstance()->getValue($sql);
@@ -1855,7 +1875,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 ON (p.`id_product` = hri.`id_product`)
                 WHERE p.`active` = 1
                 AND hbd.`is_refunded` = 0
-                AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+                AND DATE(hbd.`date_from`) <= "'.pSQL($discreteDate['date_from']).'"
+                AND GREATEST(DATE(hbd.`date_from`), DATE_SUB(DATE(hbd.`date_to`), INTERVAL 1 DAY)) >= "'.pSQL($discreteDate['date_from']).'"'.
                 (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
                 $value = Db::getInstance()->getValue($sql);
@@ -1896,7 +1917,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 WHERE p.`active` = 1
                 AND o.`valid` = 1
                 AND hbd.`is_refunded` = 0
-                AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+                AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 23:59:59"'.
                 (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
                 $value = Db::getInstance()->getValue($sql);
@@ -1939,7 +1960,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             WHERE p.`active` = 1
             AND o.`valid` = 1
             AND hbd.`is_refunded` = 0
-            AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+            AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 23:59:59"'.
             (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
             if ($servicesRevenue = Db::getInstance()->getValue($servicesRevenueSql)) {
@@ -1956,7 +1977,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             WHERE p.`active` = 1
             AND o.`valid` = 1
             AND hbd.`is_refunded` = 0
-            AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+            AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 23:59:59"'.
             (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
             if ($demandsRevenue = Db::getInstance()->getValue($demandsRevenueSql)) {
@@ -2025,7 +2046,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         ON (p.`id_product` = hri.`id_product`)
                         WHERE p.`active` = 1
                         AND hbd.`is_refunded` = 0
-                        AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+                        AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 23:59:59"'.
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
                     ) AS num_booked,
                     (
@@ -2105,7 +2126,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         WHERE p.`active` = 1'.
                         (!is_null($showAtFront) ? ' AND p.`show_at_front` = '.(int) $showAtFront : '').'
                         AND hbd.`is_refunded` = 0
-                        AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+                        AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 23:59:59"'.
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
                     ) AS num_booked,
                     (
@@ -2409,7 +2430,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 WHERE p.`active` = 1
                 AND o.`valid` = 1
                 AND hbd.`is_refunded` = 0
-                AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+                AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 23:59:59"'.
                 (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
                 $roomsExpenses = Db::getInstance()->getValue($roomsSql);
@@ -2435,7 +2456,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     WHERE p.`active` = 1
                     AND o.`valid` = 1
                     AND hbd.`is_refunded` = 0
-                    AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
+                    AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 23:59:59"'.
                     (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
                     $servicesExpenses = Db::getInstance()->getValue($servicesSql);
@@ -2565,7 +2586,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                     SELECT IF(DATEDIFF(hbd.`date_from`, \''.pSQL($dateFrom).'\') < 0, \''.pSQL($dateFrom).'\', hbd.`date_from`) AS date_from_final, IF(DATEDIFF(\''.pSQL($dateTo).'\', hbd.`date_to`) < 0, \''.pSQL($dateToNext).'\', hbd.`date_to`) AS date_to_final
                     FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                     WHERE hbd.`is_refunded` = 0
-                    AND hbd.`date_from` <= \''.pSQL($dateTo).'\' AND hbd.`date_to` > \''.pSQL($dateFrom).'\''.
+                    AND hbd.`date_from` <= \''.pSQL($dateTo).' 23:59:59\' AND hbd.`date_to` > \''.pSQL($dateFrom).' 23:59:59\''.
                     (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
                 ) AS t
             ) AS t1';
@@ -2644,20 +2665,20 @@ class AdminStatsControllerCore extends AdminStatsTabController
             ON (p.`id_product` = hbd.`id_product`)
             WHERE p.`active` = 1
             AND hbd.`is_refunded` = 0
-            AND hbd.`date_from` <= "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+            AND hbd.`date_from` <= "'.pSQL($dateTo).' 23:59:59" AND hbd.`date_to` > "'.pSQL($dateFrom).' 23:59:59"'.
             (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
 
             $total = Db::getInstance()->getValue($sql);
 
             $sql = 'SELECT COUNT(los)
             FROM (
-                SELECT DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los
+                SELECT GREATEST(1, DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS los
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 LEFT JOIN `'._DB_PREFIX_.'product` p
                 ON (p.`id_product` = hbd.`id_product`)
                 WHERE p.`active` = 1
                 AND hbd.`is_refunded` = 0
-                AND hbd.`date_from` <= "'.pSQL($dateTo).' 00:00:00" AND hbd.`date_to` > "'.pSQL($dateFrom).' 00:00:00"'.
+                AND hbd.`date_from` <= "'.pSQL($dateTo).' 23:59:59" AND hbd.`date_to` > "'.pSQL($dateFrom).' 23:59:59"'.
                 (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '').'
             ) AS t
             WHERE los >= '.(int) $losMinimum.' AND los <= '.(int) ($losMaximum ? $losMaximum : $losMinimum);

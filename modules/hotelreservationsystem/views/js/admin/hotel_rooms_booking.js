@@ -364,15 +364,16 @@ $(document).ready(function() {
                             $(".cart_booking_btn").removeAttr('disabled');
                             $current_btn.removeAttr('disabled');
                             showSuccessMessage(added_room_success_txt);
+                            btn.removeClass('btn-primary').removeClass('avai_add_cart').addClass('btn-danger').addClass('avai_delete_cart_data').html(remove);
+                            btn.attr('data-id-cart', result.data.id_cart);
+                            btn.attr('data-id-cart-book-data', result.data.id_cart_book_data);
+                            refreshCartData();
+                            refreshStatsData();
+                            calendar.refetchEvents();
+                        }else{
+                            $current_btn.attr('disabled', false);
+                            showErrorMessage(result.errors);
                         }
-
-                        btn.removeClass('btn-primary').removeClass('avai_add_cart').addClass('btn-danger').addClass('avai_delete_cart_data').html(remove);
-
-                        btn.attr('data-id-cart', result.data.id_cart);
-                        btn.attr('data-id-cart-book-data', result.data.id_cart_book_data);
-                        refreshCartData();
-                        refreshStatsData();
-                        calendar.refetchEvents();
                     }
                 }
             });
@@ -431,15 +432,17 @@ $(document).ready(function() {
                         if (result.success) {
                             $(".cart_booking_btn").removeAttr('disabled');
                             $current_btn.removeAttr('disabled');
+                            showSuccessMessage(added_room_success_txt);
+                            btn.removeClass('btn-primary').removeClass('par_add_cart').addClass('btn-danger').addClass('part_delete_cart_data').html(remove);
+                            btn.attr('data-id-cart', result.data.id_cart);
+                            btn.attr('data-id-cart-book-data', result.data.id_cart_book_data);
+                            refreshCartData();
+                            refreshStatsData();
+                            calendar.refetchEvents();
+                        }else{
+                            $current_btn.attr('disabled', false);
+                            showErrorMessage(result.errors);
                         }
-
-                        btn.removeClass('btn-primary').removeClass('par_add_cart').addClass('btn-danger').addClass('part_delete_cart_data').html(remove);
-
-                        btn.attr('data-id-cart', result.data.id_cart);
-                        btn.attr('data-id-cart-book-data', result.data.id_cart_book_data);
-                        refreshCartData();
-                        refreshStatsData();
-                        calendar.refetchEvents();
                     }
                 }
             });

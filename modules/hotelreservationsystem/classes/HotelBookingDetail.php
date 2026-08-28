@@ -357,9 +357,10 @@ class HotelBookingDetail extends ObjectModel
         extract($this->getBookingDataParams($params));
 
         if ($date_from && $date_to && $hotel_id) {
-            $date_from = date('Y-m-d H:i:s', strtotime($date_from));
+            $dateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $hotel_id);
+            $date_from = $dateRange['date_from'];
             $stayStartDate = date('Y-m-d', strtotime($date_from));
-            $date_to = date('Y-m-d H:i:s', strtotime($date_to));
+            $date_to = $dateRange['date_to'];
 
             $objRoomType = new HotelRoomType();
             $lengthOfStay = HotelHelper::getNumberOfDays($date_from, $date_to);
@@ -419,7 +420,6 @@ class HotelBookingDetail extends ObjectModel
                         'searchOccupancy' => $occupancy,
                         'allowedIdRoomTypes' => $allowedIdRoomTypes,
                         'applyLosRestriction' => $applyLosRestriction,
-                        'hourlyBooking' => $hourly_booking,
                         'allParams' => $params,
                     );
                     $availableRoomTypes = $this->getSearchAvailableRooms($searchParams);
@@ -471,7 +471,6 @@ class HotelBookingDetail extends ObjectModel
                         'idRoomType' => $id_room_type,
                         'searchOccupancy' => $occupancy,
                         'allowedIdRoomTypes' => $allowedIdRoomTypes,
-                        'hourlyBooking' => $hourly_booking,
                         'allParams' => $params,
                     );
 
@@ -736,7 +735,6 @@ class HotelBookingDetail extends ObjectModel
      *      'searchOccupancy' => ...,
      *      'allowedIdRoomTypes' => ...,
      *      'applyLosRestriction' => ...,
-     *      'hourlyBooking' => ...,
      *      'allParams' => ...,
      * );
      */
@@ -771,7 +769,7 @@ class HotelBookingDetail extends ObjectModel
         $excludeRoomId['checked_out'] = 'SELECT `id_room`
         FROM `'._DB_PREFIX_.'htl_booking_detail`
         WHERE `id_hotel` = '.(int)$idHotel.' AND `is_back_order` = 0 AND `is_refunded` = 0 AND IF(`id_status` = '. self::STATUS_CHECKED_OUT.',
-            IF('.(int) $hourlyBooking.', 1, (DATE_FORMAT(`check_out`,  "%Y-%m-%d") != DATE_FORMAT(\''.pSQL($dateFrom).'\',  "%Y-%m-%d")) AND (`check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\')) AND (
+           (DATE_FORMAT(`check_out`,  "%Y-%m-%d") != DATE_FORMAT(\''.pSQL($dateFrom).'\',  "%Y-%m-%d")) AND (`check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\') AND (`check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\') AND (
                 (`date_from` <= \''.pSQL($dateFrom).'\' AND `check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\') OR
                 (`date_from` >= \''.pSQL($dateFrom).'\' AND `check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.pSQL($dateTo).'\') OR
                 (`date_from` >= \''.pSQL($dateFrom).'\' AND `date_from` < \''.pSQL($dateTo).'\' AND `check_out` >= \''.pSQL($dateTo).'\') OR
@@ -1087,7 +1085,6 @@ class HotelBookingDetail extends ObjectModel
      *      'idRoomType' => ...,
      *      'searchOccupancy' => ...,
      *      'allowedIdRoomTypes' => ...,
-     *      'hourlyBooking' => ...,
      *      'allParams' => ...,
      * );
      */
@@ -1100,7 +1097,7 @@ class HotelBookingDetail extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_booking_detail` AS bd
             INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS rf ON (rf.`id` = bd.`id_room`)
             INNER JOIN `'._DB_PREFIX_.'htl_room_type` AS hrt ON (hrt.`id_product` = rf.`id_product`)
-            WHERE bd.`id_hotel`='.(int)$idHotel.' AND rf.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE .' AND bd.`is_back_order` = 0 AND bd.`is_refunded` = 0 AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', IF('.(int) $hourlyBooking.', 1, (DATE_FORMAT(`check_out`,  "%Y-%m-%d") != DATE_FORMAT(\''.pSQL($dateFrom).'\',  "%Y-%m-%d")) AND (`check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\')) AND (
+            WHERE bd.`id_hotel`='.(int)$idHotel.' AND rf.`id_status` != '. HotelRoomInformation::STATUS_INACTIVE .' AND bd.`is_back_order` = 0 AND bd.`is_refunded` = 0 AND IF(bd.`id_status` = '. self::STATUS_CHECKED_OUT .', (DATE_FORMAT(`check_out`,  "%Y-%m-%d") != DATE_FORMAT(\''.pSQL($dateFrom).'\',  "%Y-%m-%d")) AND (`check_out` > \''.pSQL($dateFrom).'\' AND `check_out` <= \''.PSQL($dateTo).'\') AND (
                 (bd.`date_from` <= \''.pSQL($dateFrom).'\' AND bd.`check_out` > \''.pSQL($dateFrom).'\' AND bd.`check_out` < \''.pSQL($dateTo).'\') OR
                 (bd.`date_from` > \''.pSQL($dateFrom).'\' AND bd.`date_from` < \''.pSQL($dateTo).'\' AND bd.`check_out` >= \''.pSQL($dateTo).'\') OR
                 (bd.`date_from` > \''.pSQL($dateFrom).'\' AND bd.`date_from` < \''.pSQL($dateTo).'\' AND bd.`check_out` > \''.pSQL($dateFrom).'\' AND bd.`check_out` < \''.pSQL($dateTo).'\')
@@ -1240,6 +1237,7 @@ class HotelBookingDetail extends ObjectModel
 
             // Arrange available rooms, date wise
             $datetimeObj = new DateTime();
+            $checkOutTimeOfDay = date('H:i:s', strtotime($dateTo));
             foreach ($partiallyAvailRooms as $idRoom => &$roomDetail) {
                 foreach ($roomDetail['availableDates'] as $dateTimeStamp => $dateOnRoomAvail) {
                     unset($datesToCover[$dateTimeStamp]);
@@ -1249,8 +1247,8 @@ class HotelBookingDetail extends ObjectModel
                     if (!isset($dateWiseRoomTypes[$dateTimeStamp])) {
                         $dateWiseRoomTypes[$dateTimeStamp] = array(
                             // 'date' => $dateOnRoomAvail,
-                            'dateFrom' => $datetimeObj->setTimestamp($dateTimeStamp)->format('Y-m-d'),
-                            'dateTo' => $datetimeObj->modify('+1 day')->format('Y-m-d'),
+                            'dateFrom' => $datetimeObj->setTimestamp($dateTimeStamp)->format('Y-m-d H:i:s'),
+                            'dateTo' => $datetimeObj->modify('+1 day')->format('Y-m-d').' '.$checkOutTimeOfDay,
                             'roomTypes' => array(),
                             'maxTotalOccupancy' => 0,
                             // 'roomTotalCount' => 0
@@ -1775,6 +1773,12 @@ class HotelBookingDetail extends ObjectModel
         $bookingData = $this->getBookingData($bookingParams);
 
         extract($this->getBookingDataParams($bookingParams));
+
+        if ($date_from && $date_to && $hotel_id) {
+            $dateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $hotel_id);
+            $date_from = $dateRange['date_from'];
+            $date_to = $dateRange['date_to'];
+        }
 
         if (!$only_search_data) {
             if (!empty($bookingData)) {
@@ -2695,6 +2699,10 @@ class HotelBookingDetail extends ObjectModel
     ) {
         $objHotelBookingDetail = new self((int) $idHotelBookingDetail);
         if (Validate::isLoadedObject($objHotelBookingDetail)) {
+            $dateRange = HotelHelper::formatCheckInCheckOutDate($newDateFrom, $newDateTo, (int) $objHotelBookingDetail->id_hotel);
+            $newDateFrom = $dateRange['date_from'];
+            $newDateTo = $dateRange['date_to'];
+
             // retrieve HotelCartBookingData row
             $idHotelCartBookingData = Db::getInstance()->getValue(
                 'SELECT `id`

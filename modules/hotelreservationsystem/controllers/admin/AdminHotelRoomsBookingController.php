@@ -170,6 +170,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 $occupancy = array();
             }
 
+            $booking_date_range = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $id_hotel);
+            $date_from = $booking_date_range['date_from'];
+            $date_to = $booking_date_range['date_to'];
+
             $this->id_cart = (int) $this->context->cart->id;
             $this->id_guest = (int) $this->context->cookie->id_guest;
             $this->id_hotel = $id_hotel;
@@ -816,8 +820,9 @@ public function ajaxProcessGetCalenderData()
             }
         }
 
-        $date_from = date("Y-m-d H:i:s", strtotime($date_from));
-        $date_to = date("Y-m-d H:i:s", strtotime($date_to));
+        $bookingDateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $id_hotel);
+        $date_from = $bookingDateRange['date_from'];
+        $date_to = $bookingDateRange['date_to'];
 
         $search_id_room_type = Tools::getValue('search_id_room_type');
         $search_id_hotel = Tools::getValue('search_id_hotel');
@@ -864,7 +869,12 @@ public function ajaxProcessGetCalenderData()
             'success' => false,
             'data' => array()
         );
-        if ($opt) {
+
+        if ($opt && !HotelHelper::validateDuration($date_from, $date_to, $id_product)) {
+            $this->errors[] = $this->l('Invalid booking duration for this room type.');
+        }
+
+        if ($opt && !$this->errors) {
             // add room in cart
             $objRoomType = new HotelRoomType();
             $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($id_product);
@@ -915,6 +925,10 @@ public function ajaxProcessGetCalenderData()
                     );
                 }
             }
+        }
+
+        if ($this->errors) {
+            $response['errors'] = $this->errors;
         }
         $this->ajaxDie(json_encode($response));
     }

@@ -48,8 +48,7 @@
                                                 {/if}
 
                                                 {hook h='displayRoomNumAfter' data=$avai_v type='available'}</td>
-                                                {assign var="is_full_date" value=($show_full_date && ($date_from|date_format:'%D' == $date_to|date_format:'%D'))}
-                                                <td>{dateFormat date=$date_from full=$is_full_date} - {dateFormat date=$date_to full=$is_full_date}</td>
+                                                <td>{dateFormat date=$date_from full=true} - {dateFormat date=$date_to full=true}</td>
                                                 <td>{$avai_v['room_comment']|escape:'htmlall':'UTF-8'}</td>
                                                 <td>
                                                     {foreach $allotment_types as $allotment_type}
@@ -136,9 +135,8 @@
                                             {foreach from=$part_v['rooms'] key=sub_part_k item=sub_part_v}
                                                 <tr>
                                                     {if $sub_part_v@first}
-                                                        {assign var="is_full_date" value=($show_full_date && ($part_v['date_from']|date_format:'%D' == $part_v['date_to']|date_format:'%D'))}
                                                         <td rowspan="{$part_v['rooms']|count}">
-                                                            <p>{dateFormat date=$part_v['date_from'] full=$is_full_date} - {dateFormat date=$part_v['date_to'] full=$is_full_date}</p>
+                                                            <p>{dateFormat date=$part_v['date_from'] full=true} - {dateFormat date=$part_v['date_to'] full=true}</p>
                                                         </td>
                                                     {/if}
                                                     <td >{$sub_part_v['room_num']|escape:'htmlall':'UTF-8'}
@@ -228,7 +226,6 @@
                                         {foreach from=$book_v['data']['booked'] key=booked_k item=booked_v}
                                             {foreach from=$booked_v['detail'] key=rm_dtl_k item=rm_dtl_v}
                                                 <tr>
-                                                    {assign var="is_full_date" value=($show_full_date && ($rm_dtl_v['date_from']|date_format:'%D' == $rm_dtl_v['date_to']|date_format:'%D'))}
                                                     {if $rm_dtl_v@first}
                                                         <td rowspan="{$booked_v['detail']|count}">{$booked_v['room_num']|escape:'htmlall':'UTF-8'}
                                                         {if isset($htl_connected_rooms[$booked_v['id_room']]) && $htl_connected_rooms[$booked_v['id_room']]|@count > 0}
@@ -236,7 +233,7 @@
                                                         {/if}
                                                         {hook h='displayRoomNumAfter' data=$booked_v key=$rm_dtl_k type='booked'}</td>
                                                     {/if}
-                                                    <td>{dateFormat date=$rm_dtl_v['date_from'] full=$is_full_date} - {dateFormat date=$rm_dtl_v['date_to'] full=$is_full_date}</td>
+                                                    <td>{dateFormat date=$rm_dtl_v['date_from'] full=true} - {dateFormat date=$rm_dtl_v['date_to'] full=true}</td>
                                                     <td><a href="{$link->getAdminLink('AdminOrders')}&id_order={$rm_dtl_v['id_order']|intval}&vieworder" target="_blank">#{$rm_dtl_v['id_order']}</a></td>
                                                     <td>{$rm_dtl_v['comment']|escape:'htmlall':'UTF-8'}</td>
                                                     <td>

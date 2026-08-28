@@ -157,11 +157,13 @@ class CartControllerCore extends FrontController
             // now get updated available rooms
             $date_from = Tools::getValue('dateFrom');
             $date_to = Tools::getValue('dateTo');
-            $date_from = date("Y-m-d H:i:s", strtotime($date_from));
-            $date_to = date("Y-m-d H:i:s", strtotime($date_to));
             $objRoomType = new HotelRoomType();
             if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
                 if ($id_hotel = $roomTypeInfo['id_hotel']) {
+                    $bookingDateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $id_hotel);
+                    $date_from = $bookingDateRange['date_from'];
+                    $date_to = $bookingDateRange['date_to'];
+
                     $objBookingDetail = new HotelBookingDetail();
                     $bookingParams = array(
                         'date_from' => $date_from,
@@ -339,8 +341,9 @@ class CartControllerCore extends FrontController
                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
                     $date_from = Tools::getValue('dateFrom');
                     $date_to = Tools::getValue('dateTo');
-                    $date_from = date("Y-m-d H:i:s", strtotime($date_from));
-                    $date_to = date("Y-m-d H:i:s", strtotime($date_to));
+                    $bookingDateRange = HotelHelper::formatCheckInCheckOutDate($date_from, $date_to, $roomTypeInfo['id_hotel']);
+                    $date_from = $bookingDateRange['date_from'];
+                    $date_to = $bookingDateRange['date_to'];
                     $serviceProducts = json_decode(Tools::getValue('serviceProducts'),true);
 
                     // valdiate occupancy if providede
@@ -397,6 +400,10 @@ class CartControllerCore extends FrontController
                                 $maxOrdDate = date('d-m-Y', strtotime($maxOrdDate));
                                 $this->errors[] = Tools::displayError('You can\'t book room after date '.$maxOrdDate);
                             }
+                        }
+
+                        if (!$this->errors && !HotelHelper::validateDuration($date_from, $date_to, $this->id_product)) {
+                            $this->errors[] = Tools::displayError('Invalid booking duration for this room type.');
                         }
 
                         if (!$this->errors) {

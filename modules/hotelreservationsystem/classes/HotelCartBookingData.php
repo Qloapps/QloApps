@@ -1075,6 +1075,15 @@ class HotelCartBookingData extends ObjectModel
                                 }
 
                                 foreach ($cartData as $roomData) {
+                                    if (!HotelHelper::validateDuration($roomData['date_from'], $roomData['date_to'], $product['id_product'])) {
+                                        $errors[] = sprintf(
+                                            $objModule->l('Invalid booking duration for room "%s". Please remove rooms from %s - %s to proceed.', 'HotelOrderRestrictDate'),
+                                            $product['name'],
+                                            Tools::displayDate($roomData['date_from']),
+                                            Tools::displayDate($roomData['date_to'])
+                                        );
+                                    }
+
                                     if (!$forAdminCart) {
                                         if ($maxOrderDate = HotelOrderRestrictDate::getMaxOrderDate($roomData['id_hotel'])) {
                                             if (strtotime('-1 day', strtotime($maxOrderDate)) < strtotime($roomData['date_from'])
@@ -2052,6 +2061,8 @@ class HotelCartBookingData extends ObjectModel
             $this->extra_demands = json_encode(array());
         }
 
+        $this->formatCheckInCheckOutDate();
+
         return parent::update($null_values);
     }
 
@@ -2061,7 +2072,24 @@ class HotelCartBookingData extends ObjectModel
             $this->extra_demands = json_encode(array());
         }
 
+        $this->formatCheckInCheckOutDate();
+
         return parent::add($auto_date, $null_values);
+    }
+
+    protected function formatCheckInCheckOutDate()
+    {
+        if (!$this->date_from || !$this->date_to) {
+            return;
+        }
+
+        $dateRange = HotelHelper::formatCheckInCheckOutDate(
+            $this->date_from,
+            $this->date_to,
+            (int)$this->id_hotel
+        );
+        $this->date_from = $dateRange['date_from'];
+        $this->date_to = $dateRange['date_to'];
     }
 
     // Webservice :: get extra demands for the cart booking

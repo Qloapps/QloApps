@@ -167,8 +167,7 @@
 												<td>{$booking['room_num']|escape:'htmlall':'UTF-8'}</td>
 												<td>{$booking['room_type_name']|escape:'htmlall':'UTF-8'}</td>
 												<td>{$booking['hotel_name']|escape:'htmlall':'UTF-8'}</td>
-												{assign var="is_full_date" value=($show_full_date && ($booking['date_from']|date_format:'%D' == $booking['date_to']|date_format:'%D'))}
-												<td>{dateFormat date=$booking['date_from'] full=$is_full_date} {l s='To' mod='hotelreservationsystem'} {dateFormat date=$booking['date_to'] full=$is_full_date}</td>
+												<td>{dateFormat date=$booking['date_from'] full=true} {l s='To' mod='hotelreservationsystem'} {dateFormat date=$booking['date_to'] full=true}</td>
 												<td>
 													{displayPrice price=($booking['total_price_tax_incl'] + $booking['extra_service_total_price_tax_incl']) currency=$orderCurrency['id']}
 													{capture name='refund_total_tooltip'}
