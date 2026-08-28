@@ -1,0 +1,11 @@
+
+[/{shop_url}]
+
+Hi,
+
+Thank you for subscribing to our newsletter, please confirm your request by clicking
+here. [/{verif_url}]
+
+{shop_name} [/{shop_url}] powered by Webkul(tm)
+[https://webkul.com]
+

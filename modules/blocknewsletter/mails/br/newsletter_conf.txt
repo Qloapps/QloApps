@@ -1,0 +1,11 @@
+
+[/{shop_url}]
+
+Hi,
+
+Thank you for subscribing to our newsletter! If you wish to unsubscribe, please click
+here.[/{{unsub_url}}]
+
+{shop_name} [/{shop_url}] powered by Webkul(tm)
+[https://webkul.com]
+

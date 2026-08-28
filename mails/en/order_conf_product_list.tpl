@@ -5,9 +5,9 @@
                 <tr>
                     <td width="10">&nbsp;</td>
                     <td>
-                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
+                        <font size="2" face="Open-sans, sans-serif" color="#555454">
                             {$product['reference']}
-                        </span>
+                        </font>
                     </td>
                     <td width="10">&nbsp;</td>
                 </tr>
@@ -18,9 +18,9 @@
                 <tr>
                     <td width="10">&nbsp;</td>
                     <td>
-                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
+                        <font size="2" face="Open-sans, sans-serif" color="#555454">
                             <strong>{$product['name']}</strong>
-                        </span>
+                        </font>
                     </td>
                     <td width="10">&nbsp;</td>
                 </tr>
@@ -31,9 +31,9 @@
                 <tr>
                     <td width="10">&nbsp;</td>
                     <td align="right">
-                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
+                        <font size="2" face="Open-sans, sans-serif" color="#555454">
                             {$product['unit_price']}
-                        </span>
+                        </font>
                     </td>
                     <td width="10">&nbsp;</td>
                 </tr>
@@ -44,9 +44,9 @@
                 <tr>
                     <td width="10">&nbsp;</td>
                     <td align="right">
-                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
+                        <font size="2" face="Open-sans, sans-serif" color="#555454">
                             {$product['quantity']}
-                        </span>
+                        </font>
                     </td>
                     <td width="10">&nbsp;</td>
                 </tr>
@@ -57,9 +57,9 @@
                 <tr>
                     <td width="10">&nbsp;</td>
                     <td align="right">
-                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
+                        <font size="2" face="Open-sans, sans-serif" color="#555454">
                             {$product['price']}
-                        </span>
+                        </font>
                     </td>
                     <td width="10">&nbsp;</td>
                 </tr>
@@ -73,10 +73,10 @@
                 <tr>
                     <td width="10">&nbsp;</td>
                     <td>
-                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
+                        <font size="2" face="Open-sans, sans-serif" color="#555454">
                             <strong>{$product['name']}</strong><br>
                             {$customization['customization_text']}
-                        </span>
+                        </font>
                     </td>
                     <td width="10">&nbsp;</td>
                 </tr>
@@ -87,9 +87,9 @@
                 <tr>
                     <td width="10">&nbsp;</td>
                     <td align="right">
-                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
+                        <font size="2" face="Open-sans, sans-serif" color="#555454">
                             {$product['unit_price']}
-                        </span>
+                        </font>
                     </td>
                     <td width="10">&nbsp;</td>
                 </tr>
@@ -100,9 +100,9 @@
                 <tr>
                     <td width="10">&nbsp;</td>
                     <td align="right">
-                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
+                        <font size="2" face="Open-sans, sans-serif" color="#555454">
                             {$customization['customization_quantity']}
-                        </span>
+                        </font>
                     </td>
                     <td width="10">&nbsp;</td>
                 </tr>
@@ -113,9 +113,9 @@
                 <tr>
                     <td width="10">&nbsp;</td>
                     <td align="right">
-                        <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
+                        <font size="2" face="Open-sans, sans-serif" color="#555454">
                             {$customization['quantity']}
-                        </span>
+                        </font>
                     </td>
                     <td width="10">&nbsp;</td>
                 </tr>
