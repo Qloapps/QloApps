@@ -93,20 +93,21 @@ class TaxChildRangeCore extends ObjectModel
     }
 
     /**
-     * Sum per-band tax contributions for the given child ages — each child matched to the first qualifying band, unmatched children pay the adult rate if given, else 0.
+     * Sum per-band tax contributions for the given child ages — each child matched to the first qualifying
+     * band (band value interpreted per $childCalcType); unmatched children pay the adult's own already-computed
+     * per-unit tourism tax amount flatly, since they're not governed by any band.
      *
-     * @param int        $idTax
-     * @param int[]      $ages           Ages at check-in date
-     * @param int        $taxType        0=fixed, 1=percentage
-     * @param float      $unitPrice      Room unit_price_tax_excl (used for percentage type)
-     * @param float|null $adultBaseValue Adult tax_value (fixed amount or percentage); null = exempt unmatched children
-     * @param bool       $useRanges      false = skip band lookup entirely
+     * @param int    $idTax
+     * @param int[]  $ages                     Ages at check-in date
+     * @param int    $childCalcType            0=fixed, 1=percentage — governs matched-band contributions only
+     * @param float  $unitTourismTaxAmountAdult Adult's already-computed per-unit tourism tax amount (tier-aware);
+     * @param bool   $useRanges                false = skip band lookup, every child is treated as unmatched
      * @return array ['total' => float, 'count' => int]
      */
-    public static function getChildContribution($idTax, array $ages, $taxType, $unitPrice, $adultBaseValue = null, $useRanges = true)
+    public static function getChildContribution($idTax, array $ages, $childCalcType, $unitTourismTaxAmountAdult, $useRanges = true)
     {
-        $taxType = (int) $taxType;
-        $unitPrice = (float) $unitPrice;
+        $childCalcType = (int) $childCalcType;
+        $unitTourismTaxAmountAdult = (float) $unitTourismTaxAmountAdult;
         $ranges = $useRanges ? self::getByTaxId((int) $idTax) : array();
         $total = 0.0;
         $count = 0;
@@ -119,15 +120,14 @@ class TaxChildRangeCore extends ObjectModel
                 $inUpper = ($maxAge == 0 || $age <= $maxAge);
                 if ($inLower && $inUpper) {
                     $bandValue = (float) $range['tax_value'];
-                    $total += ($taxType === TaxConfiguration::CALCULATION_TYPE_FIXED) ? $bandValue : ($unitPrice * ($bandValue / 100));
+                    $total += ($childCalcType === TaxConfiguration::CALCULATION_TYPE_FIXED) ? $bandValue : ($unitTourismTaxAmountAdult * ($bandValue / 100));
                     $count++;
                     $matched = true;
                     break;
                 }
             }
-            if (!$matched && $adultBaseValue !== null) {
-                $adultBaseValue = (float) $adultBaseValue;
-                $total += ($taxType === TaxConfiguration::CALCULATION_TYPE_FIXED) ? $adultBaseValue : ($unitPrice * ($adultBaseValue / 100));
+            if (!$matched) {
+                $total += $unitTourismTaxAmountAdult;
                 $count++;
             }
         }

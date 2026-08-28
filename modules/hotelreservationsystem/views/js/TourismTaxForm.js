@@ -25,61 +25,44 @@ $(document).ready(function () {
 
     var tierIdx  = $('#tourism-tax-tiers-body tr').length;
     var childIdx = $('#tourism-tax-child-body tr').length;
+    var validityIdx = $('#tourism-tax-validity-body tr').length;
 
-    $('#valid_from').datepicker({
-        dateFormat: 'yy-mm-dd',
-        onSelect: function () {
-            $('#valid_to').datepicker('option', 'minDate', $(this).datepicker('getDate'));
-            validateDates();
-        }
-    });
-
-    $('#valid_to').datepicker({ dateFormat: 'yy-mm-dd', onSelect: validateDates });
-
-    function validateDates() {
-        var from = $('#valid_from').val();
-        var to   = $('#valid_to').val();
-        var $err = $('#tourism-tax-date-error');
-        if (from && to) {
-            try {
-                var fromTs = $.datepicker.parseDate('yy-mm-dd', from).getTime();
-                var toTs   = $.datepicker.parseDate('yy-mm-dd', to).getTime();
-                if (toTs < fromTs) {
-                    $err.text(tourismTaxDateErrorMsg).show();
-                    return false;
-                }
-            } catch (e) {}
-        }
-        $err.hide();
-        return true;
+    function bindValidityDatepickers($scope) {
+        $scope.find('.tourism-tax-validity-date').datepicker({ dateFormat: 'yy-mm-dd' });
     }
+    bindValidityDatepickers($('#tourism-tax-validity-body'));
 
     function isTourismOn()       { return $('input[name="is_tourism_tax"]:checked').val()      == '1'; }
     function isChildRateOn()     { return $('input[name="has_child_rate"]:checked').val()      == '1'; }
     function isChildAgeRangeOn() { return $('input[name="has_child_age_range"]:checked').val() == '1'; }
     function isTieredOn()        { return $('input[name="is_tiered"]:checked').val()           == '1'; }
+    function isMultiValidOn()    { return $('input[name="has_multiple_valid_ranges"]:checked').val() == '1'; }
 
     function setVisible($el, visible, animate) {
         var duration = animate ? 200 : 0;
         visible ? $el.show(duration) : $el.hide(duration);
     }
 
-    function ensureOneRow(bodyId, tplId, idxRef) {
+    function ensureOneRow(bodyId, tplId, idxRef, signClass, signFn) {
         if ($('#' + bodyId + ' tr').length === 0) {
             var tpl = $('#' + tplId).html().replace(/__IDX__/g, idxRef.val);
             var $row = $(tpl);
-            $row.find('.tourism-tax-row-type-sign').text(currentTypeSign());
+            if (signClass && signFn) {
+                $row.find('.' + signClass).text(signFn());
+            }
+            bindValidityDatepickers($row);
             $('#' + bodyId).append($row);
             idxRef.val++;
         }
     }
 
-    var tierIdxRef  = { val: tierIdx };
-    var childIdxRef = { val: childIdx };
+    var tierIdxRef     = { val: tierIdx };
+    var childIdxRef    = { val: childIdx };
+    var validityIdxRef = { val: validityIdx };
 
     function updateAllVisibility(animate) {
         var t = isTourismOn();
-        setVisible($('.tourism-tax-field').not('.tourism-tax-child-field, .tourism-tax-child-band-field, .tourism-tax-tiered-field'), t, animate);
+        setVisible($('.tourism-tax-field').not('.tourism-tax-child-field, .tourism-tax-child-band-field, .tourism-tax-tiered-field, .tourism-tax-multi-valid-field'), t, animate);
         setVisible($('.tourism-tax-non-tourism'), !t, animate);
 
         var showChild = t && isChildRateOn();
@@ -88,20 +71,27 @@ $(document).ready(function () {
         var showChildBands = showChild && isChildAgeRangeOn();
         setVisible($('.tourism-tax-child-band-field'), showChildBands, animate);
         if (showChildBands) {
-            ensureOneRow('tourism-tax-child-body', 'tourism-tax-child-row-tpl', childIdxRef);
+            ensureOneRow('tourism-tax-child-body', 'tourism-tax-child-row-tpl', childIdxRef, 'tourism-tax-child-row-type-sign', currentChildTypeSign);
         }
 
         var showTiered = t && isTieredOn();
         setVisible($('.tourism-tax-tiered-field'), showTiered, animate);
         if (showTiered) {
-            ensureOneRow('tourism-tax-tiers-body', 'tourism-tax-tier-row-tpl', tierIdxRef);
+            ensureOneRow('tourism-tax-tiers-body', 'tourism-tax-tier-row-tpl', tierIdxRef, 'tourism-tax-row-type-sign', currentTypeSign);
+        }
+
+        var showMultiValid = t && isMultiValidOn();
+        setVisible($('.tourism-tax-multi-valid-field'), showMultiValid, animate);
+        if (showMultiValid) {
+            ensureOneRow('tourism-tax-validity-body', 'tourism-tax-validity-row-tpl', validityIdxRef, null, null);
         }
     }
 
     updateAllVisibility(false);
     updateTypeSign();
+    updateChildTypeSign();
 
-    $('input[name="is_tourism_tax"], input[name="has_child_rate"], input[name="has_child_age_range"], input[name="is_tiered"]').on('change', function () {
+    $('input[name="is_tourism_tax"], input[name="has_child_rate"], input[name="has_child_age_range"], input[name="is_tiered"], input[name="has_multiple_valid_ranges"]').on('change', function () {
         setTimeout(function () { updateAllVisibility(true); }, 0);
     });
 
@@ -120,7 +110,16 @@ $(document).ready(function () {
         $('.tourism-tax-row-type-sign').text(sign);
     }
 
+    function currentChildTypeSign() {
+        return $('select[name="child_calc_type"]').val() == CALCULATION_TYPE_PERCENTAGE ? '%' : $('#tourism-tax-type-sign').data('currency');
+    }
+
+    function updateChildTypeSign() {
+        $('.tourism-tax-child-row-type-sign').text(currentChildTypeSign());
+    }
+
     $('select[name="tax_calc_type"]').on('change', updateTypeSign);
+    $('select[name="child_calc_type"]').on('change', updateChildTypeSign);
 
     $(document).on('click', '#tourism-tax-add-tier', function (e) {
         e.preventDefault();
@@ -135,9 +134,18 @@ $(document).ready(function () {
         e.preventDefault();
         var tpl = $('#tourism-tax-child-row-tpl').html().replace(/__IDX__/g, childIdxRef.val);
         var $row = $(tpl);
-        $row.find('.tourism-tax-row-type-sign').text(currentTypeSign());
+        $row.find('.tourism-tax-child-row-type-sign').text(currentChildTypeSign());
         $('#tourism-tax-child-body').append($row);
         childIdxRef.val++;
+    });
+
+    $(document).on('click', '#tourism-tax-add-validity', function (e) {
+        e.preventDefault();
+        var tpl = $('#tourism-tax-validity-row-tpl').html().replace(/__IDX__/g, validityIdxRef.val);
+        var $row = $(tpl);
+        bindValidityDatepickers($row);
+        $('#tourism-tax-validity-body').append($row);
+        validityIdxRef.val++;
     });
 
     $(document).on('click', '.tourism-tax-remove-row', function (e) {

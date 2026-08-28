@@ -32,6 +32,7 @@ class AdminTaxesControllerCore extends AdminController
     protected $invalidCoreFields = array();
     protected $invalidTierFields = array();
     protected $invalidChildFields = array();
+    protected $invalidValidityFields = array();
 
     public function __construct()
     {
@@ -71,10 +72,11 @@ class AdminTaxesControllerCore extends AdminController
             'active' => array('title' => $this->l('Enabled'), 'width' => 25, 'align' => 'center', 'active' => 'status', 'type' => 'bool', 'orderby' => false, 'class' => 'fixed-width-sm', 'remove_onclick' => true)
             );
 
-        $ecotax_desc = '';
-        if (Configuration::get('PS_USE_ECOTAX')) {
-            $ecotax_desc = $this->l('If you disable the ecotax, the ecotax for all your products will be set to 0.');
-        }
+        // Code For eco-tax working
+        // $ecotax_desc = '';
+        // if (Configuration::get('PS_USE_ECOTAX')) {
+        //     $ecotax_desc = $this->l('If you disable the ecotax, the ecotax for all your products will be set to 0.');
+        // }
 
         $this->fields_options = array(
             'general' => array(
@@ -105,28 +107,30 @@ class AdminTaxesControllerCore extends AdminController
                     //     ),
                     //     'identifier' => 'id'
                     // ),
-                    'PS_USE_ECOTAX' => array(
-                        'title' => $this->l('Use ecotax'),
-                        'desc' => $ecotax_desc,
-                        'validation' => 'isBool',
-                        'cast' => 'intval',
-                        'type' => 'bool'
-                        ),
+                    // Code For eco-tax working
+                    // 'PS_USE_ECOTAX' => array(
+                    //     'title' => $this->l('Use ecotax'),
+                    //     'desc' => $ecotax_desc,
+                    //     'validation' => 'isBool',
+                    //     'cast' => 'intval',
+                    //     'type' => 'bool'
+                    //     ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),
         );
 
-        if (Configuration::get('PS_USE_ECOTAX') || Tools::getValue('PS_USE_ECOTAX')) {
-            $this->fields_options['general']['fields']['PS_ECOTAX_TAX_RULES_GROUP_ID'] = array(
-                'title' => $this->l('Ecotax'),
-                'hint' => $this->l('Define the ecotax (e.g. French ecotax: 19.6%).'),
-                'cast' => 'intval',
-                'type' => 'select',
-                'identifier' => 'id_tax_rules_group',
-                'list' => TaxRulesGroup::getTaxRulesGroupsForOptions()
-                );
-        }
+        // Code For eco-tax working
+        // if (Configuration::get('PS_USE_ECOTAX') || Tools::getValue('PS_USE_ECOTAX')) {
+        //     $this->fields_options['general']['fields']['PS_ECOTAX_TAX_RULES_GROUP_ID'] = array(
+        //         'title' => $this->l('Ecotax'),
+        //         'hint' => $this->l('Define the ecotax (e.g. French ecotax: 19.6%).'),
+        //         'cast' => 'intval',
+        //         'type' => 'select',
+        //         'identifier' => 'id_tax_rules_group',
+        //         'list' => TaxRulesGroup::getTaxRulesGroupsForOptions()
+        //         );
+        // }
 
         $this->fields_options['general']['fields']['QLO_USE_TOURISM_TAX'] = array(
             'title' => $this->l('Use tourism tax'),
@@ -139,6 +143,7 @@ class AdminTaxesControllerCore extends AdminController
         if (Configuration::get('QLO_USE_TOURISM_TAX') || Tools::getValue('QLO_USE_TOURISM_TAX')) {
             $this->fields_options['general']['fields']['QLO_TOURISM_TAX_GROSSED_UP'] = array(
                 'title' => $this->l('Include tourism tax in displayed prices'),
+                'desc' => $this->l('When enabled, tourism tax is included in displayed prices. The applicable tourism tax is always shown as a separate line if applicable.'),
                 'validation' => 'isBool',
                 'cast' => 'intval',
                 'type' => 'bool',
@@ -238,6 +243,7 @@ class AdminTaxesControllerCore extends AdminController
         $subtype = null;
         $tiers = array();
         $childRanges = array();
+        $validityRanges = array();
         $contextCurrency = $this->context->currency;
         $currencySign = Tools::safeOutput(trim($contextCurrency->prefix . $contextCurrency->suffix));
 
@@ -246,12 +252,6 @@ class AdminTaxesControllerCore extends AdminController
         if ($idTax && !$isAnySubmit) {
             $subtype = TaxConfiguration::getByTaxId($idTax);
             if ($subtype) {
-                if ($subtype->valid_from === '0000-00-00') {
-                    $subtype->valid_from = null;
-                }
-                if ($subtype->valid_to === '0000-00-00') {
-                    $subtype->valid_to = null;
-                }
                 $_POST['tax_calc_type'] = $subtype->calculation_type;
                 $_POST['is_per_night'] = $subtype->per_night;
                 $_POST['is_per_person'] = $subtype->per_person;
@@ -259,11 +259,12 @@ class AdminTaxesControllerCore extends AdminController
                 $_POST['is_tiered'] = $subtype->has_tiered_pricing;
                 $_POST['has_child_rate'] = $subtype->apply_on_child;
                 $_POST['has_child_age_range'] = $subtype->has_child_age_range;
-                $_POST['valid_from'] = $subtype->valid_from ?: '';
-                $_POST['valid_to'] = $subtype->valid_to ?: '';
+                $_POST['child_calc_type'] = $subtype->child_calculation_type;
+                $_POST['has_multiple_valid_ranges'] = $subtype->has_multiple_valid_ranges;
 
                 $tiers = TaxPriceTier::getByTaxId($idTax);
                 $childRanges = TaxChildRange::getByTaxId($idTax);
+                $validityRanges = TaxValidityRange::getByTaxId($idTax);
             }
         } elseif ($isAnySubmit) {
             $postTierIds = (array) Tools::getValue('tier_id', array());
@@ -289,6 +290,17 @@ class AdminTaxesControllerCore extends AdminController
                     'min_age' => isset($postChildMins[$i]) ? $postChildMins[$i] : '',
                     'max_age' => isset($postChildMaxs[$i]) ? $postChildMaxs[$i] : '',
                     'tax_value' => isset($postChildValues[$i]) ? $postChildValues[$i] : '',
+                );
+            }
+
+            $postValidityIds = (array) Tools::getValue('validity_id', array());
+            $postValidityFroms = (array) Tools::getValue('validity_from', array());
+            $postValidityTos = (array) Tools::getValue('validity_to', array());
+            foreach ($postValidityIds as $i => $rangeId) {
+                $validityRanges[] = array(
+                    'id_validity_range' => (int) $rangeId,
+                    'valid_from' => isset($postValidityFroms[$i]) ? $postValidityFroms[$i] : '',
+                    'valid_to' => isset($postValidityTos[$i]) ? $postValidityTos[$i] : '',
                 );
             }
         }
@@ -324,25 +336,13 @@ class AdminTaxesControllerCore extends AdminController
             <table class="table" id="tourism-tax-tiers-table">
                 <thead><tr class="nodrag nodrop">
                     <th class="col-sm-4 center">
-                        <label class="control-label">
-                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars($this->l('Enter the minimum room price (tax excl.) for this bracket to apply. Leave blank for no lower limit.')) . '">
-                                ' . $this->l('Min price (from)') . '
-                            </span>
-                        </label>
+                        <label class="control-label">' . $this->l('Min price (from)') . '</label>
                     </th>
                     <th class="col-sm-4 center">
-                        <label class="control-label">
-                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars($this->l('Enter the maximum room price for this bracket. Leave blank for no upper limit.')) . '">
-                                ' . $this->l('Max price (up to)') . '
-                            </span>
-                        </label>
+                        <label class="control-label">' . $this->l('Max price (up to)') . '</label>
                     </th>
                     <th class="col-sm-3 center">
-                        <label class="control-label required">
-                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars($this->l('Enter the tax value applied when the room price falls within this bracket.')) . '">
-                                ' . $this->l('Tax value') . '
-                            </span>
-                        </label>
+                        <label class="control-label required">' . $this->l('Tax value') . '</label>
                     </th>
                     <th class="col-sm-1 center">--</th>
                 </tr></thead>
@@ -421,25 +421,13 @@ class AdminTaxesControllerCore extends AdminController
             <table class="table" id="tourism-tax-child-table">
                 <thead><tr class="nodrag nodrop">
                     <th class="col-sm-4 center">
-                        <label class="control-label">
-                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars(sprintf($this->l('Enter the minimum age (inclusive) for this child band. Leave blank for no lower limit. Cannot be below %d.'), $infantMaxAge)) . '">
-                                ' . $this->l('Min age') . '
-                            </span>
-                        </label>
+                        <label class="control-label">' . $this->l('Min age') . '</label>
                     </th>
                     <th class="col-sm-4 center">
-                        <label class="control-label">
-                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars(sprintf($this->l('Enter the maximum age for this band. Leave blank for no upper limit. Cannot be %d or above (the general child age setting).'), $childMaxAge)) . '">
-                                ' . $this->l('Max age') . '
-                            </span>
-                        </label>
+                        <label class="control-label">' . $this->l('Max age') . '</label>
                     </th>
                     <th class="col-sm-3 center">
-                        <label class="control-label required">
-                            <span class="label-tooltip" data-toggle="tooltip" data-original-title="' . htmlspecialchars($this->l('Enter the tax value applied for children within this age band.')) . '">
-                                ' . $this->l('Tax value') . '
-                            </span>
-                        </label>
+                        <label class="control-label required">' . $this->l('Tax value') . '</label>
                     </th>
                     <th class="col-sm-1 center">--</th>
                 </tr></thead>
@@ -465,7 +453,7 @@ class AdminTaxesControllerCore extends AdminController
                     </td>
                     <td class="col-sm-3 center">
                         <div class="input-group">
-                            <span class="input-group-addon tourism-tax-row-type-sign"></span>
+                            <span class="input-group-addon tourism-tax-child-row-type-sign"></span>
                             <input type="text" name="child_value[' . $rangeRowIndex . ']"
                                 value="' . htmlspecialchars($rangeVal) . '" class="form-control' . (!empty($rangeRowErrors['value']) ? ' error-border' : '') . '" />
                         </div>
@@ -498,7 +486,7 @@ class AdminTaxesControllerCore extends AdminController
                     </td>
                     <td class="col-sm-3 center">
                         <div class="input-group">
-                            <span class="input-group-addon tourism-tax-row-type-sign"></span>
+                            <span class="input-group-addon tourism-tax-child-row-type-sign"></span>
                             <input type="text" name="child_value[__IDX__]" value="" class="form-control" />
                         </div>
                     </td>
@@ -511,8 +499,83 @@ class AdminTaxesControllerCore extends AdminController
                 </tr>
             </script>';
 
-        $validFromValue = Tools::getValue('valid_from', $subtype ? ($subtype->valid_from ?: '') : '');
-        $validToValue = Tools::getValue('valid_to', $subtype ? ($subtype->valid_to ?: '') : '');
+        $validityRangesHtml = '
+            <table class="table" id="tourism-tax-validity-table">
+                <thead><tr class="nodrag nodrop">
+                    <th class="col-sm-5 center"><label class="control-label">' . $this->l('From') . '</label></th>
+                    <th class="col-sm-5 center"><label class="control-label">' . $this->l('To') . '</label></th>
+                    <th class="col-sm-2 center">--</th>
+                </tr></thead>
+                <tbody id="tourism-tax-validity-body">';
+        foreach ($validityRanges as $rangeRowIndex => $range) {
+            $rangeFrom = isset($range['valid_from']) ? $range['valid_from'] : '';
+            if ($rangeFrom === '0000-00-00') {
+                $rangeFrom = '';
+            }
+            $rangeTo = isset($range['valid_to']) ? $range['valid_to'] : '';
+            if ($rangeTo === '0000-00-00') {
+                $rangeTo = '';
+            }
+            $rangeId = isset($range['id_validity_range']) ? (int) $range['id_validity_range'] : 0;
+            $validityRowErrors = isset($this->invalidValidityFields[$rangeRowIndex]) ? $this->invalidValidityFields[$rangeRowIndex] : array();
+
+            $validityRangesHtml .= '
+                <tr class="tourism-tax-validity-row nodrag nodrop">
+                    <td class="col-sm-5 center">
+                        <div class="input-group">
+                            <input type="text" name="validity_from[' . $rangeRowIndex . ']"
+                                value="' . htmlspecialchars($rangeFrom) . '" class="datepicker tourism-tax-validity-date form-control' . (!empty($validityRowErrors['from']) ? ' error-border' : '') . '" autocomplete="off" />
+                            <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
+                        </div>
+                    </td>
+                    <td class="col-sm-5 center">
+                        <div class="input-group">
+                            <input type="text" name="validity_to[' . $rangeRowIndex . ']"
+                                value="' . htmlspecialchars($rangeTo) . '" class="datepicker tourism-tax-validity-date form-control' . (!empty($validityRowErrors['to']) ? ' error-border' : '') . '" autocomplete="off" />
+                            <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
+                        </div>
+                    </td>
+                    <td class="col-sm-2 center">
+                        <input type="hidden" name="validity_id[' . $rangeRowIndex . ']" value="' . $rangeId . '" />
+                        <a href="#" class="btn btn-default tourism-tax-remove-row">
+                            <i class="icon-trash"></i>
+                        </a>
+                    </td>
+                </tr>';
+        }
+        $validityRangesHtml .= '
+                </tbody>
+            </table>
+            <div class="form-group tourism-tax-add-row-btn">
+                <div class="col-sm-12">
+                    <button type="button" class="btn btn-default" id="tourism-tax-add-validity">
+                        <i class="icon-plus-circle"></i> ' . $this->l('Add Range') . '
+                    </button>
+                </div>
+            </div>
+            <script type="text/x-template" id="tourism-tax-validity-row-tpl">
+                <tr class="tourism-tax-validity-row nodrag nodrop">
+                    <td class="col-sm-5 center">
+                        <div class="input-group">
+                            <input type="text" name="validity_from[__IDX__]" value="" class="datepicker tourism-tax-validity-date form-control" autocomplete="off" />
+                            <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
+                        </div>
+                    </td>
+                    <td class="col-sm-5 center">
+                        <div class="input-group">
+                            <input type="text" name="validity_to[__IDX__]" value="" class="datepicker tourism-tax-validity-date form-control" autocomplete="off" />
+                            <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
+                        </div>
+                    </td>
+                    <td class="col-sm-2 center">
+                        <input type="hidden" name="validity_id[__IDX__]" value="0" />
+                        <a href="#" class="btn btn-default tourism-tax-remove-row">
+                            <i class="icon-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            </script>';
+
         $weekdayLabels = array(
             'mon' => $this->l('Mon'), 'tue' => $this->l('Tue'), 'wed' => $this->l('Wed'),
             'thu' => $this->l('Thu'), 'fri' => $this->l('Fri'), 'sat' => $this->l('Sat'),
@@ -529,29 +592,6 @@ class AdminTaxesControllerCore extends AdminController
                 </label>';
         }
         $weekdayCheckboxesHtml .= '</div>';
-
-        $validityInputHtml = '
-            <div class="row">
-                <div class="col-sm-5">
-                    <div class="input-group">
-                        <span class="input-group-addon">' . $this->l('From') . '</span>
-                        <input type="text" name="valid_from" id="valid_from"
-                            class="datepicker form-control' . (!empty($this->invalidCoreFields['valid_from']) ? ' error-border' : '') . '" autocomplete="off"
-                            value="' . htmlspecialchars($validFromValue) . '" />
-                        <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
-                    </div>
-                </div>
-                <div class="col-sm-5">
-                    <div class="input-group">
-                        <span class="input-group-addon">' . $this->l('To') . '</span>
-                        <input type="text" name="valid_to" id="valid_to"
-                            class="datepicker form-control' . (!empty($this->invalidCoreFields['valid_to']) ? ' error-border' : '') . '" autocomplete="off"
-                            value="' . htmlspecialchars($validToValue) . '" />
-                        <span class="input-group-addon"><i class="icon-calendar-empty"></i></span>
-                    </div>
-                    <p class="help-block" id="tourism-tax-date-error" style="color:#a94442;display:none;margin-top:4px"></p>
-                </div>
-            </div>';
 
         $this->fields_form = array(
             'legend' => array(
@@ -589,6 +629,15 @@ class AdminTaxesControllerCore extends AdminController
                         . ' - ' . $this->l('Invalid characters') . ' <>;=#{}',
                 ),
                 array(
+                    'type' => 'html',
+                    'label' => $this->l('Rate'),
+                    'name' => 'rate_wrap',
+                    'html_content' => $rateInputHtml,
+                    'hint' => $this->l('Format: XX.XX or XX.XXX (e.g. 19.60 or 13.925)')
+                        . ' - ' . $this->l('Invalid characters') . ' <>;=#{}',
+                    'form_group_class' => 'tourism-tax-non-tourism',
+                ),
+                array(
                     'type' => 'switch',
                     'label' => $this->l('Is tourism tax'),
                     'name' => 'is_tourism_tax',
@@ -622,21 +671,13 @@ class AdminTaxesControllerCore extends AdminController
                     'form_group_class' => 'tourism-tax-field',
                 ),
                 array(
-                    'type' => 'html',
-                    'label' => $this->l('Rate'),
-                    'name' => 'rate_wrap',
-                    'html_content' => $rateInputHtml,
-                    'hint' => $this->l('Format: XX.XX or XX.XXX (e.g. 19.60 or 13.925)')
-                        . ' - ' . $this->l('Invalid characters') . ' <>;=#{}',
-                    'form_group_class' => 'tourism-tax-non-tourism',
-                ),
-                array(
                     'type' => 'switch',
                     'label' => $this->l('Per night'),
                     'name' => 'is_per_night',
                     'is_bool' => true,
                     'hint' => $this->l('When enabled, the tax amount applies for each night of the booking instead of once per booking.'),
                     'form_group_class' => 'tourism-tax-field',
+                    'default_value' => 1,
                     'values' => array(
                         array('id' => 'per_night_on', 'value' => 1, 'label' => $this->l('Yes')),
                         array('id' => 'per_night_off', 'value' => 0, 'label' => $this->l('No')),
@@ -675,11 +716,26 @@ class AdminTaxesControllerCore extends AdminController
                     'label' => $this->l('Set child age range'),
                     'name' => 'has_child_age_range',
                     'is_bool' => true,
-                    'hint' => $this->l('When enabled, define a custom set of child age ranges below, each with its own tax value.'),
+                    'desc' => $this->l('When enabled, define a set of child age bands below, each with its own tax value.'),
                     'form_group_class' => 'tourism-tax-field tourism-tax-child-field',
                     'values' => array(
                         array('id' => 'child_age_range_on', 'value' => 1, 'label' => $this->l('Yes')),
                         array('id' => 'child_age_range_off', 'value' => 0, 'label' => $this->l('No')),
+                    ),
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Child Tax Calculation Type'),
+                    'name' => 'child_calc_type',
+                    'form_group_class' => 'tourism-tax-field tourism-tax-child-band-field',
+                    'hint' => $this->l('Fixed: each age range charges its own flat amount. Percentage: each age range charges a percentage of the adult\'s own calculated tax.'),
+                    'options' => array(
+                        'query' => array(
+                            array('id' => 0, 'name' => $this->l('Fixed')),
+                            array('id' => 1, 'name' => $this->l('Percentage')),
+                        ),
+                        'id' => 'id',
+                        'name' => 'name',
                     ),
                 ),
                 array(
@@ -688,13 +744,18 @@ class AdminTaxesControllerCore extends AdminController
                     'name' => 'child_ranges',
                     'html_content' => $ageBandsHtml,
                     'form_group_class' => 'tourism-tax-field tourism-tax-child-band-field',
+                    'desc' => sprintf(
+                        $this->l('Leave blank for no limit; ages must be ≥ %d and < %d. Children outside all ranges are charged the adult’s calculated tax.'),
+                        $infantMaxAge,
+                        $childMaxAge
+                    ),
                 ),
                 array(
                     'type' => 'switch',
                     'label' => $this->l('Tiered pricing'),
                     'name' => 'is_tiered',
                     'is_bool' => true,
-                    'hint' => $this->l('When enabled, the tax amount is determined by the matching price range. Prices outside all ranges use the base tax amount.'),
+                    'desc' => $this->l('When enabled, the tax amount is determined by the matching price range below. Prices outside all ranges use the base Tax value above.'),
                     'form_group_class' => 'tourism-tax-field',
                     'values' => array(
                         array('id' => 'tiered_on', 'value' => 1, 'label' => $this->l('Yes')),
@@ -707,16 +768,27 @@ class AdminTaxesControllerCore extends AdminController
                     'name' => 'tiers',
                     'html_content' => $priceBracketsHtml,
                     'form_group_class' => 'tourism-tax-field tourism-tax-tiered-field',
+                    'desc' => $this->l('Leave blank for no limit; the maximum price is exclusive. Prices outside all ranges are charged the adult’s calculated tax.'),
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Set valid date ranges'),
+                    'name' => 'has_multiple_valid_ranges',
+                    'is_bool' => true,
+                    'desc' => $this->l('When enabled, define one or more validity date ranges below — the tax only applies within them. When disabled, there is no date restriction at all.'),
+                    'form_group_class' => 'tourism-tax-field',
+                    'values' => array(
+                        array('id' => 'multi_valid_on', 'value' => 1, 'label' => $this->l('Yes')),
+                        array('id' => 'multi_valid_off', 'value' => 0, 'label' => $this->l('No')),
+                    ),
                 ),
                 array(
                     'type' => 'html',
-                    'label' => $this->l('Valid'),
-                    'name' => 'validity_wrap',
-                    'html_content' => $validityInputHtml
-                        . '<p class="help-block">'
-                            . $this->l('Leave both blank to apply with no date restriction. Set only "From" for no end date, or only "To" for no start date.')
-                        . '</p>',
-                    'form_group_class' => 'tourism-tax-field',
+                    'label' => $this->l('Valid ranges'),
+                    'name' => 'validity_ranges',
+                    'html_content' => $validityRangesHtml,
+                    'form_group_class' => 'tourism-tax-field tourism-tax-multi-valid-field',
+                    'desc' => $this->l('Leave "From" blank for no start date and "To" for no end date. Ranges cannot overlap.'),
                 ),
                 array(
                     'type' => 'html',
@@ -870,25 +942,68 @@ class AdminTaxesControllerCore extends AdminController
             }
         }
 
-        $validFrom = trim(Tools::getValue('valid_from', ''));
-        $validTo = trim(Tools::getValue('valid_to', ''));
-        if ($validFrom === '0000-00-00') { $validFrom = ''; }
-        if ($validTo === '0000-00-00') { $validTo = ''; }
-        if ($validFrom !== '' && !Validate::isDate($validFrom)) {
-            $this->errors[] = $this->l('"Valid from" is not a valid date (use YYYY-MM-DD).');
-            $this->invalidCoreFields['valid_from'] = true;
-        }
-        if ($validTo !== '' && !Validate::isDate($validTo)) {
-            $this->errors[] = $this->l('"Valid to" is not a valid date (use YYYY-MM-DD).');
-            $this->invalidCoreFields['valid_to'] = true;
-        }
-        if ($validFrom !== '' && $validTo !== ''
-            && Validate::isDate($validFrom) && Validate::isDate($validTo)
-            && strtotime($validTo) < strtotime($validFrom)
-        ) {
-            $this->errors[] = $this->l('"Valid to" must be on or after "Valid from".');
-            $this->invalidCoreFields['valid_from'] = true;
-            $this->invalidCoreFields['valid_to'] = true;
+        if ((int) Tools::getValue('has_multiple_valid_ranges')) {
+            $submittedRangeFroms = Tools::getValue('validity_from', array());
+            $submittedRangeTos = Tools::getValue('validity_to', array());
+            $filledRanges = array();
+            foreach ($submittedRangeFroms as $rowIndex => $fromRaw) {
+                $toRaw = isset($submittedRangeTos[$rowIndex]) ? $submittedRangeTos[$rowIndex] : '';
+                $fromRaw = trim($fromRaw);
+                $toRaw = trim($toRaw);
+                if ($fromRaw === '0000-00-00') { $fromRaw = ''; }
+                if ($toRaw === '0000-00-00') { $toRaw = ''; }
+                $rowNum = (int) $rowIndex + 1;
+                if ($fromRaw === '' && $toRaw === '') {
+                    continue;
+                }
+                if ($fromRaw !== '' && !Validate::isDate($fromRaw)) {
+                    $this->errors[] = sprintf($this->l('Valid range #%d: "From" is not a valid date.'), $rowNum);
+                    $this->invalidValidityFields[$rowIndex]['from'] = true;
+                }
+                if ($toRaw !== '' && !Validate::isDate($toRaw)) {
+                    $this->errors[] = sprintf($this->l('Valid range #%d: "To" is not a valid date.'), $rowNum);
+                    $this->invalidValidityFields[$rowIndex]['to'] = true;
+                }
+                if ($fromRaw !== '' && $toRaw !== '' && Validate::isDate($fromRaw) && Validate::isDate($toRaw)
+                    && strtotime($toRaw) < strtotime($fromRaw)
+                ) {
+                    $this->errors[] = sprintf($this->l('Valid range #%d: "To" must be on or after "From".'), $rowNum);
+                    $this->invalidValidityFields[$rowIndex]['from'] = true;
+                    $this->invalidValidityFields[$rowIndex]['to'] = true;
+                }
+                $filledRanges[] = array(
+                    'from' => ($fromRaw !== '' && Validate::isDate($fromRaw)) ? strtotime($fromRaw) : null,
+                    'to' => ($toRaw !== '' && Validate::isDate($toRaw)) ? strtotime($toRaw) : null,
+                    'rowNum' => $rowNum,
+                    'rowIndex' => $rowIndex,
+                );
+            }
+            if (empty($filledRanges)) {
+                $this->errors[] = $this->l('Add at least one range or disable "Set valid date ranges".');
+            }
+            $rangeCount = count($filledRanges);
+            for ($outerIdx = 0; $outerIdx < $rangeCount; $outerIdx++) {
+                for ($innerIdx = $outerIdx + 1; $innerIdx < $rangeCount; $innerIdx++) {
+                    $outerRange = $filledRanges[$outerIdx];
+                    $innerRange = $filledRanges[$innerIdx];
+                    $outerMinEffective = ($outerRange['from'] === null) ? -PHP_INT_MAX : $outerRange['from'];
+                    $outerMaxEffective = ($outerRange['to'] === null) ? PHP_INT_MAX : $outerRange['to'];
+                    $innerMinEffective = ($innerRange['from'] === null) ? -PHP_INT_MAX : $innerRange['from'];
+                    $innerMaxEffective = ($innerRange['to'] === null) ? PHP_INT_MAX : $innerRange['to'];
+                    if ($outerMinEffective <= $innerMaxEffective && $outerMaxEffective >= $innerMinEffective) {
+                        $this->errors[] = sprintf(
+                            $this->l('Valid ranges #%d and #%d overlap. Each range must cover a distinct period.'),
+                            $outerRange['rowNum'],
+                            $innerRange['rowNum']
+                        );
+                        $this->invalidValidityFields[$outerRange['rowIndex']]['from'] = true;
+                        $this->invalidValidityFields[$outerRange['rowIndex']]['to'] = true;
+                        $this->invalidValidityFields[$innerRange['rowIndex']]['from'] = true;
+                        $this->invalidValidityFields[$innerRange['rowIndex']]['to'] = true;
+                        break 2;
+                    }
+                }
+            }
         }
 
         if ((int) Tools::getValue('has_child_rate') && (int) Tools::getValue('has_child_age_range')) {
@@ -898,7 +1013,7 @@ class AdminTaxesControllerCore extends AdminController
             $submittedBandMaxs = Tools::getValue('child_max', array());
             $submittedBandValues = Tools::getValue('child_value', array());
             if (empty($submittedBandValues)) {
-                $this->errors[] = $this->l('Add at least one band or disable "Apply on child".');
+                $this->errors[] = $this->l('Add at least one range or disable "Set child age range".');
             }
             $filledBands = array();
             foreach ($submittedBandValues as $rowIndex => $taxValue) {
@@ -906,30 +1021,30 @@ class AdminTaxesControllerCore extends AdminController
                 $bandMaxRaw = isset($submittedBandMaxs[$rowIndex]) ? $submittedBandMaxs[$rowIndex] : '';
                 $rowNum = (int) $rowIndex + 1;
                 if ($taxValue === '' || $taxValue === false) {
-                    $this->errors[] = sprintf($this->l('Child band #%d: tax value is required.'), $rowNum);
+                    $this->errors[] = sprintf($this->l('Child range #%d: tax value is required.'), $rowNum);
                     $this->invalidChildFields[$rowIndex]['value'] = true;
                     continue;
                 }
                 $bandMin = ($bandMinRaw !== '') ? (int) $bandMinRaw : 0;
                 $bandMax = ($bandMaxRaw !== '') ? (int) $bandMaxRaw : 0;
                 if (!is_numeric($taxValue)) {
-                    $this->errors[] = sprintf($this->l('Child band #%d: tax value must be a valid number.'), $rowNum);
+                    $this->errors[] = sprintf($this->l('Child range #%d: tax value must be a valid number.'), $rowNum);
                     $this->invalidChildFields[$rowIndex]['value'] = true;
                 } elseif ((float) $taxValue < 0) {
-                    $this->errors[] = sprintf($this->l('Child band #%d: tax value cannot be negative.'), $rowNum);
+                    $this->errors[] = sprintf($this->l('Child range #%d: tax value cannot be negative.'), $rowNum);
                     $this->invalidChildFields[$rowIndex]['value'] = true;
                 }
                 if ($bandMax > 0 && $bandMin > $bandMax) {
-                    $this->errors[] = sprintf($this->l('Child band #%d: min age cannot be greater than max age.'), $rowNum);
+                    $this->errors[] = sprintf($this->l('Child range #%d: min age cannot be greater than max age.'), $rowNum);
                     $this->invalidChildFields[$rowIndex]['min'] = true;
                     $this->invalidChildFields[$rowIndex]['max'] = true;
                 }
                 if ($bandMin > 0 && $bandMin < $infantMaxAge) {
-                    $this->errors[] = sprintf($this->l('Child band #%d: min age cannot be below the infant age (%d).'), $rowNum, $infantMaxAge);
+                    $this->errors[] = sprintf($this->l('Child range #%d: min age cannot be below the infant age (%d).'), $rowNum, $infantMaxAge);
                     $this->invalidChildFields[$rowIndex]['min'] = true;
                 }
                 if ($bandMax > 0 && $bandMax >= $childMaxAge) {
-                    $this->errors[] = sprintf($this->l('Child band #%d: max age cannot be %d or above (the general child age setting).'), $rowNum, $childMaxAge);
+                    $this->errors[] = sprintf($this->l('Child range #%d: max age cannot be %d or above (the general child age setting).'), $rowNum, $childMaxAge);
                     $this->invalidChildFields[$rowIndex]['max'] = true;
                 }
                 $filledBands[] = array('minAge' => $bandMin, 'maxAge' => $bandMax, 'rowNum' => $rowNum, 'rowIndex' => $rowIndex);
@@ -943,7 +1058,7 @@ class AdminTaxesControllerCore extends AdminController
                     $innerMaxEffective = ($innerBand['maxAge'] == 0) ? PHP_INT_MAX : $innerBand['maxAge'];
                     if ($outerBand['minAge'] <= $innerMaxEffective && $outerMaxEffective >= $innerBand['minAge']) {
                         $this->errors[] = sprintf(
-                            $this->l('Child age bands #%d and #%d overlap. Each band must cover a distinct age range.'),
+                            $this->l('Child age ranges #%d and #%d overlap. Each range must cover a distinct age range.'),
                             $outerBand['rowNum'],
                             $innerBand['rowNum']
                         );
@@ -962,7 +1077,7 @@ class AdminTaxesControllerCore extends AdminController
             $submittedTierMaxs = Tools::getValue('tier_max', array());
             $submittedTierValues = Tools::getValue('tier_value', array());
             if (empty($submittedTierValues)) {
-                $this->errors[] = $this->l('Add at least one bracket or disable "Tiered pricing".');
+                $this->errors[] = $this->l('Add at least one range or disable "Tiered pricing".');
             }
             $filledTiers = array();
             foreach ($submittedTierValues as $rowIndex => $taxValue) {
@@ -999,7 +1114,7 @@ class AdminTaxesControllerCore extends AdminController
                     $innerMaxEffective = ($innerTier['maxPrice'] == 0) ? PHP_FLOAT_MAX : $innerTier['maxPrice'];
                     if ($outerTier['minPrice'] < $innerMaxEffective && $outerMaxEffective > $innerTier['minPrice']) {
                         $this->errors[] = sprintf(
-                            $this->l('Price brackets #%d and #%d overlap. Each bracket must cover a distinct price range.'),
+                            $this->l('Price ranges #%d and #%d overlap. Each range must cover a distinct price range.'),
                             $outerTier['rowNum'],
                             $innerTier['rowNum']
                         );
@@ -1019,7 +1134,6 @@ class AdminTaxesControllerCore extends AdminController
         parent::setMedia();
         if ($this->display == 'edit' || $this->display == 'add') {
             $this->addCSS(_MODULE_DIR_ . 'hotelreservationsystem/views/css/HotelReservationAdmin.css');
-            Media::addJsDef(array('tourismTaxDateErrorMsg' => $this->l('"Valid to" must be on or after "Valid from".')));
             $this->addJs(_MODULE_DIR_ . 'hotelreservationsystem/views/js/TourismTaxForm.js');
         }
     }
@@ -1043,10 +1157,8 @@ class AdminTaxesControllerCore extends AdminController
         $tourismTax->has_tiered_pricing = (int) Tools::getValue('is_tiered', 0);
         $tourismTax->apply_on_child = (int) Tools::getValue('has_child_rate', 0);
         $tourismTax->has_child_age_range = (int) Tools::getValue('has_child_age_range', 0);
-        $validFromRaw = trim(Tools::getValue('valid_from', ''));
-        $validToRaw = trim(Tools::getValue('valid_to', ''));
-        $tourismTax->valid_from = ($validFromRaw && $validFromRaw !== '0000-00-00') ? $validFromRaw : null;
-        $tourismTax->valid_to = ($validToRaw && $validToRaw !== '0000-00-00') ? $validToRaw : null;
+        $tourismTax->child_calculation_type = (int) Tools::getValue('child_calc_type', 0);
+        $tourismTax->has_multiple_valid_ranges = (int) Tools::getValue('has_multiple_valid_ranges', 0);
 
         $submittedDays = Tools::getValue('valid_days', array());
         if (!is_array($submittedDays)) {
@@ -1076,6 +1188,11 @@ class AdminTaxesControllerCore extends AdminController
             Tools::getValue('child_min', array()),
             Tools::getValue('child_max', array()),
             Tools::getValue('child_value', array())
+        );
+        TaxValidityRange::saveAll(
+            $idTax,
+            Tools::getValue('validity_from', array()),
+            Tools::getValue('validity_to', array())
         );
     }
 

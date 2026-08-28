@@ -1205,8 +1205,8 @@ CREATE TABLE `PREFIX_tax_configuration` (
   `has_tiered_pricing` tinyint(1) NOT NULL DEFAULT '0',
   `apply_on_child` tinyint(1) NOT NULL DEFAULT '0',
   `has_child_age_range` tinyint(1) NOT NULL DEFAULT '0',
-  `valid_from` date DEFAULT NULL,
-  `valid_to` date DEFAULT NULL,
+  `child_calculation_type` tinyint(1) NOT NULL DEFAULT '0',
+  `has_multiple_valid_ranges` tinyint(1) NOT NULL DEFAULT '0',
   `special_days` text,
   PRIMARY KEY (`id_tax`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
@@ -1228,6 +1228,15 @@ CREATE TABLE `PREFIX_tax_child_range` (
   `max_age` tinyint(3) unsigned NOT NULL DEFAULT '17',
   `tax_value` decimal(20,6) NOT NULL DEFAULT '0.000000',
   PRIMARY KEY (`id_tax_child_range`),
+  KEY `id_tax` (`id_tax`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_tax_validity_range` (
+  `id_tax_validity_range` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id_tax` int(11) unsigned NOT NULL,
+  `valid_from` date DEFAULT NULL,
+  `valid_to` date DEFAULT NULL,
+  PRIMARY KEY (`id_tax_validity_range`),
   KEY `id_tax` (`id_tax`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 

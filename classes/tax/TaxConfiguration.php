@@ -31,13 +31,13 @@ class TaxConfigurationCore extends ObjectModel
     public $id_tax;
     public $tax_value;
     public $calculation_type;
-    public $per_night;
+    public $per_night = 1;
     public $per_person;
     public $has_tiered_pricing;
     public $apply_on_child;
     public $has_child_age_range;
-    public $valid_from;
-    public $valid_to;
+    public $child_calculation_type;
+    public $has_multiple_valid_ranges;
     public $special_days;
 
     public static $definition = array(
@@ -51,8 +51,8 @@ class TaxConfigurationCore extends ObjectModel
             'has_tiered_pricing' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'apply_on_child' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'has_child_age_range' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'valid_from' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'allow_null' => true),
-            'valid_to' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'allow_null' => true),
+            'child_calculation_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
+            'has_multiple_valid_ranges' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'special_days' => array('type' => self::TYPE_STRING),
         ),
     );
@@ -81,8 +81,8 @@ class TaxConfigurationCore extends ObjectModel
                 'has_tiered_pricing' => (int) $this->has_tiered_pricing,
                 'apply_on_child' => (int) $this->apply_on_child,
                 'has_child_age_range' => (int) $this->has_child_age_range,
-                'valid_from' => $this->valid_from ? pSQL($this->valid_from) : null,
-                'valid_to' => $this->valid_to ? pSQL($this->valid_to) : null,
+                'child_calculation_type' => (int) $this->child_calculation_type,
+                'has_multiple_valid_ranges' => (int) $this->has_multiple_valid_ranges,
                 'special_days' => $this->special_days ? pSQL($this->special_days) : null,
             )
         );
@@ -192,6 +192,10 @@ class TaxConfigurationCore extends ObjectModel
             );
             Db::getInstance()->execute(
                 'DELETE FROM `' . _DB_PREFIX_ . 'tax_child_range`
+                 WHERE `id_tax` = ' . $idTax
+            );
+            Db::getInstance()->execute(
+                'DELETE FROM `' . _DB_PREFIX_ . 'tax_validity_range`
                  WHERE `id_tax` = ' . $idTax
             );
             return true;
@@ -317,7 +321,7 @@ class TaxConfigurationCore extends ObjectModel
         $taxCalculator = TaxManagerFactory::getManager($address, $idTaxRulesGroup)->getTaxCalculator();
         $preview = array();
 
-        $today = new DateTime();
+        $today = new DateTime(date('Y-m-d'));
         $todayDayKey = self::DAY_KEYS[$today->format('N') - 1];
 
         foreach ($taxCalculator->taxes as $tax) {
@@ -326,13 +330,8 @@ class TaxConfigurationCore extends ObjectModel
                 continue;
             }
 
-            if (!empty($tourismTax->valid_from) && $tourismTax->valid_from !== '0000-00-00'
-                && $today < new DateTime($tourismTax->valid_from)
-            ) {
-                continue;
-            }
-            if (!empty($tourismTax->valid_to) && $tourismTax->valid_to !== '0000-00-00'
-                && $today > new DateTime($tourismTax->valid_to)
+            if ((bool) $tourismTax->has_multiple_valid_ranges
+                && !TaxValidityRange::dateMatchesAnyRange(TaxValidityRange::getByTaxId((int) $tax->id), $today)
             ) {
                 continue;
             }

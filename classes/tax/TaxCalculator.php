@@ -185,14 +185,9 @@ class TaxCalculatorCore
                     continue;
                 }
 
-                $validFrom = null;
-                if (!empty($tourismTax->valid_from) && $tourismTax->valid_from !== '0000-00-00') {
-                    $validFrom = new DateTime($tourismTax->valid_from);
-                }
-                $validTo = null;
-                if (!empty($tourismTax->valid_to) && $tourismTax->valid_to !== '0000-00-00') {
-                    $validTo = new DateTime($tourismTax->valid_to);
-                }
+                $hasMultiRanges = (bool) $tourismTax->has_multiple_valid_ranges;
+                $validityRanges = $hasMultiRanges ? TaxValidityRange::getByTaxId((int) $tax->id) : null;
+
                 $specialDays = null;
                 if ($tourismTax->special_days) {
                     $decoded = json_decode($tourismTax->special_days, true);
@@ -206,10 +201,7 @@ class TaxCalculatorCore
                     for ($i = 0; $i < $numNights; $i++) {
                         $night = clone $checkIn;
                         $night->modify('+' . $i . ' days');
-                        if ($validFrom && $night < $validFrom) {
-                            continue;
-                        }
-                        if ($validTo && $night > $validTo) {
+                        if ($hasMultiRanges && !TaxValidityRange::dateMatchesAnyRange($validityRanges, $night)) {
                             continue;
                         }
                         if ($specialDays !== null && !in_array(TaxConfiguration::DAY_KEYS[$night->format('N') - 1], $specialDays)) {
@@ -221,10 +213,7 @@ class TaxCalculatorCore
                         continue;
                     }
                 } else {
-                    if ($validFrom && $checkIn < $validFrom) {
-                        continue;
-                    }
-                    if ($validTo && $checkIn > $validTo) {
+                    if ($hasMultiRanges && !TaxValidityRange::dateMatchesAnyRange($validityRanges, $checkIn)) {
                         continue;
                     }
                     if ($specialDays !== null && !in_array(TaxConfiguration::DAY_KEYS[$isoDayIndex], $specialDays)) {
@@ -268,9 +257,8 @@ class TaxCalculatorCore
                     $contribution = TaxChildRange::getChildContribution(
                         $tax->id,
                         $eligibleChildAges,
-                        $taxType,
-                        $runningPriceExcl,
-                        $baseValue,
+                        (int) $tourismTax->child_calculation_type,
+                        $unitAmountAdult,
                         $tourismTax->has_child_age_range
                     );
                     if ($contribution['count'] > 0) {
