@@ -538,7 +538,7 @@ class AdminCartsControllerCore extends AdminController
                             }
                             continue;
                         }
-                        if ($error = ImageManager::validateUpload($_FILES[$field_id], (int)Configuration::get('PS_PRODUCT_PICTURE_MAX_SIZE'))) {
+                        if ($error = ImageManager::validateUpload($_FILES[$field_id], Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                             $errors[] = $error;
                         }
                         if (!($tmp_name = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES[$field_id]['tmp_name'], $tmp_name)) {

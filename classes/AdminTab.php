@@ -1119,8 +1119,8 @@ abstract class AdminTabCore
 
 
             // Check image validity
-            $max_size = isset($this->maxImageSize) ? $this->maxImageSize : 0;
-            if ($error = ImageManager::validateUpload($_FILES[$name], Tools::getMaxUploadSize($max_size))) {
+            $max_size = isset($this->maxImageSize) ? $this->maxImageSize : Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024));
+            if ($error = ImageManager::validateUpload($_FILES[$name], $max_size)) {
                 $this->_errors[] = $error;
             } elseif (!($tmpName = tempnam(_PS_TMP_IMG_DIR_, 'PS')) || !move_uploaded_file($_FILES[$name]['tmp_name'], $tmpName)) {
                 return false;

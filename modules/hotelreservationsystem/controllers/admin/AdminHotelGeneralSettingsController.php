@@ -595,7 +595,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 }
             }
             if ($_FILES['WK_HOTEL_HEADER_IMAGE']['name']) {
-                if ($error = ImageManager::validateUpload($_FILES['WK_HOTEL_HEADER_IMAGE'], Tools::getMaxUploadSize())) {
+                if ($error = ImageManager::validateUpload($_FILES['WK_HOTEL_HEADER_IMAGE'], Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)))) {
                     $this->errors[] = $error;
                 }
 
@@ -688,7 +688,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         Media::addJsDef(
             array(
                 'filesizeError' => $this->l('File exceeds maximum size.', null, true),
-                'maxSizeAllowed' => Tools::getMaxUploadSize(),
+                'maxSizeAllowed' => Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)),
             )
         );
         $this->addJs(_MODULE_DIR_.'hotelreservationsystem/views/js/HotelReservationAdmin.js');

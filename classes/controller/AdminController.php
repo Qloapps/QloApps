@@ -4023,8 +4023,8 @@ class AdminControllerCore extends Controller
             }
 
             // Check image validity
-            $max_size = isset($this->max_image_size) ? $this->max_image_size : 0;
-            if ($error = ImageManager::validateUpload($_FILES[$name], Tools::getMaxUploadSize($max_size))) {
+            $max_size = isset($this->max_image_size) ? $this->max_image_size : Tools::getMaxUploadSize((int)(Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024));
+            if ($error = ImageManager::validateUpload($_FILES[$name], $max_size)) {
                 $this->errors[] = $error;
             }
 
