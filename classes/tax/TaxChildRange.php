@@ -73,20 +73,20 @@ class TaxChildRangeCore extends ObjectModel
      * @param array $values
      * @return void
      */
-    public static function saveAll($idTax, array $mins, array $maxs, array $values)
+    public static function saveAll($idTax, $mins, $maxs, $values)
     {
         Db::getInstance()->execute(
             'DELETE FROM `' . _DB_PREFIX_ . 'tax_child_range`
              WHERE `id_tax` = ' . (int) $idTax
         );
-        foreach ($values as $i => $value) {
+        foreach ($values as $rowIndex => $value) {
             if ($value === '' || $value === false) {
                 continue;
             }
             $range = new TaxChildRange();
             $range->id_tax = (int) $idTax;
-            $range->min_age = isset($mins[$i]) ? (int) $mins[$i] : 0;
-            $range->max_age = isset($maxs[$i]) ? (int) $maxs[$i] : 0;
+            $range->min_age = isset($mins[$rowIndex]) ? (int) $mins[$rowIndex] : 0;
+            $range->max_age = isset($maxs[$rowIndex]) ? (int) $maxs[$rowIndex] : 0;
             $range->tax_value = (float) $value;
             $range->add();
         }
@@ -104,10 +104,8 @@ class TaxChildRangeCore extends ObjectModel
      * @param bool   $useRanges                false = skip band lookup, every child is treated as unmatched
      * @return array ['total' => float, 'count' => int]
      */
-    public static function getChildContribution($idTax, array $ages, $childCalcType, $unitTourismTaxAmountAdult, $useRanges = true)
+    public static function getChildContribution($idTax, $ages, $childCalcType, $unitTourismTaxAmountAdult, $useRanges = true)
     {
-        $childCalcType = (int) $childCalcType;
-        $unitTourismTaxAmountAdult = (float) $unitTourismTaxAmountAdult;
         $ranges = $useRanges ? self::getByTaxId((int) $idTax) : array();
         $total = 0.0;
         $count = 0;

@@ -164,7 +164,7 @@ class TaxConfigurationCore extends ObjectModel
      * @param Currency $currency
      * @return string
      */
-    public static function getFormattedRateForDisplay($value, array $row, Currency $currency)
+    public static function getFormattedRateForDisplay($value, $row, $currency)
     {
         if (!(int) $row['is_tourism_tax']) {
             return Tools::safeOutput($value) . '%';
@@ -221,7 +221,7 @@ class TaxConfigurationCore extends ObjectModel
      * @param Address $fallbackAddress  Used only when the hotel has no address on file
      * @return array ['address' => Address, 'collectionType' => int]
      */
-    public static function resolveHotelAddressAndCollectionType($idHotel, Address $fallbackAddress)
+    public static function resolveHotelAddressAndCollectionType($idHotel, $fallbackAddress)
     {
         $idHotel = (int) $idHotel;
 
@@ -258,7 +258,7 @@ class TaxConfigurationCore extends ObjectModel
      * @return array ['address' => Address, 'collectionType' => int, 'checkInDate' => string,
      *                'numNights' => int, 'numAdults' => int, 'childrenAges' => int[]]
      */
-    public static function resolveServiceLineTaxContext($idHotel, $idHtlBookingDetail, Address $fallbackAddress, $idHtlCartBooking = 0)
+    public static function resolveServiceLineTaxContext($idHotel, $idHtlBookingDetail, $fallbackAddress, $idHtlCartBooking = 0)
     {
         $idHotel = (int) $idHotel;
         $idHtlBookingDetail = (int) $idHtlBookingDetail;
@@ -311,7 +311,7 @@ class TaxConfigurationCore extends ObjectModel
      * @param int    $idLang
      * @return array List of ['tax_calc_type','is_tiered','tax_value','tiers']
      */
-    public static function getPreviewParams($idTaxRulesGroup, Address $address, $idLang, $collectionType = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE)
+    public static function getPreviewParams($idTaxRulesGroup, $address, $idLang, $collectionType = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE)
     {
         $idTaxRulesGroup = (int) $idTaxRulesGroup;
         if (!$idTaxRulesGroup || Tax::excludeTaxeOption() || (int) $collectionType === HotelBranchInformation::TAX_COLLECTION_TYPE_AT_HOTEL) {

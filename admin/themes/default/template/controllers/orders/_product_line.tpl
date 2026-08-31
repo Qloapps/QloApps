@@ -199,7 +199,7 @@
                         {if isset($use_tourism_tax) && $use_tourism_tax && isset($data.tourism_tax_status) && $data.tourism_tax_status != $tourism_tax_status_not_applicable && !$data.is_cancelled && !$data.is_refunded}
                             {if $data.tourism_tax_status == $tourism_tax_status_applied}
                                 <li>
-                                    <a href="#" class="tt-exempt-booking" data-id_htl_booking="{$data.id|intval}">
+                                    <a href="#" class="tt-exempt-booking" data-id_htl_booking="{$data.id|intval}" data-label="{$data.room_num|escape:'html':'UTF-8'} - {$data.room_type_name|escape:'html':'UTF-8'}: ({$data.date_from|date_format:"%d/%m/%Y"} - {$data.date_to|date_format:"%d/%m/%Y"})">
                                         <i class="icon-ban"></i>
                                         {l s='Exempt Tourism Tax'}
                                     </a>

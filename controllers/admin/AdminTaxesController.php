@@ -271,12 +271,12 @@ class AdminTaxesControllerCore extends AdminController
             $postTierMins = (array) Tools::getValue('tier_min', array());
             $postTierMaxs = (array) Tools::getValue('tier_max', array());
             $postTierValues = (array) Tools::getValue('tier_value', array());
-            foreach ($postTierIds as $i => $tierId) {
+            foreach ($postTierIds as $tierRowIndex => $tierId) {
                 $tiers[] = array(
                     'id_tier' => (int) $tierId,
-                    'min_amount' => isset($postTierMins[$i]) ? $postTierMins[$i] : '',
-                    'max_amount' => isset($postTierMaxs[$i]) ? $postTierMaxs[$i] : '',
-                    'tax_value' => isset($postTierValues[$i]) ? $postTierValues[$i] : '',
+                    'min_amount' => isset($postTierMins[$tierRowIndex]) ? $postTierMins[$tierRowIndex] : '',
+                    'max_amount' => isset($postTierMaxs[$tierRowIndex]) ? $postTierMaxs[$tierRowIndex] : '',
+                    'tax_value' => isset($postTierValues[$tierRowIndex]) ? $postTierValues[$tierRowIndex] : '',
                 );
             }
 
@@ -284,23 +284,23 @@ class AdminTaxesControllerCore extends AdminController
             $postChildMins = (array) Tools::getValue('child_min', array());
             $postChildMaxs = (array) Tools::getValue('child_max', array());
             $postChildValues = (array) Tools::getValue('child_value', array());
-            foreach ($postChildIds as $i => $childId) {
+            foreach ($postChildIds as $childRangeRowIndex => $childId) {
                 $childRanges[] = array(
                     'id_child_range' => (int) $childId,
-                    'min_age' => isset($postChildMins[$i]) ? $postChildMins[$i] : '',
-                    'max_age' => isset($postChildMaxs[$i]) ? $postChildMaxs[$i] : '',
-                    'tax_value' => isset($postChildValues[$i]) ? $postChildValues[$i] : '',
+                    'min_age' => isset($postChildMins[$childRangeRowIndex]) ? $postChildMins[$childRangeRowIndex] : '',
+                    'max_age' => isset($postChildMaxs[$childRangeRowIndex]) ? $postChildMaxs[$childRangeRowIndex] : '',
+                    'tax_value' => isset($postChildValues[$childRangeRowIndex]) ? $postChildValues[$childRangeRowIndex] : '',
                 );
             }
 
             $postValidityIds = (array) Tools::getValue('validity_id', array());
             $postValidityFroms = (array) Tools::getValue('validity_from', array());
             $postValidityTos = (array) Tools::getValue('validity_to', array());
-            foreach ($postValidityIds as $i => $rangeId) {
+            foreach ($postValidityIds as $validityRangeRowIndex => $rangeId) {
                 $validityRanges[] = array(
                     'id_validity_range' => (int) $rangeId,
-                    'valid_from' => isset($postValidityFroms[$i]) ? $postValidityFroms[$i] : '',
-                    'valid_to' => isset($postValidityTos[$i]) ? $postValidityTos[$i] : '',
+                    'valid_from' => isset($postValidityFroms[$validityRangeRowIndex]) ? $postValidityFroms[$validityRangeRowIndex] : '',
+                    'valid_to' => isset($postValidityTos[$validityRangeRowIndex]) ? $postValidityTos[$validityRangeRowIndex] : '',
                 );
             }
         }

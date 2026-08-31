@@ -1017,15 +1017,36 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
+     *
+     * @param int         $idOrder
+     * @param int         $idEmployee
+     * @param string      $autoMsg
+     * @param string|null $note         Optional remark appended as "| {$remarkLabel}: ..." — omit for apply actions
+     * @param string      $remarkLabel  Pre-translated "Remark" label
+     */
+    protected static function saveTourismTaxNote($idOrder, $idEmployee, $autoMsg, $note = null, $remarkLabel = 'Remark')
+    {
+        $noteMessage = $autoMsg . ($note && Validate::isMessage($note) ? ' | ' . $remarkLabel . ': ' . $note : '');
+        $message = new Message();
+        $message->message = $noteMessage;
+        $message->id_order = (int) $idOrder;
+        $message->id_employee = (int) $idEmployee;
+        $message->private = 1;
+        $message->save();
+    }
+
+    /**
      * Exempt a booking's tourism tax — one marker row covers the room and every service attached to
      * it. Idempotent: exempting an already-exempted booking is a no-op success.
      *
      * @param int         $idHtlBooking
      * @param int         $idEmployee   PS employee id (0 = resolved from Context)
      * @param string|null $note         Reason for exemption, entered by the employee
+     * @param string|null $autoMsgLabel Pre-translated "Tourism Tax Exempted" label
+     * @param string      $remarkLabel  Pre-translated "Remark" label
      * @return int EXEMPT_OK | EXEMPT_ERROR_NO_RULE | EXEMPT_ERROR_SAVE
      */
-    public static function exemptBooking($idHtlBooking, $idEmployee = 0, $note = null)
+    public static function exemptBooking($idHtlBooking, $idEmployee = 0, $note = null, $autoMsgLabel = null, $remarkLabel = 'Remark')
     {
         $idHtlBooking = (int) $idHtlBooking;
         if (self::isBookingExempted($idHtlBooking)) {
@@ -1047,6 +1068,13 @@ class OrderTaxDetailCore extends ObjectModel
             return self::EXEMPT_ERROR_SAVE;
         }
 
+        if ($autoMsgLabel !== null) {
+            $roomTypeName = Product::getProductName((int) $booking->id_product, null, Context::getContext()->language->id);
+            $autoMsg = $autoMsgLabel . ': ' . $booking->room_num . ' - ' . $roomTypeName . ': ('
+                . date('d/m/Y', strtotime($booking->date_from)) . ' - ' . date('d/m/Y', strtotime($booking->date_to)) . ')';
+            self::saveTourismTaxNote((int) $booking->id_order, $objOrderTaxExemption->id_employee, $autoMsg, $note, $remarkLabel);
+        }
+
         self::syncDenormalizedTotalsForBooking($idHtlBooking, false);
 
         return self::EXEMPT_OK;
@@ -1058,13 +1086,17 @@ class OrderTaxDetailCore extends ObjectModel
      * nothing has ever been computed for the room and/or a given service line (e.g. config was off
      * at order time), computes it fresh instead.
      *
-     * @param int $idHtlBooking
+     * @param int         $idHtlBooking
+     * @param int         $idEmployee    PS employee id (0 = resolved from Context)
+     * @param string|null $autoMsgLabel  Pre-translated "Tourism Tax Applied" label — null skips the Order Notes entry entirely
      * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_NOT_APPLICABLE
      */
-    public static function applyBooking($idHtlBooking)
+    public static function applyBooking($idHtlBooking, $idEmployee = 0, $autoMsgLabel = null)
     {
         $idHtlBooking = (int) $idHtlBooking;
+        $booking = new HotelBookingDetail($idHtlBooking);
         $wasExempted = self::isBookingExempted($idHtlBooking);
+        $changed = $wasExempted;
         if ($wasExempted) {
             if (!self::deleteExemptionMarker($idHtlBooking, 0)) {
                 return self::APPLY_ERROR_RESTORE;
@@ -1077,6 +1109,7 @@ class OrderTaxDetailCore extends ObjectModel
             if ($params) {
                 $params['collectionType'] = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE;
                 self::saveTourismTaxFromParams($params);
+                $changed = true;
                 if (!$wasExempted) {
                     self::adjustOrderTotalsForNewRows(self::SCOPE_COLUMN_ROOM, $idHtlBooking, $params['idOrder']);
                 }
@@ -1095,6 +1128,7 @@ class OrderTaxDetailCore extends ObjectModel
             if ($svcParams) {
                 $svcParams['collectionType'] = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE;
                 self::saveTourismTaxFromParams($svcParams);
+                $changed = true;
                 if (!$wasExempted) {
                     self::adjustOrderTotalsForNewRows(self::SCOPE_COLUMN_SERVICE, $idServiceLine, $svcParams['idOrder']);
                 }
@@ -1116,6 +1150,14 @@ class OrderTaxDetailCore extends ObjectModel
             return self::APPLY_ERROR_NOT_APPLICABLE;
         }
 
+        if ($autoMsgLabel !== null && $changed) {
+            $idEmployee = $idEmployee ? (int) $idEmployee : (int) Context::getContext()->employee->id;
+            $roomTypeName = Product::getProductName((int) $booking->id_product, null, Context::getContext()->language->id);
+            $autoMsg = $autoMsgLabel . ': ' . $booking->room_num . ' - ' . $roomTypeName . ': ('
+                . date('d/m/Y', strtotime($booking->date_from)) . ' - ' . date('d/m/Y', strtotime($booking->date_to)) . ')';
+            self::saveTourismTaxNote((int) $booking->id_order, $idEmployee, $autoMsg);
+        }
+
         return self::APPLY_OK;
     }
 
@@ -1126,9 +1168,11 @@ class OrderTaxDetailCore extends ObjectModel
      * @param int         $idServiceProductOrderDetail
      * @param int         $idEmployee
      * @param string|null $note
+     * @param string|null $autoMsgLabel  Pre-translated "Tourism Tax Exempted" label — null skips the Order Notes entry entirely
+     * @param string      $remarkLabel   Pre-translated "Remark" label
      * @return int EXEMPT_OK | EXEMPT_ERROR_NO_RULE | EXEMPT_ERROR_SAVE
      */
-    public static function exemptServiceLine($idServiceProductOrderDetail, $idEmployee = 0, $note = null)
+    public static function exemptServiceLine($idServiceProductOrderDetail, $idEmployee = 0, $note = null, $autoMsgLabel = null, $remarkLabel = 'Remark')
     {
         $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
         if (self::isServiceLineExempted($idServiceProductOrderDetail)) {
@@ -1150,6 +1194,11 @@ class OrderTaxDetailCore extends ObjectModel
             return self::EXEMPT_ERROR_SAVE;
         }
 
+        if ($autoMsgLabel !== null) {
+            $autoMsg = $autoMsgLabel . ': ' . $serviceLine->name;
+            self::saveTourismTaxNote((int) $serviceLine->id_order, $objOrderTaxExemption->id_employee, $autoMsg, $note, $remarkLabel);
+        }
+
         $total = self::getScopedTotal(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail);
         if ($total) {
             self::recomputeInclusivePrice((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail);
@@ -1162,13 +1211,17 @@ class OrderTaxDetailCore extends ObjectModel
     /**
      * Apply (or re-apply) tourism tax for a single standalone service line.
      *
-     * @param int $idServiceProductOrderDetail
+     * @param int         $idServiceProductOrderDetail
+     * @param int         $idEmployee    PS employee id (0 = resolved from Context)
+     * @param string|null $autoMsgLabel  Pre-translated "Tourism Tax Applied" label — null skips the Order Notes entry entirely
      * @return int APPLY_OK | APPLY_ERROR_RESTORE | APPLY_ERROR_NOT_APPLICABLE
      */
-    public static function applyServiceLine($idServiceProductOrderDetail)
+    public static function applyServiceLine($idServiceProductOrderDetail, $idEmployee = 0, $autoMsgLabel = null)
     {
         $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
+        $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
         $wasExempted = self::isServiceLineExempted($idServiceProductOrderDetail);
+        $changed = $wasExempted;
         if ($wasExempted) {
             if (!self::deleteExemptionMarker(0, $idServiceProductOrderDetail)) {
                 return self::APPLY_ERROR_RESTORE;
@@ -1181,6 +1234,7 @@ class OrderTaxDetailCore extends ObjectModel
             if ($params) {
                 $params['collectionType'] = HotelBranchInformation::TAX_COLLECTION_TYPE_ONLINE;
                 self::saveTourismTaxFromParams($params);
+                $changed = true;
                 if (!$wasExempted) {
                     self::adjustOrderTotalsForNewRows(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail, $params['idOrder']);
                 }
@@ -1189,17 +1243,20 @@ class OrderTaxDetailCore extends ObjectModel
 
         if ($wasExempted) {
             $total = self::getScopedTotal(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail);
-            if ($total) {
-                $serviceLine = new ServiceProductOrderDetail($idServiceProductOrderDetail);
-                if (Validate::isLoadedObject($serviceLine)) {
-                    self::recomputeInclusivePrice((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail);
-                    self::adjustOrderAndInvoiceTotals((int) $serviceLine->id_order, $total);
-                }
+            if ($total && Validate::isLoadedObject($serviceLine)) {
+                self::recomputeInclusivePrice((int) $serviceLine->id_order_detail, 0, $idServiceProductOrderDetail);
+                self::adjustOrderAndInvoiceTotals((int) $serviceLine->id_order, $total);
             }
         }
 
         if (self::getScopedTotal(self::SCOPE_COLUMN_SERVICE, $idServiceProductOrderDetail) <= 0) {
             return self::APPLY_ERROR_NOT_APPLICABLE;
+        }
+
+        if ($autoMsgLabel !== null && $changed) {
+            $idEmployee = $idEmployee ? (int) $idEmployee : (int) Context::getContext()->employee->id;
+            $autoMsg = $autoMsgLabel . ': ' . $serviceLine->name;
+            self::saveTourismTaxNote((int) $serviceLine->id_order, $idEmployee, $autoMsg);
         }
 
         return self::APPLY_OK;
@@ -1212,10 +1269,12 @@ class OrderTaxDetailCore extends ObjectModel
      * @param int         $idOrder
      * @param int         $idEmployee
      * @param string|null $note  Reason for exemption, applied to every booking/line in the order
+     * @param string|null $autoMsgLabel  Pre-translated "Tourism Tax Exempted" label — null skips the Order Notes entry entirely, for every booking/line in the order
+     * @param string      $remarkLabel   Pre-translated "Remark" label
      * @return array  [{'id_htl_booking' => int, 'result' => int}, ...] plus
      *                [{'id_service_product_order_detail' => int, 'result' => int}, ...] — failures only
      */
-    public static function exemptForOrder($idOrder, $idEmployee = 0, $note = null)
+    public static function exemptForOrder($idOrder, $idEmployee = 0, $note = null, $autoMsgLabel = null, $remarkLabel = 'Remark')
     {
         $idOrder = (int) $idOrder;
         $failures = array();
@@ -1226,14 +1285,14 @@ class OrderTaxDetailCore extends ObjectModel
                 if (!empty($booking['is_refunded']) || !empty($booking['is_cancelled'])) {
                     continue;
                 }
-                $result = self::exemptBooking($booking['id'], $idEmployee, $note);
+                $result = self::exemptBooking($booking['id'], $idEmployee, $note, $autoMsgLabel, $remarkLabel);
                 if ($result !== self::EXEMPT_OK) {
                     $failures[] = array('id_htl_booking' => (int) $booking['id'], 'result' => $result);
                 }
             }
         }
         foreach (ServiceProductOrderDetail::getActiveStandaloneIdsByOrder($idOrder) as $idServiceLine) {
-            $result = self::exemptServiceLine($idServiceLine, $idEmployee, $note);
+            $result = self::exemptServiceLine($idServiceLine, $idEmployee, $note, $autoMsgLabel, $remarkLabel);
             if ($result !== self::EXEMPT_OK) {
                 $failures[] = array('id_service_product_order_detail' => $idServiceLine, 'result' => $result);
             }
@@ -1247,11 +1306,13 @@ class OrderTaxDetailCore extends ObjectModel
      * service, or the standalone line itself, has a tourism tax rule) is not a failure — it's silently
      * skipped, same as if it had simply been left alone.
      *
-     * @param int $idOrder
+     * @param int         $idOrder
+     * @param int         $idEmployee    PS employee id (0 = resolved from Context)
+     * @param string|null $autoMsgLabel  Pre-translated "Tourism Tax Applied" label — null skips the Order Notes entry entirely, for every booking/line in the order
      * @return array  [{'id_htl_booking' => int, 'result' => int}, ...] plus
      *                [{'id_service_product_order_detail' => int, 'result' => int}, ...] — failures only
      */
-    public static function applyForOrder($idOrder)
+    public static function applyForOrder($idOrder, $idEmployee = 0, $autoMsgLabel = null)
     {
         $idOrder = (int) $idOrder;
         $failures = array();
@@ -1262,14 +1323,14 @@ class OrderTaxDetailCore extends ObjectModel
                 if (!empty($booking['is_refunded']) || !empty($booking['is_cancelled'])) {
                     continue;
                 }
-                $result = self::applyBooking($booking['id']);
+                $result = self::applyBooking($booking['id'], $idEmployee, $autoMsgLabel);
                 if ($result !== self::APPLY_OK && $result !== self::APPLY_ERROR_NOT_APPLICABLE) {
                     $failures[] = array('id_htl_booking' => (int) $booking['id'], 'result' => $result);
                 }
             }
         }
         foreach (ServiceProductOrderDetail::getActiveStandaloneIdsByOrder($idOrder) as $idServiceLine) {
-            $result = self::applyServiceLine($idServiceLine);
+            $result = self::applyServiceLine($idServiceLine, $idEmployee, $autoMsgLabel);
             if ($result !== self::APPLY_OK && $result !== self::APPLY_ERROR_NOT_APPLICABLE) {
                 $failures[] = array('id_service_product_order_detail' => $idServiceLine, 'result' => $result);
             }

@@ -120,8 +120,19 @@
 															{assign var='serviceSelected' value=true}
 															{$product.price_tax_incl = $cartRoom['selected_service'][$product['id_product']]['unit_price_tax_incl']}
 															{$product.price_tax_exc = $cartRoom['selected_service'][$product['id_product']]['unit_price_tax_excl']}
+															{assign var='selectedServiceQty' value=$cartRoom['selected_service'][$product['id_product']]['quantity']|default:1}
+															{assign var='perQtyInclAcrossNights' value=$cartRoom['selected_service'][$product['id_product']]['total_price_tax_incl']/$selectedServiceQty}
+															{assign var='perQtyExclAcrossNights' value=$cartRoom['selected_service'][$product['id_product']]['total_price_tax_excl']/$selectedServiceQty}
+														{elseif isset($cartRoom['available_service_pricing']) && ($product['id_product']|array_key_exists:$cartRoom['available_service_pricing'])}
+															{assign var='serviceSelected' value=false}
+															{$product.price_tax_incl = $cartRoom['available_service_pricing'][$product['id_product']]['unit_price_tax_incl']}
+															{$product.price_tax_exc = $cartRoom['available_service_pricing'][$product['id_product']]['unit_price_tax_excl']}
+															{assign var='perQtyInclAcrossNights' value=$cartRoom['available_service_pricing'][$product['id_product']]['total_price_tax_incl']}
+															{assign var='perQtyExclAcrossNights' value=$cartRoom['available_service_pricing'][$product['id_product']]['total_price_tax_excl']}
 														{else}
 															{assign var='serviceSelected' value=false}
+															{assign var='perQtyInclAcrossNights' value=$product.price_tax_incl}
+															{assign var='perQtyExclAcrossNights' value=$product.price_tax_exc}
 														{/if}
 														<div class="row room_demand_block">
 															<div class="col-xs-8">
@@ -155,18 +166,18 @@
 															</div>
 															<div class="col-xs-4">
 																{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
-																	<span class="room-service-product-value pull-right" data-unit_price="{if !$priceDisplay}{$product.price_tax_incl}{else}{$product.price_tax_exc}{/if}" data-currency_sign="{$currency->sign}">
+																	<span class="room-service-product-value pull-right" data-unit_price="{if !$priceDisplay}{$perQtyInclAcrossNights}{else}{$perQtyExclAcrossNights}{/if}" data-currency_sign="{$currency->sign}">
 																		{if !$priceDisplay}
 																			{if $serviceSelected}
 																				{convertPrice price=$cartRoom['selected_service'][$product['id_product']]['total_price_tax_incl']}
 																			{else}
-																				{convertPrice price=$product.price_tax_incl}
+																				{convertPrice price=$cartRoom['available_service_pricing'][$product['id_product']]['total_price_tax_incl']|default:$product.price_tax_incl}
 																			{/if}
 																		{else}
 																			{if $serviceSelected}
 																				{convertPrice price=$cartRoom['selected_service'][$product['id_product']]['total_price_tax_excl']}
 																			{else}
-																				{convertPrice price=$product.price_tax_exc}
+																				{convertPrice price=$cartRoom['available_service_pricing'][$product['id_product']]['total_price_tax_excl']|default:$product.price_tax_exc}
 																			{/if}
 																		{/if}
 																	</span>

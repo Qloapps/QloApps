@@ -9512,6 +9512,8 @@ class AdminOrdersControllerCore extends AdminController
         $idHtlBooking = (int) Tools::getValue('id_htl_booking', 0);
         $idServiceProductOrderDetail = (int) Tools::getValue('id_service_product_order_detail', 0);
         $idOrder = (int) Tools::getValue('id_order', 0);
+        $idEmployee = (int) Context::getContext()->employee->id;
+        $autoMsgLabel = $this->l('Tourism Tax Applied');
         $errors = array();
         $messagesByResult = array(
             OrderTaxDetail::APPLY_ERROR_RESTORE => $this->l('Could not restore tourism tax.'),
@@ -9519,17 +9521,17 @@ class AdminOrdersControllerCore extends AdminController
         );
 
         if ($idHtlBooking) {
-            $result = OrderTaxDetail::applyBooking($idHtlBooking);
+            $result = OrderTaxDetail::applyBooking($idHtlBooking, $idEmployee, $autoMsgLabel);
             if (isset($messagesByResult[$result])) {
                 $errors[] = $messagesByResult[$result];
             }
         } elseif ($idServiceProductOrderDetail) {
-            $result = OrderTaxDetail::applyServiceLine($idServiceProductOrderDetail);
+            $result = OrderTaxDetail::applyServiceLine($idServiceProductOrderDetail, $idEmployee, $autoMsgLabel);
             if (isset($messagesByResult[$result])) {
                 $errors[] = $messagesByResult[$result];
             }
         } elseif ($idOrder) {
-            $errors = self::tourismTaxErrorsFromResults(OrderTaxDetail::applyForOrder($idOrder), $messagesByResult);
+            $errors = self::tourismTaxErrorsFromResults(OrderTaxDetail::applyForOrder($idOrder, $idEmployee, $autoMsgLabel), $messagesByResult);
         } else {
             $errors[] = $this->l('Invalid request parameters.');
         }
@@ -9553,6 +9555,8 @@ class AdminOrdersControllerCore extends AdminController
         $idEmployee = (int) Context::getContext()->employee->id;
         $note = trim((string) Tools::getValue('note', ''));
         $note = ($note !== '') ? $note : null;
+        $autoMsgLabel = $this->l('Tourism Tax Exempted');
+        $remarkLabel = $this->l('Remark');
         $errors = array();
         $messagesByResult = array(
             OrderTaxDetail::EXEMPT_ERROR_NO_RULE => $this->l('Tourism tax exemption is not applicable for this line.'),
@@ -9560,17 +9564,17 @@ class AdminOrdersControllerCore extends AdminController
         );
 
         if ($idHtlBooking) {
-            $result = OrderTaxDetail::exemptBooking($idHtlBooking, $idEmployee, $note);
+            $result = OrderTaxDetail::exemptBooking($idHtlBooking, $idEmployee, $note, $autoMsgLabel, $remarkLabel);
             if (isset($messagesByResult[$result])) {
                 $errors[] = $messagesByResult[$result];
             }
         } elseif ($idServiceProductOrderDetail) {
-            $result = OrderTaxDetail::exemptServiceLine($idServiceProductOrderDetail, $idEmployee, $note);
+            $result = OrderTaxDetail::exemptServiceLine($idServiceProductOrderDetail, $idEmployee, $note, $autoMsgLabel, $remarkLabel);
             if (isset($messagesByResult[$result])) {
                 $errors[] = $messagesByResult[$result];
             }
         } elseif ($idOrder) {
-            $errors = self::tourismTaxErrorsFromResults(OrderTaxDetail::exemptForOrder($idOrder, $idEmployee, $note), $messagesByResult);
+            $errors = self::tourismTaxErrorsFromResults(OrderTaxDetail::exemptForOrder($idOrder, $idEmployee, $note, $autoMsgLabel, $remarkLabel), $messagesByResult);
         } else {
             $errors[] = $this->l('Invalid request parameters.');
         }

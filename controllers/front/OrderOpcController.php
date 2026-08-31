@@ -985,6 +985,14 @@ class OrderOpcControllerCore extends ParentOrderController
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
                 $cartBookings = $objCartBookingData->getHotelCartRoomsInfoByRoomType($this->context->cart->id, $idProduct,$dateFrom, $dateTo);
+                $availableServicePricing = $objRoomTypeServiceProduct->getServiceProductsPricingForCartBookings(
+                    $roomTypeServiceProducts,
+                    $cartBookings,
+                    $idProduct,
+                    $dateFrom,
+                    $dateTo
+                );
+
                 foreach($cartBookings as &$cartBookingData) {
                     $cartBookingData['selected_service'] = $objServiceProductCartDetail->getServiceProductsInCart(
                         $cartBookingData['id_cart'],
@@ -1010,7 +1018,12 @@ class OrderOpcControllerCore extends ParentOrderController
                         }
                     }
                     unset($selectedService);
+
+                    $cartBookingData['available_service_pricing'] = isset($availableServicePricing[$cartBookingData['id']])
+                        ? $availableServicePricing[$cartBookingData['id']]
+                        : array();
                 }
+                unset($cartBookingData);
                 $this->context->smarty->assign(array(
                     'roomTypeServiceProducts' => $roomTypeServiceProducts,
                     'cartRooms' => $cartBookings

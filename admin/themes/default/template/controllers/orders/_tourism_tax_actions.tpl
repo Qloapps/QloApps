@@ -38,6 +38,10 @@
                 <h4 class="modal-title"><i class="icon-ban"></i> {l s='Exempt Tourism Tax'}</h4>
             </div>
             <div class="modal-body">
+                <div class="form-group" id="tt-exempt-targets-group">
+                    <label class="control-label" id="tt-exempt-targets-label"><b>{l s='Rooms to be exempted'}</b></label>
+                    <ul id="tt-exempt-targets-list" style="max-height:150px; overflow-y:auto; margin-bottom:0; padding-left:18px;"></ul>
+                </div>
                 <div class="form-group">
                     <label class="control-label">{l s='Reason for Exemption'}</label>
                     <textarea rows="3" class="textarea-autosize" id="tt-exempt-note"></textarea>
@@ -124,26 +128,44 @@ $(document).ready(function () {
     });
 
     var ttExemptTarget = null;
+    var ttRoomsToBeExemptedLabel = '{l s='Rooms to be exempted' js=1}';
+    var ttProductsToBeExemptedLabel = '{l s='Products to be exempted' js=1}';
+
+    function ttShowExemptModal(labels, hasRooms) {
+        var $list = $('#tt-exempt-targets-list');
+        $list.empty();
+        $.each(labels, function (i, label) {
+            $list.append($('<li>').addClass('message-item-text').text(label));
+        });
+        $('#tt-exempt-targets-label b').text(hasRooms ? ttRoomsToBeExemptedLabel : ttProductsToBeExemptedLabel);
+        $('#tt-exempt-note').val('');
+        $('#exempt-tourism-tax-modal').modal('show');
+    }
 
     $(document).on('click', '.tt-exempt-booking', function (e) {
         e.preventDefault();
         ttExemptTarget = { id_htl_booking: $(this).data('id_htl_booking') };
-        $('#tt-exempt-note').val('');
-        $('#exempt-tourism-tax-modal').modal('show');
+        ttShowExemptModal([$(this).data('label')], true);
     });
 
     $(document).on('click', '.tt-exempt-all-bookings', function (e) {
         e.preventDefault();
         ttExemptTarget = { id_order: $(this).data('id_order') };
-        $('#tt-exempt-note').val('');
-        $('#exempt-tourism-tax-modal').modal('show');
+        var labels = [];
+        var hasRooms = $('.tt-exempt-booking').length > 0;
+        $('.tt-exempt-booking').each(function () {
+            labels.push($(this).data('label'));
+        });
+        $('.tt-exempt-service-line').each(function () {
+            labels.push($(this).data('label'));
+        });
+        ttShowExemptModal(labels, hasRooms);
     });
 
     $(document).on('click', '.tt-exempt-service-line', function (e) {
         e.preventDefault();
         ttExemptTarget = { id_service_product_order_detail: $(this).data('id_service_product_order_detail') };
-        $('#tt-exempt-note').val('');
-        $('#exempt-tourism-tax-modal').modal('show');
+        ttShowExemptModal([$(this).data('label')], false);
     });
 
     $(document).on('click', '#tt-exempt-confirm', function (e) {

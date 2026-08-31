@@ -73,8 +73,6 @@ class TaxPriceTierCore extends ObjectModel
      */
     public static function getMatchingTier($idTax, $unitPrice)
     {
-        $idTax = (int) $idTax;
-        $unitPrice = (float) $unitPrice;
         $tiers = self::getByTaxId($idTax);
         foreach ($tiers as $tier) {
             $maxAmount = (float) $tier['max_amount'];
@@ -103,14 +101,14 @@ class TaxPriceTierCore extends ObjectModel
             'DELETE FROM `' . _DB_PREFIX_ . 'tax_price_tier`
              WHERE `id_tax` = ' . $idTax
         );
-        foreach ($values as $i => $value) {
+        foreach ($values as $rowIndex => $value) {
             if ($value === '' || $value === false) {
                 continue;
             }
             $tier = new TaxPriceTier();
             $tier->id_tax = $idTax;
-            $tier->min_amount = isset($mins[$i]) ? (float) $mins[$i] : 0;
-            $tier->max_amount = isset($maxs[$i]) ? (float) $maxs[$i] : 0;
+            $tier->min_amount = isset($mins[$rowIndex]) ? (float) $mins[$rowIndex] : 0;
+            $tier->max_amount = isset($maxs[$rowIndex]) ? (float) $maxs[$rowIndex] : 0;
             $tier->tax_value = (float) $value;
             $tier->add();
         }

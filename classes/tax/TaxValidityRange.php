@@ -68,7 +68,7 @@ class TaxValidityRangeCore extends ObjectModel
      * @param DateTime $date
      * @return bool
      */
-    public static function dateMatchesAnyRange(array $ranges, DateTime $date)
+    public static function dateMatchesAnyRange($ranges, $date)
     {
         if (empty($ranges)) {
             return true;
@@ -90,14 +90,14 @@ class TaxValidityRangeCore extends ObjectModel
      * @param array $tos
      * @return void
      */
-    public static function saveAll($idTax, array $froms, array $tos)
+    public static function saveAll($idTax, $froms, $tos)
     {
         Db::getInstance()->execute(
             'DELETE FROM `' . _DB_PREFIX_ . 'tax_validity_range`
              WHERE `id_tax` = ' . $idTax
         );
-        foreach ($froms as $i => $from) {
-            $to = isset($tos[$i]) ? $tos[$i] : '';
+        foreach ($froms as $rowIndex => $from) {
+            $to = isset($tos[$rowIndex]) ? $tos[$rowIndex] : '';
             $fromEmpty = ($from === '' || $from === false);
             $toEmpty = ($to === '' || $to === false);
             if ($fromEmpty && $toEmpty) {
