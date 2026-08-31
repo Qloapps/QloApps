@@ -1287,7 +1287,7 @@ $(document).ready(function() {
                 date_to: dateTo,
                 id_htl_booking: idHtlBooking,
                 orderEdit: orderEdit,
-                action: 'getRoomTypeBookingDemands',
+                action: 'getRoomTypeBookingServices',
                 ajax: true
             },
             success: function(result) {
