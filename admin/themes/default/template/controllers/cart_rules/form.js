@@ -147,7 +147,7 @@ function updateProductRuleShortDescription(item)
 		$('#' + id2 + '_match').val(length);
 }
 
-var restrictions = new Array('country', 'carrier', 'group', 'cart_rule', 'shop');
+var restrictions = new Array('country', 'carrier', 'group', 'hotel', 'cart_rule', 'shop');
 for (i in restrictions)
 {
 	toggleCartRuleFilter($('#' + restrictions[i] + '_restriction'));

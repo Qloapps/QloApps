@@ -220,6 +220,40 @@
 			</div>
 		{/if}
 
+		{if $hotels.unselected|@count + $hotels.selected|@count > 1}
+			<p class="checkbox">
+				<label>
+					<input type="checkbox" id="hotel_restriction" name="hotel_restriction" value="1" {if $hotels.unselected|@count}checked="checked"{/if} />
+					{l s='Hotel selection'}
+				</label>
+			</p>
+			<div id="hotel_restriction_div">
+				<br />
+				<table class="table">
+					<tr>
+						<td>
+							<p>{l s='Unselected hotels'}</p>
+							<select id="hotel_select_1" class="input-large" multiple>
+								{foreach from=$hotels.unselected item='hotel'}
+									<option value="{$hotel.id_hotel|intval}">&nbsp;{$hotel.hotel_name|escape}</option>
+								{/foreach}
+							</select>
+							<a id="hotel_select_add" class="btn btn-default btn-block clearfix" >{l s='Add'} <i class="icon-arrow-right"></i></a>
+						</td>
+						<td>
+							<p>{l s='Selected hotels'}</p>
+							<select name="hotel_select[]" class="input-large" id="hotel_select_2" multiple>
+								{foreach from=$hotels.selected item='hotel'}
+									<option value="{$hotel.id_hotel|intval}">&nbsp;{$hotel.hotel_name|escape}</option>
+								{/foreach}
+							</select>
+							<a id="hotel_select_remove" class="btn btn-default btn-block clearfix" ><i class="icon-arrow-left"></i> {l s='Remove'}</a>
+						</td>
+					</tr>
+				</table>
+			</div>
+		{/if}
+
 		{if $cart_rules.unselected|@count + $cart_rules.selected|@count > 0}
 			<p class="checkbox">
 				<label>
