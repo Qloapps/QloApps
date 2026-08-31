@@ -486,11 +486,11 @@ class HotelRoomType extends ObjectModel
                 FROM `'._DB_PREFIX_.'htl_room_information` r
                 WHERE r.`id_product` = hrt.`id_product` AND r.`id_hotel` = hrt.`id_hotel`
             ) AS total_rooms,
-            COUNT(CASE WHEN hbd.`is_cancelled` = 0 THEN hbd.`id` END) AS bookings,
-            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END), 0) AS room_nights,
-            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 THEN hbd.`total_price_tax_excl` / o.`conversion_rate` ELSE 0 END), 0) AS room_revenue,
-            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 THEN (hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate` ELSE 0 END), 0) AS tax_amount,
-            COUNT(CASE WHEN hbd.`is_cancelled` = 1 THEN hbd.`id` END) AS cancel_count
+            COUNT(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN hbd.`id` END) AS bookings,
+            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END), 0) AS room_nights,
+            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN hbd.`total_price_tax_excl` / o.`conversion_rate` ELSE 0 END), 0) AS room_revenue,
+            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN (hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate` ELSE 0 END), 0) AS tax_amount,
+            COUNT(CASE WHEN hbd.`is_refunded` = 1 THEN hbd.`id` END) AS cancel_count
             FROM `'._DB_PREFIX_.'htl_room_type` hrt
             INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hrt.`id_product`)
             INNER JOIN `'._DB_PREFIX_.'product_lang` pl
@@ -498,7 +498,7 @@ class HotelRoomType extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
                 ON (hbil.`id` = hrt.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
             LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
-                ON (hbd.`id_product` = hrt.`id_product` AND hbd.`is_refunded` = 0
+                ON (hbd.`id_product` = hrt.`id_product`
                     AND hbd.`date_from` < "'.$dateTo.' 23:59:59"
                     AND hbd.`date_to` > "'.$dateFrom.' 00:00:00")
             LEFT JOIN `'._DB_PREFIX_.'orders` o

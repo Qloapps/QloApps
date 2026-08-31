@@ -136,7 +136,6 @@
                         <th class="text-right">{l s='Total Bookings' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Room Revenue (excl. Tax)' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Extra Services Revenue' mod='qlohotelreports'}</th>
-                        <th class="text-right">{l s='Discount Amount' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Tax Amount' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Refund Amount' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Total Collection' mod='qlohotelreports'}</th>
@@ -153,7 +152,6 @@
                                 <td class="text-right">{$revenueRow.bookings|intval}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.room_revenue currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.service_revenue currency=$id_currency}</td>
-                                <td class="text-right">{displayPrice price=$revenueRow.discounts currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.tax_amount currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.refund_amount currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.total_collection currency=$id_currency}</td>
@@ -163,7 +161,7 @@
                         {/foreach}
                     {else}
                         <tr>
-                            <td class="list-empty" colspan="11">
+                            <td class="list-empty" colspan="10">
                                 <div class="list-empty-msg">
                                     <i class="icon-warning-sign list-empty-icon"></i>
                                     {l s='No revenue data found for the selected date range.' mod='qlohotelreports'}
@@ -180,7 +178,6 @@
                         <td class="text-right"><strong>{$revenue_totals.bookings}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.room_revenue currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.service_revenue currency=$id_currency}</strong></td>
-                        <td class="text-right"><strong>{displayPrice price=$revenue_totals.discounts currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.tax_amount currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.refund_amount currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.total_collection currency=$id_currency}</strong></td>

@@ -445,7 +445,7 @@ class HotelRoomInformation extends ObjectModel
     /**
      * Per-room status with current guest info for room-status report tab.
      *
-     * @param array $params date_from, date_to, id_hotel, id_product, floor, id_lang, housekeeping_installed
+     * @param array $params date_from, date_to, id_hotel, id_product, id_lang, housekeeping_installed
      * @return array
      */
     public static function getRoomStatusForReports(array $params)
@@ -456,7 +456,6 @@ class HotelRoomInformation extends ObjectModel
         $idHotel               = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
         $idProduct             = isset($params['id_product']) ? (int) $params['id_product'] : 0;
         $idLang                = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
-        $floor                 = isset($params['floor'])      ? pSQL($params['floor'])       : '';
         $housekeepingInstalled = !empty($params['housekeeping_installed']);
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -500,7 +499,6 @@ class HotelRoomInformation extends ObjectModel
             ) bkgs ON (bkgs.`id_room` = hri.`id`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = bkgs.`id_customer`)
             WHERE p.`active` = 1 AND p.`booking_product` = 1'
-            .($floor     ? ' AND hri.`floor` = "'.$floor.'"'     : '')
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
             .($idHotel ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
             ORDER BY hbil.`hotel_name`, pl.`name`, hri.`room_num`'

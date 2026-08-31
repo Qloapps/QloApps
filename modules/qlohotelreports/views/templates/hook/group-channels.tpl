@@ -75,7 +75,8 @@
             <thead>
                 <tr>
                     <th>{l s='Booking Source' mod='qlohotelreports'}</th>
-                    <th class="text-center">{l s='Total Bookings' mod='qlohotelreports'}</th>
+                    <th class="text-center">{l s='Total Orders' mod='qlohotelreports'}</th>
+                    <th class="text-center">{l s='Rooms Booked' mod='qlohotelreports'}</th>
                     <th class="text-center">{l s='Nights Sold' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='Room Revenue (excl. Tax)' mod='qlohotelreports'}</th>
                     <th class="text-right">{l s='Discount Amount' mod='qlohotelreports'}</th>
@@ -95,6 +96,7 @@
                     <tr>
                         <td>{$sourceRow.channel_label|escape:'html':'UTF-8'}</td>
                         <td class="text-center">{$sourceRow.bookings|intval}</td>
+                        <td class="text-center">{$sourceRow.rooms_booked|intval}</td>
                         <td class="text-center">{$sourceRow.room_nights|intval}</td>
                         <td class="text-right">{displayPrice price=$sourceRow.revenue_excl currency=$id_currency}</td>
                         <td class="text-right">{displayPrice price=$sourceRow.discount_amount currency=$id_currency}</td>
@@ -110,7 +112,7 @@
                     {/foreach}
                 {else}
                     <tr>
-                        <td class="list-empty" colspan="13">
+                        <td class="list-empty" colspan="14">
                             <div class="list-empty-msg">
                                 <i class="icon-warning-sign list-empty-icon"></i>
                                 {l s='No bookings found for the selected period.' mod='qlohotelreports'}
@@ -124,6 +126,7 @@
                 <tr>
                     <td><strong>{l s='Total' mod='qlohotelreports'}</strong></td>
                     <td class="text-center"><strong>{$source_totals.bookings|intval}</strong></td>
+                    <td class="text-center"><strong>{$source_totals.rooms_booked|intval}</strong></td>
                     <td class="text-center"><strong>{$source_totals.room_nights|intval}</strong></td>
                     <td class="text-right"><strong>{displayPrice price=$source_totals.revenue_excl currency=$id_currency}</strong></td>
                     <td class="text-right"><strong>{displayPrice price=$source_totals.discount_amount currency=$id_currency}</strong></td>

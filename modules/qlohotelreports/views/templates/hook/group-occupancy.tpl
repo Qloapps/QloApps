@@ -57,19 +57,6 @@
             </div>
         </div>
         {/if}
-        {if $active_report == 'room-status' && $available_floors}
-        <div class="row">
-            <label class="col-xs-3">{l s='Floor' mod='qlohotelreports'}</label>
-            <div class="col-xs-9">
-                <select name="floor" class="form-control">
-                    <option value=""{if !$filter_floor} selected="selected"{/if}>{l s='All Floors' mod='qlohotelreports'}</option>
-                    {foreach $available_floors as $fl}
-                    <option value="{$fl.floor|escape:'html':'UTF-8'}"{if $filter_floor == $fl.floor} selected="selected"{/if}>{$fl.floor|escape:'html':'UTF-8'}</option>
-                    {/foreach}
-                </select>
-            </div>
-        </div>
-        {/if}
         <div class="actions">
             <hr>
             <span class="pull-right">
@@ -177,6 +164,7 @@
                             <td class="text-center">&mdash;</td>
                             <td class="text-center">&mdash;</td>
                         </tr>
+                        <tr><td colspan="8" style="height:14px;font-size:0;line-height:0;padding:0;border-top:0 !important;border-bottom:0 !important;background:#f4f6f9;">&nbsp;</td></tr>
                         {assign var="date_total" value=0}
                         {assign var="date_booked" value=0}
                         {assign var="date_ooo" value=0}

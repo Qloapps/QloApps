@@ -129,8 +129,6 @@
                         <th class="text-right">{l s='Total (excl. Tax)' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Tax Amount' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Grand Total' mod='qlohotelreports'}</th>
-                        <th class="text-right">{l s='Balance Due' mod='qlohotelreports'}</th>
-                        <th>{l s='Payment Status' mod='qlohotelreports'}</th>
                         <th>{l s='Created By' mod='qlohotelreports'}</th>
                         <th>{l s='Booking Date' mod='qlohotelreports'}</th>
                     </tr>
@@ -159,19 +157,13 @@
                                 <td class="text-right">{displayPrice price=$reservation.total_price_tax_excl currency=$reservation.id_currency}</td>
                                 <td class="text-right">{displayPrice price=$reservation.tax_amount currency=$reservation.id_currency}</td>
                                 <td class="text-right">{displayPrice price=$reservation.total_price_tax_incl currency=$reservation.id_currency}</td>
-                                <td class="text-right">{displayPrice price=$reservation.balance_due currency=$reservation.id_currency}</td>
-                                <td>
-                                    {if $reservation.order_paid <= 0}{l s='Pending' mod='qlohotelreports'}
-                                    {elseif $reservation.balance_due > 0}{l s='Partial' mod='qlohotelreports'}
-                                    {else}{l s='Paid' mod='qlohotelreports'}{/if}
-                                </td>
                                 <td>{if $reservation.created_by}{$reservation.created_by|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{$reservation.date_add|escape:'html':'UTF-8'}</td>
                             </tr>
                         {/foreach}
                     {else}
                         <tr>
-                            <td class="list-empty" colspan="20">
+                            <td class="list-empty" colspan="18">
                                 <div class="list-empty-msg">
                                     <i class="icon-warning-sign list-empty-icon"></i>
                                     {l s='No reservations found for the selected date range and filters.' mod='qlohotelreports'}
@@ -192,7 +184,6 @@
                         <td class="text-right"><strong>{displayPrice price=$reservation_totals.total_price_tax_excl currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$reservation_totals.tax_amount currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$reservation_totals.total_price_tax_incl currency=$id_currency}</strong></td>
-                        <td class="text-right"><strong>{displayPrice price=$reservation_totals.balance_due currency=$id_currency}</strong></td>
                         <td colspan="3"></td>
                     </tr>
                 </tfoot>

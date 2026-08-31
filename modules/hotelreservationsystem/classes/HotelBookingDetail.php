@@ -4293,6 +4293,7 @@ class HotelBookingDetail extends ObjectModel
             'SELECT
                 per_order.`booking_type`,
                 COUNT(*) AS bookings,
+                SUM(per_order.`rooms_booked`) AS rooms_booked,
                 SUM(per_order.`room_nights`) AS room_nights,
                 SUM(per_order.`revenue_excl`) AS revenue_excl,
                 SUM(per_order.`revenue_incl`) AS revenue_incl,
@@ -4303,6 +4304,7 @@ class HotelBookingDetail extends ObjectModel
             FROM (
                 SELECT
                     hbd.`id_order`, hbd.`booking_type`,
+                    SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN 1 ELSE 0 END) AS rooms_booked,
                     SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
                         THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END) AS room_nights,
                     SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
@@ -4312,7 +4314,7 @@ class HotelBookingDetail extends ObjectModel
                     MAX(o.`total_discounts_tax_excl` / o.`conversion_rate`) AS discount_amount,
                     IFNULL(MAX(ord_ref.`refunded_total`), 0) AS refund_amount,
                     COUNT(*) AS total_rooms,
-                    SUM(hbd.`is_cancelled`) AS cancelled_rooms
+                    SUM(CASE WHEN hbd.`is_refunded` = 1 THEN 1 ELSE 0 END) AS cancelled_rooms
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
                 LEFT JOIN (
@@ -4462,7 +4464,8 @@ class HotelBookingDetail extends ObjectModel
         $detailedInfo = !empty($params['detailed_info']);
 
         $extraSelect = $detailedInfo
-            ? ', orr.`question` AS cancellation_reason, orr.`refunded_amount`, orr.`payment_mode` AS refund_method,
+            ? ', orr.`question` AS cancellation_reason, orr.`refunded_amount`,
+               COALESCE(NULLIF(orr.`payment_mode`, ""), IF(os.`id_order_slip` IS NOT NULL, "Credit Slip", NULL)) AS refund_method,
                orr.`date_add` AS cancellation_date, orr.`date_upd` AS processed_date,
                hbd.`date_add` AS booking_date,
                orsl.`name` AS refund_status, hbd.`total_price_tax_incl`, o.`id_currency`,
@@ -4493,6 +4496,7 @@ class HotelBookingDetail extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'order_return_state_lang` orsl
                 ON (orsl.`id_order_return_state` = orr.`state` AND orsl.`id_lang` = '.(int) $idLang.')
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
+            LEFT JOIN `'._DB_PREFIX_.'order_slip` os ON (os.`id_order` = orr.`id_order`)
             WHERE hbd.`is_refunded` = 1
             AND orr.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             . ($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
@@ -4541,58 +4545,6 @@ class HotelBookingDetail extends ObjectModel
         }
 
         return $result;
-    }
-
-    /**
-     * Guest directory — one row per customer with lifetime stay stats and contact info.
-     * Date range (if given) filters by last stay date (HAVING), keeping lifetime aggregates accurate.
-     *
-     * @param array $params date_from, date_to, id_hotel, id_product, id_lang
-     * @return array
-     */
-    public static function getGuestDirectory(array $params)
-    {
-        $dateFrom  = isset($params['date_from']) ? pSQL($params['date_from']) : '';
-        $dateTo    = isset($params['date_to'])   ? pSQL($params['date_to'])   : '';
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
-        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
-        $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
-        if (!$idLang) {
-            $idLang = Context::getContext()->language->id;
-        }
-
-        return Db::getInstance()->executeS(
-            'SELECT c.`id_customer`,
-            CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
-            c.`email`,
-            c.`phone`, a.`address1`, a.`address2`, a.`city`, a.`postcode`, a.`vat_number`, a.`company`,
-            cl.`name` AS country,
-            st.`name` AS state,
-            COUNT(DISTINCT hbd.`id_order`) AS total_stays,
-            SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total_nights,
-            IFNULL(SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`), 0) AS lifetime_revenue,
-            IFNULL(SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`) / NULLIF(COUNT(DISTINCT hbd.`id_order`), 0), 0) AS avg_spend_per_stay,
-            MAX(hbd.`date_from`) AS last_stay
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
-            INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
-            LEFT JOIN `'._DB_PREFIX_.'address` a
-                ON (a.`id_customer` = c.`id_customer` AND a.`deleted` = 0
-                AND a.`id_address` = (SELECT MAX(`id_address`) FROM `'._DB_PREFIX_.'address`
-                    WHERE `id_customer` = c.`id_customer` AND `deleted` = 0))
-            LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
-                ON (cl.`id_country` = a.`id_country` AND cl.`id_lang` = '.(int) $idLang.')
-            LEFT JOIN `'._DB_PREFIX_.'state` st ON (st.`id_state` = a.`id_state`)
-            WHERE hbd.`is_cancelled` = 0
-            AND hbd.`is_refunded` = 0'
-            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
-            GROUP BY c.`id_customer`'
-            .($dateFrom && $dateTo
-                ? ' HAVING MAX(IF(hbd.`date_from` <= "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'", 1, 0)) = 1'
-                : '').'
-            ORDER BY total_stays DESC, lifetime_revenue DESC'
-        );
     }
 
     /**

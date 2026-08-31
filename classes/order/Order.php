@@ -3281,4 +3281,56 @@ class OrderCore extends ObjectModel
             .$hotelExists
         );
     }
+
+    /**
+     * Guest directory — one row per customer with lifetime stay stats and contact info.
+     * Date range (if given) filters by stay overlap (HAVING).
+     *
+     * @param array $params date_from, date_to, id_hotel, id_product, id_lang
+     * @return array
+     */
+    public static function getGuestDirectory(array $params)
+    {
+        $dateFrom  = isset($params['date_from']) ? pSQL($params['date_from']) : '';
+        $dateTo    = isset($params['date_to'])   ? pSQL($params['date_to'])   : '';
+        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+        $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT c.`id_customer`,
+            CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
+            c.`email`,
+            c.`phone`, a.`address1`, a.`address2`, a.`city`, a.`postcode`, a.`vat_number`, a.`company`,
+            cl.`name` AS country,
+            st.`name` AS state,
+            COUNT(DISTINCT o.`id_order`) AS total_stays,
+            SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total_nights,
+            IFNULL(SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`), 0) AS lifetime_revenue,
+            IFNULL(SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`) / NULLIF(COUNT(DISTINCT o.`id_order`), 0), 0) AS avg_spend_per_stay,
+            MAX(hbd.`date_from`) AS last_stay
+            FROM `'._DB_PREFIX_.'orders` o
+            INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
+            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0)
+            LEFT JOIN `'._DB_PREFIX_.'address` a
+                ON (a.`id_customer` = c.`id_customer` AND a.`deleted` = 0
+                AND a.`id_address` = (SELECT MAX(`id_address`) FROM `'._DB_PREFIX_.'address`
+                    WHERE `id_customer` = c.`id_customer` AND `deleted` = 0))
+            LEFT JOIN `'._DB_PREFIX_.'country_lang` cl
+                ON (cl.`id_country` = a.`id_country` AND cl.`id_lang` = '.(int) $idLang.')
+            LEFT JOIN `'._DB_PREFIX_.'state` st ON (st.`id_state` = a.`id_state`)
+            WHERE o.`valid` = 1'
+            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            GROUP BY c.`id_customer`'
+            .($dateFrom && $dateTo
+                ? ' HAVING MAX(IF(hbd.`date_from` <= "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'", 1, 0)) = 1'
+                : '').'
+            ORDER BY total_stays DESC, lifetime_revenue DESC'
+        );
+    }
 }
