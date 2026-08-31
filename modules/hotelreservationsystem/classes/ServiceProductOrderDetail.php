@@ -740,8 +740,7 @@ class ServiceProductOrderDetail extends ObjectModel
         $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
 
-        $result  = array();
-        $current = $dateFrom;
+        $result = array();
 
         $whereFilters =
             ($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
@@ -757,23 +756,23 @@ class ServiceProductOrderDetail extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)';
 
-        while ($current <= $dateTo) {
-            $ts  = strtotime($current);
-            $row = Db::getInstance()->getRow(
-                'SELECT
-                IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0) AS service_revenue,
-                IFNULL(SUM((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount
-                '.$joins.'
-                WHERE p.`active` = 1 AND o.`valid` = 1 AND hbd.`is_refunded` = 0
-                AND spod.`is_cancelled` = 0
-                AND o.`invoice_date` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
-                .$whereFilters
-            );
+        $rows = Db::getInstance()->executeS(
+            'SELECT DATE(o.`date_add`) AS grp_date,
+            IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0) AS service_revenue,
+            IFNULL(SUM((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount
+            '.$joins.'
+            WHERE p.`active` = 1 AND o.`valid` = 1
+            AND spod.`is_cancelled` = 0
+            AND o.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
+            .$whereFilters.'
+            GROUP BY DATE(o.`date_add`)'
+        );
+        foreach ($rows as $row) {
+            $ts = strtotime($row['grp_date']);
             $result[$ts] = array(
                 'service_revenue' => (float) $row['service_revenue'],
                 'tax_amount'      => (float) $row['tax_amount'],
             );
-            $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
         }
 
         return $result;

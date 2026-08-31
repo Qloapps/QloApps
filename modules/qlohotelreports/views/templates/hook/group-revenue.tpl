@@ -72,18 +72,6 @@
                 </div>
             </div>
             {/if}
-            {if $active_report == 'outstanding'}
-            <div class="row">
-                <label class="col-xs-3">{l s='Booking Status' mod='qlohotelreports'}</label>
-                <div class="col-xs-9">
-                    <select name="outstanding_status" class="form-control">
-                        <option value="0"{if !$filter_outstanding_status} selected="selected"{/if}>{l s='All' mod='qlohotelreports'}</option>
-                        <option value="2"{if $filter_outstanding_status == 2} selected="selected"{/if}>{l s='Checked-in' mod='qlohotelreports'}</option>
-                        <option value="3"{if $filter_outstanding_status == 3} selected="selected"{/if}>{l s='Checked-out' mod='qlohotelreports'}</option>
-                    </select>
-                </div>
-            </div>
-            {/if}
             {if $active_report == 'payment' && $payment_methods}
             <div class="row">
                 <label class="col-xs-3">{l s='Payment Method' mod='qlohotelreports'}</label>
@@ -144,7 +132,7 @@
                 <thead>
                     <tr>
                         <th>{l s='Date / Period' mod='qlohotelreports'}</th>
-                        <th class="text-right">{l s='Rooms Sold' mod='qlohotelreports'}</th>
+                        <th class="text-right">{l s='Rooms Booked' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Total Bookings' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Room Revenue (excl. Tax)' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Extra Services Revenue' mod='qlohotelreports'}</th>
@@ -154,8 +142,6 @@
                         <th class="text-right">{l s='Total Collection' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Net Revenue' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='ADR (Avg. Daily Rate)' mod='qlohotelreports'}</th>
-                        <th class="text-right">{l s='RevPAR (Rev. Per Avail. Room)' mod='qlohotelreports'}</th>
-                        <th class="text-right">{l s='Occupancy %' mod='qlohotelreports'}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -173,13 +159,11 @@
                                 <td class="text-right">{displayPrice price=$revenueRow.total_collection currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.net_revenue currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$revenueRow.adr currency=$id_currency}</td>
-                                <td class="text-right">{displayPrice price=$revenueRow.revpar currency=$id_currency}</td>
-                                <td class="text-right">{$revenueRow.occupancy_pct|string_format:"%.1f"}%</td>
                             </tr>
                         {/foreach}
                     {else}
                         <tr>
-                            <td class="list-empty" colspan="13">
+                            <td class="list-empty" colspan="11">
                                 <div class="list-empty-msg">
                                     <i class="icon-warning-sign list-empty-icon"></i>
                                     {l s='No revenue data found for the selected date range.' mod='qlohotelreports'}
@@ -201,7 +185,7 @@
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.refund_amount currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.total_collection currency=$id_currency}</strong></td>
                         <td class="text-right"><strong>{displayPrice price=$revenue_totals.net_revenue currency=$id_currency}</strong></td>
-                        <td colspan="3"></td>
+                        <td></td>
                     </tr>
                 </tfoot>
                 {/if}
@@ -221,7 +205,7 @@
                     <tr>
                         <th>{l s='Refund Date' mod='qlohotelreports'}</th>
                         <th>{l s='Refund ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
                         <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Original Booking Amount' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Refund Amount' mod='qlohotelreports'}</th>
@@ -281,7 +265,7 @@
                     <tr>
                         <th>{l s='Payment Date' mod='qlohotelreports'}</th>
                         <th>{l s='Payment ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
                         <th>{l s='Booking Ref.' mod='qlohotelreports'}</th>
                         <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th>{l s='Payment Method' mod='qlohotelreports'}</th>
@@ -442,20 +426,14 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
                         <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th>{l s='Guest Email' mod='qlohotelreports'}</th>
                         <th>{l s='Guest Phone' mod='qlohotelreports'}</th>
-                        <th>{l s='Room Type' mod='qlohotelreports'}</th>
-                        <th>{l s='Room No.' mod='qlohotelreports'}</th>
-                        <th>{l s='Check-in Date' mod='qlohotelreports'}</th>
-                        <th>{l s='Check-out Date' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Total Charges' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Total Paid' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Outstanding Balance' mod='qlohotelreports'}</th>
-                        <th class="text-center">{l s='Days Overdue' mod='qlohotelreports'}</th>
                         <th>{l s='Last Payment Date' mod='qlohotelreports'}</th>
-                        <th>{l s='Booking Status' mod='qlohotelreports'}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -466,23 +444,15 @@
                                 <td>{$outstandingRow.customer_name|escape:'html':'UTF-8'}</td>
                                 <td>{if $outstandingRow.email}{$outstandingRow.email|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $outstandingRow.phone}{$outstandingRow.phone|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
-                                <td>{$outstandingRow.room_type_name|escape:'html':'UTF-8'}</td>
-                                <td>{$outstandingRow.room_num|escape:'html':'UTF-8'}</td>
-                                <td>{$outstandingRow.date_from|escape:'html':'UTF-8'}</td>
-                                <td>{$outstandingRow.date_to|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{displayPrice price=$outstandingRow.total_charges currency=$id_currency}</td>
                                 <td class="text-right">{displayPrice price=$outstandingRow.total_paid currency=$id_currency}</td>
                                 <td class="text-right qlo-text-danger">{displayPrice price=$outstandingRow.balance_due currency=$id_currency}</td>
-                                <td class="text-center">{$outstandingRow.days_overdue|intval}</td>
                                 <td>{if $outstandingRow.last_payment_date}{$outstandingRow.last_payment_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
-                                <td>
-                                    {if isset($booking_statuses[$outstandingRow.id_status])}{$booking_statuses[$outstandingRow.id_status]|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}
-                                </td>
                             </tr>
                         {/foreach}
                     {else}
                         <tr>
-                            <td class="list-empty" colspan="14">
+                            <td class="list-empty" colspan="8">
                                 <div class="list-empty-msg">
                                     <i class="icon-warning-sign list-empty-icon"></i>
                                     {l s='No outstanding balances found for the selected date range.' mod='qlohotelreports'}
@@ -494,9 +464,9 @@
                 {if $outstanding}
                 <tfoot>
                     <tr class="qlo-report-totals">
-                        <td colspan="10"><strong>{l s='Total Outstanding' mod='qlohotelreports'}</strong></td>
+                        <td colspan="6"><strong>{l s='Total Outstanding' mod='qlohotelreports'}</strong></td>
                         <td class="text-right qlo-text-danger"><strong>{displayPrice price=$total_outstanding currency=$id_currency}</strong></td>
-                        <td colspan="3"></td>
+                        <td></td>
                     </tr>
                 </tfoot>
                 {/if}

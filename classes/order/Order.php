@@ -3186,26 +3186,25 @@ class OrderCore extends ObjectModel
     /**
      * Orders with unpaid balance for the outstanding-payments report.
      *
-     * @param array $params date_from, date_to, id_hotel, id_product, id_status
+     * @param array $params date_from, date_to, id_hotel, id_order
      * @return array
      */
     public static function getOutstandingBalance(array $params)
     {
-        $dateFrom  = pSQL($params['date_from']);
-        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
-        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
-        $idStatus  = isset($params['id_status'])  ? (int) $params['id_status']  : 0;
+        $dateFrom = pSQL($params['date_from']);
+        $dateTo   = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idHotel  = isset($params['id_hotel'])  ? $params['id_hotel']         : false;
+        $idOrder  = isset($params['id_order'])  ? (int) $params['id_order']  : 0;
+
+        $hotelExists = $idHotel
+            ? ' AND EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = o.`id_order`'
+              .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').')'
+            : '';
 
         return Db::getInstance()->executeS(
             'SELECT o.`id_order`, o.`reference`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             c.`email`, a.`phone`,
-            MIN(hbd.`room_type_name`) AS room_type_name,
-            MIN(hbd.`room_num`) AS room_num,
-            MIN(hbd.`date_from`) AS date_from,
-            MAX(hbd.`date_to`) AS date_to,
-            MIN(hbd.`id_status`) AS id_status,
             o.`total_paid_tax_incl` / o.`conversion_rate` AS total_charges,
             IFNULL((
                 SELECT SUM(op.`amount`)
@@ -3217,7 +3216,6 @@ class OrderCore extends ObjectModel
                 FROM `'._DB_PREFIX_.'order_payment` op
                 WHERE op.`order_reference` = o.`reference`
             ), 0)) / o.`conversion_rate` AS balance_due,
-            GREATEST(0, DATEDIFF(CURDATE(), MAX(hbd.`date_to`))) AS days_overdue,
             (
                 SELECT MAX(op.`date_add`)
                 FROM `'._DB_PREFIX_.'order_payment` op
@@ -3225,16 +3223,11 @@ class OrderCore extends ObjectModel
             ) AS last_payment_date
             FROM `'._DB_PREFIX_.'orders` o
             INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
-            INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
-                ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0)
-            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
             LEFT JOIN `'._DB_PREFIX_.'address` a ON (a.`id_address` = o.`id_address_invoice`)
             WHERE o.`valid` = 1
-            AND hbd.`date_from` BETWEEN "'.$dateFrom.'" AND "'.$dateTo.'"'
-            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
-            .($idStatus  ? ' AND hbd.`id_status` = '.$idStatus   : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
-            GROUP BY o.`id_order`
+            AND o.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .($idOrder ? ' AND o.`id_order` = '.$idOrder : '')
+            .$hotelExists.'
             HAVING balance_due > 0.01
             ORDER BY balance_due DESC'
         );
@@ -3267,10 +3260,10 @@ class OrderCore extends ObjectModel
                 IFNULL(SUM(o.`total_discounts_tax_excl` / o.`conversion_rate`), 0) AS amt
                 FROM `'._DB_PREFIX_.'orders` o
                 WHERE o.`valid` = 1
-                AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+                AND o.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
                 .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
                 .$hotelExists.'
-                GROUP BY LEFT(o.`invoice_date`, 10)'
+                GROUP BY LEFT(o.`date_add`, 10)'
             );
             $result = array();
             foreach ($rows as $row) {
@@ -3283,7 +3276,7 @@ class OrderCore extends ObjectModel
             'SELECT IFNULL(SUM(o.`total_discounts_tax_excl` / o.`conversion_rate`), 0)
             FROM `'._DB_PREFIX_.'orders` o
             WHERE o.`valid` = 1
-            AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            AND o.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
             .$hotelExists
         );

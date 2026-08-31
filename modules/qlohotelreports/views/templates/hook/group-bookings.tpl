@@ -113,13 +113,13 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest Contact' mod='qlohotelreports'}</th>
                         <th>{l s='Room Type' mod='qlohotelreports'}</th>
                         <th>{l s='Room No.' mod='qlohotelreports'}</th>
                         <th>{l s='Check-in Date' mod='qlohotelreports'}</th>
                         <th>{l s='Check-out Date' mod='qlohotelreports'}</th>
+                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Contact' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Nights' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Adults' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Children' mod='qlohotelreports'}</th>
@@ -139,13 +139,13 @@
                     {if $reservations}
                         {foreach $reservations as $reservation}
                             <tr>
-                                <td>{$reservation.id_order|intval}</td>
-                                <td>{$reservation.customer_name|escape:'html':'UTF-8'}</td>
-                                <td>{if $reservation.phone}{$reservation.phone|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{$reservation.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$reservation.room_num|escape:'html':'UTF-8'}</td>
                                 <td>{$reservation.hotel_check_in|escape:'html':'UTF-8'}</td>
                                 <td>{$reservation.hotel_check_out|escape:'html':'UTF-8'}</td>
+                                <td>{$reservation.id_order|intval}</td>
+                                <td>{$reservation.customer_name|escape:'html':'UTF-8'}</td>
+                                <td>{if $reservation.phone}{$reservation.phone|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td class="text-right">{$reservation.nights|intval}</td>
                                 <td class="text-right">{$reservation.adults|intval}</td>
                                 <td class="text-right">{$reservation.children|intval}</td>
@@ -211,11 +211,11 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th>{l s='Room Type' mod='qlohotelreports'}</th>
                         <th>{l s='Room No.' mod='qlohotelreports'}</th>
                         <th>{l s='Check-in Date' mod='qlohotelreports'}</th>
+                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
                         <th>{l s='Cancellation Date' mod='qlohotelreports'}</th>
                         <th>{l s='Cancellation Reason' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Refund Amount' mod='qlohotelreports'}</th>
@@ -227,11 +227,11 @@
                     {if $cancellations}
                         {foreach $cancellations as $cancellation}
                             <tr>
-                                <td>{$cancellation.id_order|intval}</td>
-                                <td>{$cancellation.customer_name|escape:'html':'UTF-8'}</td>
                                 <td>{$cancellation.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$cancellation.room_num|escape:'html':'UTF-8'}</td>
                                 <td>{$cancellation.hotel_check_in|escape:'html':'UTF-8'}</td>
+                                <td>{$cancellation.id_order|intval}</td>
+                                <td>{$cancellation.customer_name|escape:'html':'UTF-8'}</td>
                                 <td>{if $cancellation.cancellation_date}{$cancellation.cancellation_date|date_format:'%d-%m-%Y'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td>{if $cancellation.cancellation_reason}{$cancellation.cancellation_reason|escape:'html':'UTF-8'}{else}<span class="text-muted">—</span>{/if}</td>
                                 <td class="text-right">{displayPrice price=$cancellation.refunded_amount currency=$cancellation.id_currency}</td>
@@ -273,13 +273,13 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
-                        <th>{l s='Hotel' mod='qlohotelreports'}</th>
                         <th>{l s='Room Type' mod='qlohotelreports'}</th>
                         <th>{l s='Room No.' mod='qlohotelreports'}</th>
                         <th>{l s='Check-in' mod='qlohotelreports'}</th>
                         <th>{l s='Check-out' mod='qlohotelreports'}</th>
+                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
+                        <th>{l s='Hotel' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Nights' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Adults' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Children' mod='qlohotelreports'}</th>
@@ -290,13 +290,13 @@
                     {if $arrivals}
                         {foreach $arrivals as $arrival}
                             <tr>
-                                <td>{$arrival.id_order|intval}</td>
-                                <td>{$arrival.customer_name|escape:'html':'UTF-8'}</td>
-                                <td>{$arrival.hotel_name|escape:'html':'UTF-8'}</td>
                                 <td>{$arrival.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$arrival.room_num|escape:'html':'UTF-8'}</td>
                                 <td>{$arrival.actual_checkin|escape:'html':'UTF-8'}</td>
                                 <td>{$arrival.actual_checkout|escape:'html':'UTF-8'}</td>
+                                <td>{$arrival.id_order|intval}</td>
+                                <td>{$arrival.customer_name|escape:'html':'UTF-8'}</td>
+                                <td>{$arrival.hotel_name|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$arrival.los|intval}</td>
                                 <td class="text-right">{$arrival.adults|intval}</td>
                                 <td class="text-right">{$arrival.children|intval}</td>
@@ -339,13 +339,13 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
-                        <th>{l s='Hotel' mod='qlohotelreports'}</th>
                         <th>{l s='Room Type' mod='qlohotelreports'}</th>
                         <th>{l s='Room No.' mod='qlohotelreports'}</th>
                         <th>{l s='Check-in' mod='qlohotelreports'}</th>
                         <th>{l s='Check-out' mod='qlohotelreports'}</th>
+                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
+                        <th>{l s='Hotel' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Nights' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Adults' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Children' mod='qlohotelreports'}</th>
@@ -356,13 +356,13 @@
                     {if $departures}
                         {foreach $departures as $departure}
                             <tr>
-                                <td>{$departure.id_order|intval}</td>
-                                <td>{$departure.customer_name|escape:'html':'UTF-8'}</td>
-                                <td>{$departure.hotel_name|escape:'html':'UTF-8'}</td>
                                 <td>{$departure.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$departure.room_num|escape:'html':'UTF-8'}</td>
                                 <td>{$departure.actual_checkin|escape:'html':'UTF-8'}</td>
                                 <td>{$departure.actual_checkout|escape:'html':'UTF-8'}</td>
+                                <td>{$departure.id_order|intval}</td>
+                                <td>{$departure.customer_name|escape:'html':'UTF-8'}</td>
+                                <td>{$departure.hotel_name|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$departure.los|intval}</td>
                                 <td class="text-right">{$departure.adults|intval}</td>
                                 <td class="text-right">{$departure.children|intval}</td>
@@ -408,13 +408,13 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>{l s='Booking ID' mod='qlohotelreports'}</th>
-                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
-                        <th>{l s='Hotel' mod='qlohotelreports'}</th>
                         <th>{l s='Room Type' mod='qlohotelreports'}</th>
                         <th>{l s='Room No.' mod='qlohotelreports'}</th>
                         <th>{l s='Check-in' mod='qlohotelreports'}</th>
                         <th>{l s='Check-out' mod='qlohotelreports'}</th>
+                        <th>{l s='Order ID' mod='qlohotelreports'}</th>
+                        <th>{l s='Guest Name' mod='qlohotelreports'}</th>
+                        <th>{l s='Hotel' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Nights' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Adults' mod='qlohotelreports'}</th>
                         <th class="text-right">{l s='Children' mod='qlohotelreports'}</th>
@@ -425,13 +425,13 @@
                     {if $in_house}
                         {foreach $in_house as $inHouseGuest}
                             <tr>
-                                <td>{$inHouseGuest.id_order|intval}</td>
-                                <td>{$inHouseGuest.customer_name|escape:'html':'UTF-8'}</td>
-                                <td>{$inHouseGuest.hotel_name|escape:'html':'UTF-8'}</td>
                                 <td>{$inHouseGuest.room_type_name|escape:'html':'UTF-8'}</td>
                                 <td>{$inHouseGuest.room_num|escape:'html':'UTF-8'}</td>
                                 <td>{$inHouseGuest.actual_checkin|escape:'html':'UTF-8'}</td>
                                 <td>{$inHouseGuest.actual_checkout|escape:'html':'UTF-8'}</td>
+                                <td>{$inHouseGuest.id_order|intval}</td>
+                                <td>{$inHouseGuest.customer_name|escape:'html':'UTF-8'}</td>
+                                <td>{$inHouseGuest.hotel_name|escape:'html':'UTF-8'}</td>
                                 <td class="text-right">{$inHouseGuest.los|intval}</td>
                                 <td class="text-right">{$inHouseGuest.adults|intval}</td>
                                 <td class="text-right">{$inHouseGuest.children|intval}</td>

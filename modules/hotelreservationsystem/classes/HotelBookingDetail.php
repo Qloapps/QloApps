@@ -3953,6 +3953,35 @@ class HotelBookingDetail extends ObjectModel
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
 
+        if (isset($params['date_type']) && $params['date_type'] === 'created') {
+            $rows = Db::getInstance()->executeS(
+                'SELECT DATE(o.`date_add`) AS grp_date,
+                IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS room_revenue,
+                IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount,
+                SUM(CASE WHEN hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0 THEN 1 ELSE 0 END) AS rooms_booked,
+                SUM(CASE WHEN hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
+                    THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END) AS room_nights
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
+                LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+                WHERE p.`active` = 1 AND o.`valid` = 1
+                AND o.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
+                .$whereFilters.'
+                GROUP BY DATE(o.`date_add`)'
+            );
+            $result = array();
+            foreach ($rows as $row) {
+                $ts = strtotime($row['grp_date']);
+                $result[$ts] = array(
+                    'room_revenue' => (float) $row['room_revenue'],
+                    'tax_amount'   => (float) $row['tax_amount'],
+                    'rooms_booked' => (int) $row['rooms_booked'],
+                    'room_nights'  => (int) $row['room_nights'],
+                );
+            }
+            return $result;
+        }
+
         while ($current <= $dateTo) {
             $nextDay = date('Y-m-d', strtotime('+1 day', strtotime($current)));
             $ts  = strtotime($current);
@@ -4258,6 +4287,8 @@ class HotelBookingDetail extends ObjectModel
         $bookingType      = isset($params['booking_type']) ? (int) $params['booking_type'] : 0;
         $hotelRestriction = HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
 
+        $dateToNext = pSQL(date('Y-m-d', strtotime('+1 day', strtotime($dateTo))));
+
         $rows = Db::getInstance()->executeS(
             'SELECT
                 per_order.`booking_type`,
@@ -4267,16 +4298,21 @@ class HotelBookingDetail extends ObjectModel
                 SUM(per_order.`revenue_incl`) AS revenue_incl,
                 SUM(per_order.`discount_amount`) AS discount_amount,
                 SUM(per_order.`refund_amount`) AS refund_amount,
-                SUM(per_order.`has_cancellation`) AS cancellations
+                SUM(per_order.`total_rooms`) AS total_rooms,
+                SUM(per_order.`cancelled_rooms`) AS cancellations
             FROM (
                 SELECT
                     hbd.`id_order`, hbd.`booking_type`,
-                    IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0) AS room_nights,
-                    IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS revenue_excl,
-                    IFNULL(SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`), 0) AS revenue_incl,
+                    SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
+                        THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END) AS room_nights,
+                    SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
+                        THEN hbd.`total_price_tax_excl` / o.`conversion_rate` ELSE 0 END) AS revenue_excl,
+                    SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
+                        THEN hbd.`total_price_tax_incl` / o.`conversion_rate` ELSE 0 END) AS revenue_incl,
                     MAX(o.`total_discounts_tax_excl` / o.`conversion_rate`) AS discount_amount,
                     IFNULL(MAX(ord_ref.`refunded_total`), 0) AS refund_amount,
-                    IF(MAX(ord_ref.`id_order`) IS NOT NULL, 1, 0) AS has_cancellation
+                    COUNT(*) AS total_rooms,
+                    SUM(hbd.`is_cancelled`) AS cancelled_rooms
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
                 LEFT JOIN (
@@ -4284,9 +4320,8 @@ class HotelBookingDetail extends ObjectModel
                     FROM `'._DB_PREFIX_.'order_return`
                     GROUP BY `id_order`
                 ) ord_ref ON (ord_ref.`id_order` = hbd.`id_order`)
-                WHERE hbd.`is_cancelled` = 0
-                AND hbd.`is_refunded` = 0
-                AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+                WHERE hbd.`date_from` < "'.$dateToNext.'"
+                AND hbd.`date_to` > "'.$dateFrom.'"'
                 .($idCustomer  ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
                 .($bookingType ? ' AND hbd.`booking_type` = '.$bookingType : '')
                 .$hotelRestriction.'
@@ -4311,8 +4346,8 @@ class HotelBookingDetail extends ObjectModel
                 ? (float) $row['revenue_excl'] / (float) $row['room_nights'] : 0.0;
             $row['contribution_pct'] = $totalRevExcl > 0
                 ? round((float) $row['revenue_excl'] / $totalRevExcl * 100, 1) : 0.0;
-            $row['cancel_rate_pct']  = (int) $row['bookings'] > 0
-                ? round((float) $row['cancellations'] / (int) $row['bookings'] * 100, 1) : 0.0;
+            $row['cancel_rate_pct']  = (int) $row['total_rooms'] > 0
+                ? round((float) $row['cancellations'] / (int) $row['total_rooms'] * 100, 1) : 0.0;
         }
         unset($row);
         return $rows;
@@ -4409,8 +4444,9 @@ class HotelBookingDetail extends ObjectModel
     }
 
     /**
-     * Cancelled/refunded booking rows in a date range, one row per booking (ORDER RETURN based).
-     * AdminStatsController::getCancellationsInfoByDate() is single-date only; this covers ranges.
+     * Refunded booking rows in a date range, one row per booking (requires ORDER RETURN record).
+     * QloApps sets is_refunded=1 on all freed/refunded rooms; is_cancelled is not reliably set.
+     * Refund report filters this further to refunded_amount > 0 in the caller; Cancellation report shows all rows.
      *
      * @param array $params date_from, date_to, id_hotel, id_customer, id_product, detailed_info
      * @return array
@@ -4664,112 +4700,6 @@ class HotelBookingDetail extends ObjectModel
                 .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
             );
             $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
-        }
-
-        return $result;
-    }
-
-    /**
-     * Average Daily Rate: room revenue / total room-nights sold (invoice_date filter).
-     * Wrapper accepting array $params for use in hotel-comparison loops.
-     *
-     * @param array $params date_from, date_to, id_hotel, id_product
-     * @return float
-     */
-    public static function getAverageDailyRate(array $params)
-    {
-        $dateFrom  = pSQL($params['date_from']);
-        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']           : false;
-        $idProduct = isset($params['id_product']) ? (int) $params['id_product']  : 0;
-
-        $roomNights = (int) Db::getInstance()->getValue(
-            'SELECT IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
-            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-            WHERE p.`active` = 1
-            AND o.`valid` = 1
-            AND hbd.`is_refunded` = 0
-            AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-            .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
-        );
-
-        $revenue = self::getTotalRoomRevenue($params);
-
-        return $roomNights ? ((float) $revenue / $roomNights) : 0.0;
-    }
-
-    /**
-     * Occupancy rate (0–100) for a date range.
-     * Wrapper accepting array $params for use in hotel-comparison loops.
-     * Uses AdminStatsController::getOccupiedRoomsForDiscreteDates() + getTotalRooms().
-     *
-     * @param array $params date_from, date_to, id_hotel
-     * @return float 0–100
-     */
-    public static function getOccupancyRate(array $params)
-    {
-        $dateFrom = $params['date_from'];
-        $dateTo   = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
-
-        $numNights  = max(1, (int)(new DateTime($dateTo))->diff(new DateTime($dateFrom))->days + 1);
-        $totalRooms = (int) AdminStatsController::getTotalRooms($idHotel !== false ? $idHotel : null, 1);
-
-        if (!$totalRooms) {
-            return 0.0;
-        }
-
-        $occupiedNights = array_sum(AdminStatsController::getOccupiedRoomsForDiscreteDates($dateFrom, $dateTo, $idHotel));
-
-        return ($occupiedNights / ($totalRooms * $numNights)) * 100;
-    }
-
-    /**
-     * Revenue Per Available Room for a date range.
-     * Wrapper accepting array $params for use in hotel-comparison loops.
-     *
-     * @param array $params date_from, date_to, id_hotel
-     * @return float
-     */
-    public static function getRevPAR(array $params)
-    {
-        $dateFrom = $params['date_from'];
-        $dateTo   = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
-
-        $numNights  = max(1, (int)(new DateTime($dateTo))->diff(new DateTime($dateFrom))->days + 1);
-        $totalRooms = (int) AdminStatsController::getTotalRooms($idHotel !== false ? $idHotel : null, 1);
-
-        if (!$totalRooms || !$numNights) {
-            return 0.0;
-        }
-
-        return (float) self::getTotalRoomRevenue($params) / ($totalRooms * $numNights);
-    }
-
-    /**
-     * RevPAR per night across a date range.
-     * AdminStatsController has no daily RevPAR; uses discrete-date functions from AdminStats.
-     *
-     * @param array $params date_from, date_to, id_hotel
-     * @return array timestamp => float
-     */
-    public static function getDatewiseRevPAR(array $params)
-    {
-        $dateFrom = $params['date_from'];
-        $dateTo   = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
-
-        $revenueByNight    = AdminStatsController::getRoomsRevenueForDiscreteDates($dateFrom, $dateTo, $idHotel);
-        $totalRoomsByNight = AdminStatsController::getTotalRoomsForDiscreteDates($dateFrom, $dateTo, $idHotel);
-
-        $result = array();
-        foreach ($revenueByNight as $ts => $revenue) {
-            $total       = isset($totalRoomsByNight[$ts]) ? (int) $totalRoomsByNight[$ts] : 0;
-            $result[$ts] = $total ? ((float) $revenue / $total) : 0.0;
         }
 
         return $result;
