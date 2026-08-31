@@ -258,8 +258,8 @@ var GoogleMapsManager = {
         }
     },
     setFormVars: function(params) {
-        $('#loclatitude').val(params.lat);
-        $('#loclongitude').val(params.lng);
+        $('#loclatitude').val(Number(params.lat).toFixed(8));
+        $('#loclongitude').val(Number(params.lng).toFixed(8));
         $('#locformatedAddr').val(params.formattedAddress);
         $('#googleInputField').val(params.inputText);
     },

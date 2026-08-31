@@ -289,13 +289,13 @@
 					<div class="form-group">
 						<label class="control-label col-sm-3" for="loclatitude">{l s='Latitude :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<input class="form-control" type="text" id="loclatitude" name="loclatitude" value="{if isset($smarty.post.loclatitude)}{$smarty.post.loclatitude|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.latitude|escape:'htmlall':'UTF-8'}{/if}" />
+							<input class="form-control" type="text" id="loclatitude" name="loclatitude" value="{if isset($smarty.post.loclatitude)}{$smarty.post.loclatitude|escape:'htmlall':'UTF-8'}{elseif isset($edit) && $hotel_info.latitude != 0}{$hotel_info.latitude|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-3" for="loclongitude">{l s='Longitude :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<input class="form-control" type="text" id="loclongitude" name="loclongitude" value="{if isset($smarty.post.loclongitude)}{$smarty.post.loclongitude|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
+							<input class="form-control" type="text" id="loclongitude" name="loclongitude" value="{if isset($smarty.post.loclongitude)}{$smarty.post.loclongitude|escape:'htmlall':'UTF-8'}{elseif isset($edit) && $hotel_info.longitude != 0}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
