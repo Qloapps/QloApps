@@ -1048,7 +1048,7 @@ $(document).ready(function() {
 			actualizeRefundVoucher();
 	});
 
-    // click on back button on created additional service edit
+    // click on back button on created extra service edit
     $(document).on('click', '#back_to_service_btn', function() {
         $('.room_ordered_services').show();
         $('#btn_new_existing_room_service').show();

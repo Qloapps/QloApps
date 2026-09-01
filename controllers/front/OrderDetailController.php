@@ -231,7 +231,7 @@ class OrderDetailControllerCore extends FrontController
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
 
                                 $cartHotelData[$type_key]['hotel_name'] = $data_v['hotel_name'];
-                                // add additional services products in hotel detail.
+                                // add extra services products in hotel detail.
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services'] = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                                     $id_order,
                                     0,

@@ -1034,7 +1034,7 @@ class AdminOrdersControllerCore extends AdminController
                     $smartyVars['additionalServices'] = $additionalServices[$productLineData['id']];
                 }
 
-                // get room type additional services
+                // get room type extra services
                 if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                     // get all services
                     $objProduct = new Product();
@@ -1077,7 +1077,7 @@ class AdminOrdersControllerCore extends AdminController
 
                     }
                 }
-                
+
                 $smartyVars['serviceProducts'] = $serviceProducts;
                 $objOrderReturn = new OrderReturn();
                 $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrder->id, 0, 1);
@@ -8266,7 +8266,7 @@ class AdminOrdersControllerCore extends AdminController
                 }
             } else {
                 $response['hasError'] = true;
-                $response['errors'] = $this->l('Additional service not found');
+                $response['errors'] = $this->l('Extra service not found');
             }
         } else {
             $response['hasError'] = true;

@@ -243,7 +243,7 @@ class OrderConfirmationControllerCore extends FrontController
                                     //enter hotel name
                                     $cart_htl_data[$type_key]['hotel_name'] = $data_v['hotel_name'];
 
-                                    // add additional services products in hotel detail.
+                                    // add extra services products in hotel detail.
                                     $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services'] = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                                         $idOrder,
                                         0,

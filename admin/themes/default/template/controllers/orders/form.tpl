@@ -1675,7 +1675,7 @@
 			}
 		});
 
-         // click on back button on created additional service edit
+         // click on back button on created extra service edit
         $(document).on('click', '#back_to_service_btn', function() {
             $('#room_type_services_desc').show();
             $('#add_new_room_services_block').hide();
@@ -2398,6 +2398,7 @@
 	{addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
 	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
     {addJsDefL name='error_found_txt'}{l s='Errors found' js=1}{/addJsDefL}
+    {addJsDefL name='txtExtraServiceSucc'}{l s='Updated Successfully' js=1}{/addJsDefL}
 {/strip}
 
 <div id="loader_container">

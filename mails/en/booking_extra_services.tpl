@@ -2,7 +2,7 @@
 	<table class="table table-recap additional-service-table">
 		<thead>
 			<tr>
-				<th colspan="4">{l s='Additional services Details'}</th>
+				<th colspan="4">{l s='Extra Services Details'}</th>
 			</tr>
 			<tr>
 				<th>{l s='Room Type'}</th>
