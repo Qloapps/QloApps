@@ -448,7 +448,7 @@ class AdminImportControllerCore extends AdminController
             case 'k': $bytes *= 1024;
         }
 
-        if (!isset($bytes) || $bytes == '') {
+        if (!isset($bytes) || $bytes == 0) {
             $bytes = 20971520;
         } // 20Mb
 

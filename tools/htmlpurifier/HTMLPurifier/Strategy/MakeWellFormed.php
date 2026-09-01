@@ -641,7 +641,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
 //    Needless to say, we need to UN-skip the token so it gets
 //    reprocessed.
 //
-//  - Suppose that you successfuly process a token, replace it with
+//  - Suppose that you successfully process a token, replace it with
 //    one with your skip mark, but now another injector wants to
 //    process the skipped token with another token.  Should you continue
 //    to skip that new token, or reprocess it?  If you reprocess,

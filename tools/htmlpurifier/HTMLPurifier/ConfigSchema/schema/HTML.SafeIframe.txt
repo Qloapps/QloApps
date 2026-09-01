@@ -6,7 +6,7 @@ DEFAULT: false
 <p>
     Whether or not to permit iframe tags in untrusted documents.  This
     directive must be accompanied by a whitelist of permitted iframes,
-    such as %URI.SafeIframeRegexp, otherwise it will fatally error.
+    such as %URI.SafeIframeRegexp or %URI.SafeIframeHosts, otherwise it will fatally error.
     This directive has no effect on strict doctypes, as iframes are not
     valid.
 </p>

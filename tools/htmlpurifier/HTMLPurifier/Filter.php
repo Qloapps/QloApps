@@ -4,7 +4,7 @@
  * Represents a pre or post processing filter on HTML Purifier's output
  *
  * Sometimes, a little ad-hoc fixing of HTML has to be done before
- * it gets sent through HTML Purifier: you can use filters to acheive
+ * it gets sent through HTML Purifier: you can use filters to achieve
  * this effect. For instance, YouTube videos can be preserved using
  * this manner. You could have used a decorator for this task, but
  * PHP's support for them is not terribly robust, so we're going
