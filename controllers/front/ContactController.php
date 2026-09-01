@@ -330,7 +330,6 @@ class ContactControllerCore extends FrontController
         $this->context->smarty->assign(
             array(
                 'hotelsInfo' => $hotelsInfo,
-                'viewOnMap' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                 'displayHotels' => Configuration::get('WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST'),
                 'gblHtlPhone' => $gblHtlPhone,
                 'gblHtlEmail' => $gblHtlEmail,
