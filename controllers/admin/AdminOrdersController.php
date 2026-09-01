@@ -3748,6 +3748,36 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
 
+        // merge in room status change history (with remarks) as Order Notes entries
+        if ($statusHistoryRows = (new HotelBookingStatusHistory())->getHistoryByOrderId($order->id)) {
+            $roomStatusLabels = array(
+                HotelBookingDetail::STATUS_ASSIGNED => $this->l('Assigned'),
+                HotelBookingDetail::STATUS_CHECKED_IN => $this->l('Checked in'),
+                HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked out'),
+                HotelBookingDetail::STATUS_NO_SHOW => $this->l('No-show'),
+                HotelBookingDetail::STATUS_CANCELLED => $this->l('Cancelled'),
+            );
+            foreach ($statusHistoryRows as $historyRow) {
+                $newStatusLabel = isset($roomStatusLabels[$historyRow['id_status_to']])
+                    ? $roomStatusLabels[$historyRow['id_status_to']]
+                    : $historyRow['id_status_to'];
+                $roomType = Product::getProductName((int) $historyRow['id_product'], null, $this->context->language->id);
+                $autoMsg = $this->l('Room Status Update').': '.$historyRow['room_num'].' - '.$roomType.': ('
+                    .date('d/m/Y', strtotime($historyRow['date_from'])).' - '.date('d/m/Y', strtotime($historyRow['date_to'])).') - '.$newStatusLabel;
+                $messages[] = array(
+                    'message' => $autoMsg.($historyRow['remark'] ? ' | '.$this->l('Remark').': '.$historyRow['remark'] : ''),
+                    'date_add' => $historyRow['date_add'],
+                    'efirstname' => $historyRow['efirstname'],
+                    'elastname' => $historyRow['elastname'],
+                    'cfirstname' => $historyRow['cfirstname'],
+                    'clastname' => $historyRow['clastname'],
+                );
+            }
+            usort($messages, function ($a, $b) {
+                return (strtotime($a['date_add']) < strtotime($b['date_add'])) ? 1 : -1;
+            });
+        }
+
         // send hotel standalone and standalone products
         $objProduct = new Product();
         $hotelStandaloneProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);

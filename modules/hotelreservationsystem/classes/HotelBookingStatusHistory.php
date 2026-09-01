@@ -60,4 +60,19 @@ class HotelBookingStatusHistory extends ObjectModel
 
         return Db::getInstance()->executeS($sql);
     }
+
+    public function getHistoryByOrderId($idOrder)
+    {
+        $sql = 'SELECT h.*, hbd.room_num, hbd.id_product, hbd.date_from, hbd.date_to,
+                    e.`firstname` AS efirstname, e.`lastname` AS elastname,
+                    c.`firstname` AS cfirstname, c.`lastname` AS clastname
+                FROM `'._DB_PREFIX_.$this->table.'` h
+                INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON hbd.`id` = h.`id_htl_booking`
+                LEFT OUTER JOIN `'._DB_PREFIX_.'employee` e ON e.`id_employee` = h.`id_employee`
+                LEFT JOIN `'._DB_PREFIX_.'customer` c ON c.`id_customer` = h.`id_customer`
+                WHERE hbd.`id_order` = '.(int) $idOrder.'
+                ORDER BY h.`id_booking_status_history` ASC';
+
+        return Db::getInstance()->executeS($sql);
+    }
 }
