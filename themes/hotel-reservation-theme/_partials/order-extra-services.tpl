@@ -28,7 +28,7 @@
         <div class="card-body">
             {if (isset($extraDemands) && $extraDemands) || (isset($additionalServices) && $additionalServices)}
                 {block name='order_extra_services_tabs'}
-                    <ul class="nav nav-tabs">
+                    <ul class="nav qlo-nav-tabs">
                         {if isset($additionalServices) && $additionalServices}
                             <li class="active"><a href="#room_type_service_product_desc" data-toggle="tab">{l s='Services'}</a></li>
                         {/if}

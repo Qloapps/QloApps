@@ -80,7 +80,7 @@
 				{else}
 					<a href="{$link->getPageLink('order', true, NULL)|escape:'html':'UTF-8'}" title="{l s='Previous'}" class="button-exclusive btn btn-default"><i class="icon-chevron-left"></i>{l s='Continue Shopping'}</a>
 				{/if}
-		        <button type="submit" name="processAddress" class="button btn btn-default button-medium"><span>{l s='Proceed to checkout'}<i class="icon-chevron-right right"></i></span></button>
+		        <button type="submit" name="processAddress" class="qlo-btn qlo-btn--primary"><span>{l s='Proceed to checkout'}<i class="icon-chevron-right right"></i></span></button>
 			</p>
 		</form>
 {else}

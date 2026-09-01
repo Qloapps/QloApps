@@ -27,10 +27,10 @@
         {if $logged}
             <ul class="navbar-nav hidden-xs">
                 <li class="dropdown">
-                    <button class="btn dropdown-toggle" type="button" id="user_info_acc" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <button class="qlo-dropdown-trigger qlo-dropdown-trigger--transparent dropdown-toggle" type="button" id="user_info_acc" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                         <span class="account_user_name hide_xs">{$cookie->customer_firstname}</span>
                         <span class="account_user_name visi_xs"><i class="icon-user"></i></span>
-                        <span class="caret"></span>
+                        <span class="qlo-dropdown-trigger__icon"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="user_info_acc">
                         <li><a href="{$link->getPageLink('my-account', true)|escape:'html'}" title="{l s='View my customer account' mod='blockuserinfo'}">{l s='Accounts'  mod='blockuserinfo'}</a></li>

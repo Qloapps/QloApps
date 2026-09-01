@@ -169,4 +169,9 @@ table#product_comparison .comparison_feature .product_name {
     float: left;
     display: block; } }
 
+#product_comparison td.compare_extra_information {
+  padding: 10px; }
+#product_comparison #social-share-compare {
+  margin-bottom: 50px; }
+
 /*# sourceMappingURL=comparator.css.map */

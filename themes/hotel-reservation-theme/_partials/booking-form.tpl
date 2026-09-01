@@ -198,7 +198,7 @@
                                                 </div>
                                                 {block name='booking_form_book_now_button'}
                                                     <p id="add_to_cart" class="buttons_bottom_block no-print">
-                                                        <button type="submit" name="Submit" class="exclusive book_now_submit">
+                                                        <button type="submit" name="Submit" class="qlo-btn qlo-btn--success exclusive book_now_submit">
                                                             <span>
                                                                 {if isset($content_only) && $content_only && (isset($product->customization_required) && $product->customization_required)}{l s='Customize'}{else}{l s='Book Now'}{/if}
                                                             </span>
@@ -274,15 +274,15 @@
                                             {include file="./quantity_field.tpl"}
                                         {/block} *}
 
-                                            <div class="qty_container">
+                                            <div class="qty_container qlo-input-number">
                                                 <input type="hidden" class="stock_qty" id="stock_qty" name="stock_qty" data-id-product="{$product->id}" data-stock_quantity="{$product->quantity}" data-allow_oosp="{$allow_oosp}" >
                                                 <input type="hidden" class="service_product_qty" id="service_product_qty" name="service_product_qty" data-id-product="{$product->id}" data-cart_quantity="{if isset($product->cart_quantity) && $product->cart_quantity}{$product->cart_quantity}{else}0{/if}" data-max_quantity="{if isset($product->max_quantity)}{$product->max_quantity|escape:'html':'UTF-8'}{else}{$product->quantity}{/if}" value="{if isset($quantity)}{$quantity|intval}{else}{if $product->minimal_quantity > 1}{$product->minimal_quantity}{else}1{/if}{/if}">
-                                                <div class="qty_count pull-left">
+                                                <div class="qty_count qlo-input">
                                                     <span>{if isset($quantity)}{$quantity|intval}{else}{if $product->minimal_quantity > 1}{$product->minimal_quantity}{else}1{/if}{/if}</span>
                                                 </div>
-                                                <div class="qty_direction pull-left">
-                                                    <a href="#" class="btn btn-default quantity_up service_product_qty_up"><span><i class="icon-plus"></i></span></a>
-                                                    <a href="#" class="btn btn-default quantity_down service_product_qty_down"><span><i class="icon-minus"></i></span></a>
+                                                <div class="qty_direction qlo-stepper">
+                                                    <a href="#" class="btn btn-default quantity_up service_product_qty_up qlo-stepper__btn"><span><i class="icon-plus"></i></span></a>
+                                                    <a href="#" class="btn btn-default quantity_down service_product_qty_down qlo-stepper__btn"><span><i class="icon-minus"></i></span></a>
                                                 </div>
                                             </div>
                                         <span class="clearfix"></span>
@@ -334,7 +334,7 @@
                                     {else}
                                         {block name='booking_form_book_now_button'}
                                                 <p id="add_to_cart" class="buttons_bottom_block no-print">
-                                                    <button type="submit" name="Submit" class="exclusive book_now_submit">
+                                                    <button type="submit" name="Submit" class="qlo-btn qlo-btn--success exclusive book_now_submit">
                                                         <span>
                                                             {if isset($content_only) && $content_only && (isset($product->customization_required) && $product->customization_required)}{l s='Customize'}{else}{l s='Book Now'}{/if}
                                                         </span>

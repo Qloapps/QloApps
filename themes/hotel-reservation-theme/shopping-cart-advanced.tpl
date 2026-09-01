@@ -33,7 +33,7 @@
 {/block}
 {block name='shopping_cart_detail'}
     <div id="order-detail-content" class="table_block table-responsive">
-        <table id="cart_summary" class="table table-bordered {if $PS_STOCK_MANAGEMENT}stock-management-on{else}stock-management-off{/if}">
+        <table id="cart_summary" class="table table-bordered qlo-table {if $PS_STOCK_MANAGEMENT}stock-management-on{else}stock-management-off{/if}">
             <thead>
             <tr>
                 <th class="cart_product first_item">{l s='Product'}</th>
@@ -86,7 +86,7 @@
                                         <h4>{l s='Vouchers'}</h4>
                                         <input type="text" class="discount_name form-control" id="discount_name" name="discount_name" value="{if isset($discount_name) && $discount_name}{$discount_name}{/if}" />
                                         <input type="hidden" name="submitDiscount" />
-                                        <button type="submit" name="submitAddDiscount" class="button btn btn-default button-small"><span>{l s='OK'}</span></button>
+                                        <button type="submit" name="submitAddDiscount" class="qlo-btn qlo-btn--primary qlo-btn--sm"><span>{l s='OK'}</span></button>
                                     </fieldset>
                                 </form>
                                 {if $displayVouchers}
@@ -111,7 +111,7 @@
                                         <h4>{l s='Vouchers'}</h4>
                                         <input type="text" class="discount_name form-control" id="discount_name" name="discount_name" value="{if isset($discount_name) && $discount_name}{$discount_name}{/if}" />
                                         <input type="hidden" name="submitDiscount" />
-                                        <button type="submit" name="submitAddDiscount" class="button btn btn-default button-small"><span>{l s='OK'}</span></button>
+                                        <button type="submit" name="submitAddDiscount" class="qlo-btn qlo-btn--primary qlo-btn--sm"><span>{l s='OK'}</span></button>
                                     </fieldset>
                                 </form>
                                 {if $displayVouchers}
@@ -137,7 +137,7 @@
                                     <h4>{l s='Vouchers'}</h4>
                                     <input type="text" class="discount_name form-control" id="discount_name" name="discount_name" value="{if isset($discount_name) && $discount_name}{$discount_name}{/if}" />
                                     <input type="hidden" name="submitDiscount" />
-                                    <button type="submit" name="submitAddDiscount" class="button btn btn-default button-small">
+                                    <button type="submit" name="submitAddDiscount" class="qlo-btn qlo-btn--primary qlo-btn--sm">
                                         <span>{l s='OK'}</span>
                                     </button>
                                 </fieldset>
@@ -379,7 +379,7 @@
         <i class="icon-chevron-left"></i>
         {l s='Continue shopping'}
     </a>
-    <button data-show-if-js="" style="" id="confirmOrder" type="button" class="button btn btn-default standard-checkout button-medium"><span>{l s='Order With Obligation To Pay'}</span></button>
+    <button data-show-if-js="" style="" id="confirmOrder" type="button" class="qlo-btn qlo-btn--primary standard-checkout"><span>{l s='Order With Obligation To Pay'}</span></button>
 </p>
 
 {strip}

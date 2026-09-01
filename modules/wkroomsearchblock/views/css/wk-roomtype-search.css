@@ -54,15 +54,6 @@
       font-weight: bold;
       line-height: 30px;
       color: #333333;}
-    .header-rmsearch-details-wrapper .modify_roomtype_search_btn {
-      border: 1px solid #777777;
-      font-weight: bold;
-      border-radius: 4px;
-      font-size: 13px;
-      padding: 15px 20px;
-      color: #333333;
-      text-align: center;
-      text-transform: uppercase;}
     .header-rmsearch-details-wrapper .modify_roomtype_search_btn:hover {
       background-color: #FAFAFA;}
       .faded-txt {

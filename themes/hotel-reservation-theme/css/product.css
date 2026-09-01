@@ -1094,15 +1094,14 @@ Quick View Styles
 /****************CSS by webkul on product page********************/
 #add_to_cart {
   margin: 0px;}
+/* Was a full color/box-model rule (bg, border, radius, weight, uppercase, padding) — those are
+   now redundant with .qlo-btn--success (2026-07-29 Button component migration) and stripped per
+   the standardization spec §4 point 6. width:100% is a genuine page-specific need (this button is
+   a full-width CTA bar inside a <p id="add_to_cart">), not drift, so it stays. This ID rule used
+   to out-specificity anything class-based added alongside — real de-scoping, not just a class
+   swap, was required for the migration to have any visible effect. */
 #add_to_cart .book_now_submit {
-  background-color: #36BA46;
-  border: 1px solid #36BA46;
-  border-radius: 4px;
-  color: #ffffff;
-  font-weight: bold;
-  width: 100%;
-  text-transform: uppercase;
-  padding: 15px;}
+  width: 100%;}
 .booking_room_fields #room_date_range {
   display: grid;
   cursor: text;}
@@ -1146,42 +1145,10 @@ Quick View Styles
 .total_booking_price_block
 {
   background-color: #404040;}
-.product_description_tabs
-{
-  font-family: inherit;
-    color: #9A9A9A;
-    font-size: 18px;
-    font-weight: 700;
-    border-bottom: none!important;
-    padding-left: 20px;}
-.product_description_tabs li.selected
-{
-  font-family: inherit;
-    color: #404040;
-    font-size: 18px;
-    font-weight: 700;
-    border-bottom: 2px solid #379aef;}
-.product_description_tabs li.active {
-  font-family: inherit;
-  color: #404040;
-  font-size: 18px;
-  font-weight: 700;}
-  .product_description_tabs li.active:after {
-    content: '';
-    position: absolute;
-    top: 36px;
-    width: 100%;
-    height: 4px;
-    background: #379aef;}
 .product_description_tabs_contents
 {
   margin-top: 0px!important;
   line-height: 25px;}
-.idTabHrefShort {
-  font-size: 14px;
-  color: #000000!important;
-  text-align: center;
-  border: none!important;}
 .room_info_heading {
   margin-bottom: 5px;
   font-weight: 700;
@@ -1251,10 +1218,6 @@ Quick View Styles
     color: #FF4B4B;
     font-weight: 700;
     text-align: right;}
-
-/*for search block background*/
-.idTabHrefShort:hover {
-  color: #333;}
 
 .room_type_old_price {
   text-decoration: line-through;
@@ -1445,14 +1408,28 @@ Quick View Styles
   cursor: pointer;
 }
 .ui-tooltip.services-tootip {
-  box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
+  box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.1);
   background: #FFFFFF;
-  border: unset;
-  color: #333;
+  border: 1px solid #D9D9D9;
+  color: var(--color-secondary, #333333);
   /* min-width: 300px; */
   padding: 9px 15px;
   max-height: 310px;
   overflow-y: auto;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+.ui-tooltip.services-tootip:before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 15px;
+  width: 10px;
+  height: 10px;
+  background: #FFFFFF;
+  border-top: 1px solid #D9D9D9;
+  border-left: 1px solid #D9D9D9;
+  transform: rotate(45deg);
 }
 .services-info-tooltip-cont {
   min-width: 240px;
@@ -1606,32 +1583,8 @@ ul.service-product-nav > li:hover {
   display: flex;
 }
 
-.service-product-element .qty_container > * {
-  float: left;
-}
 .service-product-element .qty_container {
     margin-right: 10px;
-}
-.service-product-element .service_product_qty {
-  border-radius: 4px 0px 0px 4px;
-  max-width: 70px;
-}
-.service-product-element .qty_controls a {
-  display: block;
-  color: #333;
-  border: 1px solid #999999;
-  border-left: none;
-  padding: 5px;
-  line-height: 11px;
-  font-size: 12px;
-}
-
-.service-product-element .qty_controls a:first-of-type {
-  border-radius: 0 4px 0 0;
-}
-.service-product-element .qty_controls a:last-of-type {
-  border-radius: 0 0 4px 0;
-  box-shadow: 0 1px 0 0 rgb(0 0 0 / 13%);
 }
 .service-product-element .btn-service-product {
   border-radius: 4px;
@@ -1788,3 +1741,8 @@ ul.service-product-nav > li:hover {
     display: block;
   }
 }
+#product.content_only div.pb-left-column p.resetimg {
+  margin-bottom: 0px;
+  padding-top: 0px; }
+#product.content_only div.pb-left-column #thumbs_list_frame {
+  margin-bottom: 0px; }

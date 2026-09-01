@@ -107,12 +107,6 @@ span.htl-map-icon {
 .hotel-branch-info-actions{
     display: flex;
     gap: 10px;}
-.pagination-container .pagination > li > a, .pagination-container .pagination > li > span {
-    border: unset;}
-.pagination-container .pagination > li .active {
-    border: 1px solid #333333;
-    border-radius: 12px;
-    z-index: 10;}
 .hotel-address-container p.hotel-branch-info-value {
     font-size: 14px;
     color: rgba(0, 0, 0, 1);

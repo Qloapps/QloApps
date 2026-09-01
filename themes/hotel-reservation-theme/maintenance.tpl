@@ -54,9 +54,9 @@
 					<div class="dropdown">
 						{foreach from=$languages item=language}
 							{if $language.iso_code == $lang_iso}
-								<button class="dropdown-toggle" type="button" data-toggle="dropdown">
+								<button class="qlo-dropdown-trigger dropdown-toggle" type="button" data-toggle="dropdown">
 									{$language.name|regex_replace:'/\s\(.*\)$/':''}
-									<span class="caret"></span>
+									<span class="qlo-dropdown-trigger__icon"></span>
 								</button>
 							{/if}
 						{/foreach}
@@ -112,13 +112,13 @@
 										<br>
 										<input class="form-control" type="password" placeholder="{l s='Password'}" id="passwd" name="passwd" value="">
 									</div>
-									<button type="submit" id="SubmitLogin" name="SubmitLogin" class="btn btn-primary">
+									<button type="submit" id="SubmitLogin" name="SubmitLogin" class="qlo-btn qlo-btn--primary">
 										<span>
 											{l s='Log in'}
 										</span>
 									</button>
 									<button type="button" id="cancelLogin" name="cancelLogin"
-										class="btn btn-primary cancel-login">
+										class="qlo-btn qlo-btn--primary cancel-login">
 										<span>
 											{l s='Cancel'}
 										</span>

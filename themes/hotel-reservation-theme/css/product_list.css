@@ -393,4 +393,14 @@ Product list(Index page) Styles
   background: #fff;
   border: 1px solid #d6d4d4; }
 
+#instant_search_results a.close {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 1;
+  line-height: inherit;
+  text-transform: none;
+  font-family: 'Oxygen', sans-serif; }
+  #instant_search_results a.close:hover {
+    color: #515151; }
+
 /*# sourceMappingURL=product_list.css.map */

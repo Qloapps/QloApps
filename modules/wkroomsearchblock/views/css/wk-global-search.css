@@ -189,17 +189,11 @@
         border: none;
         border-radius: 4px;
         min-height: 55px;}
-      .submit_occupancy_btn {
-        background-color: #1292FF;
-        border: none;
-        border-radius: 4px;}
-
-
 /* occupancy  */
 #search_occupancy_wrapper {
   border: none;
   max-height: 400px;
-  min-width: 280px;
+  min-width: 320px;
   overflow: auto;
   box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
   left: 0px;
@@ -244,48 +238,14 @@
         font-size: 12px;
         color: #FF4343;
         text-align: right;}
-      #search_occupancy_wrapper .occupancy_info_block .occupancy_count {
-        padding: 14px;
-        border: 1px solid #E1E3E7;
-        font-size: 14px;
-        font-weight: 600;
-        color: #333333;
-        text-align: center;
-        border-radius: 4px;}
-      #search_occupancy_wrapper .occupancy_info_block .occupancy_count > span {
-        min-width: 21px;
-        text-align: center;
-        display: block;}
-      #search_occupancy_wrapper .occupancy_info_block .qty_direction {
-        margin-left: 3px;
-        width: 22px;}
-        #search_occupancy_wrapper .occupancy_info_block .qty_direction a {
-          padding: 1px 5px;
-          border: 0px;
-          border: 1px solid #E1E3E7;
-          color: #333;
-          border-radius: 4px;
-          font-weight: 400;}
-          #search_occupancy_wrapper .occupancy_info_block .qty_direction .occupancy_quantity_down {
-            margin-top: 3px;}
           #search_occupancy_wrapper .occupancy-input-errors {
             font-weight: 700;}
 
   #search_occupancy_wrapper .children_ages {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 8px;
-    justify-content: space-between;
   }
-  #search_occupancy_wrapper .children_ages select {
-    background-color: #fff;
-    height: 37px;
-    border-radius: 4px;
-    padding: 3px 5px;
-    font-size: 12px;
-    color: #333;
-    border: 1px solid #E1E3E7;
-    width: 100%;}
 
 
 @media (max-width: 411px) {

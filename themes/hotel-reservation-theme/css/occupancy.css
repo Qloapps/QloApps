@@ -27,7 +27,7 @@
     box-shadow: 0 8px 25px -4px rgba(0,0,0,0.39);
     left: 0px;
     padding: 15px 20px;
-    min-width: 280px}
+    min-width: 320px}
     .booking_occupancy_wrapper .btn {
       font-weight: 600;}
     .booking_occupancy_wrapper .btn-primary {
@@ -47,9 +47,8 @@
       color: #777777;}
       .booking_occupancy_wrapper .children_age_info_block .children_ages{
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        justify-content: space-between;}
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;}
     .booking_occupancy_wrapper .label-desc-txt {
       font-size: 12px;
       color: #777777;}
@@ -85,47 +84,10 @@
           font-size: 12px;
           color: #FF4343;
           text-align: right;}
-        .booking_occupancy_wrapper .occupancy_info_block .occupancy_count, .qty_count {
-          padding: 14px;
-          border: 1px solid #E1E3E7;
-          font-size: 14px;
-          font-weight: 600;
-          color: #333333;
-          text-align: center;
-          border-radius: 4px;}
-          .rm_qty_cont .qty_count, .rm_qty_cont .qty_direction a {
-            border: 1px solid #999999;
-            box-shadow: 0 1px 0 0 rgb(0 0 0 / 13%);}
-        .booking_occupancy_wrapper .occupancy_info_block .occupancy_count > span, .qty_count > span {
-          min-width: 21px;
-          text-align: center;
-          display: block;}
-        .qty_direction {
-          margin-left: 3px;
-          width: 22px;}
-          .qty_direction a {
-            padding: 1px 5px;
-            border: 0px;
-            border: 1px solid #E1E3E7;
-            color: #333;
-            border-radius: 4px;
-            font-weight: 400;}
-            .qty_direction .occupancy_quantity_down, .qty_direction .quantity_down {
-              margin-top: 3px;}
-
     .booking_occupancy_wrapper .children_ages .col-xs-4 {
       padding-left: 5px;
       margin-bottom: 5px;
       padding-right: 5px;}
-    .booking_occupancy_wrapper .children_ages select {
-      background-color: #fff;
-      height: 37px;
-      border-radius: 4px;
-      padding: 3px 5px;
-      font-size: 12px;
-      color: #333;
-      border: 1px solid #E1E3E7;
-      width: 100%;}
 
 
   @media (max-width: 450) {

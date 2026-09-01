@@ -709,3 +709,30 @@
 	cursor: pointer;
 	background-color: #379bf0;
 	color: #fff;}
+
+.quantity_cont {
+  display: flex;
+  gap: 4px;
+}
+.quantity_cont .cart_quantity_input {
+  padding: 14px 10px;
+  border: 1px solid #E1E3E7;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333333;
+  text-align: center;
+  border-radius: 4px;
+}
+.quantity_cont .cart_quantity_button {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.quantity_cont .cart_quantity_button a {
+  padding: 1px 5px;
+  border: 0px;
+  border: 1px solid #E1E3E7;
+  color: #333;
+  border-radius: 4px;
+  font-weight: 400;
+}

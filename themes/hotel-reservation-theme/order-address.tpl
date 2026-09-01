@@ -106,7 +106,7 @@
 					<i class="icon-chevron-left"></i>
 					{l s='Continue Shopping'}
 				</a>
-				<button type="submit" name="processAddress" class="button btn btn-default button-medium">
+				<button type="submit" name="processAddress" class="qlo-btn qlo-btn--primary">
 					<span>{l s='Proceed to checkout'}<i class="icon-chevron-right right"></i></span>
 				</button>
 			</p>

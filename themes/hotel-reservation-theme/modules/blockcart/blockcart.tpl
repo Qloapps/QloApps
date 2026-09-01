@@ -169,7 +169,7 @@
 									{/block}
 									{block name='blockcart_shopping_cart_checkout_action'}
 										<p class="cart-buttons">
-											<a id="button_order_cart" class="btn btn-default button button-small" href="{$link->getPageLink("$order_process", true)|escape:"html":"UTF-8"}" title="{l s='Check out' mod='blockcart'}" rel="nofollow">
+											<a id="button_order_cart" class="qlo-btn qlo-btn--primary qlo-btn--sm" href="{$link->getPageLink("$order_process", true)|escape:"html":"UTF-8"}" title="{l s='Check out' mod='blockcart'}" rel="nofollow">
 												<span>
 													{l s='Check out' mod='blockcart'}<i class="icon-chevron-right right"></i>
 												</span>
@@ -373,12 +373,12 @@
 								</div>
 								{block name='blockcart_layer_cart_actions'}
 									<div class="button-container">
-										<span class="continue btn btn-default button exclusive-medium" title="{l s='Continue browsing' mod='blockcart'}">
+										<span class="qlo-btn qlo-btn--outline-secondary continue" title="{l s='Continue browsing' mod='blockcart'}">
 											<span>
 												<i class="icon-chevron-left left"></i>{l s='Continue browsing' mod='blockcart'}
 											</span>
 										</span>
-										<a class="btn btn-default button button-medium"	href="{$link->getPageLink("$order_process", true)|escape:"html":"UTF-8"}" title="{l s='Proceed to checkout' mod='blockcart'}" rel="nofollow">
+										<a class="qlo-btn qlo-btn--primary"	href="{$link->getPageLink("$order_process", true)|escape:"html":"UTF-8"}" title="{l s='Proceed to checkout' mod='blockcart'}" rel="nofollow">
 											<span>
 												{l s='Proceed to checkout' mod='blockcart'}<i class="icon-chevron-right right"></i>
 											</span>

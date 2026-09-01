@@ -623,16 +623,18 @@ $(document).ready(function() {
                         occupancy_block += '<label>' + adults_txt + '</label>';
                         occupancy_block += '<div>';
                             occupancy_block += '<input type="hidden" class="num_occupancy num_adults room_occupancies" name="occupancy['+roomBlockIndex+'][adults]" value="1">';
-                            occupancy_block += '<div class="occupancy_count pull-left">';
+                            occupancy_block += '<div class="qlo-input-number qlo-input-number--sm">';
+                            occupancy_block += '<div class="occupancy_count qlo-input">';
                                 occupancy_block += '<span>1</span>';
                             occupancy_block += '</div>';
-                            occupancy_block += '<div class="qty_direction pull-left">';
-                                occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">';
+                            occupancy_block += '<div class="qty_direction qlo-stepper qlo-stepper--sm">';
+                                occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">';
                                     occupancy_block += '<span><i class="icon-plus"></i></span>';
                                 occupancy_block += '</a>';
-                                occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">';
+                                occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">';
                                     occupancy_block += '<span><i class="icon-minus"></i></span>';
                                 occupancy_block += '</a>';
+                            occupancy_block += '</div>';
                             occupancy_block += '</div>';
                         occupancy_block += '</div>';
                     occupancy_block += '</div>';
@@ -640,16 +642,18 @@ $(document).ready(function() {
                         occupancy_block += '<label>' + children_txt + '</label>';
                         occupancy_block += '<div class="clearfix">';
                             occupancy_block += '<input type="hidden" class="num_occupancy num_children room_occupancies" name="occupancy['+roomBlockIndex+'][children]" value="0">';
-                            occupancy_block += '<div class="occupancy_count pull-left">';
+                            occupancy_block += '<div class="qlo-input-number qlo-input-number--sm">';
+                            occupancy_block += '<div class="occupancy_count qlo-input">';
                                 occupancy_block += '<span>0</span>';
                             occupancy_block += '</div>';
-                            occupancy_block += '<div class="qty_direction pull-left">';
-                                occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up">';
+                            occupancy_block += '<div class="qty_direction qlo-stepper qlo-stepper--sm">';
+                                occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_up qlo-stepper__btn">';
                                     occupancy_block += '<span><i class="icon-plus"></i></span>';
                                 occupancy_block += '</a>';
-                                occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down">';
+                                occupancy_block += '<a href="#" data-field-qty="qty" class="btn btn-default occupancy_quantity_down qlo-stepper__btn">';
                                     occupancy_block += '<span><i class="icon-minus"></i></span>';
                                 occupancy_block += '</a>';
+                            occupancy_block += '</div>';
                             occupancy_block += '</div>';
                         occupancy_block += '</div>';
                         occupancy_block += '<p class="label-desc-txt"> (' + below_txt + ' ' + max_child_age + ' ' + years_txt + ')</p>';
@@ -701,14 +705,15 @@ $(document).ready(function() {
 
             var roomBlockIndex = parseInt($(this).closest('.occupancy_info_block').attr('occ_block_index'));
 
-            var childAgeSelect = '<div>';
-                childAgeSelect += '<select class="guest_child_age room_occupancies" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
+            var childAgeSelect = '<div class="qlo-input-wrap">';
+                childAgeSelect += '<select class="guest_child_age room_occupancies qlo-input not_uniform" name="occupancy[' +roomBlockIndex+ '][child_ages][]">';
                     childAgeSelect += '<option value="-1">' + select_age_txt + '</option>';
                     childAgeSelect += '<option value="0">' + under_1_age + '</option>';
                     for (let age = 1; age < max_child_age; age++) {
                         childAgeSelect += '<option value="'+age+'">'+age+'</option>';
                     }
                 childAgeSelect += '</select>';
+                childAgeSelect += '<span class="qlo-select-icon qlo-input-icon"></span>';
             childAgeSelect += '</div>';
 
             $(this).closest('.occupancy_info_block').find('.children_ages').append(childAgeSelect);

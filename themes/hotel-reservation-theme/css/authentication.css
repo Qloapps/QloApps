@@ -33,4 +33,19 @@
 #login_form .form-control, #create-account_form .form-control {
   max-width: 271px; }
 
+#account-creation_form fieldset.reversoform {
+  padding: 10px !important; }
+
+#account-creation_form fieldset.reversoform .text label {
+  display: block;
+  padding: 0 0 10px 0;
+  width: 100%;
+  text-align: left; }
+
+#account-creation_form fieldset.reversoform .infos-sup {
+  padding: 0 !important;
+  font-size: 10px;
+  font-style: italic;
+  text-align: right; }
+
 /*# sourceMappingURL=authentication.css.map */

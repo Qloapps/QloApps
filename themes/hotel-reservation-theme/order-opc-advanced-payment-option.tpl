@@ -37,7 +37,7 @@
 					</div>
 					<div class="col-sm-12 col-xs-12 margin-top-10">
 						{block name='order_opc_advanced_payment_option_submit'}
-							<button class="opc-button-small opc-btn-primary" name="submitAdvPayment" type="submit">
+							<button class="qlo-btn qlo-btn--primary" name="submitAdvPayment" type="submit">
 								<span>{l s='OK'}</span>
 							</button>
 						{/block}

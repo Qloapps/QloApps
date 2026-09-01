@@ -24,7 +24,7 @@
 	<section>
 		{if (isset($selectedRoomDemands) && $selectedRoomDemands) || (isset($roomTypeServiceProducts) && $roomTypeServiceProducts)}
 			{block name='cart_booking_demands_tabs'}
-				<ul class="nav nav-tabs">
+				<ul class="nav qlo-nav-tabs">
 					{if isset($selectedRoomDemands) && $selectedRoomDemands}
 						<li class="active"><a href="#room_type_demands_desc" data-toggle="tab">{l s='Facilities'}</a></li>
 					{/if}
@@ -141,12 +141,12 @@
 										</div>
 									{/if}
 																		{if $product.allow_multiple_quantity}
-																			<div class="qty_container">
-																				<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="room_service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
+																			<div class="qty_container qlo-input-number">
+																				<input type="text" class="qty qlo-input" id="qty_{$product.id_product}" name="room_service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
 																				<input type="hidden" class="qty_hidden" id="qty_{$product.id_product}_hidden" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}0{/if}">
-																				<div class="qty_controls">
-																					<a href="#" class="qty_up"><span><i class="icon-plus"></i></span></a>
-																					<a href="#" class="qty_down"><span><i class="icon-minus"></i></span></a>
+																				<div class="qty_controls qlo-stepper">
+																					<a href="#" class="qty_up qlo-stepper__btn"><span><i class="icon-plus"></i></span></a>
+																					<a href="#" class="qty_down qlo-stepper__btn"><span><i class="icon-minus"></i></span></a>
 																				</div>
 																			</div>
 																		{/if}

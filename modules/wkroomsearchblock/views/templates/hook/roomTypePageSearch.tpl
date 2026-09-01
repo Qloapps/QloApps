@@ -32,7 +32,7 @@
 								<div class="filter_header row">
 									<div class="col-sm-12">
 										<p>{l s='Searched results for' mod='wkroomsearchblock'}:
-										<button class="btn btn-default visible-xs modify_roomtype_search_btn pull-right"><i class="icon-pencil"></i></button>
+										<button class="qlo-btn qlo-btn--outline-secondary visible-xs modify_roomtype_search_btn pull-right"><i class="icon-pencil"></i></button>
 										</p>
 									</div>
 								</div>
@@ -43,7 +43,7 @@
 								</div>
 							</div>
 							<div class="col-sm-3 form-group hidden-xs">
-								<button class="btn btn-default modify_roomtype_search_btn pull-right">{l s='Modify Search' mod='wkroomsearchblock'}</button>
+								<button class="qlo-btn qlo-btn--outline-secondary modify_roomtype_search_btn pull-right">{l s='Modify Search' mod='wkroomsearchblock'}</button>
 							</div>
 						</div>
 					</div>

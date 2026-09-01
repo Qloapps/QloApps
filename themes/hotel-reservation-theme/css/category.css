@@ -148,7 +148,7 @@ p.capa_txt {
 
 .rm_left
 {
-    color: #e85757;
+    color: var(--message-error, #FF4B4B);
     font-size: 16px;
     font-weight: 400;
 }
@@ -224,19 +224,6 @@ p.capa_txt {
     padding: 1px 10px;
 }
 
-.qty_direction
-{
-    width: 22px;
-    float: left;
-}
-
-/* .qty_direction a
-{
-    margin-bottom: 2.8px;
-    margin-top: 3px;
-    margin-left: 2px;
-    padding: 1px 4px;
-} */
 
 .booking_guest_occupancy.form-control {
     background-color: transparent!important;
@@ -324,7 +311,7 @@ p.capa_txt {
 
 .room_type_old_price {
   text-decoration: line-through;
-  color:#e85757;
+  color: var(--message-error, #FF4B4B);
   font-size:18px;
   display: block;
 }

@@ -34,7 +34,7 @@
 					{block name='order_opc_new_account_login_submit'}
 						<p class="submit">
 							{if isset($back)}<input type="hidden" class="hidden" name="back" value="{$back|escape:'html':'UTF-8'}" />{/if}
-							<button type="submit" id="SubmitLogin" name="SubmitLogin" class="button btn btn-default button-medium pull-right"><span>{l s='Sign in'}</span></button>
+							<button type="submit" id="SubmitLogin" name="SubmitLogin" class="qlo-btn qlo-btn--primary pull-right"><span>{l s='Sign in'}</span></button>
 						</p>
 					{/block}
 					{block name='displayLoginFormBottom'}
@@ -50,10 +50,10 @@
 				<div class="col-xs-12">
 					<div class="opc-button">
 						<span>
-							<button type="submit" class="opc-button-small opc-btn-primary" id="opc_guestCheckout"><span>{l s='Guest checkout'}</span></button>
+							<button type="submit" class="qlo-btn qlo-btn--primary" id="opc_guestCheckout"><span>{l s='Guest checkout'}</span></button>
 						</span>
 						<span>
-							<button type="submit" class="opc-button-small opc-btn-default" id="opc_createAccount"><span>{l s='Create an account'}</span></button>
+							<button type="submit" class="qlo-btn qlo-btn--outline-primary" id="opc_createAccount"><span>{l s='Create an account'}</span></button>
 						</span>
 					</div>
 				</div>
@@ -404,7 +404,7 @@
 				{/block}
 				{block name='order_opc_new_account_submit'}
 					<div class="submit opc-add-save clearfix">
-						<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
+						<button type="submit" name="submitAccount" id="submitAccount" class="qlo-btn qlo-btn--primary pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
 					</div>
 				{/block}
 			<!-- END Account -->

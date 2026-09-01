@@ -95,7 +95,7 @@
 					<input type="hidden" value="" name="pagination" id="pagination"/>
 				</form>
 				<div class="row pagination-container">
-					<ul class="pagination">
+					<ul class="pagination qlo-pagination">
 						{if !isset($pagination[1])}
 							<li><a href="{$currentIndex}" data-pagination="1">1</a></li>
 							{if !isset($pagination[2])}

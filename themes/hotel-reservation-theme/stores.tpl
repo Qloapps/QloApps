@@ -36,7 +36,7 @@
 				{l s='Here you can find our store locations. Please feel free to contact us:'}
 			</strong>
 		</p>
-	    <table class="table table-bordered">
+	    <table class="table table-bordered qlo-table">
 	    	<thead>
             	<tr>
                 	<th class="logo">{l s='Logo'}</th>
@@ -103,7 +103,7 @@
             <img src="{$img_ps_dir}loader.gif" class="middle" alt="" id="stores_loader" />
         </div>
         <div>
-            <button name="search_locations" class="button btn btn-default button-small">
+            <button name="search_locations" class="qlo-btn qlo-btn--primary qlo-btn--sm">
             	<span>
             		{l s='Search'}<i class="icon-chevron-right right"></i>
             	</span>
@@ -116,7 +116,7 @@
     	</select>
     </div>
 
-	<table id="stores-table" class="table table-bordered">
+	<table id="stores-table" class="table table-bordered qlo-table">
     	<thead>
 			<tr>
                 <th class="num">#</th>

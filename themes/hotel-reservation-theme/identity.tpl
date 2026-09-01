@@ -65,8 +65,11 @@
                             <br />
                             {foreach from=$genders key=k item=gender}
                                 <div class="radio-inline">
-                                    <label for="id_gender{$gender->id}" class="top">
-                                    <input type="radio" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id|intval}" {if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id}checked="checked"{/if} />
+                                    <label for="id_gender{$gender->id}" class="top qlo-radio">
+                                    <span class="qlo-radio__control">
+                                    <input type="radio" class="not_uniform" name="id_gender" id="id_gender{$gender->id}" value="{$gender->id|intval}" {if isset($smarty.post.id_gender) && $smarty.post.id_gender == $gender->id}checked="checked"{/if} />
+                                    <span class="qlo-radio__box"></span>
+                                    </span>
                                     {$gender->name}</label>
                                 </div>
                             {/foreach}
@@ -75,25 +78,25 @@
                             <label for="firstname" class="required">
                                 {l s='First name'}
                             </label>
-                            <input class="is_required validate form-control" data-validate="isName" type="text" id="firstname" name="firstname" value="{$smarty.post.firstname}" />
+                            <input class="is_required validate qlo-input" data-validate="isName" type="text" id="firstname" name="firstname" value="{$smarty.post.firstname}" />
                         </div>
                         <div class="required form-group">
                             <label for="lastname" class="required">
                                 {l s='Last name'}
                             </label>
-                            <input class="is_required validate form-control" data-validate="isName" type="text" name="lastname" id="lastname" value="{$smarty.post.lastname}" />
+                            <input class="is_required validate qlo-input" data-validate="isName" type="text" name="lastname" id="lastname" value="{$smarty.post.lastname}" />
                         </div>
                         <div class="required form-group">
                             <label for="email" class="required">
                                 {l s='E-mail address'}
                             </label>
-                            <input class="is_required validate form-control" data-validate="isEmail" type="email" name="email" id="email" value="{$smarty.post.email}" />
+                            <input class="is_required validate qlo-input" data-validate="isEmail" type="email" name="email" id="email" value="{$smarty.post.email}" />
                         </div>
                         <div class="required form-group">
                             <label for="phone" {if isset($one_phone_at_least) && $one_phone_at_least}class="required"{/if}>
                                 {l s='Phone'}
                             </label>
-                            <input class="is_required validate form-control" data-validate="isPhoneNumber" type="phone" name="phone" id="phone" value="{$smarty.post.phone}" />
+                            <input class="is_required validate qlo-input" data-validate="isPhoneNumber" type="phone" name="phone" id="phone" value="{$smarty.post.phone}" />
                         </div>
                         {if isset($birthday) && $birthday}
                             <div class="form-group">
@@ -102,12 +105,15 @@
                                 </label>
                                 <div class="row">
                                     <div class="col-xs-4">
-                                        <select name="days" id="days" class="form-control">
+                                        <div class="qlo-input-wrap">
+                                        <select name="days" id="days" class="qlo-input not_uniform">
                                             <option value="">-</option>
                                             {foreach from=$days item=v}
                                                 <option value="{$v}" {if ($sl_day == $v)}selected="selected"{/if}>{$v}&nbsp;&nbsp;</option>
                                             {/foreach}
                                         </select>
+                                        <span class="qlo-select-icon qlo-input-icon"></span>
+                                        </div>
                                     </div>
                                     <div class="col-xs-4">
                                         {*
@@ -124,20 +130,26 @@
                                             {l s='November'}
                                             {l s='December'}
                                         *}
-                                        <select id="months" name="months" class="form-control">
+                                        <div class="qlo-input-wrap">
+                                        <select id="months" name="months" class="qlo-input not_uniform">
                                             <option value="">-</option>
                                             {foreach from=$months key=k item=v}
                                                 <option value="{$k}" {if ($sl_month == $k)}selected="selected"{/if}>{l s=$v}&nbsp;</option>
                                             {/foreach}
                                         </select>
+                                        <span class="qlo-select-icon qlo-input-icon"></span>
+                                        </div>
                                     </div>
                                     <div class="col-xs-4">
-                                        <select id="years" name="years" class="form-control">
+                                        <div class="qlo-input-wrap">
+                                        <select id="years" name="years" class="qlo-input not_uniform">
                                             <option value="">-</option>
                                             {foreach from=$years item=v}
                                                 <option value="{$v}" {if ($sl_year == $v)}selected="selected"{/if}>{$v}&nbsp;&nbsp;</option>
                                             {/foreach}
                                         </select>
+                                        <span class="qlo-select-icon qlo-input-icon"></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -146,24 +158,27 @@
                             <label for="old_passwd" class="required">
                                 {l s='Current Password'}
                             </label>
-                            <input class="is_required validate form-control" type="password" data-validate="isPasswd" name="old_passwd" id="old_passwd" />
+                            <input class="is_required validate qlo-input" type="password" data-validate="isPasswd" name="old_passwd" id="old_passwd" />
                         </div>
                         <div class="password form-group">
                             <label for="passwd">
                                 {l s='New Password'}
                             </label>
-                            <input class="is_required validate form-control" type="password" data-validate="isPasswd" name="passwd" id="passwd" />
+                            <input class="is_required validate qlo-input" type="password" data-validate="isPasswd" name="passwd" id="passwd" />
                         </div>
                         <div class="password form-group">
                             <label for="confirmation">
                                 {l s='Confirmation'}
                             </label>
-                            <input class="is_required validate form-control" type="password" data-validate="isPasswd" name="confirmation" id="confirmation" />
+                            <input class="is_required validate qlo-input" type="password" data-validate="isPasswd" name="confirmation" id="confirmation" />
                         </div>
                         {if isset($newsletter) && $newsletter}
                             <div class="checkbox">
-                                <label for="newsletter">
-                                    <input type="checkbox" id="newsletter" name="newsletter" value="1" {if isset($smarty.post.newsletter) && $smarty.post.newsletter == 1} checked="checked"{/if}/>
+                                <label for="newsletter" class="qlo-checkbox">
+                                    <span class="qlo-checkbox__control">
+                                    <input type="checkbox" class="not_uniform" id="newsletter" name="newsletter" value="1" {if isset($smarty.post.newsletter) && $smarty.post.newsletter == 1} checked="checked"{/if}/>
+                                    <span class="qlo-checkbox__box"></span>
+                                    </span>
                                     {l s='Sign up for our newsletter!'}
                                     {if isset($required_fields) && array_key_exists('newsletter', $field_required)}
                                     <sup> *</sup>
@@ -173,8 +188,11 @@
                         {/if}
                         {if isset($optin) && $optin}
                             <div class="checkbox">
-                                <label for="optin">
-                                    <input type="checkbox" name="optin" id="optin" value="1" {if isset($smarty.post.optin) && $smarty.post.optin == 1} checked="checked"{/if}/>
+                                <label for="optin" class="qlo-checkbox">
+                                    <span class="qlo-checkbox__control">
+                                    <input type="checkbox" class="not_uniform" name="optin" id="optin" value="1" {if isset($smarty.post.optin) && $smarty.post.optin == 1} checked="checked"{/if}/>
+                                    <span class="qlo-checkbox__box"></span>
+                                    </span>
                                     {l s='Receive special offers from our partners!'}
                                     {if isset($required_fields) && array_key_exists('optin', $field_required)}
                                     <sup> *</sup>
@@ -188,19 +206,19 @@
                             </h1>
                             <div class="form-group">
                                 <label for="">{l s='Company'}</label>
-                                <input type="text" class="form-control" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
+                                <input type="text" class="qlo-input" id="company" name="company" value="{if isset($smarty.post.company)}{$smarty.post.company}{/if}" />
                             </div>
                             <div class="form-group">
                                 <label for="siret">{l s='SIRET'}</label>
-                                <input type="text" class="form-control" id="siret" name="siret" value="{if isset($smarty.post.siret)}{$smarty.post.siret}{/if}" />
+                                <input type="text" class="qlo-input" id="siret" name="siret" value="{if isset($smarty.post.siret)}{$smarty.post.siret}{/if}" />
                             </div>
                             <div class="form-group">
                                 <label for="ape">{l s='APE'}</label>
-                                <input type="text" class="form-control" id="ape" name="ape" value="{if isset($smarty.post.ape)}{$smarty.post.ape}{/if}" />
+                                <input type="text" class="qlo-input" id="ape" name="ape" value="{if isset($smarty.post.ape)}{$smarty.post.ape}{/if}" />
                             </div>
                             <div class="form-group">
                                 <label for="website">{l s='Website'}</label>
-                                <input type="text" class="form-control" id="website" name="website" value="{if isset($smarty.post.website)}{$smarty.post.website}{/if}" />
+                                <input type="text" class="qlo-input" id="website" name="website" value="{if isset($smarty.post.website)}{$smarty.post.website}{/if}" />
                             </div>
                         {/if}
 
@@ -210,7 +228,7 @@
                             {/if}
                         {/block}
                         <div class="form-group">
-                            <button type="submit" name="submitIdentity" class="btn btn-default button button-medium">
+                            <button type="submit" name="submitIdentity" class="qlo-btn qlo-btn--primary">
                                 <span>{l s='Save'}<i class="icon-chevron-right right"></i></span>
                             </button>
                         </div>
@@ -222,14 +240,14 @@
     {block name='identity_footer_links'}
         <ul class="footer_links clearfix">
             <li>
-                <a class="btn btn-default button button-small" href="{$link->getPageLink('my-account', true)}">
+                <a class="qlo-btn qlo-btn--transparent" href="{$link->getPageLink('my-account', true)}">
                     <span>
                         <i class="icon-chevron-left"></i>{l s='Back to My account'}
                     </span>
                 </a>
             </li>
             <li>
-                <a class="btn btn-default button button-small" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
+                <a class="qlo-btn qlo-btn--transparent" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}">
                     <span>
                         <i class="icon-chevron-left"></i>{l s='Home'}
                     </span>

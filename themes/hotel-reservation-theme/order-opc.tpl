@@ -184,7 +184,7 @@
 																						<hr>
 																						<div class="row">
 																							<div class="col-sm-12 proceed_btn_block">
-																								<a class="btn btn-default button button-medium pull-right submit-guest-details" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
+																								<a class="qlo-btn qlo-btn--primary qlo-btn--lg pull-right submit-guest-details" href="{$link->getPageLink('order-opc', null, null, ['proceed_to_payment' => 1])}" title="Proceed to Payment" rel="nofollow">
 																									<span>
 																										{l s='Proceed'}
 																									</span>
@@ -299,7 +299,7 @@
 															<input type="hidden" name="submitDiscount" />
 														</div>
 														<div class="col-sm-4 col-xs-12 col-md-12 col-lg-4 submit_discount_div">
-															<button type="submit" name="submitAddDiscount" class="opc-button-small opc-btn-primary">
+															<button type="submit" name="submitAddDiscount" class="qlo-btn qlo-btn--primary">
 																<span>{l s='Apply'}</span>
 															</button>
 														</div>
