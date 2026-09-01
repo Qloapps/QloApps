@@ -311,7 +311,7 @@ class ContactControllerCore extends FrontController
                     )
                 ) {
                     // by webkul to get media link.
-                    $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('medium')));
+                    $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('large')));
 
                     if ((bool)Tools::file_get_contents($htlImgLink)) {
                         $hotel['image_url'] = $htlImgLink;

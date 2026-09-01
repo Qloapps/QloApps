@@ -49,7 +49,7 @@ class OurPropertiesControllerCore extends FrontController
                         && $hotel['id_cover_img']
                         && Validate::isLoadedObject($objHotelImage = new HotelImage($hotel['id_cover_img']))
                     ) {
-                        $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('medium')));
+                        $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('large')));
                         if ((bool)Tools::file_get_contents($htlImgLink)) {
                             $hotelsInfo[$hotelKey]['image_url'] = $htlImgLink;
                         } else {
