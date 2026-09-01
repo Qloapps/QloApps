@@ -405,7 +405,7 @@ class HotelReservationSystem extends Module
             // delete the feature prices of the room type
             HotelRoomTypeFeaturePricing::deleteFeaturePrices(false, $idProduct);
 
-            // delete the disable dates (temporary inactive status) of the room type
+            // delete the disable dates of the room type
             $objRoomDisableDates = new HotelRoomDisableDates();
             $objRoomDisableDates->deleteRoomDisableDatesByIdRoomType($idProduct);
 
