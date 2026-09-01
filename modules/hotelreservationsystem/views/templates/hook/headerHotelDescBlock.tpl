@@ -27,7 +27,7 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-md-offset-1 col-md-10 col-lg-offset-2 col-lg-8">
-							<p class="header-desc-welcome">{l s='Welcome To' mod='hotelreservationsystem'}</p>
+							<p class="header-desc-welcome">{l s='Sejam bem vindos' mod='hotelreservationsystem'}</p>
 							<hr class="heasder-desc-hr-first"/>
 							<div class="header-desc-inner-wrapper">
 								{block name='header_hotel_chain_name'}
