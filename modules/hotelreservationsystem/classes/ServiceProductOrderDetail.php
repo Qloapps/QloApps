@@ -585,24 +585,45 @@ class ServiceProductOrderDetail extends ObjectModel
     // ── REPORT METHODS ────────────────────────────────────────────────────────
 
     /**
+     * Builds the hotel WHERE fragment for report queries.
+     *
+     * @param int|array|false $idsHotel
+     * @param string          $alias
+     * @return string
+     */
+    private static function hotelFilter($idsHotel, $alias)
+    {
+        if (defined('_PS_ADMIN_DIR_')) {
+            return HotelBranchInformation::addHotelRestriction($idsHotel, $alias);
+        }
+        if (!$idsHotel) {
+            return '';
+        }
+        $ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)));
+        if (!$ids) {
+            return '';
+        }
+        return ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
+    }
+
+    /**
      * Total service revenue (tax excl) for a date range, filtered by invoice_date.
      *
      * @param array $params date_from, date_to, id_hotel, id_product, id_room, id_order,
-     *                      id_customer, id_category, id_service_product, granularity ('day'|'month'|false), id_lang
-     * @return float|array
+     *                      id_customer, id_category, id_service_product, id_lang
+     * @return float
      */
-    public static function getTotalServiceRevenue(array $params)
+    public static function getTotalRevenue(array $params)
     {
         $dateFrom         = pSQL($params['date_from']);
         $dateTo           = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel          = isset($params['id_hotel'])           ? $params['id_hotel']                  : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct        = isset($params['id_product'])         ? (int) $params['id_product']          : 0;
         $idRoom           = isset($params['id_room'])            ? (int) $params['id_room']             : 0;
         $idOrder          = isset($params['id_order'])           ? (int) $params['id_order']            : 0;
         $idCustomer       = isset($params['id_customer'])        ? (int) $params['id_customer']         : 0;
         $idCategory       = isset($params['id_category'])        ? (int) $params['id_category']         : 0;
         $idServiceProduct = isset($params['id_service_product']) ? (int) $params['id_service_product']  : 0;
-        $granularity      = isset($params['granularity'])        ? $params['granularity']               : false;
         $idLang           = isset($params['id_lang'])            ? (int) $params['id_lang']             : 0;
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -629,23 +650,7 @@ class ServiceProductOrderDetail extends ObjectModel
             .($idCustomer       ? ' AND hbd.`id_customer` = '.$idCustomer : '')
             .($idServiceProduct ? ' AND spod.`id_product` = '.$idServiceProduct : '')
             .($idCategory       ? ' AND spod.`id_product` IN (SELECT `id_product` FROM `'._DB_PREFIX_.'product` WHERE `id_category_default` = '.$idCategory.')' : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
-
-        if ($granularity === 'day' || $granularity === 'month') {
-            $groupLen = $granularity === 'month' ? 7 : 10;
-            $tsSuffix = $granularity === 'month' ? '-01' : '';
-            $rows     = Db::getInstance()->executeS(
-                'SELECT LEFT(o.`invoice_date`, '.$groupLen.') AS grp,
-                IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0) AS amt
-                '.$baseFrom.' '.$baseWhere.'
-                GROUP BY LEFT(o.`invoice_date`, '.$groupLen.')'
-            );
-            $result = array();
-            foreach ($rows as $row) {
-                $result[strtotime($row['grp'].$tsSuffix)] = (float) $row['amt'];
-            }
-            return $result;
-        }
+            .self::hotelFilter($idsHotel, 'hbd');
 
         return (float) Db::getInstance()->getValue(
             'SELECT IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0)
@@ -665,7 +670,7 @@ class ServiceProductOrderDetail extends ObjectModel
     {
         $dateFrom         = pSQL($params['date_from']);
         $dateTo           = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel          = isset($params['id_hotel'])           ? $params['id_hotel']                  : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct        = isset($params['id_product'])         ? (int) $params['id_product']          : 0;
         $idRoom           = isset($params['id_room'])            ? (int) $params['id_room']             : 0;
         $idOrder          = isset($params['id_order'])           ? (int) $params['id_order']            : 0;
@@ -698,7 +703,7 @@ class ServiceProductOrderDetail extends ObjectModel
             .($idCustomer       ? ' AND hbd.`id_customer` = '.$idCustomer : '')
             .($idServiceProduct ? ' AND spod.`id_product` = '.$idServiceProduct : '')
             .($idCategory       ? ' AND spod.`id_product` IN (SELECT `id_product` FROM `'._DB_PREFIX_.'product` WHERE `id_category_default` = '.$idCategory.')' : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+            .self::hotelFilter($idsHotel, 'hbd');
 
         return Db::getInstance()->executeS(
             'SELECT spod.`id_service_product_order_detail`, spod.`date_add`,
@@ -728,13 +733,13 @@ class ServiceProductOrderDetail extends ObjectModel
      * Used by revenue report daily table.
      *
      * @param array $params date_from, date_to, id_hotel, id_product, id_room, id_order, id_customer
-     * @return array timestamp => ['service_revenue' => float, 'tax_amount' => float]
+     * @return array timestamp => ['service_revenue' => float, 'total_tax' => float]
      */
-    public static function getDatewiseServiceRevenueTax(array $params)
+    public static function getDatewiseRevenue(array $params)
     {
         $dateFrom   = $params['date_from'];
         $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
         $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
         $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
@@ -747,7 +752,7 @@ class ServiceProductOrderDetail extends ObjectModel
             .($idRoom    ? ' AND hbd.`id_room` = '.$idRoom        : '')
             .($idOrder   ? ' AND hbd.`id_order` = '.$idOrder      : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+            .self::hotelFilter($idsHotel, 'hbd');
 
         $joins =
             'FROM `'._DB_PREFIX_.'service_product_order_detail` spod
@@ -759,7 +764,7 @@ class ServiceProductOrderDetail extends ObjectModel
         $rows = Db::getInstance()->executeS(
             'SELECT DATE(o.`date_add`) AS grp_date,
             IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0) AS service_revenue,
-            IFNULL(SUM((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount
+            IFNULL(SUM((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS total_tax
             '.$joins.'
             WHERE p.`active` = 1 AND o.`valid` = 1
             AND spod.`is_cancelled` = 0
@@ -771,7 +776,7 @@ class ServiceProductOrderDetail extends ObjectModel
             $ts = strtotime($row['grp_date']);
             $result[$ts] = array(
                 'service_revenue' => (float) $row['service_revenue'],
-                'tax_amount'      => (float) $row['tax_amount'],
+                'total_tax'       => (float) $row['total_tax'],
             );
         }
 
@@ -834,7 +839,7 @@ class ServiceProductOrderDetail extends ObjectModel
     {
         $dateFrom = pSQL($params['date_from']);
         $dateTo   = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel  = isset($params['id_hotel']) ? $params['id_hotel'] : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idTax    = isset($params['id_tax'])   ? (int) $params['id_tax'] : 0;
         $idLang   = isset($params['id_lang'])  ? (int) $params['id_lang'] : 0;
         if (!$idLang) {
@@ -862,7 +867,7 @@ class ServiceProductOrderDetail extends ObjectModel
             AND (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) > 0
             AND spod.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idTax ? ' AND t.`id_tax` = '.$idTax : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            .self::hotelFilter($idsHotel, 'hbd').'
             GROUP BY spod.`id_service_product_order_detail`
             ORDER BY spod.`date_add` ASC'
         );

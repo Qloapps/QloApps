@@ -459,6 +459,28 @@ class HotelRoomType extends ObjectModel
     // ── REPORT METHODS ────────────────────────────────────────────────────────
 
     /**
+     * Builds the hotel WHERE fragment for report queries.
+     *
+     * @param int|array|false $idsHotel
+     * @param string          $alias
+     * @return string
+     */
+    private static function hotelFilter($idsHotel, $alias)
+    {
+        if (defined('_PS_ADMIN_DIR_')) {
+            return HotelBranchInformation::addHotelRestriction($idsHotel, $alias);
+        }
+        if (!$idsHotel) {
+            return '';
+        }
+        $ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)));
+        if (!$ids) {
+            return '';
+        }
+        return ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
+    }
+
+    /**
      * Performance metrics per room type: revenue, ADR, RevPAR, occupancy, LOS.
      * Used by room-type performance report tab.
      *
@@ -469,7 +491,7 @@ class HotelRoomType extends ObjectModel
     {
         $dateFrom  = pSQL($params['date_from']);
         $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
         $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']     : 0;
         if (!$idLang) {
@@ -504,7 +526,7 @@ class HotelRoomType extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'orders` o
                 ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
             WHERE p.`active` = 1 AND p.`booking_product` = 1'
-            .($idHotel   ? HotelBranchInformation::addHotelRestriction($idHotel, 'hrt') : '')
+            .self::hotelFilter($idsHotel, 'hrt')
             .($idProduct ? ' AND hrt.`id_product` = '.$idProduct : '').'
             GROUP BY hrt.`id_product`, hrt.`id_hotel`
             ORDER BY room_revenue DESC'

@@ -45,11 +45,9 @@
         <div class="row">
             <label class="col-xs-3">{l s='Booking Source' mod='qlohotelreports'}</label>
             <div class="col-xs-9">
-                <select name="booking_type" class="form-control">
-                    <option value="0"{if !$filter_booking_type} selected="selected"{/if}>{l s='All Sources' mod='qlohotelreports'}</option>
-                    <option value="1"{if $filter_booking_type == 1} selected="selected"{/if}>{l s='Online / Direct' mod='qlohotelreports'}</option>
-                    <option value="2"{if $filter_booking_type == 2} selected="selected"{/if}>{l s='Walk-in / Admin' mod='qlohotelreports'}</option>
-                </select>
+                <input type="text" name="booking_source" class="form-control"
+                    value="{$filter_booking_source|escape:'html':'UTF-8'}"
+                    placeholder="{l s='All sources' mod='qlohotelreports'}">
             </div>
         </div>
         <div class="actions">

@@ -149,7 +149,7 @@
                                 <td class="text-right">{$reservation.children|intval}</td>
                                 <td class="text-right">{displayPrice price=$reservation.unit_price_tax_excl currency=$reservation.id_currency}</td>
                                 <td>
-                                    {if isset($booking_sources[$reservation.booking_type])}{$booking_sources[$reservation.booking_type]|escape:'html':'UTF-8'}{else}{l s='Other' mod='qlohotelreports'}{/if}
+                                    {$reservation.order_source|escape:'html':'UTF-8'}
                                 </td>
                                 <td>
                                     {if isset($booking_statuses[$reservation.id_status])}{$booking_statuses[$reservation.id_status]|escape:'html':'UTF-8'}{else}{$reservation.id_status|intval}{/if}

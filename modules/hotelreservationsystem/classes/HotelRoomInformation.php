@@ -333,6 +333,28 @@ class HotelRoomInformation extends ObjectModel
     // ── REPORT METHODS ────────────────────────────────────────────────────────
 
     /**
+     * Builds the hotel WHERE fragment for report queries.
+     *
+     * @param int|array|false $idsHotel
+     * @param string          $alias
+     * @return string
+     */
+    private static function hotelFilter($idsHotel, $alias)
+    {
+        if (defined('_PS_ADMIN_DIR_')) {
+            return HotelBranchInformation::addHotelRestriction($idsHotel, $alias);
+        }
+        if (!$idsHotel) {
+            return '';
+        }
+        $ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)));
+        if (!$ids) {
+            return '';
+        }
+        return ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
+    }
+
+    /**
      * Room type list for filter dropdowns in reports.
      *
      * @param array $params id_hotel, id_lang
@@ -340,7 +362,7 @@ class HotelRoomInformation extends ObjectModel
      */
     public static function getRoomTypes(array $params)
     {
-        $idHotel = isset($params['id_hotel']) ? (int) $params['id_hotel'] : 0;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idLang  = !empty($params['id_lang']) ? (int) $params['id_lang'] : (int) Context::getContext()->language->id;
 
         return Db::getInstance()->executeS(
@@ -350,7 +372,7 @@ class HotelRoomInformation extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'product_lang` pl
                 ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.$idLang.')
             WHERE p.`active` = 1 AND p.`booking_product` = 1'
-            . ($idHotel ? ' AND hri.`id_hotel` = '.$idHotel : '')
+            . self::hotelFilter($idsHotel, 'hri')
             . ' ORDER BY pl.`name`'
         );
     }
@@ -366,7 +388,7 @@ class HotelRoomInformation extends ObjectModel
     {
         $dateFrom  = pSQL($params['date_from']);
         $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
         $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']     : 0;
         if (!$idLang) {
@@ -382,7 +404,7 @@ class HotelRoomInformation extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'product_lang` pl
                 ON (pl.`id_product` = hri.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
             WHERE 1'
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hri')
+            .self::hotelFilter($idsHotel, 'hri')
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
             GROUP BY hri.`id_product`'
         );
@@ -398,7 +420,7 @@ class HotelRoomInformation extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
             WHERE hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
             AND hbd.`date_from` < "'.$dateToNext.'" AND hbd.`date_to` > "'.$dateFrom.'"'
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .self::hotelFilter($idsHotel, 'hbd')
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
         );
 
@@ -448,12 +470,12 @@ class HotelRoomInformation extends ObjectModel
      * @param array $params date_from, date_to, id_hotel, id_product, id_lang, housekeeping_installed
      * @return array
      */
-    public static function getRoomStatusForReports(array $params)
+    public static function getRoomStatus(array $params)
     {
         $dateFrom              = pSQL($params['date_from']);
         $dateTo                = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
         $dateToNext            = pSQL(date('Y-m-d', strtotime('+1 day', strtotime($dateTo))));
-        $idHotel               = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct             = isset($params['id_product']) ? (int) $params['id_product'] : 0;
         $idLang                = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
         $housekeepingInstalled = !empty($params['housekeeping_installed']);
@@ -500,7 +522,7 @@ class HotelRoomInformation extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = bkgs.`id_customer`)
             WHERE p.`active` = 1 AND p.`booking_product` = 1'
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
-            .($idHotel ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+            .self::hotelFilter($idsHotel, 'hri').'
             ORDER BY hbil.`hotel_name`, pl.`name`, hri.`room_num`'
         );
     }
@@ -513,7 +535,7 @@ class HotelRoomInformation extends ObjectModel
      */
     public static function getDistinctFloors(array $params = array())
     {
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']         : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
@@ -523,7 +545,7 @@ class HotelRoomInformation extends ObjectModel
                 ON (p.`id_product` = hri.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
             WHERE hri.`floor` != "" AND hri.`floor` IS NOT NULL'
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
-            .($idHotel ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
+            .self::hotelFilter($idsHotel, 'hri').'
             ORDER BY hri.`floor`'
         );
     }

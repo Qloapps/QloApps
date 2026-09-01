@@ -3184,6 +3184,28 @@ class OrderCore extends ObjectModel
     // ── REPORT METHODS ────────────────────────────────────────────────────────
 
     /**
+     * Builds the hotel WHERE fragment for report queries.
+     *
+     * @param int|array|false $idsHotel
+     * @param string          $alias
+     * @return string
+     */
+    protected static function hotelFilter($idsHotel, $alias)
+    {
+        if (defined('_PS_ADMIN_DIR_')) {
+            return HotelBranchInformation::addHotelRestriction($idsHotel, $alias);
+        }
+        if (!$idsHotel) {
+            return '';
+        }
+        $ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)));
+        if (!$ids) {
+            return '';
+        }
+        return ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
+    }
+
+    /**
      * Orders with unpaid balance for the outstanding-payments report.
      *
      * @param array $params date_from, date_to, id_hotel, id_order
@@ -3193,12 +3215,12 @@ class OrderCore extends ObjectModel
     {
         $dateFrom = pSQL($params['date_from']);
         $dateTo   = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel  = isset($params['id_hotel'])  ? $params['id_hotel']         : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idOrder  = isset($params['id_order'])  ? (int) $params['id_order']  : 0;
 
-        $hotelExists = $idHotel
-            ? ' AND EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = o.`id_order`'
-              .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').')'
+        $hotelFilter = self::hotelFilter($idsHotel, 'hbd');
+        $hotelExists = $hotelFilter
+            ? ' AND EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = o.`id_order`'.$hotelFilter.')'
             : '';
 
         return Db::getInstance()->executeS(
@@ -3237,40 +3259,21 @@ class OrderCore extends ObjectModel
      * Total order-level discounts applied to hotel orders in the date range.
      * Returns positive number representing the discount amount.
      *
-     * @param array $params date_from, date_to, id_hotel, id_customer, granularity ('day'|false)
-     * @return float|array scalar when no granularity, timestamp => float when granularity='day'
+     * @param array $params date_from, date_to, id_hotel, id_customer
+     * @return float
      */
     public static function getTotalDiscounts(array $params)
     {
         $dateFrom    = pSQL($params['date_from']);
         $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel     = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idCustomer  = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
-        $granularity = isset($params['granularity']) ? $params['granularity']       : false;
 
         $hotelExists = ' AND EXISTS (
             SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`id_order` = o.`id_order`'
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .self::hotelFilter($idsHotel, 'hbd')
             .')';
-
-        if ($granularity === 'day') {
-            $rows = Db::getInstance()->executeS(
-                'SELECT LEFT(o.`invoice_date`, 10) AS grp,
-                IFNULL(SUM(o.`total_discounts_tax_excl` / o.`conversion_rate`), 0) AS amt
-                FROM `'._DB_PREFIX_.'orders` o
-                WHERE o.`valid` = 1
-                AND o.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-                .($idCustomer ? ' AND o.`id_customer` = '.$idCustomer : '')
-                .$hotelExists.'
-                GROUP BY LEFT(o.`date_add`, 10)'
-            );
-            $result = array();
-            foreach ($rows as $row) {
-                $result[strtotime($row['grp'])] = (float) $row['amt'];
-            }
-            return $result;
-        }
 
         return (float) Db::getInstance()->getValue(
             'SELECT IFNULL(SUM(o.`total_discounts_tax_excl` / o.`conversion_rate`), 0)
@@ -3293,7 +3296,7 @@ class OrderCore extends ObjectModel
     {
         $dateFrom  = isset($params['date_from']) ? pSQL($params['date_from']) : '';
         $dateTo    = isset($params['date_to'])   ? pSQL($params['date_to'])   : '';
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
         $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']    : 0;
         if (!$idLang) {
@@ -3325,7 +3328,7 @@ class OrderCore extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'state` st ON (st.`id_state` = a.`id_state`)
             WHERE o.`valid` = 1'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            .self::hotelFilter($idsHotel, 'hbd').'
             GROUP BY c.`id_customer`'
             .($dateFrom && $dateTo
                 ? ' HAVING MAX(IF(hbd.`date_from` <= "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'", 1, 0)) = 1'

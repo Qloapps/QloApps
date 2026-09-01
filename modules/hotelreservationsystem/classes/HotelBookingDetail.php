@@ -3893,52 +3893,92 @@ class HotelBookingDetail extends ObjectModel
     // ── REPORT METHODS ────────────────────────────────────────────────────────
 
     /**
-     * Total room revenue (tax excl) for a date range, filtered by invoice_date.
+     * Builds the hotel WHERE fragment for report queries.
+     * Admin context: uses addHotelRestriction (employee-profile filtered).
+     * Non-admin context: builds IN (...) directly from the supplied IDs.
+     *
+     * @param int|array|false $idsHotel Scalar ID, array of IDs, or false for no filter
+     * @param string          $alias    SQL table alias
+     * @return string
+     */
+    private static function hotelFilter($idsHotel, $alias)
+    {
+        if (defined('_PS_ADMIN_DIR_')) {
+            return HotelBranchInformation::addHotelRestriction($idsHotel, $alias);
+        }
+        if (!$idsHotel) {
+            return '';
+        }
+        $ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)));
+        if (!$ids) {
+            return '';
+        }
+        return ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
+    }
+
+    /**
+    /**
+     * Per-day booking summary keyed by booking-creation date (date_add).
+     * Returns room revenue, tax, rooms booked, and room nights for each day bookings were placed.
      *
      * @param array $params date_from, date_to, id_hotel, id_product, id_room, id_order, id_customer
-     * @return float
+     * @return array timestamp => ['total_price_tax_excl' => float, 'total_tax' => float, 'rooms_booked' => int, 'room_nights' => int]
      */
-    public static function getTotalRoomRevenue(array $params)
+    public static function getDatewiseSummary(array $params)
     {
         $dateFrom   = pSQL($params['date_from']);
         $dateTo     = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idsHotel   = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
         $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
         $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
 
-        $value = Db::getInstance()->getValue(
-            'SELECT IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0)
-            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
-            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-            WHERE p.`active` = 1
-            AND o.`valid` = 1
-            AND hbd.`is_refunded` = 0
-            AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-            .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
+        $whereFilters = ($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
             .($idOrder    ? ' AND hbd.`id_order` = '.$idOrder        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
-        );
+            .self::hotelFilter($idsHotel, 'hbd');
 
-        return (float) $value;
+        $rows = Db::getInstance()->executeS(
+            'SELECT DATE(o.`date_add`) AS grp_date,
+            IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS total_price_tax_excl,
+            IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS total_tax,
+            SUM(CASE WHEN hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0 THEN 1 ELSE 0 END) AS rooms_booked,
+            SUM(CASE WHEN hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
+                THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END) AS room_nights
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
+            WHERE p.`active` = 1 AND o.`valid` = 1
+            AND o.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            .$whereFilters.'
+            GROUP BY DATE(o.`date_add`)'
+        );
+        $result = array();
+        foreach ($rows as $row) {
+            $ts = strtotime($row['grp_date']);
+            $result[$ts] = array(
+                'total_price_tax_excl' => (float) $row['total_price_tax_excl'],
+                'total_tax'            => (float) $row['total_tax'],
+                'rooms_booked'         => (int) $row['rooms_booked'],
+                'room_nights'          => (int) $row['room_nights'],
+            );
+        }
+        return $result;
     }
 
     /**
-     * Daily room revenue + tax amount split, keyed by Unix timestamp.
-     * Used by revenue report daily table (needs excl + tax columns per day).
+     * Daily room revenue + tax amount split keyed by occupancy date (pro-rated per night).
      *
      * @param array $params date_from, date_to, id_hotel, id_product, id_room, id_order, id_customer
-     * @return array timestamp => ['room_revenue' => float, 'tax_amount' => float]
+     * @return array timestamp => ['total_price_tax_excl' => float, 'total_tax' => float]
      */
-    public static function getDatewiseRoomRevenueTax(array $params)
+    public static function getDatewiseRevenue(array $params)
     {
         $dateFrom   = $params['date_from'];
         $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
         $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
         $idOrder    = isset($params['id_order'])    ? (int) $params['id_order']    : 0;
@@ -3951,36 +3991,7 @@ class HotelBookingDetail extends ObjectModel
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
             .($idOrder    ? ' AND hbd.`id_order` = '.$idOrder        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
-
-        if (isset($params['date_type']) && $params['date_type'] === 'created') {
-            $rows = Db::getInstance()->executeS(
-                'SELECT DATE(o.`date_add`) AS grp_date,
-                IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS room_revenue,
-                IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount,
-                SUM(CASE WHEN hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0 THEN 1 ELSE 0 END) AS rooms_booked,
-                SUM(CASE WHEN hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
-                    THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END) AS room_nights
-                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
-                LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-                WHERE p.`active` = 1 AND o.`valid` = 1
-                AND o.`date_add` BETWEEN "'.pSQL($dateFrom).' 00:00:00" AND "'.pSQL($dateTo).' 23:59:59"'
-                .$whereFilters.'
-                GROUP BY DATE(o.`date_add`)'
-            );
-            $result = array();
-            foreach ($rows as $row) {
-                $ts = strtotime($row['grp_date']);
-                $result[$ts] = array(
-                    'room_revenue' => (float) $row['room_revenue'],
-                    'tax_amount'   => (float) $row['tax_amount'],
-                    'rooms_booked' => (int) $row['rooms_booked'],
-                    'room_nights'  => (int) $row['room_nights'],
-                );
-            }
-            return $result;
-        }
+            .self::hotelFilter($idsHotel, 'hbd');
 
         while ($current <= $dateTo) {
             $nextDay = date('Y-m-d', strtotime('+1 day', strtotime($current)));
@@ -3989,11 +4000,11 @@ class HotelBookingDetail extends ObjectModel
                 'SELECT IFNULL(SUM(
                     ROUND(hbd.`total_price_tax_excl` / NULLIF(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0), 6)
                     / o.`conversion_rate`
-                ), 0) AS room_revenue,
+                ), 0) AS total_price_tax_excl,
                 IFNULL(SUM(
                     ROUND((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / NULLIF(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0), 6)
                     / o.`conversion_rate`
-                ), 0) AS tax_amount
+                ), 0) AS total_tax
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
@@ -4004,8 +4015,8 @@ class HotelBookingDetail extends ObjectModel
                 .$whereFilters
             );
             $result[$ts] = array(
-                'room_revenue' => (float) $row['room_revenue'],
-                'tax_amount'   => (float) $row['tax_amount'],
+                'total_price_tax_excl' => (float) $row['total_price_tax_excl'],
+                'total_tax'            => (float) $row['total_tax'],
             );
             $current = $nextDay;
         }
@@ -4023,7 +4034,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom   = $params['date_from'];
         $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
         $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
@@ -4042,7 +4053,7 @@ class HotelBookingDetail extends ObjectModel
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
                 .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
                 .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+                .self::hotelFilter($idsHotel, 'hbd')
             );
             $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
         }
@@ -4060,7 +4071,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom   = $params['date_from'];
         $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
         $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']     : 0;
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
@@ -4080,7 +4091,7 @@ class HotelBookingDetail extends ObjectModel
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
                 .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
                 .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+                .self::hotelFilter($idsHotel, 'hbd')
             );
             $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
         }
@@ -4099,7 +4110,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom    = pSQL($params['date_from']);
         $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel     = isset($params['id_hotel'])     ? $params['id_hotel']           : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct   = isset($params['id_product'])   ? (int) $params['id_product']  : 0;
         $idRoom      = isset($params['id_room'])      ? (int) $params['id_room']     : 0;
         $idCustomer  = isset($params['id_customer'])  ? (int) $params['id_customer'] : 0;
@@ -4129,7 +4140,7 @@ class HotelBookingDetail extends ObjectModel
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .self::hotelFilter($idsHotel, 'hbd')
         );
     }
 
@@ -4144,7 +4155,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom    = pSQL($params['date_from']);
         $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel     = isset($params['id_hotel'])     ? $params['id_hotel']           : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct   = isset($params['id_product'])   ? (int) $params['id_product']  : 0;
         $idRoom      = isset($params['id_room'])      ? (int) $params['id_room']     : 0;
         $idCustomer  = isset($params['id_customer'])  ? (int) $params['id_customer'] : 0;
@@ -4166,7 +4177,7 @@ class HotelBookingDetail extends ObjectModel
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .self::hotelFilter($idsHotel, 'hbd')
         );
     }
 
@@ -4182,7 +4193,7 @@ class HotelBookingDetail extends ObjectModel
         $today      = pSQL(date('Y-m-d'));
         $dateFrom   = isset($params['date_from']) ? pSQL($params['date_from']) : $today;
         $dateTo     = isset($params['date_to'])   ? pSQL($params['date_to'])   : $today;
-        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']          : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct  = isset($params['id_product'])  ? (int) $params['id_product'] : 0;
         $idRoom     = isset($params['id_room'])     ? (int) $params['id_room']    : 0;
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer']: 0;
@@ -4203,7 +4214,7 @@ class HotelBookingDetail extends ObjectModel
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .self::hotelFilter($idsHotel, 'hbd')
         );
     }
 
@@ -4218,7 +4229,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom     = pSQL($params['date_from']);
         $dateTo       = pSQL(isset($params['date_to'])   ? $params['date_to']         : $params['date_from']);
-        $idHotel      = isset($params['id_hotel'])       ? $params['id_hotel']         : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idCustomer   = isset($params['id_customer'])    ? (int) $params['id_customer']  : 0;
         $idProduct    = isset($params['id_product'])     ? (int) $params['id_product']   : 0;
         $idStatus     = isset($params['id_status'])      ? (int) $params['id_status']    : 0;
@@ -4245,6 +4256,7 @@ class HotelBookingDetail extends ObjectModel
             (o.`total_paid_tax_incl` - o.`total_paid_real`) AS balance_due,
             o.`id_currency`, o.`conversion_rate`,
             hbd.`id_status`, hbd.`booking_type`, hbd.`date_add`,
+            IFNULL(NULLIF(o.`source`, \'\'), \'(direct)\') AS order_source,
             (SELECT CONCAT(e.`firstname`, " ", e.`lastname`)
                 FROM `'._DB_PREFIX_.'order_history` oh
                 INNER JOIN `'._DB_PREFIX_.'employee` e ON (e.`id_employee` = oh.`id_employee`)
@@ -4267,7 +4279,7 @@ class HotelBookingDetail extends ObjectModel
             .($idStatus     ? ' AND hbd.`id_status` = '.$idStatus        : '')
             .($bookingType  ? ' AND hbd.`booking_type` = '.$bookingType  : '')
             .($idOrderState ? ' AND o.`current_state` = '.$idOrderState  : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            .self::hotelFilter($idsHotel, 'hbd').'
             ORDER BY hbd.`date_add` DESC'
         );
     }
@@ -4282,16 +4294,20 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom         = pSQL($params['date_from']);
         $dateTo           = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel          = isset($params['id_hotel'])     ? $params['id_hotel']          : false;
-        $idCustomer       = isset($params['id_customer'])  ? (int) $params['id_customer'] : 0;
-        $bookingType      = isset($params['booking_type']) ? (int) $params['booking_type'] : 0;
-        $hotelRestriction = HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+        $idsHotel         = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
+        $idCustomer       = isset($params['id_customer'])   ? (int) $params['id_customer'] : 0;
+        $bookingSource    = isset($params['booking_source']) ? pSQL($params['booking_source']) : '';
+        $hotelRestriction = self::hotelFilter($idsHotel, 'hbd');
 
         $dateToNext = pSQL(date('Y-m-d', strtotime('+1 day', strtotime($dateTo))));
 
+        $sourceFilter = $bookingSource
+            ? ' WHERE per_order.`order_source` = \''.$bookingSource.'\''
+            : '';
+
         $rows = Db::getInstance()->executeS(
             'SELECT
-                per_order.`booking_type`,
+                per_order.`order_source`,
                 COUNT(*) AS bookings,
                 SUM(per_order.`rooms_booked`) AS rooms_booked,
                 SUM(per_order.`room_nights`) AS room_nights,
@@ -4303,7 +4319,8 @@ class HotelBookingDetail extends ObjectModel
                 SUM(per_order.`cancelled_rooms`) AS cancellations
             FROM (
                 SELECT
-                    hbd.`id_order`, hbd.`booking_type`,
+                    hbd.`id_order`,
+                    IFNULL(NULLIF(o.`source`, \'\'), \'(direct)\') AS order_source,
                     SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN 1 ELSE 0 END) AS rooms_booked,
                     SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
                         THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END) AS room_nights,
@@ -4324,24 +4341,18 @@ class HotelBookingDetail extends ObjectModel
                 ) ord_ref ON (ord_ref.`id_order` = hbd.`id_order`)
                 WHERE hbd.`date_from` < "'.$dateToNext.'"
                 AND hbd.`date_to` > "'.$dateFrom.'"'
-                .($idCustomer  ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-                .($bookingType ? ' AND hbd.`booking_type` = '.$bookingType : '')
+                .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
                 .$hotelRestriction.'
                 GROUP BY hbd.`id_order`
-            ) AS per_order
-            GROUP BY per_order.`booking_type`
+            ) AS per_order'
+            .$sourceFilter.'
+            GROUP BY per_order.`order_source`
             ORDER BY revenue_incl DESC'
         );
 
-        $moduleInstance = Module::getInstanceByName('hotelreservationsystem');
-        $labels = array(
-            self::ALLOTMENT_AUTO   => $moduleInstance->l('Online / Direct', 'hotelreservationsystem'),
-            self::ALLOTMENT_MANUAL => $moduleInstance->l('Walk-in / Admin', 'hotelreservationsystem'),
-        );
         $totalRevExcl = array_sum(array_column($rows, 'revenue_excl'));
         foreach ($rows as &$row) {
-            $type = (int) $row['booking_type'];
-            $row['channel_label']    = isset($labels[$type]) ? $labels[$type] : $moduleInstance->l('Other', 'hotelreservationsystem');
+            $row['channel_label']    = $row['order_source'];
             $row['tax_amount']       = (float) $row['revenue_incl'] - (float) $row['revenue_excl'];
             $row['net_revenue']      = (float) $row['revenue_excl'] - (float) $row['discount_amount'];
             $row['adr']              = (float) $row['room_nights'] > 0
@@ -4365,7 +4376,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom    = pSQL($params['date_from']);
         $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel     = isset($params['id_hotel'])     ? $params['id_hotel']          : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idCustomer  = isset($params['id_customer'])  ? (int) $params['id_customer'] : 0;
         $bookingType = isset($params['booking_type']) ? (int) $params['booking_type'] : 0;
 
@@ -4381,7 +4392,7 @@ class HotelBookingDetail extends ObjectModel
             AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idCustomer  ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
             .($bookingType ? ' AND hbd.`booking_type` = '.$bookingType : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            .self::hotelFilter($idsHotel, 'hbd').'
             GROUP BY o.`payment`, o.`module`
             ORDER BY revenue_incl DESC'
         );
@@ -4398,10 +4409,10 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom      = pSQL($params['date_from']);
         $dateTo        = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel       = isset($params['id_hotel'])       ? $params['id_hotel']         : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct     = isset($params['id_product'])     ? (int) $params['id_product'] : 0;
         $idTax         = isset($params['id_tax'])         ? (int) $params['id_tax']     : 0;
-        $revenueSource = isset($params['revenue_source']) ? $params['revenue_source']   : 'room';
+        $revenueSource = isset($params['revenue_source']) ? $params['revenue_source']   : 'all';
         $idLang        = isset($params['id_lang'])        ? (int) $params['id_lang']    : 0;
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -4425,7 +4436,7 @@ class HotelBookingDetail extends ObjectModel
             WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
             .($idTax     ? ' AND t.`id_tax` = '.$idTax           : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+            .self::hotelFilter($idsHotel, 'hbd');
 
         if ($revenueSource === 'service') {
             return ServiceProductOrderDetail::getTaxBreakdown($params);
@@ -4457,7 +4468,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom     = pSQL($params['date_from']);
         $dateTo       = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel      = isset($params['id_hotel'])    ? $params['id_hotel']          : null;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idCustomer   = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
         $idProduct    = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
         $idLang       = Context::getContext()->language->id;
@@ -4501,8 +4512,8 @@ class HotelBookingDetail extends ObjectModel
             AND orr.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             . ($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
             . ($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
-            . HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
-            GROUP BY ord.`id_htl_booking`
+            . self::hotelFilter($idsHotel, 'hbd').'
+            GROUP BY ord.`id_htl_booking`, orr.`id_order_return`
             ORDER BY orr.`date_add` DESC'
         );
     }
@@ -4526,62 +4537,28 @@ class HotelBookingDetail extends ObjectModel
      */
     public static function getDatewiseCancellations(array $params)
     {
-        $dateFrom = $params['date_from'];
-        $dateTo   = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-
-        $result  = array();
-        $current = $dateFrom;
-        while ($current <= $dateTo) {
-            $result[strtotime($current)] = 0;
-            $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
-        }
-
-        $rows = self::getCancellations(array_merge($params, array('detailed_info' => true)));
+        $result = array();
+        $rows   = self::getCancellations(array_merge($params, array('detailed_info' => true)));
         foreach ($rows as $row) {
             $ts = strtotime(date('Y-m-d', strtotime($row['cancellation_date'])));
-            if (isset($result[$ts])) {
-                $result[$ts]++;
-            }
+            $result[$ts] = isset($result[$ts]) ? $result[$ts] + 1 : 1;
         }
-
         return $result;
     }
 
     /**
      * Count of distinct orders (new bookings) created in a date range.
      *
-     * @param array $params date_from, date_to, id_hotel, id_product, id_customer, granularity ('day'|'month'|false)
-     * @return int|array
+     * @param array $params date_from, date_to, id_hotel, id_product, id_customer
+     * @return int
      */
     public static function getTotalBookings(array $params)
     {
         $dateFrom    = pSQL($params['date_from']);
         $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel     = isset($params['id_hotel'])    ? $params['id_hotel']          : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct   = isset($params['id_product'])  ? (int) $params['id_product'] : 0;
         $idCustomer  = isset($params['id_customer']) ? (int) $params['id_customer']: 0;
-        $granularity = isset($params['granularity']) ? $params['granularity']      : false;
-
-        if ($granularity === 'day') {
-            return self::getDatewiseBookings($params);
-        }
-
-        if ($granularity === 'month') {
-            $rows = Db::getInstance()->executeS(
-                'SELECT LEFT(hbd.`date_add`, 7) AS grp, COUNT(DISTINCT hbd.`id_order`) AS cnt
-                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
-                .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
-                .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
-                GROUP BY LEFT(hbd.`date_add`, 7)'
-            );
-            $result = array();
-            foreach ($rows as $row) {
-                $result[strtotime($row['grp'].'-01')] = (int) $row['cnt'];
-            }
-            return $result;
-        }
 
         $countExpr = (isset($params['count_rows']) && $params['count_rows'])
             ? 'hbd.`id`'
@@ -4593,7 +4570,7 @@ class HotelBookingDetail extends ObjectModel
             WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .self::hotelFilter($idsHotel, 'hbd')
         );
     }
 
@@ -4607,8 +4584,9 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom  = pSQL($params['date_from']);
         $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : false;
+        $idsHotel  = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+        $idRoom    = isset($params['id_room'])    ? (int) $params['id_room']    : 0;
 
         return (int) Db::getInstance()->getValue(
             'SELECT IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
@@ -4621,7 +4599,8 @@ class HotelBookingDetail extends ObjectModel
             AND hbd.`is_cancelled` = 0
             AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
-            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+            .($idRoom    ? ' AND hbd.`id_room` = '.$idRoom        : '')
+            .self::hotelFilter($idsHotel, 'hbd')
         );
     }
 
@@ -4635,7 +4614,7 @@ class HotelBookingDetail extends ObjectModel
     {
         $dateFrom   = $params['date_from'];
         $dateTo     = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel    = isset($params['id_hotel'])    ? $params['id_hotel']           : false;
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idProduct  = isset($params['id_product'])  ? (int) $params['id_product']  : 0;
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer'] : 0;
 
@@ -4649,7 +4628,7 @@ class HotelBookingDetail extends ObjectModel
                 WHERE hbd.`date_add` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
                 .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-                .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd')
+                .self::hotelFilter($idsHotel, 'hbd')
             );
             $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
         }
@@ -4663,20 +4642,15 @@ class HotelBookingDetail extends ObjectModel
      * @param array $params date_from, date_to, id_hotel, id_status (optional)
      * @return array [$timestamp => int]
      */
-    public static function getOccupiedRoomsForDiscreteDates(array $params)
+    public static function getDatewiseOccupiedRooms(array $params)
     {
         $dateFrom  = $params['date_from'];
         $dateTo    = isset($params['date_to']) ? $params['date_to'] : $params['date_from'];
-        $idHotel   = isset($params['id_hotel'])   ? $params['id_hotel']          : null;
+        $idsHotel  = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idStatus  = isset($params['id_status'])  ? (int) $params['id_status']   : null;
         $idProduct = isset($params['id_product']) ? (int) $params['id_product']  : 0;
 
-        // Delegate to AdminStatsController only when no additional filters need own SQL
-        if ($idStatus === null && !$idProduct) {
-            return AdminStatsController::getOccupiedRoomsForDiscreteDates($dateFrom, $dateTo, $idHotel ?: null);
-        }
-
-        $hotelFilter   = HotelBranchInformation::addHotelRestriction($idHotel, 'hbd');
+        $hotelFilter   = self::hotelFilter($idsHotel, 'hbd');
         $statusFilter  = $idStatus !== null ? ' AND hbd.`id_status` = '.$idStatus : '';
         $productFilter = $idProduct ? ' AND hri.`id_product` = '.$idProduct : '';
         $result        = array();
@@ -4722,20 +4696,6 @@ class HotelBookingDetail extends ObjectModel
         return $result;
     }
 
-    /**
-     * Per-day room revenue (excl. tax). Thin wrapper over getDatewiseRoomRevenueTax.
-     *
-     * @param array $params same as getDatewiseRoomRevenueTax
-     * @return array [$timestamp => float]
-     */
-    public static function getDatewiseRoomRevenue(array $params)
-    {
-        $result = array();
-        foreach (self::getDatewiseRoomRevenueTax($params) as $ts => $day) {
-            $result[$ts] = $day['room_revenue'];
-        }
-        return $result;
-    }
     /**
      * Returns all Guest Registration Card sections and their fields.
      * Modules may add, remove, or reorder sections/fields via the hook.
