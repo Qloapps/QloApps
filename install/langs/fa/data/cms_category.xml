@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<entity_cms_category>
+  <cms_category id="Home">
+    <name>خانه</name>
+    <description/>
+    <link_rewrite>home</link_rewrite>
+    <meta_title/>
+    <meta_keywords/>
+    <meta_description/>
+  </cms_category>
+</entity_cms_category>

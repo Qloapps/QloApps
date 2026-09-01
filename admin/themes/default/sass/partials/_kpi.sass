@@ -1,0 +1,179 @@
+$kpi-rows-gap: 8px
+$kpi-gap: 10px
+
+.kpi-container
+	display: flex
+	gap: 15px
+	justify-content: space-between
+	padding: 12px !important
+	.kpis-wrap
+		width: 100%
+		white-space: nowrap
+		overflow-x: auto
+		font-size: 0
+		margin-bottom: -$kpi-rows-gap
+		display: flex
+		flex-wrap: wrap
+		margin-left: -($kpi-gap / 2)
+		margin-right: -($kpi-gap / 2)
+		flex-grow: 1
+		.kpi-wrap
+			display: inline-block
+			width: 20%
+			margin-bottom: $kpi-rows-gap
+			padding-left: $kpi-gap / 2
+			padding-right: $kpi-gap / 2
+	.actions-wrap
+		width: 16px
+		button
+			padding: 0
+			border: none
+			opacity: 0.2
+			display: block
+			width: 100%
+			&:not(:first-of-type)
+				margin-top: 4px
+			&:hover
+				opacity: 0.5
+				background-color: #fff
+			&:focus,
+			&:active
+				outline: none !important
+			i
+				color: #000 !important
+				font-size: 16px
+				&.icon-ellipsis-vertical
+					position: relative
+					top: 3px
+		.dropdown-menu
+			top: 25px
+			right: 0
+			left: unset
+			min-width: 200px
+			font-size: 13px
+			padding: 8px 12px
+			label
+				font-weight: normal
+	&.no-wrapping
+		.kpis-wrap
+			white-space: normal
+			flex-wrap: nowrap
+			.kpi-wrap
+				@media (min-width: $screen-lg)
+					min-width: 20%
+				@media (max-width: $screen-lg)
+					min-width: 20%
+				@media (max-width: $screen-sm)
+					min-width: 33.33%
+				@media (max-width: $screen-xs)
+					min-width: 50%
+
+@media (max-width: $screen-desktop)
+	&.no-wrapping
+		.kpis-wrap
+			flex-wrap: nowrap !important
+
+@media (max-width: $screen-lg)
+	.kpi-container .kpis-wrap .kpi-wrap
+		width: 20%
+@media (max-width: $screen-sm)
+	.kpi-container .kpis-wrap .kpi-wrap
+		width: 33.33%
+@media (max-width: $screen-xs)
+	.kpi-container .kpis-wrap .kpi-wrap
+		width: 50%
+
+.box-stats
+	display: block
+	height: 100%
+	.boxchart-overlay
+		@include padding(10px, 10px, 5px, 10px)
+		@include margin-right(10px)
+		@include float(left)
+		@include border-radius(3px)
+	.kpi-content
+		width: 100%
+		height: 100%
+		position: relative
+		border: 1px solid #e7edfa
+		border-left-width: 3px
+		border-radius: 6px
+		padding: 4px 8px 8px 4px
+		display: flex
+		gap: 10px
+		white-space: normal
+		i.kpi-icon
+			font-size: 15px
+			text-align: center
+			color: white
+			line-height: 26px
+			background: #eee
+			width: 28px
+			height: 28px
+			@include border-radius(6px)
+		.kpi-data
+			flex-grow: 1
+		.title-subtitle
+			display: flex
+			justify-content: space-between
+			.title
+				display: block
+				color: #666
+				font-size: 13px
+
+			.subtitle
+				display: block
+				text-transform: capitalize
+				color: #aaa
+				font-size: 10px
+				position: relative
+				top: 3px
+				text-align: right
+		.value-container
+			.value
+				display: block
+				clear: both
+				font-size: 14px
+				font-weight: bold
+				color: #666
+				min-height: 22px
+				&.loading
+					height: 22px
+					min-width: 40px
+		.arrow i
+			color: #828282 !important
+	&:hover
+		text-decoration: none
+.color1
+	.kpi-content
+		border-left-color: #2BA8E3
+	i, .boxchart-overlay
+		color: #2BA8E3 !important
+.color2
+	.kpi-content
+		border-left-color: #FF5450
+	i, .boxchart-overlay
+		color: #FF5450 !important
+.color3
+	.kpi-content
+		border-left-color: #9E5BA1
+	i, .boxchart-overlay
+		color: #9E5BA1 !important
+.color4
+	.kpi-content
+		border-left-color: #95CC6B
+	i, .boxchart-overlay
+		color: #95CC6B !important
+
+.data_chart
+	rect
+		fill: white
+	path
+		stroke: white
+		stroke-width: 2
+		fill: none
+	line
+		stroke: black
+	.area
+		fill: rgba(white,0.30)
+		stroke-width: 0

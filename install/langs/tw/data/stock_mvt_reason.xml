@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<entity_stock_mvt_reason>
+  <stock_mvt_reason id="Increase">
+    <name>增加</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Decrease">
+    <name>減少</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Customer_Order">
+    <name>客戶訂購</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Regulation_following_an_inventory_of_stock">
+    <name>庫存調整1</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Regulation_following_an_inventory_of_stock_1">
+    <name>庫存調整2</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Transfer_to_another_warehouse">
+    <name>調貨給另一個倉庫</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Transfer_from_another_warehouse">
+    <name>從另一個倉庫調貨</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id="Supply_Order">
+    <name>採購單</name>
+  </stock_mvt_reason>
+</entity_stock_mvt_reason>

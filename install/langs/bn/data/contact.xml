@@ -1,0 +1,9 @@
+<?xml version='1.0'?>
+<entity_contact>
+  <contact id='Webmaster' name='ওয়েব মাস্টার'>
+    <description>যদি এই ওয়েব সাইটে একটি টেকনিকাল ত্রুটি ঘটে</description>
+  </contact>
+  <contact id='Customer_service' name='গ্রাহক সেবা '>
+    <description>যে কোনো পণ্য সম্পর্কে প্রশ্ন, একটি অর্ডার </description>
+  </contact>
+</entity_contact>

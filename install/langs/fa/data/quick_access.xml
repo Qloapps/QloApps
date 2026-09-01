@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<entity_quick_access>
+  <quick_access id="Home" name="خانه"/>
+  <quick_access id="My_Shop" name="فروشگاه من"/>
+  <quick_access id="New_category" name="شاخه جدید"/>
+  <quick_access id="New_product" name="محصول جدید"/>
+  <quick_access id="New_voucher" name="کوپن جدید"/>
+</entity_quick_access>

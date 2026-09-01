@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+	<name><![CDATA[پارسی (Persian)]]></name>
+	<language_code>fa-ir</language_code>
+	<date_format_lite>Y/m/j</date_format_lite>
+	<date_format_full>Y/m/j H:i:s</date_format_full>
+	<is_rtl>true</is_rtl>
+</language>

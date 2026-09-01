@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_profile>
+  <fields id="name" class="Profile" sql="a.id_profile = 1"/>
+  <entities>
+    <profile id="SuperAdmin"/>
+  </entities>
+</entity_profile>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+	<name><![CDATA[Français (French)]]></name>
+	<language_code>fr</language_code>
+	<date_format_lite>d/m/Y</date_format_lite>
+	<date_format_full>d/m/Y H:i:s</date_format_full>
+	<is_rtl>false</is_rtl>
+</language>

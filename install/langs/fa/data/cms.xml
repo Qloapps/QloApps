@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>سیاست‌ها</meta_title>
+    <meta_description>سیاست‌های رزرو هتل ما</meta_description>
+    <meta_keywords>شرایط، سیاست، راهنما، پروتکل، قانون</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;سیاست‌ها&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;این صفحه حاوی محتوای نمونه برای اهداف توضیحی است و هرگونه شباهت با محصولات، خدمات یا رویدادهای واقعی به طور اتفاقی است. با تشکر از درک شما.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سیاست رزرو:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;مهمانان باید جزئیات معتبر کارت اعتباری خود را برای تضمین رزرو ارائه دهند.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;سیاست‌های لغو بستگی به نوع اتاق و طرح نرخ دارد.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;تغییرات در رزروها ممکن است به دلیل موجودی و هزینه‌های اضافی باشد.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;زمان ورود و خروج:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;زمان ورود: ۱۱:۰۰ صبح&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;زمان خروج: ۱۰:۳۰ صبح&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;درخواست‌های ورود زودهنگام و خروج دیرهنگام ممکن است با موجودی و هزینه‌های اضافی همراه باشد.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سیاست پرداخت:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;پرداخت کل هزینه اقامت باید هنگام ورود انجام شود.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;انواع پرداخت قابل قبول: کارت‌های اعتباری، نقدی، و غیره.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;ممکن است در هنگام ورود وثیقه امنیتی لازم باشد.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سیاست لغو و عدم حضور:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;لغو رزروهایی که ۷ روز قبل از ورود انجام شود، مستحق برگشت کامل هزینه می‌باشد.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;در صورت عدم حضور، مبلغ کل رزرو به حساب خواهد شد.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سیاست حیوانات خانگی:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;حیوانات خانگی با هماهنگی قبلی مورد استقبال هستند.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;ممکن است هزینه‌های اضافی برای اقامت‌های سازگار با حیوانات خانگی اعمال شود.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;مهمانان مسئول هرگونه خسارت ناشی از حیوانات خانگی خود هستند.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سیاست سیگار کشیدن:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;هتل ما بدون دودی است. سیگار کشیدن در داخل ساختمان به طور کاملاً ممنوع است.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;مناطق مشخص شده برای سیگار کشیدن در خارج از محوطه همگانی موجود است.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سیاست حفظ حریم خصوصی:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;ما متعهد به حفاظت از حریم خصوصی و اطلاعات شخصی شما هستیم.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;اطلاعات جمع‌آوری شده در طول رزرو و اقامت فقط برای اهداف عملیاتی استفاده می‌شود.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سیاست دسترسی‌پذیری:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;هتل ما به ارائه اقامتگاه‌ها و امکانات دسترسی‌پذیر برای مهمانان با ناتوانی‌های جسمی متعهد است.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;لطفاً برای درخواست‌های خاص دسترسی، به‌طور مستقیم با ما تماس بگیرید.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سیاست‌های اضافی:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;سیاست‌های اضافی ممکن است برای رویدادها، گروه‌ها بزرگ، یا رزروهای خاص اعمال شود.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;لطفاً قبل از رزرو با تیم پشتیبانی تماس بگیرید، تا سیاست‌های اضافی را بررسی کنید.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سوالات و پاسخ‌ها:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;در صورت داشتن هر گونه سوال یا ابهام، می‌توانید با تیم پشتیبانی تماس بگیرید.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;حقوق معنوی:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;این وب‌سایت حقوق معنوی خود را محفوظ می‌دارد.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;استفاده از محتوای وب‌سایت تنها با اجازه کتبی این وب‌سایت مجاز است.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;تغییرات و به‌روزرسانی‌ها:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;این صفحه ممکن است بدون اطلاع قبلی به‌روز شود. لطفاً برای اطلاع از تغییرات مداوم صفحه به آن مراجعه کنید.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>policies</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>اطلاعات قانونی</meta_title>
+    <meta_description>اطلاعات قانونی ما</meta_description>
+    <meta_keywords>قانونی، اطلاعیه، اعتبارات</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;اطلاعات قانونی&lt;/strong&gt;&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;این صفحه شامل محتوای نمونه برای اهداف توضیحی می‌باشد. هرگونه شباهت به محصولات، خدمات یا رویدادهای واقعی به صورت اتفاقی می‌باشد. از درک شما سپاسگزاریم.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;شرایط استفاده از وب‌سایت:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;محتوای این وب‌سایت فقط برای اطلاعات عمومی و استفاده شماست و ممکن است بدون اطلاع قبلی تغییر کند.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;نه ما و نه هیچ شخص ثالثی ضمانت یا تضمینی در خصوص دقت، به‌روزی، عملکرد، کامل بودن یا مناسب بودن اطلاعات و مواد موجود یا ارائه شده در این وب‌سایت برای هر مقصد خاصی نداریم. شما به این نکته پذیرفته‌اید که چنین اطلاعات و موادی ممکن است دارای نادرستی یا خطا باشند و ما به طور کامل از هرگونه مسئولیتی در قبال چنین نادرستی‌ها یا خطاهایی معافیم که بر اساس قانون مجاز می‌باشد.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;استفاده شما از هر گونه اطلاعات یا مواد موجود در این وب‌سایت کاملاً به عهده خود شماست و ما هیچ گونه مسئولیتی در قبال اینکه هر گونه محصول، خدمات یا اطلاعاتی که از این وب‌سایت در اختیار شما قرار می‌دهیم، نشاپذاری‌های خاص شما را برآورده کند نداریم.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;مالکیت فکری:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;این وب‌سایت شامل موادی است که متعلق به ما یا به ما اجازه استفاده از آن را داده است. این مواد شامل، اما به آن محدود نمی‌شود، طراحی، قالب، نمای ظاهری، و گرافیک می‌باشد. هرگونه کپی‌برداری غیرمجاز به جز طبق اعلامیه حقوقی، که جزء این شرایط و ضوابط می‌باشد، ممنوع است.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;همه علامت‌های تجاری که در این وب‌سایت بازتاب داده شده و متعلق به مالک اصلی آنها نیستند، در این وب‌سایت اذعان شده‌اند.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;سیاست حفظ حریم خصوصی:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;حریم خصوصی شما برای ما مهم است. لطفاً برای درک بهتر اطلاعات درباره چگونگی جمع‌آوری، استفاده، و افشای اطلاعات درباره شما، سیاست حفظ حریم خصوصی ما را مرور کنید.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;مسئولیت محدودیت:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;نه ما و نه هیچ شخص ثالثی ضمانت یا تضمینی در خصوص دقت، به‌روزی، عملکرد، کامل بودن یا مناسب بودن اطلاعات و مواد موجود یا ارائه شده در این وب‌سایت برای هر مقصد خاصی نداریم. شما به این نکته پذیرفته‌اید که چنین اطلاعات و موادی ممکن است دارای نادرستی یا خطا باشند و ما به طور کامل از هرگونه مسئولیتی در قبال چنین نادرستی‌ها یا خطاهایی معافیم که بر اساس قانون مجاز می‌باشد.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;استفاده شما از هر گونه اطلاعات یا مواد موجود در این وب‌سایت کاملاً به عهده خود شماست و ما هیچ گونه مسئولیتی در قبال اینکه هر گونه محصول، خدمات یا اطلاعاتی که از این وب‌سایت در اختیار شما قرار می‌دهیم، نشاپذاری‌های خاص شما را برآورده کند نداریم.&lt;/li&gt;
+      &lt;/ul&gt;
+    </content>
+    <link_rewrite>legal-notice</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>شرایط و ضوابط استفاده</meta_title>
+    <meta_description>شرایط و ضوابط استفاده از ما</meta_description>
+    <meta_keywords>شرایط، ضوابط، استفاده، فروش</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;شرایط و ضوابط استفاده&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;این صفحه شامل محتوای نمونه برای اهداف توضیحی می‌باشد. هرگونه شباهت به محصولات، خدمات یا رویدادهای واقعی به صورت اتفاقی می‌باشد. از درک شما سپاسگزاریم.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;سیاست لغو:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;لغو رایگان: تا ۴۸ ساعت قبل از ورود برای نرخ‌های استاندارد.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;رزروهای انجام شده با نرخ غیرقابل بازپرداخت قابل لغو یا تغییر نمی‌باشند.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;لغویات در داخل ۲۴ ساعت از ورود، هزینه اقامت یک شب را بر عهده دارند.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;تغییرات در رزروها:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;هزینه ۲۵ دلار ممکن است برای تغییر تاریخ رزرو شما بعد از رزرو اعمال شود.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;تغییرات در نوع اتاق یا تعداد مهمان‌ها بسته به در دسترس بودن در هتل می‌باشند.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;مسئولیت مهمان:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;همه مهمان‌ها باید مدارک شناسایی معتبر دولتی با عکس را در زمان ورود ارائه دهند.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;حداکثر ظرفیت برای نوع اتاق ۲ نفر می‌باشد.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;سیگار کشیدن و مصرف الکل در همه اتاق‌های مهمان و مناطق عمومی به شدت ممنوع می‌باشد.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>terms-and-conditions-of-use</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>درباره ما</meta_title>
+    <meta_description>بیشتر درباره ما بیاموزید</meta_description>
+    <meta_keywords>درباره ما، اطلاعات</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;درباره ما&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;این صفحه شامل محتوای نمونه برای اهداف توضیحی می‌باشد. هرگونه شباهت به محصولات، خدمات یا رویدادهای واقعی به صورت اتفاقی می‌باشد. از درک شما سپاسگزاریم.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;به معبد لوکس و آرام ما خوش آمدید، جایی که هر اقامت برای ارائه تجربه‌ای بی‌نظیر طراحی شده است. آیا به دنبال یک فراری آرام، سفری پربار به کاری و یا یک رویداد بی‌نظیر هستید، ما متعهد به ارائه تجربه‌ای استثنایی هستیم.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;داستان ما&lt;/p&gt;
+      &lt;p&gt;الهام گرفته از محیط آرام و فرهنگ غنی محلی، هتل ما راحتی مدرن را با الگوی بی‌زمان ارتباط داده است. اتاق‌های طراحی شده با دقت، خدمات بی‌نقص و توجه به جزییات، تعهد ما به ارائه آرامش برای مسافران را نشان می‌دهند.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;ماموریت ما&lt;/p&gt;
+      &lt;p&gt;ماموریت ما ایجاد یک خانه دور از خانه است، ارائه خدمات شخصی‌سازی شده و امکانات لوکسی که به نیازهای شما تنظیم شده است. راحتی و رضایت شما اولین اولویت‌های ما هستند و ما سعی داریم که در هر لحظه انتظارات شما را بیشتر از آنچه که انتظار می‌رود پاسخ دهیم.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;امکانات ما&lt;/p&gt;
+      &lt;p&gt;در طول اقامت خود از بهترین امکانات لذت ببرید. در اتاق‌ها و سوئیت‌های طراحی شده با دقت با منظره‌های خیره‌کننده استراحت کنید. از غذاهای گورمه در رستوران ما لذت ببرید، با نوشیدنی در بار شیک ما استراحت کنید و در مرکز آبگرمی و تناسب اندام مدرن ما دوباره احیایی کنید. از استخر خارجی آرام، باغ‌های سبز و امکانات کسب و کار مدرن ما برای پاسخگویی به تمام نیازهای شما لذت ببرید.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;تیم ما&lt;/p&gt;
+      &lt;p&gt;تیم متعهد از حرفه‌ای‌های خدمات مهمانپذیری اینجاست تا با علاقه‌مندی به برتری به شما خدمت کنند. از خدمات اختصاصی کنسیرژ تا خدمات نظافت دقیق، هر عضوی از تیم ما متعهد به ارائه اقامتی بی‌نظیر است.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;به ما بپیوندید&lt;/p&gt;
+      &lt;p&gt;جذابیت و اصالت هتل ما را برای خودتان کشف کنید. آیا برای تفریح یا کار به ما می‌آیید، ما شما را به تجربه خدمات دم‌دستی و اقامت لوکسی خود دعوت می‌کنیم. اقامت خود را با ما رزرو کنید و اجازه دهید تا اقامت شما را به یادماندنی تبدیل کنیم.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;نظرات مشتریان&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;هتل پرایم در هر لحظه انتظارات من را بیشتر از آنچه که انتظار می‌رفت تجاوز کرد. اتاق اجرایی نه تنها لوکس بود بلکه با مناظر زیبای دریاچه ای ارائه ایستگاه آرامش بود. توجه به جزئیات و خدمات شخصی سازی شده اقامت من را واقعا به یادماندنی کرد. هتل پرایم را برای مسافران کاری و تفریحی که به دنبال ترکیبی از راحتی و عالی هستند پیشنهاد می‌کنم.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;کلارک کنت&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;به عنوان یک مسافر مکرر، من می‌توانم با اطمینان بگویم که هتل پرایم به خاطر محیط آرام و مهمان نوازی استثنایی خود برجسته است. اتاق ویو یک پناهی کامل با نمایش شهر زیبا و اقامتی راحت فراهم کرد. &lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;جان دو&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>about-us</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>پرداخت امن</meta_title>
+    <meta_description>روش پرداخت امن ما</meta_description>
+    <meta_keywords>پرداخت امن، SSL، ویزا، مسترکارت، پیپال</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;پرداخت امن&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;این صفحه شامل محتوای نمونه برای اهداف توضیحی می‌باشد. هرگونه شباهت به محصولات، خدمات یا رویدادهای واقعی به صورت اتفاقی می‌باشد. از درک شما سپاسگزاریم.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;ما از امنیت شما اولویت می‌دهیم. تمام تراکنش‌های انجام شده در وب‌سایت ما با استفاده از تکنولوژی لایه‌ی امنیتی پروتکل سوکت لایه‌ی امن (SSL) رمزگذاری می‌شوند تا اطلاعات شخصی و جزئیات پرداخت شما محافظت شوند. ما کارت‌های اعتباری اصلی را قبول می‌کنیم و محیطی امن برای یک تجربه رزرو بی‌دردسر فراهم می‌کنیم. برای هرگونه پرسش درباره امنیت پرداخت، لطفا با تیم پشتیبانی مشتریان ما تماس بگیرید.&lt;/div&gt;
+    </content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

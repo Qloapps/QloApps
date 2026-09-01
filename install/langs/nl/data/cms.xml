@@ -1,0 +1,200 @@
+<?xml version='1.0'?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>Beleid</meta_title>
+    <meta_description>Ons beleid voor hotelreserveringen</meta_description>
+    <meta_keywords>voorwaarden, beleid, richtlijnen, protocol, regel</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Beleid&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Deze pagina bevat demo-inhoud ter illustratie. Elke gelijkenis met echte producten, diensten of gebeurtenissen is puur toeval. Bedankt voor uw begrip.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Reserveringsbeleid:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Gasten moeten geldige creditcardgegevens verstrekken om een reservering te garanderen.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Annuleringsvoorwaarden variëren afhankelijk van het kamertype en tariefplan.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Wijzigingen in reserveringen kunnen afhankelijk zijn van beschikbaarheid en extra kosten met zich meebrengen.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;In- en uitchecktijden:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Inchecktijd: 11:00 uur&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Uitchecktijd: 10:30 uur&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Verzoeken voor vroeg inchecken en laat uitchecken zijn afhankelijk van beschikbaarheid en kunnen extra kosten met zich meebrengen.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Betalingsbeleid:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Betaling voor het gehele verblijf dient bij het inchecken te worden voldaan.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Acceptabele betaalmethoden: creditcards, contant geld, enz.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Bij aankomst kan een borgsom vereist zijn.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Annulerings- en No-showbeleid:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Annuleringen die 7 dagen voor aankomst worden gedaan, komen in aanmerking voor een volledige terugbetaling.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;No-shows worden belast met het volledige bedrag van de reservering.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Huisdierenbeleid:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Huisdieren zijn welkom na voorafgaande afspraak.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Er kunnen extra kosten in rekening worden gebracht voor huisdiervriendelijke accommodaties.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Gasten zijn verantwoordelijk voor eventuele schade veroorzaakt door hun huisdieren.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Rookbeleid:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Ons hotel is rookvrij. Roken is ten strengste verboden binnenshuis.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Er zijn aangewezen rookruimtes beschikbaar buiten de accommodatie.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Privacybeleid:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Wij zijn toegewijd aan het beschermen van uw privacy en persoonlijke informatie.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Informatie verzameld tijdens het reserveren en verblijf wordt uitsluitend gebruikt voor operationele doeleinden.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Toegankelijkheidsbeleid:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Ons hotel streeft ernaar toegankelijke accommodaties en faciliteiten te bieden voor gasten met een handicap.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Neem rechtstreeks contact met ons op voor specifieke toegankelijkheidsverzoeken.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Aanvullend beleid:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Gebruik van hotelfaciliteiten zoals de sportschool, spa, zwembad, enzovoort.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Verwachtingen voor gedrag en gedrag tijdens het verblijf op het hotelterrein.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>policies</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Juridische kennisgeving</meta_title>
+    <meta_description>Juridische kennisgeving</meta_description>
+    <meta_keywords>kennisgeving, juridisch, credits</meta_keywords>
+    <content>
+        &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;Juridische kennisgeving&lt;/strong&gt;&lt;/h2&gt;
+        &lt;div&gt;
+        &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Deze pagina bevat demo-inhoud ter illustratie. Elke gelijkenis met echte producten, diensten of evenementen is puur toevallig. Bedankt voor uw begrip.&lt;/p&gt;
+        &lt;hr /&gt;&lt;/div&gt;
+        &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;Gebruiksvoorwaarden van de website:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;De inhoud van de pagina's van deze website is alleen voor uw algemene informatie en gebruik. Deze kan zonder kennisgeving worden gewijzigd.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Noch wij, noch derden bieden enige garantie of garantie met betrekking tot de nauwkeurigheid, tijdigheid, prestaties, volledigheid of geschiktheid van de informatie en materialen die op deze website worden gevonden of aangeboden voor een bepaald doel. U erkent dat dergelijke informatie en materialen onnauwkeurigheden of fouten kunnen bevatten, en wij sluiten uitdrukkelijk aansprakelijkheid uit voor dergelijke onnauwkeurigheden of fouten voor zover toegestaan door de wet.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Uw gebruik van informatie of materialen op deze website is geheel op eigen risico, waarvoor wij niet aansprakelijk zijn. Het is uw eigen verantwoordelijkheid om ervoor te zorgen dat producten, diensten of informatie beschikbaar via deze website voldoen aan uw specifieke vereisten.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Intellectueel eigendom:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Deze website bevat materiaal dat eigendom is van ons of onder licentie aan ons is verstrekt. Dit materiaal omvat, maar is niet beperkt tot, het ontwerp, de lay-out, uitstraling en graphics. Reproductie is verboden behalve in overeenstemming met de auteursrechtelijke kennisgeving, die deel uitmaakt van deze voorwaarden en bepalingen.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Alle handelsmerken die in deze website worden gereproduceerd, die niet eigendom zijn van of in licentie zijn gegeven aan de exploitant, worden erkend op de website.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Privacybeleid:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Uw privacy is belangrijk voor ons. Bekijk ons Privacybeleid voor meer informatie over hoe wij informatie over u verzamelen, gebruiken en openbaar maken.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Beperking van aansprakelijkheid:&lt;/p&gt;
+        &lt;ul class=&quot;margin-btm-30&quot;&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Noch wij, noch derden bieden enige garantie of garantie met betrekking tot de nauwkeurigheid, tijdigheid, prestaties, volledigheid of geschiktheid van de informatie en materialen die op deze website worden gevonden of aangeboden voor een bepaald doel. U erkent dat dergelijke informatie en materialen onnauwkeurigheden of fouten kunnen bevatten, en wij sluiten uitdrukkelijk aansprakelijkheid uit voor dergelijke onnauwkeurigheden of fouten voor zover toegestaan door de wet.&lt;/li&gt;
+        &lt;li class=&quot;margin-btm-20&quot;&gt;Uw gebruik van informatie of materialen op deze website is geheel op eigen risico, waarvoor wij niet aansprakelijk zijn. Het is uw eigen verantwoordelijkheid om ervoor te zorgen dat producten, diensten of informatie beschikbaar via deze website voldoen aan uw specifieke vereisten.&lt;/li&gt;
+        &lt;/ul&gt;
+    </content>
+    <link_rewrite>wettelijke-mededeling</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Algemene Voorwaarden</meta_title>
+    <meta_description>Onze Algemene Voorwaarden</meta_description>
+    <meta_keywords>voorwaarden, gebruik, verkoop</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Algemene Voorwaarden&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Deze pagina bevat demo-inhoud ter illustratie. Elke gelijkenis met echte producten, diensten of gebeurtenissen is puur toeval. Bedankt voor uw begrip.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Annuleringsbeleid:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Gratis annulering: Tot 48 uur voor aankomst voor standaardtarieven.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Boekingen gemaakt met een niet-restitueerbaar tarief kunnen niet worden geannuleerd of gewijzigd.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Annuleringen binnen 24 uur voor aankomst worden in rekening gebracht met een vergoeding van één overnachting.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Wijzigingen in Reserveringen:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Er kan een vergoeding van €25 van toepassing zijn om uw reserveringsdata na het boeken te wijzigen.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Wijzigingen in het kamertype of het aantal gasten zijn afhankelijk van beschikbaarheid in het hotel.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Verantwoordelijkheid van de Gast:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Alle gasten moeten bij het inchecken een geldig identiteitsbewijs met foto van de overheid tonen.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;De maximale bezetting voor het kamertype is 2 volwassenen.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Roken en alcohol zijn ten strengste verboden in alle kamers en openbare ruimtes.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>gebruiks-voorwaarden</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>Over Ons</meta_title>
+    <meta_description>Kom meer over ons te weten</meta_description>
+    <meta_keywords>over ons, informatie</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Over Ons&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Deze pagina bevat demo-inhoud ter illustratie. Elke gelijkenis met echte producten, diensten of gebeurtenissen is puur toeval. Bedankt voor uw begrip.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;Welkom in ons toevluchtsoord van luxe en rust, waar elk verblijf is ontworpen om een ongeëvenaarde ervaring te bieden. Of u nu op zoek bent naar een ontspannend uitje, een productieve zakenreis of een gedenkwaardig evenement, wij zijn toegewijd om uw bezoek uitzonderlijk te maken.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Ons Verhaal&lt;/p&gt;
+      &lt;p&gt;Geïnspireerd door serene omgevingen en rijke lokale cultuur, combineert ons hotel modern comfort met tijdloze elegantie. Onze doordachte kamers, onberispelijke service en oog voor detail weerspiegelen onze toewijding om een oase voor reizigers te bieden.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Onze Missie&lt;/p&gt;
+      &lt;p&gt;Onze missie is om een thuis weg van huis te creëren, met gepersonaliseerde service en luxe voorzieningen afgestemd op uw behoeften. Uw comfort en tevredenheid staan voorop en we streven ernaar uw verwachtingen te overtreffen bij elke gelegenheid.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Onze Voorzieningen&lt;/p&gt;
+      &lt;p&gt;Geniet van de beste voorzieningen tijdens uw verblijf. Ontspan in elegant ingerichte kamers en suites met adembenemend uitzicht. Geniet van gastronomisch dineren in ons restaurant, ontspan met een cocktail in onze stijlvolle bar, en verjong in onze ultramoderne spa en fitnesscentrum. Ontspan bij ons serene buitenzwembad, weelderige tuinen en moderne zakelijke faciliteiten die aan al uw behoeften voldoen.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Ons Team&lt;/p&gt;
+      &lt;p&gt;Ons toegewijde team van horecaprofessionals staat klaar om u te dienen met een passie voor uitmuntendheid. Van gepersonaliseerde conciërgediensten tot nauwgezette schoonmaak, elk lid van ons team zet zich in om uw verblijf buitengewoon te maken.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Kom Bij Ons&lt;/p&gt;
+      &lt;p&gt;Ontdek zelf de charme en elegantie van ons hotel. Of u nu voor vrije tijd of zakelijke doeleinden komt, wij nodigen u uit om onze warme gastvrijheid en luxe accommodaties te ervaren. Boek vandaag nog uw verblijf bij ons en laat ons uw bezoek onvergetelijk maken.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Getuigenissen&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Hotel Prime overtrof mijn verwachtingen op alle fronten. De Executive Kamer was niet alleen luxe, maar bood ook een rustige plek met een prachtig uitzicht op het meer. De aandacht voor detail en persoonlijke service maakten mijn verblijf echt onvergetelijk. Ik beveel Hotel Prime ten zeerste aan voor zowel zakelijke als recreatieve reizigers die op zoek zijn naar comfort en verfijning.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Clark Kent&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Als frequente reiziger kan ik met vertrouwen zeggen dat Hotel Prime zich onderscheidt door zijn rustige omgeving en uitzonderlijke gastvrijheid. De View Kamer bood een perfecte plek met een prachtig uitzicht over de stad en comfortabele accommodaties.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;John Doe&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>over-ons</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>Veilige Betaling</meta_title>
+    <meta_description>Onze veilige betalingsmethode</meta_description>
+    <meta_keywords>veilige betaling, SSL, Visa, MasterCard, PayPal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Veilige Betaling&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Deze pagina bevat demotekst ter illustratie. Elke overeenkomst met werkelijke producten, diensten of gebeurtenissen is puur toevallig. Bedankt voor uw begrip.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;Wij hechten veel waarde aan uw veiligheid. Alle transacties die via onze website worden gedaan, zijn versleuteld met behulp van Secure Socket Layer (SSL) technologie om uw persoonlijke informatie en betaalgegevens te beschermen. Wij accepteren alle grote creditcards en bieden een veilige omgeving voor een naadloze boekingservaring. Neem voor vragen over de betalingsbeveiliging gerust contact op met onze klantenservice.&lt;/div&gt;
+    </content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

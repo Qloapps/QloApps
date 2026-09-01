@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<entity_group>
+  <group id="Visitor" name="Odwiedzający"/>
+  <group id="Guest" name="Gość"/>
+  <group id="Customer" name="Klient"/>
+</entity_group>

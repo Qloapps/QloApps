@@ -1,0 +1,54 @@
+// Avatar
+
+@mixin avatar($size, $radius)
+    height: $size
+    width: $size
+    display: inline-block
+    text-align: center
+    overflow: hidden
+    -webkit-border-radius: $radius
+    border-radius: $radius
+    img
+        width: 100%
+        height: 100%
+    i
+        font-size: $size/3*2
+        line-height: $size
+
+// Vendor-prefix helper (replaces Compass experimental mixin)
+@mixin experimental($property, $value)
+    -webkit-#{$property}: $value
+    -moz-#{$property}: $value
+    -ms-#{$property}: $value
+    #{$property}: $value
+
+// Returns $dark or $light based on $color luminance (replaces Compass contrast-color)
+@function contrast-color($color, $dark, $light)
+    @if lightness($color) > 50%
+        @return $dark
+    @else
+        @return $light
+
+// Opacity with IE filter fallback
+@mixin opacity($value)
+    opacity: $value
+    filter: alpha(opacity=#{$value * 100})
+
+// Text shadow
+@mixin text-shadow($values...)
+    text-shadow: $values
+
+// Transform with vendor prefixes
+@mixin transform($values...)
+    -webkit-transform: $values
+    -ms-transform: $values
+    transform: $values
+
+// Transform style with vendor prefix
+@mixin transform-style($value: preserve-3d)
+    -webkit-transform-style: $value
+    transform-style: $value
+
+// Background image wrapper
+@mixin background-image($values...)
+    background-image: $values

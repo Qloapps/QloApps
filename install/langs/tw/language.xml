@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+	<name><![CDATA[正體中文 (Traditional Chinese)]]></name>
+	<language_code>tw-tw</language_code>
+	<date_format_lite>Y-m-d</date_format_lite>
+	<date_format_full>Y-m-d H:i:s</date_format_full>
+	<is_rtl>false</is_rtl>
+</language>

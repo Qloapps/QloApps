@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>Политики</meta_title>
+    <meta_description>Наши политики бронирования отеля</meta_description>
+    <meta_keywords>условия, политика, руководство, протокол, правило</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Политики&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Эта страница содержит демонстрационный контент исключительно в иллюстративных целях. Любое сходство с реальными продуктами, услугами или событиями является случайным. Спасибо за понимание.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Политика бронирования:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Гостям необходимо предоставить действующие данные кредитной карты для гарантирования бронирования.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Политика отмены зависит от типа номера и тарифного плана.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Изменения в бронировании могут взиматься в зависимости от наличия номеров и дополнительных сборов.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Время заезда и выезда:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Время заезда: 11:00 утра&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Время выезда: 10:30 утра&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Запросы на ранний заезд и поздний выезд рассматриваются в зависимости от наличия номеров и могут взиматься дополнительные сборы.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Политика оплаты:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Оплата за проживание производится при заезде.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Допустимые формы оплаты: кредитные карты, наличные и т. д.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Может потребоваться залог при заезде.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Политика отмены и неприбытия:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Отмены, сделанные за 7 дней до заезда, имеют право на полный возврат средств.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;В случае неприбытия будет взиматься полная стоимость бронирования.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Политика по отношению к домашним животным:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Домашние животные допускаются при предварительном согласовании.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Могут взиматься дополнительные сборы за размещение с домашними животными.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Гости несут ответственность за любые повреждения, причиненные их домашними животными.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Политика курения:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Наш отель является местом без курения. Курение в помещениях строго запрещено.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;На территории отеля есть специально оборудованные места для курения.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Политика конфиденциальности:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Мы стремимся защитить вашу конфиденциальность и персональную информацию.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Информация, собранная во время бронирования и проживания, используется исключительно в операционных целях.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Политика доступности:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Наш отель стремится предоставлять доступное размещение и удобства для гостей с ограниченными возможностями.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Пожалуйста, свяжитесь с нами напрямую для конкретных запросов доступности.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Дополнительные политики:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Использование отельных удобств, таких как тренажерный зал, спа, бассейн и т. д.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Ожидаемое поведение гостей и требования к ним во время пребывания в отеле.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>policies</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Юридическое уведомление</meta_title>
+    <meta_description>Юридическое уведомление</meta_description>
+    <meta_keywords>уведомление, юридическое, кредиты</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;Юридическое уведомление&lt;/strong&gt;&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Эта страница содержит демонстрационный контент исключительно в иллюстративных целях. Любое сходство с реальными продуктами, услугами или событиями является случайным. Благодарим за понимание.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;Условия использования сайта:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Содержимое страниц данного сайта предназначено только для вашей общей информации и использования. Оно может быть изменено без предварительного уведомления.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Ни мы, ни третьи лица не гарантируем или не несем ответственности за точность, своевременность, производительность, полноту или пригодность информации и материалов, размещенных или предлагаемых на этом сайте для какой-либо конкретной цели. Вы соглашаетесь с тем, что такая информация и материалы могут содержать неточности или ошибки, и мы исключаем ответственность за любые такие неточности или ошибки в полном объеме, допустимом по закону.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Ваше использование любой информации или материалов на этом сайте полностью на ваш собственный риск, за который мы не несем ответственности. Вы несете ответственность за обеспечение того, чтобы любые продукты, услуги или информация, доступные через этот сайт, соответствовали вашим конкретным требованиям.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Интеллектуальная собственность:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Этот сайт содержит материалы, которые являются собственностью нас или предоставлены нам по лицензии. Эти материалы включают, помимо прочего, дизайн, оформление, внешний вид и графику. Любое воспроизведение запрещено, за исключением случаев, предусмотренных авторским уведомлением, которое является частью этих условий и положений.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Все товарные знаки, воспроизведенные на этом сайте и не являющиеся собственностью или предоставленными по лицензии оператору, признаются на сайте.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Политика конфиденциальности:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Ваша конфиденциальность имеет для нас важное значение. Пожалуйста, ознакомьтесь с нашей политикой конфиденциальности, чтобы понять, как мы собираем, используем и раскрываем информацию о вас.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Ограничение ответственности:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Ни мы, ни третьи лица не гарантируем или не несем ответственности за точность, своевременность, производительность, полноту или пригодность информации и материалов, размещенных или предлагаемых на этом сайте для какой-либо конкретной цели. Вы соглашаетесь с тем, что такая информация и материалы могут содержать неточности или ошибки, и мы исключаем ответственность за любые такие неточности или ошибки в полном объеме, допустимом по закону.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;Ваше использование любой информации или материалов на этом сайте полностью на ваш собственный риск, за который мы не несем ответственности. Вы несете ответственность за обеспечение того, чтобы любые продукты, услуги или информация, доступные через этот сайт, соответствовали вашим конкретным требованиям.&lt;/li&gt;
+      &lt;/ul&gt;
+    </content>
+    <link_rewrite>legal-notice</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Условия использования</meta_title>
+    <meta_description>Наши условия использования</meta_description>
+    <meta_keywords>условия, использование, продажа</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Условия использования&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Эта страница содержит демонстрационный контент исключительно в иллюстративных целях. Любое сходство с реальными продуктами, услугами или событиями является случайным. Благодарим за понимание.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Политика отмены:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Бесплатная отмена: До 48 часов до прибытия для стандартных тарифов.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Бронирование по тарифу без возможности возврата не может быть отменено или изменено.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Отмена в течение 24 часов до прибытия влечет за собой штраф в размере стоимости одних суток проживания.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Изменение бронирования:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Возможно взимание платы в размере $25 за изменение дат бронирования после подтверждения.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Изменение типа номера или количества гостей осуществляется в зависимости от наличия в отеле.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Обязанности гостя:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Все гости должны предъявить действующее удостоверение личности с фотографией при регистрации.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Максимальная вместимость номера составляет 2 взрослых.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Курение и употребление алкоголя строго запрещены во всех номерах и общественных местах.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>terms-and-conditions-of-use</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>О нас</meta_title>
+    <meta_description>Узнайте больше о нас</meta_description>
+    <meta_keywords>о нас, информация</meta_keywords>
+    <content>
+        &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;О нас&lt;/h2&gt;
+        &lt;div&gt;
+        &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Эта страница содержит демонстрационный контент исключительно в иллюстративных целях. Любое сходство с реальными продуктами, услугами или событиями является случайным. Благодарим за понимание.&lt;/p&gt;
+        &lt;hr /&gt;&lt;/div&gt;
+        &lt;div class=&quot;row&quot;&gt;
+        &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+        &lt;div class=&quot;cms-block&quot;&gt;
+        &lt;div class=&quot;margin-btm-30&quot;&gt;
+        &lt;p class=&quot;dark&quot;&gt;Добро пожаловать в нашу гавань роскоши и спокойствия, где каждое пребывание создано, чтобы предоставить вам непревзойденные впечатления. Независимо от того, ищете ли вы расслабляющий отдых, продуктивное деловое путешествие или запоминающееся мероприятие, мы посвящаем себя тому, чтобы сделать ваш визит исключительным.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;margin-btm-30&quot;&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Наша история&lt;/p&gt;
+        &lt;p&gt;Вдохновленные окружающей тишиной и богатой местной культурой, наш отель сочетает современный комфорт с вечной элегантностью. Наши продуманные номера, безупречное обслуживание и внимание к деталям отражают наше стремление создать убежище для путешественников.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;margin-btm-30&quot;&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Наша миссия&lt;/p&gt;
+        &lt;p&gt;Наша миссия - создать второй дом, предлагая персонализированное обслуживание и роскошные удобства, соответствующие вашим потребностям. Ваш комфорт и удовлетворение - наши главные приоритеты, и мы стремимся превзойти ваши ожидания на каждом этапе.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;margin-btm-30&quot;&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Наши удобства&lt;/p&gt;
+        &lt;p&gt;Насладитесь лучшими удобствами во время вашего пребывания. Расслабьтесь в элегантно обставленных номерах и люксах с захватывающими видами. Наслаждайтесь изысканным обедом в нашем ресторане, расслабьтесь с коктейлем в нашем стильном баре и восстановитесь в нашем современном спа-центре и фитнес-центре. Насладитесь нашим спокойным открытым бассейном, зелеными садами и современными деловыми удобствами, удовлетворяющими все ваши потребности.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;margin-btm-30&quot;&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Наша команда&lt;/p&gt;
+        &lt;p&gt;Наша преданная команда гостиничных профессионалов здесь, чтобы обслужить вас с страстью к совершенству. От персонализированных услуг консьержа до тщательной уборки номеров, каждый член нашей команды стремится сделать ваше пребывание необыкновенным.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;margin-btm-30&quot;&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Присоединяйтесь к нам&lt;/p&gt;
+        &lt;p&gt;Откройте для себя шарм и элегантность нашего отеля самостоятельно. Будь то отдых или деловая поездка, мы приглашаем вас испытать нашу теплую гостеприимность и роскошные размещения. Забронируйте ваше пребывание с нами сегодня и позвольте нам сделать ваш визит незабываемым.&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+        &lt;div class=&quot;cms-box&quot;&gt;
+        &lt;p class=&quot;page-subheading&quot;&gt;Отзывы&lt;/p&gt;
+        &lt;div class=&quot;testimonials&quot;&gt;
+        &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Отель Приме превзошел мои ожидания во всех отношениях. Эксклюзивный номер был не только роскошным, но и предоставил уединенный уголок с потрясающими видами на озеро. Внимание к деталям и персонализированное обслуживание сделали мое пребывание по-настоящему незабываемым. Я настоятельно рекомендую Отель Приме как для деловых поездок, так и для отдыхающих, ищущих сочетание комфорта и изысканности&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Кларк Кент&lt;/strong&gt;&lt;/p&gt;
+        &lt;div class=&quot;testimonials&quot;&gt;
+        &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Как частый путешественник, я с уверенностью могу сказать, что Отель Приме выделяется своей спокойной атмосферой и исключительным гостеприимством. Номер с видом на город был идеальным убежищем с его захватывающими видами и удобными апартаментами.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Джон Доу&lt;/strong&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+    </content>
+    <link_rewrite>about-us</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>Безопасная оплата</meta_title>
+    <meta_description>Наш безопасный метод оплаты</meta_description>
+    <meta_keywords>безопасная оплата, SSL, Visa, MasterCard, PayPal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Безопасная оплата&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Эта страница содержит демонстрационный контент исключительно для иллюстративных целей. Любое сходство с реальными продуктами, услугами или событиями является чисто случайным. Спасибо за понимание.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;Мы придерживаемся принципов безопасности. Все транзакции, совершаемые на нашем веб-сайте, защищены шифрованием технологии Secure Socket Layer (SSL), чтобы обеспечить защиту ваших личных данных и реквизитов платежа. Мы принимаем основные кредитные карты и предоставляем безопасную среду для безупречного опыта бронирования. Если у вас возникли вопросы по поводу безопасности платежей, не стесняйтесь обращаться в нашу службу поддержки клиентов.&lt;/div&gt;
+    </content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>Politiky</meta_title>
+    <meta_description>Naše politiky týkající se rezervací hotelu</meta_description>
+    <meta_keywords>podmínky, politika, směrnice, protokol, pravidlo</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Politiky&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Tato stránka obsahuje demo obsah pouze pro ilustrační účely. Jakákoli podobnost s reálnými produkty, službami nebo událostmi je čistě náhodná. Děkujeme za pochopení.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politika rezervace:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Hosté musí poskytnout platné údaje o platební kartě k zajištění rezervace.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Podmínky pro zrušení se liší podle typu pokoje a tarifu.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Změny rezervace mohou být podmíněny dostupností a dodatečnými poplatky.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Časy příchodu a odchodu:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Čas příchodu: 11:00 dopoledne&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Čas odchodu: 10:30 dopoledne&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Žádosti o časný příchod a pozdní odchod podléhají dostupnosti a mohou se zpoplatnit.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Platební podmínky:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Platba za celý pobyt je splatná při příjezdu.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Přijatelné formy platby: kreditní karty, hotovost, atd.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Při příjezdu může být vyžadován bezpečnostní depozit.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politika zrušení a neobjevení se:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Zrušení provedené nejpozději 7 dní před příjezdem je oprávněno k úplnému vrácení peněz.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Neobjevené rezervace budou zpoplatněny celou částkou rezervace.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politika týkající se domácích mazlíčků:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Domácí mazlíčci jsou vítáni po předchozí dohodě.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Může být účtován dodatečný poplatek za ubytování se zvířaty.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Hosté jsou odpovědní za škody způsobené jejich domácími mazlíčky.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politika kouření:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Náš hotel je nekuřácký. Kouření je přísně zakázáno v interiéru.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Jsou k dispozici vyhrazená místa pro kouření mimo prostor hotelu.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Ochrana osobních údajů:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Zavazujeme se chránit vaše soukromí a osobní údaje.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Informace získané během rezervace a pobytu se používají výhradně pro provozní účely.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Politika dostupnosti:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Náš hotel se zavazuje poskytovat přístupné ubytování a zařízení pro hosty s postižením.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Pro specifické požadavky na dostupnost nás prosím kontaktujte přímo.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Další politiky:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Použití hotelových zařízení jako jsou fitness centrum, spa, bazén, atd.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Očekávané chování a pravidla chování během pobytu v hotelu.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>politiky</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Právní upozornění</meta_title>
+    <meta_description>Právní upozornění</meta_description>
+    <meta_keywords>upozornění, právní, kredity</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;Právní upozornění&lt;/strong&gt;&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Tato stránka obsahuje demo obsah pouze pro ilustrační účely. Jakákoli podobnost s reálnými produkty, službami nebo událostmi je čistě náhodná. Děkujeme za pochopení.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Ochrana osobních údajů:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Zavazujeme se chránit vaše soukromí a osobní údaje.&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;Informace získané během rezervace a pobytu se používají výhradně pro provozní účely.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Odpovědnost:&lt;/p&gt;
+      &lt;p&gt;Náš hotel nenese odpovědnost za ztrátu nebo poškození osobního majetku hostů.&lt;/p&gt;
+      &lt;p&gt;Každý host je odpovědný za své osobní věci během pobytu v hotelu.&lt;/p&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Práva a povinnosti:&lt;/p&gt;
+      &lt;p&gt;Všechna práva vyhrazena. Jakékoliv kopírování nebo distribuce obsahu je zakázáno bez předchozího souhlasu.&lt;/p&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Změny a platnost:&lt;/p&gt;
+      &lt;p&gt;Tato stránka může být pravidelně aktualizována bez předchozího upozornění.&lt;/p&gt;
+      &lt;p&gt;Prosím, informujte se o platných podmínkách před každým použitím našich služeb.&lt;/p&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Kontakt:&lt;/p&gt;
+      &lt;p&gt;Pro více informací nebo otázky týkající se právních záležitostí nás kontaktujte na:&lt;/p&gt;
+      &lt;p&gt;Email: legal@hotel-example.com&lt;/p&gt;
+      &lt;p&gt;Telefon: +123456789&lt;/p&gt;
+    </content>
+    <link_rewrite>pravni-upozorneni</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+      <meta_title>Obchodní podmínky</meta_title>
+      <meta_description>Naše obchodní podmínky</meta_description>
+      <meta_keywords>podmínky, užití, prodej</meta_keywords>
+      <content>
+          &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Obchodní podmínky&lt;/h2&gt;
+          &lt;div&gt;
+          &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Tato stránka obsahuje demonstrační obsah pouze pro ilustrační účely. Jakékoli podobnosti s reálnými produkty, službami nebo událostmi jsou čistě náhodné. Děkujeme za pochopení.&lt;/p&gt;
+          &lt;hr /&gt;&lt;/div&gt;
+          &lt;div&gt;
+          &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Storno podmínky:&lt;/strong&gt;&lt;/h3&gt;
+          &lt;div&gt;
+          &lt;ul&gt;
+          &lt;li&gt;&lt;span&gt;Zdarma storno: Až 48 hodin před příjezdem pro standardní sazby.&lt;/span&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;span&gt;Rezervace s nevratnou sazbou nelze zrušit nebo upravit.&lt;/span&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;span&gt;Stornování méně než 24 hodin před příjezdem bude účtováno poplatkem ve výši jedné noclehu.&lt;/span&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;/div&gt;
+          &lt;br /&gt;
+          &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Změny rezervací:&lt;/strong&gt;&lt;/h3&gt;
+          &lt;div&gt;
+          &lt;ul&gt;
+          &lt;li&gt;&lt;span&gt;Poplatek ve výši 25 $ se může vztahovat na změnu termínů rezervace po jejím provedení.&lt;/span&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;span&gt;Změny typu pokoje nebo počtu hostů závisí na dostupnosti v hotelu.&lt;/span&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;/div&gt;
+          &lt;br /&gt;
+          &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Zodpovědnost hostů:&lt;/strong&gt;&lt;/h3&gt;
+          &lt;div&gt;
+          &lt;ul&gt;
+          &lt;li&gt;&lt;span&gt;Všichni hosté musí předložit platný průkaz totožnosti s fotografií vydaný vládou při ubytování.&lt;/span&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;span&gt;Maximální obsazenost pokoje je 2 dospělí.&lt;/span&gt;&lt;/li&gt;
+          &lt;li&gt;&lt;span&gt;Kouření a konzumace alkoholu jsou přísně zakázány ve všech pokojích a veřejných prostorách.&lt;/span&gt;&lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;/div&gt;
+          &lt;/div&gt;
+      </content>
+      <link_rewrite>terms-and-conditions-of-use</link_rewrite>
+  </cms>
+  <cms id="About_us">
+      <meta_title>Právní upozornění</meta_title>
+      <meta_description>Právní upozornění</meta_description>
+      <meta_keywords>upozornění, právní, autorská práva</meta_keywords>
+      <content>
+          &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;Právní upozornění&lt;/strong&gt;&lt;/h2&gt;
+          &lt;div&gt;
+          &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Tato stránka obsahuje demonstrační obsah pouze pro ilustrační účely. Jakékoli podobnosti s reálnými produkty, službami nebo událostmi jsou čistě náhodné. Děkujeme za pochopení.&lt;/p&gt;
+          &lt;hr /&gt;&lt;/div&gt;
+          &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;Podmínky užívání webu:&lt;/p&gt;
+          &lt;ul class=&quot;margin-btm-30&quot;&gt;
+          &lt;li class=&quot;margin-btm-20&quot;&gt;Obsah stránek tohoto webu je určen pouze pro vaši obecnou informaci a použití. Může se změnit bez předchozího upozornění.&lt;/li&gt;
+          &lt;li class=&quot;margin-btm-20&quot;&gt;My ani žádní třetí strany nezaručujeme nebo neneseme odpovědnost za přesnost, aktuálnost, výkon, úplnost nebo vhodnost informací a materiálů nalezených nebo nabízených na tomto webu pro jakýkoli konkrétní účel. Uznáváte, že takové informace a materiály mohou obsahovat nepřesnosti nebo chyby, a my výslovně neodpovídáme za jakékoli takové nepřesnosti nebo chyby v nejširším možném rozsahu povoleném zákonem.&lt;/li&gt;
+          &lt;li class=&quot;margin-btm-20&quot;&gt;Vaše používání jakýchkoli informací nebo materiálů na tomto webu je zcela na vašem vlastním riziku, za což nebudeme nijak odpovědní. Je na vás, abyste zajistili, že jakékoliv produkty, služby nebo informace dostupné prostřednictvím tohoto webu vyhovují vašim konkrétním požadavkům.&lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;p class=&quot;page-subheading&quot;&gt;Duševní vlastnictví:&lt;/p&gt;
+          &lt;ul class=&quot;margin-btm-30&quot;&gt;
+          &lt;li class=&quot;margin-btm-20&quot;&gt;Tento web obsahuje materiál, který je vlastněn nebo licencován nám. Tento materiál zahrnuje, ale není omezen na, design, rozvržení, vzhled a grafiku. Jakékoli reprodukce je zakázána, pokud není provedena v souladu s autorským právem, které je součástí těchto podmínek a ustanovení.&lt;/li&gt;
+          &lt;li class=&quot;margin-btm-20&quot;&gt;Všechny obchodní značky reprodukované na tomto webu, které nejsou majetkem nebo licencovány provozovatelem, jsou uznávány na webu.&lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;p class=&quot;page-subheading&quot;&gt;Ochrana osobních údajů:&lt;/p&gt;
+          &lt;ul class=&quot;margin-btm-30&quot;&gt;
+          &lt;li class=&quot;margin-btm-20&quot;&gt;Vaše soukromí je pro nás důležité. Přečtěte si naši zásadu ochrany osobních údajů, abyste porozuměli, jak shromažďujeme, používáme a zveřejňujeme informace o vás.&lt;/li&gt;
+          &lt;/ul&gt;
+          &lt;p class=&quot;page-subheading&quot;&gt;Omezení odpovědnosti:&lt;/p&gt;
+          &lt;ul class=&quot;margin-btm-30&quot;&gt;
+          &lt;li class=&quot;margin-btm-20&quot;&gt;My ani žádné třetí strany nezaručujeme nebo neneseme odpovědnost za přesnost, aktuálnost, výkon, úplnost nebo vhodnost informací a materiálů nalezených nebo nabízených na tomto webu pro jakýkoli konkrétní účel. Uznáváte, že takové informace a materiály mohou obsahovat nepřesnosti nebo chyby, a my výslovně neodpovídáme za jakékoli takové nepřesnosti nebo chyby v nejširším možném rozsahu povoleném zákonem.&lt;/li&gt;
+          &lt;li class=&quot;margin-btm-20&quot;&gt;Vaše používání jakýchkoli informací nebo materiálů na tomto webu je zcela na vašem vlastním riziku, za což nebudeme nijak odpovědní. Je na vás, abyste zajistili, že jakékoliv produkty, služby nebo informace dostupné prostřednictvím tohoto webu vyhovují vašim konkrétním požadavkům.&lt;/li&gt;
+          &lt;/ul&gt;
+      </content>
+      <link_rewrite>legal-notice</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>Bezpečná platba</meta_title>
+    <meta_description>Náš zabezpečený platební způsob</meta_description>
+    <meta_keywords>bezpečná platba, SSL, Visa, MasterCard, PayPal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Bezpečná platba&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Tato stránka obsahuje demo obsah pouze pro ilustrační účely. Jakékoliv podobnosti se skutečnými produkty, službami nebo událostmi jsou čistě náhodné. Děkujeme za pochopení.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;Klademe důraz na vaši bezpečnost. Všechny transakce provedené na našem webu jsou šifrovány pomocí technologie Secure Socket Layer (SSL), aby byly vaše osobní údaje a platební údaje chráněny. Přijímáme hlavní platební karty a poskytujeme zabezpečené prostředí pro bezproblémový rezervační zážitek. Pokud máte jakékoli dotazy ohledně bezpečnosti platby, neváhejte kontaktovat naši zákaznickou podporu.&lt;/div&gt;
+    </content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

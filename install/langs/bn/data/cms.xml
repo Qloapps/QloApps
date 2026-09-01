@@ -1,0 +1,196 @@
+<?xml version='1.0'?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>পলিসি</meta_title>
+    <meta_description>আমাদের হোটেল বুকিং নীতিমালা</meta_description>
+    <meta_keywords>conditions, policy, guidelines, protocol, rule</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;পলিসি&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;এই পৃষ্ঠাটি উদাহরণমূলক উদ্দেশ্যে ডেমো কন্টেন্ট রয়েছে। যেকোনো প্রোডাক্ট, সেবা, বা ঘটনার সাথে যদি কোনো সাম্য থাকে তাহলে তা কেবলমাত্র যেতে পারে। আপনার বুঝতে ধন্যবাদ।&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;রিজার্ভেশন নীতি:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;অতিথিদের সঠিক রিজার্ভেশন করার জন্য একটি বৈধ ক্রেডিট কার্ডের বিবরণ সরবরাহ করুন।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;রুমের ধরণ এবং রেট প্ল্যান অনুসারে বাতিলের নীতি পরিবর্তন হতে পারে।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;রিজার্ভেশনের পরিবর্তনগুলি উপলভ্যতা এবং অতিরিক্ত চার্জের অধীনে হতে পারে।&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;চেক-ইন এবং চেক-আউট সময়:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;চেক-ইন সময়: সকাল ১১:০০ টা&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;চেক-আউট সময়: সকাল ১০:৩০ টা&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;পূর্বাভিমুক্ত চেক-ইন এবং দেরি চেক-আউট অনুরোধ উপলভ্যতা এবং অতিরিক্ত চার্জের অধীনে হতে পারে।&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;পেমেন্ট নীতি:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;চেক-ইন সময় পূর্ণ অবস্থানের জন্য পরিশোধ করা আবশ্যক।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;গ্রহণযোগ্য পেমেন্টের ফর্ম: ক্রেডিট কার্ড, নগদ, ইত্যাদি।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;আগমনে নিরাপত্তা জামানোর জন্য একটি নিরাপত্তা জমা আগামী অনুমতি হতে পারে।&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;বাতিল এবং অনুপস্থিতি নীতি:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;আগমনের ৭ দিন পূর্বে বাতিলের মন্তব্য পূর্ণ ফেরতের জন্য যোগ্য।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;অনুপস্থিতিতে বুকিংর পূর্ণ পরিমাণ টাকা প্রদান করা হবে।&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;প্রাণী নীতি:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;পূর্ববর্তী ব্যবস্থার সাথে প্রাণীদের স্বাগতম।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;প্রাণী-বন্ধুত্বপূর্ণ বাসস্থানের জন্য অতিরিক্ত চার্জ প্রযোজ্য হতে পারে।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;সংশ্লিষ্ট বিষয়ে আমাদের সাথে যোগাযোগ করুন এবং বিস্তারিত তথ্য জানুন।&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;ম্যানেজমেন্ট নীতি:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;ব্যবস্থাপনা পদ্ধতি: প্রশাসনিক নির্দেশিকা অনুসরণ করুন।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-10&quot;&gt;ম্যানেজমেন্ট কমিটমেন্ট: বাড়তি সার্ভিসের জন্য প্রস্তুতি করুন।&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>policies</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>আইনি নোটিশ</meta_title>
+    <meta_description>আমাদের আইনি নোটিশ</meta_description>
+    <meta_keywords>notice, legal, credits</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;আইনি নোটিশ&lt;/strong&gt;&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;এই পৃষ্ঠাটি উদাহরণমূলক উদ্দেশ্যে ডেমো কন্টেন্ট রয়েছে। যেকোনো প্রোডাক্ট, সেবা, বা ঘটনার সাথে যদি কোনো সাম্য থাকে তাহলে তা কেবলমাত্র যেতে পারে। আপনার বুঝতে ধন্যবাদ।&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;ওয়েবসাইট ব্যবহারের শর্তাবলী:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;এই ওয়েবসাইটের পৃষ্ঠার বিষয়বস্তু আপনার সাধারণ তথ্য এবং ব্যবহারের জন্য মাত্র। এটি নোটিশ ছাড়াই পরিবর্তনের সাপেক্ষে সংশোধন করা যেতে পারে।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;আমরা বা কোনও তৃতীয় পক্ষ এই ওয়েবসাইটের তথ্য এবং উপাদানের সঠিকতা, সময়সূচী, কার্যক্ষমতা, পূর্ণতা বা উপযুক্ততা সম্পর্কে কোনও মেয়াদকাল বা গ্যারান্টি প্রদান করি না। আপনি স্বীকার করেন যে এমন তথ্য এবং উপাদান অসঠিক বা ভুল থাকতে পারে, এবং আমরা আইন অনুযায়ী এমন ভুলগুলির জন্য দায়িত্ব পূর্ণতম সীমায় অপসারিত করি।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;এই ওয়েবসাইটের যেকোনো তথ্য বা উপাদান ব্যবহার করা আপনার নিজের ঝুঁকিতে এবং আপনি এই ওয়েবসাইটের মাধ্যমে উপলব্ধ কোনও পণ্য, সেবা, বা তথ্য যাচাই করার জন্য আপনার নিজের দায়িত্ব হবে।&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;বৈষ্ণব সম্পত্তি:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;এই ওয়েবসাইটে অধিগ্রহণ করা উপাদান যা আমাদের মালিকানাধীন বা অনুমতি দেওয়া হয়। এই উপাদান প্রক্রিয়াজাতভাবে অনুলিপি করা বাদ দেওয়া হয়, যা এই শর্তাবলীর অংশ হিসেবে গড়ে তোলে।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;এই ওয়েবসাইটে উল্লিখিত সমস্ত ট্রেডমার্ক যা অপারেটরের মালিকানাধীন নয়, তারা ওয়েবসাইটে স্বীকৃতিপ্রাপ্ত হয়।&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;গোপনীয়তা নীতি:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;আপনার গোপনীয়তা আমাদের জন্য গুরুত্বপূর্ণ। আমরা আপনার সম্পর্কে তথ্য সংগ্রহ, ব্যবহার, এবং ফাঁস সম্পর্কে আমরা আমাদের গোপনীয়তা নীতি পর্যালোচনা করার জন্য আহ্বান জানাই।&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;দায়িত্বের সীমা:&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;আমরা বা কোনও তৃতীয় পক্ষ এই ওয়েবসাইটের তথ্য এবং উপাদানের সঠিকতা, সময়সূচী, কার্যক্ষমতা, পূর্ণতা বা উপযুক্ততা সম্পর্কে কোনও মেয়াদকাল বা গ্যারান্টি প্রদান করি না। আপনি স্বীকার করেন যে এমন তথ্য এবং উপাদান অসঠিক বা ভুল থাকতে পারে, এবং আমরা আইন অনুযায়ী এমন ভুলগুলির জন্য দায়িত্ব পূর্ণতম সীমায় অপসারিত করি।&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;এই ওয়েবসাইটের যেকোনো তথ্য বা উপাদান ব্যবহার করা আপনার নিজের ঝুঁকিতে এবং আপনি এই ওয়েবসাইটের মাধ্যমে উপলব্ধ কোনও পণ্য, সেবা, বা তথ্য যাচাই করার জন্য আপনার নিজের দায়িত্ব হবে।&lt;/li&gt;
+      &lt;/ul&gt;
+    </content>
+    <link_rewrite>legal-notice</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>ব্যবহারের শর্তাবলী</meta_title>
+    <meta_description>আমাদের ব্যবহারের শর্তাবলী</meta_description>
+    <meta_keywords>conditions, terms, use, sell</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;ব্যবহারের শর্তাবলী&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;এই পৃষ্ঠাটি উদাহরণমূলক উদ্দেশ্যে ডেমো কন্টেন্ট রয়েছে। যেকোনো প্রোডাক্ট, সেবা, বা ঘটনার সাথে যদি কোনো সাম্য থাকে তাহলে তা কেবলমাত্র যেতে পারে। আপনার বুঝতে ধন্যবাদ।&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;বাতিলের নীতি:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;বিনামূল্যে বাতিলযোগ্যতা: স্ট্যান্ডার্ড হারের জন্য আগমনের ৪৮ ঘণ্টা পূর্বে পর্যালোচনা।&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;প্রতিবন্ধীর হার দিয়ে বুকিং করা হয় না বা পরিবর্তিত করা যাবে না।&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;আগমনের ২৪ ঘণ্টা পূর্বে বাতিলযোগ্যতা নিয়ে এক রাতের রাজাই ফি দেওয়া হবে।&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;বুকিং পরিবর্তনের বিষয়ে:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;বুকিং করার পরে আপনার রাজাইর তারিখ পরিবর্তনের জন্য একটি ২৫ ডলারের ফি প্রযোজ্য হতে পারে।&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;রুমের প্রকার বা অতিথির সংখ্যা পরিবর্তন হতে পারে হোটেলে উপলব্ধতা অনুসারে।&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;অতিথি দায়িত্ব:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;সমস্ত অতিথিদের অ্যাক্সেস নিশ্চিত করা যাবে যে চেক-ইনে বৈধ সরকার প্রদত্ত ফটো আইডি দেওয়া হবে।&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;রুম প্রকারের সর্বাধিক গৃহবসতি ২ পুরুষ।&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;সমস্ত অতিথিকে সমস্ত অতিথি কক্ষ এবং পাবলিক এলাকায় ধূমপান এবং মদ সম্পর্কে শ্রদ্ধার্হ করা হবে।&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>terms-and-conditions-of-use</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>আমাদের সম্পর্কে</meta_title>
+    <meta_description>আমাদের সম্পর্কে আরও জানুন</meta_description>
+    <meta_keywords>about us, informations</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;আমাদের সম্পর্কে&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;এই পৃষ্ঠাটি উদাহরণমূলক উদ্দেশ্যে ডেমো কন্টেন্ট রয়েছে। যেকোনো প্রোডাক্ট, সেবা, বা ঘটনার সাথে যদি কোনো সাম্য থাকে তাহলে তা কেবলমাত্র যেতে পারে। আপনার বুঝতে ধন্যবাদ।&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;আমাদের শান্তি এবং মৃদুত্বের আশ্রয়স্থলে আপনাকে স্বাগতম, যেখানে প্রতিটি স্থানান্তর অবস্থানটি একটি অপেক্ষাকৃত অভিজ্ঞতা প্রদান করার জন্য তৈরি করা হয়েছে। আপনি যদি একটি শান্তিপূর্ণ মুক্তসম্প্রসারণ, একটি উন্নতমানের ব্যবসায়িক ভ্রমণ বা একটি মনে রাখতে, আমরা আপনার দর্শন অসাধারণ করার জন্য প্রতিশ্রুতিবদ্ধ।&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;আমাদের গল্প&lt;/p&gt;
+      &lt;p&gt;প্রাচীন পরিবেশ এবং ধনী স্থানীয় সংস্কৃতি থেকে অনুপ্রেরিত, আমাদের হোটেলটি আধুনিক সুবিধা সহ চলমান মধুর সমন্বয়ে মিশেছে। আমাদের ধর্মপ্রতি নম্রতার ডিজাইনগুলি, অপূর্ব সেবা, এবং বিস্তারিত বিবরণ আমাদের প্রয়োজনীয়তা প্রতিফলিত করে যে প্রতিষ্ঠানের জন্য একটি আশ্রয় সরবরাহ করার প্রতিশ্রুতি দেয়।&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;আমাদের লক্ষ্য&lt;/p&gt;
+      &lt;p&gt;আমাদের লক্ষ্য হল একটি বাড়ির বাইরের বাড়ি তৈরি করা, যেখানে আপনার প্রতিযোগিতামূলক সেবা এবং বিশেষ সুবিধাসমূহ প্রদান করা হয়। আপনার সুখ এবং সন্তুষ্টি আমাদের শীর্ষ অধিক্ষেপ, এবং আমরা প্রতিবেদন দেওয়ার জন্য অনুরোধ করি আপনার প্রত্যাশাগুলি প্রতিটি ঘর ত্যাগ করার চেষ্টা করি।&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;আমাদের সুবিধা&lt;/p&gt;
+      &lt;p&gt;আপনার অবস্থানের সময়ে শ্রেষ্ঠ সুবিধা অনুভব করুন। আমাদের উদ্যানপাল, অপূর্ব ভিউ সহ সুন্দরভাবে অঙ্কিত কক্ষ এবং সুযোগ অনুসারে উপস্থিত রেস্তোরাঁতে অশ্রু দিয়েন। আমাদের স্পা এবং ফিটনেস সেন্টারে জীবন নবায়ন করুন। আমাদের সুন্দর বাইর্ন পুল, জানলানি বাগান, এবং ব্যবসায়িক সুবিধাসমূহ সমস্ত প্রয়োজনীয়তা প্রদান করা হয়।&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;আমাদের দল&lt;/p&gt;
+      &lt;p&gt;আমাদের দলের প্রতিজন আতিথের জন্য একটি উৎসাহ দিয়ে এখানে আপনাকে পরিচালনা করতে। ব্যক্তিগত কনসিয়ের্জ সেবা থেকে সম্পূর্ণ হাউসকিপিং পর্যন্ত, আমাদের দলের প্রতিটি সদস্য আপনার অসাধারণ তাড়া দেওয়ার জন্য প্রতিশ্রুতিবদ্ধ।&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;আমাদের সঙ্গে যোগ দিন&lt;/p&gt;
+      &lt;p&gt;নিজের হোটেলের মন্তব্য এবং সুযোগ আবিষ্কার করুন। মনোরম বা ব্যবসায়ের জন্য যেতে, আমরা আপনাকে আমাদের গর্ম অভিনন্দন এবং মন্দিরের বাসায় অভিজ্ঞ করার জন্য আমন্ত্রিত করি। আজই আমাদের সাথে আপনার অভিজ্ঞতা অমন করুন এবং আমরা আপনার দর্শন অসমাপ্ত করার জন্য প্রচেষ্টা করি।&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;প্রশংসাপত্র&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;হোটেল প্রাইম প্রত্যাশা ছাড়াই আমার প্রত্যাশার প্রতিটি পর্যায়ে ছাড়িয়ে যাওয়ার কারণ হয়েছিল। এক্সেকিউটিভ রুমটি না শুধুমাত্র প্রাসাদাত্মক ছিল, তবু তার আকর্ষনীয় লেক দৃশ্যের সঙ্গে একটি শান্তিপ্রদ প্রায়মার পরিবেশ প্রদান করে। বিস্তারিত সেবা এবং ব্যক্তিগতকৃত পরিষেবা আমার আটকাবুজ স্মরণীয় করে দিয়েছে। আমি ব্যবসায় ও মনোরম ভ্রমণের জন্য হোটেল প্রাইম পরামর্শ দিচ্ছি যারা মঞ্চে বৃহত্তর সমস্ত রহমণীর জন্য অবস্থান প্রদান করতে চান।&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;ক্লার্ক কেন্ট&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;একটি প্রাসঙ্গিক ভ্রমণকারী হিসাবে, আমি নিশ্চিতভাবে বলতে পারি যে হোটেল প্রাইম শান্তিপূর্ণ পরিবেশ এবং অসাধারণ অতিথিসেবা জন্য বিশেষ করে বেরিয়ে উঠে। দৃশ্য রুমের সাথে একটি পরিপূর্ণ প্রতিরোধশীল প্রতিস্থান প্রদান করে যা অবশ্যই শহরের দৃশ্য দেখায় এবং মন্তব্য করতে সুবিধাজনক ছিল।&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;জন ডো&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>about-us</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>নিরাপদ অর্থ প্রদান</meta_title>
+    <meta_description>আমাদের নিরাপদ অর্থ প্রদান পদ্ধতি</meta_description>
+    <meta_keywords>secure payment, ssl, visa, mastercard, paypal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;নিরাপদ অর্থ প্রদান&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;এই পৃষ্ঠাটি উদাহরণমূলক উদ্দেশ্যে ডেমো কন্টেন্ট রয়েছে। যেকোনো প্রোডাক্ট, সেবা, বা ঘটনার সাথে যদি কোনো সাম্য থাকে তাহলে তা কেবলমাত্র যেতে পারে। আপনার বুঝতে ধন্যবাদ।&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;আমরা আপনার নিরাপত্তা অগ্রাধিকারে রাখি। আমাদের ওয়েবসাইটে যেকোনো লেনদেন এসএসএল (SSL) প্রযুক্তি ব্যবহার করে এনক্রিপ্ট করা হয় যাতে আপনার ব্যক্তিগত তথ্য এবং অর্থ প্রদানের বিবরণ সুরক্ষিত থাকে। আমরা প্রধান ক্রেডিট কার্ড গ্রহণ করি এবং সমস্ত লেনদেনের জন্য একটি নিরাপদ পরিবেশ প্রদান করি। পেমেন্ট নিরাপত্তা সম্পর্কিত যেকোনো অনুসন্ধানের জন্য, আমাদের গ্রাহক সমর্থন দলের সাথে যোগাযোগ করতে আপনার আমলার যোগাযোগ করুন।&lt;/div&gt;
+    </content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

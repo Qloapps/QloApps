@@ -1,0 +1,143 @@
+#leave_bprice
+    margin-left: 0px
+.padding-top-20
+    padding-top: 20px
+.modal-subtitle
+    font-weight: 400
+    color: #333333
+    font-size: 13px
+    padding-bottom: 10px
+.rooms-disable-dates-title
+    .rooms-disable-dates
+        thead
+            tr
+                background-color: #f1f1f1
+    margin-top: 15px
+    padding-bottom: 5px
+    font-size: 13px
+    border-bottom: solid 1px #EAEDEF
+.rooms_bulk_actions
+    .dropdown-menu
+        li > a:hover
+            cursor: pointer
+#bulk-update-rooms-button[disabled]
+    &:hover
+        cursor: not-allowed
+    border-color: $btn-default-border
+.add_disable_date_row_container
+    margin-top: 5px
+
+#deactiveDatesModal
+    .fc-popover-body .fc-daygrid-event-harness
+        .fc-event-end, .fc-event-start
+            margin-left: unset
+            margin-right: unset
+    .fc-popover.fc-more-popover
+        max-width: 450px
+    .fc-daygrid-event
+        box-shadow: 0px 1px 2px 0px rgba(171, 171, 171, 0.3)
+        border-radius: 4px
+    .fc-daygrid-day-bg
+        min-height: 40px
+    .fc-h-event.fc-event
+        border-color: #FFFFFF
+        background: #FFFFFF
+    .fc-h-event .fc-event-main
+        color: #333333
+    .fc-h-event.fc-event.calendar_hover_highlight
+        border-color: #CAE4FF
+        background: #CAE4FF
+    .fc-event-title-container
+        cursor: pointer
+        padding: 4px
+    .highlight-event-day
+        background: #F5F5F5
+    .fc-event-title
+        text-overflow: ellipsis
+        white-space: nowrap
+        max-width: 65%
+        overflow: hidden
+        padding-left: 10px
+    .event_title_container, .fc-popover-body .fc-event-title
+        border-left: 2px solid red
+    #disable_dates_form
+        .date_from_container, .date_to_container
+            .ui-datepicker
+                position: absolute
+                top: 62px
+                left: 5px
+            position: relative
+        textarea
+            border-radius: 4px
+        .form-group
+            .control-label
+                margin-bottom: 5px
+            .btn
+                border-radius: 5px
+    .modal-title
+        .add_disable_dates, .close
+            margin-right: 10px
+        .remove_disable_dates
+            margin-right: 20px
+        .close
+            line-height: 2
+        .disable_dates_title
+            .disable_dates_room_num
+                color: grey
+            display: inline-block
+            font-weight: 600
+        line-height: 2
+    .delete_disable_dates
+        margin-left: 10px
+    .delete_disable_dates:hover , .edit_disable_dates:hover
+        cursor: pointer
+    .tooltip_info_block
+        .tooltip_title
+            margin: 10px 5px
+        font-weight: 600
+        min-width: 340px
+    .tooltip_container
+        .tooltip_title
+            .close
+                opacity: 0.6
+            padding-bottom: 5px
+            font-weight: 600
+        .tooltip_label
+            font-weight: 400
+            color: #888888
+            margin-bottom: 5px
+        .tooltip_event_title
+            border: 1px solid #D9D9D9
+            border-radius: 6px
+            padding: 5px 10px
+        .tooltip_content
+            .tooltip_reason
+                word-wrap: break-word
+                max-height: 200px
+                overflow: auto
+            .tooltip_reason_container, .id_event
+                margin-top: 10px
+            &> div
+                display: inline-block
+            .row
+                margin-left: 0
+                margin-right: 0
+            ul.disable_dates_actions
+                .btn
+                    text-align: left
+                    display: block
+                    border: none
+                padding-left: 0
+                margin-bottom: 0
+                list-style-type: none
+        font-size: 14px
+        z-index: 99999
+        position: absolute
+        min-width: 450px
+        max-width: 450px
+        background: #fff
+        box-shadow: 0 8px 25px -2px rgba(0,0,0,0.20)
+        padding: 15px
+        border-radius: 6px
+    .tooltip_action_block
+        min-width: unset

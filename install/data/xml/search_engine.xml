@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_search_engine>
+  <fields id="server" class="SearchEngine">
+    <field name="server"/>
+    <field name="getvar"/>
+  </fields>
+  <entities>
+    <search_engine id="google" getvar="q">
+      <server>google</server>
+    </search_engine>
+    <search_engine id="aol" getvar="q">
+      <server>aol</server>
+    </search_engine>
+    <search_engine id="yandex" getvar="text">
+      <server>yandex</server>
+    </search_engine>
+    <search_engine id="ask_com" getvar="q">
+      <server>ask.com</server>
+    </search_engine>
+    <search_engine id="nhl_com" getvar="q">
+      <server>nhl.com</server>
+    </search_engine>
+    <search_engine id="yahoo" getvar="p">
+      <server>yahoo</server>
+    </search_engine>
+    <search_engine id="baidu" getvar="wd">
+      <server>baidu</server>
+    </search_engine>
+    <search_engine id="lycos" getvar="query">
+      <server>lycos</server>
+    </search_engine>
+    <search_engine id="exalead" getvar="q">
+      <server>exalead</server>
+    </search_engine>
+    <search_engine id="search_live" getvar="q">
+      <server>search.live</server>
+    </search_engine>
+    <search_engine id="voila" getvar="rdata">
+      <server>voila</server>
+    </search_engine>
+    <search_engine id="altavista" getvar="q">
+      <server>altavista</server>
+    </search_engine>
+    <search_engine id="bing" getvar="q">
+      <server>bing</server>
+    </search_engine>
+    <search_engine id="daum" getvar="q">
+      <server>daum</server>
+    </search_engine>
+    <search_engine id="eniro" getvar="search_word">
+      <server>eniro</server>
+    </search_engine>
+    <search_engine id="naver" getvar="query">
+      <server>naver</server>
+    </search_engine>
+    <search_engine id="msn" getvar="q">
+      <server>msn</server>
+    </search_engine>
+    <search_engine id="netscape" getvar="query">
+      <server>netscape</server>
+    </search_engine>
+    <search_engine id="cnn" getvar="query">
+      <server>cnn</server>
+    </search_engine>
+    <search_engine id="about" getvar="terms">
+      <server>about</server>
+    </search_engine>
+    <search_engine id="mamma" getvar="query">
+      <server>mamma</server>
+    </search_engine>
+    <search_engine id="alltheweb" getvar="q">
+      <server>alltheweb</server>
+    </search_engine>
+    <search_engine id="virgilio" getvar="qs">
+      <server>virgilio</server>
+    </search_engine>
+    <search_engine id="alice" getvar="qs">
+      <server>alice</server>
+    </search_engine>
+    <search_engine id="najdi" getvar="q">
+      <server>najdi</server>
+    </search_engine>
+    <search_engine id="mama" getvar="query">
+      <server>mama</server>
+    </search_engine>
+    <search_engine id="seznam" getvar="q">
+      <server>seznam</server>
+    </search_engine>
+    <search_engine id="onet" getvar="qt">
+      <server>onet</server>
+    </search_engine>
+    <search_engine id="szukacz" getvar="q">
+      <server>szukacz</server>
+    </search_engine>
+    <search_engine id="yam" getvar="k">
+      <server>yam</server>
+    </search_engine>
+    <search_engine id="pchome" getvar="q">
+      <server>pchome</server>
+    </search_engine>
+    <search_engine id="kvasir" getvar="q">
+      <server>kvasir</server>
+    </search_engine>
+    <search_engine id="sesam" getvar="q">
+      <server>sesam</server>
+    </search_engine>
+    <search_engine id="ozu" getvar="q">
+      <server>ozu</server>
+    </search_engine>
+    <search_engine id="terra" getvar="query">
+      <server>terra</server>
+    </search_engine>
+    <search_engine id="mynet" getvar="q">
+      <server>mynet</server>
+    </search_engine>
+    <search_engine id="ekolay" getvar="q">
+      <server>ekolay</server>
+    </search_engine>
+    <search_engine id="rambler" getvar="words">
+      <server>rambler</server>
+    </search_engine>
+  </entities>
+</entity_search_engine>

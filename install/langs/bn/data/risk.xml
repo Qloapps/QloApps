@@ -1,0 +1,7 @@
+<?xml version='1.0'?>
+<entity_risk>
+  <risk id='None' name='কোনটি নয় '/>
+  <risk id='Low' name='নিচু'/>
+  <risk id='Medium' name='মধ্যম'/>
+  <risk id='High' name='উচ্চ'/>
+</entity_risk>

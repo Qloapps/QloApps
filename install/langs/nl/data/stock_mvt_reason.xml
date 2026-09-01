@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<entity_stock_mvt_reason>
+  <stock_mvt_reason id='Increase'>
+    <name>Stijging</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Decrease'>
+    <name>Daling</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Customer_Order'>
+    <name>Klantenbestelling</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Regulation_following_an_inventory_of_stock'>
+    <name>Regeling na inventaris</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Regulation_following_an_inventory_of_stock_1'>
+    <name>Regeling na inventaris</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Transfer_to_another_warehouse'>
+    <name>Verplaatsing naar ander magazijn</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Transfer_from_another_warehouse'>
+    <name>Verplaatsing uit ander magazijn</name>
+  </stock_mvt_reason>
+  <stock_mvt_reason id='Supply_Order'>
+    <name>Bestelling</name>
+  </stock_mvt_reason>
+</entity_stock_mvt_reason>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<entity_supply_order_state>
+  <supply_order_state id="supply_order_state_1">
+    <name>1 - В процессе создания</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_2">
+    <name>2 - Заказ одобрен</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_3">
+    <name>3 - Ожидает оплаты</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_4">
+    <name>4 - Получен частично</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_5">
+    <name>5 - Получен</name>
+  </supply_order_state>
+  <supply_order_state id="supply_order_state_6">
+    <name>6 - Отклонен</name>
+  </supply_order_state>
+</entity_supply_order_state>

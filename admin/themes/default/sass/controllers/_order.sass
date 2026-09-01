@@ -1,0 +1,120 @@
+.nowrap
+	white-space: nowrap
+
+#customization_list
+	border: 0px
+
+.booking_occupancy_edit, .booking_occupancy
+	.occupancy-info-separator
+		margin-top: 0px
+		margin-bottom: 10px
+	.close_occupancy
+		text-decoration: underline
+
+.booking_occupancy
+	.booking_occupancy_wrapper
+		max-height: 250px
+		width: 100%
+		overflow-x: auto
+	label.room_num_wrapper
+		text-decoration: underline
+		margin-bottom: 10px
+
+#booking-documents-modal
+	.documents-list table tbody img
+		max-width: 55px
+
+.toolbar_order_status_badge
+	font-size: 12px
+.error_text
+	color: red
+.room_type_old_price
+	text-decoration: line-through
+	color: #979797
+	font-size: 12px
+.wk-input-date
+	cursor: text
+	background-color: #F5F8F9
+#room_status_info_wrapper .margin-bottom-5
+	margin-bottom: 5px
+#room_status_info_wrapper .room_status_date
+	display: none
+
+#order_detail_view .panel .panel-heading
+	height: auto
+	padding: 5px 5px 3px 5px
+	a
+		text-transform: none
+.modal-body .modal-footer
+	padding: 15px 0px 0px 0px
+.modal-body .tab-content
+	padding: 15px
+	border: 1px solid #ddd
+
+.loading_overlay
+	display: none
+	position: fixed
+	left: 0
+	top: 0
+	height: 100%
+	width: 100%
+	background-color: rgba(0, 0, 0, 0.5)
+	z-index: 100000
+	.loading-img
+		position: absolute
+		top: 50%
+		left: 0
+		right: 0
+		margin: 0 auto
+
+#customer_cart_details .overbooked_room
+	background-color: #FF69B4
+	color: #FFF
+	padding: 2px 5px
+	border-radius: 2px
+	font-weight: 600
+
+.room_status_info_form
+	.room_status
+		white-space: normal
+
+#noteContent
+	max-height: 200px
+
+.panel-refund-request .refunded_amount
+	margin-top: 2px
+
+.order-notes
+	.panel-content
+		max-height: 240px
+		overflow: auto
+
+.panel-guest_address
+	.panel-heading
+		align-items: center
+		display: flex
+		gap: 10px
+		justify-content: space-between
+		.panel-title
+			width: 100%
+		.dropdown-menu
+			right: 0
+			left: unset
+			font-size: 14px
+
+#order-details-price
+	.icon-bold
+		font-weight: 600
+	#convenience_services, #order_tax_details
+		.panel
+			.table
+				tr
+					&:last-child td
+						border-bottom: none
+					td
+						background-color: #F5F8F9
+			padding: 10px
+			background-color: #F5F8F9
+			// Adding transparent border for display while printing screen
+			border: solid 1px transparent
+			border-radius: 0

@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>Politici</meta_title>
+    <meta_description>Politici și regulamente</meta_description>
+    <meta_keywords>politici, reguli, condiții, informații</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Politici&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Această pagină conține conținut demonstrativ în scopuri ilustrative. Oricăre asemănare cu produse, servicii sau evenimente reale este întâmplătoare. Vă mulțumim pentru înțelegere.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Politica de Anulare:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Anulare gratuită: Până la 48 de ore înainte de sosire pentru tarifele standard.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Rezervările făcute cu tarif non-refundable nu pot fi anulate sau modificate.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Anulări în termen de 24 de ore de la sosire vor suporta o taxă echivalentă cu o noapte de cazare.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Modificări la Rezervări:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;O taxă de 25 USD poate fi aplicată pentru modificarea datelor rezervării după confirmare.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Modificările la tipul camerei sau numărul de persoane sunt supuse disponibilității la hotel.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;Responsabilitatea Oaspeților:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;Toți oaspeții trebuie să prezinte un act de identitate cu fotografie emis de guvern la check-in.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Numărul maxim de persoane admise în cameră este de 2 adulți.&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;Fumatul și consumul de alcool sunt strict interzise în toate camerele de oaspeți și în zonele publice.&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>policies</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>Avis Legal</meta_title>
+    <meta_description>Termenii și condițiile noastre legale</meta_description>
+    <meta_keywords>avis legal, termeni, condiții, utilizare, vânzare</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Avis Legal&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Această pagină conține conținut demonstrativ în scopuri ilustrative. Oricăre asemănare cu produse, servicii sau evenimente reale este întâmplătoare. Vă mulțumim pentru înțelegere.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p&gt;Acești termeni și condiții stabilesc regulile și regulamentele pentru utilizarea site-ului nostru, [numele site-ului]. Accesând acest site web, presupunem că acceptați acești termeni și condiții în întregime. Nu continuați să utilizați [numele site-ului] dacă nu sunteți de acord cu toate termenii și condițiile specificate pe această pagină.&lt;/p&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;1. Licență&lt;/strong&gt;&lt;/h3&gt;
+      &lt;p&gt;Se permite descărcarea temporară a materialelor (informații sau software) de pe [numele site-ului] pentru vizualizare personală, netransitorie și necomercială doar. Aceasta este acordarea unei licențe, nu o transferare de titlu, și în aceste condiții nu puteți:&lt;/p&gt;
+      &lt;ul&gt;
+      &lt;li&gt;a. modificați sau copiați materialele;&lt;/li&gt;
+      &lt;li&gt;b. utilizați materialele în scopuri comerciale sau pentru orice afișare publică (comercială sau non-comercială);&lt;/li&gt;
+      &lt;li&gt;c. încercați să dezasamblați sau să reconstruiți orice software conținut pe [numele site-ului];&lt;/li&gt;
+      &lt;li&gt;d. eliminați orice drept de autor sau alte notificări de proprietate de pe materiale;&lt;/li&gt;
+      &lt;li&gt;e. transferați materialele altui persoane sau „reflectați” materialele pe orice alt server.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;2. Notă specială privind software-ul&lt;/strong&gt;&lt;/h3&gt;
+      &lt;p&gt;Orice software care este disponibil pentru descărcare de pe [numele site-ului] este operațional al sau al distribuitorilor, autorii programelor nu oferă nicio garanție. Software-ul este oferit „așa cum este” fără nicio garanție, exprese sau implicite și, astfel, nici autorii programelor nu oferă garanții de niciun fel.&lt;/p&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>notificare-legala</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>Termeni și condiții</meta_title>
+    <meta_description>Termenii și condițiile noastre</meta_description>
+    <meta_keywords>termeni, condiții, utilizare, vânzare</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Termeni și condiții&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Această pagină conține conținut demonstrativ în scopuri ilustrative. Oricăre asemănare cu produse, servicii sau evenimente reale este întâmplătoare. Vă mulțumim pentru înțelegere.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;p&gt;Accesând acest site web, presupunem că acceptați acești termeni și condiții în întregime. Nu continuați să utilizați [numele site-ului] dacă nu sunteți de acord cu toate termenii și condițiile specificate pe această pagină.&lt;/p&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;Termeni de utilizare a site-ului web:&lt;/h3&gt;
+      &lt;ul&gt;
+      &lt;li&gt;Conținutul paginilor acestui site web este doar pentru informarea generală și utilizarea dvs. personală. Acesta poate fi modificat fără notificare prealabilă.&lt;/li&gt;
+      &lt;li&gt;Nici noi, nici alte terțe părți nu oferim nicio garanție sau promisiune cu privire la acuratețea, actualitatea, performanța, completitudinea sau adecvarea informațiilor și materialelor găsite sau oferite pe acest site web pentru orice scop particular. Sunteți de acord că astfel de informații și materiale pot conține inexactități sau erori, iar noi excludem în mod expres orice răspundere pentru astfel de inexactități sau erori în măsura permisă de lege.&lt;/li&gt;
+      &lt;li&gt;Utilizarea oricărei informații sau materiale de pe acest site web se face pe riscul dvs. propriu, iar noi nu vom fi responsabili. Este responsabilitatea dvs. să vă asigurați că produsele, serviciile sau informațiile disponibile prin acest site web satisfac cerințele dvs. specifice.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;Proprietate intelectuală:&lt;/h3&gt;
+      &lt;ul&gt;
+      &lt;li&gt;Acest site web conține materiale care sunt deținute de noi sau licențiate nouă. Aceste materiale includ, dar nu se limitează la, designul, aspectul și grafica. Reproducerea este interzisă în afara respectării notificării de drepturi de autor, care face parte din acești termeni și condiții.&lt;/li&gt;
+      &lt;li&gt;Toate mărcile comerciale reproduce în acest site web, care nu sunt proprietatea noastră sau nu sunt licențiate operatorului, sunt recunoscute pe site.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;Politica de confidențialitate:&lt;/h3&gt;
+      &lt;ul&gt;
+      &lt;li&gt;Confidențialitatea dvs. este importantă pentru noi. Vă rugăm să consultați Politica noastră de confidențialitate pentru a înțelege cum colectăm, utilizăm și dezvăluim informațiile despre dvs.&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;Limitarea răspunderii:&lt;/h3&gt;
+      &lt;ul&gt;
+      &lt;li&gt;Nici noi, nici alte terțe părți nu oferim nicio garanție sau promisiune cu privire la acuratețea, actualitatea, performanța, completitudinea sau adecvarea informațiilor și materialelor găsite sau oferite pe acest site web pentru orice scop particular. Sunteți de acord că astfel de informații și materiale pot conține inexactități sau erori, iar noi excludem în mod expres orice răspundere pentru astfel de inexactități sau erori în măsura permisă de lege.&lt;/li&gt;
+      &lt;li&gt;Utilizarea oricărei informații sau materiale de pe acest site web se face pe riscul dvs. propriu, iar noi nu vom fi responsabili. Este responsabilitatea dvs. să vă asigurați că produsele, serviciile sau informațiile disponibile prin acest site web satisfac cerințele dvs. specifice.&lt;/li&gt;
+      &lt;/ul&gt;
+    </content>
+    <link_rewrite>termeni-si-conditii-de-utilizare</link_rewrite>
+  </cms>
+  <cms id="About_Us">
+    <meta_title>Despre Noi</meta_title>
+    <meta_description>Aflați mai multe despre noi</meta_description>
+    <meta_keywords>despre noi, informații</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Despre Noi&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Această pagină conține conținut demonstrativ în scopuri ilustrative. Oricăre asemănare cu produse, servicii sau evenimente reale este întâmplătoare. Vă mulțumim pentru înțelegere.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;Bine ați venit la sanctuarul nostru al luxului și liniștii, unde fiecare ședere este creată pentru a oferi o experiență de neegalat. Indiferent dacă căutați o evadare relaxantă, o călătorie de afaceri productivă sau un eveniment memorabil, suntem dedicați să facem vizita dvs. excepțională.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Povestea Noastră&lt;/p&gt;
+      &lt;p&gt;Inspirat de împrejurimile seren și cultura locală bogată, hotelul nostru îmbină confortul modern cu eleganța atemporală. Camerele noastre gândite cu atenție, serviciul impecabil și atenția la detalii reflectă angajamentul nostru de a oferi o oază pentru călători.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Misiunea Noastră&lt;/p&gt;
+      &lt;p&gt;Misiunea noastră este de a crea o casă departe de casă, oferind servicii personalizate și facilități de lux adaptate nevoilor dvs. Confortul și satisfacția dvs. sunt prioritățile noastre principale, și ne străduim să depășim așteptările dvs. la fiecare pas.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Facilitățile Noastre&lt;/p&gt;
+      &lt;p&gt;Bucurați-vă de cele mai bune facilități în timpul șederii dvs. Relaxați-vă în camere și apartamente elegant mobilate cu vederi impresionante. Savurați o masă gourmet la restaurantul nostru, relaxați-vă cu un cocktail la barul nostru elegant și reîmprospătați-vă la spa și centrul nostru de fitness ultramodern. Bucurați-vă de piscina noastră în aer liber, grădinile luxuriante și facilitățile noastre moderne pentru afaceri pentru a satisface toate nevoile dvs.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Echipa Noastră&lt;/p&gt;
+      &lt;p&gt;Echipa noastră dedicată de profesioniști din domeniul ospitalității este aici pentru a vă servi cu pasiune pentru excelență. De la servicii de concierge personalizate până la servicii de menaj meticulos, fiecare membru al echipei noastre este dedicat să vă facă șederea extraordinară.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Alăturați-Vă Nouă&lt;/p&gt;
+      &lt;p&gt;Descoperiți farmecul și eleganța hotelului nostru. Fie că vizitați pentru agrement sau afaceri, vă invităm să experimentați ospitalitatea noastră caldă și cazările de lux. Rezervați-vă șederea cu noi astăzi și lăsați-ne să facem vizita dvs. de neuitat.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;Păreri&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Hotelul Prime a depășit așteptările mele în fiecare aspect. Camera Executivă nu numai că a fost luxoasă, dar a oferit și o refugiu liniștit cu vederi uimitoare ale lacului. Atitudinea la detalii și serviciul personalizat au făcut șederea mea cu adevărat memorabilă. Recomand cu căldură Hotelul Prime atât pentru călătorii de afaceri, cât și pentru cei în căutare de confort și rafinament&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Clark Kent&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Ca călător frecvent, pot spune cu încredere că Hotelul Prime se remarcă prin mediu său liniștit și ospitalitatea excepțională. Camera cu vedere a oferit un refugiu perfect cu vederi impresionante asupra orașului și cazare confortabilă.&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;John Doe&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>despre-noi</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+   <meta_title>Plată Securizată</meta_title>
+    <meta_description>Metoda noastră securizată de plată</meta_description>
+    <meta_keywords>plată securizată, SSL, Visa, MasterCard, PayPal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;Plată Securizată&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;Această pagină conține conținut demonstrativ în scopuri ilustrative. Oricăre asemănare cu produse, servicii sau evenimente reale este întâmplătoare. Vă mulțumim pentru înțelegere.&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;Prioritizăm securitatea dvs. Toate tranzacțiile efectuate pe site-ul nostru sunt criptate folosind tehnologia Secure Socket Layer (SSL) pentru a vă proteja informațiile personale și detaliile de plată. Acceptăm carduri de credit majore și oferim un mediu securizat pentru o experiență de rezervare fără probleme. Pentru orice întrebări referitoare la securitatea plății, nu ezitați să contactați echipa noastră de suport clienți.&lt;/div&gt;
+    </content>
+    <link_rewrite>plati-securizate</link_rewrite>
+  </cms>
+</entity_cms>

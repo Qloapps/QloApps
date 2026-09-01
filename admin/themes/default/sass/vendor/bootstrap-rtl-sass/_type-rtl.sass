@@ -1,0 +1,25 @@
+// Blockquotes
+
+blockquote
+	border-right: 5px solid $blockquote-border-color
+	border-left: 0
+
+	// Float left with text-align: left
+	&.pull-left
+		p,
+		small,
+		.small
+			text-align: left
+
+// Horizontal description lists
+
+@media (min-width: $grid-float-breakpoint)
+	.dl-horizontal
+		dt
+			float: right
+			width: ($component-offset-horizontal - 20)
+			clear: right
+			text-align: left
+		dd
+			margin-left: 0
+			margin-right: $component-offset-horizontal

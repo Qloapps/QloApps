@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<entity_cms>
+  <cms id="Policies">
+    <meta_title>政策</meta_title>
+    <meta_description>政策說明</meta_description>
+    <meta_keywords>政策, 規則, 條款, 條件</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;政策&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;本頁面僅包含示意性的演示內容。任何與實際產品、服務或事件的相似性純屬巧合。感謝您的理解。&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;取消政策:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;免費取消：標準價格，入住前48小時內取消。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;使用不可退款價格預訂的不可取消或修改。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;入住前24小時內取消需支付一晚房費。&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;預訂更改:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;預訂後更改入住日期可能需支付25美元費用。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;更改房型或客人數需視酒店供應情況而定。&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;客人責任:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;所有客人需在入住時出示有效的政府發行的照片身份證件。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;房型的最大入住人數為2名成人。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;所有客房和公共區域嚴禁吸煙和飲酒。&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>policies</link_rewrite>
+  </cms>
+  <cms id="Legal_Notice">
+    <meta_title>法律聲明</meta_title>
+    <meta_description>法律聲明</meta_description>
+    <meta_keywords>聲明, 法律, 信用</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;&lt;strong&gt;法律聲明&lt;/strong&gt;&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;本頁面僅包含示意性的演示內容。任何與實際產品、服務或事件的相似性純屬巧合。感謝您的理解。&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;p class=&quot;margin-btm-30 page-subheading&quot;&gt;網站使用條款：&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;本網站的內容僅供一般信息和使用。內容如有更改，恕不另行通知。&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;我們和任何第三方均不保證本網站上提供的信息和材料的準確性、及時性、性能、完整性或適用性。您承認此類信息和材料可能存在不準確或錯誤，我們明確排除法律允許範圍內的任何此類不準確性或錯誤的責任。&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;您使用本網站的信息或材料完全出於自己的風險，我們不對此承擔責任。您需自行負責確保通過本網站提供的任何產品、服務或信息符合您的具體要求。&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;知識產權：&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;本網站包含我們擁有或許可的材料。此類材料包括但不限於設計、版面、外觀和圖形。未經版權聲明的許可，嚴禁複製。&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;在本網站上重現的所有商標，除非是運營商的財產或獲得許可，否則均承認在網站上已被註冊。&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;隱私政策：&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;我們重視您的隱私。請查閱我們的隱私政策，了解我們如何收集、使用和披露關於您的信息。&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;責任限制：&lt;/p&gt;
+      &lt;ul class=&quot;margin-btm-30&quot;&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;我們和任何第三方對本網站上提供的信息和材料的準確性、及時性、性能、完整性或適用性不作任何保證或擔保。您承認此類信息和材料可能存在不準確或錯誤，我們明確排除法律允許範圍內的任何此類不準確性或錯誤的責任。&lt;/li&gt;
+      &lt;li class=&quot;margin-btm-20&quot;&gt;您使用本網站的信息或材料完全出於自己的風險，我們不對此承擔責任。您需自行負責確保通過本網站提供的任何產品、服務或信息符合您的具體要求。&lt;/li&gt;
+      &lt;/ul&gt;
+    </content>
+    <link_rewrite>legal-notice</link_rewrite>
+  </cms>
+  <cms id="Terms_and_conditions_of_use">
+    <meta_title>使用條款</meta_title>
+    <meta_description>我們的使用條款</meta_description>
+    <meta_keywords>條款, 使用, 銷售</meta_keywords>
+    <content>
+      &lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;使用條款&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;本頁面僅包含示意性的演示內容。任何與實際產品、服務或事件的相似性純屬巧合。感謝您的理解。&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;取消政策:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;免費取消：標準價格可在抵達前48小時內取消。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;使用不可退款價格預訂的房間無法取消或修改。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;抵達前24小時內取消預訂將收取一晚住宿的費用。&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;預訂變更:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;預訂後如需更改預訂日期，可能需支付25美元的費用。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;房型或客人數量的更改需視酒店空房情況而定。&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;br /&gt;
+      &lt;h3 class=&quot;page-subheading&quot;&gt;&lt;strong&gt;客人責任:&lt;/strong&gt;&lt;/h3&gt;
+      &lt;div&gt;
+      &lt;ul&gt;
+      &lt;li&gt;&lt;span&gt;所有客人必須在登記入住時出示有效的政府發行的身份證件。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;房間類型的最大入住人數為2位成人。&lt;/span&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;span&gt;所有客房和公共區域嚴禁吸煙和飲酒。&lt;/span&gt;&lt;/li&gt;
+      &lt;/ul&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>terms-and-conditions-of-use</link_rewrite>
+  </cms>
+  <cms id="About_us">
+    <meta_title>關於我們</meta_title>
+    <meta_description>了解更多關於我們</meta_description>
+    <meta_keywords>關於我們, 資訊</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;關於我們&lt;/h2&gt;&lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;本頁面僅包含示意性的演示內容。任何與實際產品、服務或事件的相似性純屬巧合。感謝您的理解。&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div class=&quot;row&quot;&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-8&quot;&gt;
+      &lt;div class=&quot;cms-block&quot;&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;dark&quot;&gt;歡迎來到我們的奢華寧靜之地，每次入住都精心打造，以提供無與倫比的體驗。無論您尋求輕鬆的度假、高效的商務旅行還是難忘的活動，我們致力於讓您的訪問變得非凡。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;我們的故事&lt;/p&gt;
+      &lt;p&gt;我們的酒店融合了寧靜的環境和豐富的本地文化，將現代舒適與永恆優雅相結合。我們精心設計的客房、無可挑剔的服務和細緻的注意細節，反映了我們對為旅客提供避風港的承諾。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;我們的使命&lt;/p&gt;
+      &lt;p&gt;我們的使命是創造一個像家一樣的地方，提供個性化的服務和量身定制的豪華設施。您的舒適和滿意是我們的首要任務，我們努力在每個轉折處超越您的期望。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;我們的設施&lt;/p&gt;
+      &lt;p&gt;在您的逗留期間享受最精美的設施。在風景如畫的客房和套房中放鬆身心，享受美食餐廳的美味佳餚，在時尚的酒吧中品嚐雞尾酒，並在我們現代化的水療中心恢復活力。享受我們寧靜的室外游泳池、郁郁蔥蔥的花園和現代化的商務設施，滿足您的所有需求。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;我們的團隊&lt;/p&gt;
+      &lt;p&gt;我們專業的款待團隊致力於以卓越的熱情為您服務。從個性化的禮賓服務到一絲不苟的客房服務，我們團隊的每位成員都致力於讓您的逗留變得非凡。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;margin-btm-30&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;加入我們&lt;/p&gt;
+      &lt;p&gt;親自探索我們酒店的魅力和優雅。無論是出於休閒還是商務目的，我們誠邀您體驗我們溫暖的款待和豪華的住宿。立即預訂您的逗留，讓我們讓您的訪問變得難忘。&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;col-xs-12 col-sm-4&quot;&gt;
+      &lt;div class=&quot;cms-box&quot;&gt;
+      &lt;p class=&quot;page-subheading&quot;&gt;客戶見證&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;Hotel Prime 在各方面都超出了我的期望。行政客房不僅豪華，而且由於其令人驚嘆的湖景而提供了一個寧靜的撤退。細緻入微的服務和個性化的服務使我的逗留真正難忘。我強烈推薦Hotel Prime，無論是商務還是休閒旅客都可以在這裡找到舒適和精緻。&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;Clark Kent&lt;/strong&gt;&lt;/p&gt;
+      &lt;div class=&quot;testimonials&quot;&gt;
+      &lt;div class=&quot;inner&quot;&gt;&lt;span class=&quot;before&quot;&gt;“&lt;/span&gt;作為一名頻繁旅行者，我可以自信地說，Hotel Prime 以其寧靜的環境和卓越的款待脫穎而出。View Room 以其令人驚嘆的城市景觀和舒適的住宿，提供了完美的撤退。&lt;span class=&quot;after&quot;&gt;”&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p&gt;&lt;strong class=&quot;dark&quot;&gt;John Doe&lt;/strong&gt;&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;/div&gt;
+    </content>
+    <link_rewrite>about-us</link_rewrite>
+  </cms>
+  <cms id="Secure_payment">
+    <meta_title>安全付款</meta_title>
+    <meta_description>我們的安全付款方式</meta_description>
+    <meta_keywords>安全付款, SSL, Visa, MasterCard, PayPal</meta_keywords>
+    <content>&lt;h2 class=&quot;page-heading bottom-indent&quot;&gt;安全付款&lt;/h2&gt;
+      &lt;div&gt;
+      &lt;p style=&quot;border-left:2px solid #808080;padding-left:5px;&quot;&gt;本頁面僅包含示意性的演示內容。任何與實際產品、服務或事件的相似性純屬巧合。感謝您的理解。&lt;/p&gt;
+      &lt;hr /&gt;&lt;/div&gt;
+      &lt;div&gt;我們非常重視您的安全。所有在我們網站上進行的交易都使用安全套接字層（SSL）技術進行加密，以確保您的個人信息和付款詳情得到保護。我們接受主要信用卡，並提供安全的環境，讓您無縫預訂體驗。如有任何關於付款安全的疑問，請隨時聯繫我們的客戶服務團隊。&lt;/div&gt;
+    </content>
+    <link_rewrite>secure-payment</link_rewrite>
+  </cms>
+</entity_cms>

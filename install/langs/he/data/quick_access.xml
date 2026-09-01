@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity_quick_access>
+  <quick_access id="Home" name="עמוד הבית"/>
+  <quick_access id="My_Shop" name="החנות שלנו"/>
+  <quick_access id="New_category" name="קטגורייה חדשה"/>
+  <quick_access id="New_product" name="מוצר חדש"/>
+  <quick_access id="New_voucher" name="שובר חדש"/>
+</entity_quick_access>
