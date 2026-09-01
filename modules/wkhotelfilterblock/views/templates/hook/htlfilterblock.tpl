@@ -24,7 +24,7 @@
 	<div id="filter_results" class="row block">
 		<div class="col-sm-12">
 			{block name='room_types_amenities_filter'}
-				{if isset($config) && $config['SHOW_AMENITIES_FILTER'] && $all_feat}
+				{if isset($config) && $config['SHOW_AMENITIES_FILTER'] && $all_amenities}
 					<div class="row margin-lr-0 layered_filter_cont">
 						<div class="col-sm-12 layered_filter_heading">
 							<div class="row margin-lr-0">
@@ -36,14 +36,14 @@
 							</div>
 						</div>
 						<div class="col-sm-12 lf_sub_cont">
-							{foreach $all_feat as $feat}
+							{foreach $all_amenities as $amenity}
 								<div class="layered_filt">
 									<label class="qlo-checkbox">
 										<span class="qlo-checkbox__control">
-											<input type="checkbox" class="filter not_uniform" data-type="amenities" value="{$feat.id_feature}">
+											<input type="checkbox" class="filter" data-type="amenities" value="{$amenity.id_amenity}">
 											<span class="qlo-checkbox__box"></span>
 										</span>
-										<span class="filters_name">{$feat.name}</span>
+										<span class="filters_name">{$amenity.name}</span>
 									</label>
 								</div>
 							{/foreach}

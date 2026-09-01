@@ -24,6 +24,11 @@
 *}
 
 {block name='category'}
+ 	{block name='errors'}
+		{include file="$tpl_dir./errors.tpl"}
+	{/block}
+
+    {if !isset($errors) OR !sizeof($errors)}
     <div class="row cat_cont">
         <div class="col-sm-12">
             {block name='category_top_left'}
@@ -54,6 +59,7 @@
             </div>
         </div>
     </div>
+    {/if}
 
     {block name='category_js_vars'}
         {strip}

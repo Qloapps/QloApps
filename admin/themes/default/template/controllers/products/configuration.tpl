@@ -428,6 +428,17 @@
 			</div>
 			<div class="modal-body padding-top-20">
 				<div class="text-left errors-wrap" style="display: none;"></div>
+                <div class="alert alert-info">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <p>{l s='If both the Room Prefix and Starting Room No. fields are left blank, the room name will be generated using the acronym of the Room Type name.'}</p>
+                    <p>
+                        <strong>{l s='Example:'}</strong>
+                        {l s='For the Room Type'}
+                        <strong id="bulk_create_room_example_name">{$product->name[$id_lang]|escape:'html':'UTF-8'}</strong>,
+                        {l s='the room name will be'}
+                        <strong id="room_type_acronym">{$room_type_acronym|escape:'html':'UTF-8'}</strong>.
+                    </p>
+                </div>
                 <div class="form-group">
                     <label class="control-label col-lg-3">
                         <span>{l s='Room prefix'}</span>
@@ -635,6 +646,7 @@
     $(document).ready(function() {
         var tooltipCounter = 0;
         var disableDatesCounter = {};
+
         // Setting the Date object without current time.
         const dateToday = new Date("{date('Y-m-d')}");
         {literal}
