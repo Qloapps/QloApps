@@ -665,6 +665,11 @@ class FrontControllerCore extends Controller
     public function initCursedPage()
     {
         $this->displayMaintenancePage();
+
+        header('HTTP/1.1 403 Forbidden');
+        $this->context->smarty->assign($this->initLogoAndFavicon());
+        $front_controller = preg_match('/ModuleFrontController$/', get_class($this)) ? new FrontController() : $this;
+        $this->layout = $front_controller->getTemplatePath($this->getThemeDir().'access-denied.tpl');
     }
 
     /**
