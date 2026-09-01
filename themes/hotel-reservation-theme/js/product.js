@@ -1269,7 +1269,7 @@ function addProductToRoomType(that) {
     } else {
         $('<input type="hidden">').attr({
             id: 'service_product_'+ id_product,
-            name: 'service_product['+ id_product +'][]',
+            name: 'service_product['+ id_product +'][quantity]',
             class: 'service_product',
             'data-id_product': id_product,
             value: qty
