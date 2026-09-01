@@ -486,9 +486,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['id_room'] = $data_v['id_room'];
                             }
 
-                            $totalDemandsPriceTE += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'];
-                            $totalDemandsPriceTI += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'];
-
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['total_price_tax_excl'] += $data_v['total_price_tax_excl'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['total_price_tax_incl'] += $data_v['total_price_tax_incl'];
                             $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services_price_auto_add_ti'] += $objServiceProductOrderDetail->getroomTypeServiceProducts(
