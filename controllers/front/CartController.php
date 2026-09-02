@@ -180,20 +180,10 @@ class CartControllerCore extends FrontController
             }
         } else {
             $idProductOption = Tools::getValue('id_product_option', null);
-            if ($product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
-                $objServiceProductCartDetail = new ServiceProductCartDetail();
-                $result = $objServiceProductCartDetail->removeCartServiceProduct(
-                    $this->context->cart->id,
-                    $this->id_product,
-                    false,
-                    false,
-                    false,
-                    $idProductOption ? $idProductOption : null
-                );
+            $canSellWithHotel = Product::isSellableWithHotel($product->id);
+            $canSellStandalone = Product::isSellableAsStandalone($product->id);
 
-            } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                || $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
-            ) {
+            if ($canSellWithHotel && $this->id_hotel) {
                 $objServiceProductCartDetail = new ServiceProductCartDetail();
 
                 $result = $objServiceProductCartDetail->removeCartServiceProduct(
@@ -201,6 +191,16 @@ class CartControllerCore extends FrontController
                     $this->id_product,
                     false,
                     $this->id_hotel,
+                    false,
+                    $idProductOption ? $idProductOption : null
+                );
+            } elseif ($canSellStandalone) {
+                $objServiceProductCartDetail = new ServiceProductCartDetail();
+                $result = $objServiceProductCartDetail->removeCartServiceProduct(
+                    $this->context->cart->id,
+                    $this->id_product,
+                    false,
+                    false,
                     false,
                     $idProductOption ? $idProductOption : null
                 );
@@ -481,7 +481,52 @@ class CartControllerCore extends FrontController
         } else {
             $objHotelCartBookingData = new HotelCartBookingData();
             $idProductOption = Tools::getValue('id_product_option');
-            if ($product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
+            $id_hotel = (int) Tools::getValue('id_hotel');
+            $canSellWithHotel = Product::isSellableWithHotel($product->id);
+            $canSellStandalone = Product::isSellableAsStandalone($product->id);
+
+            if ($canSellWithHotel && $id_hotel) {
+                if ($operator == 'up') {
+                    $objServiceProductCartDetail = new ServiceProductCartDetail();
+                    $productCartDetail = array();
+                    if ($id_cart) {
+                        if ($cartDetail = $objServiceProductCartDetail->getServiceProductsInCart(
+                            (int) $id_cart,
+                            [$product->selling_preference_type],
+                            $id_hotel,
+                            null,
+                            null,
+                            $this->id_product
+                        )) {
+                            $productCartDetail = array_shift($cartDetail);
+                        }
+                    }
+                    if ($product->allow_multiple_quantity) {
+                        $finalQuantity = $this->qty;
+                        if (isset($productCartDetail) && $productCartDetail) {
+                            $quantityInCart = Cart::getProductQtyInCart(
+                                $id_cart,
+                                $this->id_product
+                            );
+                            $finalQuantity += $quantityInCart;
+                        }
+                        if ($product->max_quantity && $finalQuantity > $product->max_quantity) {
+                            $this->errors[] = Tools::displayError(sprintf('You cannot add more than %d quantity for this product in the cart.', $product->max_quantity));
+                        }
+                    } elseif ($productCartDetail) {
+                        $this->errors[] = Tools::displayError('You can only order one quantity for this product.');
+                    }
+                    if (ServiceProductOption::productHasOptions($this->id_product)) {
+                        if (!$idProductOption) {
+                            $this->errors[] = Tools::displayError('Cannot add product without a option.');
+                        } else {
+                            if (!ServiceProductOption::productHasOptions($this->id_product, $idProductOption)) {
+                                $this->errors[] = Tools::displayError('The selected option is not available.');
+                            }
+                        }
+                    }
+                }
+            } elseif ($canSellStandalone) {
                 // if can be added without room type then we can directly add product in cart.
                 if ($operator == 'up') {
                     if ($product->allow_multiple_quantity) {
@@ -515,50 +560,8 @@ class CartControllerCore extends FrontController
                         }
                     }
                 }
-            } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                || $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
-            ) {
-                $id_hotel = Tools::getValue('id_hotel');
-                if ($operator == 'up') {
-                    if ($id_hotel) {
-                        $objServiceProductCartDetail = new ServiceProductCartDetail();
-                        $productCartDetail = array();
-                        if ($id_cart) {
-                            if ($cartDetail = $objServiceProductCartDetail->getServiceProductsInCart(
-                                (int) $id_cart,
-                                [$product->selling_preference_type],
-                                $id_hotel,
-                                null,
-                                null,
-                                $this->id_product
-                            )) {
-                                $productCartDetail = array_shift($cartDetail);
-                            }
-                        }
-                        if ($product->allow_multiple_quantity) {
-                            $finalQuantity = $this->qty;
-                            if (isset($productCartDetail) && $productCartDetail) {
-                                $finalQuantity += $productCartDetail['quantity'];
-                            }
-                            if ($product->max_quantity && $finalQuantity > $product->max_quantity) {
-                                $this->errors[] = Tools::displayError(sprintf('You cannot add more than %d quantity for this product in the cart.', $product->max_quantity));
-                            }
-                        } elseif ($productCartDetail) {
-                            $this->errors[] = Tools::displayError('You can only order one quantity for this product.');
-                        }
-                        if (ServiceProductOption::productHasOptions($this->id_product)) {
-                            if (!$idProductOption) {
-                                $this->errors[] = Tools::displayError('Cannot add product without a option.');
-                            } else {
-                                if (!ServiceProductOption::productHasOptions($this->id_product, $idProductOption)) {
-                                    $this->errors[] = Tools::displayError('The selected option is not available.');
-                                }
-                            }
-                        }
-                    } else {
-                        $this->errors[] = Tools::displayError('Cannot add product without a hotel.');
-                    }
-                }
+            } elseif ($canSellWithHotel) {
+                $this->errors[] = Tools::displayError('Cannot add product without a hotel.');
             } else {
                 $this->errors[] = Tools::displayError('Can not add product without room in cart');
             }
@@ -583,22 +586,24 @@ class CartControllerCore extends FrontController
             }
         }
 
-        // Check product quantity availability
-        if ($this->id_product_attribute) {
-            if (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty($this->id_product_attribute, $qty_to_check)) {
+        // Check product quantity availability only when no earlier validation error exists
+        if (!$this->errors) {
+            if ($this->id_product_attribute) {
+                if (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty($this->id_product_attribute, $qty_to_check)) {
+                    $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
+                }
+            } elseif ($product->hasAttributes()) {
+                $minimumQuantity = ($product->out_of_stock == 2) ? !Configuration::get('PS_ORDER_OUT_OF_STOCK') : !$product->out_of_stock;
+                $this->id_product_attribute = Product::getDefaultAttribute($product->id, $minimumQuantity);
+                // @todo do something better than a redirect admin !!
+                if (!$this->id_product_attribute) {
+                    Tools::redirectAdmin($this->context->link->getProductLink($product));
+                } elseif (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty($this->id_product_attribute, $qty_to_check)) {
+                    $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
+                }
+            } elseif (!$product->checkQty($qty_to_check)) {
                 $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
             }
-        } elseif ($product->hasAttributes()) {
-            $minimumQuantity = ($product->out_of_stock == 2) ? !Configuration::get('PS_ORDER_OUT_OF_STOCK') : !$product->out_of_stock;
-            $this->id_product_attribute = Product::getDefaultAttribute($product->id, $minimumQuantity);
-            // @todo do something better than a redirect admin !!
-            if (!$this->id_product_attribute) {
-                Tools::redirectAdmin($this->context->link->getProductLink($product));
-            } elseif (!Product::isAvailableWhenOutOfStock($product->out_of_stock) && !ProductAttribute::checkAttributeQty($this->id_product_attribute, $qty_to_check)) {
-                $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
-            }
-        } elseif (!$product->checkQty($qty_to_check)) {
-            $this->errors[] = Tools::displayError('There isn\'t enough product in stock.', !Tools::getValue('ajax'));
         }
 
         // If no errors, process product addition
@@ -659,8 +664,9 @@ class CartControllerCore extends FrontController
                         $availQty = $total_available_rooms + $req_rm;
                     }
                     $this->context->cookie->avail_rooms = $availQty;
-                } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                    || $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
+                } elseif (
+                    Product::isSellableWithHotel($product->id)
+                    && $id_hotel
                 ) {
                     $objServiceProductCartDetail = new ServiceProductCartDetail();
                     $update_quantity = $objServiceProductCartDetail->updateCartServiceProduct(
@@ -680,15 +686,15 @@ class CartControllerCore extends FrontController
                             'id_product_option' => isset($idProductOption) ? $idProductOption : null
                         ));
                     }
-                } elseif ($product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
+                } elseif (Product::isSellableAsStandalone($product->id)) {
                     $objServiceProductCartDetail = new ServiceProductCartDetail();
                     $update_quantity = $objServiceProductCartDetail->updateCartServiceProduct(
                         $this->context->cart->id,
                         $this->id_product,
                         $operator,
                         $this->qty,
-                        false,
-                        false,
+                        0,
+                        0,
                         isset($idProductOption) ? $idProductOption : null
                     );
                     if ($operator == 'up') {
@@ -770,8 +776,20 @@ class CartControllerCore extends FrontController
                             if ($objProduct->allow_multiple_quantity) {
                                 if (!Validate::isUnsignedInt($qty)) {
                                     $this->errors[] = Tools::displayError('The quantity you\'ve entered is invalid.');
-                                } elseif ($objProduct->max_quantity && $qty > $objProduct->max_quantity) {
-                                    $this->errors[] = Tools::displayError(sprintf('cannot add more than %d quantity.', $objProduct->max_quantity));
+                                } else {
+                                    $cartTotalQty  = Cart::getProductQtyInCart((int)$this->context->cart->id,(int)$idServiceProduct);
+                                    $numDays = Product::getServicePriceBillableDays(
+                                        $objProduct->price_calculation_method,
+                                        $objHotelCartBookingData->date_from,
+                                        $objHotelCartBookingData->date_to
+                                    );
+                                    $currentQty = $qty * $numDays;
+                                    $finalQty = (int)$cartTotalQty + $currentQty;
+                                    if ($objProduct->max_quantity && $finalQty > $objProduct->max_quantity) {
+                                        $this->errors[] = Tools::displayError(sprintf('cannot add more than %d quantity.', $objProduct->max_quantity));
+                                    } else if (!Product::isAvailableWhenOutOfStock($objProduct->out_of_stock) && !$objProduct->checkQty($finalQty)) {
+                                        $this->errors[] = Tools::displayError('There isn\'t enough product in stock.');
+                                    }
                                 }
                             } else {
                                 $qty = 1;

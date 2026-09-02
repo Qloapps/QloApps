@@ -230,22 +230,37 @@
 		</script>
 	</div>
     {* Code For Standard product working *}
-	{* <div class="form-group" id="global_product_type_container">
-		<label class="control-label col-lg-3" for="selling_preference_type">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether this product will be sold with room type or as an standalone product'}">
-				{l s='Product selling preference'}
-			<span>
+	{* <div class="form-group " id="global_product_type_container">
+		<label class="control-label required col-lg-3">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select how this product will be sold: with room types, with hotels, as a standalone product, or in a combination of these options.'}">
+				{l s='Buying Option'}
+			</span>
 		</label>
-		<div class="col-lg-4">
-			<select name="selling_preference_type" id="selling_preference_type">
-                <option value="{Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with room types'}</option>
-                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE}selected="selected"{/if} >{l s='Sell with hotels'}</option>
-                <option value="{Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}selected="selected"{/if} >{l s='Sell with hotels and room types'}</option>
-                <option value="{Product::SELLING_PREFERENCE_STANDALONE}" {if $product->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE}selected="selected"{/if} >{l s='Sell as standalone product'}</option>
-			</select>
+		<div class="col-lg-9">
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" id="sp_with_room_type" name="selling_preference_type[]" value="{Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}"
+						{if Product::isSellableWithRoomType($product->id) }checked="checked"{/if}>
+					{l s='Sell With Room Type'}
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" id="sp_with_hotel" name="selling_preference_type[]" value="{Product::SELLING_PREFERENCE_WITH_HOTEL}"
+						{if Product::isSellableWithHotel($product->id)}checked="checked"{/if}>
+					{l s='Sell With Hotel'}
+				</label>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox" id="sp_standalone" name="selling_preference_type[]" value="{Product::SELLING_PREFERENCE_WITH_STANDALONE}"
+						{if Product::isSellableAsStandalone($product->id) }checked="checked"{/if}>
+					{l s='Sell With Standalone'}
+				</label>
+			</div>
 		</div>
 	</div> *}
-    <div class="form-group" id="associated_hotel_tree" {if ($product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE)}style="display:none;"{/if}>
+    <div class="form-group" id="associated_hotel_tree" {if !Product::isSellableWithHotel($product->id)}style="display:none;"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="category_box" type="category_box"}</span></div>
 		<label class="control-label col-lg-2" for="hotel_block">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select hotels for which this service will be available.'}">
@@ -258,7 +273,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group" id="associated_hotel_rooms_tree" {if ($product->selling_preference_type != Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product->selling_preference_type != Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE && $product->selling_preference_type != 0)}style="display:none;"{/if}>
+	<div class="form-group" id="associated_hotel_rooms_tree" {if !Product::isSellableWithRoomType($product->id) && $product->selling_preference_type != 0}style="display:none;"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="category_box" type="category_box"}</span></div>
 		<label class="control-label col-lg-2" for="hotel_room_block">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select room type and hotels for which this service will be available.'}">
@@ -271,7 +286,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="form-group" id="auto_add_to_cart_container" {if $product->selling_preference_type != Product::SELLING_PREFERENCE_WITH_ROOM_TYPE && $product->selling_preference_type != 0}style="display:none;"{/if}>
+	<div class="form-group" id="auto_add_to_cart_container" {if !Product::isSellableWithRoomType($product->id) && $product->selling_preference_type != 0}style="display:none;"{/if}>
 		<label class="control-label col-lg-3" for="">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='When enabled, this service will be added in cart for each associated Room type or Hotel when they are added in cart. Also auto added services will not be visible to customers.'}">
 				{l s='Auto add to cart this product'}
@@ -604,4 +619,11 @@
 <script type="text/javascript">
 	hideOtherLanguage({$default_form_language});
 	var missing_product_name = '{l s='Please fill product name input field' js=1}';
+	var SELLING_PREFERENCE_WITH_ROOM_TYPE = {Product::SELLING_PREFERENCE_WITH_ROOM_TYPE|intval};
+	var SELLING_PREFERENCE_WITH_HOTEL = {Product::SELLING_PREFERENCE_WITH_HOTEL|intval};
+	var SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE = {Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE|intval};
+	var SELLING_PREFERENCE_WITH_STANDALONE = {Product::SELLING_PREFERENCE_WITH_STANDALONE|intval};
+	var SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE = {Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE|intval};
+	var SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE = {Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE|intval};
+	var SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE = {Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE|intval};
 </script>

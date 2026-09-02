@@ -63,14 +63,15 @@
 											<dl class="products">
 												{foreach from=$products key=data_k item='product' name='myLoop'}
 												{* only show products that are booking or global without room *}
-													{if $product.booking_product || ($product.selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE)|| ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) || ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE)}
-														{if $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE || $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}
-                                                            {if isset($product.hotel_wise_data) && $product.hotel_wise_data}
-                                                                {foreach $product.hotel_wise_data as $hotel_wise_data}
-                                                                    {include file="./cartrow.tpl" hotel_wise_data=$hotel_wise_data}
-                                                                {/foreach}
-                                                            {/if}
-														{else}
+													{if $product.booking_product || Product::isSellableAsStandalone($product.id_product) || Product::isSellableWithHotel($product.id_product)}
+														{if isset($product.hotel_wise_data) && $product.hotel_wise_data}
+															{foreach $product.hotel_wise_data as $hotel_wise_data}
+																{include file="./cartrow.tpl" hotel_wise_data=$hotel_wise_data}
+															{/foreach}
+														{/if}
+														{if $product.booking_product
+															|| (!Product::isSellableWithHotel($product.id_product) && !Product::isSellableWithRoomType($product.id_product))
+															|| (Product::isSellableAsStandalone($product.id_product) && $product.standalone_total_qty > 0)}
 															{include file="./cartrow.tpl" hotel_wise_data=false}
 														{/if}
 													{/if}
@@ -401,11 +402,13 @@
 		{addJsDef img_dir=$img_dir|escape:'quotes':'UTF-8'}
 		{addJsDef generated_date=$smarty.now|intval}
 		{addJsDef ajax_allowed=$ajax_allowed|boolval}
-		{addJsDef hasDeliveryAddress=(isset($cart->id_address_delivery) && $cart->id_address_delivery)}
 		{addJsDef SELLING_PREFERENCE_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}
-		{addJsDef SELLING_PREFERENCE_STANDALONE=Product::SELLING_PREFERENCE_STANDALONE}
-		{addJsDef SELLING_PREFERENCE_HOTEL_STANDALONE=Product::SELLING_PREFERENCE_HOTEL_STANDALONE}
-		{addJsDef SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}
+		{addJsDef SELLING_PREFERENCE_WITH_STANDALONE=Product::SELLING_PREFERENCE_WITH_STANDALONE}
+		{addJsDef SELLING_PREFERENCE_WITH_HOTEL=Product::SELLING_PREFERENCE_WITH_HOTEL}
+		{addJsDef SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE}
+		{addJsDef SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE=Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE}
+		{addJsDef SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE}
+		{addJsDef SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE=Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE}
 
 		{addJsDefL name=customizationIdMessage}{l s='Customization #' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=removingLinkText}{l s='remove this product from my cart' mod='blockcart' js=1}{/addJsDefL}

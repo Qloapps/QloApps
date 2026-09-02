@@ -62,76 +62,7 @@ function sendOrderMessage() {
     });
 }
 
-function initPriceTooltip() {
-    if ($('.order-price-info').length) {
-        $('.order-price-info').each(function () {
-            $(this).tooltip({
-                content: $(this).closest('dd').find('.price-info-container').html(),
-                items: 'span',
-                trigger: 'hover',
-                tooltipClass: 'price-tootip',
-                open: function (event, ui) {
-                    if (typeof (event.originalEvent) === 'undefined') {
-                        return false;
-                    }
 
-                    var $id = $(ui.tooltip).attr('id');
-
-                    // close any lingering tooltips
-                    if ($('div.ui-tooltip').not('#' + $id).length) {
-                        return false;
-                    }
-                },
-                close: function (event, ui) {
-                    ui.tooltip.hover(function () {
-                        $(this).stop(true).fadeTo(400, 1);
-                    },
-                    function () {
-                        $(this).fadeOut('400', function () {
-                            $(this).remove();
-                        });
-                    });
-                }
-            });
-        });
-    }
-}
-
-// initialize tooltip for
-function initRefundDeniedTooltip() {
-    if ($('.refund-denied-info').length) {
-        $('.refund-denied-info').each(function () {
-            $(this).tooltip({
-                content: $(this).data('refund_denied_info'),
-                items: 'i',
-                trigger: 'hover',
-                tooltipClass: 'refund-denied-tootip',
-                open: function (event, ui) {
-                    if (typeof (event.originalEvent) === 'undefined') {
-                        return false;
-                    }
-
-                    var $id = $(ui.tooltip).attr('id');
-
-                    // close any lingering tooltips
-                    if ($('div.ui-tooltip').not('#' + $id).length) {
-                        return false;
-                    }
-                },
-                close: function (event, ui) {
-                    ui.tooltip.hover(function () {
-                        $(this).stop(true).fadeTo(400, 1);
-                    },
-                    function () {
-                        $(this).fadeOut('400', function () {
-                            $(this).remove();
-                        });
-                    });
-                }
-            });
-        });
-    }
-}
 
 function initMap() {
     $('.booking-hotel-map-container').each(function (i, element) {
@@ -377,6 +308,7 @@ $(document).on('click', '.btn-view-extra-services', function(e) {
             if (result.extra_demands) {
                 $('#popup-view-extra-services').html('');
                 $('#popup-view-extra-services').append(result.extra_demands);
+                initHtlTooltip();
 
                 $.fancybox.open({
                     href: '#popup-view-extra-services',
@@ -402,6 +334,5 @@ $(document).ready(function () {
         sendOrderMessage();
     });
 
-    initPriceTooltip();
-    initRefundDeniedTooltip();
+    initHtlTooltip();
 });

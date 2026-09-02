@@ -200,7 +200,12 @@ class RoomTypeServiceProduct extends ObjectModel
             $subCategory
         )) {
             $serviceProducts = Product::getProductsProperties($idLang, $serviceProducts);
-            foreach($serviceProducts as &$serviceProduct) {
+            foreach($serviceProducts as $key => &$serviceProduct) {
+                if (!$serviceProduct['allow_oosp'] && $serviceProduct['quantity'] <= 0) {
+                    unset($serviceProducts[$key]);
+                    continue;
+                }
+
                 $serviceProduct['price_tax_exc'] = Product::getServiceProductPrice(
                     (int)$serviceProduct['id_product'],
                     0,

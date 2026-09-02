@@ -179,24 +179,25 @@ class QloStatsServiceProducts extends ModuleGrid
 
     public function setQueryForServices($dateBetween)
     {
+        $numNightsSql = 'IFNULL(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0)';
+        $applicableDaysSql = 'CASE
+            WHEN spod.`id_htl_booking_detail` IS NULL OR spod.`id_htl_booking_detail` = 0 THEN 1
+            WHEN od.`product_price_calculation_method` IN ('.(int)Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY.', '.(int)Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY.') THEN 1
+            WHEN od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY.' THEN GREATEST('.$numNightsSql.' - 1, 1)
+            WHEN od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY.' THEN 2
+            WHEN od.`product_price_calculation_method` IN ('.(int)Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY.', '.(int)Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY.') THEN GREATEST('.$numNightsSql.', 1)
+            WHEN od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY.' THEN GREATEST('.$numNightsSql.' + 1, 1)
+            ELSE GREATEST('.$numNightsSql.', 1)
+        END';
+
         $this->query = '(SELECT od.`product_name` as `display_name`, p.`active`,
             od.`product_auto_add` as auto_add_to_cart,
             od.`product_price_addition_type` as price_addition_type,
             ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / SUM(
-                IF(od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.',
-                    (IF(spod.`id_htl_booking_detail`,
-                        DATEDIFF(hbd.`date_to`, hbd.`date_from`),
-                    1)) * spod.`quantity`,
-                    spod.`quantity`
-                )
+                ('.$applicableDaysSql.') * spod.`quantity`
             ) AS avgPriceSold,
             IFNULL(SUM(
-                IF(od.`product_price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.',
-                    (IF(spod.`id_htl_booking_detail`,
-                        DATEDIFF(hbd.`date_to`, hbd.`date_from`),
-                    1)) * spod.`quantity`,
-                    spod.`quantity`
-                )
+                ('.$applicableDaysSql.') * spod.`quantity`
             ), 0) AS totalQuantitySold,
             ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) AS totalPriceSold
             FROM '._DB_PREFIX_.'service_product_order_detail spod

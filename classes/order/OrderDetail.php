@@ -450,12 +450,11 @@ class OrderDetailCore extends ObjectModel
                         $taxGroupInfo['id_room_type'],
                 )) {
                     $serviceProductData = array_shift($serviceProductData);
-                    $numDays = 1;
-                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
-                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
-                    ) {
-                        $numDays = 1;
-                    }
+                    $numDays = Product::getServicePriceBillableDays(
+                        $this->product_price_calculation_method,
+                        $serviceProductData['date_from'],
+                        $serviceProductData['date_to']
+                    );
 
                     $quantity = array_reduce($serviceProductData['additional_services'], function ($totalQty, $item) {
                         return $totalQty + (isset($item['quantity']) ? $item['quantity'] : 0);
@@ -485,12 +484,11 @@ class OrderDetailCore extends ObjectModel
                     $serviceProductData = array_shift($serviceProductData);
                     $unit_price_tax_excl = isset($serviceProductData['unit_price_tax_excl']) ? $serviceProductData['unit_price_tax_excl'] : 0;
 
-                    $numDays = 1;
-                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method)
-                        && (!$numDays = HotelHelper::getNumberOfDays($serviceProductData['date_from'], $serviceProductData['date_to']))
-                    ) {
-                        $numDays = 1;
-                    }
+                    $numDays = Product::getServicePriceBillableDays(
+                        $this->product_price_calculation_method,
+                        $serviceProductData['date_from'],
+                        $serviceProductData['date_to']
+                    );
 
                     $quantity = $quantity * $numDays;
                 }

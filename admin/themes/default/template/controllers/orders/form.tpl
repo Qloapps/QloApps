@@ -1611,6 +1611,7 @@
 				},
                 complete: function() {
                     $(".loading_overlay").hide();
+					initTooltip();
                 }
 			});
 		});
@@ -1831,6 +1832,7 @@
 				},
 				complete: function() {
 					$(".loading_overlay").hide();
+					initTooltip();
 				}
 			});
 		});
@@ -1881,6 +1883,7 @@
                 },
                 complete: function() {
                     $(".loading_overlay").hide();
+					initTooltip();
                 }
             });
         });

@@ -58,6 +58,18 @@
                                                                 {if $additionalService['allow_multiple_quantity']}
                                                                     <span class="quantity">{l s='(Quantity: %s)' sprintf=[$additionalService['quantity']|string_format:'%02d']}</span>
                                                                 {/if}
+                                                                {assign var='priceCalcMethod' value=$additionalService.price_calculation_method|default:0}
+                                                                {capture name='htl_pcm_tooltip'}
+                                                                <div class="htl-tooltip-cont">
+                                                                    <p class="htl-tooltip-title">{l s='Applied on:'}</p>
+                                                                    <ul>
+                                                                        {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                                                            <li>{$pcmDayLabel}</li>
+                                                                        {/foreach}
+                                                                    </ul>
+                                                                </div>
+                                                                {/capture}
+                                                                {include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}
                                                             </div>
                                                         </div>
                                                         <div class="">

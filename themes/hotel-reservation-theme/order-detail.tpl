@@ -333,8 +333,8 @@
 
                                         {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl ))}
 
-                                        {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
-                                        {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
+                                        {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL))}
+                                        {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL))}
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
                                                 <td>{l s='Total rooms cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
@@ -360,7 +360,7 @@
                                             </tr>
                                         {/if}
 
-                                        {if $total_convenience_fee_te || $total_convenience_fee_te}
+                                        {if $total_convenience_fee_te || $total_convenience_fee_ti}
                                              <tr class="item">
                                                 <td>{l s='Total Convenience Fees'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
                                                 <td class="text-right">
@@ -749,8 +749,8 @@
                                         {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_te)}
                                         {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_ti)}
 
-                                        {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
-                                        {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
+                                        {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL))}
+                                        {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL))}
 
                                         {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl) + ($total_standard_products_tax_incl - $total_standard_products_tax_excl))}
 
@@ -779,7 +779,7 @@
                                             </tr>
                                         {/if}
 
-                                        {if $total_convenience_fee_te || $total_convenience_fee_te}
+                                        {if $total_convenience_fee_te || $total_convenience_fee_ti}
                                              <tr class="item">
                                                 <td>{l s='Total Convenience Fees'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if}{/if}</td>
                                                 <td class="text-right">
@@ -999,7 +999,7 @@
                                                                                     </label>
 
                                                                                     <span>({$hotel_booking_detail.adults|string_format:'%02d'} {if $hotel_booking_detail.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $hotel_booking_detail.children > 0}{l s=', '}{$hotel_booking_detail.children|string_format:'%02d'} {if $hotel_booking_detail.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
-                                                                                    {if $hotel_booking_detail.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{else if $hotel_booking_detail.is_refunded}<span class="badge badge-danger badge-cancelled">{l s='Refunded'}</span>{else if $hotel_booking_detail.refund_denied}<span class="badge badge-danger badge-cancelled">{l s='Refund denied'}</span> <i class="icon-info-circle refund-denied-info" data-refund_denied_info="{l s='Refund for this booking is denied. Please contact admin for more detail.'}"></i>{else if $hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED}<span class="badge badge-danger badge-cancelled">{if $hotel_booking_detail.id_status == $ROOM_STATUS_CHECKED_OUT}{l s='Checked-Out'}{else}{l s='Checked-In'}{/if}</span>{/if}
+                                                                                    {if $hotel_booking_detail.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{else if $hotel_booking_detail.is_refunded}<span class="badge badge-danger badge-cancelled">{l s='Refunded'}</span>{else if $hotel_booking_detail.refund_denied}<span class="badge badge-danger badge-cancelled">{l s='Refund denied'}</span> {include file='_partials/htl-tooltip.tpl' tooltip_content={l s='Refund for this booking is denied. Please contact admin for more detail.'}}{else if $hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED}<span class="badge badge-danger badge-cancelled">{if $hotel_booking_detail.id_status == $ROOM_STATUS_CHECKED_OUT}{l s='Checked-Out'}{else}{l s='Checked-In'}{/if}</span>{/if}
                                                                                 </div>
                                                                             </div>
 
@@ -1057,7 +1057,7 @@
                                                                                 <input type="checkbox" class="bookings_to_refund" id="products_to_refund_{$product_option.id_service_product_order_detail}" name="id_service_product_order_detail[]" value="{$product_option.id_service_product_order_detail|escape:'html':'UTF-8'}" {if $is_product_cancelled }disabled{/if}/>
                                                                                 {$product_option.name}{if isset($product_option.option_name) && $product_option.option_name} : {$product_option.option_name}{/if}
                                                                             </label>
-                                                                            {if $product_option.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{else if $product_option.is_refunded}<span class="badge badge-danger badge-cancelled">{l s='Refunded'}</span>{else if isset($product_option.refund_denied) && $product_option.refund_denied}<span class="badge badge-danger badge-cancelled">{l s='Refund denied'}</span> <i class="icon-info-circle refund-denied-info" data-refund_denied_info="{l s='Refund for this product is denied. Please contact admin for more detail.'}"></i></span>{/if}
+                                                                            {if $product_option.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{else if $product_option.is_refunded}<span class="badge badge-danger badge-cancelled">{l s='Refunded'}</span>{else if isset($product_option.refund_denied) && $product_option.refund_denied}<span class="badge badge-danger badge-cancelled">{l s='Refund denied'}</span> {include file='_partials/htl-tooltip.tpl' tooltip_content={l s='Refund for this product is denied. Please contact admin for more detail.'}}</span>{/if}
                                                                         </div>
                                                                         {if $product_option.allow_multiple_quantity}
                                                                             <div class="quantity-wrap clearfix">
@@ -1153,7 +1153,7 @@
             {addJsDefL name=pending_state_msg}{l s='Pending...' js=1}{/addJsDefL}
             {addJsDefL name=mail_sending_err}{l s='Some error occurred while sending mail to the customer' js=1}{/addJsDefL}
             {addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for booking cancellation.' js=1}{/addJsDefL}
-            {addJsDefL name=no_bookings_selected}{l s='Please select at least one room to proceed for cancellation.' js=1}{/addJsDefL}
+            {addJsDefL name=no_bookings_selected}{l s='Please select at least one room or service to proceed for cancellation.' js=1}{/addJsDefL}
             {addJsDefL name=refund_request_success_txt}{l s='Request for booking cancellation is successffully created.' js=1}{/addJsDefL}
             {addJsDefL name=order_message_choose_txt}{l s='-- Choose --' js=1}{/addJsDefL}
             {addJsDefL name=order_message_success_txt}{l s='Order message sent successfully.' js=1}{/addJsDefL}

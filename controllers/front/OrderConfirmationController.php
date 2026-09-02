@@ -362,7 +362,7 @@ class OrderConfirmationControllerCore extends FrontController
 
                                     $totalRoomsBooked += 1;
                                 }
-                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
+                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTEL) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
 
                                 if (!empty($cover_image_arr)) {
@@ -385,7 +385,7 @@ class OrderConfirmationControllerCore extends FrontController
                                     }
                                     $cart_hotel_service_products[] = $type_value;
                                 }
-                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE) {
+                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_STANDALONE) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
 
                                 if (!empty($cover_image_arr)) {
@@ -415,8 +415,8 @@ class OrderConfirmationControllerCore extends FrontController
                     if (!$objCartOrder->hasInvoice()) {
                         $orders_has_invoice = 0;
                     }
-                    $orderTotalInfo['total_standalone_products_ti'] += ($objCartOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)+$objCartOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE));
-                    $orderTotalInfo['total_standalone_products_te'] += ($objCartOrder->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)+$objCartOrder->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE));
+                    $orderTotalInfo['total_standalone_products_ti'] += ($objCartOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL)+$objCartOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE));
+                    $orderTotalInfo['total_standalone_products_te'] += ($objCartOrder->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL)+$objCartOrder->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE));
                     $orderTotalInfo['total_wrapping'] += $objCartOrder->total_wrapping;
                     $orderTotalInfo['total_rooms_te'] += $objCartOrder->getTotalProductsWithoutTaxes(false, true);
                     $orderTotalInfo['total_rooms_ti'] += $objCartOrder->getTotalProductsWithTaxes(false, true);
@@ -470,6 +470,7 @@ class OrderConfirmationControllerCore extends FrontController
 
         $this->setTemplate(_PS_THEME_DIR_.'order-confirmation.tpl');
     }
+
 
     /**
      * Execute the hook displayPaymentReturn

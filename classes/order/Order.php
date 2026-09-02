@@ -46,6 +46,7 @@ class OrderCore extends ObjectModel
     const ORDER_COMPLETE_CANCELLATION_FLAG = 2;
     const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
 
+
     /** @var int Delivery address id */
     public $id_address_delivery;
 
@@ -1135,7 +1136,7 @@ class OrderCore extends ObjectModel
         $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
-        $ids_order_detail = []
+        $ids_order_detail = [],
     ) {
         // update
         if (!$products) {
@@ -1161,7 +1162,7 @@ class OrderCore extends ObjectModel
         $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
-        $ids_order_detail = []
+        $ids_order_detail = [],
     ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
@@ -2599,12 +2600,11 @@ class OrderCore extends ObjectModel
                     )) {
                         $totals = array_reduce($serviceProductDetail, function ($carry, $item) use ($order_detail) {
                             $objHotelBookingDetail = new HotelBookingDetail((int) $item['id_htl_booking_detail']);
-                            $numDays = 1;
-                            if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
-                                && (!$numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to))
-                            ) {
-                                $numDays = 1;
-                            }
+                            $numDays = Product::getServicePriceBillableDays(
+                                $order_detail['product_price_calculation_method'],
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to
+                            );
 
                             if (!empty($item['id_tax_rules_group'])) {
                                 $qty = isset($item['quantity']) ? $item['quantity'] : 0;
@@ -2655,12 +2655,11 @@ class OrderCore extends ObjectModel
                     // We are getting auto added service for specific room.There will be only on htl_booking_detail but can have multiple auto added service with room.
                     // Note: All the auto added service with room  have same id_tax_rule group 
                     $autoAddedServiceData = array_shift($autoAddedServiceData);
-                    $numDays = 1;
-                    if ((Product::PRICE_CALCULATION_METHOD_PER_DAY == $order_detail['product_price_calculation_method'])
-                        && (!$numDays = HotelHelper::getNumberOfDays($autoAddedServiceData['date_from'], $autoAddedServiceData['date_to']))
-                    ) {
-                        $numDays = 1;
-                    }
+                    $numDays = Product::getServicePriceBillableDays(
+                        $order_detail['product_price_calculation_method'],
+                        $autoAddedServiceData['date_from'],
+                        $autoAddedServiceData['date_to']
+                    );
                     $autoAddedServices = $autoAddedServiceData['additional_services'];
 
                     // Calculate total quantity of auto-added services
@@ -2905,12 +2904,12 @@ class OrderCore extends ObjectModel
         }
         // check hotel linked products
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-        if ($hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)) {
+        if ($hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_WITH_HOTEL)) {
             $res &= $this->checkList($hotelProducts, $action, false);
             $hasRoomsOrProducts = 1;
         }
 
-        if ($standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_STANDALONE)) {
+        if ($standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($this->id, 0, 0, Product::SELLING_PREFERENCE_WITH_STANDALONE)) {
             $res &= $this->checkList($standaloneProducts, $action, false);
             $hasRoomsOrProducts = 1;
         }

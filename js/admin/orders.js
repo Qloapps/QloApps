@@ -1468,6 +1468,7 @@ $(document).ready(function() {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                initTooltip();
             }
         });
     });
@@ -2539,7 +2540,7 @@ const EditRoomBookingModal = {
 
                     // initialize datepickers
                     EditRoomBookingModal.initDatePickers();
-
+                    initTooltip();
                     $('#edit_product .extra-services-container #id_htl_booking').val(jsonProductLineData.id);
                     $('#edit-room-booking-modal').modal('show');
                 } else {

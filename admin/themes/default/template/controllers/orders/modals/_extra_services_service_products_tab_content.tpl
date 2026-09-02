@@ -53,7 +53,23 @@
                             {foreach $additionalServices['additional_services'] as $service}
                                 <tr class="room_demand_block" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}">
                                     <td>
-                                        <div>{$service['name']|escape:'html':'UTF-8'}</div>
+                                        <div>
+                                            {$service['name']|escape:'html':'UTF-8'}
+                                            {capture name='room_type_service_tooltip_content'}
+                                            {assign var="priceCalcMethod" value=$service['price_calculation_method']|default:0}
+                                            <div class="tooltip-cont">
+                                                <div class="tooltip-popup-row"><label>{l s='Applied on:'}</label></div>
+                                                <ul class="tooltip-days">
+                                                    {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                                        <li>{$pcmDayLabel}</li>
+                                                    {/foreach}
+                                                </ul>
+                                            </div>
+                                            {/capture}
+
+                                            {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_tooltip_content allow_html=true}
+                                        </div>
+                                        </div>
                                         <input value="{$service['id_service_product_order_detail']|escape:'html':'UTF-8'}" name="id_service_product_order_detail[]" type="hidden"/>
                                     </td>
                                     <td>
@@ -82,7 +98,11 @@
                                         <div class="input-group">
                                             <span class="input-group-addon">{$currencySign}</span>
                                             <input type="text" class="form-control unit_price" value="{Tools::ps_round($service['unit_price_tax_excl'], 2)}" data-id-product="{$service['id_product']}" name="service_price[{$service['id_service_product_order_detail']}]">
-                                            {if Product::PRICE_CALCULATION_METHOD_PER_DAY == $service.price_calculation_method}
+                                            {if Product::getServicePriceBillableDays(
+                                                $service.price_calculation_method,
+                                                $additionalServices['date_from'],
+                                                $additionalServices['date_to']
+                                            ) > 1}
                                                 <span class="input-group-addon">{l s='/ night'}</span>
                                             {/if}
                                         </div>
@@ -130,7 +150,19 @@
 									</td>
 									<td>
 										{$product['name']|escape:'html':'UTF-8'}
-									</td>
+                                        {capture name='adm_pcm_tooltip_content'}
+                                            {assign var="priceCalcMethod" value=$product['price_calculation_method']|default:0}
+                                            <div class="tooltip-cont">
+                                                <div class="tooltip-popup-row"><label>{l s='Applied on:'}</label></div>
+                                                <ul class="tooltip-days">
+                                                    {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                                        <li>{$pcmDayLabel}</li>
+                                                    {/foreach}
+                                                </ul>
+                                            </div>
+                                        {/capture}
+                                        {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.adm_pcm_tooltip_content allow_html=true}
+                                    </td>
 									<td class="text-center">
 										{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
 											<span class="badge badge-info label">{l s='Auto added'}</span><br>
@@ -152,9 +184,13 @@
 										<div class="input-group">
 											<span class="input-group-addon">{$currencySign}</span>
 											<input type="text" class="form-control unit_price" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]" value="{$product['price_tax_exc']}" data-id-product="{$product.id_product}">
-											{if Product::PRICE_CALCULATION_METHOD_PER_DAY == $product['price_calculation_method']}
-												<span class="input-group-addon">{l s='/ night'}</span>
-											{/if}
+												{if Product::getServicePriceBillableDays(
+                                                    $product['price_calculation_method'],
+                                                    $additionalServices['date_from'],
+                                                    $additionalServices['date_to']
+                                                ) > 1}
+													<span class="input-group-addon">{l s='/ night'}</span>
+												{/if}
 										</div>
 									</td>
 								</tr>
@@ -189,11 +225,25 @@
                 </div>
                 <div class="row form-group">
                     <div class="col-sm-6">
-                        <label class="control-label">{l s='Price calculation method'}</label>
-                        <select class="form-control" name="new_service_price_calc_method">
-                            <option value="{Product::PRICE_CALCULATION_METHOD_PER_BOOKING}">{l s='Add price once for the booking range'}</option>
-                            <option value="{Product::PRICE_CALCULATION_METHOD_PER_DAY}">{l s='Add price for each day of booking'}</option>
-                        </select>
+                        <label class="control-label required">{l s='Price calculation method'}</label>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="pcm_checkin" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY|intval}">
+                                {l s='Check-in day'}
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="pcm_checkout" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY|intval}">
+                                {l s='Check-out day'}
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" id="pcm_duringstay" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY|intval}"/>
+                                {l s='During-stay days'}
+                            </label>
+                        </div>
                     </div>
                     <div class="col-sm-6">
                         <label class="control-label">{l s='Auto added service'}</label>
@@ -268,7 +318,20 @@
 						<td>
 							{$service['id_product']|escape:'html':'UTF-8'}{if !$service['product_deleted']} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service['id_product']|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a>{/if}
 						</td>
-						<td>{$service['name']|escape:'html':'UTF-8'}</td>
+						<td>
+                            {$service['name']|escape:'html':'UTF-8'}
+                                {capture name='room_type_service_pcm_tooltip_content'}
+                                    {assign var="priceCalcMethod" value=$service['price_calculation_method']|default:0}
+                                    <div class="tooltip-cont">
+                                        <div class="tooltip-popup-row"><label>{l s='Applied on:'}</label></div>
+                                        <ul class="tooltip-days">
+                                            {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                                <li>{$pcmDayLabel}</li>
+                                            {/foreach}
+                                        </ul>
+                                    </div>
+                                {/capture}
+                            {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_pcm_tooltip_content allow_html=true}                        </td>
 						<td>
 							{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
 								<span class="badge badge-info label">{l s='Convenience fee'}</span>
@@ -286,9 +349,13 @@
                         </td>
 						<td>
 							{displayPrice price=$service['unit_price_tax_excl'] currency=$orderCurrency}
-							{if $service['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY}
-								{l s='/ night'}
-							{/if}
+								{if Product::getServicePriceBillableDays(
+                                    $service['price_calculation_method'],
+                                    $additionalServices['date_from'],
+                                    $additionalServices['date_to']
+                                ) > 1}
+									{l s='/ night'}
+								{/if}
 						</td>
 						<td>
 							{displayPrice price=$service['total_price_tax_excl'] currency=$orderCurrency}

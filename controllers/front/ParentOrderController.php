@@ -322,9 +322,15 @@ class ParentOrderControllerCore extends FrontController
                 $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
             }
             $objServiceProductCartDetail = new ServiceProductCartDetail();
+            $hotelSellingPreferences = [
+                Product::SELLING_PREFERENCE_WITH_HOTEL,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            ];
             if ($hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                 $this->context->cart->id,
-                [Product::SELLING_PREFERENCE_HOTEL_STANDALONE, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE],
+                $hotelSellingPreferences,
                 $idHotel = null,
                 0,
                 null,
@@ -337,12 +343,25 @@ class ParentOrderControllerCore extends FrontController
                 null,
                 1
             )) {
-                $this->context->smarty->assign('hotel_products', $hotelProducts);
+                $hotelProducts = array_values(array_filter($hotelProducts, function ($product) {
+                    return !empty($product['id_hotel']);
+                }));
+                if (!empty($hotelProducts)) {
+                    $this->context->smarty->assign('hotel_products', $hotelProducts);
+                }
             }
 
+            $standaloneSellingPreferences = [
+                Product::SELLING_PREFERENCE_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            ];
             $standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                 $this->context->cart->id,
-                [Product::SELLING_PREFERENCE_STANDALONE]
+                $standaloneSellingPreferences,
+                0,
+                0
             );
 
             if (count($standaloneProducts)) {
@@ -480,9 +499,17 @@ class ParentOrderControllerCore extends FrontController
             Tools::redirect('');
         } elseif (!Customer::getAddressesTotalById($this->context->customer->id)) {
             $objServiceProductCartDetail = new ServiceProductCartDetail();
+            $standaloneSellingPreferences = [
+                Product::SELLING_PREFERENCE_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            ];
             if (count($objServiceProductCartDetail->getServiceProductsInCart(
                 $this->context->cart->id,
-                [Product::SELLING_PREFERENCE_STANDALONE]
+                $standaloneSellingPreferences,
+                0,
+                0
             ))) {
                 $multi = (int)Tools::getValue('multi-shipping');
                 Tools::redirect('index.php?controller=address&back='.urlencode('order.php?step=1'.($multi ? '&multi-shipping='.$multi : '')));

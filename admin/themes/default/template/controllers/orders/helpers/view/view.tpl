@@ -830,7 +830,8 @@
                 <div class="panel panel-total">
                     <div class="table-responsive">
                         <table class="table" id="order-details-price">
-                            {* Assign order price *}
+  
+                        {* Assign order price *}
                             {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
                                 {assign var=order_product_price value=($order->total_products)}
                                 {assign var=order_discount_price value=$order->total_discounts_tax_excl}
@@ -852,8 +853,8 @@
                             {assign var=total_rooms_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
 
                             {* Get total extra services including convenience fees prices *}
-                            {assign var=total_products_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE))}
-                            {assign var=total_products_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE))}
+                            {assign var=total_products_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE))}
+                            {assign var=total_products_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE))}
 
                             {* Get total of extra services and extra demands prices(excluding convenience fee) *}
                             {assign var=total_room_services_and_demands_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $totalDemandsPriceTE)}
