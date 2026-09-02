@@ -24,7 +24,10 @@
     {if is_array($hotel_images) && count($hotel_images)}
         {foreach from=$hotel_images item=hotel_image}
             <div class="col-sm-4 image-item">
-                <a class="hotel-images-fancybox" href="{$hotel_image.link|escape:'html':'UTF-8'}">
+                <a class="fancybox"
+                   href="{$hotel_image.link|escape:'html':'UTF-8'}"
+                   data-fancybox-group="hotel-images"
+                   title="{if isset($hotel_image.category_name) && $hotel_image.category_name}{$hotel_image.category_name|escape:'html':'UTF-8'}{/if}">
                     <img class="img img-responsive" src="{$hotel_image.link|escape:'html':'UTF-8'}">
                 </a>
             </div>
