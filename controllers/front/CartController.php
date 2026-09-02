@@ -155,8 +155,8 @@ class CartControllerCore extends FrontController
             $result = $this->context->cart->deleteProduct($this->id_product, $this->id_product_attribute, $this->customization_id, $this->id_address_delivery);
 
             // now get updated available rooms
-            $date_from = Tools::getValue('dateFrom');
-            $date_to = Tools::getValue('dateTo');
+            $date_from = Tools::getValue('date_from');
+            $date_to = Tools::getValue('date_to');
             $date_from = date("Y-m-d H:i:s", strtotime($date_from));
             $date_to = date("Y-m-d H:i:s", strtotime($date_to));
             $objRoomType = new HotelRoomType();
@@ -315,7 +315,7 @@ class CartControllerCore extends FrontController
             }
 
             if ($occupancyRequiredForBooking && $operator == 'up') {
-                if ($occupancy = json_decode(Tools::getValue('occupancy'), true)) {
+                if ($occupancy = Tools::getValue('occupancy')) {
                     $this->qty = count($occupancy);
                 } else {
                     $this->errors[] = Tools::displayError('Invalid occupnacy.');
@@ -337,11 +337,21 @@ class CartControllerCore extends FrontController
             if (!$this->errors) {
                 $objRoomType = new HotelRoomType();
                 if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($this->id_product)) {
-                    $date_from = Tools::getValue('dateFrom');
-                    $date_to = Tools::getValue('dateTo');
+                    $date_from = Tools::getValue('date_from');
+                    $date_to = Tools::getValue('date_to');
                     $date_from = date("Y-m-d H:i:s", strtotime($date_from));
                     $date_to = date("Y-m-d H:i:s", strtotime($date_to));
-                    $serviceProducts = json_decode(Tools::getValue('serviceProducts'),true);
+
+                    $rawServiceProducts = Tools::getValue('service_product');
+                    $serviceProducts = [];
+                    if (is_array($rawServiceProducts) && !empty($rawServiceProducts)) {
+                        foreach ($rawServiceProducts as $id_product => $data) {
+                            $serviceProducts[] = [
+                                'id_product' => (int) $id_product,
+                                'quantity'   => isset($data['quantity']) ? (int) $data['quantity'] : 1,
+                            ];
+                        }
+                    }
 
                     // valdiate occupancy if providede
                     if ($operator == 'up' && $occupancyRequiredForBooking) {
@@ -419,7 +429,11 @@ class CartControllerCore extends FrontController
                                     $total_available_rooms = $hotelRoomData['stats']['num_avail'];
                                     if (Tools::getValue('op', 'up') == 'up') {
                                         if ($total_available_rooms < $req_rm) {
-                                            die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
+                                            if (Tools::getValue('ajax')) {
+                                                die(json_encode(array('status' => 'unavailable_quantity', 'avail_rooms' => $total_available_rooms)));
+                                            } else {
+                                                $this->errors[] = Tools::displayError('All rooms are sold out for the selected dates. Please try with different dates.');
+                                            }
                                         } else {
                                             // validate service products if available
                                             if ($serviceProducts) {
@@ -450,10 +464,18 @@ class CartControllerCore extends FrontController
                             }
                         }
                     } else {
-                        die(json_encode(array('status' => 'failed3')));
+                        if (Tools::getValue('ajax')) {
+                            die(json_encode(array('status' => 'failed3')));
+                        } else {
+                            $this->errors[] = Tools::displayError('An error occurred while processing your request.');
+                        }
                     }
                 } else {
-                    die(json_encode(array('status' => 'failed4')));
+                    if (Tools::getValue('ajax')) {
+                        die(json_encode(array('status' => 'failed4')));
+                    } else {
+                        $this->errors[] = Tools::displayError('An error occurred while processing your request.');
+                    }
                 }
             }
         } else {

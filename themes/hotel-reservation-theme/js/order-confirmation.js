@@ -26,6 +26,7 @@ $(document).ready(function(){
         var idOrder = $(this).data('id_order');
         var dateFrom = $(this).data('date_from');
         var dateTo = $(this).data('date_to');
+        var secureKey = $(this).data('secure_key');
         var action = $(this).data('action');
         $.ajax({
             type: 'POST',
@@ -42,6 +43,7 @@ $(document).ready(function(){
                 id_order: idOrder,
                 action: 'getRoomTypeBookingServices',
                 method: 'getRoomTypeBookingServices',
+                secure_key: secureKey,
                 ajax: true,
                 token: static_token
             },

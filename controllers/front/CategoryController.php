@@ -59,6 +59,7 @@ class CategoryControllerCore extends FrontController
 
         $this->addCSS(_THEME_CSS_DIR_.'occupancy.css');
         $this->addJS(_THEME_JS_DIR_.'occupancy.js');
+        $this->addJS(_THEME_JS_DIR_.'room-type-service-products.js');
         $scenes = Scene::getScenes($this->category->id, $this->context->language->id, true, false);
         if ($scenes && count($scenes)) {
             $this->addJS(_THEME_JS_DIR_.'scenes.js');

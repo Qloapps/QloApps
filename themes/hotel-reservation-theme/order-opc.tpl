@@ -394,6 +394,9 @@
 								{addJsDefL name=liUpdate}{$smarty.capture.default|@addcslashes:'\''}{/addJsDefL}
 								{addJsDefL name=txtExtraServiceSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
 								{addJsDefL name=txtMaxQuantityAdded}{l s='Maximum quantity of service added' js=1}{/addJsDefL}
+								{addJsDefL name=txtExtraDemandErr}{l s='Some error occurred while updating demands' js=1}{/addJsDefL}
+								{addJsDefL name=freeShippingTranslation}{l s='Free shipping!' mod='blockcart' js=1}{/addJsDefL}
+
 							{/strip}
 						{/block}
 					{/if}

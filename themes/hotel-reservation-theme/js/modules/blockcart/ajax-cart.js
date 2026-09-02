@@ -394,16 +394,27 @@ var ajaxCart = {
         if (parseInt(booking_product)) {
             // get the selected extra services by customer
             if (typeof dateFrom != 'undefined')
-                req.append('dateFrom', dateFrom);
+                req.append('date_from', dateFrom);
             if (typeof dateTo != 'undefined')
-                req.append('dateTo', dateTo);
+                req.append('date_to', dateTo);
 
             if (occupancy_required_for_booking) {
-                req.append('occupancy', JSON.stringify(occupancy));
+                occupancy.forEach(function(room, i) {
+                    req.append('occupancy['+i+'][adults]', room.adults);
+                    req.append('occupancy['+i+'][children]', room.children || 0);
+                    if (room.child_ages && room.child_ages.length) {
+                        room.child_ages.forEach(function(age) {
+                            req.append('occupancy['+i+'][child_ages][]', age);
+                        });
+                    }
+                });
             } else {
                 req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
             }
-            req.append('serviceProducts', JSON.stringify(getRoomsServiceProducts()) );
+
+            getRoomsServiceProducts().forEach(function(product) {
+                req.append('service_product['+product.id_product+'][quantity]', product.quantity);
+            });
         } else {
             req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
         }
@@ -547,7 +558,7 @@ var ajaxCart = {
             async: true,
             cache: false,
             dataType: "json",
-            data: 'controller=cart&add=1&op=down&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&ajax=true&qty=' + ((quantity && quantity != null) ? quantity : '1') + '&id_product=' + idProduct + '&token=' + static_token + ((parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination) : '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
+            data: 'controller=cart&add=1&op=down&date_from=' + dateFrom + '&date_to=' + dateTo + '&ajax=true&qty=' + ((quantity && quantity != null) ? quantity : '1') + '&id_product=' + idProduct + '&token=' + static_token + ((parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination) : '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
             success: function(jsonData, textStatus, jqXHR) {
                 /*by webkul checking and setting availability of rooms*/
                 /*for product page add to cart quantity management*/
@@ -618,7 +629,7 @@ var ajaxCart = {
             async: true,
             cache: false,
             dataType: "json",
-            data: 'controller=cart&delete=1&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&id_product=' + idProduct + '&id_hotel=' + idHotel + '&id_product_option=' + ((idCombination != null && parseInt(idCombination)) ? idCombination : '') + ((customizationId && customizationId != null) ? '&id_customization=' + customizationId : '') + '&id_address_delivery=' + idAddressDelivery + '&token=' + static_token + '&ajax=true',
+            data: 'controller=cart&delete=1&date_from=' + dateFrom + '&date_to=' + dateTo + '&id_product=' + idProduct + '&id_hotel=' + idHotel + '&id_product_option=' + ((idCombination != null && parseInt(idCombination)) ? idCombination : '') + ((customizationId && customizationId != null) ? '&id_customization=' + customizationId : '') + '&id_address_delivery=' + idAddressDelivery + '&token=' + static_token + '&ajax=true',
             success: function(jsonData) {
                 if (pagename == 'product') {
                     BookingForm.refresh();
