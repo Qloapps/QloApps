@@ -394,19 +394,29 @@ var ajaxCart = {
         if (parseInt(booking_product)) {
             // get the selected extra demands by customer
             if (typeof dateFrom != 'undefined')
-                req.append('dateFrom', dateFrom);
+                req.append('date_from', dateFrom);
             if (typeof dateTo != 'undefined')
-                req.append('dateTo', dateTo);
+                req.append('date_to', dateTo);
 
-            if (occupancy_required_for_booking) {
-                req.append('occupancy', JSON.stringify(occupancy));
+             if (occupancy_required_for_booking) {
+                occupancy.forEach(function(room, i) {
+                    req.append('occupancy['+i+'][adults]', room.adults);
+                    req.append('occupancy['+i+'][children]', room.children || 0);
+                    if (room.child_ages && room.child_ages.length) {
+                        room.child_ages.forEach(function(age) {
+                            req.append('occupancy['+i+'][child_ages][]', age);
+                        });
+                    }
+                });
             } else {
                 req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
             }
 
             var roomDemands = getRoomsExtraDemands();
-            req.append('roomDemands', JSON.stringify(roomDemands) );
-            req.append('serviceProducts', JSON.stringify(getRoomsServiceProducts()) );
+            req.append('room_demands', JSON.stringify(roomDemands) );
+            getRoomsServiceProducts().forEach(function(product) {
+                req.append('service_product['+product.id_product+'][quantity]', product.quantity);
+            });
         } else {
             req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
         }
@@ -555,7 +565,7 @@ var ajaxCart = {
             async: true,
             cache: false,
             dataType: "json",
-            data: 'controller=cart&add=1&op=down&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&ajax=true&qty=' + ((quantity && quantity != null) ? quantity : '1') + '&id_product=' + idProduct + '&token=' + static_token + ((parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination) : '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
+            data: 'controller=cart&add=1&op=down&date_from=' + dateFrom + '&date_to=' + dateTo + '&ajax=true&qty=' + ((quantity && quantity != null) ? quantity : '1') + '&id_product=' + idProduct + '&token=' + static_token + ((parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination) : '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
             success: function(jsonData, textStatus, jqXHR) {
                 /*by webkul checking and setting availability of rooms*/
                 /*for product page add to cart quantity management*/
@@ -629,7 +639,7 @@ var ajaxCart = {
             async: true,
             cache: false,
             dataType: "json",
-            data: 'controller=cart&delete=1&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&id_product=' + idProduct + '&id_hotel=' + idHotel + '&id_product_option=' + ((idCombination != null && parseInt(idCombination)) ? idCombination : '') + ((customizationId && customizationId != null) ? '&id_customization=' + customizationId : '') + '&id_address_delivery=' + idAddressDelivery + '&token=' + static_token + '&ajax=true',
+            data: 'controller=cart&delete=1&date_from=' + dateFrom + '&date_to=' + dateTo + '&id_product=' + idProduct + '&id_hotel=' + idHotel + '&id_product_option=' + ((idCombination != null && parseInt(idCombination)) ? idCombination : '') + ((customizationId && customizationId != null) ? '&id_customization=' + customizationId : '') + '&id_address_delivery=' + idAddressDelivery + '&token=' + static_token + '&ajax=true',
             success: function(jsonData) {
                 if (pagename == 'product') {
                     disableRoomTypeDemands(0);
@@ -1386,113 +1396,4 @@ function crossselling_serialScroll() {
             hideControlOnEnd: true,
             pager: false
         });
-}
-
-function resetRoomtypeServices(refresh = true) {
-    $('.room_demands_container').find('input.id_room_type_demand:checked').prop('checked', false).uniform();
-    $('#additional_products').empty();
-    $('#additional_products div')
-    $('.remove_roomtype_product').text(select_txt).removeClass('btn-danger remove_roomtype_product').addClass('btn-success add_roomtype_product');
-    if (refresh) {
-        BookingForm.refresh();
-    }
-}
-
-function disableRoomTypeDemands(show) {
-    if (show) {
-        $('.room_demands_container_overlay').show();
-        $('.room_demands_container').find('input:checkbox.id_room_type_demand').prop('checked', false);
-        $('.room_demand_block').find('.id_room_type_demand').prop('checked', false).parent().removeClass('checked');
-        $('.room_demands_container').find('input:checkbox.id_room_type_demand').attr('disabled', 'disabled');
-    } else {
-        $('.room_demands_container_overlay').hide();
-        $('.room_demands_container').find('input:checkbox.id_room_type_demand').removeAttr('disabled');
-        $('.room_demands_container').find('.checker').removeClass('disabled');
-    }
-}
-
-function disableRoomTypeServices(disable) {
-    if (disable) {
-        resetRoomtypeServices(false);
-        $('#service_products_cont').find('button.add_roomtype_product').attr('disabled', 'disabled');
-        $('#service_products_cont').find('.qty_container .qty_direction a').attr('disabled', 'disabled');
-    } else {
-        $('#service_products_cont').find('button.add_roomtype_product').removeAttr('disabled');
-        $('#service_products_cont').find('.qty_container .qty_direction a').removeAttr('disabled');
-    }
-}
-
-function getRoomsExtraDemands()
-{
-    var roomDemands = [];
-
-    $('input:checkbox.id_room_type_demand:checked').each(function () {
-        roomDemands.push({
-            'id_global_demand':$(this).val(),
-            'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
-        });
-    });
-
-    return roomDemands;
-}
-
-function getRoomsServiceProducts()
-{
-    var serviceProducts = [];
-
-    $('#additional_products input.service_product').each(function () {
-        serviceProducts.push({
-            'id_product': $(this).data('id_product'),
-            'quantity':$(this).val(),
-        });
-    });
-
-    return serviceProducts;
-}
-
-function getBookingOccupancyDetails(bookingform, booking_product)
-{
-    let occupancy;
-    if (booking_product) {
-        if (occupancy_required_for_booking) {
-            $('.booking_guest_occupancy_conatiner .dropdown').removeClass('open');
-            let selected_occupancy = $(bookingform).find(".occupancy_info_block.selected")
-            if (selected_occupancy.length) {
-                occupancy = [];
-                $(selected_occupancy).each(function(ind, element) {
-                    if (parseInt($(element).find('.num_adults').val())) {
-                        let child_ages = [];
-                        $(element).find('.guest_child_age').each(function(index) {
-                            if ($(this).val() > -1) {
-                                child_ages.push($(this).val());
-                            }
-                        });
-                        if ($(element).find('.num_children').val()) {
-                            if (child_ages.length != $(element).find('.num_children').val()) {
-                                $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
-                                occupancy = false;
-                            }
-                        }
-                        occupancy.push({
-                            'adults': $(element).find('.num_adults').val(),
-                            'children': $(element).find('.num_children').val(),
-                            'child_ages': child_ages
-                        });
-                    } else {
-                        $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
-                        occupancy = false;
-                    }
-                });
-            } else {
-                $(bookingform).find('.booking_occupancy_wrapper').parent().addClass('open')
-                occupancy = false;
-            }
-        } else {
-            occupancy = parseInt($(bookingform).find(".quantity_wanted").val());
-        }
-    } else {
-        occupancy = parseInt($('#service_product_qty').val());
-    }
-
-    return occupancy;
 }

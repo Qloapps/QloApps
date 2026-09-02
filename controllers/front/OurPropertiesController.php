@@ -49,7 +49,7 @@ class OurPropertiesControllerCore extends FrontController
                         && $hotel['id_cover_img']
                         && Validate::isLoadedObject($objHotelImage = new HotelImage($hotel['id_cover_img']))
                     ) {
-                        $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('medium')));
+                        $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('large')));
                         if ((bool)Tools::file_get_contents($htlImgLink)) {
                             $hotelsInfo[$hotelKey]['image_url'] = $htlImgLink;
                         } else {
@@ -128,7 +128,6 @@ class OurPropertiesControllerCore extends FrontController
             array(
                 'hotelsInfo' => $hotelsInfo,
                 'hotelLocationArray' => $hotelLocationArray,
-                'viewOnMap' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                 'displayHotelMap' => $displayHotelMap,
                 'WK_HTL_SHORT_DESC' => Configuration::get('WK_HTL_SHORT_DESC', $this->context->language->id),
                 'currentIndex' => $this->context->link->getPageLink('our-properties')
