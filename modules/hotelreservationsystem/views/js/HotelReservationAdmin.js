@@ -258,15 +258,32 @@ var GoogleMapsManager = {
         }
     },
     setFormVars: function(params) {
-        $('#loclatitude').val(params.lat);
-        $('#loclongitude').val(params.lng);
+        $('#loclatitude').val(Number(params.lat).toFixed(8));
+        $('#loclongitude').val(Number(params.lng).toFixed(8));
         $('#locformatedAddr').val(params.formattedAddress);
         $('#googleInputField').val(params.inputText);
+    },
+    updateMarkerFromInputs: function() {
+        if (!this.map) {
+            return;
+        }
+        var latitude = Number($('#loclatitude').val());
+        var longitude = Number($('#loclongitude').val());
+        if (!latitude || !longitude) {
+            return;
+        }
+        var latLng = {lat: latitude, lng: longitude};
+        this.map.setCenter(latLng);
+        this.addMarker(latLng, null, null, false);
     },
 }
 
 $(document).on('click', 'button.gm-ui-hover-effect', function () {
     GoogleMapsManager.clearAllMarkers();
+});
+
+$(document).on('change', '#loclatitude, #loclongitude', function () {
+    GoogleMapsManager.updateMarkerFromInputs();
 });
 
 function initGoogleMaps() {

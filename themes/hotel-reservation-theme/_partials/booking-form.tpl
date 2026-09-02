@@ -23,7 +23,7 @@
 <div class="booking-form card">
     <div class="booking_room_fields">
         {block name='booking_form_content'}
-            <form id="booking-form" action="" method="post">
+            <form id="booking-form" action="{$link->getPageLink('cart')|escape:'html':'UTF-8'}" method="post">
                 {block name='product_hidden_fields'}
                     <p class="hidden">
                         <input type="hidden" name="token" value="{$static_token}" />
@@ -51,8 +51,8 @@
                                     <div class="form-group col-sm-12">
                                         <label class="control-label">{l s='Check In - Check Out'}</label>
                                         <div class="form-control input-date" id="room_date_range"  autocomplete="off" placeholder="{l s='Check-in - Check-out'}"><span>{l s='Check-in'} &nbsp;<i class="icon icon-minus"></i>&nbsp; {l s='Check-out'}</span></div>
-                                        <input type="hidden" class="input-date" name="room_check_in" id="room_check_in" value="{if isset($date_from)}{$date_from}{/if}" />
-                                        <input type="hidden" class="input-date" name="room_check_out" id="room_check_out" value="{if isset($date_to)}{$date_to}{/if}" />
+                                        <input type="hidden" class="input-date" name="date_from" id="room_check_in" value="{if isset($date_from)}{$date_from}{/if}" />
+                                        <input type="hidden" class="input-date" name="date_to" id="room_check_out" value="{if isset($date_to)}{$date_to}{/if}" />
                                     </div>
                                 {/block}
                             </div>
@@ -192,7 +192,7 @@
                                                 <div id="additional_products" class="hidden">
                                                     {if isset($selected_service_product) && $selected_service_product}
                                                         {foreach $selected_service_product as $product}
-                                                            <input type="hidded" id="service_product_{$product['id_product']}" name="service_product[{$product['id_product']}][]" class="service_product" data-id_product="{$product['id_product']}" value="{$product['quantity']}">
+                                                            <input type="hidden" id="service_product_{$product['id_product']}" name="service_product[{$product['id_product']}][quantity]" class="service_product" data-id_product="{$product['id_product']}" value="{$product['quantity']}">
                                                         {/foreach}
                                                     {/if}
                                                 </div>
@@ -231,7 +231,7 @@
                             {if isset($associated_hotels) && $associated_hotels}
                                 <div class="form-group">
                                     <label class="control-label">{l s='Select Property'}</label>
-                                    <select class="chosen input-hotel" name="service_id_hotel" id="service_id_hotel">
+                                    <select class="chosen input-hotel" name="id_hotel" id="service_id_hotel">
                                         {foreach $associated_hotels as $hotel}
                                             <option value="{$hotel.id_hotel}" {if isset($service_id_hotel) && $service_id_hotel == $hotel['id_hotel']}selected{elseif $hotel@first}selected{/if}>{$hotel.name}</option>
                                         {/foreach}
@@ -276,7 +276,7 @@
 
                                             <div class="qty_container">
                                                 <input type="hidden" class="stock_qty" id="stock_qty" name="stock_qty" data-id-product="{$product->id}" data-stock_quantity="{$product->quantity}" data-allow_oosp="{$allow_oosp}" >
-                                                <input type="hidden" class="service_product_qty" id="service_product_qty" name="service_product_qty" data-id-product="{$product->id}" data-cart_quantity="{if isset($product->cart_quantity) && $product->cart_quantity}{$product->cart_quantity}{else}0{/if}" data-max_quantity="{if isset($product->max_quantity)}{$product->max_quantity|escape:'html':'UTF-8'}{else}{$product->quantity}{/if}" value="{if isset($quantity)}{$quantity|intval}{else}{if $product->minimal_quantity > 1}{$product->minimal_quantity}{else}1{/if}{/if}">
+                                                <input type="hidden" class="service_product_qty" id="service_product_qty" name="qty" data-id-product="{$product->id}" data-cart_quantity="{if isset($product->cart_quantity) && $product->cart_quantity}{$product->cart_quantity}{else}0{/if}" data-max_quantity="{if isset($product->max_quantity)}{$product->max_quantity|escape:'html':'UTF-8'}{else}{$product->quantity}{/if}" value="{if isset($quantity)}{$quantity|intval}{else}{if $product->minimal_quantity > 1}{$product->minimal_quantity}{else}1{/if}{/if}">
                                                 <div class="qty_count pull-left">
                                                     <span>{if isset($quantity)}{$quantity|intval}{else}{if $product->minimal_quantity > 1}{$product->minimal_quantity}{else}1{/if}{/if}</span>
                                                 </div>
@@ -292,7 +292,7 @@
                                     <hr class="separator-hr-mg-10">
                                 {/if}
                             {else}
-                                <input type="hidden" class="service_product_qty" id="service_product_qty" name="service_product_qty" data-id-product="{$product->id}" data-max_quantity="1" value="1">
+                                <input type="hidden" class="service_product_qty" id="service_product_qty" name="qty" data-id-product="{$product->id}" data-max_quantity="1" value="1">
                             {/if}
                         {/block}
                         {block name='booking_form_actions'}

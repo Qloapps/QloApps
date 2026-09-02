@@ -124,7 +124,7 @@
 														{/if}
 														{block name='room_type_list_room_book_now_button'}
 															<div>
-																<a cat_rm_check_in="{$booking_date_from|escape:'htmlall':'UTF-8'}" cat_rm_check_out="{$booking_date_to|escape:'htmlall':'UTF-8'}" href="" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days|escape:'htmlall':'UTF-8'}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium ajax_add_to_cart_button"><span>{l s='Book Now'}</span></a>
+																<a cat_rm_check_in="{$booking_date_from|escape:'htmlall':'UTF-8'}" cat_rm_check_out="{$booking_date_to|escape:'htmlall':'UTF-8'}" href="{$link->getPageLink('cart')|escape:'html':'UTF-8'}?id_product={$room_v['id_product']}&date_from={$booking_date_from|escape:'htmlall':'UTF-8'}&date_to={$booking_date_to|escape:'htmlall':'UTF-8'}&add=1&token={$static_token}" rm_product_id="{$room_v['id_product']}" cat_rm_book_nm_days="{$num_days|escape:'htmlall':'UTF-8'}" data-id-product-attribute="0" data-id-product="{$room_v['id_product']|intval}" class="btn btn-default button button-medium btn_book_now_with_occupancy ajax_add_to_cart_button"><span>{l s='Book Now'}</span></a>
 															</div>
 														{/block}
 													</div>

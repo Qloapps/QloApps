@@ -531,6 +531,7 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminBookingDocument', 'Booking Documents', false, false);
+        $this->installTab('AdminHotelImageCategory', 'Hotel Image Category', false, false);
 
         return true;
     }
