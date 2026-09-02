@@ -100,6 +100,8 @@
                         });
                     }
                 {/if}
+
+                changeStandardProductAddressType();
             });
         </script>
     {/if}
@@ -110,6 +112,5 @@
 <script type="text/javascript">
     changeCMSActivationAuthorization();
     changeOverbookingOrderAction();
-    changeStandardProductAddressType();
 </script>
 {/block}
