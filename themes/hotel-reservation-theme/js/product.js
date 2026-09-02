@@ -205,6 +205,13 @@ $(document).ready(function() {
     }
 
     if ($('.room_info_hotel_images_wrap').length) {
+        if (!!$.prototype.fancybox) {
+            $('.room_info_hotel_images_wrap .fancybox').fancybox({
+                'hideOnContentClick': true,
+                'openEffect': 'elastic',
+                'closeEffect': 'elastic',
+            });
+        }
         loadHotelImagesByPage(1);
     }
 });
@@ -1269,7 +1276,7 @@ function addProductToRoomType(that) {
     } else {
         $('<input type="hidden">').attr({
             id: 'service_product_'+ id_product,
-            name: 'service_product['+ id_product +'][]',
+            name: 'service_product['+ id_product +'][quantity]',
             class: 'service_product',
             'data-id_product': id_product,
             value: qty
@@ -1310,11 +1317,14 @@ function updateRoomServiceQuantity(that) {
 
 
 function initMap() {
-    const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), {
+    const mapOptions = {
         zoom: 10,
         streetViewControl: false,
-        mapId: PS_MAP_ID
-    });
+    };
+    if (PS_MAP_ID) {
+        mapOptions.mapId = PS_MAP_ID;
+    }
+    const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), mapOptions);
 
     const hotelLatLng = {
         lat: Number(hotel_location.latitude),
@@ -1326,11 +1336,20 @@ function initMap() {
     icon.src = PS_STORES_ICON;
     icon.style.width = '24px';
     icon.style.height = '24px';
-    let marker = new google.maps.marker.AdvancedMarkerElement({
-        position: hotelLatLng,
-        map: map,
-        content: icon,
-    });
+    let marker;
+    if (PS_MAP_ID) {
+        marker = new google.maps.marker.AdvancedMarkerElement({
+            position: hotelLatLng,
+            map: map,
+            content: icon,
+        });
+    } else {
+        marker = new google.maps.Marker({
+            position: hotelLatLng,
+            map: map,
+            icon: PS_STORES_ICON,
+        });
+    }
 
     const uiContent = $('#room-info-map-ui-content .hotel-info-wrap').get(0);
     map.controls[google.maps.ControlPosition.LEFT_TOP].push(uiContent);
@@ -1524,7 +1543,6 @@ function loadHotelImagesByPage(page = 1) {
         success: function(response) {
             if (response.status == true && response.message == 'HTML_OK') {
                 $('.room_info_hotel_images_wrap .images-wrap').append(response.html);
-                $('.room_info_hotel_images_wrap .hotel-images-fancybox').fancybox();
                 $('.room_info_hotel_images_wrap .btn-show-more-images').removeClass('hide');
             }
 

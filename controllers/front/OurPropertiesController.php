@@ -49,7 +49,7 @@ class OurPropertiesControllerCore extends FrontController
                         && $hotel['id_cover_img']
                         && Validate::isLoadedObject($objHotelImage = new HotelImage($hotel['id_cover_img']))
                     ) {
-                        $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('medium')));
+                        $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('large')));
                         if ((bool)Tools::file_get_contents($htlImgLink)) {
                             $hotelsInfo[$hotelKey]['image_url'] = $htlImgLink;
                         } else {
@@ -111,7 +111,7 @@ class OurPropertiesControllerCore extends FrontController
                 $hotelsInfo = array_slice($hotelsInfo, $page * 10, 10);
             }
 
-            if ($displayHotelMap && Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP') && Configuration::get('PS_MAP_ID')) {
+            if ($displayHotelMap && Configuration::get('PS_API_KEY') && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
                 if ($hotelLocations = $objHotelInfo->getMapFormatHotelsInfo(Configuration::get('WK_MAP_HOTEL_ACTIVE_ONLY'))) {
                     $hotelLocationArray = str_replace(array('\n', '\r'), '', json_encode($hotelLocations));
                 }
@@ -128,7 +128,6 @@ class OurPropertiesControllerCore extends FrontController
             array(
                 'hotelsInfo' => $hotelsInfo,
                 'hotelLocationArray' => $hotelLocationArray,
-                'viewOnMap' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                 'displayHotelMap' => $displayHotelMap,
                 'WK_HTL_SHORT_DESC' => Configuration::get('WK_HTL_SHORT_DESC', $this->context->language->id),
                 'currentIndex' => $this->context->link->getPageLink('our-properties')
@@ -144,11 +143,11 @@ class OurPropertiesControllerCore extends FrontController
         $this->addJS(_THEME_JS_DIR_.'our-properties.js');
         $this->addCSS(_THEME_CSS_DIR_.'our-properties.css');
         // GOOGLE MAP
-        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && ($PS_MAP_ID = Configuration::get('PS_MAP_ID')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
             Media::addJsDef(
                 array(
                     'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
-                    'PS_MAP_ID' => $PS_MAP_ID
+                    'PS_MAP_ID' => Configuration::get('PS_MAP_ID')
                 )
             );
 

@@ -25,7 +25,9 @@
 
 var current_product = null;
 var ajaxQueries = new Array();
-
+if (typeof jQuery !== 'undefined' && jQuery.effects && !jQuery.effects.effect) {
+    jQuery.effects.effect = {};
+}
 $(document).ready(function() {
 	// Init all events
 	init();

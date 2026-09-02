@@ -179,7 +179,7 @@ class wkhotelfilterblock extends Module
                     $this->context->controller->addJS($this->_path.'/views/js/wkhotelfilterblock.js');
                     $this->context->controller->addCSS($this->_path.'/views/css/wkhotelfilterblock.css');
                     $id_lang = $this->context->language->id;
-                    $all_feat = FeatureCore::getFeatures($id_lang);
+                    $all_amenities = HotelAmenities::getAmenities($id_lang);
 
                     $max_adult = HotelRoomType::getMaxAdults($id_hotel);
                     $max_child = HotelRoomType::getMaxChild($id_hotel);
@@ -235,7 +235,7 @@ class wkhotelfilterblock extends Module
                     $warning_num = Configuration::get('WK_ROOM_LEFT_WARNING_NUMBER');
                     $this->context->smarty->assign(array(
                         'warning_num' => $warning_num,
-                        'all_feat' => $all_feat,
+                        'all_amenities' => $all_amenities,
                         'max_adult' => $max_adult,
                         'max_child' => $max_child,
                         'cat_link' => $categoryUrl,

@@ -237,11 +237,11 @@ class ContactControllerCore extends FrontController
         $this->addJS(_PS_JS_DIR_.'validate.js');
 
         // GOOGLE MAP
-        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && ($PS_MAP_ID = Configuration::get('PS_MAP_ID')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
+        if (($PS_API_KEY = Configuration::get('PS_API_KEY')) && Configuration::get('WK_GOOGLE_ACTIVE_MAP')) {
             Media::addJsDef(
                 array(
                     'PS_STORES_ICON' => $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_STORES_ICON')),
-                    'PS_MAP_ID' => $PS_MAP_ID,
+                    'PS_MAP_ID' => Configuration::get('PS_MAP_ID'),
                 )
             );
             $this->addJS(
@@ -311,7 +311,7 @@ class ContactControllerCore extends FrontController
                     )
                 ) {
                     // by webkul to get media link.
-                    $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('medium')));
+                    $htlImgLink = $this->context->link->getMediaLink($objHotelImage->getImageLink($hotel['id_cover_img'], ImageType::getFormatedName('large')));
 
                     if ((bool)Tools::file_get_contents($htlImgLink)) {
                         $hotel['image_url'] = $htlImgLink;
@@ -330,7 +330,6 @@ class ContactControllerCore extends FrontController
         $this->context->smarty->assign(
             array(
                 'hotelsInfo' => $hotelsInfo,
-                'viewOnMap' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
                 'displayHotels' => Configuration::get('WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST'),
                 'gblHtlPhone' => $gblHtlPhone,
                 'gblHtlEmail' => $gblHtlEmail,

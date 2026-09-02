@@ -37,6 +37,7 @@
   <tab id="Credit_Slips" name="Kreditnota"/>
   <tab id="Statuses" name="Statusar"/>
   <tab id="Order_Messages" name="Ordermeddelanden"/>
+  <tab id="Guest_Registration" name="Gästregistreringskort"/>
   <tab id="Customers_1" name="Kunder"/>
   <tab id="Addresses" name="Adresser"/>
   <tab id="Groups" name="Grupper"/>

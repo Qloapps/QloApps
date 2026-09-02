@@ -165,6 +165,11 @@
                             </a>
                         </li>
                         <li>
+                            <a title="{l s='Guest Registration Card'}" href="{$link->getAdminLink('AdminPdf')|escape:'html':'UTF-8'}&amp;submitAction=generateGuestRegistrationFormPDF&amp;id_hotel_booking_detail={$data['id']}" target="_blank">
+                                <i class="icon-download"></i> {l s='GRC'}
+                            </a>
+                        </li>
+                        <li>
                             <a href="#" class="room_reallocate_swap" id="reallocate_room_{$data['id']}" data-room_type_name="{$data['room_type_name']}" data-toggle="modal" data-target="#mySwappigModal" data-id_htl_booking="{$data['id']}" data-id_order="{$data['id_order']}" data-room_num='{$data.room_num}' data-id_room_type='{$data.id_product}' data-cust_name='{$data.alloted_cust_name}' data-cust_email='{$data.alloted_cust_email}' data-avail_rm_swap='{$data.avail_rooms_to_swap|@json_encode}' data-avail_realloc_room_types='{$data.avail_room_types_to_realloc|@json_encode}' data-allotment_type='{$data.booking_type}' data-allotment_type_label='{if $data.booking_type == $ALLOTMENT_MANUAL}{l s='Manual'}{else}{l s='Auto'}{/if}' data-comment='{$data.comment}'>
                                 <i class="icon-refresh"></i>
                                 {l s='Reallocate/Swap Room'}

@@ -30,6 +30,7 @@
 	</div>
 
 	<form id="{$table|escape:'htmlall':'UTF-8'}_form" class="defaultForm {$name_controller|escape:'htmlall':'UTF-8'} form-horizontal" action="{$current|escape:'htmlall':'UTF-8'}&{if !empty($submit_action)}{$submit_action|escape:'htmlall':'UTF-8'}{/if}&token={$token|escape:'htmlall':'UTF-8'}" method="post" enctype="multipart/form-data" {if isset($style)}style="{$style|escape:'htmlall':'UTF-8'}"{/if}>
+		<input type="hidden" id="htl_active_tab" name="htl_active_tab" value="">
 		{if isset($edit)}
 			{assign var=hook_arg_id_hotel value=$hotel_info.id}
 		{else}
@@ -95,7 +96,7 @@
 				<li>
 					<a href="#hotel-features" data-toggle="tab">
 						<i class="icon-list-alt"></i>
-						{l s='Features' mod='hotelreservationsystem'}
+						{l s='Amenities' mod='hotelreservationsystem'}
 					</a>
 				</li>
 				{hook h='displayAdminAddHotelFormTab' id_hotel=$hook_arg_id_hotel}
@@ -287,6 +288,18 @@
 						</div>
 					</div>
 					<div class="form-group">
+						<label class="control-label col-sm-3" for="loclatitude">{l s='Latitude :' mod='hotelreservationsystem'}</label>
+						<div class="col-sm-6">
+							<input class="form-control" type="text" id="loclatitude" name="loclatitude" value="{if isset($smarty.post.loclatitude)}{$smarty.post.loclatitude|escape:'htmlall':'UTF-8'}{elseif isset($edit) && $hotel_info.latitude != 0}{$hotel_info.latitude|escape:'htmlall':'UTF-8'}{/if}" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label col-sm-3" for="loclongitude">{l s='Longitude :' mod='hotelreservationsystem'}</label>
+						<div class="col-sm-6">
+							<input class="form-control" type="text" id="loclongitude" name="loclongitude" value="{if isset($smarty.post.loclongitude)}{$smarty.post.loclongitude|escape:'htmlall':'UTF-8'}{elseif isset($edit) && $hotel_info.longitude != 0}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
+						</div>
+					</div>
+					<div class="form-group">
 						<label class="col-sm-3 control-label">
 							{l s='Hotel Policies :' mod='hotelreservationsystem'}
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
@@ -308,8 +321,6 @@
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{l s='Map:' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-6" id="googleMapContainer">
-								<input type="hidden" id="loclatitude" name="loclatitude" value="{if isset($edit)}{$hotel_info.latitude|escape:'htmlall':'UTF-8'}{/if}" />
-								<input type="hidden" id="loclongitude" name="loclongitude" value="{if isset($edit)}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
 								<input type="hidden" id="locformatedAddr" name="locformatedAddr" value="{if isset($edit)}{$hotel_info.map_formated_address}{/if}" />
 								<input type="hidden" id="googleInputField" name="googleInputField" value="{if isset($edit)}{$hotel_info.map_input_text}{/if}" />
 								<div id="pac-input" class="controls" type="text"></div>
@@ -423,12 +434,12 @@
 						show_label_tooltip = false
 						show_flag = true
 						inputs = [
-    						'meta_title' => $meta_title_info,
-    						'meta_description' => $meta_description_info,
-    						'link_rewrite' => $link_rewrite_info,
-							'meta_keywords' => $meta_keywords_info,
-							'name' => $hotel_info.hotel_name,
-							'description_short' => $hotel_info.short_description
+    						'meta_title' => $meta_title_info|default:'',
+    						'meta_description' => $meta_description_info|default:'',
+    						'link_rewrite' => $link_rewrite_info|default:'',
+							'meta_keywords' => $meta_keywords_info|default:'',
+							'name' => $hotel_info.hotel_name|default:'',
+							'description_short' => $hotel_info.short_description|default:''
 						]
 					}
 					{hook h='displayAdminAddHotelFormSeoTabAfter' id_hotel=$hook_arg_id_hotel}
@@ -437,19 +448,17 @@
 					{hook h='displayAdminAddHotelFormImagesTabBefore' id_hotel=$hook_arg_id_hotel}
 
 					{if isset($hotel_info.id) && $hotel_info.id}
-						<div class="form-group row">
-							<label for="hotel_images" class="col-sm-3 control-label padding-top-0">
-								{l s='Upload images' mod='hotelreservationsystem'}&nbsp;:&nbsp;&nbsp;
-							</label>
-							<div class="col-sm-5">
-								<input class="form-control-static" type="file" accept="image/gif, image/jpg, image/jpeg, image/png" id="hotel_images" name="hotel_images[]" multiple>
-							</div>
-						</div>
-						<hr>
-						{* Image table *}
-						<h4><i class="icon-image"></i> <span>{l s='Hotel Images' mod='hotelreservationsystem'}</span></h4>
 						<div class="row">
+							<div class="col-sm-12 text-right">
+								<a href="{$link->getAdminLink('AdminHotelImageCategory')|escape:'html':'UTF-8'}" class="btn btn-default">
+									<i class="icon-plus-sign"></i> {l s='ADD CATEGORY' mod='hotelreservationsystem'}
+								</a>
+								<button type="button" class="btn btn-primary" id="open-add-hotel-images-modal">
+									<i class="icon-plus-sign"></i> {l s='Add images' mod='hotelreservationsystem'}
+								</button>
+							</div>
 							<div class="col-sm-12">
+								<hr>
 								{include file="../../_partials/htl-images-list.tpl"}
 							</div>
 						</div>
@@ -610,22 +619,43 @@
 				</div>
 				<div class="tab-pane" id="hotel-features">
 					{hook h='displayAdminAddHotelFormFeaturesTabBefore' id_hotel=$hook_arg_id_hotel}
-					{if isset($hotel_feature_tree)}
+					<div class="alert alert-info">
+						<p>{l s='If you want to add a new amenity, please use the following link.'}
+							<a href="{$link->getAdminLink('AdminHotelAmenities')|escape:'html':'UTF-8'}" class="btn btn-link button" target="_blank">
+								<i class="icon-plus-sign"></i> {l s='Manage amenities'} <i class="icon-external-link-sign"></i>
+							</a>
+						</p>
+					</div>
+					{if isset($hotel_amenity_tree)}
 						<div class="form-group">
-							<label for="hotel_feature" class="control-label col-sm-3">
-								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select features for this hotel.' mod='hotelreservationsystem'}'>{l s='Select feature' mod='hotelreservationsystem'}</span>
+							<label for="hotel_amenity" class="control-label col-sm-3">
+								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select amenities for this hotel.' mod='hotelreservationsystem'}'>{l s='Select amenities' mod='hotelreservationsystem'}</span>
 							</label>
-							<div class="col-xs-7 hotel_features_tree">
-								{$hotel_feature_tree}
+							<div class="col-xs-7 hotel_amenities_tree">
+								{$hotel_amenity_tree}
 							</div>
 						</div>
+
+						<div class="form-group">
+							<label class="control-label col-sm-3">
+								<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title='{l s='Select which of the chosen amenities should be featured for this hotel.' mod='hotelreservationsystem'}'>{l s='Featured amenities' mod='hotelreservationsystem'}</span>
+							</label>
+							<div class="col-sm-7">
+								<select name="hotel_featured_amenities[]" id="htl_featured_amenities" class="form-control" multiple>
+								</select>
+							</div>
+						</div>
+
+						<script type="text/javascript">
+						var htlFeaturedAmenityIds = {if isset($hotel_featured_amenity_ids)}{$hotel_featured_amenity_ids|json_encode}{else}[]{/if};
+						</script>
 					{elseif isset($hotel_info.id) && $hotel_info.id}
 						<div class="alert alert-warning">
-							{l s='No features created yet.' mod='hotelreservationsystem'} {l s='You can create features by visiting ' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminHotelFeatures')}">{l s='manage hotel features.' mod='hotelreservationsystem'}</a>
+							{l s='No amenities created yet.' mod='hotelreservationsystem'} {l s='You can create amenities by visiting ' mod='hotelreservationsystem'} <a target="_blank" href="{$link->getAdminLink('AdminHotelAmenities')}">{l s='manage hotel amenities.' mod='hotelreservationsystem'}</a>
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save hotel information before assigning hotel features.' mod='hotelreservationsystem'}
+							{l s='Please save hotel information before assigning hotel amenities.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 
@@ -651,10 +681,14 @@
 	</form>
 </div>
 
-{strip}
-	{addJsDef adminHotelCtrlUrl = $link->getAdminlink('AdminAddHotel')}
-		{addJsDefL name=imgUploadSuccessMsg}{l s='Image Successfully Uploaded' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+	{strip}
+		{addJsDef adminHotelCtrlUrl = $link->getAdminlink('AdminAddHotel')}
+			{addJsDefL name=imgSelectErrorMsg}{l s='Please select at least one image before uploading.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+			{addJsDefL name=bulkUpdateSelectErrorMsg}{l s='Please select at least one image to update.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+			{addJsDefL name=bulkDeleteSelectErrorMsg}{l s='Please select at least one image to delete.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+			{addJsDefL name=imgUploadSuccessMsg}{l s='Image Successfully Uploaded' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+			{addJsDefL name=imgUploadErrorMsg}{l s='Something went wrong while uploading images. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+			{addJsDefL name=imgUpdateSuccessMsg}{l s='Image updated successfully.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 
 	{addJsDefL name=coverImgSuccessMsg}{l s='Cover image changed successfully' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 	{addJsDefL name=coverImgErrorMsg}{l s='Error while changing cover image' js=1 mod='hotelreservationsystem'}{/addJsDefL}
@@ -665,8 +699,6 @@
 	{addJsDef enabledDisplayMap = $enabledDisplayMap}
 	{addJsDef defaultCountry = $defaultCountry}
 	{addJsDef statebycountryurl = $link->getAdminLink('AdminAddHotel')}
-	{addJsDefL name=htlImgDeleteSuccessMsg}{l s='Image removed successfully.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=htlImgDeleteErrMsg}{l s='Some error occurred while deleting hotel image.' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 {/strip}
 
 {block name=script}
@@ -704,6 +736,17 @@
 		// Trigger autosize width recalculation when language is switched
 		$(document).on('wk.lang.changed', function(e, idLang) {
 			$(window).trigger('resize.autosize');
+		});
+
+		// Restore active tab from controller redirect param
+		var _htlActiveTab = '{if !empty($smarty.get.htl_active_tab)}{$smarty.get.htl_active_tab|escape:'javascript':'UTF-8'}{/if}';
+		if (/^#[\w-]+$/.test(_htlActiveTab) && $('a[href="' + _htlActiveTab + '"]').length) {
+			$('a[href="' + _htlActiveTab + '"]').tab('show');
+		}
+
+		// Keep hidden input in sync so active tab survives form submission
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+			$('#htl_active_tab').val($(e.target).attr('href'));
 		});
 	});
 	$(".textarea-autosize").autosize();

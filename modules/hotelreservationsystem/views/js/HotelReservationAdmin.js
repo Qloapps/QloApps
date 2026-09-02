@@ -84,11 +84,15 @@ var GoogleMapsManager = {
         if (!this.map) {
             var that = this;
             that.setDefaultLatLng(function() {
-                that.map = new google.maps.Map($(that.mapDiv).get(0), {
+                var mapOptions = {
                     zoom: that.defaultZoom,
                     clickableIcons: true,
-                    mapId: PS_MAP_ID
-                });
+                };
+                if (PS_MAP_ID) {
+                    mapOptions.mapId = PS_MAP_ID;
+                }
+                that.map = new google.maps.Map($(that.mapDiv).get(0), mapOptions);
+                google.maps.event.trigger(that.map, 'resize');
                 that.map.setCenter(that.defaultLatLng);
                 if (that.defaultLatLng && that.formattedAddress) {
                     that.addMarker(that.defaultLatLng, null, that.formattedAddress);
@@ -171,12 +175,22 @@ var GoogleMapsManager = {
         icon.style.width = '24px';
         icon.style.height = '24px';
 
-        var marker = new google.maps.marker.AdvancedMarkerElement({
-            position: latLng,
-            map: that.map,
-            content: icon,
-            draggable: true,
-        });
+        var marker;
+        if (PS_MAP_ID) {
+            marker = new google.maps.marker.AdvancedMarkerElement({
+                position: latLng,
+                map: that.map,
+                content: icon,
+                draggable: true,
+            });
+        } else {
+            marker = new google.maps.Marker({
+                position: latLng,
+                map: that.map,
+                icon: PS_STORES_ICON,
+                draggable: true,
+            });
+        }
         that.markers.push(marker);
         marker.addListener('dragend', function(e) {
             var latLng = {
@@ -234,25 +248,42 @@ var GoogleMapsManager = {
                 that.clearAllMarkers();
             });
 
-            var latLng = marker.position;
+            var latLng = marker.position ? marker.position : marker.getPosition();
             that.setFormVars({
-                lat: latLng.lat,
-                lng: latLng.lng,
+                lat: typeof latLng.lat === 'function' ? latLng.lat() : latLng.lat,
+                lng: typeof latLng.lng === 'function' ? latLng.lng() : latLng.lng,
                 formattedAddress: content,
                 inputText: $('#pac-input').val(),
             });
         }
     },
     setFormVars: function(params) {
-        $('#loclatitude').val(params.lat);
-        $('#loclongitude').val(params.lng);
+        $('#loclatitude').val(Number(params.lat).toFixed(8));
+        $('#loclongitude').val(Number(params.lng).toFixed(8));
         $('#locformatedAddr').val(params.formattedAddress);
         $('#googleInputField').val(params.inputText);
+    },
+    updateMarkerFromInputs: function() {
+        if (!this.map) {
+            return;
+        }
+        var latitude = Number($('#loclatitude').val());
+        var longitude = Number($('#loclongitude').val());
+        if (!latitude || !longitude) {
+            return;
+        }
+        var latLng = {lat: latitude, lng: longitude};
+        this.map.setCenter(latLng);
+        this.addMarker(latLng, null, null, false);
     },
 }
 
 $(document).on('click', 'button.gm-ui-hover-effect', function () {
     GoogleMapsManager.clearAllMarkers();
+});
+
+$(document).on('change', '#loclatitude, #loclongitude', function () {
+    GoogleMapsManager.updateMarkerFromInputs();
 });
 
 function initGoogleMaps() {
@@ -954,3 +985,60 @@ function showLangField(select_lang_name, id_lang)
 $(function() {
     $('[data-toggle="popover"]').popover()
 });
+
+/* ---- Hotel Featured Amenities (AdminAddHotelController) ---- */
+(function ($) {
+    var featuredIds = [];
+    var $select;
+    var chosenReady = false;
+
+    function syncAmenitiesToFeatured() {
+        if (!$select || !$select.length) {
+            return;
+        }
+        var existing = {};
+        $select.find('option').each(function () {
+            existing[$(this).val()] = true;
+        });
+        $('input[name="id_amenities[]"]').each(function () {
+            var $checkbox = $(this);
+            var id = $checkbox.val();
+            var name = $checkbox.siblings('label.tree-toggler').text().trim();
+            if ($checkbox.is(':checked')) {
+                if (!existing[id]) {
+                    var selected = featuredIds.indexOf(parseInt(id)) !== -1;
+                    $select.append($('<option></option>').val(id).text(name).prop('selected', selected));
+                }
+            } else {
+                $select.find('option[value="' + id + '"]').remove();
+            }
+        });
+        if (chosenReady) {
+            $select.trigger('chosen:updated');
+        }
+    }
+
+    $(document).on('click', '#hotel-amenities-tree :input[type="checkbox"]', function () {
+        setTimeout(syncAmenitiesToFeatured, 0);
+    });
+
+    $(document).on('click', '#check-all-hotel-amenities-tree, #uncheck-all-hotel-amenities-tree', function () {
+        setTimeout(syncAmenitiesToFeatured, 0);
+    });
+
+    $(document).ready(function () {
+        featuredIds = (typeof htlFeaturedAmenityIds !== 'undefined') ? htlFeaturedAmenityIds : [];
+        $select = $('#htl_featured_amenities');
+        syncAmenitiesToFeatured();
+
+        $('a[href="#hotel-features"]').on('shown.bs.tab', function () {
+            syncAmenitiesToFeatured();
+            if (!chosenReady) {
+                $select.chosen({ disable_search_threshold: 5, search_contains: true });
+                chosenReady = true;
+            } else {
+                $select.trigger('chosen:updated');
+            }
+        });
+    });
+}(jQuery));

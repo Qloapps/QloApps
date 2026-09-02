@@ -66,10 +66,8 @@ function initMap() {
     hotelLocationArray = JSON.parse(hotelLocationArray);
 
     // Display a map on the page
-    map = new google.maps.Map(document.getElementById("map"), {mapId: PS_MAP_ID});
+    map = new google.maps.Map(document.getElementById("map"), PS_MAP_ID ? {mapId: PS_MAP_ID} : {});
     google.maps.event.trigger(map, 'resize');
-
-    map.setTilt(45);
 
     // Display multiple markers on a map
     var infoWindow = new google.maps.InfoWindow();
@@ -84,12 +82,21 @@ function initMap() {
         icon.style.width = '24px';
         icon.style.height = '24px';
 
-        marker = new google.maps.marker.AdvancedMarkerElement({
-            map: map,
-            position: position,
-            title: location.hotel_name,
-            content: icon,
-        });
+        if (PS_MAP_ID) {
+            marker = new google.maps.marker.AdvancedMarkerElement({
+                map: map,
+                position: position,
+                title: location.hotel_name,
+                content: icon,
+            });
+        } else {
+            marker = new google.maps.Marker({
+                map: map,
+                position: position,
+                title: location.hotel_name,
+                icon: PS_STORES_ICON,
+            });
+        }
         // Allow each marker to have an info window
         google.maps.event.addListener(marker, 'click', (function(marker, i) {
             return function() {
