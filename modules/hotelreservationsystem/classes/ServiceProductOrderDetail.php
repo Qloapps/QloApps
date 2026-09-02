@@ -585,28 +585,6 @@ class ServiceProductOrderDetail extends ObjectModel
     // ── REPORT METHODS ────────────────────────────────────────────────────────
 
     /**
-     * Builds the hotel WHERE fragment for report queries.
-     *
-     * @param int|array|false $idsHotel
-     * @param string          $alias
-     * @return string
-     */
-    private static function hotelFilter($idsHotel, $alias)
-    {
-        if (defined('_PS_ADMIN_DIR_')) {
-            return HotelBranchInformation::addHotelRestriction($idsHotel, $alias);
-        }
-        if (!$idsHotel) {
-            return '';
-        }
-        $ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)));
-        if (!$ids) {
-            return '';
-        }
-        return ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
-    }
-
-    /**
      * Total service revenue (tax excl) for a date range, filtered by invoice_date.
      *
      * @param array $params date_from, date_to, id_hotel, id_product, id_room, id_order,
@@ -650,7 +628,7 @@ class ServiceProductOrderDetail extends ObjectModel
             .($idCustomer       ? ' AND hbd.`id_customer` = '.$idCustomer : '')
             .($idServiceProduct ? ' AND spod.`id_product` = '.$idServiceProduct : '')
             .($idCategory       ? ' AND spod.`id_product` IN (SELECT `id_product` FROM `'._DB_PREFIX_.'product` WHERE `id_category_default` = '.$idCategory.')' : '')
-            .self::hotelFilter($idsHotel, 'hbd');
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
 
         return (float) Db::getInstance()->getValue(
             'SELECT IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0)
@@ -703,7 +681,7 @@ class ServiceProductOrderDetail extends ObjectModel
             .($idCustomer       ? ' AND hbd.`id_customer` = '.$idCustomer : '')
             .($idServiceProduct ? ' AND spod.`id_product` = '.$idServiceProduct : '')
             .($idCategory       ? ' AND spod.`id_product` IN (SELECT `id_product` FROM `'._DB_PREFIX_.'product` WHERE `id_category_default` = '.$idCategory.')' : '')
-            .self::hotelFilter($idsHotel, 'hbd');
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
 
         return Db::getInstance()->executeS(
             'SELECT spod.`id_service_product_order_detail`, spod.`date_add`,
@@ -752,7 +730,7 @@ class ServiceProductOrderDetail extends ObjectModel
             .($idRoom    ? ' AND hbd.`id_room` = '.$idRoom        : '')
             .($idOrder   ? ' AND hbd.`id_order` = '.$idOrder      : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
-            .self::hotelFilter($idsHotel, 'hbd');
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
 
         $joins =
             'FROM `'._DB_PREFIX_.'service_product_order_detail` spod
@@ -867,7 +845,7 @@ class ServiceProductOrderDetail extends ObjectModel
             AND (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) > 0
             AND spod.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idTax ? ' AND t.`id_tax` = '.$idTax : '')
-            .self::hotelFilter($idsHotel, 'hbd').'
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
             GROUP BY spod.`id_service_product_order_detail`
             ORDER BY spod.`date_add` ASC'
         );

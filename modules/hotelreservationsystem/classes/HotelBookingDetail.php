@@ -3893,30 +3893,6 @@ class HotelBookingDetail extends ObjectModel
     // ── REPORT METHODS ────────────────────────────────────────────────────────
 
     /**
-     * Builds the hotel WHERE fragment for report queries.
-     * Admin context: uses addHotelRestriction (employee-profile filtered).
-     * Non-admin context: builds IN (...) directly from the supplied IDs.
-     *
-     * @param int|array|false $idsHotel Scalar ID, array of IDs, or false for no filter
-     * @param string          $alias    SQL table alias
-     * @return string
-     */
-    private static function hotelFilter($idsHotel, $alias)
-    {
-        if (defined('_PS_ADMIN_DIR_')) {
-            return HotelBranchInformation::addHotelRestriction($idsHotel, $alias);
-        }
-        if (!$idsHotel) {
-            return '';
-        }
-        $ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)));
-        if (!$ids) {
-            return '';
-        }
-        return ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
-    }
-
-    /**
     /**
      * Per-day booking summary keyed by booking-creation date (date_add).
      * Returns room revenue, tax, rooms booked, and room nights for each day bookings were placed.
@@ -3938,7 +3914,7 @@ class HotelBookingDetail extends ObjectModel
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
             .($idOrder    ? ' AND hbd.`id_order` = '.$idOrder        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-            .self::hotelFilter($idsHotel, 'hbd');
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
 
         $rows = Db::getInstance()->executeS(
             'SELECT DATE(o.`date_add`) AS grp_date,
@@ -3991,7 +3967,7 @@ class HotelBookingDetail extends ObjectModel
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
             .($idOrder    ? ' AND hbd.`id_order` = '.$idOrder        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-            .self::hotelFilter($idsHotel, 'hbd');
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
 
         while ($current <= $dateTo) {
             $nextDay = date('Y-m-d', strtotime('+1 day', strtotime($current)));
@@ -4053,7 +4029,7 @@ class HotelBookingDetail extends ObjectModel
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
                 .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
                 .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-                .self::hotelFilter($idsHotel, 'hbd')
+                .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
             );
             $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
         }
@@ -4091,7 +4067,7 @@ class HotelBookingDetail extends ObjectModel
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
                 .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
                 .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-                .self::hotelFilter($idsHotel, 'hbd')
+                .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
             );
             $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
         }
@@ -4140,7 +4116,7 @@ class HotelBookingDetail extends ObjectModel
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
-            .self::hotelFilter($idsHotel, 'hbd')
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
         );
     }
 
@@ -4177,7 +4153,7 @@ class HotelBookingDetail extends ObjectModel
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
-            .self::hotelFilter($idsHotel, 'hbd')
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
         );
     }
 
@@ -4214,7 +4190,7 @@ class HotelBookingDetail extends ObjectModel
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom        : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
-            .self::hotelFilter($idsHotel, 'hbd')
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
         );
     }
 
@@ -4279,7 +4255,7 @@ class HotelBookingDetail extends ObjectModel
             .($idStatus     ? ' AND hbd.`id_status` = '.$idStatus        : '')
             .($bookingType  ? ' AND hbd.`booking_type` = '.$bookingType  : '')
             .($idOrderState ? ' AND o.`current_state` = '.$idOrderState  : '')
-            .self::hotelFilter($idsHotel, 'hbd').'
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
             ORDER BY hbd.`date_add` DESC'
         );
     }
@@ -4297,7 +4273,7 @@ class HotelBookingDetail extends ObjectModel
         $idsHotel         = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idCustomer       = isset($params['id_customer'])   ? (int) $params['id_customer'] : 0;
         $bookingSource    = isset($params['booking_source']) ? pSQL($params['booking_source']) : '';
-        $hotelRestriction = self::hotelFilter($idsHotel, 'hbd');
+        $hotelRestriction = HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
 
         $dateToNext = pSQL(date('Y-m-d', strtotime('+1 day', strtotime($dateTo))));
 
@@ -4392,7 +4368,7 @@ class HotelBookingDetail extends ObjectModel
             AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idCustomer  ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
             .($bookingType ? ' AND hbd.`booking_type` = '.$bookingType : '')
-            .self::hotelFilter($idsHotel, 'hbd').'
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
             GROUP BY o.`payment`, o.`module`
             ORDER BY revenue_incl DESC'
         );
@@ -4436,7 +4412,7 @@ class HotelBookingDetail extends ObjectModel
             WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
             .($idTax     ? ' AND t.`id_tax` = '.$idTax           : '')
-            .self::hotelFilter($idsHotel, 'hbd');
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
 
         if ($revenueSource === 'service') {
             return ServiceProductOrderDetail::getTaxBreakdown($params);
@@ -4512,7 +4488,7 @@ class HotelBookingDetail extends ObjectModel
             AND orr.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             . ($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
             . ($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
-            . self::hotelFilter($idsHotel, 'hbd').'
+            . HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
             GROUP BY ord.`id_htl_booking`, orr.`id_order_return`
             ORDER BY orr.`date_add` DESC'
         );
@@ -4570,7 +4546,7 @@ class HotelBookingDetail extends ObjectModel
             WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
             .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-            .self::hotelFilter($idsHotel, 'hbd')
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
         );
     }
 
@@ -4600,7 +4576,7 @@ class HotelBookingDetail extends ObjectModel
             AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
             .($idRoom    ? ' AND hbd.`id_room` = '.$idRoom        : '')
-            .self::hotelFilter($idsHotel, 'hbd')
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
         );
     }
 
@@ -4628,7 +4604,7 @@ class HotelBookingDetail extends ObjectModel
                 WHERE hbd.`date_add` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
                 .($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
-                .self::hotelFilter($idsHotel, 'hbd')
+                .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
             );
             $current = date('Y-m-d', strtotime('+1 day', strtotime($current)));
         }
@@ -4650,7 +4626,7 @@ class HotelBookingDetail extends ObjectModel
         $idStatus  = isset($params['id_status'])  ? (int) $params['id_status']   : null;
         $idProduct = isset($params['id_product']) ? (int) $params['id_product']  : 0;
 
-        $hotelFilter   = self::hotelFilter($idsHotel, 'hbd');
+        $hotelFilter   = HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
         $statusFilter  = $idStatus !== null ? ' AND hbd.`id_status` = '.$idStatus : '';
         $productFilter = $idProduct ? ' AND hri.`id_product` = '.$idProduct : '';
         $result        = array();

@@ -333,28 +333,6 @@ class HotelRoomInformation extends ObjectModel
     // ── REPORT METHODS ────────────────────────────────────────────────────────
 
     /**
-     * Builds the hotel WHERE fragment for report queries.
-     *
-     * @param int|array|false $idsHotel
-     * @param string          $alias
-     * @return string
-     */
-    private static function hotelFilter($idsHotel, $alias)
-    {
-        if (defined('_PS_ADMIN_DIR_')) {
-            return HotelBranchInformation::addHotelRestriction($idsHotel, $alias);
-        }
-        if (!$idsHotel) {
-            return '';
-        }
-        $ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)));
-        if (!$ids) {
-            return '';
-        }
-        return ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
-    }
-
-    /**
      * Room type list for filter dropdowns in reports.
      *
      * @param array $params id_hotel, id_lang
@@ -372,7 +350,7 @@ class HotelRoomInformation extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'product_lang` pl
                 ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.$idLang.')
             WHERE p.`active` = 1 AND p.`booking_product` = 1'
-            . self::hotelFilter($idsHotel, 'hri')
+            . HotelBranchInformation::addHotelRestriction($idsHotel, 'hri')
             . ' ORDER BY pl.`name`'
         );
     }
@@ -404,7 +382,7 @@ class HotelRoomInformation extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'product_lang` pl
                 ON (pl.`id_product` = hri.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
             WHERE 1'
-            .self::hotelFilter($idsHotel, 'hri')
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hri')
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '').'
             GROUP BY hri.`id_product`'
         );
@@ -420,7 +398,7 @@ class HotelRoomInformation extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
             WHERE hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
             AND hbd.`date_from` < "'.$dateToNext.'" AND hbd.`date_to` > "'.$dateFrom.'"'
-            .self::hotelFilter($idsHotel, 'hbd')
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
         );
 
@@ -522,7 +500,7 @@ class HotelRoomInformation extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = bkgs.`id_customer`)
             WHERE p.`active` = 1 AND p.`booking_product` = 1'
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
-            .self::hotelFilter($idsHotel, 'hri').'
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hri').'
             ORDER BY hbil.`hotel_name`, pl.`name`, hri.`room_num`'
         );
     }
@@ -545,7 +523,7 @@ class HotelRoomInformation extends ObjectModel
                 ON (p.`id_product` = hri.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
             WHERE hri.`floor` != "" AND hri.`floor` IS NOT NULL'
             .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
-            .self::hotelFilter($idsHotel, 'hri').'
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hri').'
             ORDER BY hri.`floor`'
         );
     }

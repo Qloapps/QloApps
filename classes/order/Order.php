@@ -3184,28 +3184,6 @@ class OrderCore extends ObjectModel
     // ── REPORT METHODS ────────────────────────────────────────────────────────
 
     /**
-     * Builds the hotel WHERE fragment for report queries.
-     *
-     * @param int|array|false $idsHotel
-     * @param string          $alias
-     * @return string
-     */
-    protected static function hotelFilter($idsHotel, $alias)
-    {
-        if (defined('_PS_ADMIN_DIR_')) {
-            return HotelBranchInformation::addHotelRestriction($idsHotel, $alias);
-        }
-        if (!$idsHotel) {
-            return '';
-        }
-        $ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)));
-        if (!$ids) {
-            return '';
-        }
-        return ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
-    }
-
-    /**
      * Orders with unpaid balance for the outstanding-payments report.
      *
      * @param array $params date_from, date_to, id_hotel, id_order
@@ -3218,7 +3196,7 @@ class OrderCore extends ObjectModel
         $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
         $idOrder  = isset($params['id_order'])  ? (int) $params['id_order']  : 0;
 
-        $hotelFilter = self::hotelFilter($idsHotel, 'hbd');
+        $hotelFilter = HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
         $hotelExists = $hotelFilter
             ? ' AND EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = o.`id_order`'.$hotelFilter.')'
             : '';
@@ -3272,7 +3250,7 @@ class OrderCore extends ObjectModel
         $hotelExists = ' AND EXISTS (
             SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`id_order` = o.`id_order`'
-            .self::hotelFilter($idsHotel, 'hbd')
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
             .')';
 
         return (float) Db::getInstance()->getValue(
@@ -3328,7 +3306,7 @@ class OrderCore extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'state` st ON (st.`id_state` = a.`id_state`)
             WHERE o.`valid` = 1'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
-            .self::hotelFilter($idsHotel, 'hbd').'
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
             GROUP BY c.`id_customer`'
             .($dateFrom && $dateTo
                 ? ' HAVING MAX(IF(hbd.`date_from` <= "'.$dateTo.'" AND hbd.`date_to` > "'.$dateFrom.'", 1, 0)) = 1'
