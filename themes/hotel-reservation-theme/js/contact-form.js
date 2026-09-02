@@ -69,8 +69,6 @@ function initMap() {
     map = new google.maps.Map(document.getElementById("map"), PS_MAP_ID ? {mapId: PS_MAP_ID} : {});
     google.maps.event.trigger(map, 'resize');
 
-    map.setTilt(45);
-
     // Display multiple markers on a map
     var infoWindow = new google.maps.InfoWindow();
     var marker;
