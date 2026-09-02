@@ -72,10 +72,6 @@ function psinstall_google_click() {
 	window.open('https://plus.google.com/share?url=www.qloapps.com/', 'sharergplus', 'toolbar=0,status=0,width=660,height=445');
 }
 
-function psinstall_pinterest_click() {
-	window.open('http://www.pinterest.com/pin/create/button/?media=http://img-cdn.prestashop.com/logo.png&url=https://qloapps.com/', 'sharerpinterest', 'toolbar=0,status=0,width=660,height=445');
-}
-
 function psinstall_linkedin_click() {
 	window.open('https://www.linkedin.com/shareArticle?title=QloApps&url=www.qloapps.com/download/', 'sharerlinkedin', 'toolbar=0,status=0,width=600,height=450');
 }

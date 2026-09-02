@@ -527,7 +527,7 @@ class AdminControllerCore extends Controller
             29 => $this->l('Successful upgrade'),
             30 => $this->l('A partial refund was successfully created.'),
             31 => $this->l('The discount was successfully generated.'),
-            32 => $this->l('Successfully signed in to PrestaShop Addons'),
+            32 => $this->l('Successfully signed in to QloApps Addons'),
             33 => $this->l('The selected module(s) have been successfully enabled.'),
             34 => $this->l('The selected module(s) have been successfully disabled.'),
 
@@ -1797,8 +1797,7 @@ class AdminControllerCore extends Controller
         $this->initTabModuleList();
         $this->addPageHeaderToolBarModulesListButton();
 
-        $this->context->smarty->assign('help_link', 'http://help.prestashop.com/'.Language::getIsoById($this->context->employee->id_lang).'/doc/'
-            .Tools::getValue('controller').'?version='._PS_VERSION_.'&country='.Language::getIsoById($this->context->employee->id_lang));
+        $this->context->smarty->assign('help_link', 'https://docs.qloapps.com');
     }
 
     /**
@@ -2516,7 +2515,7 @@ class AdminControllerCore extends Controller
             'check_url_fopen' => (ini_get('allow_url_fopen') ? 'ok' : 'ko'),
             'check_openssl' => (extension_loaded('openssl') ? 'ok' : 'ko'),
             'add_permission' => 1,
-            'addons_register_link' => 'https://addons.prestashop.com/'.$this->context->language->iso_code.'/login'
+            'addons_register_link' => 'https://qloapps.com/addons/'
         ));
 
         //Force override translation key
