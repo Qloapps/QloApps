@@ -4005,6 +4005,38 @@ class CartCore extends ObjectModel
             }
         }
 
+        $totalRoomsCount = 0;
+        if ($htlCartData = HotelCartBookingData::getHotelCartBookingData(0)) {
+            foreach ($htlCartData as $roomTypeCart) {
+                $totalRoomsCount += $roomTypeCart['total_num_rooms'];
+            }
+        }
+        $nbTotalProducts = 0;
+        $objServiceProductCartDetail = new ServiceProductCartDetail();
+        foreach ($products as &$product) {
+           if (!$product['booking_product']) {
+                if (Product::SELLING_PREFERENCE_STANDALONE == $product['selling_preference_type']) {
+                    $nbTotalProducts += (int) $product['cart_quantity'];
+                } elseif (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $product['selling_preference_type']
+                    || Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE == $product['selling_preference_type']
+                ) {
+                    if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
+                        $this->id,
+                        [Product::SELLING_PREFERENCE_HOTEL_STANDALONE, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE],
+                        null,
+                        0,
+                        null,
+                        $product['id_product']
+                    )) {
+                        foreach ($serviceProducts as $serviceProduct) {
+                            if ($serviceProduct['id_hotel'] && $serviceProduct['id_product'] == $product['id_product']) {
+                                $nbTotalProducts += (int) $serviceProduct['quantity'];
+                            }
+                        }
+                    }
+                }
+           }
+        }
         $objHotelAdvancedPayment = new HotelAdvancedPayment();
         $total_rooms_with_services_without_discount_te = $total_rooms + $total_demands + $total_additional_services + $total_additional_services_auto_add + $total_standalone_service_products;
         $total_rooms_with_services_without_discount_ti = $total_rooms_wt + $total_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt + $total_standalone_service_products_wt;
@@ -4082,6 +4114,7 @@ class CartCore extends ObjectModel
             'tourism_tax' => max(0.0, (float) $tourism_tax),
             'total_tourism_tax' => max(0.0, (float) $tourism_tax),
             'tourism_tax_grossed_up' => TaxConfiguration::isGrossedUp($tourism_tax),
+            'total_products_in_cart' => $totalRoomsCount + $nbTotalProducts,
         );
         $hook = Hook::exec('actionCartSummary', $summary, null, true);
         if (is_array($hook)) {
