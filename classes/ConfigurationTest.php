@@ -145,14 +145,14 @@ class ConfigurationTestCore
     public static function test_phpversion()
     {
         return (
-            version_compare(substr(phpversion(), 0, 5), '8.2.0', '>=')
+            version_compare(substr(phpversion(), 0, 5), '8.1.0', '>=')
             && version_compare(substr(phpversion(), 0, 5), '8.6.0', '<')
         );
     }
 
     public static function test_new_phpversion()
     {
-        return version_compare(substr(phpversion(), 0, 5), '8.2.0', '>=');
+        return version_compare(substr(phpversion(), 0, 5), '8.1.0', '>=');
     }
 
     public static function test_mysql_support()
