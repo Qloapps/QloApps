@@ -110,6 +110,12 @@ class GuestTrackingControllerCore extends FrontController
     {
         $response = array('extra_demands' => false);
 
+        $order = new Order((int) Tools::getValue('id_order'));
+
+        if (!Validate::isLoadedObject($order) || $order->secure_key != Tools::getValue('secure_key')) {
+            $this->ajaxDie(json_encode($response));
+        }
+
         if (($idProduct = Tools::getValue('id_product'))
             && ($idOrder = Tools::getValue('id_order'))
             && ($dateFrom = Tools::getValue('date_from'))

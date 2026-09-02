@@ -59,6 +59,7 @@ class CartRuleCore extends ObjectModel
     public $cart_rule_restriction;
     public $product_restriction;
     public $shop_restriction;
+    public $hotel_restriction;
     public $free_shipping;
     public $reduction_percent;
     public $reduction_amount;
@@ -102,6 +103,7 @@ class CartRuleCore extends ObjectModel
             'cart_rule_restriction' =>    array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'product_restriction' =>    array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'shop_restriction' =>        array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'hotel_restriction' =>       array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'free_shipping' =>            array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'reduction_percent' =>        array('type' => self::TYPE_FLOAT, 'validate' => 'isPercentage'),
             'reduction_amount' =>        array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
@@ -163,6 +165,7 @@ class CartRuleCore extends ObjectModel
         $r &= Db::getInstance()->delete('cart_rule_carrier', '`id_cart_rule` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_shop', '`id_cart_rule` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_group', '`id_cart_rule` = '.(int)$this->id);
+        $r &= Db::getInstance()->delete('cart_rule_hotel', '`id_cart_rule` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_country', '`id_cart_rule` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_combination', '`id_cart_rule_1` = '.(int)$this->id.' OR `id_cart_rule_2` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_product_rule_group', '`id_cart_rule` = '.(int)$this->id);
@@ -353,6 +356,28 @@ class CartRuleCore extends ObjectModel
                         continue;
                     }
                     unset($result[$key]);
+                }
+            }
+
+            // Remove cart rule if the cart contains a product from a hotel not covered by its hotel restriction
+            foreach ($result as $key => $cart_rule) {
+                if (isset($cart_rule['hotel_restriction']) && $cart_rule['hotel_restriction']) {
+                    $total_cart_products = (int)Db::getInstance()->getValue('
+                        SELECT COUNT(cp.id_product)
+                        FROM '._DB_PREFIX_.'cart_product cp
+                        WHERE cp.id_cart = '.(int)$cart->id
+                    );
+                    $allowed_cart_products = (int)Db::getInstance()->getValue('
+                        SELECT COUNT(cp.id_product)
+                        FROM '._DB_PREFIX_.'cart_product cp
+                        INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
+                        INNER JOIN '._DB_PREFIX_.'cart_rule_hotel crh ON crh.id_hotel = hrt.id_hotel
+                        WHERE crh.id_cart_rule = '.(int)$cart_rule['id_cart_rule'].'
+                        AND cp.id_cart = '.(int)$cart->id
+                    );
+                    if (!$total_cart_products || $total_cart_products != $allowed_cart_products) {
+                        unset($result[$key]);
+                    }
                 }
             }
         }
@@ -634,6 +659,26 @@ class CartRuleCore extends ObjectModel
 			AND crs.id_shop = '.(int)$context->shop->id);
             if (!$id_cart_rule) {
                 return (!$display_error) ? false : Tools::displayError('You cannot use this voucher');
+            }
+        }
+
+        // Check if all the products in the cart belong to the restricted hotel(s)
+        if ($this->hotel_restriction) {
+            $total_cart_products = (int)Db::getInstance()->getValue('
+                SELECT COUNT(cp.id_product)
+                FROM '._DB_PREFIX_.'cart_product cp
+                WHERE cp.id_cart = '.(int)$context->cart->id
+            );
+            $allowed_cart_products = (int)Db::getInstance()->getValue('
+                SELECT COUNT(cp.id_product)
+                FROM '._DB_PREFIX_.'cart_product cp
+                INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
+                INNER JOIN '._DB_PREFIX_.'cart_rule_hotel crh ON crh.id_hotel = hrt.id_hotel
+                WHERE crh.id_cart_rule = '.(int)$this->id.'
+                AND cp.id_cart = '.(int)$context->cart->id
+            );
+            if (!$total_cart_products || $total_cart_products != $allowed_cart_products) {
+                return (!$display_error) ? false : Tools::displayError('You cannot use this voucher with the selected hotels');
             }
         }
 
@@ -1365,6 +1410,49 @@ class CartRuleCore extends ObjectModel
                 while ($row = Db::getInstance()->nextRow($resource)) {
                     $array[($row['selected'] || $this->{$type.'_restriction'} == 0) ? 'selected' : 'unselected'][] = $row;
                 }
+            }
+        }
+        return $array;
+    }
+
+    public function getHotelRestrictions($id_profile = null)
+    {
+        $array = array('selected' => array(), 'unselected' => array());
+        $id_lang = (int)Context::getContext()->language->id;
+
+        $hotel_access_condition = '';
+        if ($id_profile) {
+            $accessible_hotels = HotelBranchInformation::getProfileAccessedHotels($id_profile, 1, 1);
+            if (!empty($accessible_hotels)) {
+                $hotel_access_condition = ' AND hbi.`id` IN ('.implode(',', array_map('intval', $accessible_hotels)).')';
+            }
+        }
+
+        if (!Validate::isLoadedObject($this) || $this->hotel_restriction == 0) {
+            $array['selected'] = Db::getInstance()->executeS('
+                SELECT hbi.`id` AS id_hotel, hbl.`hotel_name`, 1 AS selected
+                FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+                LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
+                    ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.$id_lang.')
+                WHERE hbi.`active` = 1'.$hotel_access_condition.'
+                ORDER BY hbl.`hotel_name` ASC
+            ');
+        } else {
+            $resource = Db::getInstance()->query('
+                SELECT hbi.`id` AS id_hotel, hbl.`hotel_name`,
+                    IF(crh.id_hotel IS NULL, 0, 1) AS selected
+                FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+                LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
+                    ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.$id_lang.')
+                LEFT JOIN (
+                    SELECT id_hotel FROM `'._DB_PREFIX_.'cart_rule_hotel`
+                    WHERE id_cart_rule = '.(int)$this->id.'
+                ) crh ON hbi.`id` = crh.id_hotel
+                WHERE hbi.`active` = 1'.$hotel_access_condition.'
+                ORDER BY hbl.`hotel_name` ASC
+            ');
+            while ($row = Db::getInstance()->nextRow($resource)) {
+                $array[$row['selected'] ? 'selected' : 'unselected'][] = $row;
             }
         }
         return $array;

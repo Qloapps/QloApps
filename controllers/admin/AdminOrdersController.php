@@ -484,7 +484,7 @@ class AdminOrdersControllerCore extends AdminController
             if (!$cart_order_exists) {
                 $this->context->cart = $cart;
                 $this->context->currency = new Currency((int)$cart->id_currency);
-
+                $this->context->customer = new Customer((int)$cart->id_customer);
                 // validate cart for removing invalid data from cart before new order creation
                 // remove not linked services with room types from cart if not allowed to book them
                 $this->errors = array_merge(

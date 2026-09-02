@@ -44,7 +44,9 @@ a.fancybox-nav {
   .pb-left-column #image-block img {
     background: #fbfbfb;
     border-radius: 4px;
-    width: 100%; }
+    width: 100%;
+    min-height: 420px;
+    object-fit: cover; }
   .pb-left-column #image-block #view_full_size .span_link {
     position: absolute;
     bottom: 20px;

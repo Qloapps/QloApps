@@ -47,12 +47,22 @@ class AdminCartRulesControllerCore extends AdminController
         $this->fields_list = array(
             'id_cart_rule' => array('title' => $this->l('ID'), 'align' => 'center', 'class' => 'fixed-width-xs'),
             'name' => array('title' => $this->l('Name')),
+            'hotel_names' => array('title' => $this->l('Hotels'), 'orderby' => false, 'havingFilter' => true, 'filter_key' => 'hotel_names', 'callback' => 'formatHotelNames'),
             'priority' => array('title' => $this->l('Priority'), 'align' => 'center', 'class' => 'fixed-width-xs'),
             'code' => array('title' => $this->l('Code'), 'class' => 'fixed-width-sm'),
             'quantity' => array('title' => $this->l('Quantity'), 'align' => 'center', 'class' => 'fixed-width-xs'),
             'date_to' => array('title' => $this->l('Expiration date'), 'type' => 'datetime', 'class' => 'fixed-width-lg'),
             'active' => array('title' => $this->l('Status'), 'active' => 'status', 'type' => 'bool', 'align' => 'center', 'class' => 'fixed-width-xs', 'orderby' => false),
         );
+
+        $this->_select = 'GROUP_CONCAT(DISTINCT hbl.`hotel_name` ORDER BY hbl.`hotel_name` ASC SEPARATOR "|||") AS hotel_names';
+        $this->_join = 'LEFT JOIN `'._DB_PREFIX_.'cart_rule_hotel` crh ON (crh.`id_cart_rule` = a.`id_cart_rule`)
+            LEFT JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (
+                (a.`hotel_restriction` = 1 AND hbi.`id` = crh.`id_hotel`)
+                OR (a.`hotel_restriction` = 0 AND hbi.`active` = 1)
+            )
+            LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)Context::getContext()->language->id.')';
+        $this->_group = 'GROUP BY a.`id_cart_rule`';
 
         // START send access query information to the admin controller
         $this->access_select = ' SELECT a.`id_cart_rule` FROM '._DB_PREFIX_.'cart_rule a';
@@ -74,6 +84,20 @@ class AdminCartRulesControllerCore extends AdminController
         }
         $this->access_where = ' WHERE a.`id_cart_rule` NOT IN ('.$notInCond.')';
         parent::__construct();
+    }
+
+    public function formatHotelNames($hotelNames, $row)
+    {
+        $hotels = !empty($hotelNames) ? explode('|||', $hotelNames) : array();
+        $this->context->smarty->assign(array(
+            'hotel_names_first'     => !empty($hotels) ? $hotels[0] : null,
+            'hotel_names_remaining' => count($hotels) > 1 ? array_slice($hotels, 1) : array(),
+            'selected_hotels'       => $hotels,
+        ));
+
+        return $this->context->smarty->fetch(
+            'controllers/cart_rules/helpers/list/_hotel_names_tooltip.tpl'
+        );
     }
 
     public function ajaxProcessLoadCartRules()
@@ -254,6 +278,7 @@ class AdminCartRulesControllerCore extends AdminController
                 'room_rmv_txt' => $this->l('Unselect below room types'),
             )
         );
+        $this->addJqueryUI('ui.tooltip', 'base', true);
         $this->addJS(_PS_JS_DIR_.'admin/cart-rules.js');
         $this->addJqueryPlugin(array('typewatch', 'fancybox', 'autocomplete'));
     }
@@ -324,7 +349,7 @@ class AdminCartRulesControllerCore extends AdminController
             }
 
             // These are checkboxes (which aren't sent through POST when they are not check), so they are forced to 0
-            foreach (array('country', 'carrier', 'group', 'cart_rule', 'product', 'shop') as $type) {
+            foreach (array('country', 'carrier', 'group', 'cart_rule', 'product', 'shop', 'hotel') as $type) {
                 if (!Tools::getValue($type.'_restriction')) {
                     $_POST[$type.'_restriction'] = 0;
                 }
@@ -380,7 +405,7 @@ class AdminCartRulesControllerCore extends AdminController
     {
         // All the associations are deleted for an update, then recreated when we call the "afterAdd" method
         $id_cart_rule = Tools::getValue('id_cart_rule');
-        foreach (array('country', 'carrier', 'group', 'product_rule_group', 'shop') as $type) {
+        foreach (array('country', 'carrier', 'group', 'hotel', 'product_rule_group', 'shop') as $type) {
             Db::getInstance()->delete('cart_rule_'.$type, '`id_cart_rule` = '.(int)$id_cart_rule);
         }
         Db::getInstance()->delete('cart_rule_product_rule', 'NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'cart_rule_product_rule_group`
@@ -414,7 +439,7 @@ class AdminCartRulesControllerCore extends AdminController
      */
     protected function afterAdd($currentObject)
     {
-        // Add restrictions for generic entities like country, carrier and group
+        // Add restrictions for generic entities like country, carrier, group, hotel and shop
         foreach (array('country', 'carrier', 'group', 'shop') as $type) {
             if (Tools::getValue($type.'_restriction') && is_array($array = Tools::getValue($type.'_select')) && count($array)) {
                 $values = array();
@@ -423,6 +448,14 @@ class AdminCartRulesControllerCore extends AdminController
                 }
                 Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_'.$type.'` (`id_cart_rule`, `id_'.$type.'`) VALUES '.implode(',', $values));
             }
+        }
+        // Add hotel restrictions
+        if (Tools::getValue('hotel_restriction') && is_array($array = Tools::getValue('hotel_select')) && count($array)) {
+            $values = array();
+            foreach ($array as $id) {
+                $values[] = '('.(int)$currentObject->id.','.(int)$id.')';
+            }
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'cart_rule_hotel` (`id_cart_rule`, `id_hotel`) VALUES '.implode(',', $values));
         }
         // Add cart rule restrictions
         if (Tools::getValue('cart_rule_restriction') && is_array($array = Tools::getValue('cart_rule_select')) && count($array)) {
@@ -803,6 +836,7 @@ class AdminCartRulesControllerCore extends AdminController
         $languages = Language::getLanguages();
         $countries = $current_object->getAssociatedRestrictions('country', true, true);
         $groups = $current_object->getAssociatedRestrictions('group', false, true);
+        $hotels = $current_object->getHotelRestrictions($this->context->employee->id_profile);
         $shops = $current_object->getAssociatedRestrictions('shop', false, false);
         $cart_rules = $current_object->getAssociatedRestrictions('cart_rule', false, true, 0, $limit);
         $carriers = $current_object->getAssociatedRestrictions('carrier', true, false);
@@ -862,6 +896,7 @@ class AdminCartRulesControllerCore extends AdminController
                 'countries' => $countries,
                 'carriers' => $carriers,
                 'groups' => $groups,
+                'hotels' => $hotels,
                 'shops' => $shops,
                 'cart_rules' => $cart_rules,
                 'product_rule_groups' => $product_rule_groups,

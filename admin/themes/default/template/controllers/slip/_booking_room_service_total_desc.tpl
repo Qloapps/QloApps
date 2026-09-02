@@ -20,17 +20,6 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{block name='hotel_images'}
-    {if is_array($hotel_images) && count($hotel_images)}
-        {foreach from=$hotel_images item=hotel_image}
-            <div class="col-sm-4 image-item">
-                <a class="fancybox"
-                   href="{$hotel_image.link|escape:'html':'UTF-8'}"
-                   data-fancybox-group="hotel-images"
-                   title="{if isset($hotel_image.category_name) && $hotel_image.category_name}{$hotel_image.category_name|escape:'html':'UTF-8'}{/if}">
-                    <img class="img img-responsive" src="{$hotel_image.link|escape:'html':'UTF-8'}">
-                </a>
-            </div>
-        {/foreach}
-    {/if}
-{/block}
+{l s='Total room price:'} <strong><span id="booking-room-amount">-</span></strong><br>
+{l s='Total service price:'} <strong><span id="booking-service-amount">-</span></strong><br>
+{l s='Total room booking price:'} <strong><span id="booking-amount">-</span></strong><br>

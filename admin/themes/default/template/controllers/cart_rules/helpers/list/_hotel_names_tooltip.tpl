@@ -20,17 +20,22 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{block name='hotel_images'}
-    {if is_array($hotel_images) && count($hotel_images)}
-        {foreach from=$hotel_images item=hotel_image}
-            <div class="col-sm-4 image-item">
-                <a class="fancybox"
-                   href="{$hotel_image.link|escape:'html':'UTF-8'}"
-                   data-fancybox-group="hotel-images"
-                   title="{if isset($hotel_image.category_name) && $hotel_image.category_name}{$hotel_image.category_name|escape:'html':'UTF-8'}{/if}">
-                    <img class="img img-responsive" src="{$hotel_image.link|escape:'html':'UTF-8'}">
-                </a>
+{if $hotel_names_first}
+    <span>{$hotel_names_first|escape:'html':'UTF-8'}</span>
+    {if $hotel_names_remaining}
+        {capture name='hotel_names_tooltip'}
+            <div class="tooltip_cont">
+                <div class="tip_header"><div class="tip_date">{l s='Selected Hotels'}</div></div>
+                <ul>
+                    {foreach from=$selected_hotels item='hotel'}
+                        <li class="tip_element_value">{$hotel|escape:'html':'UTF-8'}</li>
+                    {/foreach}
+                </ul>
             </div>
-        {/foreach}
+        {/capture}
+        {capture name='hotel_names_tooltip_title'}<span class="badge tooltip-trigger">+{$hotel_names_remaining|@count}</span>{/capture}
+        {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.hotel_names_tooltip tooltip_title=$smarty.capture.hotel_names_tooltip_title}
     {/if}
-{/block}
+{else}
+    --
+{/if}

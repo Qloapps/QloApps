@@ -205,6 +205,13 @@ $(document).ready(function() {
     }
 
     if ($('.room_info_hotel_images_wrap').length) {
+        if (!!$.prototype.fancybox) {
+            $('.room_info_hotel_images_wrap .fancybox').fancybox({
+                'hideOnContentClick': true,
+                'openEffect': 'elastic',
+                'closeEffect': 'elastic',
+            });
+        }
         loadHotelImagesByPage(1);
     }
 });
@@ -1270,7 +1277,7 @@ function addProductToRoomType(that) {
     } else {
         $('<input type="hidden">').attr({
             id: 'service_product_'+ id_product,
-            name: 'service_product['+ id_product +'][]',
+            name: 'service_product['+ id_product +'][quantity]',
             class: 'service_product',
             'data-id_product': id_product,
             value: qty
@@ -1537,7 +1544,6 @@ function loadHotelImagesByPage(page = 1) {
         success: function(response) {
             if (response.status == true && response.message == 'HTML_OK') {
                 $('.room_info_hotel_images_wrap .images-wrap').append(response.html);
-                $('.room_info_hotel_images_wrap .hotel-images-fancybox').fancybox();
                 $('.room_info_hotel_images_wrap .btn-show-more-images').removeClass('hide');
             }
 
