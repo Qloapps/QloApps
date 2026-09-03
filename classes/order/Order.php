@@ -3079,7 +3079,7 @@ class OrderCore extends ObjectModel
         }
         // any completed refund anywhere in the order takes priority over
         // No-show/Cancelled and is sticky (a refund never un-completes)
-        if ((new OrderReturn())->hasAnyCompletedRefund($this->id)) {
+        if ((new OrderReturn())->getRefundedAmount($this->id) > 0) {
             return Configuration::get('PS_OS_REFUND');
         }
 
@@ -3174,7 +3174,7 @@ class OrderCore extends ObjectModel
                     $objOrderReturn = new OrderReturn();
                     foreach ($orderBookings as $orderBooking) {
                         // If booking is refunded (or cancelled) then no need to check inventory
-                        if ($objOrderReturn->hasCompletedRefund($orderBooking['id'])
+                        if ($objOrderReturn->hasCompletelyRefundedBooking($orderBooking['id'])
                             || $orderBooking['id_status'] == HotelBookingDetail::STATUS_CANCELLED
                         ) {
                             continue;

@@ -26,7 +26,7 @@
             <label class="control-label">{l s='Status'}</label>
             <select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
                 {foreach from=$hotel_order_status item=state}
-                    <option value="{$state['id_status']|intval}" {if $state['id_status'] != $current_room_status && !($state['id_status']|in_array:$allowed_room_status_transitions)}disabled="disabled"{/if}>{$state.name|escape}</option>
+                    <option value="{$state['id_status']|intval}"{if $state.disabled} disabled{/if}>{$state.name|escape}</option>
                 {/foreach}
             </select>
         </div>

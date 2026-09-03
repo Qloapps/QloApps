@@ -856,16 +856,20 @@ class AdminOrdersControllerCore extends AdminController
         $response['hasError'] = 1;
         if (Validate::isLoadedObject($objOrder = new Order(Tools::getValue('id_order')))) {
             $objHotelBookingStatus = new HotelBookingStatus();
-            // show every status here — PHP-side validation in changeStatus()/changeRoomStatus()
-            // rejects an invalid pick, so the dropdown doesn't need to pre-filter to allowed ones
+            $currentRoomStatus = (int) Tools::getValue('current_room_status');
             $htlOrderStatus = $objHotelBookingStatus->getAllStatuses($this->context->language->id);
+            $allowedStatuses = HotelBookingStatus::getAllowedTransitions($currentRoomStatus);
+            foreach ($htlOrderStatus as &$status) {
+                $status['disabled'] = !in_array((int) $status['id_status'], $allowedStatuses);
+            }
+            unset($status);
             $this->context->smarty->assign(
                 array(
                     'order' => $objOrder,
                     'current_index' => self::$currentIndex,
                     'hotel_order_status' => $htlOrderStatus,
                     'ROOM_STATUS_ASSIGNED' => HotelBookingDetail::STATUS_ASSIGNED,
-                    'current_room_status' => Tools::getValue('current_room_status')
+                    'current_room_status' => $currentRoomStatus
                 )
             );
             $modal = array(
@@ -3622,12 +3626,12 @@ class AdminOrdersControllerCore extends AdminController
                 $roomRefundInfo = $objOrderReturn->getRefundedAmount($order->id, 0, $value['id'], true);
                 $order_detail_data[$key]['refund_amount'] = $roomRefundInfo['amount'];
                 $order_detail_data[$key]['refund_count'] = (int) $roomRefundInfo['count'];
-                $order_detail_data[$key]['is_refunded'] = $objOrderReturn->hasCompletedRefund($value['id']);
+                $order_detail_data[$key]['is_refunded'] = $objOrderReturn->hasCompletelyRefundedBooking($value['id']);
 
                 if (isset($value['refund_info'])
                     && $value['refund_info']['refunded']
                     && $value['refund_info']['id_customization']
-                    && $objOrderReturn->hasCompletedRefund($value['id'])
+                    && $objOrderReturn->hasCompletelyRefundedBooking($value['id'])
                     && $value['id_status'] != HotelBookingDetail::STATUS_CANCELLED
                 ) {
                     $totalRefundedRooms += 1;
@@ -3675,7 +3679,7 @@ class AdminOrdersControllerCore extends AdminController
             // Get last refund request for booking
             $bookingOrderRoomInfo['is_sealed_no_show'] = false;
             $bookingOrderRoomInfo['is_sealed_cancelled'] = false;
-            $bookingOrderRoomInfo['is_refunded'] = $objOrderReturn->hasCompletedRefund($bookingOrderRoomInfo['id']);
+            $bookingOrderRoomInfo['is_refunded'] = $objOrderReturn->hasCompletelyRefundedBooking($bookingOrderRoomInfo['id']);
             if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($bookingOrderRoomInfo['id_order'], 0, $bookingOrderRoomInfo['id'])) {
                 $bookingRefundDetail = reset($bookingRefundDetail);
                 // a Cancellation/No-show request seals the room the moment it's created —
@@ -3749,7 +3753,7 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         // merge in room status change history (with remarks) as Order Notes entries
-        if ($statusHistoryRows = (new HotelBookingStatusHistory())->getHistoryByOrderId($order->id)) {
+        if ($statusHistoryRows = (new HotelBookingStatusHistory())->getBookingStatusHistoryByOrder($order->id)) {
             $roomStatusLabels = array(
                 HotelBookingDetail::STATUS_ASSIGNED => $this->l('Assigned'),
                 HotelBookingDetail::STATUS_CHECKED_IN => $this->l('Checked in'),
@@ -7079,7 +7083,7 @@ class AdminOrdersControllerCore extends AdminController
             // If booking is cancelled or no-show, we can't edit it at all
             if (($objBookingDetail->id_status == HotelBookingDetail::STATUS_CANCELLED
                     || $objBookingDetail->id_status == HotelBookingDetail::STATUS_NO_SHOW)
-                && $objOrderReturn->hasCompletedRefund($id_hotel_booking)
+                && $objOrderReturn->hasCompletelyRefundedBooking($id_hotel_booking)
             ) {
                 die(json_encode(array(
                     'result' => false,
@@ -7088,7 +7092,7 @@ class AdminOrdersControllerCore extends AdminController
                         : Tools::displayError('Booking cannot be edited if booking is cancelled.'),
                 )));
             // If order is refunded, we can't edit dates
-            } elseif ($objOrderReturn->hasCompletedRefund($id_hotel_booking)
+            } elseif ($objOrderReturn->hasCompletelyRefundedBooking($id_hotel_booking)
                 && (strtotime($old_date_from) != strtotime($new_date_from) || strtotime($old_date_to) != strtotime($new_date_to))
             ) {
                 die(json_encode(array(
@@ -8930,10 +8934,6 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('Room cannot be marked as No-show before the booking\'s check-in date.');
             }
 
-            if (!$statusRemark) {
-                $this->errors[] = Tools::displayError('Please enter a note for this status change.');
-            }
-
             if ($objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_CHECKED_OUT
                 && (date('Y-m-d', strtotime($objHotelBookingDetail->check_out)) != date('Y-m-d', strtotime($objHotelBookingDetail->date_to)))
                 && ($booking = $objHotelBookingDetail->chechRoomBooked($objHotelBookingDetail->id_room, $objHotelBookingDetail->check_out, $objHotelBookingDetail->date_to))
@@ -8976,6 +8976,8 @@ class AdminOrdersControllerCore extends AdminController
                 } else {
                     if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
                         $objHotelBookingDetail->check_in = $statusDate;
+                        // reverting from Checked-out: clear the stale check-out timestamp
+                        $objHotelBookingDetail->check_out = '';
                     } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_OUT) {
                         $objHotelBookingDetail->check_out = $statusDate;
                     } else {

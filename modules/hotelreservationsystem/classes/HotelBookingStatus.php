@@ -64,6 +64,7 @@ class HotelBookingStatus extends ObjectModel
             HotelBookingDetail::STATUS_CHECKED_OUT => array(
                 // revert: undo an accidental check-out
                 HotelBookingDetail::STATUS_ASSIGNED,
+                HotelBookingDetail::STATUS_CHECKED_IN,
             ),
         );
 

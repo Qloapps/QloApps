@@ -79,13 +79,15 @@ class OrderReturnDetailCore extends ObjectModel
     {
         $orderReturnDetails = OrderReturn::getOrdersReturnDetail($idOrder, 0, $idHtlBooking);
 
-        foreach ($orderReturnDetails as $row) {
-            $objOrderReturnDetail = new OrderReturnDetail((int) $row['id_order_return_detail']);
-            if (Validate::isLoadedObject($objOrderReturnDetail) && $objOrderReturnDetail->delete()) {
-                $objOrderReturn = new OrderReturn();
-                if (empty($objOrderReturn->getOrderRefundRequestedBookings($idOrder, $objOrderReturnDetail->id_order_return, true))) {
-                    $objOrderReturn = new OrderReturn($objOrderReturnDetail->id_order_return);
-                    $objOrderReturn->delete();
+        if ($orderReturnDetails) {
+            foreach ($orderReturnDetails as $row) {
+                $objOrderReturnDetail = new OrderReturnDetail((int) $row['id_order_return_detail']);
+                if (Validate::isLoadedObject($objOrderReturnDetail) && $objOrderReturnDetail->delete()) {
+                    $objOrderReturn = new OrderReturn();
+                    if (empty($objOrderReturn->getOrderRefundRequestedBookings($idOrder, $objOrderReturnDetail->id_order_return, true))) {
+                        $objOrderReturn = new OrderReturn($objOrderReturnDetail->id_order_return);
+                        $objOrderReturn->delete();
+                    }
                 }
             }
         }

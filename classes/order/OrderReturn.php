@@ -209,26 +209,10 @@ class OrderReturnCore extends ObjectModel
      * @param int $idHtlBooking
      * @return bool
      */
-    public function hasCompletedRefund($idHtlBooking)
+    public function hasCompletelyRefundedBooking($idHtlBooking)
     {
         return (bool) Db::getInstance()->getValue(
             'SELECT '.(int) $idHtlBooking.' IN ('.self::getRefundedBookingIdsSubquery().')'
-        );
-    }
-
-    /**
-     * Whether this order has at least one completed (actually refunded) return,
-     * for any booking or product in it — not "all of them," just any one.
-     *
-     * @param int $idOrder
-     * @return bool
-     */
-    public function hasAnyCompletedRefund($idOrder)
-    {
-        return (bool) Db::getInstance()->getValue(
-            'SELECT COUNT(orr.`id_order_return`) FROM `'._DB_PREFIX_.'order_return` orr
-             INNER JOIN `'._DB_PREFIX_.'order_return_state` ors ON ors.`id_order_return_state` = orr.`state`
-             WHERE orr.`id_order` = '.(int) $idOrder.' AND ors.`refunded` = 1'
         );
     }
 

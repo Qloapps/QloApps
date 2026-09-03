@@ -34,7 +34,7 @@
                     {if isset($refundReqProducts) && $refundReqProducts}
                         <th><span class="title_box"><div>{l s='Refund'}</div><div>{l s='Refund requests'}</div></span></th>
                     {/if}
-                    {if ($can_edit && !$order->hasBeenDelivered())}
+                    {if ($can_edit)}
                         <th class="fixed-width-md center"><span class="title_box">{l s='Actions'}</span></th>
                     {/if}
                 </tr>
@@ -87,7 +87,7 @@
                                     {/if}
                                 </td>
                             {/if}
-                            {if ($can_edit && !$order->hasBeenDelivered())}
+                            {if ($can_edit)}
                                 <td class="room_invoice" style="display: none;">
                                 {if sizeof($invoices_collection)}
                                 <select name="product_invoice" class="edit_product_invoice">
@@ -150,7 +150,7 @@
                         {if isset($refundReqProducts) && $refundReqProducts}
                             {assign var=colspan value=($colspan+1)}
                         {/if}
-                        {if ($can_edit && !$order->hasBeenDelivered())}
+                        {if ($can_edit)}
                             {assign var=colspan value=($colspan+1)}
                         {/if}
                         <td class="list-empty hidden-print" colspan="{$colspan}">

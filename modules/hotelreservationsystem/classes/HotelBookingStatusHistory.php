@@ -48,20 +48,7 @@ class HotelBookingStatusHistory extends ObjectModel
         ),
     );
 
-    /**
-     * @param int $idHtlBooking
-     * @return array history rows for one booking, oldest first
-     */
-    public function getHistoryByBooking($idHtlBooking)
-    {
-        $sql = 'SELECT * FROM `'._DB_PREFIX_.$this->table.'`
-            WHERE `id_htl_booking` = '.(int) $idHtlBooking.'
-            ORDER BY `id_booking_status_history` ASC';
-
-        return Db::getInstance()->executeS($sql);
-    }
-
-    public function getHistoryByOrderId($idOrder)
+    public function getBookingStatusHistoryByOrder($idOrder)
     {
         $sql = 'SELECT h.*, hbd.room_num, hbd.id_product, hbd.date_from, hbd.date_to,
                     e.`firstname` AS efirstname, e.`lastname` AS elastname,

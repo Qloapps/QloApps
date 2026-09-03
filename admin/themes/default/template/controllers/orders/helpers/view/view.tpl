@@ -767,7 +767,7 @@
                         <div class="panel">
                             <div class="panel-heading">
                                 <i class="icon-bed"></i> &nbsp;{l s='Rooms Booking Detail'} <span class="badge">{$order_detail_data|@count}</span>
-                                {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
+                                {if $can_edit && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
                                     <button type="button" id="add_room" class="btn btn-primary pull-right">
                                         <i class="icon-plus-sign"></i> {l s='Add Rooms'}
                                     </button>
@@ -787,7 +787,7 @@
                             <div class="panel">
                                 <div class="panel-heading">
                                     <i class="icon-bed"></i> &nbsp;{l s='Products Detail'} <span class="badge">{$hotel_service_products|count}</span>
-                                    {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
+                                    {if $can_edit && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
                                         <button type="button" id="add_product" class="btn btn-primary pull-right">
                                             <i class="icon-plus-sign"></i> {l s='Add Product'}
                                         </button>
@@ -807,7 +807,7 @@
                             <div class="panel">
                                 <div class="panel-heading">
                                     <i class="icon-bed"></i> &nbsp;{l s='Products Detail'} <span class="badge">{$standalone_service_products|count}</span>
-                                    {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
+                                    {if $can_edit && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
                                         <button type="button" id="add_product" class="btn btn-primary pull-right">
                                             <i class="icon-plus-sign"></i> {l s='Add Product'}
                                         </button>

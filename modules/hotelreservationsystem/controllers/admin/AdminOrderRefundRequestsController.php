@@ -47,9 +47,13 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
             // optional: narrow the list down to requests that include one specific
             // booking or product — used by the Refund column's link on the order detail page
             if ($idHtlBooking = (int) Tools::getValue('id_htl_booking')) {
-                $this->_where .= ' AND ordrd.`id_htl_booking` = '.$idHtlBooking;
+                $this->_where .= ' AND a.`id_order_return` IN (
+                    SELECT id_order_return FROM `'._DB_PREFIX_.'order_return_detail` WHERE id_htl_booking = '.$idHtlBooking.'
+                )';
             } elseif ($idServiceProductOrderDetail = (int) Tools::getValue('id_service_product_order_detail')) {
-                $this->_where .= ' AND ordrd.`id_service_product_order_detail` = '.$idServiceProductOrderDetail;
+                $this->_where .= ' AND a.`id_order_return` IN (
+                    SELECT id_order_return FROM `'._DB_PREFIX_.'order_return_detail` WHERE id_service_product_order_detail = '.$idServiceProductOrderDetail.'
+                )';
             }
             $this->_group = 'GROUP BY a.`id_order_return`';
         } else {

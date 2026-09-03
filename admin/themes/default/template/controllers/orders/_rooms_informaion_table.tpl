@@ -39,10 +39,10 @@
                             <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Total price of the room including extra services/fees, tax included'}"><div>{l s='Total Price'}</div><div>{l s='(Tax incl.)'}</div></span></th>
                             <th><span class="title_box">{l s='Room status'}</span></th>
                             {if (isset($refundReqBookings) && $refundReqBookings)}
-                                <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Refund or cancellation status and refunded amount for this room booking'}"><div>{l s='Refund'}</div><div>{l s='Refund requests'}</div></span></th>
+                                <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Refund or cancellation status and refunded amount for this room booking'}"><div>{l s='Refunds'}</div></span></th>
                             {/if}
-                            {if ($can_edit && !$order->hasBeenDelivered())}
-                            <th class="fixed-width-md center"><span >{l s='Actions'}</span></th>
+                            {if ($can_edit)}
+                                <th class="fixed-width-md center"><span >{l s='Actions'}</span></th>
                             {/if}
                         </tr>
                     </thead>

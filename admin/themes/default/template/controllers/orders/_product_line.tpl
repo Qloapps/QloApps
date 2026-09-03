@@ -128,7 +128,7 @@
 		{/if}
 		</td>
 	{/if}
-	{if ($can_edit && !$order->hasBeenDelivered())}
+	{if ($can_edit)}
 		<td class="product_action center">
             <div class="btn-group pull-right">
                 {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && ($data.id_status == $ROOM_STATUS_CANCELLED || $data.id_status == $ROOM_STATUS_NO_SHOW)}

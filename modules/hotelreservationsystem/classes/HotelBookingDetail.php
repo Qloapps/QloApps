@@ -249,6 +249,23 @@ class HotelBookingDetail extends ObjectModel
         $this->moduleInstance = Module::getInstanceByName('hotelreservationsystem');
         parent::__construct($id);
     }
+    public function update($null_values = false)
+    {
+        $result = parent::update($null_values);
+
+        // if automatic overbooking resolution is enabled
+        if (Configuration::get('PS_OVERBOOKING_AUTO_RESOLVE')) {
+            if ($this->is_back_order == 0 && (
+                $this->id_status == self::STATUS_CANCELLED
+                || $this->id_status == self::STATUS_NO_SHOW
+                || (new OrderReturn())->getRefundedAmount($this->id_order, 0, $this->id) > 0
+            )) {
+                $this->resolveOverBookings();
+            }
+        }
+
+        return $result;
+    }
 
     public function getBookingDataParams(&$params)
     {
