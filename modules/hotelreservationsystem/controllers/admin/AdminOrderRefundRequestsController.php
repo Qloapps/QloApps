@@ -661,9 +661,29 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     $confirmation = 4;
                     if ($objRefundState->denied) {
                         $confirmation = 101;
+                        $refundStatus = $this->l('Rejected');
                     } elseif ($objRefundState->refunded) {
                         $confirmation = 102;
+                        $refundStatus = $this->l('Approved/Refunded');
                     }
+
+                    $idHotel = HotelBookingDetail::getIdHotelByIdOrder((int)$objOrder->id);
+                    $objHotelBranch = new HotelBranchInformation((int)$idHotel, (int)$this->context->language->id);
+                    PrestaShopLogger::addLog(
+                        sprintf(
+                            $this->l('[%s] Hotel: %s | Refund request #%s status updated to %s'),
+                            $objOrder->reference,
+                            $objHotelBranch->hotel_name,
+                            $idOrderReturn,
+                            $refundStatus
+                        ),
+                        1,
+                        null,
+                        'Order',
+                        (int)$objOrder->id,
+                        true,
+                        (int)$this->context->employee->id
+                    );
 
                     if (Tools::isSubmit('submitRefundReqBookingsAndStay')) {
                         Tools::redirectAdmin(
