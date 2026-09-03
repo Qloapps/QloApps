@@ -54,14 +54,10 @@
 				<input type="hidden" name="lang" value="{$lang}" />
 				<input type="hidden" name="type" value="{$type}" />
 				<input type="hidden" name="theme" value="{$theme}" />
-				<script type="text/javascript">
-					$(document).ready(function(){
-						$('a.useSpecialSyntax').click(function(){
-							var syntax = $(this).find('img').attr('alt');
-							$('#BoxUseSpecialSyntax .syntax span').html(syntax+".");
-						});
-					});
-				</script>
+				<input type="hidden" name="reset_mail_name" id="reset_mail_name" value="" />
+				<input type="hidden" name="reset_template_type" id="reset_template_type" value="" />
+				<input type="hidden" name="reset_module_name" id="reset_module_name" value="" />
+				<input type="hidden" name="token" id="translation_mails_token" value="{$token}" />
 				<div id="BoxUseSpecialSyntax">
 					<div class="alert alert-warning">
 						<p>
@@ -80,6 +76,10 @@
 					<a name="submitTranslations{$type|ucfirst}" href="{$cancel_url}" class="btn btn-default">
 						<i class="process-icon-cancel"></i> {l s='Cancel'}
 					</a>
+					<button type="button" id="{$table}_form_reset_btn" class="btn btn-default mail-template-reset-btn label-tooltip" disabled="disabled" data-toggle="tooltip" title="">
+						<i class="process-icon-refresh"></i>
+						{l s='Reset'}
+					</button>
 					{*$toggle_button*}
 					<button type="submit" id="{$table}_form_submit_btn" name="submitTranslations{$type|ucfirst}" class="btn btn-default pull-right">
 						<i class="process-icon-save"></i>
@@ -101,56 +101,6 @@
 					</span>
 				</h3>
 				{$mail_content}
-				{literal}
-				<script type="text/javascript">
-				//<![CDATA[
-					$(document).ready(function () {
-						$('.mails_field').on('shown.bs.collapse', function () {
-							// get active email
-							var active_email = $(this).find('.email-collapse.in');
-							// get iframe container for active email
-							var frame = active_email.find('.email-html-frame');
-							// get source url for active email
-							var src = frame.data('email-src');
-							// get rte container for active email
-							var rte_mail_selector = active_email.find('textarea.rte-mail').data('rte');
-							// create special config
-							var rte_mail_config = {};
-							rte_mail_config['editor_selector'] = 'rte-mail-' + rte_mail_selector;
-							rte_mail_config['height'] = '500px';
-							// We want the default plugins + 'fullpage' plugin for HTML emails
-							rte_mail_config['plugins'] = "colorpicker link image paste pagebreak table contextmenu filemanager table code media autoresize textcolor anchor fullpage";
-							// move controls to active panel
-							$('#translation_mails-control-actions').appendTo($(this).find('.panel-collapse.in'));
-							// when user first open email
-							if (frame.find('iframe.email-frame').length == 0) {
-								// load iframe
-								frame.append('<iframe class="email-frame" />');
-								$.ajax({
-									url:'ajax.php',
-									type: 'POST',
-									dataType: 'html',
-									data: {
-										getEmailHTML : true,
-										email : src
-									},
-									success: function(result)
-									{
-										var doc = frame.find('iframe')[0].contentWindow.document;
-										doc.open();
-										doc.write(result);
-										doc.close();
-										tinySetup(rte_mail_config);
-										// init tinyMCE with special config
-									}
-								});
-
-							}
-						});
-					})
-				//]]>
-				</script>
-				{/literal}
 			</div>
 			<div class="panel">
 				<h3>

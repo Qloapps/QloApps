@@ -22,8 +22,7 @@
 
 <div class="extra-services-content modal-body">
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#room_type_demands_desc" aria-controls="facilities" role="tab" data-toggle="tab">{l s='Facilities'}</a></li>
-        <li role="presentation"><a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
+        <li role="presentation" class="active"><a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
     </ul>
     <div class="tab-content clearfix">
         {include file='controllers/orders/modals/_partials/_room_extra_services_content.tpl'}

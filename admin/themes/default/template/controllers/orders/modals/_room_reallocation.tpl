@@ -89,8 +89,8 @@
                     </div>
                     <div class="row">
                         <div class="alert alert-warning col-sm-12 realloc_roomtype_change_message" style="display:none">
-                            <p>{l s="If room type is changed while room reallocation then all additional facilities and services will be assigned to the selected room of new room type."}</p>
-                            <p>{l s="If you want to change additional facilities or services, you can update by editing the room after reallocation."}</p>
+                            <p>{l s="If room type is changed while room reallocation then all extra services will be assigned to the selected room of new room type."}</p>
+                            <p>{l s="If you want to change extra services, you can update by editing the room after reallocation."}</p>
                         </div>
                     </div>
                     <p class="error_text" id="realloc_sel_rm_err_p"></p>

@@ -594,6 +594,7 @@ CREATE TABLE `PREFIX_customer` (
   `id_gender` int(10) unsigned NOT NULL,
   `id_default_group` int(10) unsigned NOT NULL DEFAULT '1',
   `id_lang` int(10) unsigned NULL,
+  `id_country` int(10) NOT NULL DEFAULT '0',
   `id_risk` int(10) unsigned NOT NULL DEFAULT '1',
   `company` varchar(64),
   `siret` varchar(14),

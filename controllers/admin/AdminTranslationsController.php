@@ -110,6 +110,23 @@ class AdminTranslationsControllerCore extends AdminController
             'page_header_toolbar_title' => $this->page_header_toolbar_title,
             'page_header_toolbar_btn' => $this->page_header_toolbar_btn));
     }
+    public function setMedia()
+    {
+        parent::setMedia();
+
+        if (Tools::getValue('type') == 'mails') {
+            Media::addJsDef(array(
+                'mailResetSuccessMsg' => $this->l('The template is reset to its original content.'),
+                'mailResetErrorMsg' => $this->l('An error occurred while resetting the template.'),
+                'mailResetTooltipCore' => $this->l('On reset, the template will be reset to the default mail template.'),
+                'mailResetTooltipModule' => $this->l('On reset, the template will be reset using modules/{module}/mails/{iso}/'),
+                'admin_translations_link' => $this->context->link->getAdminLink('AdminTranslations'),
+                'EMAIL_TEMPLATE_TYPE_CORE' => Language::EMAIL_TEMPLATE_TYPE_CORE,
+                'EMAIL_TEMPLATE_TYPE_MODULE' => Language::EMAIL_TEMPLATE_TYPE_MODULE,
+            ));
+            $this->addJS(_PS_JS_DIR_.'admin/translations.js');
+        }
+    }
 
     /**
      * This function create vars by default and call the good method for generate form
@@ -1429,6 +1446,9 @@ class AdminTranslationsControllerCore extends AdminController
      */
     public function postProcess()
     {
+        if ($this->ajax) {
+            return parent::postProcess();
+        }
         $this->getInformations();
 
         /* PrestaShop demo mode */
@@ -1661,6 +1681,50 @@ class AdminTranslationsControllerCore extends AdminController
         } else {
             $this->redirect();
         }
+    }
+
+    public function ajaxProcessResetMailTemplate()
+    {
+        if (empty($this->tabAccess['edit'])) {
+            die(json_encode(array('hasError' => true, 'error' => Tools::displayError('You do not have permission to edit this.'))));
+        }
+
+        $iso_code = Tools::getValue('iso_code') ? Tools::getValue('iso_code') : null;
+        $theme = Tools::getValue('theme');
+        $mail_template_name = Tools::getValue('mail_name');
+        $template_type = (int)Tools::getValue('template_type');
+        $module_name = Tools::getValue('module_name') ? Tools::getValue('module_name') : false;
+
+        if (!Validate::isLanguageIsoCode($iso_code)) {
+            die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid iso code.'))));
+        }
+
+        if (!Validate::isTplName($mail_template_name)) {
+            die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid mail template to reset.'))));
+        }
+
+        if ($template_type === Language::EMAIL_TEMPLATE_TYPE_MODULE) {
+            if (!$module_name || !Validate::isModuleName($module_name)) {
+                die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid module name.'))));
+            }
+        } elseif ($template_type === Language::EMAIL_TEMPLATE_TYPE_CORE) {
+            $module_name = false;
+        } else {
+            die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid template type.'))));
+        }
+
+        if ($theme) {
+            $themes_base_dir = realpath(_PS_ALL_THEMES_DIR_);
+            $theme_real_path = realpath(_PS_ALL_THEMES_DIR_.$theme);
+            if ($themes_base_dir === false
+                || $theme_real_path === false
+                || strncmp($theme_real_path, $themes_base_dir.DIRECTORY_SEPARATOR, strlen($themes_base_dir) + 1) !== 0
+            ) {
+                die(json_encode(array('hasError' => true, 'error' => Tools::displayError('Invalid theme.'))));
+            }
+        }
+
+        die(json_encode(Language::resetEmailTemplate($mail_template_name, $iso_code, $template_type, $module_name, $theme)));
     }
 
     /**
@@ -2362,9 +2426,12 @@ class AdminTranslationsControllerCore extends AdminController
                         $str_return .= '</div>';
                     }
 
+                    $mail_available_variables = $this->displayMailAvailableVariables($mail_files);
+
                     if (array_key_exists('txt', $mail_files)) {
                         $str_return .= '<div class="tab-pane" id="'.$mail_name.'-text">';
                         $str_return .= $this->displayMailBlockTxt($mail_files['txt'], $obj_lang->iso_code, $mail_name, $group_name, $name_for_module);
+                        $str_return .= $mail_available_variables;
                         $str_return .= '</div>';
                     }
 
@@ -2372,6 +2439,7 @@ class AdminTranslationsControllerCore extends AdminController
                     if (isset($mail_files['html'])) {
                         $str_return .= $this->displayMailEditor($mail_files['html'], $obj_lang->iso_code, $url_mail, $mail_name, $group_name, $name_for_module);
                     }
+                    $str_return .= $mail_available_variables;
                     $str_return .= '</div>';
 
                     $str_return .= '</div>';
@@ -2389,6 +2457,46 @@ class AdminTranslationsControllerCore extends AdminController
         $str_return .= '</div><!-- #'.$id_html.' --></div><!-- end .mails_field -->';
         return $str_return;
     }
+
+    protected function displayMailAvailableVariables($mail_files)
+    {
+        $variables = $this->getMailTemplateVariables($mail_files);
+        if (empty($variables)) {
+            return '';
+        }
+
+        $str_return = '<div class="mail-available-variables" style="margin-top:10px;">';
+        foreach ($variables as $variable) {
+            $tag = '{'.$variable.'}';
+            $str_return .= '<span class="label label-default pointer mail-variable-tag" style="display:inline-block;margin:0 4px 6px 0;" data-variable="'.Tools::htmlentitiesUTF8($tag).'">'.Tools::htmlentitiesUTF8($tag).'</span> ';
+        }
+        $str_return .= '</div>';
+
+        return $str_return;
+    }
+    protected function getMailTemplateVariables($mail_files)
+    {
+        $content = '';
+        foreach (array('html', 'txt') as $type) {
+            if (empty($mail_files[$type]) || !is_array($mail_files[$type])) {
+                continue;
+            }
+            if (isset($mail_files[$type]['en'])) {
+                $content .= ' '.$mail_files[$type]['en'];
+            } else {
+                $content .= ' '.reset($mail_files[$type]);
+            }
+        }
+
+        $variables = array();
+        if ($content !== '' && preg_match_all('/\{([a-zA-Z0-9_]+)\}/', $content, $matches)) {
+            $variables = array_unique($matches[1]);
+            sort($variables);
+        }
+
+        return $variables;
+    }
+
     /**
      * Just build the html structure for display txt mails
      * @since 1.4.0.14
@@ -3070,9 +3178,28 @@ class AdminTranslationsControllerCore extends AdminController
         }
 
         $sanitizedFilePath = realpath($email_file);
-        $permittedMailDir  = realpath(_PS_MAIL_DIR_) . DIRECTORY_SEPARATOR;
+        if ($sanitizedFilePath === false) {
+            return false;
+        }
 
-        if ($sanitizedFilePath === false || $permittedMailDir === false || strpos($sanitizedFilePath, $permittedMailDir) !== 0) {
+        $permitted_roots = array(
+            realpath(_PS_MAIL_DIR_),
+            realpath(_PS_ROOT_DIR_.'/themes/'),
+            realpath(_PS_ROOT_DIR_.'/modules/'),
+        );
+
+        $is_permitted = false;
+        foreach ($permitted_roots as $permitted_root) {
+            if ($permitted_root !== false
+                && strpos($sanitizedFilePath, $permitted_root.DIRECTORY_SEPARATOR) === 0
+                && strpos($sanitizedFilePath, DIRECTORY_SEPARATOR.'mails'.DIRECTORY_SEPARATOR) !== false
+            ) {
+                $is_permitted = true;
+                break;
+            }
+        }
+
+        if (!$is_permitted) {
             return false;
         }
 
