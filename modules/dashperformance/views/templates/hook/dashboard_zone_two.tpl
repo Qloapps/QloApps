@@ -83,7 +83,7 @@
 					</div>
 				</div>
 				<div class="col-xs-6 col-lg-3">
-					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Total Revenue Per Available Room (TrevPAR) measures the total revenue being generated per available room including additional facilities and service products.' mod='dashperformance'}" data-placement="top" style="background-color: #EBCDFF;">
+					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Total Revenue Per Available Room (TrevPAR) measures the total revenue being generated per available room including service products.' mod='dashperformance'}" data-placement="top" style="background-color: #EBCDFF;">
 						<div class="title-wrapper">
 							<p>{l s='Total Revenue Per Available Room' mod='dashperformance'}</p>
 						</div>
@@ -93,7 +93,7 @@
 					</div>
 				</div>
 				<div class="col-xs-6 col-lg-3">
-					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Gross Operating Profit Per Available Room (GOPPAR) measures how much gross operating profit comes from each room including additional facilities and service products.' mod='dashperformance'}" data-placement="top" style="background-color: #B7F0FF;">
+					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Gross Operating Profit Per Available Room (GOPPAR) measures how much gross operating profit comes from each room including service products.' mod='dashperformance'}" data-placement="top" style="background-color: #B7F0FF;">
 						<div class="title-wrapper">
 							<p>{l s='Gross Operating Profit Per Available Room' mod='dashperformance'}</p>
 						</div>

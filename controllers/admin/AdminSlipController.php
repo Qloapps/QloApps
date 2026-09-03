@@ -560,28 +560,10 @@ public function initPageHeaderToolbar()
         $objHotelBookingDetail = new HotelBookingDetail();
         $bookingDetails = $objHotelBookingDetail->getBookingDataByOrderId($idOrder);
 
-        $objBookingDemands = new HotelBookingDemands();
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
 
         foreach ($bookingDetails as &$booking) {
             $booking['extra_service_total_price_tax_incl'] = 0;
-
-            $extraDemands = $objBookingDemands->getRoomTypeBookingExtraDemands(
-                $idOrder,
-                $booking['id_product'],
-                $booking['id_room'],
-                $booking['date_from'],
-                $booking['date_to'],
-                0,
-                0,
-                1,
-                $booking['id']
-            );
-            if ($extraDemands) {
-                foreach ($extraDemands as $demand) {
-                    $booking['extra_service_total_price_tax_incl'] += (float) $demand['total_price_tax_incl'];
-                }
-            }
 
             $roomServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                 0, 0, 0, 0, 0, 0, 0, 0, null, null, null, 0, $booking['id']

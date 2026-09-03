@@ -415,30 +415,6 @@ class WkPaypalCommerceHelper
                     }
                 }
             }
-
-            $items = array_values($items);
-            $itemKey = count($items);
-
-            if ($totalFacilityCostTE = $objCartBookingData->getCartExtraDemands($objCart->id, 0, 0, 0, 0, 1, 0, 0)) {
-                $totalFacilityCostTI = $objCartBookingData->getCartExtraDemands($objCart->id, 0, 0, 0, 0, 1, 0, 1);
-                $items[$itemKey]['name'] = 'Extra facilities';
-                // $items[$itemKey]['sku'] = $product['reference'];
-                $items[$itemKey]['category'] = 'DIGITAL_GOODS';
-
-                $items[$itemKey]['description'] = 'Price of all Extra facilities added to the bookings';
-
-                // unit amount
-                $items[$itemKey]['unit_amount']['value'] = Tools::ps_round($totalFacilityCostTE, 2);
-                $items[$itemKey]['unit_amount']['currency_code'] = $currency['iso_code'];
-
-                // tax values
-                $tax = $totalFacilityCostTI - $totalFacilityCostTE;
-                $items[$itemKey]['tax']['value'] = Tools::ps_round($tax, 2);
-                $items[$itemKey]['tax']['currency_code'] = $currency['iso_code'];
-
-                // quantity
-                $items[$itemKey]['quantity'] = 1;
-            }
         }
 
         return $items;

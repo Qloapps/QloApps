@@ -495,12 +495,8 @@ class ServiceProductOrderDetail extends ObjectModel
 
             $hasOrderDiscountOrPayment = ((float)$orderTotalPaid > 0 || $orderDiscounts) ? true : false;
 
-            // only the legacy full-cancellation callers (no amount passed) still
-            // zero this out below. When an amount is passed (refund-approval
-            // screen), an unpaid order is treated the same as a paid one — the
-            // refunded amount lives only in OrderReturnDetail.refunded_amount.
-            if (!$hasOrderDiscountOrPayment && $refundedAmountTaxIncl === null) {
-                $objHotelBookingDemands = new HotelBookingDemands();
+            // things to do if order is not paid
+            if (!$hasOrderDiscountOrPayment) {
                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
 
                 $priceTaxExcl = (float) $this->total_price_tax_excl;

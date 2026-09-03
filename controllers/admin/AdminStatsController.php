@@ -1910,7 +1910,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result;
     }
 
-    // Calculate total services revenue (services and demands)
+    // Calculate total services revenue (services )
     public static function getServicesRevenueForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
     {
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
@@ -1945,23 +1945,6 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             if ($servicesRevenue = Db::getInstance()->getValue($servicesRevenueSql)) {
                 $totalServicesRevenue += $servicesRevenue;
-            }
-
-            // Calculate demands revenue
-            $demandsRevenueSql = 'SELECT SUM((hdmd.`total_price_tax_excl` / o.`conversion_rate`) / DATEDIFF(hbd.`date_to`, hbd.`date_from`))
-            FROM `'._DB_PREFIX_.'htl_booking_demands` hdmd
-            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
-            ON (hdmd.`id_htl_booking` = hbd.`id`)
-            LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
-            LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-            WHERE p.`active` = 1
-            AND o.`valid` = 1
-            AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
-            AND hbd.`date_from` < "'.pSQL($discreteDate['date_to']).' 00:00:00" AND hbd.`date_to` > "'.pSQL($discreteDate['date_from']).' 00:00:00"'.
-            (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hbd') : '');
-
-            if ($demandsRevenue = Db::getInstance()->getValue($demandsRevenueSql)) {
-                $totalServicesRevenue += $demandsRevenue;
             }
 
             $result[$discreteDate['timestamp_from']] = $totalServicesRevenue;

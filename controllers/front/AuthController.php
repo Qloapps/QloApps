@@ -106,6 +106,9 @@ class AuthControllerCore extends FrontController
         $newsletter = Configuration::get('PS_CUSTOMER_NWSL') || (Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active);
 
         $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
+        $this->context->smarty->assign('nationality', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY'));
+        $this->context->smarty->assign('nationality_mandatory', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY'));
+        $this->context->smarty->assign('nationality_countries', Customer::getNationalities($this->context->language->id));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
 
@@ -429,6 +432,10 @@ class AuthControllerCore extends FrontController
                 $this->errors[] = Tools::displayError('Phone number is required.');
             }
 
+            if (Configuration::get('PS_CUSTOMER_NATIONALITY') && Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY') && !Tools::getValue('id_nationality')) {
+                $this->errors[] = Tools::displayError('Nationality is required.');
+            }
+
             if (!Tools::getValue('is_new_customer', 1)) {
                 if (Validate::isEmail($email = Tools::getValue('email'))
                     && $idCustomer = Customer::customerExists(Tools::getValue('email'), true, false)
@@ -461,6 +468,7 @@ class AuthControllerCore extends FrontController
 
                     if (!count($this->errors)) {
                         $customer->phone = Tools::getValue('phone');
+                        $customer->id_country = (int)Tools::getValue('id_nationality');
                         if ($customer->add()) {
                             if (!$customer->is_guest) {
                                 if (!$this->sendConfirmationMail($customer)) {
@@ -607,6 +615,7 @@ class AuthControllerCore extends FrontController
                         $customer->is_guest = 0;
                     }
                     $customer->phone = Tools::getValue('phone');
+                    $customer->id_country = (int)Tools::getValue('id_nationality');
                     if (!$customer->save()) {
                         $this->errors[] = Tools::displayError('An error occurred while creating your account.');
                     } else {

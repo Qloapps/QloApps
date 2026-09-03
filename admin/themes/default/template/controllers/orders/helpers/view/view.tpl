@@ -845,10 +845,6 @@
                                 {assign var=order_shipping_price value=$order->total_shipping_tax_incl}
                             {/if}
 
-                            {* total extra demands prices *}
-                            {* $totalDemandsPriceTE
-                            $totalDemandsPriceTI *}
-
                             {* Get total rooms prices *}
                             {assign var=total_rooms_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                             {assign var=total_rooms_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
@@ -857,16 +853,16 @@
                             {assign var=total_products_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE))}
                             {assign var=total_products_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE))}
 
-                            {* Get total of extra services and extra demands prices(excluding convenience fee) *}
-                            {assign var=total_room_services_and_demands_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $totalDemandsPriceTE)}
-                            {assign var=total_room_services_and_demands_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $totalDemandsPriceTI)}
+                            {* Get total of extra services prices(excluding convenience fee) *}
+                            {assign var=total_room_services_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE))}
+                            {assign var=total_room_services_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE))}
 
                             {* Get total of only convenience fees prices *}
                             {assign var=total_convenience_fee_tax_excl value=$order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
                             {assign var=total_convenience_fee_tax_incl value=$order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT)}
 
-                            {assign var=order_total_price_tax_excl value=($total_rooms_price_tax_excl + $total_room_services_and_demands_tax_excl + $total_products_price_tax_excl)}
-                            {assign var=order_total_price_tax_incl value=($total_rooms_price_tax_incl + $total_room_services_and_demands_tax_incl + $total_products_price_tax_incl)}
+                            {assign var=order_total_price_tax_excl value=($total_rooms_price_tax_excl + $total_room_services_tax_excl + $total_products_price_tax_excl)}
+                            {assign var=order_total_price_tax_incl value=($total_rooms_price_tax_incl + $total_room_services_tax_incl + $total_products_price_tax_incl)}
 
                             {if $total_rooms_price_tax_excl}
                                 <tr id="total_products">
@@ -886,11 +882,11 @@
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
                             {/if}
-                            {if isset($total_room_services_and_demands_tax_excl) && $total_room_services_and_demands_tax_excl > 0}
+                            {if isset($total_room_services_tax_excl) && $total_room_services_tax_excl > 0}
                                 <tr id="total_products">
                                     <td class="text-right">{l s='Total Extra services (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
-                                        {displayPrice price=($total_room_services_and_demands_tax_excl - $total_convenience_fee_tax_excl) currency=$currency->id}
+                                        {displayPrice price=($total_room_services_tax_excl - $total_convenience_fee_tax_excl) currency=$currency->id}
                                     </td>
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
@@ -950,11 +946,11 @@
                                                         </td>
                                                     </tr>
                                                 {/if}
-                                                {if isset($total_room_services_and_demands_tax_incl) && (($total_room_services_and_demands_tax_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) > 0}
+                                                {if isset($total_room_services_tax_incl) && (($total_room_services_tax_incl - $total_room_services_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Extra services Tax'}</td>
                                                         <td class="text-right nowrap">
-                                                            {displayPrice price=(($total_room_services_and_demands_tax_incl - $total_room_services_and_demands_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) currency=$currency->id}
+                                                            {displayPrice price=(($total_room_services_tax_incl - $total_room_services_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
@@ -1263,12 +1259,12 @@
         {addJsDefL name=no_swap_rm_avail_txt}{l s='No room available for swap.' js=1}{/addJsDefL}
         {addJsDefL name=slct_rm_type_err}{l s='Please select a room type first.' js=1}{/addJsDefL}
         {addJsDefL name=slct_rm_err}{l s='Please select a room first.' js=1}{/addJsDefL}
-        {addJsDefL name=txtExtraDemandSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
+        {addJsDefL name=txtExtraServiceSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
         {addJsDefL name=atleastSelectTxt}{l s='Select at least one facility to update.' js=1}{/addJsDefL}
 
         {addJsDefL name=txtSomeErr}{l s='Some error occurred. Please try again.' js=1}{/addJsDefL}
         {addJsDefL name=txtDeleteSucc}{l s='Deleted successfully' js=1}{/addJsDefL}
-        {addJsDefL name=txtInvalidDemandVal}{l s='Invalid demand value found' js=1}{/addJsDefL}
+        {addJsDefL name=txtInvalidServiceVal}{l s='Invalid service value found' js=1}{/addJsDefL}
         {addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
         {addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
         {addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
