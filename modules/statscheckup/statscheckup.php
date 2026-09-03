@@ -167,7 +167,7 @@ class StatsCheckUp extends Module
             <ul class="nav nav-tabs">
                 <li '.($activeTab == 'hotels' ? 'class="active"' : '').'>
                     <a href="#statscheckup_hotels" data-toggle="tab">
-                        <span>'.$this->l('Hotels').'</span>
+                        <span>'.$this->l('Properties').'</span>
                     </a>
                 </li>
                 <li '.($activeTab == 'services' ? 'class="active"' : '').'>
@@ -234,7 +234,7 @@ class StatsCheckUp extends Module
             'DESCRIPTIONS' => array('name' => $this->l('Descriptions'), 'text' => $this->l('chars (without HTML)')),
             'IMAGES' => array('name' => $this->l('Images'), 'text' => $this->l('images')),
             'ORDERS' => array('name' => $this->l('Orders'), 'text' => $this->l('orders / month')),
-            'TOTAL_ROOMS' => array('name' => $this->l('Total rooms'), 'text' => $this->l('rooms')),
+            'TOTAL_ROOMS' => array('name' => $this->l('Total stays'), 'text' => $this->l('stays')),
         );
 
         $hotelsHtml = '
@@ -301,7 +301,7 @@ class StatsCheckUp extends Module
             <thead>
                 <tr>
                     <th><span class="title_box active">'.$this->l('ID').'</span></th>
-                    <th><span class="title_box active">'.(!$this->id_hotel ? $this->l('Hotel') : $this->l('Room type')).'</span></th>
+                    <th><span class="title_box active">'.(!$this->id_hotel ? $this->l('Property') : $this->l('Room type')).'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Active').'</span></th>';
         foreach ($languages as $language) {
             $hotelsHtml .= '<th><span class="title_box active">'.$this->l('Desc.').' ('.Tools::strtoupper($language['iso_code']).')</span></th>';
@@ -309,7 +309,7 @@ class StatsCheckUp extends Module
         $hotelsHtml .= '
                     <th class="center"><span class="title_box active">'.$this->l('Images').'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
-                    <th class="center"><span class="title_box active">'.$this->l('Total rooms').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Total stays').'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Overall status').'</span></th>
                     '.(!$this->id_hotel ? '<th class="center"><span class="title_box active">'.$this->l('Action').'</span></th>' : '').'
                 </tr>
@@ -415,7 +415,7 @@ class StatsCheckUp extends Module
         $hotelsHtml .= '
                     <th class="center"><span class="title_box active">'.$this->l('Images').'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Orders').'</span></th>
-                    <th class="center"><span class="title_box active">'.$this->l('Total rooms').'</span></th>
+                    <th class="center"><span class="title_box active">'.$this->l('Total stays').'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Overall status').'</span></th>
                     '.(!$this->id_hotel ? '<th></th>' : '').'
                 </tr>

@@ -113,7 +113,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                 'class' => 'chosen',
             ),
             'hotel_name' => array(
-                'title' => $this->l('Hotel'),
+                'title' => $this->l('Property'),
                 'align' => 'center',
                 'type' => 'select',
                 'filter_key' => 'hrt!id_hotel',

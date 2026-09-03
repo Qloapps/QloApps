@@ -43,8 +43,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
         parent::__construct();
 
-        $this->_conf[52] = $this->l('Room in the booking is successfully reallocated');
-        $this->_conf[53] = $this->l('Room in the booking is successfully swapped');
+        $this->_conf[52] = $this->l('Stay in the booking is successfully reallocated');
+        $this->_conf[53] = $this->l('Stay in the booking is successfully swapped');
 
         $this->eventColors = array(
             'available' => array('event' => '#7EC77B', 'cell' => '#D9EFD8'),
@@ -697,16 +697,16 @@ public function ajaxProcessGetCalenderData()
         if ($bookingData = $objBookingDetail->getBookingData($bookingParams)) {
             if ($bookingData['stats']['num_avail']) {
                 $eventColor = $this->eventColors['available']['event'];
-                $title = sprintf($this->l('%s Available Rooms'), $bookingData['stats']['num_avail']);
+                $title = sprintf($this->l('%s Available Stays'), $bookingData['stats']['num_avail']);
             } elseif ($bookingData['stats']['num_part_avai']) {
                 $eventColor = $this->eventColors['partially_available']['event'];
-                $title = sprintf($this->l('%s Partially Available Rooms'), $bookingData['stats']['num_part_avai']);
+                $title = sprintf($this->l('%s Partially Available Stays'), $bookingData['stats']['num_part_avai']);
             } elseif ($bookingData['stats']['num_booked'] == $bookingData['stats']['total_rooms'] && $bookingData['stats']['total_rooms'] != 0 && $bookingData['stats']['num_unavail'] == 0) {
                 $eventColor = $this->eventColors['booked']['event'];
-                $title = sprintf($this->l('%s Available Rooms'), $bookingData['stats']['num_avail']);
+                $title = sprintf($this->l('%s Available Stays'), $bookingData['stats']['num_avail']);
             } else {
                 $eventColor = $this->eventColors['unavailable']['event'];
-                $title = sprintf($this->l('%s Available Rooms'), $bookingData['stats']['num_avail']);
+                $title = sprintf($this->l('%s Available Stays'), $bookingData['stats']['num_avail']);
             }
             $bookingData['date_from_format'] = Tools::displayDate($searchDateFrom);
             $bookingData['date_to_format'] = Tools::displayDate($searchDateTo);
@@ -766,7 +766,7 @@ public function ajaxProcessGetCalenderData()
             if (validate::isLoadedObject($objHotelBranch = new HotelBranchInformation($id_hotel))) {
                 $hotelIdAddress = $objHotelBranch->getHotelIdAddress();
             } else {
-                $this->errrors[] = $this->l('Hotel not found');
+                $this->errrors[] = $this->l('Property not found');
             }
 
         }
@@ -1069,7 +1069,7 @@ public function ajaxProcessGetCalenderData()
             $modal = array(
                 'modal_id' => 'room-reallocation-modal',
                 'modal_class' => 'modal-md order_detail_modal',
-                'modal_title' => '<i class="icon icon-refresh"></i> &nbsp'.$this->l('Room Reallocation / Swap'),
+                'modal_title' => '<i class="icon icon-refresh"></i> &nbsp'.$this->l('Stay Reallocation / Swap'),
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_room_reallocation.tpl'),
                 'modal_actions' => null,
             );
@@ -1108,27 +1108,28 @@ public function ajaxProcessGetCalenderData()
             'SELLING_PREFERENCE_WITH_ROOM_TYPE' => Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
             'SELLING_PREFERENCE_STANDALONE' => Product::SELLING_PREFERENCE_STANDALONE,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'rooms_reallocation_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'rooms_booking_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'opt_select_all' => $this->l('All Types', null, true),
-            'slt_another_htl' => $this->l('Select Another Hotel', null, true),
+            'slt_another_htl' => $this->l('Select Another Property', null, true),
             'product_type_cond' => $this->l('Product type is required', null, true),
             'from_date_cond' => $this->l('From date is required', null, true),
             'to_date_cond' => $this->l('To date is required', null, true),
-            'hotel_name_cond' => $this->l('Hotel Name is required', null, true),
+            'hotel_name_cond' => $this->l('Property Name is required', null, true),
             'num_rooms_cond' => $this->l('Number of Rooms is required', null, true),
             'add_to_cart' => $this->l('Add To Cart', null, true),
             'remove' => $this->l('Remove', null, true),
             'noRoomTypeAvlTxt' => $this->l('No room type available.', null, true),
-            'slct_rm_err' => $this->l('Please select a room first.', null, true),
+            'slct_rm_err' => $this->l('Please select a stay first.', null, true),
             'slct_rm_type_err' => $this->l('Please select a room type first.', null, true),
             'product_added_cart_txt' => $this->l('Product added in cart', null, true),
             'info_icon_path' => _MODULE_DIR_.$this->module->name.'/views/img/Slices/info-icon.svg',
             'select_age_txt' => $this->l('Select age', null, true),
             'under_1_age' => $this->l('Under 1', null, true),
-            'room_txt' => $this->l('Room', null, true),
-            'rooms_txt' => $this->l('Rooms', null, true),
+            'room_txt' => $this->l('Stay', null, true),
+            'rooms_txt' => $this->l('Stays', null, true),
             'remove_txt' => $this->l('Remove', null, true),
             'adult_txt' => $this->l('Adults', null, true),
             'adults_txt' => $this->l('Adults', null, true),
@@ -1137,7 +1138,7 @@ public function ajaxProcessGetCalenderData()
             'below_txt' => $this->l('Below', null, true),
             'years_txt' => $this->l('years', null, true),
             'all_children_txt' => $this->l('All Children', null, true),
-            'max_occupancy_reached_txt' => $this->l('Maximum room occupancy reached', null, true),
+            'max_occupancy_reached_txt' => $this->l('Maximum stay occupancy reached', null, true),
             'max_adults_txt' => $this->l('Maximum adult occupancy reached', null, true),
             'max_children_txt' => $this->l('Maximum children occupancy reached', null, true),
             'no_children_allowed_txt' => $this->l('Only adults can be accommodated', null, true),
@@ -1145,13 +1146,13 @@ public function ajaxProcessGetCalenderData()
             'PS_BACKDATE_ORDER_ALLOW' => $PS_BACKDATE_ORDER_ALLOW,
             // 'check_calender_var' => $check_calender_var,
             'txtSomeErr' => $this->l('Some error occurred. Please try again.', null, true),
-            'no_rm_avail_txt' => $this->l('No room available.', null, true),
-            'no_realloc_rm_avail_txt' => $this->l('No room available for reallocation.', null, true),
+            'no_rm_avail_txt' => $this->l('No stay available.', null, true),
+            'no_realloc_rm_avail_txt' => $this->l('No stay available for reallocation.', null, true),
             'no_realloc_rm_type_avail_txt' => $this->l('No room type available for reallocation.', null, true),
-            'no_swap_rm_avail_txt' => $this->l('No room available for swap.', null, true),
-            'select_room_txt' => $this->l('Select room', null, true),
-            'added_room_success_txt' => $this->l('Room added to cart successfully', null, true),
-            'removed_room_success_txt' => $this->l('Room removed from cart successfully', null, true),
+            'no_swap_rm_avail_txt' => $this->l('No stay available for swap.', null, true),
+            'select_room_txt' => $this->l('Select stay', null, true),
+            'added_room_success_txt' => $this->l('Stay added to cart successfully', null, true),
+            'removed_room_success_txt' => $this->l('Stay removed from cart successfully', null, true),
         );
         if (Configuration::get('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS ) {
             $jsVars['is_occupancy_wise_search'] = true;

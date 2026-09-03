@@ -26,6 +26,7 @@ class HotelBranchInformation extends ObjectModel
     public $id_category;
     public $hotel_name;
     public $email;
+    public $id_property_type;
     public $check_in;
     public $check_out;
     public $description;
@@ -43,6 +44,7 @@ class HotelBranchInformation extends ObjectModel
     public $date_upd;
 
     public $moduleInstance;
+    public $propertyTypeName;
 
     public static $definition = array(
         'table' => 'htl_branch_info',
@@ -51,6 +53,7 @@ class HotelBranchInformation extends ObjectModel
         'fields' => array(
             'id_category' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'email' => array('type' => self::TYPE_STRING,'validate' => 'isEmail', 'size' => 255, 'required' => true),
+            'id_property_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'check_in' => array('type' => self::TYPE_STRING, 'required' => true),
             'check_out' => array('type' => self::TYPE_STRING, 'required' => true),
@@ -161,6 +164,7 @@ class HotelBranchInformation extends ObjectModel
                 $this->use_global_min_booking_offset = $hotelRestrictions['use_global_min_booking_offset'];
                 $this->min_booking_offset = $hotelRestrictions['min_booking_offset'];
             }
+            $this->propertyTypeName = self::getHotelPropertyTypeByPropertyId($this->id_property_type, $id_lang);
         }
     }
 
@@ -1395,6 +1399,25 @@ class HotelBranchInformation extends ObjectModel
             AND ha.`access`= 1 AND ha.`id_profile` = '.(int) $idEmployeeProfile;
 
         return Db::getInstance()->executeS($sql);
+    }
+
+    public static function getHotelPropertyTypeByPropertyId($idPropertyType, $idLang = null)
+    {
+        $idPropertyType = (int) $idPropertyType;
+        $idLang = $idLang ? (int) $idLang : (int) Context::getContext()->language->id;
+        $cacheKey = 'HotelPropertyType::getHotelPropertyTypeByPropertyId'.$idPropertyType.'_'.$idLang;
+
+        if (!Cache::isStored($cacheKey)) {
+            $sql = 'SELECT hptl.`name`
+                FROM `'._DB_PREFIX_.'htl_property_type_lang` hptl
+                WHERE hptl.`id_htl_property_type` = '.$idPropertyType.'
+                AND hptl.`id_lang` = '.$idLang;
+
+            Cache::store($cacheKey, Db::getInstance()->getValue($sql));
+        }
+
+        $propertyType = Cache::retrieve($cacheKey);
+        return $propertyType ? $propertyType : Module::getInstanceByName('hotelreservationsystem')->l('Hotel', 'HotelBranchInformation');
     }
 
 }

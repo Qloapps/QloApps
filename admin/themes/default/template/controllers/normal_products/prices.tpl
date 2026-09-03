@@ -139,7 +139,7 @@ $(document).ready(function () {
 	<div class="form-group {if $product->auto_add_to_cart && $product->price_addition_type == Product::PRICE_ADDITION_TYPE_WITH_ROOM}show_on_auto_add_Withroom{/if}" {if !$product->auto_add_to_cart || $product->price_addition_type != Product::PRICE_ADDITION_TYPE_WITH_ROOM}style="display:none"{/if}>
 		<div class="col-lg-9 col-lg-offset-3">
 			<div class="alert alert-info">
-				{l s='This service product price will be auto added to room price so the tax rule set on room type will be applied on this service product'}
+				{l s='This service product price will be auto added to stay price so the tax rule set on room type will be applied on this service product'}
 			</div>
 		</div>
 	</div>

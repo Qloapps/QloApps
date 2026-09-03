@@ -265,6 +265,7 @@ class Blockcart extends Module
         }
 
         $objCartBookingData = new HotelCartBookingData();
+        $objRoomType = new HotelRoomType();
 
         $addedProduct = false;
         // get currently added product if exists
@@ -296,13 +297,24 @@ class Blockcart extends Module
                 'cart_default'
             );
             $addedProduct['booking_product'] = $objProduct->booking_product;
+            $room_info =  $objRoomType->getRoomTypeInfoByIdProduct($objProduct->id, $this->context->language->id);
+            $addedProduct['room_info'] = $room_info;
             if ($objProduct->booking_product) {
+                $occupancyRequiredForBooking = false;
+                if (Configuration::get('PS_FRONT_ROOM_UNIT_SELECTION_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
+                    $occupancyRequiredForBooking = true;
+                }
+                $addedProduct['occupancy_required_for_booking'] = $occupancyRequiredForBooking;
+                $addedProduct['layer_cart_attribute_label'] = $addedProduct['occupancy_required_for_booking']
+                    ? sprintf($this->l('%s occupancy'), $room_info['selling_object_name'])
+                    : sprintf($this->l('%s quantity added'), $room_info['selling_object_plural_name']);
                 $price = $addedProduct['price'] = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                     $objProduct->id,
                     $addedProduct['date_from'],
                     $addedProduct['date_to'],
                     $addedProduct['occupancy']
                 );
+                $addedProduct['layer_cart_room_success_msg'] = sprintf($this->l('%s successfully added to your cart'), $room_info['selling_object_name']);
                 if ($priceDisplayMethod == PS_TAX_EXC) {
                     $addedProduct['price'] = Tools::displayPrice($price['total_price_tax_excl']);
                 } else {

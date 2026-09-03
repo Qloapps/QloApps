@@ -12,7 +12,7 @@ Booking details
 
 Room Type
 Hotel
-Num. Rooms
+Num. Stays
 Duration
 
 {refundBookingHtml}

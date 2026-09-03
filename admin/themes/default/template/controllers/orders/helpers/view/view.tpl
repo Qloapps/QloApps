@@ -678,7 +678,7 @@
                                         <tr>
                                             <th>{l s='Request ID'}</th>
                                             {if isset($refundReqBookings) && $refundReqBookings}
-                                                <th>{l s='Total Rooms'}</th>
+                                                <th>{l s='Total Stays'}</th>
                                             {/if}
                                             {if isset($refundReqProducts) && $refundReqProducts}
                                                 <th>{l s='Total Products'}</th>
@@ -764,10 +764,10 @@
                     {if $hotel_booking}
                         <div class="panel">
                             <div class="panel-heading">
-                                <i class="icon-bed"></i> &nbsp;{l s='Rooms Booking Detail'} <span class="badge">{$order_detail_data|@count}</span>
+                                <i class="icon-bed"></i> &nbsp;{l s='Stays Booking Detail'} <span class="badge">{$order_detail_data|@count}</span>
                                 {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))}
                                     <button type="button" id="add_room" class="btn btn-primary pull-right">
-                                        <i class="icon-plus-sign"></i> {l s='Add Rooms'}
+                                        <i class="icon-plus-sign"></i> {l s='Add Stays'}
                                     </button>
                                 {/if}
                             </div>
@@ -864,7 +864,7 @@
 
                             {if $total_rooms_price_tax_excl}
                                 <tr id="total_products">
-                                    <td class="text-right">{l s='Total Rooms Cost (Tax excl.)'}</td>
+                                    <td class="text-right">{l s='Total Stays Cost (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
                                         {displayPrice price=$total_rooms_price_tax_excl currency=$currency->id}
                                     </td>
@@ -938,7 +938,7 @@
                                             <tbody>
                                                 {if $total_rooms_price_tax_excl}
                                                     <tr>
-                                                        <td class="text-left">{l s='Total Rooms Tax'}</td>
+                                                        <td class="text-left">{l s='Total Stays Tax'}</td>
                                                         <td class="text-right">
                                                             {displayPrice price=($total_rooms_price_tax_incl - $total_rooms_price_tax_excl) currency=$currency->id}
                                                         </td>
@@ -1251,12 +1251,12 @@
         </div>
     </div>
     {strip}
-        {addJsDefL name=no_rm_avail_txt}{l s='No room available.' js=1}{/addJsDefL}
-        {addJsDefL name=no_realloc_rm_avail_txt}{l s='No room available for reallocation.' js=1}{/addJsDefL}
+        {addJsDefL name=no_rm_avail_txt}{l s='No stay available.' js=1}{/addJsDefL}
+        {addJsDefL name=no_realloc_rm_avail_txt}{l s='No stay available for reallocation.' js=1}{/addJsDefL}
         {addJsDefL name=no_realloc_rm_type_avail_txt}{l s='No room type available for reallocation.' js=1}{/addJsDefL}
-        {addJsDefL name=no_swap_rm_avail_txt}{l s='No room available for swap.' js=1}{/addJsDefL}
+        {addJsDefL name=no_swap_rm_avail_txt}{l s='No stay available for swap.' js=1}{/addJsDefL}
         {addJsDefL name=slct_rm_type_err}{l s='Please select a room type first.' js=1}{/addJsDefL}
-        {addJsDefL name=slct_rm_err}{l s='Please select a room first.' js=1}{/addJsDefL}
+        {addJsDefL name=slct_rm_err}{l s='Please select a stay first.' js=1}{/addJsDefL}
         {addJsDefL name=txtExtraServiceSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
         {addJsDefL name=atleastSelectTxt}{l s='Select at least one facility to update.' js=1}{/addJsDefL}
 
@@ -1265,8 +1265,8 @@
         {addJsDefL name=txtInvalidServiceVal}{l s='Invalid service value found' js=1}{/addJsDefL}
         {addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
         {addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
-        {addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
-        {addJsDefL name='rooms_txt'}{l s='Rooms' js=1}{/addJsDefL}
+        {addJsDefL name='room_txt'}{l s='Stay' js=1}{/addJsDefL}
+        {addJsDefL name='rooms_txt'}{l s='Stays' js=1}{/addJsDefL}
         {addJsDefL name='remove_txt'}{l s='Remove' js=1}{/addJsDefL}
         {addJsDefL name='adult_txt'}{l s='Adult' js=1}{/addJsDefL}
         {addJsDefL name='adults_txt'}{l s='Adults' js=1}{/addJsDefL}
@@ -1275,12 +1275,12 @@
         {addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
         {addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
         {addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
-        {addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum room occupancy reached' js=1}{/addJsDefL}
+        {addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum stay occupancy reached' js=1}{/addJsDefL}
         {addJsDefL name='max_adults_txt'}{l s='Maximum adult occupancy reached' js=1}{/addJsDefL}
         {addJsDefL name='max_children_txt'}{l s='Maximum children occupancy reached' js=1}{/addJsDefL}
         {addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
         {addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
-        {addJsDefL name='select_room_txt'}{l s='Select room' js=1}{/addJsDefL}
+        {addJsDefL name='select_room_txt'}{l s='Select stay' js=1}{/addJsDefL}
         {addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_IN=$ROOM_STATUS_CHECKED_IN|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_OUT=$ROOM_STATUS_CHECKED_OUT|escape:'quotes':'UTF-8'}

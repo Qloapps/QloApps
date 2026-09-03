@@ -33,8 +33,8 @@
 				<a href="{$link->getPageLink($order_process, true)|escape:'html':'UTF-8'}" title="{l s='View my booking cart' mod='blockcart'}" rel="nofollow">
 					<!-- <b>{l s='Cart' mod='blockcart'}</b> -->
 					<span class="badge badge_style ajax_cart_quantity{if $cart_qties == 0} unvisible{/if}">{$total_products_in_cart}</span>
-					<!-- <span class="ajax_cart_product_txt{if $cart_qties != 1} unvisible{/if}">{l s='Rooms' mod='blockcart'}</span> -->
-					<!-- <span class="ajax_cart_product_txt_s{if $cart_qties < 2} unvisible{/if}">{l s='Rooms' mod='blockcart'}</span> -->
+					<!-- <span class="ajax_cart_product_txt{if $cart_qties != 1} unvisible{/if}">{l s='Stays' mod='blockcart'}</span> -->
+					<!-- <span class="ajax_cart_product_txt_s{if $cart_qties < 2} unvisible{/if}">{l s='Stays' mod='blockcart'}</span> -->
 					<span class="ajax_cart_total{if $cart_qties == 0} unvisible{/if}">
 						{if $cart_qties > 0}
 							{if $priceDisplay == 1}
@@ -196,7 +196,7 @@
 							<span class="cross" title="{l s='Close window' mod='blockcart'}"></span>
 							{block name='blockcart_layer_cart_left_heading'}
 								<h2 class="layer_cart_room_txt">
-									<i class="icon-check"></i>{l s='Room successfully added to your cart' mod='blockcart'}
+									<i class="icon-check"></i><span class="layer_cart_room_success_msg">{l s='Stay successfully added to your cart' mod='blockcart'}</span>
 								</h2>
 								<h2 class="layer_cart_product_txt">
 									<i class="icon-check"></i>{l s='Product successfully added to your cart' mod='blockcart'}
@@ -215,7 +215,7 @@
 										<span id="layer_cart_product_time_duration"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_product_txt">{l s='Hotel Name' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_product_txt">{l s='Property Name' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_hotel_name"></span>
 									</div>
 									<div>
@@ -223,12 +223,12 @@
 										<span id="layer_cart_product_unit_price"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_room_txt">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_room_txt"><span class="layer_cart_attribute_type">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Stay occupancy' mod='blockcart'}{else}{l s='Stays quantity added' mod='blockcart'}{/if}</span> &nbsp;-&nbsp;</strong>
 										<strong class="dark layer_cart_product_txt">{l s='Quantity' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_quantity"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_room_txt">{l s='Room type cost' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_room_txt"><span class="layer_cart_room_type_cost_label">{l s='Room type cost' mod='blockcart'}</span> &nbsp;-&nbsp;</strong>
 										<strong class="dark layer_cart_product_txt">{l s='Total' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_price"></span>
 									</div>
@@ -255,7 +255,7 @@
 							{block name='blockcart_layer_cart_room_total_price'}
 								<div class="layer_cart_row">
 									<strong class="dark">
-										{l s='Total Rooms Cost in cart' mod='blockcart'}
+										{l s='Total Stay Cost in cart' mod='blockcart'}
 										{if $display_tax_label}
 											{if $priceDisplay == 1}
 												{l s='(tax excl.)' mod='blockcart'}
@@ -432,7 +432,7 @@
 		{addJsDefL name=qty_txt}{l s='Qty' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=duration_txt}{l s='Duration' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=capacity_txt}{l s='Capacity' mod='blockcart' js=1}{/addJsDefL}
-		{addJsDefL name=remove_rm_title}{l s='Remove this room from my cart' mod='blockcart' js=1}{/addJsDefL}
+		{addJsDefL name=remove_rm_title}{l s='Remove this stay from my cart' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=no_internet_txt}{l s='No internet. Please check your internet connection.' mod='blockcart' js=1}{/addJsDefL}
 
 		{addJsDef rm_avail_process_lnk = $link->getModuleLink('blockcart', 'checkroomavailabilityajaxprocess')}

@@ -224,9 +224,9 @@ class DashGuestCycle extends Module
     {
         $header = array(
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
-            'room_num' => array('title' => $this->l('Room No.'), 'class' => 'text-center'),
+            'room_num' => array('title' => $this->l('Stay No.'), 'class' => 'text-center'),
             'room_type' => array('title' => $this->l('Room Type'), 'class' => 'text-left'),
-            'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
+            'hotel' => array('title' => $this->l('Property'), 'class' => 'text-left'),
             'guests' => array('title' => $this->l('Guests'), 'class' => 'text-center'),
             'check_out' => array('title' => $this->l('Check-out (LOS)'), 'class' => 'text-left'),
             'order_id' => array('title' => $this->l('Order ID'), 'class' => 'text-center'),
@@ -284,9 +284,9 @@ class DashGuestCycle extends Module
     {
         $header = array(
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
-            'room_num' => array('title' => $this->l('Room No.'), 'class' => 'text-center'),
+            'room_num' => array('title' => $this->l('Stay No.'), 'class' => 'text-center'),
             'room_type' => array('title' => $this->l('Room Type'), 'class' => 'text-left'),
-            'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
+            'hotel' => array('title' => $this->l('Property'), 'class' => 'text-left'),
             'guests' => array('title' => $this->l('Guests'), 'class' => 'text-center'),
             'check_in' => array('title' => $this->l('Check-in (LOS)'), 'class' => 'text-left'),
             'order_id' => array('title' => $this->l('Order ID'), 'class' => 'text-center'),
@@ -344,9 +344,9 @@ class DashGuestCycle extends Module
     {
         $header = array(
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
-            'room_num' => array('title' => $this->l('Room No.'), 'class' => 'text-center'),
+            'room_num' => array('title' => $this->l('Stay No.'), 'class' => 'text-center'),
             'room_type' => array('title' => $this->l('Room Type'), 'class' => 'text-left'),
-            'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
+            'hotel' => array('title' => $this->l('Property'), 'class' => 'text-left'),
             'guests' => array('title' => $this->l('Guests'), 'class' => 'text-center'),
             'check_in' => array('title' => $this->l('Check-in'), 'class' => 'text-left'),
             'check_out' => array('title' => $this->l('Check-out (LOS)'), 'class' => 'text-left'),
@@ -410,8 +410,8 @@ class DashGuestCycle extends Module
         $header = array(
             'order_id' => array('title' => $this->l('Order ID'), 'class' => 'text-center'),
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
-            'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
-            'total' => array('title' => $this->l('Total Rooms'), 'class' => 'text-center'),
+            'hotel' => array('title' => $this->l('Property'), 'class' => 'text-left'),
+            'total' => array('title' => $this->l('Total Stays'), 'class' => 'text-center'),
             'guests' => array('title' => $this->l('Guests'), 'class' => 'text-center'),
             'order_total' => array('title' => $this->l('Order Total'), 'class' => 'text-right'),
             'order_status' => array('title' => $this->l('Order Status'), 'class' => 'text-left'),
@@ -472,9 +472,9 @@ class DashGuestCycle extends Module
         $header = array(
             'request_id' => array('title' => $this->l('Request ID'), 'class' => 'text-center'),
             'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
-            'room_num' => array('title' => $this->l('Room No.'), 'class' => 'text-center'),
+            'room_num' => array('title' => $this->l('Stay No.'), 'class' => 'text-center'),
             'room_type' => array('title' => $this->l('Room Type'), 'class' => 'text-left'),
-            'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
+            'hotel' => array('title' => $this->l('Property'), 'class' => 'text-left'),
             'guests' => array('title' => $this->l('Guests'), 'class' => 'text-center'),
             'check_in' => array('title' => $this->l('Check-in'), 'class' => 'text-left'),
             'check_out' => array('title' => $this->l('Check-out'), 'class' => 'text-left'),

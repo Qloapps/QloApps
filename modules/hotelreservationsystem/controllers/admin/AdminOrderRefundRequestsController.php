@@ -93,7 +93,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
             if ($refundReqBookings) {
                 $this->fields_list['num_rooms'] = array(
-                    'title' => $this->l('Total Rooms'),
+                    'title' => $this->l('Total Stays'),
                     'align' => 'center',
                     'havingFilter' => true,
                 );
@@ -241,7 +241,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     'callback' => 'getUniqueRoomTypeNames'
                 ),
                 'hotel_name' => array(
-                    'title' => $this->l('Hotel')
+                    'title' => $this->l('Property Name')
                 ),
                 'date_from' => array(
                     'title' => $this->l('Date From')
@@ -313,7 +313,12 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                     $objOrderReturn->id,
                     $booking['id']
                 );
+                
                 $booking = array_merge($booking, array_shift($bookingCharges));
+
+                if (!empty($booking['selling_object_name'])) {
+                    $booking['selling_object_name'] = $booking['selling_object_name'];
+                }
             }
         }
 

@@ -112,11 +112,11 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('Enable if you want the next booking search field to be focused automatically after setting value for a field.'),
                     ),
                     'WK_HOTEL_NAME_SEARCH_THRESHOLD' => array(
-                        'title' => $this->l('Hotel name search threshold'),
+                        'title' => $this->l('Property name search threshold'),
                         'type' => 'text',
                         'required' => true,
                         'validation' => 'isUnsignedInt',
-                        'hint' => $this->l('Enter the number of hotels after which user can search hotel by name.'),
+                        'hint' => $this->l('Enter the number of properties after which user can search property by name.'),
                         'desc' => $this->l('Set to 0 to always show the search box.'),
                         'class' => 'fixed-width-xxl',
                     ),
@@ -129,34 +129,34 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 'title' => $this->l('Website Configuration'),
                 'fields' => array(
                     'WK_HTL_CHAIN_NAME' => array(
-                        'title' => $this->l('Hotel Name'),
+                        'title' => $this->l('Property Name'),
                         'type' => 'textLang',
                         'lang' => true,
                         'required' => true,
                         'validation' => 'isGenericName',
-                        'hint' => $this->l('Enter Hotel name in case of single hotel or enter your hotels chain name in case of multiple hotels.'),
+                        'hint' => $this->l('Enter Property name in case of single property or enter your properties chain name in case of multiple properties.'),
                     ),
                     'WK_HTL_TAG_LINE' => array(
-                        'title' => $this->l('Hotel Tag Line'),
+                        'title' => $this->l('Property Tag Line'),
                         'type' => 'textareaLang',
                         'lang' => true,
                         'required' => true,
                         'validation' => 'isGenericName',
-                        'hint' => $this->l('This will display hotel tag line in hotel page.'),
+                        'hint' => $this->l('This will display property tag line in property page.'),
                     ),
                     'WK_HTL_SHORT_DESC' => array(
-                        'title' => $this->l('Hotel Short Description'),
+                        'title' => $this->l('Property Short Description'),
                         'type' => 'textareaLang',
                         'lang' => true,
                         'required' => true,
                         'rows' => '4',
                         'cols' => '2',
                         'validation' => 'isGenericName',
-                        'hint' => $this->l('This will display hotel short description in footer. Note: number of letters must be less than 220.'),
+                        'hint' => $this->l('This will display property short description in footer. Note: number of letters must be less than 220.'),
                     ),
                     'WK_PRIMARY_HOTEL' => array(
-                        'title' => $this->l('Primary hotel'),
-                        'hint' => $this->l('Primary hotel is used to default address for your business. The hotel address will be considered as your registered business address.'),
+                        'title' => $this->l('Primary property'),
+                        'hint' => $this->l('Primary property is used to default address for your business. The property address will be considered as your registered business address.'),
                         'type' => 'select',
                         'identifier' => 'id',
                         'list' => $hotelsInfo,
@@ -555,41 +555,41 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             // End occupancy fields validation
 
             if (!$hotelNameSearchThreshold && $hotelNameSearchThreshold !== '0') {
-                $this->errors[] = $this->l('Hotel name search threshold field is required.');
+                $this->errors[] = $this->l('Property name search threshold field is required.');
             } elseif (!Validate::isUnsignedInt($hotelNameSearchThreshold)) {
-                $this->errors[] = $this->l('Hotel name search threshold field is invalid.');
+                $this->errors[] = $this->l('Property name search threshold field is invalid.');
             }
 
             if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Hotel chain name is required at least in ').$objDefaultLanguage['name'];
+                $this->errors[] = $this->l('Property chain name is required at least in ').$objDefaultLanguage['name'];
             } else {
                 foreach ($languages as $lang) {
                     if (trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
                         if (!Validate::isGenericName(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid hotel chain name in ').$lang['name'];
+                            $this->errors[] = $this->l('Invalid property chain name in ').$lang['name'];
                         }
                     }
                 }
             }
             if (!trim(Tools::getValue('WK_HTL_TAG_LINE_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Hotel tag line is required at least in ').$objDefaultLanguage['name'];
+                $this->errors[] = $this->l('Property tag line is required at least in ').$objDefaultLanguage['name'];
             } else {
                 foreach ($languages as $lang) {
                     if (trim(Tools::getValue('WK_HTL_TAG_LINE_'.$lang['id_lang']))) {
                         if (!Validate::isGenericName(Tools::getValue('WK_HTL_TAG_LINE_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid Hotel tag line in ').$lang['name'];
+                            $this->errors[] = $this->l('Invalid Property tag line in ').$lang['name'];
                         }
                     }
                 }
             }
             if (!trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Hotel short description is required at least in ').
+                $this->errors[] = $this->l('Property short description is required at least in ').
                 $objDefaultLanguage['name'];
             } else {
                 foreach ($languages as $lang) {
                     if (trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
                         if (!Validate::isGenericName(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid hotel short description in ').$lang['name'];
+                            $this->errors[] = $this->l('Invalid property short description in ').$lang['name'];
                         }
                     }
                 }

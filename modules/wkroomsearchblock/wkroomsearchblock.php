@@ -41,8 +41,8 @@ class WkRoomSearchBlock extends Module
         $this->bootstrap = true;
         parent::__construct();
 
-        $this->displayName = $this->l('QloApps Room Search Panels');
-        $this->description = $this->l('Room search blocks on different pages to search rooms as per user travel parameters.');
+        $this->displayName = $this->l('QloApps Stay Search Panels');
+        $this->description = $this->l('Stay search blocks on different pages to search stays as per user travel parameters.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 
@@ -71,17 +71,17 @@ class WkRoomSearchBlock extends Module
                             'autocompletesearch'
                         ),
                         'no_results_found_cond' => $this->l('No results found for this search', false, true),
-                        'hotel_name_cond' => $this->l('Please select a hotel name', false, true),
+                        'hotel_name_cond' => $this->l('Please select a property name', false, true),
                         'check_in_time_cond' => $this->l('Please enter Check In time', false, true),
                         'check_out_time_cond' => $this->l('Please enter Check Out time', false, true),
                         'less_checkin_date' => $this->l('Check In date can not be before current date.', false, true),
                         'more_checkout_date' => $this->l('Check Out date must be greater than Check In date.', false, true),
-                        'hotel_location_txt' => $this->l('Hotel Location', false, true),
-                        'select_htl_txt' => $this->l('Select Hotel', false, true),
+                        'hotel_location_txt' => $this->l('Property Location', false, true),
+                        'select_htl_txt' => $this->l('Select Property', false, true),
                         'select_age_txt' => $this->l('Select age', false, true),
                         'under_1_age' => $this->l('Under 1', false, true),
-                        'room_txt' => $this->l('Room', false, true),
-                        'rooms_txt' => $this->l('Rooms', false, true),
+                        'room_txt' => $this->l('Stay', false, true),
+                        'rooms_txt' => $this->l('Stays', false, true),
                         'remove_txt' => $this->l('Remove', false, true),
                         'adult_txt' => $this->l('Adult', false, true),
                         'adults_txt' => $this->l('Adults', false, true),

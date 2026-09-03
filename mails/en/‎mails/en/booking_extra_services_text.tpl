@@ -1,5 +1,5 @@
 {if isset($list) && $list}
-{l s='Rooms Services Detail'}
+{l s='Stays Services Detail'}
 
 {l s='Room Type'}
 {l s='Name'}
@@ -22,7 +22,7 @@
 {if $smarty.foreach.serviceRow.first}
 {$data_v['name']}
 {$rm_v['data_form']|date_format:"%d-%m-%Y"} {l s='to'} {$rm_v['data_to']|date_format:"%d-%m-%Y"}
-{l s='Room'} - {$roomCount}
+{l s='Stay'} - {$roomCount}
 {/if}
 
 {$service['name']}
@@ -43,6 +43,6 @@
 {/foreach}
 
 {if !isset($room_additinal_services_exists)}
-{l s='No room services added.'}
+{l s='No stay services added.'}
 {/if}
 {/if}

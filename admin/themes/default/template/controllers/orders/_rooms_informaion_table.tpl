@@ -27,7 +27,7 @@
                 <table class="table" id="customer_cart_details">
                     <thead>
                         <tr>
-                            <th class="center"><span ><p>{l s='Room'}</p></span></th>
+                            <th class="center"><span ><p>{l s='Stay'}</p></span></th>
                             <th class="center"><span >{l s='Image'}</span></th>
                             <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Booking check-in and check-out dates'}">{l s='Duration'}</span></th>
                             <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Number of adults and children'}">{l s='Occupancy'}</span></th>
@@ -59,7 +59,7 @@
     <div class="list-empty">
         <div class="list-empty-msg">
             <i class="icon-warning-sign list-empty-icon"></i>
-            {l s='Room information not available.'}
+            {l s='Stay information not available.'}
         </div>
     </div>
 {/if}

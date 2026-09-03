@@ -64,7 +64,7 @@ class StatsBestProducts extends ModuleGrid
             ),
             array(
                 'id' => 'hotelName',
-                'header' => $this->l('Hotel name'),
+                'header' => $this->l('Property Name'),
                 'dataIndex' => 'hotelName',
                 'align' => 'center',
             ),

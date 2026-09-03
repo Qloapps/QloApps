@@ -1581,6 +1581,7 @@ CREATE TABLE `PREFIX_product` (
   `cache_has_attachments` tinyint(1) NOT NULL DEFAULT '0',
   `is_virtual` tinyint(1) NOT NULL DEFAULT '0',
   `booking_product` tinyint(1) NOT NULL DEFAULT '1',
+  `id_selling_object` int(10) unsigned DEFAULT NULL,
   `cache_default_attribute` int(10) unsigned DEFAULT NULL,
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
@@ -2786,4 +2787,20 @@ CREATE TABLE IF NOT EXISTS `PREFIX_maintenance_access` (
   `email` varchar(128) NOT NULL,
   `date_add` datetime NOT NULL,
   PRIMARY KEY (`id_maintenance_access`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_room_type_selling_object` (
+  `id_room_type_selling_object` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  PRIMARY KEY (`id_room_type_selling_object`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `PREFIX_room_type_selling_object_lang` (
+  `id_room_type_selling_object` int(10) unsigned NOT NULL,
+  `id_lang` int(10) unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `plural_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id_room_type_selling_object`, `id_lang`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8;

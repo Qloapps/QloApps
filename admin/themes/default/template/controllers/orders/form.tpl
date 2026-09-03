@@ -2215,7 +2215,7 @@
                 <div class="row">
                     <div class="col-lg-2">
                         <div class="data-focus">
-                            <span>{l s='Total rooms (Tax excl.)'}</span><br/>
+                            <span>{l s='Total stays (Tax excl.)'}</span><br/>
                             <span id="total_rooms" class="size_l text-success"></span>
                         </div>
                     </div>
@@ -2382,8 +2382,8 @@
 	{addJsDef max_child_age=$max_child_age}
 	{addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
 	{addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
-	{addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
-	{addJsDefL name='rooms_txt'}{l s='Rooms' js=1}{/addJsDefL}
+	{addJsDefL name='room_txt'}{l s='Stay' js=1}{/addJsDefL}
+	{addJsDefL name='rooms_txt'}{l s='Stays' js=1}{/addJsDefL}
 	{addJsDefL name='remove_txt'}{l s='Remove' js=1}{/addJsDefL}
 	{addJsDefL name='adult_txt'}{l s='Adult' js=1}{/addJsDefL}
 	{addJsDefL name='adults_txt'}{l s='Adults' js=1}{/addJsDefL}
@@ -2392,7 +2392,7 @@
 	{addJsDefL name='below_txt'}{l s='Below' js=1}{/addJsDefL}
 	{addJsDefL name='years_txt'}{l s='years' js=1}{/addJsDefL}
 	{addJsDefL name='all_children_txt'}{l s='All Children' js=1}{/addJsDefL}
-	{addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum room occupancy reached' js=1}{/addJsDefL}
+	{addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum stay occupancy reached' js=1}{/addJsDefL}
 	{addJsDefL name='max_adults_txt'}{l s='Maximum adult occupancy reached' js=1}{/addJsDefL}
 	{addJsDefL name='max_children_txt'}{l s='Maximum children occupancy reached' js=1}{/addJsDefL}
 	{addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}

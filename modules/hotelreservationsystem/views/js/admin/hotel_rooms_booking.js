@@ -775,7 +775,8 @@ $(document).ready(function() {
         var adults = 0;
         var children = 0;
         var rooms = $(booking_occupancy_wrapper).find('.occupancy_info_block').length;
-
+        var roomLabel = $(booking_occupancy_wrapper).data('attribute_type') || room_txt;
+        var roomsLabel = $(booking_occupancy_wrapper).data('attribute_types') || rooms_txt;
         $(booking_occupancy_wrapper).find(".num_adults" ).each(function(key, val) {
             adults += parseInt($(this).val());
         });
@@ -797,9 +798,9 @@ $(document).ready(function() {
             }
         }
         if (parseInt(rooms) > 1) {
-            guestButtonVal += ', ' + parseInt(rooms) + ' ' + rooms_txt;
+            guestButtonVal += ', ' + parseInt(rooms) + ' ' + roomsLabel;
         } else {
-            guestButtonVal += ', ' + parseInt(rooms) + ' ' + room_txt;
+            guestButtonVal += ', ' + parseInt(rooms) + ' ' + roomLabel;
         }
         $(booking_occupancy_wrapper).siblings('.booking_guest_occupancy').find('span').text(guestButtonVal);
     }

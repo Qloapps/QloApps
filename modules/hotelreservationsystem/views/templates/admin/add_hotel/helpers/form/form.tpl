@@ -23,9 +23,9 @@
 <div class="panel">
 	<div class="panel-heading">
 		{if isset($edit)}
-			<i class='icon-pencil'></i> {l s='Edit Hotel' mod='hotelreservationsystem'}
+			<i class='icon-pencil'></i> {l s='Edit Property' mod='hotelreservationsystem'}
 		{else}
-			<i class='icon-plus'></i> {l s='Add New Hotel' mod='hotelreservationsystem'}
+			<i class='icon-plus'></i> {l s='Add New Property' mod='hotelreservationsystem'}
 		{/if}
 	</div>
 
@@ -111,7 +111,7 @@
 					<div class="form-group">
 						<label class="control-label col-lg-3">
 							<span>
-								{l s='Enable Hotel' mod='hotelreservationsystem'}
+								{l s='Enable' mod='hotelreservationsystem'}
 							</span>
 						</label>
 						<div class="col-lg-9 ">
@@ -124,9 +124,28 @@
 							</span>
 						</div>
 					</div>
+					{if isset($hotel_property_types_info) && $hotel_property_types_info}
+						<div class="form-group">
+							<label class="control-label col-sm-3 " for="id_property_type">
+								<span>
+									{l s='Property Type :' mod='hotelreservationsystem'}
+								</span>
+							</label>
+							<div class="col-sm-6">
+								<select name="id_property_type" id="id_property_type" class="form-control chosen">
+									{foreach from=$hotel_property_types_info item=property_type}
+										<option value="{$property_type.id_property_type|escape:'htmlall':'UTF-8'}"
+											{if isset($selected_hotel_property_type) && $selected_hotel_property_type == $property_type.id_property_type}selected{/if}>
+											{$property_type.name|escape:'htmlall':'UTF-8'}
+										</option>
+									{/foreach}
+								</select>
+							</div>
+						</div>
+					{/if}
 					<div class="form-group">
 						<label class="col-sm-3 control-label required" for="hotel_name" >
-							{l s='Hotel Name :' mod='hotelreservationsystem'}
+							{l s='Name :' mod='hotelreservationsystem'}
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -301,7 +320,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label">
-							{l s='Hotel Policies :' mod='hotelreservationsystem'}
+							{l s='Policies :' mod='hotelreservationsystem'}
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -464,7 +483,7 @@
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save hotel information before saving hotel images.' mod='hotelreservationsystem'}
+							{l s='Please save property information before saving property images.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 
@@ -521,7 +540,7 @@
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save the hotel information before saving the hotel booking restrictions.' mod='hotelreservationsystem'}
+							{l s='Please save the property information before saving the property booking restrictions.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 
@@ -611,7 +630,7 @@
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save hotel information before saving refund policy options.' mod='hotelreservationsystem'}
+							{l s='Please save property information before saving refund policy options.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 
@@ -655,7 +674,7 @@
 						</div>
 					{else}
 						<div class="alert alert-warning">
-							{l s='Please save hotel information before assigning hotel amenities.' mod='hotelreservationsystem'}
+							{l s='Please save property information before assigning property amenities.' mod='hotelreservationsystem'}
 						</div>
 					{/if}
 

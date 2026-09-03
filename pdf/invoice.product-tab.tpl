@@ -27,20 +27,20 @@
 	<table class="bordered-table" width="100%" cellpadding="4" cellspacing="0">
 		<thead>
 			<tr>
-				<th colspan="{if $display_product_images}8{else}7{/if}" class="header">{l s='Rooms Details' pdf='true'}</th>
+				<th colspan="{if $display_product_images}8{else}7{/if}" class="header">{l s='Stays Details' pdf='true'}</th>
 			</tr>
 			<tr>
 				{if $display_product_images}
-					<th class="product header small">{l s='Room Image' pdf='true'}</th>
+					<th class="product header small">{l s='Stay Image' pdf='true'}</th>
 				{/if}
-				<th class="product header small">{l s='Room Description' pdf='true'}</th>
+				<th class="product header small">{l s='Stay Description' pdf='true'}</th>
 				<th class="product header small">{l s='Tax Rate(s)' pdf='true'}</th>
 				{* {if isset($layout.before_discount)}
 					<th class="product header small">{l s='Base price' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
 				{/if} *}
 
 				<th class="product header small">{l s='Unit Price' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
-				<th class="product header small">{l s='Rooms' pdf='true'}</th>
+				<th class="product header small">{l s='Stays' pdf='true'}</th>
 				<th class="product header small">{l s='Check-in Date' pdf='true'}</th>
 				<th class="product header small">{l s='Check-out Date' pdf='true'}</th>
 				<th class="product header small">{l s='Total' pdf='true'} <br /> {l s='(Tax excl.)' pdf='true'}</th>
@@ -71,7 +71,7 @@
 							</td>
 							<td class="product center">
 								<p class="text-left">
-									{if $rm_v['adults'] <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else} {$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}<br>{if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']} {if $rm_v['num_rm'] > 1}{l s='Rooms'}{else}{l s='Room'}{/if}
+									{if $rm_v['adults'] <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else} {$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}<br>{if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']} {if $rm_v['num_rm'] > 1}{l s='Stays'}{else}{l s='Stay'}{/if}
 								</p>
 							</td>
 							<td class="product center">

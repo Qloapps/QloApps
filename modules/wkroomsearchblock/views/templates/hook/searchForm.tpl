@@ -28,7 +28,7 @@
                 {if isset($location_enabled) && $location_enabled}
                     <div class="form-group grid-item area-4" style="grid-column: span 4;">
                         <div class="dropdown">
-                            <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Hotel Location' mod='wkroomsearchblock'}" {if isset($search_data['location'])}value="{$search_data['location']|escape:'htmlall':'UTF-8'}"{/if}>
+                            <input type="text" class="form-control header-rmsearch-input input-location" id="hotel_location" name="hotel_location" autocomplete="off" placeholder="{l s='Property Location' mod='wkroomsearchblock'}" {if isset($search_data['location'])}value="{$search_data['location']|escape:'htmlall':'UTF-8'}"{/if}>
                             <input hidden="hidden" name="location_category_id" id="location_category_id" {if isset($search_data['location_category_id'])}value="{$search_data['location_category_id']|escape:'htmlall':'UTF-8'}"{/if}>
                             <ul class="location_search_results_ul dropdown-menu"></ul>
                         </div>
@@ -50,7 +50,7 @@
                         <input type="hidden" id="min_booking_offset" name="min_booking_offset" value="{if isset($min_booking_offset)}{$min_booking_offset|escape:'htmlall':'UTF-8'}{/if}">
 
                         <div class="hotel-selector-wrap {if isset($language_is_rtl) && $language_is_rtl}rtl{/if}">
-                            <select name="id_hotel" class="chosen header-rmsearch-input" data-placeholder="{l s='Select Hotel' mod='wkroomsearchblock'}" id="id_hotel_button">
+                            <select name="id_hotel" class="chosen header-rmsearch-input" data-placeholder="{l s='Select Property' mod='wkroomsearchblock'}" id="id_hotel_button">
                                 <option value=""></option>
                                 {foreach $hotels_info as $name_val}
                                     <option class="search_result_li" value="{$name_val['id']|escape:'htmlall':'UTF-8'}" data-id-hotel="{$name_val['id']|escape:'htmlall':'UTF-8'}" data-hotel-cat-id="{$name_val['id_category']|escape:'htmlall':'UTF-8'}" data-max_order_date="{$name_val['max_order_date']}" data-min_booking_offset="{$name_val['min_booking_offset']|escape:'htmlall':'UTF-8'}" {if isset($search_data) && $name_val['id'] == $search_data['htl_dtl']['id']}selected{/if}>{$name_val['hotel_name']|escape:'htmlall':'UTF-8'}</option>
@@ -88,7 +88,7 @@
                         <div class="dropdown">
                             <button class="form-control input-occupancy header-rmsearch-input {if isset($error) && $error == 1}error_border{/if}" type="button" data-toggle="dropdown" id="guest_occupancy">
                                 <span class="pull-left">{if (isset($search_data['occupancy_adults']) && $search_data['occupancy_adults'])}{$search_data['occupancy_adults']} {if $search_data['occupancy_adults'] > 1}{l s='Adults' mod='wkroomsearchblock'}{else}{l s='Adult' mod='wkroomsearchblock'}{/if}, {if isset($search_data['occupancy_children']) && $search_data['occupancy_children']}{$search_data['occupancy_children']} {if $search_data['occupancy_children'] > 1}
-                                {l s='Children' mod='wkroomsearchblock'}{else}{l s='Child' mod='wkroomsearchblock'}{/if}, {/if}{$search_data['occupancies']|count} {if $search_data['occupancies']|count > 1}{l s='Rooms' mod='wkroomsearchblock'}{else}{l s='Room' mod='wkroomsearchblock'}{/if}{else}{l s='1 Adult, 1 Room' mod='wkroomsearchblock'}{/if}</span>
+                                {l s='Children' mod='wkroomsearchblock'}{else}{l s='Child' mod='wkroomsearchblock'}{/if}, {/if}{$search_data['occupancies']|count} {if $search_data['occupancies']|count > 1}{l s='Stays' mod='wkroomsearchblock'}{else}{l s='Stay' mod='wkroomsearchblock'}{/if}{else}{l s='1 Adult, 1 Stay' mod='wkroomsearchblock'}{/if}</span>
                             </button>
                             <div id="search_occupancy_wrapper" class="dropdown-menu">
                                 <div id="occupancy_inner_wrapper">
@@ -96,7 +96,7 @@
                                         {assign var=countRoom value=1}
                                         {foreach from=$search_data['occupancies'] key=key item=$occupancy name=occupancyInfo}
                                             <div class="occupancy-room-block">
-                                                <div class="occupancy_info_head"><span class="room_num_wrapper">{l s='Room' mod='wkroomsearchblock'} - {$countRoom|escape:'htmlall':'UTF-8'} </span>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove' mod='wkroomsearchblock'}</a>{/if}</div>
+                                                <div class="occupancy_info_head"><span class="room_num_wrapper">{l s='Stay' mod='wkroomsearchblock'} - {$countRoom|escape:'htmlall':'UTF-8'} </span>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove' mod='wkroomsearchblock'}</a>{/if}</div>
                                                 <div class="occupancy_info_block" occ_block_index="{$key|escape:'htmlall':'UTF-8'}">
                                                     <div class="row">
                                                         <div class="form-group occupancy_count_block col-sm-5 col-xs-6">
@@ -164,7 +164,7 @@
                                         {/foreach}
                                     {else}
                                         <div class="occupancy-room-block">
-                                            <div class="occupancy_info_head"><span class="room_num_wrapper">{l s='Room - 1' mod='wkroomsearchblock'}</span></div>
+                                            <div class="occupancy_info_head"><span class="room_num_wrapper">{l s='Stay - 1' mod='wkroomsearchblock'}</span></div>
                                             <div class="occupancy_info_block" occ_block_index="0">
                                                 <div class="row">
                                                     <div class="form-group occupancy_count_block col-sm-5 col-xs-6">
@@ -226,7 +226,7 @@
                                 </div>
                                 <div class="occupancy_block_actions">
                                     <span id="add_new_occupancy">
-                                        <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='wkroomsearchblock'}</span></a>
+                                        <a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Stay' mod='wkroomsearchblock'}</span></a>
                                     </span>
                                     <span>
                                         <button class="submit_occupancy_btn btn btn-primary">{l s='Done' mod='wkroomsearchblock'}</button>
@@ -240,7 +240,7 @@
             {block name='search_form_submit'}
                 <div class="form-group grid-item search_room_submit_block area-4" style="grid-column: span 4;">
                     <button type="submit" class="btn btn btn-primary" name="search_room_submit" id="search_room_submit">
-                        <span>{l s='Search Rooms' mod='wkroomsearchblock'}</span>
+                        <span>{l s='Search Stays' mod='wkroomsearchblock'}</span>
                     </button>
                 </div>
             {/block}

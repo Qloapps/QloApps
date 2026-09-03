@@ -180,6 +180,12 @@ class OrderConfirmationControllerCore extends FrontController
                                 $cart_htl_data[$type_key]['adults'] = $rm_dtl['adults'];
                                 $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
 
+                                // Prefer the name stored at order-creation time so it stays historically accurate
+                                if (!empty($order_bk_data[0]['selling_object_name'])) {
+                                    $cart_htl_data[$type_key]['selling_object_name'] = $order_bk_data[0]['selling_object_name'];
+                                    $cart_htl_data[$type_key]['selling_object_plural_name'] = $order_bk_data[0]['selling_object_plural_name'];
+                                }
+
                                 foreach ($order_bk_data as $data_k => $data_v) {
                                     $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
                                     /*Product price when order was created*/

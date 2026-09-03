@@ -205,14 +205,13 @@
 								{/block}
 							{/if}
 						</div>
-
 						<div class="product_info_containter">
 							<!-- tab hook is added here -->
 							<!--HOOK_PRODUCT_TAB -->
 							<section class="page-product-box">
 								{block name='product_tabs'}
 									<ul class="nav nav-tabs product_description_tabs">
-									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='Room Information'}{else}{l s='Product Information'}{/if}</a></li>
+									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='%s Information' sprintf=$room_type_info['selling_object_name']}{else}{l s='Product Information'}{/if}</a></li>
 										{* Block for booking products *}
 										{if isset($id_hotel) && $id_hotel}
 											<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
@@ -304,7 +303,7 @@
 															{if isset($room_dynamic_amenities) && $room_dynamic_amenities}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Room Amenities'}</span>
+																		<span>{l s='%s Amenities' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$room_dynamic_amenities item=amenity}
@@ -352,7 +351,7 @@
 															{if isset($hotel_description) && $hotel_description}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Description'}</span>
+																		<span>{l s='%s Description' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content">
 																		{$hotel_description}
@@ -366,7 +365,7 @@
 															<div class="room_info_hotel_images_wrap">
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Images'}</span>
+																		<span>{l s='Property Images'}</span>
 																	</div>
 																	<div class="room_info_content" id="room_info_hotel_images">
 																		<div class="row images-wrap"></div>
@@ -393,7 +392,7 @@
 													{/block}
 													<!-- <div class="info_margin_div">
 														<div class="room_info_heading">
-															<span>{l s='Rooms'}</span>
+															<span>{l s='Stays'}</span>
 														</div>
 														<div class="room_info_content row"></div>
 													</div> -->
@@ -401,7 +400,7 @@
 														{if isset($hotel_policies) && $hotel_policies}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
-																	<span>{l s='Hotel Policies'}</span>
+																	<span>{l s='%s Policies' sprintf=$property_type}</span>
 																</div>
 																<div class="room_info_content">
 																	<p class="">{$hotel_policies}</p>
@@ -751,7 +750,7 @@
 		{else}
 			<div class="bootstrap">
 				<div class="alert alert-warning">
-					{l s='This room type has not enough information. Please save information of related hotel and other required room information for the booking of this room type.'}
+					{l s='This room type has not enough information. Please save information of related hotel and other required stay information for the booking of this room type.'}
 				</div>
 			</div>
 		{/if}
@@ -869,8 +868,8 @@
 			{addJsDef currency_blank = $currency->blank}
 			{addJsDefL name=correct_date_cond}{l s='Check Out Date should be greater than Check in date.' js=1}{/addJsDefL}
 			{addJsDefL name=some_error_cond}{l s='Some error occured .Please try again.' js=1}{/addJsDefL}
-			{addJsDefL name=unavail_qty_text}{l s='Required quantity of rooms are Not available.' js=1}{/addJsDefL}
-			{addJsDefL name=out_of_stock_cond}{l s='No room is available for this period.' js=1}{/addJsDefL}
+			{addJsDefL name=unavail_qty_text}{l s='Required quantity of stays are Not available.' js=1}{/addJsDefL}
+			{addJsDefL name=out_of_stock_cond}{l s='No stay is available for this period.' js=1}{/addJsDefL}
 			{addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
 			{addJsDefL name=select_txt}{l s='Select' js=1}{/addJsDefL}
 			{addJsDefL name=remove_txt}{l s='Remove' js=1}{/addJsDefL}

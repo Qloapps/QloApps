@@ -60,7 +60,7 @@
 
 			<div class="form-group">
 				<label class="control-label col-sm-3 required" for="max_los">
-					<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enter maximum length of stay for the hotel. set 0 day for setting no limit on maximum length of stay.'}">{l s='Maximum length of stay'}</span>
+					<span title="" data-toggle="tooltip" class="label-tooltip" data-original-title="{l s='Enter maximum length of stay for the property. set 0 day for setting no limit on maximum length of stay.'}">{l s='Maximum length of stay'}</span>
 				</label>
                 <div class="col-sm-9">
                     <div class="row">

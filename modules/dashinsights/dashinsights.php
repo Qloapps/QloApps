@@ -58,9 +58,9 @@ class DashInsights extends Module
     {
         if (Tools::getValue('controller') == 'AdminDashboard') {
             Media::addJsDef(array(
-                'hotel_txt' => $this->l('Hotel'),
+                'hotel_txt' => $this->l('Property'),
                 'nights_booked_txt' => $this->l('Nights Booked'),
-                'room_booked_txt' => $this->l('Rooms Booked'),
+                'room_booked_txt' => $this->l('Stays Booked'),
                 'length_of_stay_txt' => $this->l('Length Of Stay'),
                 'total_nights_booked_txt' => $this->l('Total Nights Booked'),
                 'date_txt' => $this->l('Date'),
@@ -127,7 +127,7 @@ class DashInsights extends Module
             $addressInfo = HotelBranchInformation::getAddress($idHotel, $this->context->language->id);
             $panelsLabel = sprintf('(%s, %s)', $objHotelBranchInformation->hotel_name, $addressInfo['city']);
         } else {
-            $panelsLabel = $this->l('(All Hotels)');
+            $panelsLabel = $this->l('(All Properties)');
         }
 
         $return = array(
@@ -145,13 +145,13 @@ class DashInsights extends Module
                     'chart_type' => 'multibar_chart_dotw_dashinsights',
                     'data' => $daysOfTheWeekData,
                     'date_format' => $this->context->language->date_format_lite,
-                    'axis_labels' => array('y' => $this->l('Rooms occupied')),
+                    'axis_labels' => array('y' => $this->l('Stays occupied')),
                 ),
                 'dashinsights_multibar_chart2' => array(
                 'chart_type' => 'multibar_chart_los_dashinsights',
                     'data' => $lengthOfStayData,
                     'date_format' => $this->context->language->date_format_lite,
-                    'axis_labels' => array('x' => $this->l('Length of stay'), 'y' => $this->l('Rooms occupied')),
+                    'axis_labels' => array('x' => $this->l('Length of stay'), 'y' => $this->l('Stays occupied')),
                 ),
             ),
         );
@@ -164,10 +164,10 @@ class DashInsights extends Module
         $seriesWiseRoomNights = array();
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
             // set room nights demo data
-            if ($idHotel == 0) { // if 'All Hotels' is selected
+            if ($idHotel == 0) { // if 'All Properties' is selected
                 $allHotelSeriesInfo = array(
                     'data' => array(),
-                    'label' => $this->l('All Hotels'),
+                    'label' => $this->l('All Properties'),
                 );
 
                 foreach ($this->discreteDates as $discreteDate) {
@@ -207,11 +207,11 @@ class DashInsights extends Module
                 );
             }
         } else {
-            if ($idHotel == 0) { // if 'All Hotels' is selected
+            if ($idHotel == 0) { // if 'All Properties' is selected
                 $idsHotel = $this->accessibleIdsHotel;
                 $allHotelSeriesInfo = array(
                     'data' => AdminStatsController::getRoomNightsData($dateFrom, $dateTo, $idsHotel),
-                    'label' => $this->l('All Hotels'),
+                    'label' => $this->l('All Properties'),
                 );
 
                 $seriesWiseRoomNights[] = $allHotelSeriesInfo;
@@ -271,10 +271,10 @@ class DashInsights extends Module
         $seriesWiseDaysOfTheWeek = array();
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
             // set room nights demo data
-            if ($idHotel == 0) { // if 'All Hotels' is selected
+            if ($idHotel == 0) { // if 'All Properties' is selected
                 $allHotelSeriesInfo = array(
                     'data' => array(),
-                    'label' => $this->l('All Hotels'),
+                    'label' => $this->l('All Properties'),
                 );
 
                 // 1 = SUN
@@ -316,11 +316,11 @@ class DashInsights extends Module
                 );
             }
         } else {
-            if ($idHotel == 0) { // if 'All Hotels' is selected
+            if ($idHotel == 0) { // if 'All Properties' is selected
                 $idsHotel = $this->accessibleIdsHotel;
                 $allHotelSeriesInfo = array(
                     'data' => AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idsHotel),
-                    'label' => $this->l('All Hotels'),
+                    'label' => $this->l('All Properties'),
                 );
 
                 $seriesWiseDaysOfTheWeek[] = $allHotelSeriesInfo;
@@ -348,7 +348,7 @@ class DashInsights extends Module
                     $averageDaysOfTheWeekData = AdminStatsController::getOccupiedRoomsForDaysOfTheWeek($dateFrom, $dateTo, $idsHotel, true, true);
                     $averageSeriesInfo = array(
                         'data' => $averageDaysOfTheWeekData,
-                        'label' => $this->l('Other Hotels Average'),
+                        'label' => $this->l('Other Properties Average'),
                     );
 
                     $seriesWiseDaysOfTheWeek[] = $averageSeriesInfo;
@@ -409,10 +409,10 @@ class DashInsights extends Module
 
         if (Configuration::get('PS_DASHBOARD_SIMULATION')) {
             // set room nights demo data
-            if ($idHotel == 0) { // if 'All Hotels' is selected
+            if ($idHotel == 0) { // if 'All Properties' is selected
                 $allHotelSeriesInfo = array(
                     'data' => array(),
-                    'label' => $this->l('All Hotels'),
+                    'label' => $this->l('All Properties'),
                 );
 
                 $roomsOccupied = array(
@@ -486,11 +486,11 @@ class DashInsights extends Module
                 );
             }
         } else {
-            if ($idHotel == 0) { // if 'All Hotels' is selected
+            if ($idHotel == 0) { // if 'All Properties' is selected
                 $idsHotel = $this->accessibleIdsHotel;
                 $allHotelSeriesInfo = array(
                     'data' => AdminStatsController::getLengthOfStayInfo($day, $dateFrom, $dateTo, $idsHotel),
-                    'label' => $this->l('All Hotels'),
+                    'label' => $this->l('All Properties'),
                 );
 
                 $seriesWiseLengthOfStay[] = $allHotelSeriesInfo;

@@ -27,7 +27,7 @@
 	<table id="additional-services-table" class="bordered-table" width="100%" cellpadding="4" cellspacing="0">
 		<thead>
 			<tr>
-				<th colspan="5" class="header">{l s='Room Extra Services Detail' pdf='true'}</th>
+				<th colspan="5" class="header">{l s='Stay Extra Services Detail' pdf='true'}</th>
 			</tr>
 			<tr>
 				<th class="header-left small">{l s='Room Type' pdf='true'}</th>
@@ -47,7 +47,7 @@
                                 <td rowspan="{$htlBookingServices['additional_services']|count}">
                                     {$htlBookingServices['room_type_name']}<br>
                                     {dateFormat date=$htlBookingServices['date_from']} {l s='to' pdf='true'} {dateFormat date=$htlBookingServices['date_to']}<br>
-                                    <strong>{l s='Room' pdf='true'} - {$roomCount}</strong>
+                                    <strong>{l s='Stay' pdf='true'} - {$roomCount}</strong>
                                 </td>
                             {/if}
                             <td>

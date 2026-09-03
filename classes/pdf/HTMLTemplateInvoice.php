@@ -314,6 +314,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         $service_product_data = array();
         $room_additinal_services = array();
         $formattedHotelAddress = '';
+        $propertyType = '';
         if (Module::isInstalled('hotelreservationsystem')) {
             $obj_htl_bk_dtl = new HotelBookingDetail();
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
@@ -368,6 +369,8 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                             $unit_price_tax_incl = $order_details_obj->unit_price_tax_incl;
 
                             $cart_htl_data[$type_key]['hotel_name'] = $data_v['hotel_name'];
+                            $propertyType = $data_v['property_type_name'];
+
                             $cart_htl_data[$type_key]['name'] = $order_details_obj->product_name;
                             $cart_htl_data[$type_key]['unit_price_tax_excl'] = $unit_price_tax_excl;
                             $cart_htl_data[$type_key]['unit_price_tax_incl'] = $unit_price_tax_incl;
@@ -627,6 +630,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'delivery_address' => $formatted_delivery_address,
             'invoice_address' => $formatted_invoice_address,
             'hotel_address' => $formattedHotelAddress,
+            'property_type' => $propertyType,
             'addresses' => array('invoice' => $invoice_address, 'delivery' => $delivery_address),
             'tax_excluded_display' => $tax_excluded_display,
             'display_product_images' => $display_product_images,

@@ -83,7 +83,7 @@
 					<th><span class="title_box">{l s='Hotel'}</span></th>
 					<th><span class="title_box">{l s='Duration'}</span></th>
 					<th><span class="title_box">{l s='occupancy'}</span></th>
-					<th><span class="title_box">{l s='Room price'}</span></th>
+					<th><span class="title_box">{l s='Stay price'}</span></th>
 					<th><span class="title_box">{l s='Extra services'}</span></th>
 					<th class="text-right"><span class="title_box">{l s='Total'}</span></th>
 				</tr>
@@ -102,7 +102,7 @@
 						<td>{dateFormat date=$room['date_from'] full=$is_full_date} - {dateFormat date=$room['date_to'] full=$is_full_date}</td>
 						<td>
 							<span>
-								{if $room['adults']}{$room['adults']}{/if} {if $room['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$room['children']}}, {$room['children']} {if $room['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
+								{if $stay['adults']}{$stay['adults']}{/if} {if $stay['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$stay['children']}}, {$stay['children']} {if $stay['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
 							</span>
 						</td>
 						<td>{displayWtPriceWithCurrency price=$room['feature_price_tax_excl'] currency=$currency}</td>
@@ -131,7 +131,7 @@
 										<span aria-hidden="true">&times;</span>
 									</button>
 									<ul class="nav nav-tabs" role="tablist">
-										<li role="presentation" class="active" ><a href="#room_type_service_product_desc_{$room['id']}" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
+										<li role="presentation" class="active" ><a href="#room_type_service_product_desc_{$stay['id']}" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a></li>
 									</ul>
 									<div class="tab-content panel">
 										{if isset($room['selected_services']) && $room['selected_services']}

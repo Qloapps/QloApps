@@ -2,14 +2,14 @@
     <table class="table table-recap room-booking-table">
         <thead>
             <tr>
-                <th colspan="9" class="table-caption">{l s='Rooms Booking Detail'}</th>
+                <th colspan="9" class="table-caption">{l s='Stays Booking Detail'}</th>
             </tr>
             <tr>
-                <th>{l s="Room Image"}</th>
-                <th>{l s="Room Description"}</th>
-                <th>{l s="Room Capcity"}</th>
+                <th>{l s="Stay Image"}</th>
+                <th>{l s="Stay Description"}</th>
+                <th>{l s="Stay Capcity"}</th>
                 <th>{l s="Unit Price"}</th>
-                <th>{l s="Rooms Qty"}</th>
+                <th>{l s="Stays Qty"}</th>
                 <th>{l s="Check-in Date"}</th>
                 <th>{l s="Check-out Date"}</th>
                 <th>{l s="Total"}</th>

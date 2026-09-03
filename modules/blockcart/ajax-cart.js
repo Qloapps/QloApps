@@ -1207,13 +1207,19 @@ var ajaxCart = {
             let rooms = 0;
             let adults = 0;
             let children = 0;
+            if (typeof product.layer_cart_attribute_label !== 'undefined') {
+                $('#layer_cart .layer_cart_attribute_type').text(product.layer_cart_attribute_label);
+            }
+            if(typeof product.layer_cart_room_success_msg !== 'undefined'){
+                $('#layer_cart .layer_cart_room_success_msg').text(product.layer_cart_room_success_msg);
+            }
             if (occupancy_required_for_booking) {
                 $.each(product.occupancy, function(index, val) {
                     rooms++;
                     adults += parseInt(val.adults);
                     children += parseInt(val.children);
                 });
-                product_quantity_text = getRoomTypeGuestOccupancyFormated(adults, children, rooms);
+                product_quantity_text = getRoomTypeGuestOccupancyFormated(adults, children, rooms,product.room_info.selling_object_name, product.room_info.selling_object_plural_name);
             } else {
                 product_quantity_text = product.occupancy;
             }

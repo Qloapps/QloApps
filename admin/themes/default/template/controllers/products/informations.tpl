@@ -125,16 +125,16 @@
 	<div class="form-group" id="hotel_selection">
 		{if isset($htl_room_type)}
 			<label class="control-label col-sm-3 required">
-				{l s='Hotel'}
+				{l s='Property'}
 			</label>
 			<div class="col-sm-5">
 				<input type="text" class="form-control" value="{$htl_full_info['hotel_name']}" readonly>
 				<input type="hidden" name="id_hotel" value="{$htl_room_type['id_hotel']}">
-				<p class="help-block">{l s='Hotel once assigned cannot be reassigned'}</p>
+				<p class="help-block">{l s='Property once assigned cannot be reassigned'}</p>
 			</div>
 		{else}
 			<label class="control-label col-sm-3 required" for="hotel_place">
-				{l s='Select Hotel'}
+				{l s='Select Property'}
 			</label>
 			<div class="col-sm-5">
 			{if isset($htl_info) && $htl_info}
@@ -143,9 +143,9 @@
 						<option value="{$htl_dtl['id_hotel']}" >{$htl_dtl['hotel_name']}</option>
 					{/foreach}
 				</select>
-				<p class="help-block">{l s='Hotel once assigned cannot be reassigned'}</p>
+				<p class="help-block">{l s='Property once assigned cannot be reassigned'}</p>
 			{else}
-				<div class="control-label col-sm-3 text-danger">{l s='No hotel are available'}</div>
+				<div class="control-label col-sm-3 text-danger">{l s='No property are available'}</div>
 			{/if}
 			</div>
 		{/if}
@@ -464,6 +464,24 @@
 			</div>
 		</div>
 	{/if}
+
+	{if isset($selling_object_info) && $selling_object_info}
+		<div class="form-group" id="room_type_selection">
+			<label class="control-label col-sm-3">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select the stay selling type for this room type.'}">
+					{l s='Selling Object'}
+				</span>
+			</label>
+			<div class="col-sm-5">
+				<select name="id_selling_object" id="id_selling_object" class="form-control chosen" >
+					{foreach from=$selling_object_info item=selling_object_type}
+						<option value="{$selling_object_type['id_room_type_selling_object']}" {if isset($selected_room_type_selling_object) && $selling_object_type['id_room_type_selling_object'] == $selected_room_type_selling_object}selected{/if}>{$selling_object_type['name']}</option>
+					{/foreach}
+				</select>
+			</div>
+		</div>
+	{/if}
+
 
 	{* <div class="form-group">
 		<label class="control-label col-lg-3" for="tags_{$id_lang}">

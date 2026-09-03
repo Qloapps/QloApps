@@ -1,6 +1,6 @@
 {if isset($list) && $list}
 
-{l s="Room Num"}
+{l s="Stay Num"}
 
 {l s="Room Type"}
 

@@ -42,7 +42,7 @@
 							</div>
 							<div class="form-group col-sm-12">
 								<label for="id_hotel" class="control-label col-sm-4 required">
-									<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Hotel Name' mod='hotelreservationsystem'}</span>
+									<span title="" data-toggle="tooltip" class="label-tooltip">{l s='Property Name' mod='hotelreservationsystem'}</span>
 								</label>
 								<div class="col-sm-8">
 									<select name="id_hotel" class="form-control" id="id_hotel">
@@ -51,7 +51,7 @@
 												<option value="{$name_val['id']|escape:'htmlall':'UTF-8'}" {if isset($id_hotel) && ($name_val['id'] == $id_hotel)}selected{/if}>{$name_val['hotel_name']|escape:'htmlall':'UTF-8'}</option>
 											{/foreach}
 										{else}
-											{l s='No hotels available' mod='hotelreservationsystem'}
+											{l s='No properties available' mod='hotelreservationsystem'}
 										{/if}
 									</select>
 									<input type="hidden" name="search_id_hotel" id="search_id_hotel" {if isset($id_hotel)}value="{$id_hotel|escape:'htmlall':'UTF-8'}"{/if}>
@@ -75,7 +75,7 @@
 														<hr class="occupancy-info-separator col-sm-12">
 														{foreach from=$occupancy key=key item=$room_occupancy name=occupancyInfo}
 															<div class="occupancy_info_block" occ_block_index="{$key|escape:'htmlall':'UTF-8'}">
-																<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room' mod='hotelreservationsystem'} - {$countRoom|escape:'htmlall':'UTF-8'} </label>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove' mod='hotelreservationsystem'}</a>{/if}</div>
+																<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Stay' mod='hotelreservationsystem'} - {$countRoom|escape:'htmlall':'UTF-8'} </label>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove' mod='hotelreservationsystem'}</a>{/if}</div>
 																<div class="col-sm-12">
 																	<div class="row">
 																		<div class="form-group col-xs-6 occupancy_count_block">
@@ -117,7 +117,7 @@
 														{/foreach}
 													{else}
 														<div class="occupancy_info_block col-sm-12" occ_block_index="0">
-															<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
+															<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Stay - 1' mod='hotelreservationsystem'}</label></div>
 															<div class="col-sm-12">
 																<div class="row">
 																	<div class="form-group col-xs-6 occupancy_count_block">
@@ -145,7 +145,7 @@
 													{/if}
 												</div>
 												<div class="add_occupancy_block col-sm-12">
-													<a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='hotelreservationsystem'}</span></a>
+													<a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Stay' mod='hotelreservationsystem'}</span></a>
 												</div>
 											</div>
 										</div>
@@ -227,7 +227,7 @@
 	{else}
 		<div class="panel">
 			<div class="panel-heading">
-				<i class="icon-warning"></i> {l s='No Hotels' mod='hotelreservationsystem'}
+				<i class="icon-warning"></i> {l s='No Properties Available' mod='hotelreservationsystem'}
 			</div>
 
 			<div class="alert alert-warning">
@@ -249,7 +249,7 @@
 		</div>
 		<div class="tip-body">
 			<div class="total_rooms">
-				<div class="tip_element_head">{l s='Total Rooms' mod='hotelreservationsystem'}</div>
+				<div class="tip_element_head">{l s='Total Stays' mod='hotelreservationsystem'}</div>
 				<div class="tip_element_value"></div>
 			</div>
 			<div class="num_avail">
@@ -257,15 +257,15 @@
 				<div class="tip_element_value"></div>
 			</div>
 			<div class="num_booked">
-				<div class="tip_element_head">{l s='Booked Rooms' mod='hotelreservationsystem'}</div>
+				<div class="tip_element_head">{l s='Booked Stays' mod='hotelreservationsystem'}</div>
 				<div class="tip_element_value"></div>
 			</div>
 			<div class="num_unavail">
-				<div class="tip_element_head">{l s='Unavailable Rooms' mod='hotelreservationsystem'}</div>
+				<div class="tip_element_head">{l s='Unavailable Stays' mod='hotelreservationsystem'}</div>
 				<div class="tip_element_value"></div>
 			</div>
             <div class="num_part_avai">
-				<div class="tip_element_head">{l s='Partially Available Rooms' mod='hotelreservationsystem'}</div>
+				<div class="tip_element_head">{l s='Partially Available Stays' mod='hotelreservationsystem'}</div>
 				<div class="tip_element_value"></div>
 			</div>
 		</div>

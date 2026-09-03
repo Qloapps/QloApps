@@ -64,15 +64,15 @@
 {addJsDef max_child_age=$max_child_age}
 {addJsDef hasDeliveryAddress=(isset($cart->id_address_delivery) && $cart->id_address_delivery)}
 
-{addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum room occupancy reached' js=1}{/addJsDefL}
+{addJsDefL name='max_occupancy_reached_txt'}{l s='Maximum stay occupancy reached' js=1}{/addJsDefL}
 {addJsDefL name='max_adults_txt'}{l s='Maximum adult occupancy reached' js=1}{/addJsDefL}
 {addJsDefL name='max_children_txt'}{l s='Maximum children occupancy reached' js=1}{/addJsDefL}
 {addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
 {addJsDefL name='select_occupancy_txt'}{l s='Select Occupancy' js=1}{/addJsDefL}
 {addJsDefL name='select_age_txt'}{l s='Select age' js=1}{/addJsDefL}
 {addJsDefL name='under_1_age'}{l s='Under 1' js=1}{/addJsDefL}
-{addJsDefL name='room_txt'}{l s='Room' js=1}{/addJsDefL}
-{addJsDefL name='rooms_txt'}{l s='Rooms' js=1}{/addJsDefL}
+{addJsDefL name='room_txt'}{l s='Stay' js=1}{/addJsDefL}
+{addJsDefL name='rooms_txt'}{l s='Stays' js=1}{/addJsDefL}
 {addJsDefL name='remove_txt'}{l s='Remove' js=1}{/addJsDefL}
 {addJsDefL name='adult_txt'}{l s='Adult' js=1}{/addJsDefL}
 {addJsDefL name='adults_txt'}{l s='Adults' js=1}{/addJsDefL}

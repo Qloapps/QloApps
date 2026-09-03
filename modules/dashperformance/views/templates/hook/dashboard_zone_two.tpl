@@ -73,9 +73,9 @@
 					</div>
 				</div>
                 <div class="col-xs-6 col-lg-3">
-					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Revenue Per Available Room (RevPAR) is calculated by dividing total rooms revenue by the total number of rooms in the period being measured.' mod='dashperformance'}" data-placement="top" style="background-color: #B6FFB6;">
+					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Revenue Per Available Room (RevPAR) is calculated by dividing total stays revenue by the total number of rooms in the period being measured.' mod='dashperformance'}" data-placement="top" style="background-color: #B6FFB6;">
 						<div class="title-wrapper">
-							<p>{l s='Revenue Per Available Room' mod='dashperformance'}</p>
+							<p>{l s='Revenue Per Available Stay' mod='dashperformance'}</p>
 						</div>
 						<div class="value-wrapper">
 							<span id="dp_revenue_per_available_room" style="color: #00B200;">--</span>
@@ -85,7 +85,7 @@
 				<div class="col-xs-6 col-lg-3">
 					<div class="stat-box label-tooltip" data-toggle="tooltip" data-original-title="{l s='Total Revenue Per Available Room (TrevPAR) measures the total revenue being generated per available room including service products.' mod='dashperformance'}" data-placement="top" style="background-color: #EBCDFF;">
 						<div class="title-wrapper">
-							<p>{l s='Total Revenue Per Available Room' mod='dashperformance'}</p>
+							<p>{l s='Total Revenue Per Available Stay' mod='dashperformance'}</p>
 						</div>
 						<div class="value-wrapper">
 							<span id="dp_total_revenue_per_available_room" style="color: #FF4036;">--</span>

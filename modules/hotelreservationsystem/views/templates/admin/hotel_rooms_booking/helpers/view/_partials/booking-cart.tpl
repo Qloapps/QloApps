@@ -13,7 +13,7 @@
 							<table class="table table-responsive addtocart-table">
 								<thead class="cart-table-thead">
 									<tr>
-										<th class="text-center">{l s='Room No.' mod='hotelreservationsystem'}</th>
+										<th class="text-center">{l s='Stay No.' mod='hotelreservationsystem'}</th>
 										<th class="text-center">{l s='Room Type' mod='hotelreservationsystem'}</th>
 										<th class="text-center">{l s='Duration' mod='hotelreservationsystem'}</th>
 										<th class="text-center">{l s='Amount (Tax excl.)' mod='hotelreservationsystem'}</th>
@@ -70,7 +70,7 @@
 					<div class="row cart_amt_div">
 						<table class="table table-responsive">
 							<tr>
-								<td>{l s='Rooms Amount (Tax excl.):' mod='hotelreservationsystem'}</td>
+								<td>{l s='Stays Amount (Tax excl.):' mod='hotelreservationsystem'}</td>
 								<td class="text-right" id="cart_rooms_amount">
 									{if isset($cart_rooms_amount)}{convertPrice price=$cart_rooms_amount}{else}{convertPrice price=0}{/if}
 								</td>

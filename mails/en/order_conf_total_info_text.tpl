@@ -1,5 +1,5 @@
 {if isset($list['has_room_bookings']) && $list['has_room_bookings']}
-{l s="Total Rooms Cost"}  {$list['room_price_tax_excl']}
+{l s="Total Stays Cost"}  {$list['room_price_tax_excl']}
 {/if}
 
 {if isset($list['has_standalone_products']) && $list['has_standalone_products']}

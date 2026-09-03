@@ -166,7 +166,7 @@
                     <div id="new_service_price_addition_type_container" class="col-sm-6" style="display:none;">
                         <label class="control-label">{l s='Price display preference'}</label>
                         <select name="new_service_price_addition_type" id="new_service_price_addition_type">
-                            <option value="{Product::PRICE_ADDITION_TYPE_WITH_ROOM}">{l s='Add price in room price'}</option>
+                            <option value="{Product::PRICE_ADDITION_TYPE_WITH_ROOM}">{l s='Add price in stay price'}</option>
                             <option value="{Product::PRICE_ADDITION_TYPE_INDEPENDENT}">{l s='Add price as convenience Fee'}</option>
                         </select>
                     </div>

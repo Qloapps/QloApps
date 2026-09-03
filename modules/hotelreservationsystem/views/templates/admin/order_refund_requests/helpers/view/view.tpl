@@ -84,7 +84,7 @@
                         {if isset($refundReqBookings) && $refundReqBookings}
                             <div class="form-group row">
                                 <div class="col-sm-3">
-                                    <strong>{l s='Total rooms' mod='hotelreservationsystem'} :</strong>
+                                    <strong>{l s='Total stays' mod='hotelreservationsystem'} :</strong>
                                 </div>
                                 <div class="col-sm-9">
                                     {$refundReqBookings|count}
@@ -142,14 +142,14 @@
 											{if !$isRefundCompleted}
 												<th></th>
 											{/if}
-											<th>{l s='Room num' mod='hotelreservationsystem'}</th>
+											<th>{l s='Stay num' mod='hotelreservationsystem'}</th>
 											<th>{l s='Room type' mod='hotelreservationsystem'}</th>
-											<th>{l s='Hotel' mod='hotelreservationsystem'}</th>
+											<th>{l s='Property' mod='hotelreservationsystem'}</th>
 											<th>{l s='Duration' mod='hotelreservationsystem'}</th>
 											<th>{l s='Total cost (tax incl.)' mod='hotelreservationsystem'}</th>
 											<th>{l s='Total paid amount (tax incl.)' mod='hotelreservationsystem'}</th>
 											{if !$isRefundCompleted}
-												<th>{l s='Rooms cancelation charges' mod='hotelreservationsystem'}</th>
+												<th>{l s='Stays cancelation charges' mod='hotelreservationsystem'}</th>
 											{/if}
 											{if $hasOrderDiscountOrPayment || $isRefundCompleted}
 												<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
@@ -173,7 +173,7 @@
 													{displayPrice price=($booking['total_price_tax_incl'] + $booking['extra_service_total_price_tax_incl']) currency=$orderCurrency['id']}
 													{capture name='refund_total_tooltip'}
 														<div>
-															<label>{l s='Room cost:' mod='hotelreservationsystem'}</label>
+															<label>{l s='%s cost:' sprintf=$booking.selling_object_name mod='hotelreservationsystem'}</label>
 															<span class="pull-right">{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</span>
 														</div>
 														<div>
@@ -187,7 +187,7 @@
 													{displayPrice price=($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount']) currency=$orderCurrency['id']}
 													{capture name='refund_paid_tooltip'}
 														<div>
-															<label>{l s='Room paid amount:' mod='hotelreservationsystem'}</label>
+															<label>{l s='%s paid amount:' sprintf=$booking.selling_object_name mod='hotelreservationsystem'}</label>
 															<span class="pull-right">{displayPrice price=$booking['room_paid_amount'] currency=$orderCurrency['id']}</span>
 														</div>
 														<div>

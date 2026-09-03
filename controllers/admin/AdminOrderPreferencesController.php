@@ -96,7 +96,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                     'PS_MIN_BOOKING_OFFSET' => array(
                         'title' => $this->l('Minimum booking offset'),
-                        'hint' => $this->l('The minimum booking offset is the minimum number of days before the check-in date that a guest must book a room. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book rooms for dates from and after 3 days, i.e, 5th of March.'),
+                        'hint' => $this->l('The minimum booking offset is the minimum number of days before the check-in date that a guest must book a stay. For example, if you set this value to 3 and someone is booking on 2nd of March he can only book stays for dates from and after 3 days, i.e, 5th of March.'),
                         'desc' => $this->l('Set to 0 to disable this feature.'),
                         'type' => 'text',
                         'class' => 'fixed-width-xl',
@@ -187,9 +187,9 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'cast' => 'intval'
                     ),
                     'PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN' => array(
-                        'title' => $this->l('Show room price breakdown'),
-                        'hint' => $this->l('Show price breakdown for rooms with auto added services on checkout page.'),
-                        'desc' => $this->l('Displays a price breakdown for rooms that have auto-added services during checkout.'),
+                        'title' => $this->l('Show stay price breakdown'),
+                        'hint' => $this->l('Show price breakdown for stays with auto added services on checkout page.'),
+                        'desc' => $this->l('Displays a price breakdown for stays that have auto-added services during checkout.'),
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
@@ -311,8 +311,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                     ),
                     'PS_OVERBOOKING_AUTO_RESOLVE' => array(
                         'title' => $this->l('Resolve overbooking automatically'),
-                        'hint' => $this->l('Enable, if you want to resolve overbooking automatically when rooms are available to be replaced with overbooked rooms.'),
-                        'desc' => $this->l('If enabled, the overbookings in the order will be resolved automatically when rooms are available to be replaced with all overbooked rooms in the order.'),
+                        'hint' => $this->l('Enable, if you want to resolve overbooking automatically when stays are available to be replaced with overbooked stays.'),
+                        'desc' => $this->l('If enabled, the overbookings in the order will be resolved automatically when stays are available to be replaced with all overbooked stays in the order.'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'type' => 'bool'
@@ -330,7 +330,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                 ),
                 array(
                     'value' => Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_HOTEL,
-                    'name' => $this->l('Hotel Address')
+                    'name' => $this->l('Property Address')
                 ),
                 array(
                     'value' => Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOM,
@@ -374,8 +374,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'identifier' => 'value',
                         'js' => "changeStandardProductAddressType()",
                         'hint' => $this->l('Select address for standard product tax calculation, this will be used to calculate the tax for the standard product price.'),
-                        'desc' => $this->l('The selected address will be used to calculate tax for standard products. To change the hotel address, update the "Primary Hotel" in the').
-                        '<a href="'.$this->context->link->getAdminLink('AdminHotelGeneralSettings').'"> '.$this->l('Hotel General Configuration.').'</a>'
+                        'desc' => $this->l('The selected address will be used to calculate tax for standard products. To change the property address, update the "Primary Property" in the').
+                        '<a href="'.$this->context->link->getAdminLink('AdminHotelGeneralSettings').'"> '.$this->l('Property General Configuration.').'</a>'
                     ),
                     'PS_STANDARD_PRODUCT_ORDER_ADDRESS' => array(
                         'title' => $this->l('Custom address for tax calculation'),

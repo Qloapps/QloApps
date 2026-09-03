@@ -44,6 +44,7 @@ require_once 'classes/HotelRoomTypeRestrictionDateRange.php';
 
 require_once 'classes/HotelRoomDisableDates.php';
 require_once 'classes/HotelBranchRefundRules.php';
+require_once 'classes/HotelPropertyType.php';
 require_once 'classes/HotelConnectedRoom.php';
 
 // linked products

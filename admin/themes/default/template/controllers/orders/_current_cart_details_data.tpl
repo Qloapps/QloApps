@@ -33,8 +33,8 @@
 				{if isset($cart_detail_data) && $cart_detail_data}
 					<thead>
 						<tr>
-							<th><span class="title_box">{l s='Room No.'}</span></th>
-							<th><span class="title_box">{l s='Room Image'}</th>
+							<th><span class="title_box">{l s='Stay No.'}</span></th>
+							<th><span class="title_box">{l s='Stay Image'}</th>
 							<th><span class="title_box">{l s='Room Type'}</span></th>
 							<th><span class="title_box">{l s='Duration'}</span></th>
 							{if $occupancy_required_for_booking}
@@ -42,7 +42,7 @@
 						{/if}
 						<th><span class="title_box">{l s='Unit Price (tax excl)'}</span></th>
 							<th><span class="title_box">{l s='Extra Services / Fees (tax excl)'}</span></th>
-							{* <th><span class="title_box">{l s='Total Rooms Price (tax excl)'}</span></th> *}
+							{* <th><span class="title_box">{l s='Total Stays Price (tax excl)'}</span></th> *}
 							<th><span class="title_box">{l s='Total Price (tax excl)'}</span></th>
 							<th></th>
 						</tr>
@@ -57,7 +57,7 @@
 								{/if}
 
 								{hook h='displayRoomNumAfter' data=$data type='adminOrder'}</td>
-								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Room image" /></td>
+								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Stay image" /></td>
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
 								</td>
@@ -77,7 +77,7 @@
 													<input type="hidden" class="max_children" value="{if isset($data['room_type_info'])}{$data['room_type_info']['max_children']|escape:'html':'UTF-8'}{/if}">
 													<input type="hidden" class="max_guests" value="{if isset($data['room_type_info'])}{$data['room_type_info']['max_guests']|escape:'html':'UTF-8'}{/if}">
 													<div class="occupancy_info_block selected" occ_block_index="0">
-														<div class="occupancy_info_head col-sm-12"><span class="room_num_wrapper">{l s='Room - 1'}</span></div>
+														<div class="occupancy_info_head col-sm-12"><span class="room_num_wrapper">{l s='Stay - 1'}</span></div>
 														<div class="row">
 															<div class="col-xs-6 occupancy_count_block">
 																<div class="col-sm-12">

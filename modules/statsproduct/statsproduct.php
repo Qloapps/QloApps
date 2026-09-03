@@ -308,7 +308,7 @@ class StatsProduct extends ModuleGraph
 							<span class="title_box active">'.$this->l('Room type name').'</span>
 						</th>
 						<th>
-							<span class="title_box text-center active">'.$this->l('Total rooms').'</span>
+							<span class="title_box text-center active">'.$this->l('Total stays').'</span>
 						</th>
 						<th>
 							<span class="title_box text-center active">'.$this->l('Action').'</span>
@@ -356,9 +356,9 @@ class StatsProduct extends ModuleGraph
                 if (Tools::getValue('export')) {
                     $this->_titles['main'][] = $this->l('Date');
                 }
-                $this->_titles['main'][] = $this->l('Room nights');
+                $this->_titles['main'][] = $this->l('Stay nights');
                 $this->_titles['main'][] = $this->l('Views (x100)');
-                $this->_titles['y'] = $this->l('Room nights, Views (x100)');
+                $this->_titles['y'] = $this->l('Stay nights, Views (x100)');
                 $this->_formats['y'] = 'd';
 
                 $this->query[0] = 'SELECT o.`date_add`, SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total
@@ -400,7 +400,7 @@ class StatsProduct extends ModuleGraph
             case 42:
                 $this->_titles['main'][0] = $this->l('ID');
                 $this->_titles['main'][1] = $this->l('Room type name');
-                $this->_titles['main'][2] = $this->l('Total Rooms');
+                $this->_titles['main'][2] = $this->l('Total Stays');
                 break;
         }
     }

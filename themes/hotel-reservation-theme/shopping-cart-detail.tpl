@@ -23,7 +23,7 @@
 <div class="order-detail-content">
     {if isset($cart_htl_data) && $cart_htl_data}
         {block name='shopping_cart_heading'}
-            <p class="cart_section_title">{l s='rooms information'}</p>
+            <p class="cart_section_title">{l s='stays information'}</p>
         {/block}
         {foreach from=$cart_htl_data key=data_k item=data_v}
             {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
@@ -101,10 +101,23 @@
                                     <p class="room_duration_block_value">{$rm_v['data_to']|date_format:"%d %b, %a"}{if $is_full_date} {$rm_v['data_to']|date_format:"%H:%M"}{/if}</p>
                                 </div>
                                 <div class="col-sm-6 col-xs-6">
-                                    <p class="room_duration_block_head">{l s='OCCUPANCY'}</p>
-                                    <p class="room_duration_block_value">
-                                        {if {$rm_v['adults']} <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {l s='Rooms'}{else} {l s='Room'}{/if}
-                                    </p>
+                                    {if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
+                                        <p class="room_duration_block_head">{l s='OCCUPANCY'}</p>
+                                        <p class="room_duration_block_value">
+                                            {if {$rm_v['adults']} <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {$data_v['selling_object_plural_name']|escape:'html':'UTF-8'}{else} {$data_v['selling_object_name']|escape:'html':'UTF-8'}{/if}
+                                        </p>
+                                    {else}
+                                        <p class="room_duration_block_head">{l s='QUANTITY'}</p>
+                                        <p class="room_duration_block_value">
+                                            {if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']}
+                                            {if $rm_v['num_rm'] > 1}
+                                                {$data_v['selling_object_plural_name']|escape:'html':'UTF-8'}
+                                            {else}
+                                                {$data_v['selling_object_name']|escape:'html':'UTF-8'}
+                                            {/if}                                        
+                                        </p>
+                                    {/if}
+
                                 </div>
                             </div>
                         {/block}
@@ -130,14 +143,14 @@
                                                             </span>
                                                             <div class="room-price-detail-container" style="display: none;">
                                                                 <div class="room-price-detail-tooltip-cont">
-                                                                    <div><label>{l s='Room price'}</label> : {displayPrice price=($rm_v['amount_without_auto_add'])}</div>
+                                                                    <div><label>{l s='Stay price'}</label> : {displayPrice price=($rm_v['amount_without_auto_add'])}</div>
                                                                     <div><label>{l s='Additional charges'}</label> : {displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</div>
                                                                 </div>
                                                             </div>
                                                         {/if}
                                                     </p>
                                                     <p class="total_price_detial">
-                                                        {l s='Total rooms price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                                        {l s='Total %s price' sprintf=$data_v['selling_object_plural_name']|escape:'html':'UTF-8'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                                     </p>
                                                 </div>
                                             </div>
