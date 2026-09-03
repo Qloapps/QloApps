@@ -112,7 +112,6 @@ class AdminProductsControllerCore extends AdminController
             'Configuration' => $this->l('Rooms'),
             'Occupancy' => $this->l('Occupancy'),
             'LengthOfStay' => $this->l('Length of Stay'),
-            'AdditionalFacilities' => $this->l('Additional Facilities'),
         );
 
         if ($this->context->shop->getContext() != Shop::CONTEXT_GROUP) {
@@ -128,7 +127,6 @@ class AdminProductsControllerCore extends AdminController
                 'Occupancy' => 8,
                 'ServiceProduct' => 9,
                 'LengthOfStay' => 10,
-                'AdditionalFacilities' => 11,
             ));
         }
 
@@ -232,7 +230,6 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
 				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)
 				LEFT JOIN `'._DB_PREFIX_.'feature_product` fp ON (fp.`id_product` = a.`id_product`)
-				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtd ON (hrtd.`id_product` = a.`id_product`)
 				LEFT JOIN (
                     SELECT rsp.*, GROUP_CONCAT(pl.`name`) AS service_products
                     FROM `'._DB_PREFIX_.'htl_room_type_service_product` rsp
@@ -432,23 +429,6 @@ class AdminProductsControllerCore extends AdminController
             'operator' => 'and',
             'filter_key' => 'hrtsp!id_product',
             'list' => $serviceProducts,
-            'displayed' => false,
-        );
-
-        $additionalFacilities = array();
-        $objHotelRoomTypeGlobalDemand = new HotelRoomTypeGlobalDemand();
-        $demands = $objHotelRoomTypeGlobalDemand->getAllDemands();
-        foreach ($demands as $demand) {
-            $additionalFacilities[$demand['id_global_demand']] = $demand['name'];
-        }
-        $this->fields_list['id_global_demand'] = array(
-            'title' => $this->l('Additional Facilities'),
-            'align' => 'text-center',
-            'type' => 'select',
-            'multiple' => true,
-            'operator' => 'and',
-            'filter_key' => 'hrtd!id_global_demand',
-            'list' => $additionalFacilities,
             'displayed' => false,
         );
 
@@ -671,7 +651,7 @@ class AdminProductsControllerCore extends AdminController
             $orderWay = 'ASC';
         }
         if ($this->action == 'export' && empty($this->_listsql)) {
-            $this->_select .= ' , trg.`name` AS `id_tax_rules_group`, `features`, hrtdl.`global_demands`';
+            $this->_select .= ' , trg.`name` AS `id_tax_rules_group`, `features`';
             $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'tax_rules_group` trg
                 ON trg.`id_tax_rules_group` = a.`id_tax_rules_group`
                 LEFT JOIN (SELECT GROUP_CONCAT(fpl.`name`) AS features, fp.`id_product`
@@ -681,14 +661,6 @@ class AdminProductsControllerCore extends AdminController
                     WHERE fpl.`id_lang`='.(int) $this->context->language->id.'
                     GROUP BY fp.`id_product`
                 ) AS fpl ON (a.`id_product` = fpl.`id_product`)';
-
-            $this->_join .= ' LEFT JOIN (SELECT hrtgd.`id_product`, `id_lang`, GROUP_CONCAT(`name`) AS `global_demands`
-                    FROM `'._DB_PREFIX_.'htl_room_type_global_demand_lang` hrtgdl
-                    LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtgd
-                    ON hrtgd.`id_global_demand` = hrtgdl.`id_global_demand`
-                    WHERE `id_lang`='.(int) $this->context->language->id.'
-                    GROUP BY hrtgd.`id_product`
-                ) AS hrtdl ON (hrtdl.`id_product` = a.`id_product`)';
 
             $this->fields_list = array_merge($this->fields_list, array(
                    'id_tax_rules_group' => array(
@@ -701,14 +673,10 @@ class AdminProductsControllerCore extends AdminController
                     'service_products' => array(
                         'title' => $this->l('Services Products'),
                     ),
-                    'global_demands' => array(
-                        'title' => $this->l('Additional Facilities'),
-                    )
                 )
             );
 
             unset($this->fields_list['id_category_default']);
-            unset($this->fields_list['id_global_demand']);
             unset($this->fields_list['id_feature']);
             unset($this->fields_list['id_service_product']);
         }
@@ -966,11 +934,6 @@ class AdminProductsControllerCore extends AdminController
                             $id_hotel_new
                         )) {
                             $this->errors[] = Tools::displayError('An error occurred while duplicating rooms.');
-                        }
-                        if (!HotelRoomTypeDemand::duplicateRoomTypeDemands($id_product_old, $product->id)) {
-                            $this->errors[] = Tools::displayError(
-                                'An error occurred while duplicating additional facilities.'
-                            );
                         }
                     } else {
                         $this->errors[] = Tools::displayError('An error occurred while duplicating room type.');
@@ -2260,9 +2223,6 @@ class AdminProductsControllerCore extends AdminController
                         }
                         if ($this->isTabSubmitted('Configuration')) {
                             $this->processConfiguration();
-                        }
-                        if ($this->isTabSubmitted('AdditionalFacilities')) {
-                            $this->processAdditionalFacilities();
                         }
 
                         // $this->updatePackItems($object);
@@ -3832,136 +3792,6 @@ class AdminProductsControllerCore extends AdminController
             $response['errors'] = $this->errors;
         }
         die(json_encode($response));
-    }
-
-    public function initFormAdditionalFacilities($obj)
-    {
-        $data = $this->createTemplate($this->tpl_form);
-
-        if ($obj->id) {
-            $objGlobalDemand = new HotelRoomTypeGlobalDemand();
-            $allDemands = $objGlobalDemand->getAllDemands();
-            foreach($allDemands as &$demand) {
-                if ($demand['id_tax_rules_group'] == 0) {
-                    $demand['default_tax_rules_group_name'] = 'No tax';
-                } else {
-                    $objTaxRuleGroup = new TaxRulesGroup(
-                        $demand['id_tax_rules_group'],
-                        $this->context->language->id
-                    );
-                    $demand['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
-                }
-            }
-            $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-
-            // get room type additional facilities
-            $objRoomDemand = new HotelRoomTypeDemand();
-            $selectedDemands = $objRoomDemand->getRoomTypeDemands($obj->id, 0, 0);
-
-            $data->assign(array(
-                'product' => $obj,
-                'selectedDemands' => $selectedDemands,
-                'allDemands' => $allDemands,
-                'defaultcurrencySign' => $objCurrency->sign,
-                'idDefaultcurrency' => $objCurrency->id,
-            ));
-        } else {
-            $this->displayWarning($this->l('You must save this room type before managing additional facilities.'));
-        }
-
-        $this->tpl_form_vars['custom_form'] = $data->fetch();
-    }
-
-    public function processAdditionalFacilities()
-    {
-        if ($idProduct = Tools::getValue('id_product')) {
-            $errors = array();
-            $objRoomTypeDemand = new HotelRoomTypeDemand();
-            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-            // first delete all the previously saved prices and demands of this room type
-            $objRoomTypeDemand->deleteRoomTypeDemands($idProduct);
-            $objRoomTypeDemandPrice->deleteRoomTypeDemandPrices($idProduct);
-            if ($selectedDemands = Tools::getValue('selected_demand')) {
-                $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
-                foreach ($selectedDemands as $idGlobalDemand) {
-                    if (Validate::isLoadedObject($objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand))) {
-                        // save selected demands for this room type
-                        $objRoomTypeDemand = new HotelRoomTypeDemand();
-                        $objRoomTypeDemand->id_product = $idProduct;
-                        $objRoomTypeDemand->id_global_demand = $idGlobalDemand;
-                        $objRoomTypeDemand->save();
-
-                        // save selected demands prices for this room type
-                        $demandPrice = Tools::getValue('demand_price_'.$idGlobalDemand);
-                        if (Validate::isPrice($demandPrice)) {
-                            if ($objGlobalDemand->price != $demandPrice) {
-                                $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                                $objRoomTypeDemandPrice->id_product = $idProduct;
-                                $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
-                                $objRoomTypeDemandPrice->id_option = 0;
-                                $objRoomTypeDemandPrice->price = $demandPrice;
-                                $objRoomTypeDemandPrice->save();
-                            }
-                        } else {
-                            $errors[] = Tools::displayError('Invalid demand price of facility.').
-                            ' : '.$objGlobalDemand->name[$this->context->language->id];
-                        }
-                        if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand)) {
-                            foreach ($advOptions as $option) {
-                                if (Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($option['id']))) {
-                                    $optionPrice = Tools::getValue('option_price_'.$option['id']);
-                                    if (Validate::isPrice($optionPrice)) {
-                                        if ($optionPrice != $objAdvOption->price) {
-                                            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                                            $objRoomTypeDemandPrice->id_product = $idProduct;
-                                            $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
-                                            $objRoomTypeDemandPrice->id_option = $option['id'];
-                                            $objRoomTypeDemandPrice->price = $optionPrice;
-                                            $objRoomTypeDemandPrice->save();
-                                        }
-                                    } else {
-                                        $errors[] = Tools::displayError('Invalid price of advanced option: ').$objAdvOption->name[$this->context->language->id];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (count($errors)) {
-                    $this->warnings[] = Tools::displayError('Invalid price values for additional facilities were not saved. Please correct them and try again.');
-                    $this->errors = array_merge($this->errors, $errors);
-                }
-
-                $objCartBookingData = new HotelCartBookingData();
-                if ($cartExtraDemands = $objCartBookingData->getCartExtraDemands(0, $idProduct)) {
-                    // delete the demands from cart if not available in cart
-                    $objRoomDemand = new HotelRoomTypeDemand();
-                    $roomTypeDemandIds = array();
-                    if ($roomTypeDemands = $objRoomDemand->getRoomTypeDemands($idProduct)) {
-                        $roomTypeDemandIds = array_keys($roomTypeDemands);
-                    }
-                    foreach ($cartExtraDemands as &$demandInfo) {
-                        if (isset($demandInfo['extra_demands']) && $demandInfo['extra_demands']) {
-                            $cartChanged = 0;
-                            foreach ($demandInfo['extra_demands'] as $key => $demand) {
-                                if (!in_array($demand['id_global_demand'], $roomTypeDemandIds)) {
-                                    $cartChanged = 1;
-                                    unset($demandInfo['extra_demands'][$key]);
-                                }
-                            }
-                            if ($cartChanged) {
-                                if (Validate::isLoadedObject(
-                                    $objCartBooking = new HotelCartBookingData($demandInfo['id'])
-                                )) {
-                                    $objCartBooking->extra_demands = json_encode($demandInfo['extra_demands']);
-                                    $objCartBooking->save();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     /**
