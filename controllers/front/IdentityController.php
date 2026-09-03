@@ -63,6 +63,10 @@ class IdentityControllerCore extends FrontController
                 }
             }
 
+            if (Configuration::get('PS_CUSTOMER_NATIONALITY') && Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY') && !Tools::getValue('id_nationality')) {
+                $this->errors[] = Tools::displayError('Nationality is required.');
+            }
+
             if (Tools::getIsset('old_passwd')) {
                 $old_passwd = trim(Tools::getValue('old_passwd'));
             }
@@ -91,6 +95,7 @@ class IdentityControllerCore extends FrontController
 
             if (!count($this->errors)) {
                 $this->customer->phone = $phone;
+                $this->customer->id_country = (int)Tools::getValue('id_nationality');
                 $this->customer->id_default_group = (int)$prev_id_default_group;
                 $this->customer->firstname = Tools::ucwords($this->customer->firstname);
 
@@ -127,6 +132,7 @@ class IdentityControllerCore extends FrontController
         } else {
             $_POST = array_map('stripslashes', $this->customer->getFields());
             $_POST['phone'] = $this->customer->phone;
+            $_POST['id_nationality'] = $this->customer->id_country;
         }
 
         return $this->customer;
@@ -167,6 +173,9 @@ class IdentityControllerCore extends FrontController
 
         $newsletter = Configuration::get('PS_CUSTOMER_NWSL') || (Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active);
         $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
+        $this->context->smarty->assign('nationality', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY'));
+        $this->context->smarty->assign('nationality_mandatory', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY'));
+        $this->context->smarty->assign('nationality_countries', Customer::getNationalities($this->context->language->id));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
 

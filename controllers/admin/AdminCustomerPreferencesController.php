@@ -107,6 +107,20 @@ class AdminCustomerPreferencesControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
+                    'PS_CUSTOMER_NATIONALITY' => array(
+                        'title' => $this->l('Enable nationality'),
+                        'hint' => $this->l('Display or not the nationality field.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
+                    'PS_CUSTOMER_NATIONALITY_MANDATORY' => array(
+                        'title' => $this->l('Nationality is mandatory'),
+                        'hint' => $this->l('If you choose yes, your customer will have to select their nationality.'),
+                        'validation' => 'isBool',
+                        'cast' => 'intval',
+                        'type' => 'bool'
+                    ),
                     'PS_CUSTOMER_NWSL' => array(
                         'title' => $this->l('Enable newsletter registration'),
                         'hint' => $this->l('Display or not the newsletter registration tick box.'),

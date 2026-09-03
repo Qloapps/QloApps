@@ -3,7 +3,7 @@
         'name' => 'qloapps/qlocrontaskmanager',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => 'f7d1d629ca72fc5ffd3349dea2877013367cea81',
+        'reference' => '8d04d350b83cd28b5d141bf0cb287d4ba95de7d0',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'dragonmantank/cron-expression' => array(
-            'pretty_version' => 'v3.6.0',
-            'version' => '3.6.0.0',
-            'reference' => 'd61a8a9604ec1f8c3d150d09db6ce98b32675013',
+            'pretty_version' => 'v3.5.0',
+            'version' => '3.5.0.0',
+            'reference' => '1b2de7f4a468165dca07b142240733a1973e766d',
             'type' => 'library',
             'install_path' => __DIR__ . '/../dragonmantank/cron-expression',
             'aliases' => array(),
@@ -28,7 +28,7 @@
         'qloapps/qlocrontaskmanager' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => 'f7d1d629ca72fc5ffd3349dea2877013367cea81',
+            'reference' => '8d04d350b83cd28b5d141bf0cb287d4ba95de7d0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

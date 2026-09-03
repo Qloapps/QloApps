@@ -328,8 +328,8 @@
                                         {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                                         {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
 
-                                        {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_te)}
-                                        {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_ti)}
+                                        {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE))}
+                                        {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE))}
 
                                         {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl ))}
 
@@ -746,8 +746,8 @@
                                         {assign var=room_price_tax_excl value=$order->getTotalProductsWithoutTaxes(false, true)}
                                         {assign var=room_price_tax_incl value=$order->getTotalProductsWithTaxes(false, true)}
 
-                                        {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_te)}
-                                        {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) + $total_demands_price_ti)}
+                                        {assign var=room_services_price_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE))}
+                                        {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE))}
 
                                         {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
                                         {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
@@ -1005,9 +1005,7 @@
 
                                                                             {* Services are indexed with id_htl_booking *}
                                                                             {assign var='has_services' value=(isset($rm_v.additional_services) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]) && isset($rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services']))}
-                                                                            {* Additional Facilities are indexed with id_room *}
-                                                                            {assign var='has_facilities' value=(isset($rm_v.extra_demands) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]) && isset($rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands']))}
-                                                                            {if $has_services || $has_facilities}
+                                                                            {if $has_services}
                                                                                 <div class="extra-services-wrap clearfix">
                                                                                     {if $has_services}
                                                                                         <div class="services-wrap clearfix">
@@ -1017,18 +1015,6 @@
                                                                                             <div class="col-xs-9">
                                                                                                 {foreach from=$rm_v.additional_services[$hotel_booking_detail.id_htl_booking]['additional_services'] item=service}
                                                                                                     <span class="service">{$service.name}</span>
-                                                                                                {/foreach}
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    {/if}
-                                                                                    {if $has_facilities}
-                                                                                        <div class="facilities-wrap clearfix">
-                                                                                            <div class="col-xs-3">
-                                                                                                <strong>{l s='Facilities'}</strong>
-                                                                                            </div>
-                                                                                            <div class="col-xs-9">
-                                                                                                {foreach from=$rm_v.extra_demands[$hotel_booking_detail.id_room]['extra_demands'] item=facility}
-                                                                                                    <span class="facility">{$facility.name}</span>
                                                                                                 {/foreach}
                                                                                             </div>
                                                                                         </div>
