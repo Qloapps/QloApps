@@ -1182,6 +1182,7 @@ CREATE TABLE `PREFIX_orders` (
   `invoice_date` datetime NOT NULL,
   `delivery_date` datetime NOT NULL,
   `source` varchar(255) DEFAULT NULL,
+  `id_source` int(10) unsigned DEFAULT NULL,
   `valid` int(1) unsigned NOT NULL DEFAULT '0',
   `is_advance_payment` tinyint(1) NOT NULL DEFAULT '0',
   `advance_paid_amount` decimal(20,6) NOT NULL DEFAULT '0.00',
@@ -1201,6 +1202,7 @@ CREATE TABLE `PREFIX_orders` (
   KEY `id_shop_group` (`id_shop_group`),
   KEY (`current_state`),
   KEY `id_shop` (`id_shop`),
+  KEY `id_source` (`id_source`),
   INDEX `date_add`(`date_add`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
@@ -1887,6 +1889,48 @@ CREATE TABLE `PREFIX_search_word` (
   PRIMARY KEY (`id_word`),
   UNIQUE KEY `id_lang` (`id_lang`,`id_shop`, `word`)
 ) ENGINE=ENGINE_TYPE  DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_business_source` (
+  `id_business_source` int(10) unsigned NOT NULL auto_increment,
+  `code` varchar(64) NOT NULL,
+  `position` int(10) unsigned NOT NULL DEFAULT '0',
+  `unremovable` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `active` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
+  `deleted` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  PRIMARY KEY (`id_business_source`),
+  UNIQUE KEY `code` (`code`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_business_source_lang` (
+  `id_business_source` int(10) unsigned NOT NULL,
+  `id_lang` int(10) unsigned NOT NULL,
+  `name` varchar(64) NOT NULL,
+  PRIMARY KEY (`id_business_source`,`id_lang`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_source` (
+  `id_source` int(10) unsigned NOT NULL auto_increment,
+  `id_business_source` int(10) unsigned NOT NULL,
+  `code` varchar(64) NOT NULL,
+  `position` int(10) unsigned NOT NULL DEFAULT '0',
+  `unremovable` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `active` tinyint(1) UNSIGNED NOT NULL DEFAULT '1',
+  `deleted` tinyint(1) UNSIGNED NOT NULL DEFAULT '0',
+  `date_add` datetime NOT NULL,
+  `date_upd` datetime NOT NULL,
+  PRIMARY KEY (`id_source`),
+  UNIQUE KEY `code` (`code`),
+  KEY `id_business_source` (`id_business_source`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_source_lang` (
+  `id_source` int(10) unsigned NOT NULL,
+  `id_lang` int(10) unsigned NOT NULL,
+  `name` varchar(64) NOT NULL,
+  PRIMARY KEY (`id_source`,`id_lang`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_specific_price` (
 	`id_specific_price` INT UNSIGNED NOT NULL AUTO_INCREMENT,

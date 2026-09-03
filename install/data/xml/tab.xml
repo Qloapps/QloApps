@@ -117,6 +117,9 @@
     <tab id="Statuses" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminStatuses</class_name>
     </tab>
+    <tab id="Sources" id_parent="Orders" active="1" hide_host_mode="0">
+      <class_name>AdminSources</class_name>
+    </tab>
     <tab id="Order_Messages" id_parent="Orders" active="1" hide_host_mode="0">
       <class_name>AdminOrderMessage</class_name>
     </tab>

@@ -357,6 +357,13 @@ abstract class PaymentModuleCore extends Module
                         $order->source = Configuration::get('PS_SHOP_DOMAIN');
                     }
 
+                    // Booking Source (business categorization, e.g. Direct Website/Walk-in/OTA) —
+                    if (isset($this->idBookingSource) && $this->idBookingSource) {
+                        $order->id_source = (int)$this->idBookingSource;
+                    } else {
+                        $order->id_source = (int)Source::getDefaultSourceId();
+                    }
+
                     if (self::DEBUG_MODE) {
                         PrestaShopLogger::addLog('PaymentModule::validateOrder - Order is about to be added', 1, null, 'Cart', (int)$id_cart, true);
                     }

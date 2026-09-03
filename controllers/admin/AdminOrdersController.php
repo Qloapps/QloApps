@@ -33,6 +33,7 @@ class AdminOrdersControllerCore extends AdminController
 
     protected $statuses_array = array();
     protected $all_order_sources = array();
+    protected $bookingSourcesArray = array();
     protected $hotelsArray = array();
     protected $roomTypesArray = array();
     protected $roomsArray = array();
@@ -75,6 +76,10 @@ class AdminOrdersControllerCore extends AdminController
         (SELECT GROUP_CONCAT(CONCAT(ps.period, \'~\', ps.cnt) ORDER BY ps.period SEPARATOR \'::\') FROM (SELECT CONCAT(hbd.`date_from`, \'|\', hbd.`date_to`) AS period, COUNT(*) AS cnt FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order` GROUP BY hbd.`date_from`, hbd.`date_to`) AS ps) AS stay_periods,
         (SELECT COUNT(spod.`id_service_product_order_detail`) FROM `'._DB_PREFIX_.'service_product_order_detail` spod WHERE spod.`id_order` = a.`id_order` AND spod.`id_htl_booking_detail`=0) as num_products';
 
+        $this->_select .= ',
+        (SELECT sl.`name` FROM `'._DB_PREFIX_.'source` s LEFT JOIN `'._DB_PREFIX_.'source_lang` sl ON (sl.`id_source` = s.`id_source` AND sl.`id_lang` = '.(int)$this->context->language->id.') WHERE s.`id_source` = a.`id_source`) AS `booking_source_name`,
+        (SELECT s.`code` FROM `'._DB_PREFIX_.'source` s WHERE s.`id_source` = a.`id_source`) AS `booking_source_code`';
+
         $this->_join = '
         LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = a.`id_customer`)
         LEFT JOIN `'._DB_PREFIX_.'currency` cu ON (cu.`id_currency` = a.`id_currency`)
@@ -113,6 +118,9 @@ class AdminOrdersControllerCore extends AdminController
         $all_order_sources = Db::getInstance()->executeS('SELECT DISTINCT(`source`) FROM  `'._DB_PREFIX_.'orders`');
         foreach ($all_order_sources as $source) {
             $this->all_order_sources[$source['source']] = $source['source'];
+        }
+        foreach (Source::getSourcesUsedInOrders((int)$this->context->language->id) as $bookingSource) {
+            $this->bookingSourcesArray[$bookingSource['id_source']] = $bookingSource['name'];
         }
 
         $hotelsArray = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1);
@@ -280,6 +288,15 @@ class AdminOrdersControllerCore extends AdminController
                 'filter_key' => 'a!source',
                 'list' => $this->all_order_sources,
                 'optional' => true,
+            ),
+            'booking_source_name' => array(
+                'title' => $this->l('Booking Source'),
+                'type' => 'select',
+                'filter_key' => 'a!id_source',
+                'list' => $this->bookingSourcesArray,
+                'orderby' => false,
+                'callback' => 'formatBookingSource',
+                'optional' => true,
                 'visible_default' => true
             ),
             'osname' => array(
@@ -367,6 +384,15 @@ class AdminOrdersControllerCore extends AdminController
             $idCurrency = $row['id_currency'];
         }
         return Tools::displayPrice($echo, (int)$idCurrency);
+    }
+
+    public function formatBookingSource($echo, $row)
+    {
+        if (!$echo) {
+            return '--';
+        }
+
+        return Tools::safeOutput($echo);
     }
 
     public function formatStayPeriods($value, $row)
@@ -567,6 +593,7 @@ class AdminOrdersControllerCore extends AdminController
                     'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
                     'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
                     'occupancy_required_for_booking' => $occupancyRequiredForBooking,
+                    'booking_sources' => Source::getAllSource(true, (int)$this->context->language->id),
                 ));
 
             } else {
@@ -2195,6 +2222,14 @@ class AdminOrdersControllerCore extends AdminController
                         $advancePaymentAmount = $objCart->getOrderTotal(true, Cart::ADVANCE_PAYMENT);
                     }
 
+                    $idBookingSource = (int)Tools::getValue('id_booking_source');
+                    if ($idBookingSource) {
+                        $objBookingSource = new Source($idBookingSource);
+                        if (!Validate::isLoadedObject($objBookingSource) || !$objBookingSource->active) {
+                            $this->errors[] = Tools::displayError('Please select a valid Booking Source.');
+                        }
+                    }
+
                     // Validate data if required
                     if ($orderTotal > 0) {
                         $moduleName = trim(Tools::getValue('payment_module_name'));
@@ -2281,6 +2316,10 @@ class AdminOrdersControllerCore extends AdminController
 
                             // Set transaction ID
                             $extraVars = null;
+                        }
+
+                        if ($idBookingSource) {
+                            $objPaymentModule->idBookingSource = $idBookingSource;
                         }
 
                         $amountPaid = Tools::ps_round($amountPaid, 6);
@@ -2979,11 +3018,24 @@ class AdminOrdersControllerCore extends AdminController
             $helper->id = 'box-order-source';
             $helper->icon = 'icon-globe';
             $helper->color = 'color1';
+            $helper->visible = false;
             $helper->title = $this->l('Order Source');
             $helper->tooltip = $this->l('Order source shows from which source the order was placed.');
             $helper->subtitle = $orderHistory[0]['id_employee'] ? $this->l('Back office') : $this->l('Front office');
             $helper->value = $objOrder->source;
             $this->kpis[] = $helper;
+
+            $objBookingSource = new Source((int)$objOrder->id_source, $this->context->language->id);
+            if (Validate::isLoadedObject($objBookingSource)) {
+                $helper = new HelperKpi();
+                $helper->id = 'box-booking-source';
+                $helper->icon = 'icon-tag';
+                $helper->color = 'color2';
+                $helper->title = $this->l('Booking Source');
+                $helper->tooltip = $this->l('Booking source shows the source from which this booking originated, e.g. Walk-in, Website, OTA.');
+                $helper->value = $objBookingSource->name;
+                $this->kpis[] = $helper;
+            }
 
             $objCustomerThread = new CustomerThread();
             $idCustomerThread = $objCustomerThread->getIdCustomerThreadByIdOrder($objOrder->id);

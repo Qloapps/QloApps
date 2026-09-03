@@ -271,6 +271,7 @@ class OrderCore extends ObjectModel
             'invoice_date' =>                array('type' => self::TYPE_DATE),
             'delivery_date' =>                array('type' => self::TYPE_DATE),
             'source' =>                        array('type' => self::TYPE_STRING),
+            'id_source' =>                    array('type' => self::TYPE_INT),
             'valid' =>                        array('type' => self::TYPE_BOOL),
             'reference' =>                    array('type' => self::TYPE_STRING),
             'is_advance_payment' =>         array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'default' => 0),
