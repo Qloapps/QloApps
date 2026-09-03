@@ -35,14 +35,11 @@
 
 				<div class="panel">
 					<div class="row">
-						<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12">
-							<img class="img-responsive" alt="QloApps Addons" src="themes/default/img/prestashop-addons-logo.png">
-						</div>
 						<div class="col-lg-4 col-lg-offset-1 col-md-4 col-sm-7 col-xs-12 addons-style-search-bar">
-							<form id="addons-search-form" method="get" action="http://addons.prestashop.com/{$iso_code}/search" class="float">
-							<label>{l s='Search on PrestaShop Marketplace:'}</label>
+							<form id="addons-search-form" method="get" action="https://qloapps.com/addons/" class="float">
+							<label>{l s='Search for QloApps Addons:'}</label>
 							<div class="input-group">
-								<input id="addons-search-box" class="form-control" type="text" autocomplete="off" name="query" value="" placeholder="Search on PrestaShop Marketplace">
+								<input id="addons-search-box" class="form-control" type="text" autocomplete="off" name="query" value="" placeholder="Search for QloApps Addons">
 								<div id="addons-search-btn" class="btn btn-primary input-group-addon">
 									<i class="icon-search"></i>
 								</div>
@@ -50,7 +47,7 @@
 							</form>
 						</div>
 						<div class="col-lg-3 col-md-4 col-sm-5 col-xs-12 addons-see-all-themes">
-							{l s='Or'}<a href="http://addons.prestashop.com/{$iso_code}/2-modules-prestashop" class="btn btn-primary" onclick="return !window.open(this.href)">{l s='See all modules'}</a>
+							{l s='Or'}<a href="https://qloapps.com/addons/" class="btn btn-primary" onclick="return !window.open(this.href)">{l s='See all modules'}</a>
 						</div>
 					</div>
 				</div>

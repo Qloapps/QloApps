@@ -32,7 +32,7 @@ $(document).ready(function()
 current_step = 0;
 function start_install()
 {
-	// If we are already installing PrestaShop, do not trigger action again
+	// If we are already installing QloApps, do not trigger action again
 	if (is_installing)
 		return;
 	is_installing = true;
