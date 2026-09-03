@@ -20,17 +20,14 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-{include file='controllers/orders/modals/_extra_services_facilities_tab_content.tpl'}
 {include file='controllers/orders/modals/_extra_services_service_products_tab_content.tpl'}
 
-{* Css for handling extra demands changes *}
+{* Css for handling extra services changes *}
 <style type="text/css">
-	/*Extra demands CSS*/
-	#edit_product .extra-services-container .room_demands_container,
+	/*Extra services CSS*/
+	#edit_product .extra-services-container .room_service_container,
 	#edit_product .extra-services-container .room_services_container {
 		display: none;}
-	#edit_product .extra-services-container #save_room_demands,
-	#edit_product .extra-services-container #back_to_demands_btn,
 	#edit_product .extra-services-container #save_service_service,
 	#edit_product .extra-services-container #back_to_service_btn {
 		display: none;}
