@@ -42,7 +42,7 @@
 										<div class="row accordion-section">
 											<div class="col-sm-12 additional_service_header">
 												<a class="accordion-section-title {if $roomCount == 1}active{/if}" href="#accordion_service_{$key|escape:'html':'UTF-8'}">
-													{l s='Room'} {$roomCount|escape:'html':'UTF-8'}&nbsp;
+													{$room_type_info['selling_object_name']} {$roomCount|escape:'html':'UTF-8'}&nbsp;
 													<span>({if {$cartRoom['adults']} <= 9}0{$cartRoom['adults']}{else}{$cartRoom['adults']}{/if} {if $cartRoom['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if {$cartRoom['children']} <= 9}0{$cartRoom['children']}{else}{$cartRoom['children']}{/if} {if $cartRoom['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if})</span>
 												</a>
 											</div>

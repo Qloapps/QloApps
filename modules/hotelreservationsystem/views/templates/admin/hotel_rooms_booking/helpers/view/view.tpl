@@ -75,7 +75,7 @@
 														<hr class="occupancy-info-separator col-sm-12">
 														{foreach from=$occupancy key=key item=$room_occupancy name=occupancyInfo}
 															<div class="occupancy_info_block" occ_block_index="{$key|escape:'htmlall':'UTF-8'}">
-																<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room' mod='hotelreservationsystem'} - {$countRoom|escape:'htmlall':'UTF-8'} </label>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove' mod='hotelreservationsystem'}</a>{/if}</div>
+																<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Stay' mod='hotelreservationsystem'} - {$countRoom|escape:'htmlall':'UTF-8'} </label>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove' mod='hotelreservationsystem'}</a>{/if}</div>
 																<div class="col-sm-12">
 																	<div class="row">
 																		<div class="form-group col-xs-6 occupancy_count_block">
@@ -117,7 +117,7 @@
 														{/foreach}
 													{else}
 														<div class="occupancy_info_block col-sm-12" occ_block_index="0">
-															<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Room - 1' mod='hotelreservationsystem'}</label></div>
+															<div class="occupancy_info_head col-sm-12"><label class="room_num_wrapper">{l s='Stay - 1' mod='hotelreservationsystem'}</label></div>
 															<div class="col-sm-12">
 																<div class="row">
 																	<div class="form-group col-xs-6 occupancy_count_block">
@@ -145,7 +145,7 @@
 													{/if}
 												</div>
 												<div class="add_occupancy_block col-sm-12">
-													<a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Room' mod='hotelreservationsystem'}</span></a>
+													<a class="add_new_occupancy_btn" href="#"><i class="icon-plus"></i> <span>{l s='Add Stay' mod='hotelreservationsystem'}</span></a>
 												</div>
 											</div>
 										</div>
