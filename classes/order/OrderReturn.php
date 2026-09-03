@@ -203,7 +203,6 @@ class OrderReturnCore extends ObjectModel
             }
 
             $objOrder = new Order($idOrder);
-            $objBookingDemands = new HotelBookingDemands();
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
 
             $calcServicePriceFirst = false;
@@ -230,31 +229,6 @@ class OrderReturnCore extends ObjectModel
                     $bookingRow['tourism_tax_applied_amount'] = 0;
                     $bookingRow['tourism_tax_paid_amount'] = 0;
 
-                    $roomSelectedDemands = $objBookingDemands->getRoomTypeBookingExtraDemands(
-                        $idOrder,
-                        $bookingRow['id_product'],
-                        $bookingRow['id_room'],
-                        $bookingRow['date_from'],
-                        $bookingRow['date_to'],
-                        0,
-                        0,
-                        1,
-                        $bookingRow['id']
-                    );
-                    if (count($roomSelectedDemands)) {
-                        foreach ($roomSelectedDemands as $demand) {
-                            if ($demand['total_price_tax_incl'] > 0) {
-                                if ($objOrder->total_paid_real > 0) {
-                                    if ($calcServicePriceFirst) {
-                                        $bookingRow['extra_service_total_paid_amount'] += $demand['total_price_tax_incl'];
-                                    } else {
-                                        $bookingRow['extra_service_total_paid_amount'] += ($objOrder->total_paid_real*$demand['total_price_tax_incl'])/($objOrder->total_paid_tax_incl + $objOrder->total_discounts_tax_incl);
-                                    }
-                                }
-                                $bookingRow['extra_service_total_price_tax_incl'] += $demand['total_price_tax_incl'];
-                            }
-                        }
-                    }
 
                     if ($roomSelectedServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                         0,

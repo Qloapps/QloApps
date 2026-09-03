@@ -1602,10 +1602,10 @@
 		});
 	}
 
-	{* JS for handling extra demands changes *}
+	{* JS for handling extra services changes *}
 	$(document).ready(function() {
-		// modalbox for extra demands
-		$('body').on('click', '.open_rooms_extra_demands', function() {
+		// modalbox for extra services
+		$('body').on('click', '.open_rooms_extra_services', function() {
 			var idProduct = $(this).attr('id_product');
 			var idCart = $(this).attr('id_cart');
 			var idRoom = $(this).attr('id_room');
@@ -1630,7 +1630,7 @@
 					id_product: idProduct,
 					id_customer: id_customer,
 					id_hotel_cart_booking: idHotelCartBooking,
-					action: 'getRoomTypeCartDemands',
+					action: 'getRoomTypeCartServices',
 					ajax: true
 				},
 				success: function(response) {
@@ -1643,10 +1643,8 @@
                         errorHtml += '</ol>';
                         showErrorMessage(errorHtml);
                     } else {
-                        $('#customer_cart_details').after(response.html_exta_demands);
-						// $('#rooms_type_extra_demands').find('#room_type_demands_desc').html('');
-						// $('#rooms_type_extra_demands').find('#room_type_demands_desc').append(response.html_exta_demands);
-						$('#rooms_type_extra_demands').modal('show');
+						$('#customer_cart_details').after(response.html_exta_services);
+						$('#rooms_type_extra_services').modal('show');
                     }
 				},
                 complete: function() {
@@ -1654,96 +1652,9 @@
                 }
 			});
 		});
-		$(document).on('hidden.bs.modal', '#rooms_type_extra_demands', function (e) {
+		$(document).on('hidden.bs.modal', '#rooms_type_extra_services', function (e) {
 			// reload to make changes reflect everywhere
 			location.reload();
-		});
-
-		// select/unselect extra demand
-		$(document).on('click', '.id_room_type_demand', function() {
-			var roomDemands = [];
-			// get the selected extra demands by customer
-			$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
-				roomDemands.push({
-					'id_global_demand':$(this).val(),
-					'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
-				});
-			});
-			var idBookingCart = $(this).attr('id_cart_booking');
-            $(".loading_overlay").show();
-			$.ajax({
-				type: 'POST',
-				dataType: 'JSON',
-				headers: {
-					"cache-control": "no-cache"
-				},
-				url: "{$link->getAdminLink('AdminCarts')|addslashes}",
-				dataType: 'JSON',
-				cache: false,
-				data: {
-					id_cart_booking: idBookingCart,
-					room_demands: JSON.stringify(roomDemands),
-					action: 'changeRoomDemands',
-					ajax: true
-				},
-				success: function(response) {
-					if (response.status) {
-						showSuccessMessage(txtExtraDemandSucc);
-					} else {
-						showErrorMessage(txtExtraDemandErr);
-					}
-				},
-                complete: function() {
-                    $(".loading_overlay").hide();
-                }
-			});
-		});
-
-		// change advanced option of extra demand
-		$(document).on('change', '.demand_adv_option_block .id_option', function(e) {
-			var option_selected = $(this).find('option:selected');
-			var extra_demand_price = option_selected.attr("optionPrice")
-			extra_demand_price = parseFloat(extra_demand_price);
-			extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
-			$(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extra_demand_price);
-			var roomDemands = [];
-			if ($(this).closest('.room_demand_block').find('input:checkbox.id_room_type_demand').is(':checked')) {
-				// get the selected extra demands by customer
-				$(this).closest('.room_demand_detail').find('input:checkbox.id_room_type_demand:checked').each(function () {
-					roomDemands.push({
-						'id_global_demand':$(this).val(),
-						'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
-					});
-				});
-				var idBookingCart = $(this).closest('.room_demand_block').find('.id_room_type_demand').attr('id_cart_booking');
-                $(".loading_overlay").show();
-				$.ajax({
-					type: 'POST',
-					dataType: 'JSON',
-					headers: {
-						"cache-control": "no-cache"
-					},
-					url: "{$link->getAdminLink('AdminCarts')|addslashes}",
-					dataType: 'JSON',
-					cache: false,
-					data: {
-						id_cart_booking: idBookingCart,
-						room_demands: JSON.stringify(roomDemands),
-						action: 'changeRoomDemands',
-						ajax: true
-					},
-					success: function(response) {
-						if (response.status) {
-							showSuccessMessage(txtExtraDemandSucc);
-						} else {
-							showErrorMessage(txtExtraDemandErr);
-						}
-					},
-                    complete: function() {
-                        $(".loading_overlay").hide();
-                    }
-				});
-			}
 		});
 
 		$(document).on('keyup', '#payment_module_name', function() {
@@ -1804,7 +1715,7 @@
 			}
 		});
 
-        // click on back button on created facilities while additional facilities edit
+         // click on back button on created extra service edit
         $(document).on('click', '#back_to_service_btn', function() {
             $('#room_type_services_desc').show();
             $('#add_new_room_services_block').hide();
@@ -1858,7 +1769,7 @@
 						if (jsonData.service_panel) {
 							$('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
 						}
-						showSuccessMessage(txtExtraDemandSucc);
+						showSuccessMessage(txtExtraServiceSucc);
 					} else {
 						var errorHtml = error_found_txt + ':<br>';
 						errorHtml += '<ol>';
@@ -1906,7 +1817,7 @@
                         if (jsonData.service_panel) {
                             $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
                         }
-                        showSuccessMessage(txtExtraDemandSucc);
+                        showSuccessMessage(txtExtraServiceSucc);
                     } else {
                         if (jsonData.errors != 'undefined' && jsonData.errors.length) {
                             var errorHtml = error_found_txt + ':<br>';
@@ -2539,6 +2450,7 @@
 	{addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
 	{addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
     {addJsDefL name='error_found_txt'}{l s='Errors found' js=1}{/addJsDefL}
+    {addJsDefL name='txtExtraServiceSucc'}{l s='Updated Successfully' js=1}{/addJsDefL}
 {/strip}
 
 <div id="loader_container">

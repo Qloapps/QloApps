@@ -73,6 +73,12 @@
 						</div>
 					</div>
 					<div class="row">
+						<label class="control-label col-lg-3">{l s='Nationality'}</label>
+						<div class="col-lg-9">
+							<p class="form-control-static">{if $nationality}{$nationality}{else}--{/if}</p>
+						</div>
+					</div>
+					<div class="row">
 						<label class="control-label col-lg-3">{l s='Registration Date'}</label>
 						<div class="col-lg-9">
 							<p class="form-control-static">{$registration_date}</p>

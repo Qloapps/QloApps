@@ -126,6 +126,7 @@ class OrderOpcControllerCore extends ParentOrderController
                             }
 
                             $this->context->customer->phone = $phone;
+                            $this->context->customer->id_country = (int)Tools::getValue('id_nationality');
                             $_POST['lastname'] = $_POST['customer_lastname'];
                             $_POST['firstname'] = $_POST['customer_firstname'];
                             $this->errors = array_merge($this->errors, $this->context->customer->validateController());
@@ -376,12 +377,8 @@ class OrderOpcControllerCore extends ParentOrderController
                             $this->context->cart->setNoMultishipping();
                             $this->ajaxDie();
                             break;
-                        case 'getRoomTypeBookingDemands':
+                        case 'getRoomTypeBookingServices':
                             $this->ajaxDie($this->getRoomTypeBookingServices());
-                            exit;
-                            break;
-                        case 'changeRoomDemands':
-                            $this->ajaxDie($this->changeRoomDemands());
                             exit;
                             break;
                         case 'getCustomerGuestDetail':
@@ -495,15 +492,9 @@ class OrderOpcControllerCore extends ParentOrderController
 
         $this->context->smarty->assign('checkout_process_steps', $this->checkoutProcess->getSteps());
 
-        // set room type demands
-        // $objGlobalDemand = new HotelRoomTypeGlobalDemand();
-        // $allDemands = $objGlobalDemand->getAllDemands();
-        // $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $this->_assignCheckoutVars();
         $this->context->smarty->assign(
             array(
-                // 'allDemands' => $allDemands,
-                // 'defaultcurrencySign' => $objCurrency->sign,
                 'PS_REGISTRATION_PROCESS_TYPE' => Configuration::get('PS_REGISTRATION_PROCESS_TYPE'),
                 'free_shipping' => $free_shipping,
                 'isGuest' => isset($this->context->cookie->is_guest) ? $this->context->cookie->is_guest : 0,
@@ -559,6 +550,9 @@ class OrderOpcControllerCore extends ParentOrderController
 
         $newsletter = Module::isInstalled('blocknewsletter') && Module::getInstanceByName('blocknewsletter')->active && Configuration::get('PS_CUSTOMER_NWSL');
         $this->context->smarty->assign('birthday', (bool) Configuration::get('PS_CUSTOMER_BIRTHDATE'));
+        $this->context->smarty->assign('nationality', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY'));
+        $this->context->smarty->assign('nationality_mandatory', (bool) Configuration::get('PS_CUSTOMER_NATIONALITY_MANDATORY'));
+        $this->context->smarty->assign('nationality_countries', Customer::getNationalities($this->context->language->id));
         $this->context->smarty->assign('newsletter', $newsletter);
         $this->context->smarty->assign('optin', (bool)Configuration::get('PS_CUSTOMER_OPTIN'));
         $this->context->smarty->assign('field_required', $this->context->customer->validateFieldsRequiredDatabase());
@@ -645,6 +639,7 @@ class OrderOpcControllerCore extends ParentOrderController
             'id_country' => (int)$address_delivery->id_country,
             'id_state' => (int)$address_delivery->id_state,
             'id_gender' => (int)$customer->id_gender,
+            'id_nationality' => (int)$customer->id_country,
             'phone' => $customer->phone,
             'sl_year' => $birthday[0],
             'sl_month' => $birthday[1],
@@ -950,37 +945,6 @@ class OrderOpcControllerCore extends ParentOrderController
                 && ($dateTo = Tools::getValue('date_to'))
             ) {
                 $objCartBookingData = new HotelCartBookingData();
-                if ($selectedRoomDemands = $objCartBookingData->getCartExtraDemands(
-                    $this->context->cart->id,
-                    $idProduct,
-                    0,
-                    $dateFrom,
-                    $dateTo
-                )) {
-                    // get room type additional demands
-                    $objRoomDemands = new HotelRoomTypeDemand();
-                    if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
-                        foreach ($roomTypeDemands as &$demand) {
-                            // if demand has advance options then set demand price as first advance option price.
-                            if (isset($demand['adv_option']) && $demand['adv_option']) {
-                                $demand['price'] = current($demand['adv_option'])['price'];
-                            }
-                        }
-                        foreach ($selectedRoomDemands as &$selectedDemand) {
-                            if (isset($selectedDemand['extra_demands']) && $selectedDemand['extra_demands']) {
-                                $extraDmd = array();
-                                foreach ($selectedDemand['extra_demands'] as $sDemand) {
-                                    $selectedDemand['selected_global_demands'][] = $sDemand['id_global_demand'];
-                                    $extraDmd[$sDemand['id_global_demand'].'-'.$sDemand['id_option']] = $sDemand;
-                                }
-                                $selectedDemand['extra_demands'] = $extraDmd;
-                            }
-                        }
-                        $this->context->smarty->assign('roomTypeDemands', $roomTypeDemands);
-                        $this->context->smarty->assign('selectedRoomDemands', $selectedRoomDemands);
-
-                    }
-                }
                 $objServiceProductCartDetail = new ServiceProductCartDetail();
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
@@ -1030,27 +994,11 @@ class OrderOpcControllerCore extends ParentOrderController
                 ));
             }
         }
-        $response['extra_demands'] = $this->context->smarty->fetch(
-            _PS_THEME_DIR_.'_partials/cart_booking_demands.tpl'
+        $response['extra_services'] = $this->context->smarty->fetch(
+            _PS_THEME_DIR_.'_partials/cart_booking_services.tpl'
         );
 
         return json_encode($response);
-    }
-
-    public function changeRoomDemands()
-    {
-        if ($idCartBooking = Tools::getValue('id_cart_booking')) {
-            if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
-                $roomDemands = Tools::getValue('room_demands');
-                $roomDemands = json_decode($roomDemands, true);
-                $roomDemands = json_encode($roomDemands);
-                $objCartbookingCata->extra_demands = $roomDemands;
-                if ($objCartbookingCata->save()) {
-                    die('1');
-                }
-            }
-        }
-        die('0');
     }
 
     public function getCustomerGuestDetail()

@@ -475,40 +475,6 @@
 							{block name='booking_form'}
 								{include file='./_partials/booking-form.tpl'}
 							{/block}
-
-							{block name='product_demands'}
-								{* extra room type demands *}
-								{if isset($room_type_demands) && $room_type_demands}
-									<div class="col-sm-12 card room_demands_container">
-										<label for="" class="control-label">{l s='Additional Facilities'}</label>
-										{foreach $room_type_demands as $idGlobalDemand => $demand}
-											<div class="row room_demand_block">
-												{if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
-													<div class="col-xs-1">
-														<p class="checkbox">
-															<input value="{$idGlobalDemand|escape:'html':'UTF-8'}" type="checkbox" class="id_room_type_demand" data-id_global_demand="{$idGlobalDemand|escape:'html':'UTF-8'}" />
-														</p>
-													</div>
-												{/if}
-												<div class="col-xs-11 demand_adv_option_block">
-													<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right"><span class="extra_demand_option_price">{convertPrice price = $demand['price']}</span>{if $demand['price_calc_method'] == $WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/Night'}{/if}</span>{/if}</p>
-													{if isset($demand['adv_option']) && $demand['adv_option']}
-														<select class="id_option">
-															{foreach $demand['adv_option'] as $idOption => $option}
-																<option optionPrice="{$option['price']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}">{$option['name']|escape:'html':'UTF-8'}</option>
-															{/foreach}
-														</select>
-													{else}
-														<input type="hidden" class="id_option" value="0" />
-													{/if}
-												</div>
-											</div>
-										{/foreach}
-										<div class="room_demands_container_overlay">
-										</div>
-									</div>
-								{/if}
-							{/block}
 						{/if}
 						{block name='displayRightColumnProduct'}
 							{if isset($HOOK_EXTRA_RIGHT) && $HOOK_EXTRA_RIGHT}{$HOOK_EXTRA_RIGHT}{/if}

@@ -403,17 +403,6 @@ class ProductControllerCore extends FrontController
                         );
                     }
 
-                    // get room type additional demands
-                    $objRoomDemands = new HotelRoomTypeDemand();
-                    if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($this->product->id)) {
-                        foreach ($roomTypeDemands as &$demand) {
-                            // if demand has advance options then set demand price as first advance option price.
-                            if (isset($demand['adv_option']) && $demand['adv_option']) {
-                                $demand['price'] = current($demand['adv_option'])['price'];
-                            }
-                        }
-                    }
-
                     $roomFeatures = $this->product->getFrontFeatures($this->context->language->id);
                     $roomAmenities = HotelRoomTypeAmenities::getAmenities($this->product->id, $this->context->language->id);
                     $hotelAmenities = HotelBranchAmenities::getAmenities($hotel_id, $this->context->language->id);
@@ -421,7 +410,6 @@ class ProductControllerCore extends FrontController
                     $this->context->smarty->assign(
                         array(
                             'id_hotel' => $hotel_id,
-                            'room_type_demands' => $roomTypeDemands,
                             'room_type_info' => $room_info_by_product_id,
                             'isHotelRefundable' => $hotel_branch_obj->isRefundable(),
                             'max_order_date' => $max_order_date,
@@ -561,7 +549,6 @@ class ProductControllerCore extends FrontController
                 array(
                     'product_controller_url' => $this->context->link->getPageLink('product'),
                     'ratting_img_path' => _MODULE_DIR_.'hotelreservationsystem/views/img/Slices/icons-sprite.png',
-                    'WK_PRICE_CALC_METHOD_EACH_DAY' => HotelRoomTypeGlobalDemand::WK_PRICE_CALC_METHOD_EACH_DAY,
                     'stock_management' => Configuration::get('PS_STOCK_MANAGEMENT'),
                     'customizationFields' => $customization_fields,
                     'id_customization' => empty($customization_datas) ? null : $customization_datas[0]['id_customization'],
@@ -654,7 +641,6 @@ class ProductControllerCore extends FrontController
         $dateFrom,
         $dateTo,
         $occupancy = array(),
-        $jsonDemands = '',
         $roomServiceProducts = null
     ) {
         $objProduct = new Product($idProduct, true, $this->context->language->id, $this->context->shop->id);
@@ -667,8 +653,6 @@ class ProductControllerCore extends FrontController
         $objHotel = new HotelBranchInformation();
         $objHotelCartBookingData = new HotelCartBookingData();
         $objBookingDetail = new HotelBookingDetail();
-        $objHRTDemand = new HotelRoomTypeDemand();
-        $objHRTDemandPrice = new HotelRoomTypeDemandPrice();
 
         $idCart = (int) $this->context->cart->id;
         $idGuest = (int) $this->context->cart->id_guest;
@@ -820,51 +804,8 @@ class ProductControllerCore extends FrontController
         }
 
         $totalRoomPrice = $roomTypeDateRangePrice;
-        // calculate demand price now
-        $demandsPricePerRoom = 0;
-        $roomTypeDemands = $objHRTDemand->getRoomTypeDemands($idProduct);
-        if ($jsonDemands !== '') {
-            $cartDemands = json_decode($jsonDemands, true);
-            $demandsPricePerRoom = $objHRTDemandPrice->getRoomTypeDemandsTotalPrice(
-                $idProduct,
-                $cartDemands,
-                $useTax,
-                $dateFrom,
-                $dateTo
-            );
-
-            // send demand info to booking form
-            foreach($cartDemands as &$demand) {
-                if (Validate::isLoadedObject(
-                    $objRoomTypeGlobalDemand = new HotelRoomTypeGlobalDemand($demand['id_global_demand'], $this->context->language->id)
-                )) {
-                    $demand['name'] = $objRoomTypeGlobalDemand->name;
-                    if ($demand['id_option']) {
-                        if (Validate::isLoadedObject($objDemandAdvanceOption = new HotelRoomTypeGlobalDemandAdvanceOption($demand['id_option'], $this->context->language->id))) {
-                            if ($objDemandAdvanceOption->id_global_demand != $objRoomTypeGlobalDemand->id) {
-                                unset($demand);
-                                continue;
-                            }
-                            $demand['advance_option'] = array(
-                                'id_option' => $objDemandAdvanceOption->id,
-                                'name' => $objDemandAdvanceOption->name
-                            );
-                        } else {
-                            unset($demand);
-                            continue;
-                        }
-                    }
-
-                    $demand['price'] = HotelRoomTypeDemand::getPriceStatic(
-                        $idProduct,
-                        $objRoomTypeGlobalDemand->id,
-                        $demand['id_option'],
-                        $useTax
-                    );
-                }
-            }
-            $smartyVars['selected_demands'] = $cartDemands;
-        }
+        // calculate service product price now
+        $serviceProductPricePerRoom = 0;
 
         if ($roomServiceProducts) {
             $serviceProductsPrice = 0;
@@ -915,13 +856,13 @@ class ProductControllerCore extends FrontController
                 }
                 $smartyVars['selected_service_product'] = $roomServiceProducts;
             }
-            $demandsPricePerRoom += $serviceProductsPrice;
+            $serviceProductPricePerRoom += $serviceProductsPrice;
             $totalPrice += $serviceProductsPrice;
         }
         // multiply price by number of room required
-        $demandsPrice = $demandsPricePerRoom * $quantity;
+        $serviceProductPrice = $serviceProductPricePerRoom * $quantity;
         // calculate total price
-        $totalPrice = $totalRoomPrice + $demandsPrice;
+        $totalPrice = $totalRoomPrice + $serviceProductPrice;
         // send occupancy information searched by the user
         if ($occupancy && is_array($occupancy)) {
             $smartyVars['occupancies'] = $occupancy;
@@ -944,11 +885,10 @@ class ProductControllerCore extends FrontController
         $smartyVars['los_max_days'] = $losMaxDays;
         $smartyVars['los_min_failed'] = $losMinFailed;
         $smartyVars['los_max_failed'] = $losMaxFailed;
-        $smartyVars['has_room_type_demands'] = $roomTypeDemands ? true : false; // whether to show price breakup
         $smartyVars['rooms_price'] = $totalRoomPrice;
-        $smartyVars['demands_price_per_room'] = $demandsPricePerRoom;
-        $smartyVars['total_price_without_discount'] = $totalPriceWithoutDiscount + $demandsPrice;
-        $smartyVars['demands_price'] = $demandsPrice;
+        $smartyVars['service_product_price_per_room'] = $serviceProductPricePerRoom;
+        $smartyVars['total_price_without_discount'] = $totalPriceWithoutDiscount + $serviceProductPrice;
+        $smartyVars['service_product_price'] = $serviceProductPrice;
         $smartyVars['total_price'] = $totalPrice;
         $this->context->smarty->assign($smartyVars);
         return true;
@@ -1536,7 +1476,6 @@ class ProductControllerCore extends FrontController
             } else {
                 $occupancy = Tools::getValue('qty', 1);
             }
-            $roomTypeDemands = Tools::getValue('room_type_demands');
             $roomServiceProducts = Tools::getValue('room_service_products');
             $dateFrom = date('Y-m-d H:i:s', strtotime($dateFrom));
             $dateTo = date('Y-m-d H:i:s', strtotime($dateTo));
@@ -1546,7 +1485,6 @@ class ProductControllerCore extends FrontController
                 $dateFrom,
                 $dateTo,
                 $occupancy,
-                $roomTypeDemands,
                 $roomServiceProducts
             )) {
             }
