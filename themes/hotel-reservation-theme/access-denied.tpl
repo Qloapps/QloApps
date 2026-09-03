@@ -19,62 +19,18 @@
 * @copyright Since 2010 Webkul
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
-<!DOCTYPE html>
-<html lang="{$language_code|escape:'html':'UTF-8'}">
-	<head>
-		<meta charset="utf-8">
-		<title>{$meta_title|escape:'html':'UTF-8'}</title>
-		<meta name="robots" content="noindex,nofollow">
-		<link rel="shortcut icon" href="{$favicon_url}">
-		<style>
-			html {
-				padding: 30px 10px;
-				font-size: 16px;
-				line-height: 1.4;
-				color: #737373;
-				background: #f0f0f0;
-			}
+<div id="pagenotfound">
+	<div class="pagenotfound">
+		<h1>{l s='Access denied'}</h1>
 
-			html, input {
-				font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-			}
+		<p>
+			{l s='You do not have permission to access this page.'}
+		</p>
 
-			body {
-				max-width: 480px;
-				padding: 0 0 50px;
-				border: 1px solid #b3b3b3;
-				border-radius: 4px;
-				margin: 0 auto;
-				box-shadow: 0 1px 10px #a7a7a7, inset 0 1px 0 #fff;
-				background-color: #e0e0e0;
-				text-align: center;
-			}
-
-			.logo-band {
-				background-color: #e0e0e0;
-				padding: 20px;
-			}
-
-			img.logo {
-				max-height: 60px;
-			}
-
-			h2 {
-				color: #D35780;
-				margin: 1em 0 0.5em;
-				font-size: 28px;
-			}
-
-			p {
-				margin: 1em 20px;
-			}
-		</style>
-	</head>
-	<body>
-		<div class="logo-band">
-			<img class="logo" src="{$logo_url}" alt="logo" />
+		<div class="buttons">
+			<a class="btn btn-primary" href="{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}" title="{l s='Home'}">
+				<span>{l s='Home Page'}</span>
+			</a>
 		</div>
-		<h2>{l s='Access denied'}</h2>
-		<p>{l s='You do not have permission to access this page.'}</p>
-	</body>
-</html>
+	</div>
+</div>
