@@ -111,7 +111,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                 if ($synchronize_interval && // synchronization is on
                     $cursor > 0 && // cursor is further than zero
                     $loops % $synchronize_interval === 0) { // time to synchronize!
-                    $current_line = 1 + $this->substrCount($html, $nl, 0, $cursor);
+                    $current_line = 1 + substr_count($html, $nl, 0, $cursor);
                 }
             }
 
@@ -139,7 +139,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                 );
                 if ($maintain_line_numbers) {
                     $token->rawPosition($current_line, $current_col);
-                    $current_line += $this->substrCount($html, $nl, $cursor, $position_next_lt - $cursor);
+                    $current_line += substr_count($html, $nl, $cursor, $position_next_lt - $cursor);
                 }
                 $array[] = $token;
                 $cursor = $position_next_lt + 1;
@@ -214,7 +214,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                     );
                     if ($maintain_line_numbers) {
                         $token->rawPosition($current_line, $current_col);
-                        $current_line += $this->substrCount($html, $nl, $cursor, $strlen_segment);
+                        $current_line += substr_count($html, $nl, $cursor, $strlen_segment);
                     }
                     $array[] = $token;
                     $cursor = $end ? $position_comment_end : $position_comment_end + 3;
@@ -229,7 +229,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                     $token = new HTMLPurifier_Token_End($type);
                     if ($maintain_line_numbers) {
                         $token->rawPosition($current_line, $current_col);
-                        $current_line += $this->substrCount($html, $nl, $cursor, $position_next_gt - $cursor);
+                        $current_line += substr_count($html, $nl, $cursor, $position_next_gt - $cursor);
                     }
                     $array[] = $token;
                     $inside_tag = false;
@@ -248,7 +248,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                     $token = new HTMLPurifier_Token_Text('<');
                     if ($maintain_line_numbers) {
                         $token->rawPosition($current_line, $current_col);
-                        $current_line += $this->substrCount($html, $nl, $cursor, $position_next_gt - $cursor);
+                        $current_line += substr_count($html, $nl, $cursor, $position_next_gt - $cursor);
                     }
                     $array[] = $token;
                     $inside_tag = false;
@@ -276,7 +276,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                     }
                     if ($maintain_line_numbers) {
                         $token->rawPosition($current_line, $current_col);
-                        $current_line += $this->substrCount($html, $nl, $cursor, $position_next_gt - $cursor);
+                        $current_line += substr_count($html, $nl, $cursor, $position_next_gt - $cursor);
                     }
                     $array[] = $token;
                     $inside_tag = false;
@@ -310,7 +310,7 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
                 }
                 if ($maintain_line_numbers) {
                     $token->rawPosition($current_line, $current_col);
-                    $current_line += $this->substrCount($html, $nl, $cursor, $position_next_gt - $cursor);
+                    $current_line += substr_count($html, $nl, $cursor, $position_next_gt - $cursor);
                 }
                 $array[] = $token;
                 $cursor = $position_next_gt + 1;
@@ -341,28 +341,6 @@ class HTMLPurifier_Lexer_DirectLex extends HTMLPurifier_Lexer
         $context->destroy('CurrentLine');
         $context->destroy('CurrentCol');
         return $array;
-    }
-
-    /**
-     * PHP 5.0.x compatible substr_count that implements offset and length
-     * @param string $haystack
-     * @param string $needle
-     * @param int $offset
-     * @param int $length
-     * @return int
-     */
-    protected function substrCount($haystack, $needle, $offset, $length)
-    {
-        static $oldVersion;
-        if ($oldVersion === null) {
-            $oldVersion = version_compare(PHP_VERSION, '5.1', '<');
-        }
-        if ($oldVersion) {
-            $haystack = substr($haystack, $offset, $length);
-            return substr_count($haystack, $needle);
-        } else {
-            return substr_count($haystack, $needle, $offset, $length);
-        }
     }
 
     /**

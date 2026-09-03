@@ -27,7 +27,7 @@ a different font.
 First double-check that the font in question really contains the character
 in question.  If you don't have font development software, this can be
 tricky.  In the case of FreeFont, you can check if a given character 
-range is supported: <http://www.gnu.org/software/freefont/coverage.html>
+range is supported: <https://www.gnu.org/software/freefont/coverage.html>
 
 Next double-check that your application (web browser, text editor, etc)
 has indeed been properly instructed to use the font.

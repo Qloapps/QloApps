@@ -37,7 +37,7 @@ class HTMLPurifier_AttrDef_URI_IPv6 extends HTMLPurifier_AttrDef_URI_IPv4
             }
         }
 
-        //      IPv4-compatiblity check
+        //      IPv4-compatibility check
         if (preg_match('#(?<=:' . ')' . $this->ip4 . '$#s', $aIP, $find)) {
             $aIP = substr($aIP, 0, 0 - strlen($find[0]));
             $ip = explode('.', $find[0]);

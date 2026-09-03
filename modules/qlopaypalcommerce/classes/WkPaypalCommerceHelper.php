@@ -60,8 +60,6 @@ class WkPaypalCommerceHelper
         $response = curl_exec($curl);
         $err = curl_error($curl);
 
-        curl_close($curl);
-
         if ($err) {
             throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
         } else {
@@ -156,7 +154,6 @@ class WkPaypalCommerceHelper
 
             $response = curl_exec($curl);
             $err = curl_error($curl);
-            curl_close($curl);
 
             if ($err) {
                 throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
@@ -215,8 +212,6 @@ class WkPaypalCommerceHelper
             curl_exec($curl);
             $err = curl_error($curl);
 
-            curl_close($curl);
-
             if ($err) {
                 throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
             }
@@ -254,8 +249,6 @@ class WkPaypalCommerceHelper
 
             $response = curl_exec($curl);
             $err = curl_error($curl);
-
-            curl_close($curl);
 
             if ($err) {
                 throw new PrestaShopException(sprintf('cURL Error #: %s', $err));

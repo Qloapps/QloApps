@@ -224,7 +224,7 @@ class ToolsCore
     *
     * @param string $url Desired URL
     */
-    public static function redirectAdmin($url)
+    public static function redirectAdmin($url): never
     {
         header('Location: '.$url);
         exit;
@@ -1891,13 +1891,13 @@ class ToolsCore
         }
 
         $precision_places = 14 - floor(log10(abs($value)));
-        $f1 = pow(10.0, (double)abs($places));
+        $f1 = pow(10.0, (float) abs($places));
 
         /* If the decimal precision guaranteed by FP arithmetic is higher than
         * the requested places BUT is small enough to make sure a non-zero value
         * is returned, pre-round the result to the precision */
         if ($precision_places > $places && $precision_places - $places < 15) {
-            $f2 = pow(10.0, (double)abs($precision_places));
+            $f2 = pow(10.0, (float) abs($precision_places));
 
             if ($precision_places >= 0) {
                 $tmp_value = $value * $f2;
@@ -1909,7 +1909,7 @@ class ToolsCore
             * thus never larger than 1e15 here) */
             $tmp_value = Tools::round_helper($tmp_value, $mode);
             /* now correctly move the decimal point */
-            $f2 = pow(10.0, (double)abs($places - $precision_places));
+            $f2 = pow(10.0, (float) abs($places - $precision_places));
             /* because places < precision_places */
             $tmp_value = $tmp_value / $f2;
         } else {
@@ -2091,7 +2091,6 @@ class ToolsCore
                 }
             }
             $content = curl_exec($curl);
-            curl_close($curl);
             return $content;
         } else {
             return false;
@@ -2965,7 +2964,7 @@ exit;
     /**
     * @deprecated as of 1.5 use Controller::getController('PageNotFoundController')->run();
     */
-    public static function display404Error()
+    public static function display404Error(): never
     {
         header('HTTP/1.1 404 Not Found');
         header('Status: 404 Not Found');

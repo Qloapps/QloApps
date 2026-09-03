@@ -1,6 +1,6 @@
 HTML.MaxImgLength
 TYPE: int/null
-DEFAULT: 1200
+DEFAULT: null
 VERSION: 3.1.1
 --DESCRIPTION--
 <p>

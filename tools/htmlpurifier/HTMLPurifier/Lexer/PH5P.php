@@ -1223,14 +1223,14 @@ class HTML5
                 'type' => self::COMMENT
             );
 
-            /* Otherwise if the next seven chacacters are a case-insensitive match
+            /* Otherwise if the next seven characters are a case-insensitive match
             for the word "DOCTYPE", then consume those characters and switch to the
             DOCTYPE state. */
         } elseif (strtolower($this->character($this->char + 1, 7)) === 'doctype') {
             $this->char += 7;
             $this->state = 'doctype';
 
-            /* Otherwise, is is a parse error. Switch to the bogus comment state.
+            /* Otherwise, it is a parse error. Switch to the bogus comment state.
             The next character that is consumed, if any, is the first character
             that will be in the comment. */
         } else {
