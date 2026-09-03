@@ -40,6 +40,7 @@
                             {if (isset($refundReqBookings) && $refundReqBookings)}
                                 <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Refund or cancellation status and refunded amount for this room booking'}">{l s='Refund'}</span></th>
                             {/if}
+                            {hook h='displayOrderRoomsBookingsTableHeading' order=$order}
                             {if ($can_edit && !$order->hasBeenDelivered())}
                             <th class="fixed-width-md center"><span >{l s='Actions'}</span></th>
                             {/if}

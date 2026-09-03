@@ -131,6 +131,7 @@
 				{/if}
 		</td>
 	{/if}
+	{hook h='displayOrderRoomsBookingsTableData' order=$order data=$data}
 	{if ($can_edit && !$order->hasBeenDelivered())}
 		<td class="product_action center">
             <div class="btn-group pull-right">
