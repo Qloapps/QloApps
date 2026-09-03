@@ -150,7 +150,7 @@ class SourceCore extends ObjectModel
         }
 
         return Db::getInstance()->executeS('
-            SELECT a.`id_source`, a.`id_business_source`, al.`name`, bsl.`name` AS `business_source_name`
+            SELECT a.`id_source`, a.`id_business_source`, a.`code`, al.`name`, bsl.`name` AS `business_source_name`
             FROM `'._DB_PREFIX_.'source` a
             LEFT JOIN `'._DB_PREFIX_.'source_lang` al ON (al.`id_source` = a.`id_source` AND al.`id_lang` = '.(int)$idLang.')
             LEFT JOIN `'._DB_PREFIX_.'business_source_lang` bsl ON (bsl.`id_business_source` = a.`id_business_source` AND bsl.`id_lang` = '.(int)$idLang.')

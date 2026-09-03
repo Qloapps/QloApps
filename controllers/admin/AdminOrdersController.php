@@ -288,7 +288,6 @@ class AdminOrdersControllerCore extends AdminController
                 'filter_key' => 'a!source',
                 'list' => $this->all_order_sources,
                 'optional' => true,
-                'visible_default' => true
             ),
             'booking_source_name' => array(
                 'title' => $this->l('Booking Source'),
@@ -393,14 +392,7 @@ class AdminOrdersControllerCore extends AdminController
             return '--';
         }
 
-        $html = Tools::safeOutput($echo);
-
-        if (isset($row['booking_source_code']) && $row['booking_source_code'] === 'DIRECT_WEBSITE') {
-            $title = $this->l('Visit website', 'AdminOrders', true);
-            $html .= ' <a href="'.Context::getContext()->link->getBaseLink().'" target="_blank" title="'.$title.'" onclick="event.stopPropagation();"><i class="icon-external-link"></i></a>';
-        }
-
-        return $html;
+        return Tools::safeOutput($echo);
     }
 
     public function formatStayPeriods($value, $row)
@@ -3026,11 +3018,24 @@ class AdminOrdersControllerCore extends AdminController
             $helper->id = 'box-order-source';
             $helper->icon = 'icon-globe';
             $helper->color = 'color1';
+            $helper->visible = false;
             $helper->title = $this->l('Order Source');
             $helper->tooltip = $this->l('Order source shows from which source the order was placed.');
             $helper->subtitle = $orderHistory[0]['id_employee'] ? $this->l('Back office') : $this->l('Front office');
             $helper->value = $objOrder->source;
             $this->kpis[] = $helper;
+
+            $objBookingSource = new Source((int)$objOrder->id_source, $this->context->language->id);
+            if (Validate::isLoadedObject($objBookingSource)) {
+                $helper = new HelperKpi();
+                $helper->id = 'box-booking-source';
+                $helper->icon = 'icon-tag';
+                $helper->color = 'color2';
+                $helper->title = $this->l('Booking Source');
+                $helper->tooltip = $this->l('Booking source shows the source from which this booking originated, e.g. Walk-in, Website, OTA.');
+                $helper->value = $objBookingSource->name;
+                $this->kpis[] = $helper;
+            }
 
             $objCustomerThread = new CustomerThread();
             $idCustomerThread = $objCustomerThread->getIdCustomerThreadByIdOrder($objOrder->id);

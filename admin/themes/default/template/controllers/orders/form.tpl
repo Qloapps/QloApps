@@ -2348,13 +2348,13 @@
                                         <optgroup label="{$booking_source.business_source_name}">
                                         {assign var="prev_business_source" value=$booking_source.business_source_name}
                                     {/if}
-                                    <option value="{$booking_source.id_source}" {if isset($smarty.post.id_booking_source) && $booking_source.id_source == $smarty.post.id_booking_source}selected="selected"{/if}>
+                                    <option value="{$booking_source.id_source}" {if (isset($smarty.post.id_booking_source) && $booking_source.id_source == $smarty.post.id_booking_source) || (!isset($smarty.post.id_booking_source) && $booking_source.code == 'WALKIN')}selected="selected"{/if}>
                                         {$booking_source.name}
                                     </option>
                                 {/foreach}
                                 {if $booking_sources}</optgroup>{/if}
                             </select>
-                            <p class="help-block">{l s='Leave unselected to use the default Walk-in source.'}</p>
+                            <p class="help-block">{l s='Walk-in is selected by default. Change it if this booking came from a different source.'}</p>
                         </div>
                     </div>
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>

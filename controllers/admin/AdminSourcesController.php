@@ -176,7 +176,7 @@ class AdminSourcesControllerCore extends AdminController
                 'class' => 'fixed-width-xs'
             ),
             'name' => array(
-                'title' => $this->l('Name'),
+                'title' => $this->l('Booking Source'),
                 'width' => 'auto',
                 'filter_key' => 'b!name'
             ),
