@@ -9206,21 +9206,15 @@ a.open_rooms_extra_services_panel {
 #rooms_extra_services .tab-content {
   padding: 0 15px;
 }
-#rooms_extra_services .demand_header a {
+rooms_extra_services .additional_service_header a {
   text-decoration: none;
   color: #444444;}
-#rooms_extra_services .room_demand_detail {
+#rooms_extra_services .room_service_detail {
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid #eeeeee;}
-/* #rooms_extra_services .room_demand_detail .demand_detail_price_block {
-  margin-bottom: 9px;
-  font-size: 14px;
-  margin-bottom: 15px;} */
-/* #rooms_extra_services .rooms_extra_services_head {
-  margin-bottom: 18px;} */
 
-#rooms_extra_services .room_demand_block {
+#rooms_extra_services .room_service_block {
   margin-bottom: 10px;
   color: #333;
   font-size: 14px;}

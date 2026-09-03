@@ -1048,24 +1048,7 @@ $(document).ready(function() {
 			actualizeRefundVoucher();
 	});
 
-    // when choose to add new facilities while additional facilities edit
-    $(document).on('click', '#btn_new_room_demand', function() {
-        $('.room_demands_container').show();
-        $('#save_room_demands').show();
-        $('#back_to_demands_btn').show();
-        $('.room_ordered_demands').hide();
-        $('#btn_new_room_demand').hide();
-    });
-    // click on back button on created facilities while additional facilities edit
-    $(document).on('click', '#back_to_demands_btn', function() {
-        $('.room_ordered_demands').show();
-        $('#btn_new_room_demand').show();
-        $('.room_demands_container').hide();
-        $('#save_room_demands').hide();
-        $('#back_to_demands_btn').hide();
-    });
-
-    // click on back button on created facilities while additional facilities edit
+    // click on back button on created extra service edit
     $(document).on('click', '#back_to_service_btn', function() {
         $('.room_ordered_services').show();
         $('#btn_new_existing_room_service').show();
@@ -1140,7 +1123,7 @@ $(document).ready(function() {
                     if (jsonData.service_panel) {
                         $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
                     }
-                    showSuccessMessage(txtExtraDemandSucc);
+                    showSuccessMessage(txtExtraServiceSucc);
                 } else {
                     var errorHtml = error_found_txt + ':<br>';
                     errorHtml += '<ol>';
@@ -1201,7 +1184,7 @@ $(document).ready(function() {
                     if (jsonData.service_panel) {
                         $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
                     }
-                    showSuccessMessage(txtExtraDemandSucc);
+                    showSuccessMessage(txtExtraServiceSucc);
                 } else {
                     showErrorMessage(jsonData.errors);
 
@@ -1236,7 +1219,7 @@ $(document).ready(function() {
                     if (jsonData.service_panel) {
                         $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
                     }
-                    showSuccessMessage(txtExtraDemandSucc);
+                    showSuccessMessage(txtExtraServiceSucc);
                 } else {
                     if (jsonData.errors != 'undefined' && jsonData.errors.length) {
                         var errorHtml = error_found_txt + ':<br>';
@@ -1253,157 +1236,6 @@ $(document).ready(function() {
                 $(".loading_overlay").hide();
             }
         });
-    });
-
-    // save room extra demand to the order
-    $(document).on('click', '#save_room_demands', function(e) {
-        e.preventDefault();
-
-        var idHtlBooking = parseInt($('#edit_product .extra-services-container #id_htl_booking').val());
-        if (idHtlBooking) {
-            var roomDemands = [];
-            // get the selected extra demands by customer
-            $(this).closest('#edit_product #room_type_demands_desc').find('input:checkbox.id_room_type_demand:checked').each(function () {
-                roomDemands.push({
-                    'id_global_demand':$(this).val(),
-                    'id_option': $(this).closest('.room_demand_block').find('.id_option').val(),
-                    'unit_price': $(this).closest('.room_demand_block').find('.unit_price').val()
-                });
-            });
-
-            if (roomDemands.length) {
-                $(".loading_overlay").show();
-                $.ajax({
-                    type: 'POST',
-                    headers: {
-                        "cache-control": "no-cache"
-                    },
-                    url: admin_order_tab_link,
-                    dataType: 'JSON',
-                    cache: false,
-                    data: {
-                        id_htl_booking: idHtlBooking,
-                        room_demands: JSON.stringify(roomDemands),
-                        action: 'addRoomExtraDemands',
-                        ajax: true
-                    },
-                    success: function(jsonData) {
-                        if (!jsonData.hasError) {
-                            showSuccessMessage(txtExtraDemandSucc);
-                            if (jsonData.facilities_panel) {
-                                $('#room_type_demands_desc').replaceWith(jsonData.facilities_panel);
-                            }
-                        } else if (jsonData.errors) {
-                            showErrorMessage(jsonData.errors);
-                        } else {
-                            showErrorMessage(txtSomeErr);
-                        }
-                    },
-                    complete: function() {
-                        $(".loading_overlay").hide();
-                    }
-                });
-            } else {
-                showErrorMessage(atleastSelectTxt);
-            }
-        }
-    });
-
-    // edit room extra deman
-    $(document).on('focusout', '#edit-room-booking-modal .room_ordered_demands .unit_price', function(e) {
-        updateRoomDemand($(this).closest('tr'));
-    });
-
-    // Delete ordered room booking demand
-    $(document).on('click', '.del-order-room-demand', function(e) {
-        e.preventDefault();
-        if (confirm(txt_confirm)) {
-            var idBookingDemand = $(this).attr('id_booking_demand');
-            $currentItem = $(this);
-            if (idBookingDemand) {
-                $(".loading_overlay").show();
-                $.ajax({
-                    type: 'POST',
-                    headers: {
-                        "cache-control": "no-cache"
-                    },
-                    url: admin_order_tab_link,
-                    dataType: 'JSON',
-                    cache: false,
-                    data: {
-                        id_booking_demand: idBookingDemand,
-                        action: 'DeleteRoomExtraDemand',
-                        ajax: true
-                    },
-                    success: function(jsonData) {
-                        if (jsonData.success) {
-                            showSuccessMessage(txtDeleteSucc);
-                            if (jsonData.facilities_panel) {
-                                $('#room_type_demands_desc').replaceWith(jsonData.facilities_panel);
-                            }
-                        } else {
-                            showErrorMessage(txtSomeErr);
-                        }
-                    },
-                    complete: function() {
-                        $(".loading_overlay").hide();
-                    }
-                });
-            } else {
-                showErrorMessage(txtInvalidDemandVal);
-            }
-        }
-    });
-
-    $(document).on('click', '.del_room_additional_service', function(e){
-        e.preventDefault();
-        if (confirm(txt_confirm)) {
-            var idServiceProductOrderDetail = $(this).data('id_service_product_order_detail');
-            $currentItem = $(this);
-            if (idServiceProductOrderDetail) {
-                $(".loading_overlay").show();
-                $.ajax({
-                    type: 'POST',
-                    headers: {
-                        "cache-control": "no-cache"
-                    },
-                    url: admin_order_tab_link,
-                    dataType: 'JSON',
-                    cache: false,
-                    data: {
-                        id_service_product_order_detail: idServiceProductOrderDetail,
-                        action: 'DeleteRoomAdditionalService',
-                        ajax: true
-                    },
-                    success: function(jsonData) {
-                        if (!jsonData.hasError) {
-                            if (jsonData.service_panel) {
-                                $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
-                            }
-                            showSuccessMessage(txtExtraDemandSucc);
-                        } else {
-                            showErrorMessage(jsonData.errors);
-
-                        }
-                    },
-                    complete: function() {
-                        $(".loading_overlay").hide();
-                    }
-                });
-            } else {
-                showErrorMessage(txtInvalidDemandVal);
-            }
-        }
-
-    });
-
-    // change advance option of extra demand
-    $(document).on('change', '.demand_adv_option_block .id_option', function(e) {
-        var option_selected = $(this).find('option:selected');
-        var extra_demand_price = option_selected.attr("optionPrice")
-        extra_demand_price = parseFloat(extra_demand_price);
-        // extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
-        $(this).closest('.room_demand_block').find('.unit_price').val(extra_demand_price);
     });
 
     $(".textarea-autosize").autosize();
@@ -1455,7 +1287,7 @@ $(document).ready(function() {
                 date_to: dateTo,
                 id_htl_booking: idHtlBooking,
                 orderEdit: orderEdit,
-                action: 'getRoomTypeBookingDemands',
+                action: 'getRoomTypeBookingServices',
                 ajax: true
             },
             success: function(result) {
@@ -1463,7 +1295,7 @@ $(document).ready(function() {
                     showErrorMessage(txtSomeErr);
                 } else {
                     $('#footer').next('.bootstrap').append(result.modalHtml);
-                    $('#room-extra-demands').modal('show');
+                    $('#room-extra-services').modal('show');
                 }
             },
             complete: function() {
@@ -1472,8 +1304,8 @@ $(document).ready(function() {
         });
     });
 
-    // Empty extra-services-container when room-extra-demands modal is closed
-    $(document).on('hidden.bs.modal', '#room-extra-demands', function(){
+    // Empty extra-services-container when room-extra-services modal is closed
+    $(document).on('hidden.bs.modal', '#room-extra-services', function(){
         $('#footer').next('.bootstrap').empty();
     });
 
@@ -2895,7 +2727,7 @@ function updateAdditionalServices(element)
                     if (jsonData.service_panel) {
                         $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
                     }
-                    showSuccessMessage(txtExtraDemandSucc);
+                    showSuccessMessage(txtExtraServiceSucc);
                 } else {
                     showErrorMessage(jsonData.errors);
 
@@ -2907,42 +2739,6 @@ function updateAdditionalServices(element)
         });
     }
 
-}
-
-function updateRoomDemand(element)
-{
-    var id_booking_demand = $(element).data('id_booking_demand');
-    var unit_price = $(element).find('.unit_price').val();
-    $(".loading_overlay").show();
-    $.ajax({
-        type: 'POST',
-        headers: {
-            "cache-control": "no-cache"
-        },
-        url: admin_order_tab_link,
-        dataType: 'JSON',
-        cache: false,
-        data: {
-            id_booking_demand: id_booking_demand,
-            unit_price: unit_price,
-            action: 'updateRoomExtraDemands',
-            ajax: true
-        },
-        success: function(jsonData) {
-            if (!jsonData.hasError) {
-                if (jsonData.facilities_panel) {
-                    $('#room_type_demands_desc').replaceWith(jsonData.facilities_panel);
-                }
-                showSuccessMessage(txtExtraDemandSucc);
-            } else {
-                showErrorMessage(jsonData.errors);
-
-            }
-        },
-        complete: function() {
-            $(".loading_overlay").hide();
-        }
-    });
 }
 
 function checkPartialRefundProductQuantity(it)

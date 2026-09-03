@@ -1048,30 +1048,8 @@ $(document).ready(function() {
         BookingForm.refresh();
     });
 
-    $('.id_room_type_demand').on('click', function() {
-        BookingForm.refresh();
-    });
 
-    $(document).on('click', '.remove_roomtype_demand', function(e) {
-        e.preventDefault();
-        let idGlobalDemand = $(this).data('id_global_demand');
-        $('.id_room_type_demand[data-id_global_demand="' + idGlobalDemand + '"]:checked').prop('checked', false).uniform();
-        BookingForm.refresh();
-    });
-
-    $(document).on('change', '.room_demand_block .id_option', function(e) {
-        var optionSelected = $(this).find('option:selected');
-        var extraDemandPrice = optionSelected.attr("optionPrice")
-        extraDemandPrice = parseFloat(extraDemandPrice);
-        extraDemandPrice = formatCurrency(extraDemandPrice, currency_format, currency_sign, currency_blank);
-        $(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extraDemandPrice);
-        if ($(this).closest('.room_demand_block').find('.id_room_type_demand:checked').val()) {
-            BookingForm.refresh();
-        }
-    });
-
-
-    // Accordian for extra demand
+    // Accordian for extra services
     function close_accordion_section() {
         $('.accordion .accordion-section-title').removeClass('active');
         $('.accordion .accordion-section-content').slideUp(300).removeClass('open');
@@ -1409,10 +1387,8 @@ var BookingForm = {
             });
         }
         if (!$('.max_avail_type_qty').length || $('.max_avail_type_qty').val() < 1) {
-            disableRoomTypeDemands(1);
             disableRoomTypeServices(1);
         } else {
-            disableRoomTypeDemands(0);
             disableRoomTypeServices(0);
         }
         $(document).trigger("QloApps:afterBookingFormInit");
@@ -1472,7 +1448,6 @@ var BookingForm = {
     },
     getFormData: function () {
         let formData = new FormData($('form#booking-form').get(0));
-        formData.append('room_type_demands', JSON.stringify(getRoomsExtraDemands()));
         formData.append('room_service_products', JSON.stringify(getRoomsServiceProducts()));
         return formData;
     },

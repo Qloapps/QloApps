@@ -27,9 +27,6 @@
                 <a href="#edit_room_tab" role="tab" data-toggle="tab">{l s='Stays'}</a>
             </li>
             <li role="presentation">
-                <a href="#room_type_demands_desc" aria-controls="facilities" role="tab" data-toggle="tab">{l s='Facilities'}</a>
-            </li>
-            <li role="presentation">
                 <a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a>
             </li>
         </ul>

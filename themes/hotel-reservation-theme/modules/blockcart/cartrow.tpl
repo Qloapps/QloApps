@@ -88,7 +88,7 @@
                                         {dateFormat date=$data_v['data_form'] full=$is_full_date}&nbsp;-&nbsp;{dateFormat date=$data_v['data_to'] full=$is_full_date}
                                     </td>
                                     <td class="num_rooms_in_date">{$data_v['num_rm']}</td>
-                                    <td>{convertPrice price=($data_v['amount'] + $data_v['demand_price'])}</td>
+                                    <td>{convertPrice price=($data_v['amount'] + $data_v['additional_price'])}</td>
                                     <td><a class="remove_rooms_from_cart_link" href="#" rm_price="{$data_v['amount']}" id_product="{$product.id_product|intval}" date_from="{$data_v['data_form']}" date_to="{$data_v['data_to']}" num_rooms="{$data_v['num_rm']}" title="{l s='remove this stay from my cart' mod='blockcart'}"></a></td>
                                 </tr>
                             {/foreach}

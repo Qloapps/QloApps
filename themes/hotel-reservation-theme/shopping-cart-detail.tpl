@@ -131,7 +131,7 @@
                                             </span>
                                         {/if}
                                         <div class="row">
-                                            <div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
+                                            <div class="{if (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
                                                 <div class="price_block">
                                                     <p class="total_price">
                                                         <span>
@@ -154,12 +154,12 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                            {if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
+                                            {if (isset($data_v['service_products']) && $data_v['service_products'])}
                                                 <div class="col-xs-6">
-                                                    <div class="demand_price_block">
-                                                        <p class="demand_total_price">
+                                                    <div class="extra_service_price_block">
+                                                        <p class="extra_service_total_price">
                                                             <span>
-                                                                {displayPrice price=$rm_v['demand_price']}
+                                                                {displayPrice price=$rm_v['additional_price']}
                                                             </span>
                                                         </p>
                                                         <p class="total_price_detial">
@@ -178,7 +178,7 @@
                                         <div class="total_price_block col-xs-12">
                                             <p class="total_price">
                                                 <span>
-                                                    {displayPrice price=($rm_v['amount']+$rm_v['demand_price'])}
+                                                    {displayPrice price=($rm_v['amount']+$rm_v['additional_price'])}
                                                 </span>
                                             </p>
                                             <p class="total_price_detial">

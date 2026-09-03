@@ -133,7 +133,6 @@ class HotelOrderRefundRules extends ObjectModel
     {
         $bookingCancellations = array();
         $objHtlRefundRules = new HotelBranchRefundRules();
-        $objHotelBookingDemands = new HotelBookingDemands();
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
 
         if ($bookingsToRefund = OrderReturn::getOrdersReturnDetail($idOrder, $idOrderReturn, $idHtlBooking)) {
@@ -144,18 +143,6 @@ class HotelOrderRefundRules extends ObjectModel
                     $objOrder = new Order($objHtlBooking->id_order);
                     $adPaidAmount = 0;
                     $refundValue = 0;
-
-                    $totalDemandsPrice = $objHotelBookingDemands->getRoomTypeBookingExtraDemands(
-                        $objHtlBooking->id_order,
-                        $objHtlBooking->id_product,
-                        $objHtlBooking->id_room,
-                        $objHtlBooking->date_from,
-                        $objHtlBooking->date_to,
-                        1,
-                        1,
-                        1,
-                        $objHtlBooking->id
-                    );
 
                     $totalServicesPrice = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                         0,
@@ -172,7 +159,7 @@ class HotelOrderRefundRules extends ObjectModel
                         0,
                         $objHtlBooking->id
                     );
-                    $totalAmount = $objHtlBooking->total_price_tax_incl + $totalDemandsPrice + $totalServicesPrice;
+                    $totalAmount = $objHtlBooking->total_price_tax_incl + $totalServicesPrice;
 
                     if ($refundRules = $objHtlRefundRules->getHotelRefundRules($objHtlBooking->id_hotel, 0, 1)) {
                         $orderCurrency = $objOrder->id_currency;

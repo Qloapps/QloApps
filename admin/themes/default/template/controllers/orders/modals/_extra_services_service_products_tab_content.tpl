@@ -20,7 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<div id="room_type_service_product_desc" class="tab-pane {if isset($show_active) && $show_active}active{/if} extra-services-container">
+<div id="room_type_service_product_desc" class="tab-pane {if isset($show_active) && $show_active}active{/if}  extra-services-container">
 	{if isset($orderEdit) && $orderEdit}
 
 		<div class="col-sm-12 facility_nav_btn">
@@ -51,7 +51,7 @@
                     <tbody>
                         {if isset($additionalServices) && $additionalServices}
                             {foreach $additionalServices['additional_services'] as $service}
-                                <tr class="room_demand_block" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}">
+                                <tr class="room_service_block" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}">
                                     <td>
                                         <div>{$service['name']|escape:'html':'UTF-8'}</div>
                                         <input value="{$service['id_service_product_order_detail']|escape:'html':'UTF-8'}" name="id_service_product_order_detail[]" type="hidden"/>
@@ -110,7 +110,7 @@
 
         {* add already available service interface *}
 		<form id="add_existing_room_services_form" class="col-sm-12 room_services_container">
-			<div class="room_demand_detail">
+			<div class="room_service_detail">
 				{if isset($serviceProducts) && $serviceProducts}
 					<table class="table">
 						<thead>
@@ -124,7 +124,7 @@
 						</thead>
 						<tbody>
 							{foreach $serviceProducts as $product}
-								<tr class="room_demand_block">
+								<tr class="room_service_block">
 									<td>
 										<input data-id_booking_detail="{$id_booking_detail}" value="{$product['id_product']|escape:'html':'UTF-8'}" name="selected_service[]" type="checkbox" class="id_room_type_service"/>
 									</td>
@@ -250,7 +250,7 @@
         {/if}
 
 	{elseif isset($additionalServices) && $additionalServices}
-		<table class="table room_demand_detail">
+		<table class="table room_service_detail">
 			<thead>
 				<tr>
 					<th>{l s='ID'}</th>
@@ -264,7 +264,7 @@
 			</thead>
 			</tbody>
 				{foreach $additionalServices['additional_services'] as $service}
-					<tr class="room_demand_block">
+					<tr class="room_service_block">
 						<td>
 							{$service['id_product']|escape:'html':'UTF-8'}{if !$service['product_deleted']} <a target="blank" href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$service['id_product']|escape:'html':'UTF-8'}&amp;updateproduct"><i class="icon-external-link-sign"></i></a>{/if}
 						</td>
