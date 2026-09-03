@@ -2322,8 +2322,13 @@
 							<p class="help-block">{l s='If disabled, no mail related to this order will be sent during order creation.'}</p>
 						</div>
 					</div>
-                    <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
-                        <label class="control-label col-lg-3">{l s="Full payment"}</label>
+                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
+                        <label class="control-label col-lg-3">
+                            <span class="label-tooltip" data-toggle="tooltip"
+                            title="{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}">
+                                {l s="Full payment"}
+                            </span>
+                        </label>
                         <div class="col-lg-9">
                             <span class="switch prestashop-switch fixed-width-lg">
                                 <input type="radio" name="is_full_payment" id="is_full_payment_on" value="1" {if $is_full_payment}checked="checked"{/if}>
@@ -2332,8 +2337,7 @@
                                 <label for="is_full_payment_off">{l s="No"}</label>
                                 <a class="slide-button btn"></a>
                             </span>
-                            <p class="help-block">{l s='Keep this option enabled for full payment and disable it to take partial payment of the booking.'}</p>
-							<p class="help-block">
+                            <p class="help-block">
                                 <span>{l s='Total amount: '}</span>
                                 <span id="full_payment_amount_value">{displayPrice price=$order_total currency=$currency->id}</span>
                             </p>
