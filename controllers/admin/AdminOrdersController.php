@@ -2215,15 +2215,13 @@ class AdminOrdersControllerCore extends AdminController
                             $paymentAmount = $orderTotal;
                         }
 
-                        if ($paymentAmount >= 0) {
+                        if ($paymentAmount > 0) {
                             if (!$moduleName) {
                                 $this->errors[] = Tools::displayError('Please enter Payment method.');
                             } elseif ($moduleName && !Validate::isGenericName($moduleName)) {
                                 $this->errors[] = Tools::displayError('Payment method is invalid. Please enter a valid payment method.');
                             }
-                        }
 
-                        if ($paymentAmount > 0) {
                             if (!$paymentType) {
                                 $this->errors[] = Tools::displayError('Please select a Payment source.');
                             } elseif ($paymentType && !Validate::isUnsignedInt($paymentType)) {
@@ -2240,10 +2238,14 @@ class AdminOrdersControllerCore extends AdminController
 
                         // Set payment module details
                         $objPaymentModule = new BoOrder();
-                        $objPaymentModule->displayName = $moduleName;
+                        if ($moduleName) {
+                            $objPaymentModule->displayName = $moduleName;
+                        }
 
                         if ($orderTotal > 0) {
-                            $objPaymentModule->payment_type = $paymentType;
+                            if ($paymentType) {
+                                $objPaymentModule->payment_type = $paymentType;
+                            }
 
                             // Set order state
                             if ($isFullPayment) {
