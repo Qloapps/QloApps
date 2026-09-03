@@ -121,7 +121,7 @@
                                         <a href="#" class="btn btn-default connectedRoomModal" data-toggle="modal"
                                             data-target="#connectedRoomModal" data-id-room="{$room_info['id']|intval}"
                                             data-room-num="{$room_info['room_num']|escape:'html':'UTF-8'}"
-                                            data-room-type="{$room_info['id_product']|intval}">
+                                            data-room-type="{if isset($room_info['id_product'])}{$room_info['id_product']|intval}{/if}">
                                             <span class="connected-room-icon-wrapper">
                                                 <i class="icon-random"></i>
                                                 <span class="connected-room-count">
