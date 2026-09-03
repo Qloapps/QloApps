@@ -587,6 +587,12 @@ class AdminNormalProductsControllerCore extends AdminController
         if ($this->_list) {
             $context = $this->context->cloneContext();
             $context->shop = clone($context->shop);
+            $useTourismTax = (bool) Configuration::get('QLO_USE_TOURISM_TAX');
+            $tourismTaxContext = $useTourismTax ? TaxConfiguration::resolveServiceLineTaxContext(
+                (int) Configuration::get('WK_PRIMARY_HOTEL'),
+                0,
+                new Address(0)
+            ) : null;
             /* update product final price */
             for ($i = 0; $i < $nb; $i++) {
                 if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP) {
@@ -598,6 +604,31 @@ class AdminNormalProductsControllerCore extends AdminController
                 $this->_list[$i]['price_tmp'] = Product::getPriceStatic($this->_list[$i]['id_product'], true, null,
                     (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION'), null, false, true, 1, true, null, null, null, $nothing, true, true,
                     $context);
+
+                if ($useTourismTax) {
+                    $unitPriceTaxExcl = Product::getPriceStatic($this->_list[$i]['id_product'], false, null,
+                        6, null, false, true, 1, true, null, null, null, $nothing, true, true,
+                        $context);
+                    $serviceTourismTaxAmount = 0.0;
+                    $idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $this->_list[$i]['id_product']);
+                    if ($idTourismTaxRulesGroup) {
+                        $taxCalculator = TaxManagerFactory::getManager(
+                            $tourismTaxContext['address'],
+                            $idTourismTaxRulesGroup
+                        )->getTaxCalculator();
+                        $serviceTourismTaxAmount = $taxCalculator->getTaxesTotalAmount(
+                            (float) $unitPriceTaxExcl,
+                            $tourismTaxContext['checkInDate'],
+                            $tourismTaxContext['numNights'],
+                            $tourismTaxContext['numAdults'],
+                            $tourismTaxContext['childrenAges'],
+                            $tourismTaxContext['collectionType'],
+                            1,
+                            $this->context->currency->id
+                        );
+                    }
+                    $this->_list[$i]['price_tmp'] += $serviceTourismTaxAmount;
+                }
             }
         }
 
@@ -3372,6 +3403,26 @@ class AdminNormalProductsControllerCore extends AdminController
         //     $productFeaturePrices = $htlFeaturePrices->getFeaturePricesbyIdProduct($product->id);
         //     $data->assign('productFeaturePrices', $productFeaturePrices);
         // }
+
+        if (Configuration::get('QLO_USE_TOURISM_TAX') && !Tax::excludeTaxeOption()) {
+            $tourismTaxRulesGroups = TaxRulesGroup::getTaxRulesGroupsForOptions(true, true);
+            $data->assign('tourismTaxRulesGroups', $tourismTaxRulesGroups);
+            $data->assign('id_tourism_tax_rules_group', isset($product->id_tourism_tax_rules_group) ? (int) $product->id_tourism_tax_rules_group : 0);
+
+            $tourismTaxRates = array();
+            foreach ($tourismTaxRulesGroups as $tourismTaxRulesGroup) {
+                $idTourismTaxRulesGroup = (int) $tourismTaxRulesGroup['id_tax_rules_group'];
+                if (!$idTourismTaxRulesGroup) {
+                    continue;
+                }
+                $tourismTaxRates[$idTourismTaxRulesGroup] = TaxConfiguration::getPreviewParams(
+                    $idTourismTaxRulesGroup,
+                    $address,
+                    (int) $this->context->language->id
+                );
+            }
+            $data->assign('tourismTaxRatesByGroup', $tourismTaxRates);
+        }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }

@@ -949,6 +949,14 @@ class OrderOpcControllerCore extends ParentOrderController
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $roomTypeServiceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, true, 1);
                 $cartBookings = $objCartBookingData->getHotelCartRoomsInfoByRoomType($this->context->cart->id, $idProduct,$dateFrom, $dateTo);
+                $availableServicePricing = $objRoomTypeServiceProduct->getServiceProductsPricingForCartBookings(
+                    $roomTypeServiceProducts,
+                    $cartBookings,
+                    $idProduct,
+                    $dateFrom,
+                    $dateTo
+                );
+
                 foreach($cartBookings as &$cartBookingData) {
                     $cartBookingData['selected_service'] = $objServiceProductCartDetail->getServiceProductsInCart(
                         $cartBookingData['id_cart'],
@@ -964,7 +972,22 @@ class OrderOpcControllerCore extends ParentOrderController
                         null,
                         1
                     );
+                    foreach ($cartBookingData['selected_service'] as &$selectedService) {
+                        if ($selectedService['tourism_tax'] > 0 && TaxConfiguration::isGrossedUp($selectedService['tourism_tax'])) {
+                            $selectedService['total_price_tax_incl'] += $selectedService['tourism_tax'];
+                            $quantity = $selectedService['quantity'] ?: 1;
+                            $impliedNumDays = $selectedService['unit_price_tax_excl'] > 0 ? $selectedService['total_price_tax_excl'] / ($selectedService['unit_price_tax_excl'] * $quantity) : 1;
+                            $unitDivisor = $impliedNumDays * $quantity;
+                            $selectedService['unit_price_tax_incl'] += $unitDivisor > 0 ? ($selectedService['tourism_tax'] / $unitDivisor) : 0;
+                        }
+                    }
+                    unset($selectedService);
+
+                    $cartBookingData['available_service_pricing'] = isset($availableServicePricing[$cartBookingData['id']])
+                        ? $availableServicePricing[$cartBookingData['id']]
+                        : array();
                 }
+                unset($cartBookingData);
                 $this->context->smarty->assign(array(
                     'roomTypeServiceProducts' => $roomTypeServiceProducts,
                     'cartRooms' => $cartBookings

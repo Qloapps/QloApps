@@ -610,7 +610,9 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         $footer['total_without_discount_te'] = $footer['room_price_tax_excl'] + $footer['total_convenience_fee_te'] + $footer['additional_service_price_tax_excl'] + $footer['service_products_price_tax_excl'];
         $footer['total_without_discount_ti'] = $footer['room_price_tax_incl'] + $footer['total_convenience_fee_ti'] + $footer['additional_service_price_tax_incl'] + $footer['service_products_price_tax_incl'];
 
-        $footer['total_tax_without_discount'] = $footer['total_without_discount_ti'] - $footer['total_without_discount_te'];
+        $footer['total_tourism_tax'] = OrderTaxDetail::getOrderTourismTaxTotal((int) $this->order->id);
+
+        $footer['total_tax_without_discount'] = $footer['total_without_discount_ti'] - $footer['total_without_discount_te'] - $footer['total_tourism_tax'];
         if ($footer['total_tax_without_discount'] < 0) {
             $footer['total_tax_without_discount'] = 0;
         }
@@ -733,6 +735,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
             'shipping_tax' => $this->order_invoice->getShippingTaxesBreakdown($this->order),
             'ecotax_tax' => $this->order_invoice->getEcoTaxTaxesBreakdown(),
             'wrapping_tax' => $this->order_invoice->getWrappingTaxesBreakdown(),
+            'tourism_tax' => $this->order_invoice->getTourismTaxBreakdown(),
         );
 
         foreach ($breakdowns as $type => $bd) {

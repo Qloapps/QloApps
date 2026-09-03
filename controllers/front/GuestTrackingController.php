@@ -249,6 +249,7 @@ class GuestTrackingControllerCore extends FrontController
                     if ($orderProducts = $order->getProducts()) {
                         $total_convenience_fee_te = 0;
                         $total_convenience_fee_ti = 0;
+                        $total_tourism_tax = OrderTaxDetail::getOrderTourismTaxTotal($idOrder);
 
                         $objOrderReturn = new OrderReturn();
                         $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1);
@@ -555,6 +556,7 @@ class GuestTrackingControllerCore extends FrontController
             'use_tax' => Configuration::get('PS_TAX'),
             'guestInformations' => (array)$customer,
             'view_on_map' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
+            'total_tourism_tax' => isset($total_tourism_tax) ? $total_tourism_tax : 0,
         ));
     }
 

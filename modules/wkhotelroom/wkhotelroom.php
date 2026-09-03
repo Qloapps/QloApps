@@ -68,17 +68,19 @@ class WkHotelRoom extends Module
                         ImageType::getFormatedName('large')
                     );
                 }
+                $includeTourismTax = $useTax && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
                 $productPriceWithoutReduction = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                     $idProduct,
                     $dateFrom,
                     $dateTo,
-                    1,
+                    array(array('adults' => 1, 'children' => 0, 'child_ages' => array())),
                     0,
                     0,
                     0,
                     0,
                     1,
-                    0
+                    0,
+                    $includeTourismTax
                 );
 
                 if ($useTax) {
@@ -98,7 +100,14 @@ class WkHotelRoom extends Module
                     $idProduct,
                     $dateFrom,
                     $dateTo,
-                    $useTax
+                    $useTax,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    array(array('adults' => 1, 'children' => 0, 'child_ages' => array()))
                 );
                 $htlRoom['feature_price'] = $featurePrice;
                 $htlRoom['feature_price_diff'] = (float)($priceWithoutReduction - $featurePrice);

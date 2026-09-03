@@ -69,6 +69,23 @@
                             </td>
                             <td>
                                 <span>{displayPrice price=($product.total_price_tax_incl - $product.total_price_tax_excl) currency=$currency->id}</span>
+                                {if isset($use_tourism_tax) && $use_tourism_tax && isset($product.tourism_tax_status)}
+                                    <span class="price_info">
+                                        &nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
+                                    </span>
+                                    <div class="price_info_container" style="display: none;">
+                                        <div>
+                                            <label>{l s='Service Tax:'}</label>
+                                            <span class="pull-right">{displayPrice price=$product.total_service_tax_only currency=$currency->id}</span>
+                                        </div>
+                                        {if $product.tourism_tax_total > 0}
+                                        <div>
+                                            <label>{l s='Tourism Tax:'}</label>
+                                            <span class="pull-right">{displayPrice price=$product.tourism_tax_total currency=$currency->id}</span>
+                                        </div>
+                                        {/if}
+                                    </div>
+                                {/if}
                             </td>
                             <td>
                                 <span>{displayPrice price=$product.total_price_tax_incl currency=$currency->id}</span>
@@ -136,6 +153,23 @@
                                                         {l s='Delete'}
                                                     </a>
                                                 </li>
+                                                {if isset($use_tourism_tax) && $use_tourism_tax && isset($product.tourism_tax_status) && $product.tourism_tax_status != $tourism_tax_status_not_applicable && !$product.is_cancelled && !$product.is_refunded}
+                                                    {if $product.tourism_tax_status == $tourism_tax_status_applied}
+                                                        <li>
+                                                            <a href="#" class="tt-exempt-service-line" data-id_service_product_order_detail="{$product.id_service_product_order_detail|intval}" data-label="{$product.name|escape:'html':'UTF-8'}">
+                                                                <i class="icon-ban"></i>
+                                                                {l s='Exempt Tourism Tax'}
+                                                            </a>
+                                                        </li>
+                                                    {else}
+                                                        <li>
+                                                            <a href="#" class="tt-apply-service-line" data-id_service_product_order_detail="{$product.id_service_product_order_detail|intval}">
+                                                                <i class="icon-check"></i>
+                                                                {l s='Apply Tourism Tax'}
+                                                            </a>
+                                                        </li>
+                                                    {/if}
+                                                {/if}
                                             </ul>
                                         </div>
                                     {/if}

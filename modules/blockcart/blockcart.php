@@ -138,9 +138,12 @@ class Blockcart extends Module
                         foreach ($serviceProducts as $key => $serviceProduct) {
                             if ($serviceProduct['id_product'] == $product['id_product']) {
                                 $product['options'][] = $serviceProduct;
-                                $product['total_price_tax_incl'] += $serviceProduct['total_price_tax_incl'];
+                                $tourismTaxGrossUp = ($useTax && TaxConfiguration::isGrossedUp($serviceProduct['tourism_tax_amount']))
+                                    ? $serviceProduct['tourism_tax_amount']
+                                    : 0.0;
+                                $product['total_price_tax_incl'] += $serviceProduct['total_price_tax_incl'] + $tourismTaxGrossUp;
                                 $product['total_price_tax_excl'] += $serviceProduct['total_price_tax_excl'];
-                                $product['amount'] += $useTax ? $serviceProduct['total_price_tax_incl'] : $serviceProduct['total_price_tax_excl'];
+                                $product['amount'] += $useTax ? ($serviceProduct['total_price_tax_incl'] + $tourismTaxGrossUp) : $serviceProduct['total_price_tax_excl'];
                             }
                         }
                     }
@@ -207,11 +210,16 @@ class Blockcart extends Module
         $shipping_cost_float = Tools::convertPrice($base_shipping, $currency);
         $wrappingCost = (float) ($params['cart']->getOrderTotal($useTax, Cart::ONLY_WRAPPING));
         $totalToPay = $params['cart']->getOrderTotal($useTax);
+        $tourismTaxTotals = $params['cart']->getOrderTotal(true, Cart::ONLY_TOURISM_TAX);
+        $tourismTax = (float) $tourismTaxTotals['tourism_tax'];
+        $tourismTaxRoom = (float) $tourismTaxTotals['tourism_tax_room'];
 
         $tax_cost = 0;
+        $tourismTaxCost = Tools::displayPrice(0, $currency);
         if ($useTax && $useTax) {
             $totalToPayWithoutTaxes = $params['cart']->getOrderTotal(false);
-            $tax_cost = Tools::displayPrice($totalToPay - $totalToPayWithoutTaxes, $currency);
+            $tax_cost = Tools::displayPrice(($totalToPay - $totalToPayWithoutTaxes) - $tourismTax, $currency);
+            $tourismTaxCost = Tools::displayPrice($tourismTax, $currency);
         }
         // The cart content is altered for display
         $orderProcess = Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
@@ -297,28 +305,46 @@ class Blockcart extends Module
             );
             $addedProduct['booking_product'] = $objProduct->booking_product;
             if ($objProduct->booking_product) {
+                $includeTourismTax = ($priceDisplayMethod != PS_TAX_EXC) && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
                 $price = $addedProduct['price'] = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                     $objProduct->id,
                     $addedProduct['date_from'],
                     $addedProduct['date_to'],
-                    $addedProduct['occupancy']
+                    $addedProduct['occupancy'],
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1,
+                    $includeTourismTax
                 );
                 if ($priceDisplayMethod == PS_TAX_EXC) {
                     $addedProduct['price'] = Tools::displayPrice($price['total_price_tax_excl']);
                 } else {
-                    $addedProduct['price'] = Tools::displayPrice($price['total_price_tax_incl']);
+                    $addedProduct['price'] = Tools::displayPrice((float) $price['total_price_tax_incl']);
                 }
                 $fullDate = ($this->context->controller->show_full_date && (date('Y-m-d', strtotime($addedProduct['date_from'])) == date('Y-m-d', strtotime($addedProduct['date_to']))) ? true : false);
                 $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from'], null, $fullDate);
                 $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to'], null, $fullDate);
             } else {
+                $includeTourismTax = $useTax && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
                 if ($objProduct->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
-                    $addedProduct['unit_price'] = RoomTypeServiceProductPrice::getPrice(
+                    $addedProduct['unit_price'] = Product::getServiceProductPrice(
                         $objProduct->id,
-                        0,
                         isset($addedProduct['id_product_option']) ? $addedProduct['id_product_option'] : null,
+                        0,
+                        false,
                         $useTax,
-                        $addedProduct['qty']
+                        1,
+                        null,
+                        null,
+                        false,
+                        null,
+                        1,
+                        null,
+                        0,
+                        $includeTourismTax
                     );
 
                     if (isset($addedProduct['id_product_option'])
@@ -330,12 +356,21 @@ class Blockcart extends Module
                 } elseif ($objProduct->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
                     || $objProduct->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
                 ) {
-                    $addedProduct['unit_price'] = RoomTypeServiceProductPrice::getPrice(
+                    $addedProduct['unit_price'] = Product::getServiceProductPrice(
                         $objProduct->id,
-                        $addedProduct['id_hotel'],
                         isset($addedProduct['id_product_option']) ? $addedProduct['id_product_option'] : null,
+                        $addedProduct['id_hotel'],
+                        false,
                         $useTax,
-                        $addedProduct['qty']
+                        1,
+                        null,
+                        null,
+                        false,
+                        null,
+                        1,
+                        null,
+                        0,
+                        $includeTourismTax
                     );
                     $objHotel = new HotelBranchInformation($addedProduct['id_hotel'], $this->context->language->id);
                     $addedProduct['hotel_name'] = $objHotel->hotel_name;
@@ -354,10 +389,21 @@ class Blockcart extends Module
         }
 
         $totalAdditionalServicesWithoutAutoAddPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOM_SERVICES_WITHOUT_AUTO_ADD);
-        $totalAdditionalServicesWithAutoAddPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOM_SERVICES);
+        $totalAdditionalServicesWithAutoAddPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOM_SERVICES_WITH_AUTO_ADD_WITHOUT_CONVENIENCE_FEE);
         $totalConvenienceFee = $params['cart']->getOrderTotal($useTax, Cart::ONLY_CONVENIENCE_FEE);
         $totalRoomsPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_ROOMS);
+        $tourismTaxConvenienceFee = (float) $tourismTaxTotals['tourism_tax_convenience_fee'];
+        if ($useTax && TaxConfiguration::isGrossedUp($tourismTaxRoom)) {
+            $totalRoomsPrice += $tourismTaxRoom;
+        }
+        if ($useTax && TaxConfiguration::isGrossedUp($tourismTaxConvenienceFee)) {
+            $totalConvenienceFee += $tourismTaxConvenienceFee;
+        }
         $totalNormalProductPrice = $params['cart']->getOrderTotal($useTax, Cart::ONLY_STANDALONE_PRODUCTS);
+        $tourismTaxStandaloneProducts = (float) $tourismTaxTotals['tourism_tax_standalone_products'];
+        if ($useTax && TaxConfiguration::isGrossedUp($tourismTaxStandaloneProducts)) {
+            $totalNormalProductPrice += $tourismTaxStandaloneProducts;
+        }
 
         $response = array(
             'products' => $products,
@@ -373,6 +419,8 @@ class Blockcart extends Module
             'show_tax' => $showTax,
             'use_tax' => $useTax,
             'tax_cost' => $tax_cost,
+            'tourism_tax_cost' => $tourismTaxCost,
+            'tourism_tax' => $tourismTax,
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
             'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
             'room_total' => ($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice),

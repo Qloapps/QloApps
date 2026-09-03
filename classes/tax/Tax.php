@@ -39,6 +39,9 @@ class TaxCore extends ObjectModel
     /** @var bool true if the tax has been historized */
     public $deleted = 0;
 
+    /** @var int 1 = this ps_tax row is a tourism tax (subtype params in tourism_tax) */
+    public $is_tourism_tax = 0;
+
     /**
      * @see ObjectModel::$definition
      */
@@ -47,11 +50,12 @@ class TaxCore extends ObjectModel
         'primary' => 'id_tax',
         'multilang' => true,
         'fields' => array(
-            'rate' =>            array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat', 'required' => true),
-            'active' =>        array('type' => self::TYPE_BOOL),
-            'deleted' =>        array('type' => self::TYPE_BOOL),
+            'rate' =>             array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat', 'required' => true),
+            'active' =>           array('type' => self::TYPE_BOOL),
+            'deleted' =>          array('type' => self::TYPE_BOOL),
+            'is_tourism_tax' =>   array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             /* Lang fields */
-            'name' =>            array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true, 'size' => 32),
+            'name' =>             array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true, 'size' => 32),
         ),
     );
 
@@ -133,7 +137,7 @@ class TaxCore extends ObjectModel
     {
         return Db::getInstance()->getValue('
 		SELECT `id_tax`
-		FROM `'._DB_PREFIX_.'order_detail_tax`
+		FROM `'._DB_PREFIX_.'order_tax_detail`
 		WHERE `id_tax` = '.(int)$this->id
         );
     }

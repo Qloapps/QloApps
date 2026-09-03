@@ -91,8 +91,14 @@
     {/block}
     {if $show_taxes}
         <p class="cart_total_tax">
-            <span>{l s='Total tax'}</span>
+            <span>{l s='Room and Service Tax'}</span>
             <span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
+        </p>
+    {/if}
+    {if $show_taxes && isset($total_tourism_tax) && $total_tourism_tax > 0}
+        <p class="cart_total_tourism_tax">
+            <span>{l s='Total Tourism Tax'}</span>
+            <span class="cart_total_values">{displayPrice price=$total_tourism_tax}</span>
         </p>
     {/if}
     <p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">

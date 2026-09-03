@@ -242,7 +242,7 @@ class AdminProductsControllerCore extends AdminController
         $this->_select .= ' a.`show_at_front`, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
-        $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
+        $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`, a.`id_tourism_tax_rules_group`';
         $this->_select .= ', IFNULL(hap.`active`, 0) AS advance_payment';
         $this->_select .= ', IF(IFNULL(hap.`active`, 0), 1, 0) badge_success, IF(IFNULL(hap.`active`, 0), 0, 1) badge_danger ';
 
@@ -645,7 +645,7 @@ class AdminProductsControllerCore extends AdminController
     {
         $prefix = $this->getCookieFilterPrefix();
         $orderByPriceFinal = (empty($orderBy) ? ($this->context->cookie->__get($prefix.$this->table.'Orderby') ? $this->context->cookie->__get($prefix.$this->table.'Orderby') : 'id_'.$this->table) : $orderBy);
-        $orderWayPriceFinal = (empty($orderWay) ? ($this->context->cookie->__get($prefix.$this->table.'Orderway') ? $this->context->cookie->__get($prefix.$this->table.'Orderby') : 'ASC') : $orderWay);
+        $orderWayPriceFinal = (empty($orderWay) ? ($this->context->cookie->__get($prefix.$this->table.'Orderway') ? $this->context->cookie->__get($prefix.$this->table.'Orderway') : 'ASC') : $orderWay);
         if ($orderByPriceFinal == 'price_final') {
             $orderBy = 'id_'.$this->table;
             $orderWay = 'ASC';
@@ -680,24 +680,52 @@ class AdminProductsControllerCore extends AdminController
             unset($this->fields_list['id_feature']);
             unset($this->fields_list['id_service_product']);
         }
-        parent::getList($id_lang, $orderBy, $orderWay, $start, $limit, $this->context->shop->id);
+        parent::getList($id_lang, $orderBy, $orderWay, $start, $limit, $id_lang_shop ?: $this->context->shop->id);
 
         /* update product quantity with attributes ...*/
         $nb = count($this->_list);
         if ($this->_list) {
             $context = $this->context->cloneContext();
             $context->shop = clone($context->shop);
+            $isAllShopsContext = (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP);
+            $priceDisplayPrecision = (int) Configuration::get('PS_PRICE_DISPLAY_PRECISION');
+            $useTourismTax = (bool) Configuration::get('QLO_USE_TOURISM_TAX');
+            $todayDate = date('Y-m-d');
+            $tomorrowDate = date('Y-m-d', strtotime('+1 day', strtotime($todayDate)));
+
             /* update product final price */
             for ($i = 0; $i < $nb; $i++) {
-                if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP) {
+                if ($isAllShopsContext) {
                     $context->shop = new Shop((int)$this->_list[$i]['id_shop_default']);
                 }
 
                 // convert price with the currency from context
                 $this->_list[$i]['price'] = Tools::convertPrice($this->_list[$i]['price'], $this->context->currency, true, $this->context);
                 $this->_list[$i]['price_tmp'] = Product::getPriceStatic($this->_list[$i]['id_product'], true, null,
-                    (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION'), null, false, true, 1, true, null, null, null, $nothing, true, true,
+                    $priceDisplayPrecision, null, false, true, 1, true, null, null, null, $nothing, true, true,
                     $context);
+
+                $idTourismTaxRulesGroup = (int) $this->_list[$i]['id_tourism_tax_rules_group'];
+                $idHotel = (int) $this->_list[$i]['id_hotel'];
+                if ($useTourismTax && $idTourismTaxRulesGroup && $idHotel) {
+                    $idProduct = $this->_list[$i]['id_product'];
+                    $vatAddress = new Address(HotelRoomType::getHotelIdAddressByIdProduct($idProduct));
+                    $vatCalculator = TaxManagerFactory::getManager($vatAddress, Product::getIdTaxRulesGroupByIdProduct($idProduct))->getTaxCalculator();
+                    $unitPriceTaxExcl = $vatCalculator->removeTaxes($this->_list[$i]['price_tmp']);
+
+                    $hotelTaxContext = TaxConfiguration::resolveHotelAddressAndCollectionType($idHotel, $vatAddress);
+                    $taxCalculator = TaxManagerFactory::getManager($hotelTaxContext['address'], $idTourismTaxRulesGroup)->getTaxCalculator();
+                    $this->_list[$i]['price_tmp'] += $taxCalculator->getTaxesTotalAmount(
+                        $unitPriceTaxExcl,
+                        $todayDate,
+                        1,
+                        1,
+                        array(),
+                        $hotelTaxContext['collectionType'],
+                        1,
+                        $this->context->currency->id
+                    );
+                }
             }
         }
 
@@ -3263,7 +3291,7 @@ class AdminProductsControllerCore extends AdminController
                             if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
                                 $serviceProductPriceInfo['id_tax_rules_group'],
                                 $this->context->language->id
-                            ))) {
+                            )) && !$objTaxRuleGroup->is_tourism_tax_rule_group) {
                                 $associationInfo['tax_rules_group_name'] = $objTaxRuleGroup->name;
                             }
                             $associationInfo['id_room_type_service_product_price'] = $serviceProductPriceInfo['id_room_type_service_product_price'];
@@ -3273,7 +3301,7 @@ class AdminProductsControllerCore extends AdminController
                         if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
                             $objProduct->id_tax_rules_group,
                             $this->context->language->id
-                        ))) {
+                        )) && !$objTaxRuleGroup->is_tourism_tax_rule_group) {
                             $associationInfo['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
                         }
 
@@ -3287,7 +3315,7 @@ class AdminProductsControllerCore extends AdminController
                         if (Validate::isLoadedObject($objTaxRulesGroup = new TaxRulesGroup(
                             $serviceProduct['id_tax_rules_group'],
                             $this->context->language->id
-                        ))) {
+                        )) && !$objTaxRulesGroup->is_tourism_tax_rule_group) {
                             $serviceProduct['tax_rules_group_name'] = $objTaxRulesGroup->name;
                         }
 
@@ -4020,6 +4048,25 @@ class AdminProductsControllerCore extends AdminController
             $htlFeaturePrices = new HotelRoomTypeFeaturePricing();
             $productFeaturePrices = $htlFeaturePrices->getFeaturePricesbyIdProduct($product->id);
             $data->assign('productFeaturePrices', $productFeaturePrices);
+        }
+
+        if (Configuration::get('QLO_USE_TOURISM_TAX') && !Tax::excludeTaxeOption()) {
+            $tourismTaxRulesGroups = TaxRulesGroup::getTaxRulesGroupsForOptions(true, true);
+            $data->assign('tourismTaxRulesGroups', $tourismTaxRulesGroups);
+            $data->assign('id_tourism_tax_rules_group', isset($product->id_tourism_tax_rules_group) ? (int) $product->id_tourism_tax_rules_group : 0);
+
+            $roomTypeInfo = (new HotelRoomType())->getRoomTypeInfoByIdProduct((int) $product->id);
+            $idHotel = $roomTypeInfo ? (int) $roomTypeInfo['id_hotel'] : 0;
+            $collectionType = TaxConfiguration::resolveHotelAddressAndCollectionType($idHotel, $address)['collectionType'];
+
+            $tourismTaxRates = array();
+            foreach ($tourismTaxRulesGroups as $tourismTaxRulesGroup) {
+                if (!$tourismTaxRulesGroup['id_tax_rules_group']) {
+                    continue;
+                }
+                $tourismTaxRates[$tourismTaxRulesGroup['id_tax_rules_group']] = TaxConfiguration::getPreviewParams($tourismTaxRulesGroup['id_tax_rules_group'], $address, $this->context->language->id, $collectionType);
+            }
+            $data->assign('tourismTaxRatesByGroup', $tourismTaxRates);
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();

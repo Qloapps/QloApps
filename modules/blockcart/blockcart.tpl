@@ -138,7 +138,15 @@
 												{if $show_tax && $use_tax}
 													<div class="cart-prices-line">
 														<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
-														<span>{l s='Tax' mod='blockcart'}</span>
+														<span>{l s='Room and Service Tax' mod='blockcart'}</span>
+													</div>
+												{/if}
+											{/block}
+											{block name='blockcart_shopping_cart_total_tourism_tax'}
+												{if $show_tax && $use_tax}
+													<div class="cart-prices-line ajax_cart_tourism_tax_line"{if !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
+														<span class="price cart_block_tourism_tax_cost ajax_cart_tourism_tax_cost">{$tourism_tax_cost}</span>
+														<span>{l s='Total Tourism Tax' mod='blockcart'}</span>
 													</div>
 												{/if}
 											{/block}
@@ -266,7 +274,7 @@
 									</strong>
 									<span class="ajax_block_room_total pull-right">
 										{if $cart_qties > 0}
-											{convertPrice price=$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS)}
+											{convertPrice price=$cart->getOrderTotal(($priceDisplay != 1), Cart::ONLY_ROOMS)}
 										{/if}
 									</span>
 								</div>
@@ -285,7 +293,7 @@
 									</strong>
 									<span class="ajax_block_product_total pull-right">
 										{if $cart_qties > 0}
-											{convertPrice price=$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS)}
+											{convertPrice price=$normal_products_total}
 										{/if}
 									</span>
 								</div>
@@ -344,8 +352,16 @@
 							{block name='blockcart_layer_cart_total_tax'}
 								{if $show_tax && $use_tax}
 									<div class="layer_cart_row">
-										<strong class="dark">{l s='Tax' mod='blockcart'}</strong>
+										<strong class="dark">{l s='Room and Service Tax' mod='blockcart'}</strong>
 										<span class="price cart_block_tax_cost ajax_cart_tax_cost pull-right">{$tax_cost}</span>
+									</div>
+								{/if}
+							{/block}
+							{block name='blockcart_layer_cart_total_tourism_tax'}
+								{if $show_tax && $use_tax}
+									<div class="layer_cart_row ajax_cart_tourism_tax_line"{if !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
+										<strong class="dark">{l s='Total Tourism Tax' mod='blockcart'}</strong>
+										<span class="price cart_block_tourism_tax_cost ajax_cart_tourism_tax_cost pull-right">{$tourism_tax_cost}</span>
 									</div>
 								{/if}
 							{/block}

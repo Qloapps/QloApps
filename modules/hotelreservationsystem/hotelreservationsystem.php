@@ -566,7 +566,9 @@ class HotelReservationSystem extends Module
             'WK_HOTEL_NAME_ENABLE',
             'WK_CUSTOMER_SUPPORT_PHONE_NUMBER',
             'WK_CUSTOMER_SUPPORT_EMAIL',
-            'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST'
+            'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST',
+            'QLO_USE_TOURISM_TAX',
+            'QLO_TOURISM_TAX_GROSSED_UP',
         );
         foreach ($configKeys as $key) {
             if (!Configuration::deleteByName($key)) {

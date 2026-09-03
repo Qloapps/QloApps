@@ -23,6 +23,9 @@
 
 class HotelBranchInformation extends ObjectModel
 {
+    const TAX_COLLECTION_TYPE_ONLINE = 0;
+    const TAX_COLLECTION_TYPE_AT_HOTEL = 1;
+
     public $id_category;
     public $hotel_name;
     public $email;
@@ -39,6 +42,7 @@ class HotelBranchInformation extends ObjectModel
     public $map_input_text;
     public $active_refund;
     public $fax;
+    public $tourism_tax_collection_type = 0;
     public $date_add;
     public $date_upd;
 
@@ -61,6 +65,7 @@ class HotelBranchInformation extends ObjectModel
             'map_input_text' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'active_refund' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'fax' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
+            'tourism_tax_collection_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
 

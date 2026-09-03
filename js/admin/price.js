@@ -100,6 +100,48 @@ function getEcotaxTaxIncluded()
 	return ps_round(ecotax_tax_excl * (1 + ecotaxTaxRate), 2);
 }
 
+
+function getTourismTaxIncluded(priceTE)
+{
+	var CALCULATION_TYPE_PERCENTAGE = 1;
+
+	if (typeof tourismTaxRatesByGroup === 'undefined' || isNaN(priceTE)) {
+		return 0;
+	}
+
+	var selectedTourismTax = document.getElementById('id_tourism_tax_rules_group');
+	if (!selectedTourismTax) {
+		return 0;
+	}
+
+	var taxes = tourismTaxRatesByGroup[selectedTourismTax.options[selectedTourismTax.selectedIndex].value] || [];
+	var tourismAmount = 0;
+
+	for (var i = 0; i < taxes.length; i++) {
+		var t = taxes[i];
+		var baseValue = null;
+
+		if (t.is_tiered) {
+			for (var j = 0; j < t.tiers.length; j++) {
+				var tier = t.tiers[j];
+				if (priceTE >= tier.min_amount && (tier.max_amount == 0 || priceTE <= tier.max_amount)) {
+					baseValue = tier.tax_value;
+					break;
+				}
+			}
+			if (baseValue === null) {
+				continue;
+			}
+		} else {
+			baseValue = t.tax_value;
+		}
+
+		tourismAmount += (t.tax_calc_type == CALCULATION_TYPE_PERCENTAGE) ? (priceTE * baseValue / 100) : baseValue;
+	}
+
+	return tourismAmount;
+}
+
 function getEcotaxTaxExcluded()
 {
 	return ecotax_tax_excl;
@@ -138,7 +180,7 @@ function calcPriceTI()
 	}
 	else
 	{
-		$('#priceTI').val((parseFloat($('#priceTI').val()) + getEcotaxTaxIncluded()).toFixed(priceDisplayPrecision));
+		$('#priceTI').val((parseFloat($('#priceTI').val()) + getEcotaxTaxIncluded() + getTourismTaxIncluded(priceTE)).toFixed(priceDisplayPrecision));
 		$('#finalPrice').html(parseFloat($('#priceTI').val()).toFixed(priceDisplayPrecision));
 	}
 }
@@ -148,6 +190,10 @@ function calcPriceTE()
 	ecotax_tax_excl =  $('#ecotax').val() / (1 + ecotaxTaxRate);
 	var priceTI = parseFloat($('#priceTI').val().replace(/,/g, '.'));
 	var newPrice = removeTaxes(ps_round(priceTI - getEcotaxTaxIncluded(), priceDisplayPrecision));
+	var tourismTaxIncluded = getTourismTaxIncluded(newPrice);
+	if (tourismTaxIncluded > 0) {
+		newPrice = removeTaxes(ps_round(priceTI - getEcotaxTaxIncluded() - tourismTaxIncluded, priceDisplayPrecision));
+	}
 
 	$('#priceTE').val((isNaN(newPrice) == true || newPrice < 0) ? '' : ps_round(newPrice, 6).toFixed(6));
 	$('#priceTEReal').val((isNaN(newPrice) == true || newPrice < 0) ? 0 : ps_round(newPrice, 9));

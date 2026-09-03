@@ -229,32 +229,54 @@ class ServiceProductCartDetail extends ObjectModel
             foreach ($serviceProducts as $product) {
                 $objProduct = new Product($product['id_product'], false, $language->id);
                 if (!$objProduct->booking_product) {
+                    $quantity = $product['quantity'] ? (int) $product['quantity'] : 1;
+
+                    $numDays = 1;
+                    // If price type is per day but the dates are not valid.
+                    if (($objProduct->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY)
+                        && (!$numDays = HotelHelper::getNumberOfDays($product['date_from'], $product['date_to']))
+                    ) {
+                        $numDays = 1;
+                    }
+
+                    $objHotelCartBooking = $product['htl_cart_booking_id']
+                        ? new HotelCartBookingData($product['htl_cart_booking_id'])
+                        : null;
+
+                    $priceTaxExcl = Product::getServiceProductPrice(
+                        $objProduct->id,
+                        $product['id_product_option'],
+                        $product['id_hotel'],
+                        $product['id_product_room_type'],
+                        false,
+                        1,
+                        $product['date_from'],
+                        $product['date_to'],
+                        $idCart,
+                        null,
+                        1,
+                        null,
+                        $product['htl_cart_booking_id']
+                    ) / $numDays;
+
                     if ($getTotalPrice) {
-                        $qty = $product['quantity'] ? (int)$product['quantity'] : 1;
                         $totalPrice += Product::getServiceProductPrice(
                             $objProduct->id,
                             $product['id_product_option'],
                             $product['id_hotel'],
                             $product['id_product_room_type'],
                             $useTax,
-                            $qty,
+                            $quantity,
                             $product['date_from'],
                             $product['date_to'],
                             $idCart,
                             null,
                             1,
                             null,
-                            $product['htl_cart_booking_id']
+                            $product['htl_cart_booking_id'],
+                            $useTax && Configuration::get('QLO_TOURISM_TAX_GROSSED_UP')
                         );
                     } else {
-                        $numDays = 1;
-                        // If price type is per day but the dates are not valid.
-                        if (($objProduct->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY)
-                            && (!$numDays = HotelHelper::getNumberOfDays($product['date_from'], $product['date_to']))
-                        ) {
-                            $numDays = 1;
-                        }
-
                         $priceTaxIncl = Product::getServiceProductPrice(
                             $objProduct->id,
                             $product['id_product_option'],
@@ -270,21 +292,42 @@ class ServiceProductCartDetail extends ObjectModel
                             null,
                             $product['htl_cart_booking_id']
                         )/$numDays;
-                        $priceTaxExcl = Product::getServiceProductPrice(
-                            $objProduct->id,
-                            $product['id_product_option'],
-                            $product['id_hotel'],
-                            $product['id_product_room_type'],
-                            false,
-                            1,
-                            $product['date_from'],
-                            $product['date_to'],
-                            $idCart,
-                            null,
-                            1,
-                            null,
-                            $product['htl_cart_booking_id']
-                        )/$numDays;
+
+                        $tourismTaxAmount = 0.0;
+                        if (Product::getIdTourismTaxRulesGroupByIdProduct($objProduct->id)) {
+                            $totalExclTourismTax = Product::getServiceProductPrice(
+                                $objProduct->id,
+                                $product['id_product_option'],
+                                $product['id_hotel'],
+                                $product['id_product_room_type'],
+                                false,
+                                $quantity,
+                                $product['date_from'],
+                                $product['date_to'],
+                                $idCart,
+                                null,
+                                1,
+                                null,
+                                $product['htl_cart_booking_id']
+                            );
+                            $totalInclTourismTax = Product::getServiceProductPrice(
+                                $objProduct->id,
+                                $product['id_product_option'],
+                                $product['id_hotel'],
+                                $product['id_product_room_type'],
+                                false,
+                                $quantity,
+                                $product['date_from'],
+                                $product['date_to'],
+                                $idCart,
+                                null,
+                                1,
+                                null,
+                                $product['htl_cart_booking_id'],
+                                true
+                            );
+                            $tourismTaxAmount = $totalInclTourismTax - $totalExclTourismTax;
+                        }
 
                         $optionDetails = false;
                         if (ServiceProductOption::productHasOptions($product['id_product'])) {
@@ -331,10 +374,10 @@ class ServiceProductCartDetail extends ObjectModel
                             'auto_add_to_cart' => $product['auto_add_to_cart'],
                             'price_addition_type' => $product['price_addition_type'],
                             'total_price' => ($useTax ? $priceTaxIncl : $priceTaxExcl) * $numDays * (int)$product['quantity'],
+                            'tourism_tax_amount' => $tourismTaxAmount,
                         );
 
-                        if ($product['htl_cart_booking_id']) {
-                            $objHotelCartBooking = new HotelCartBookingData($product['htl_cart_booking_id']);
+                        if ($objHotelCartBooking) {
                             $productInfo['date_from'] = $objHotelCartBooking->date_from;
                             $productInfo['date_to'] = $objHotelCartBooking->date_to;
                             $productInfo['id_room_type_hotel'] = $objHotelCartBooking->id_hotel;
@@ -347,6 +390,8 @@ class ServiceProductCartDetail extends ObjectModel
                             $productInfo['id_room_type'] = 0;
                             $productInfo['id_room'] = 0;
                         }
+
+                        $productInfo['tourism_tax'] = $tourismTaxAmount;
 
                         if ($detailedInfo) {
                             $objHotelBranchInformation = new HotelBranchInformation();

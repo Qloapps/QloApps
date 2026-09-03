@@ -475,12 +475,22 @@
 														{/if}
 														<tr class="item">
 															<td>
-																<strong>{l s='Total Tax'}</strong>
+																<strong>{l s='Room and Service Tax'}</strong>
 															</td>
 															<td class="text-right">
 																<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_tax_without_discount'] currency=$objOrderCurrency convert=1}</span>
 															</td>
 														</tr>
+														{if isset($orderTotalInfo['total_tourism_tax']) && $orderTotalInfo['total_tourism_tax'] > 0}
+															<tr class="item">
+																<td>
+																	<strong>{l s='Total Tourism Tax'}</strong>
+																</td>
+																<td class="text-right">
+																	<span>{displayWtPriceWithCurrency price=$orderTotalInfo['total_tourism_tax'] currency=$objOrderCurrency}</span>
+																</td>
+															</tr>
+														{/if}
 														{if $order->total_discounts > 0}
 															<tr class="item">
 																<td>

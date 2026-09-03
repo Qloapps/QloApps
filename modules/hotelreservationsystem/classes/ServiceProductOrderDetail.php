@@ -479,6 +479,45 @@ class ServiceProductOrderDetail extends ObjectModel
         return $result;
     }
 
+    /**
+     * Active (non-refunded, non-cancelled) service line ids attached to a room booking.
+     * Used by the tourism tax apply/exempt flow to also act on a room's own service lines.
+     *
+     * @param int $idHtlBookingDetail
+     * @return array int[]
+     */
+    public static function getActiveIdsByHtlBookingDetail($idHtlBookingDetail)
+    {
+        $rows = Db::getInstance()->executeS(
+            'SELECT `id_service_product_order_detail` FROM `' . _DB_PREFIX_ . 'service_product_order_detail`
+             WHERE `id_htl_booking_detail` = ' . (int) $idHtlBookingDetail . '
+               AND `is_refunded` = 0
+               AND `is_cancelled` = 0'
+        );
+
+        return $rows ? array_map('intval', array_column($rows, 'id_service_product_order_detail')) : array();
+    }
+
+    /**
+     * Active (not refunded/cancelled) standalone service line ids for an order — lines with no room
+     * attachment (id_htl_booking_detail = 0), the counterpart to getActiveIdsByHtlBookingDetail().
+     *
+     * @param int $idOrder
+     * @return array int[]
+     */
+    public static function getActiveStandaloneIdsByOrder($idOrder)
+    {
+        $rows = Db::getInstance()->executeS(
+            'SELECT `id_service_product_order_detail` FROM `' . _DB_PREFIX_ . 'service_product_order_detail`
+             WHERE `id_order` = ' . (int) $idOrder . '
+               AND `id_htl_booking_detail` = 0
+               AND `is_refunded` = 0
+               AND `is_cancelled` = 0'
+        );
+
+        return $rows ? array_map('intval', array_column($rows, 'id_service_product_order_detail')) : array();
+    }
+
     // process the tables changes when a product refund/cancellation is processed
     public function processRefundInTables()
     {

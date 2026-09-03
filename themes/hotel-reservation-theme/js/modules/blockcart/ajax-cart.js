@@ -1293,6 +1293,12 @@ var ajaxCart = {
             $('.ajax_cart_shipping_cost').parent().find('.unvisible').show();
 
         $('.ajax_cart_tax_cost').text(jsonData.tax_cost);
+        $('.ajax_cart_tourism_tax_cost').text(jsonData.tourism_tax_cost);
+        if (parseFloat(jsonData.tourism_tax) > 0) {
+            $('.ajax_cart_tourism_tax_line').show();
+        } else {
+            $('.ajax_cart_tourism_tax_line').hide();
+        }
         $('.cart_block_wrapping_cost').text(jsonData.wrapping_cost);
 
         $('.ajax_block_cart_total').text(jsonData.total);

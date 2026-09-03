@@ -1161,16 +1161,25 @@ class OrderCore extends ObjectModel
         $selling_preference_type = null,
         $product_auto_add = null,
         $product_price_addition_type = null,
-        $ids_order_detail = []
+        $ids_order_detail = [],
+        $includeTourismTax = true
     ) {
         /* Retro-compatibility (now set directly on the validateOrder() method) */
         if (!$products) {
             $products = $this->getProductsDetail($bookingProducts, $selling_preference_type, $product_auto_add, $product_price_addition_type, $ids_order_detail);
         }
 
+        $tourismTaxByOrderDetail = array();
+        if (!$includeTourismTax && $products) {
+            $tourismTaxByOrderDetail = OrderTaxDetail::getAmountsByOrderDetail((int) $this->id);
+        }
+
         $return = 0;
         foreach ($products as $row) {
             $return += $row['total_price_tax_incl'];
+            if (!$includeTourismTax) {
+                $return -= isset($tourismTaxByOrderDetail[$row['id_order_detail']]) ? $tourismTaxByOrderDetail[$row['id_order_detail']] : 0;
+            }
         }
 
         return $return;
@@ -1821,10 +1830,11 @@ class OrderCore extends ObjectModel
         // if one of the order details use the tax computation method the display will be different
         return Db::getInstance()->getValue('
             SELECT od.`tax_computation_method`
-            FROM `'._DB_PREFIX_.'order_detail_tax` odt
+            FROM `'._DB_PREFIX_.'order_tax_detail` odt
             LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
             WHERE od.`id_order` = '.(int)$this->id.'
-            AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD
+            AND od.`tax_computation_method` = '.(int)TaxCalculator::ONE_AFTER_ANOTHER_METHOD.'
+            AND NOT EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'tax` tc WHERE tc.`id_tax` = odt.`id_tax` AND tc.`is_tourism_tax` = 1)'
         );
     }
 
@@ -2150,61 +2160,6 @@ class OrderCore extends ObjectModel
 
         // update database
         return $this->update();
-    }
-
-    /**
-     * Returns the correct product taxes breakdown.
-     *
-     * @since 1.5.0.1
-     * @return array
-     */
-    public function getProductTaxesBreakdown()
-    {
-        $tmp_tax_infos = array();
-        if ($this->useOneAfterAnotherTaxComputationMethod()) {
-            // sum by taxes
-            $taxes_by_tax = Db::getInstance()->executeS('
-			SELECT odt.`id_order_detail`, t.`name`, t.`rate`, SUM(`total_amount`) AS `total_amount`
-			FROM `'._DB_PREFIX_.'order_detail_tax` odt
-			LEFT JOIN `'._DB_PREFIX_.'tax` t ON (t.`id_tax` = odt.`id_tax`)
-			LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
-			WHERE od.`id_order` = '.(int)$this->id.'
-			GROUP BY odt.`id_tax`
-			');
-
-            // format response
-            $tmp_tax_infos = array();
-            foreach ($taxes_by_tax as $tax_infos) {
-                $tmp_tax_infos[$tax_infos['rate']]['total_amount'] = $tax_infos['tax_amount'];
-                $tmp_tax_infos[$tax_infos['rate']]['name'] = $tax_infos['name'];
-            }
-        } else {
-            // sum by order details in order to retrieve real taxes rate
-            $taxes_infos = Db::getInstance()->executeS('
-			SELECT odt.`id_order_detail`, t.`rate` AS `name`, SUM(od.`total_price_tax_excl`) AS total_price_tax_excl, SUM(t.`rate`) AS rate, SUM(`total_amount`) AS `total_amount`
-			FROM `'._DB_PREFIX_.'order_detail_tax` odt
-			LEFT JOIN `'._DB_PREFIX_.'tax` t ON (t.`id_tax` = odt.`id_tax`)
-			LEFT JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
-			WHERE od.`id_order` = '.(int)$this->id.'
-			GROUP BY odt.`id_order_detail`
-			');
-
-            // sum by taxes
-            $tmp_tax_infos = array();
-            foreach ($taxes_infos as $tax_infos) {
-                if (!isset($tmp_tax_infos[$tax_infos['rate']])) {
-                    $tmp_tax_infos[$tax_infos['rate']] = array('total_amount' => 0,
-                                                                'name' => 0,
-                                                                'total_price_tax_excl' => 0);
-                }
-
-                $tmp_tax_infos[$tax_infos['rate']]['total_amount'] += $tax_infos['total_amount'];
-                $tmp_tax_infos[$tax_infos['rate']]['name'] = $tax_infos['name'];
-                $tmp_tax_infos[$tax_infos['rate']]['total_price_tax_excl'] += $tax_infos['total_price_tax_excl'];
-            }
-        }
-
-        return $tmp_tax_infos;
     }
 
     /**
@@ -2538,7 +2493,7 @@ class OrderCore extends ObjectModel
         } else {
             $order_details = $this->getOrderDetailList();
         }
-        $expected_total_tax = (float)$this->getTotalProductsWithTaxes($limitToOrderDetails) - (float)$this->getTotalProductsWithoutTaxes($limitToOrderDetails);
+        $expected_total_tax = (float)$this->getTotalProductsWithTaxes($limitToOrderDetails, null, null, null, null, [], false) - (float)$this->getTotalProductsWithoutTaxes($limitToOrderDetails);
 
         $order_ecotax_tax = 0;
 

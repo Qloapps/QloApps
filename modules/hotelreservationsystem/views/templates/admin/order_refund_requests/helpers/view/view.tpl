@@ -160,6 +160,8 @@
 											{/if}
 										</tr>
 										{foreach $refundReqBookings as $booking}
+											{assign var="tourismTaxAppliedAmount" value=$booking['tourism_tax_applied_amount']|default:0}
+											{assign var="tourismTaxPaidAmount" value=$booking['tourism_tax_paid_amount']|default:0}
 											<tr>
 												{if !$isRefundCompleted}
 													<td><input type="checkbox" name="id_order_return_detail[]" value="{$booking['id_order_return_detail']|escape:'html':'UTF-8'}" checked/></td>
@@ -180,6 +182,12 @@
 															<label>{l s='Services cost:' mod='hotelreservationsystem'}</label>
 															<span class="pull-right">{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</span>
 														</div>
+														{if $tourismTaxAppliedAmount > 0}
+															<div>
+																<label>{l s='Tourism Tax:' mod='hotelreservationsystem'}</label>
+																<span class="pull-right">{displayPrice price=$tourismTaxAppliedAmount currency=$orderCurrency['id']}</span>
+															</div>
+														{/if}
 													{/capture}
 													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_total_tooltip}
 												</td>
@@ -194,6 +202,12 @@
 															<label>{l s='Services paid amount:' mod='hotelreservationsystem'}</label>
 															<span class="pull-right">{displayPrice price=$booking['extra_service_total_paid_amount'] currency=$orderCurrency['id']}</span>
 														</div>
+														{if $tourismTaxPaidAmount > 0}
+															<div>
+																<label>{l s='Tourism Tax paid:' mod='hotelreservationsystem'}</label>
+																<span class="pull-right">{displayPrice price=$tourismTaxPaidAmount currency=$orderCurrency['id']}</span>
+															</div>
+														{/if}
 													{/capture}
 													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_paid_tooltip }
 												</td>

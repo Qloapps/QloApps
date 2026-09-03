@@ -1204,13 +1204,79 @@ CREATE TABLE `PREFIX_orders` (
   INDEX `date_add`(`date_add`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
-CREATE TABLE `PREFIX_order_detail_tax` (
-  `id_order_detail` int(11) NOT NULL,
-  `id_tax` int(11) NOT NULL,
-  `unit_amount` DECIMAL(16, 6) NOT NULL DEFAULT '0.00',
-  `total_amount` DECIMAL(16, 6) NOT NULL DEFAULT '0.00',
-   KEY (`id_order_detail`),
-   KEY `id_tax` (`id_tax`)
+CREATE TABLE `PREFIX_tax_configuration` (
+  `id_tax` int(11) unsigned NOT NULL,
+  `tax_value` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `calculation_type` tinyint(1) NOT NULL DEFAULT '0',
+  `per_night` tinyint(1) NOT NULL DEFAULT '1',
+  `per_person` tinyint(1) NOT NULL DEFAULT '0',
+  `has_tiered_pricing` tinyint(1) NOT NULL DEFAULT '0',
+  `apply_on_child` tinyint(1) NOT NULL DEFAULT '0',
+  `has_child_age_range` tinyint(1) NOT NULL DEFAULT '0',
+  `child_calculation_type` tinyint(1) NOT NULL DEFAULT '0',
+  `has_multiple_valid_ranges` tinyint(1) NOT NULL DEFAULT '0',
+  `special_days` text,
+  PRIMARY KEY (`id_tax`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_tax_price_tier` (
+  `id_tax_price_tier` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id_tax` int(11) unsigned NOT NULL,
+  `min_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `max_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `tax_value` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  PRIMARY KEY (`id_tax_price_tier`),
+  KEY `id_tax` (`id_tax`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_tax_child_range` (
+  `id_tax_child_range` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id_tax` int(11) unsigned NOT NULL,
+  `min_age` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `max_age` tinyint(3) unsigned NOT NULL DEFAULT '17',
+  `tax_value` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  PRIMARY KEY (`id_tax_child_range`),
+  KEY `id_tax` (`id_tax`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_tax_validity_range` (
+  `id_tax_validity_range` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id_tax` int(11) unsigned NOT NULL,
+  `valid_from` date DEFAULT NULL,
+  `valid_to` date DEFAULT NULL,
+  PRIMARY KEY (`id_tax_validity_range`),
+  KEY `id_tax` (`id_tax`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_order_tax_detail` (
+  `id_order_tax_detail` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id_order` int(11) unsigned NOT NULL,
+  `id_order_detail` int(11) unsigned NOT NULL,
+  `id_htl_booking` int(11) unsigned NOT NULL,
+  `id_service_product_order_detail` int(11) unsigned NOT NULL DEFAULT '0',
+  `id_tax` int(11) unsigned NOT NULL,
+  `unit_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `total_amount` decimal(20,6) NOT NULL DEFAULT '0.000000',
+  `date_add` datetime NOT NULL,
+  PRIMARY KEY (`id_order_tax_detail`),
+  KEY `id_order` (`id_order`),
+  KEY `id_order_detail` (`id_order_detail`),
+  KEY `id_htl_booking` (`id_htl_booking`),
+  KEY `id_service_product_order_detail` (`id_service_product_order_detail`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
+
+CREATE TABLE `PREFIX_order_tax_exemption` (
+  `id_order_tax_exemption` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id_htl_booking` int(11) unsigned NOT NULL DEFAULT '0',
+  `id_service_product_order_detail` int(11) unsigned NOT NULL DEFAULT '0',
+  `id_order` int(11) unsigned NOT NULL,
+  `id_employee` int(11) unsigned NOT NULL,
+  `note` text,
+  `date_add` datetime NOT NULL,
+  PRIMARY KEY (`id_order_tax_exemption`),
+  KEY `id_htl_booking` (`id_htl_booking`),
+  KEY `id_service_product_order_detail` (`id_service_product_order_detail`),
+  KEY `id_order` (`id_order`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 
 CREATE TABLE `PREFIX_order_invoice` (
@@ -1280,6 +1346,7 @@ CREATE TABLE `PREFIX_order_detail` (
   `product_supplier_reference` varchar(32) DEFAULT NULL,
   `product_weight` DECIMAL(20,6) NOT NULL,
   `id_tax_rules_group` INT(11) UNSIGNED DEFAULT '0',
+  `id_tourism_tax_rule_group` INT(11) UNSIGNED DEFAULT '0',
   `tax_computation_method` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `tax_name` varchar(16) NOT NULL,
   `tax_rate` DECIMAL(10,3) NOT NULL DEFAULT '0.000',
@@ -1536,6 +1603,7 @@ CREATE TABLE `PREFIX_product` (
   `id_category_default` int(10) unsigned DEFAULT NULL,
   `id_shop_default` int(10) unsigned NOT NULL DEFAULT 1,
   `id_tax_rules_group` INT(11) UNSIGNED NOT NULL,
+  `id_tourism_tax_rules_group` INT(11) UNSIGNED NOT NULL DEFAULT '0',
   `on_sale` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `online_only` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `ean13` varchar(13) DEFAULT NULL,
@@ -1599,6 +1667,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_product_shop` (
   `id_shop` int(10) unsigned NOT NULL,
   `id_category_default` int(10) unsigned DEFAULT NULL,
   `id_tax_rules_group` INT(11) UNSIGNED NOT NULL,
+  `id_tourism_tax_rules_group` INT(11) UNSIGNED NOT NULL DEFAULT '0',
   `on_sale` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `online_only` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `ecotax` decimal(17,6) NOT NULL DEFAULT '0.000000',
@@ -1997,6 +2066,7 @@ CREATE TABLE `PREFIX_tag_count` (
 CREATE TABLE `PREFIX_tax` (
   `id_tax` int(10) unsigned NOT NULL auto_increment,
   `rate` DECIMAL(10, 3) NOT NULL,
+  `is_tourism_tax` TINYINT(1) NOT NULL DEFAULT '0',
   `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
   `deleted` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_tax`)
@@ -2122,6 +2192,7 @@ CREATE TABLE `PREFIX_tax_rules_group` (
 `id_tax_rules_group` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 `name` VARCHAR( 50 ) NOT NULL,
 `active` INT NOT NULL,
+`is_tourism_tax_rule_group` TINYINT(1) NOT NULL DEFAULT '0',
 `deleted` TINYINT(1) UNSIGNED NOT NULL,
 `date_add` DATETIME NOT NULL,
 `date_upd` DATETIME NOT NULL

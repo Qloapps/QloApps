@@ -105,6 +105,21 @@
 	</td>
 	<td class="center">
 		{convertPriceWithCurrency price=($data['total_room_tax']) currency=$currency->id}
+			<span class="price_info">
+				&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
+			</span>
+			<div class="price_info_container" style="display: none;">
+				<div>
+					<label>{l s='Room & Service Tax:'}</label>
+					<span class="pull-right">{convertPriceWithCurrency price=$data.total_room_service_tax_only currency=$currency->id}</span>
+				</div>
+				{if isset($data.tourism_tax_total) && $data.tourism_tax_total > 0}
+				<div>
+					<label>{l s='Tourism Tax:'}</label>
+					<span class="pull-right">{convertPriceWithCurrency price=$data.tourism_tax_total currency=$currency->id}</span>
+				</div>
+				{/if}
+			</div>
 	</td>
 	<td class="center">
 		{convertPriceWithCurrency price=($data['total_room_price_ti']) currency=$currency->id}
@@ -181,6 +196,23 @@
                                 {l s='Delete'}
                             </a>
                         </li>
+                        {if isset($use_tourism_tax) && $use_tourism_tax && isset($data.tourism_tax_status) && $data.tourism_tax_status != $tourism_tax_status_not_applicable && !$data.is_cancelled && !$data.is_refunded}
+                            {if $data.tourism_tax_status == $tourism_tax_status_applied}
+                                <li>
+                                    <a href="#" class="tt-exempt-booking" data-id_htl_booking="{$data.id|intval}" data-label="{$data.room_num|escape:'html':'UTF-8'} - {$data.room_type_name|escape:'html':'UTF-8'}: ({$data.date_from|date_format:"%d/%m/%Y"} - {$data.date_to|date_format:"%d/%m/%Y"})">
+                                        <i class="icon-ban"></i>
+                                        {l s='Exempt Tourism Tax'}
+                                    </a>
+                                </li>
+                            {else}
+                                <li>
+                                    <a href="#" class="tt-apply-booking" data-id_htl_booking="{$data.id|intval}">
+                                        <i class="icon-check"></i>
+                                        {l s='Apply Tourism Tax'}
+                                    </a>
+                                </li>
+                            {/if}
+                        {/if}
                     </ul>
                 {/if}
 			</div>

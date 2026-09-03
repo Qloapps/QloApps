@@ -139,7 +139,7 @@ class RoomTypeServiceProduct extends ObjectModel
         return Db::getInstance()->getValue($sql);
     }
 
-    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $use_reduc = 1)
+    public static function getAutoAddServices($idProduct, $dateFrom = null, $dateTo = null, $priceAdditionType = null, $useTax = null, $use_reduc = 1, $includeTourismTax = false)
     {
         if (Product::isBookingProduct($idProduct)) {
             $context = Context::getContext();
@@ -168,7 +168,10 @@ class RoomTypeServiceProduct extends ObjectModel
                         $dateTo,
                         false,
                         null,
-                        $use_reduc
+                        $use_reduc,
+                        null,
+                        0,
+                        $includeTourismTax
                     );
                 }
 
@@ -222,7 +225,12 @@ class RoomTypeServiceProduct extends ObjectModel
                     1,
                     null,
                     null,
-                    $context->cart->id
+                    $context->cart->id,
+                    null,
+                    1,
+                    null,
+                    0,
+                    Configuration::get('QLO_TOURISM_TAX_GROSSED_UP')
                 );
 
                 $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
@@ -244,6 +252,99 @@ class RoomTypeServiceProduct extends ObjectModel
         }
 
         return $serviceProducts;
+    }
+
+    /**
+     *
+     * @param array  $roomTypeServiceProducts  Catalog rows from getServiceProductsData()
+     * @param array  $cartBookings             Rows from HotelCartBookingData::getHotelCartRoomsInfoByRoomType()
+     * @param int    $idProductRoomType
+     * @param string $dateFrom
+     * @param string $dateTo
+     * @return array  id_cart_booking => id_product => [unit_price_tax_incl, unit_price_tax_excl, total_price_tax_incl, total_price_tax_excl]
+     */
+    public function getServiceProductsPricingForCartBookings($roomTypeServiceProducts, $cartBookings, $idProductRoomType, $dateFrom, $dateTo)
+    {
+        $pricingByBookingAndProduct = array();
+        if (!$roomTypeServiceProducts || !$cartBookings) {
+            return $pricingByBookingAndProduct;
+        }
+
+        $numNights = max(1, (int) HotelHelper::getNumberOfDays($dateFrom, $dateTo));
+        $grossedUp = (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
+        $idCart = Context::getContext()->cart->id;
+
+        $serviceProductsById = array();
+        $totalExclByProduct = array();
+        $totalInclVatOnlyByProduct = array();
+        $unitInclVatOnlyByProduct = array();
+        $taxContextByProduct = array();
+        $hotelContext = null;
+
+        foreach ($roomTypeServiceProducts as $serviceProduct) {
+            $idServiceProduct = (int) $serviceProduct['id_product'];
+            $serviceProductsById[$idServiceProduct] = $serviceProduct;
+            $totalExclByProduct[$idServiceProduct] = Product::getServiceProductPrice($idServiceProduct, 0, false, $idProductRoomType, false, 1, $dateFrom, $dateTo, $idCart);
+            $totalInclVatOnlyByProduct[$idServiceProduct] = Product::getServiceProductPrice($idServiceProduct, 0, false, $idProductRoomType, true, 1, $dateFrom, $dateTo, $idCart);
+            $unitInclVatOnlyByProduct[$idServiceProduct] = $grossedUp ? Product::getServiceProductPrice($idServiceProduct, 0, false, $idProductRoomType, true, 1, null, null, $idCart) : (float) $serviceProduct['price_tax_incl'];
+
+            if (!$grossedUp) {
+                continue;
+            }
+            if (!$idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idServiceProduct)) {
+                continue;
+            }
+            if ($hotelContext === null) {
+                $idHotel = (int) $cartBookings[0]['id_hotel'];
+                $hotelContext = TaxConfiguration::resolveHotelAddressAndCollectionType($idHotel, new Address((int) Cart::getIdAddressForTaxCalculation($idProductRoomType)));
+            }
+            $taxContextByProduct[$idServiceProduct] = array(
+                'calculator' => TaxManagerFactory::getManager($hotelContext['address'], $idTourismTaxRulesGroup)->getTaxCalculator(),
+                'collectionType' => $hotelContext['collectionType'],
+            );
+        }
+
+        $occupancySignatures = array();
+        foreach ($cartBookings as $cartBooking) {
+            $childrenAges = !empty($cartBooking['child_ages']) ? (array) json_decode($cartBooking['child_ages'], true) : array();
+            $occupancySignature = (int) $cartBooking['adults'] . '|' . implode(',', $childrenAges);
+            if (!isset($occupancySignatures[$occupancySignature])) {
+                $occupancySignatures[$occupancySignature] = array('adults' => (int) $cartBooking['adults'], 'childrenAges' => $childrenAges);
+            }
+        }
+
+        $totalTourismTaxByProductAndSignature = array();
+        $unitTourismTaxByProductAndSignature = array();
+        foreach ($taxContextByProduct as $idServiceProduct => $taxContext) {
+            $unitExcl = (float) $serviceProductsById[$idServiceProduct]['price_tax_exc'];
+            foreach ($occupancySignatures as $occupancySignature => $occupancy) {
+                $totalTourismTaxByProductAndSignature[$idServiceProduct][$occupancySignature] = $taxContext['calculator']->getTaxesTotalAmount(
+                    $unitExcl, $dateFrom, $numNights, $occupancy['adults'], $occupancy['childrenAges'], $taxContext['collectionType'], 1
+                );
+                $unitTourismTaxByProductAndSignature[$idServiceProduct][$occupancySignature] = $taxContext['calculator']->getTaxesTotalAmount(
+                    $unitExcl, $dateFrom, 1, $occupancy['adults'], $occupancy['childrenAges'], $taxContext['collectionType'], 1
+                );
+            }
+        }
+
+        foreach ($cartBookings as $cartBooking) {
+            $idCartBooking = (int) $cartBooking['id'];
+            $childrenAges = !empty($cartBooking['child_ages']) ? (array) json_decode($cartBooking['child_ages'], true) : array();
+            $occupancySignature = (int) $cartBooking['adults'] . '|' . implode(',', $childrenAges);
+            foreach ($roomTypeServiceProducts as $serviceProduct) {
+                $idServiceProduct = (int) $serviceProduct['id_product'];
+                $totalTourismTax = isset($totalTourismTaxByProductAndSignature[$idServiceProduct][$occupancySignature]) ? $totalTourismTaxByProductAndSignature[$idServiceProduct][$occupancySignature] : 0;
+                $unitTourismTax = isset($unitTourismTaxByProductAndSignature[$idServiceProduct][$occupancySignature]) ? $unitTourismTaxByProductAndSignature[$idServiceProduct][$occupancySignature] : 0;
+                $pricingByBookingAndProduct[$idCartBooking][$idServiceProduct] = array(
+                    'total_price_tax_excl' => $totalExclByProduct[$idServiceProduct],
+                    'total_price_tax_incl' => $totalInclVatOnlyByProduct[$idServiceProduct] + $totalTourismTax,
+                    'unit_price_tax_excl' => (float) $serviceProduct['price_tax_exc'],
+                    'unit_price_tax_incl' => $unitInclVatOnlyByProduct[$idServiceProduct] + $unitTourismTax,
+                );
+            }
+        }
+
+        return $pricingByBookingAndProduct;
     }
 
     public function getServiceProductsGroupByCategory($idProduct, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $idLang = false)

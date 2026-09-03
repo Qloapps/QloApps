@@ -96,6 +96,59 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         return parent::renderList();
     }
 
+    /**
+     * Return taxes for the rule-form dropdown, filtered by whether this TRG is a tourism group.
+     *
+     * @return array
+     */
+    protected function getTaxOptionsForGroup()
+    {
+        $idTaxRulesGroup = (int) Tools::getValue('id_tax_rules_group');
+        $isTourism = false;
+        if ($idTaxRulesGroup) {
+            $taxRulesGroup = new TaxRulesGroup($idTaxRulesGroup);
+            if (Validate::isLoadedObject($taxRulesGroup)) {
+                $isTourism = (bool) $taxRulesGroup->is_tourism_tax_rule_group;
+            }
+        }
+
+        $idLang = (int) $this->context->language->id;
+        $sql = new DbQuery();
+        if ($isTourism) {
+            $sql->select(
+                't.`id_tax`, tl.`name`,'
+                . ' IFNULL(tourism_tax.`calculation_type`, 0) AS tourism_tax_calc_type,'
+                . ' IFNULL(tourism_tax.`tax_value`, 0) AS tourism_tax_value'
+            );
+        } else {
+            $sql->select('t.`id_tax`, tl.`name`, t.`rate`');
+        }
+        $sql->from('tax', 't');
+        $sql->leftJoin('tax_lang', 'tl', 't.`id_tax` = tl.`id_tax` AND tl.`id_lang` = ' . $idLang);
+        if ($isTourism) {
+            $sql->leftJoin('tax_configuration', 'tourism_tax', 'tourism_tax.`id_tax` = t.`id_tax`');
+        }
+        $sql->where('t.`deleted` != 1 AND t.`active` = 1');
+        $sql->where('t.`is_tourism_tax` = ' . ($isTourism ? 1 : 0));
+        $sql->orderBy('tl.`name` ASC');
+
+        $rows = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
+
+        if ($isTourism && is_array($rows)) {
+            $currency = $this->context->currency;
+            $currencySign = Tools::safeOutput(trim($currency->prefix . $currency->suffix));
+            foreach ($rows as &$row) {
+                $typeLabel = ((int) $row['tourism_tax_calc_type'] === TaxConfiguration::CALCULATION_TYPE_PERCENTAGE)
+                    ? (float) $row['tourism_tax_value'] . '%'
+                    : $currencySign . ' ' . (float) $row['tourism_tax_value'];
+                $row['name'] = $row['name'] . ' (' . $typeLabel . ')';
+            }
+            unset($row);
+        }
+
+        return $rows;
+    }
+
     public function initRulesList($id_group)
     {
         $this->table = 'tax_rule';
@@ -127,7 +180,10 @@ class AdminTaxRulesGroupControllerCore extends AdminController
             ),
             'rate' => array(
                 'title' => $this->l('Tax'),
-                'class' => 'fixed-width-sm'
+                'class' => 'fixed-width-sm',
+                'callback' => 'displayTaxRuleRate',
+                'orderby' => false,
+                'search' => false,
             ),
             'description' => array(
                 'title' => $this->l('Description')
@@ -141,7 +197,10 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 			c.`name` AS country_name,
 			s.`name` AS state_name,
 			CONCAT_WS(" - ", a.`zipcode_from`, a.`zipcode_to`) AS zipcode,
-			t.rate';
+			t.`rate`,
+			t.`is_tourism_tax`,
+			IFNULL(tourism_tax.`calculation_type`, 0) AS tourism_tax_calc_type,
+			IFNULL(tourism_tax.`tax_value`, 0) AS tourism_tax_value';
 
         $this->_join = '
 			LEFT JOIN `'._DB_PREFIX_.'country_lang` c
@@ -149,7 +208,9 @@ class AdminTaxRulesGroupControllerCore extends AdminController
 			LEFT JOIN `'._DB_PREFIX_.'state` s
 				ON (a.`id_state` = s.`id_state`)
 			LEFT JOIN `'._DB_PREFIX_.'tax` t
-				ON (a.`id_tax` = t.`id_tax`)';
+				ON (a.`id_tax` = t.`id_tax`)
+			LEFT JOIN `'._DB_PREFIX_.'tax_configuration` tourism_tax
+				ON (tourism_tax.`id_tax` = t.`id_tax`)';
         $this->_where = 'AND `id_tax_rules_group` = '.(int)$id_group;
         $this->_use_found_rows = false;
 
@@ -194,7 +255,19 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                             'label' => $this->l('Disabled')
                         )
                     )
-                )
+                ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Tourism tax rule group'),
+                    'name' => 'is_tourism_tax_rule_group',
+                    'required' => false,
+                    'is_bool' => true,
+                    'hint' => $this->l('Mark this group as tourism-only. All tax rules added here must reference tourism taxes.'),
+                    'values' => array(
+                        array('id' => 'is_tourism_tax_rule_on', 'value' => 1, 'label' => $this->l('Yes')),
+                        array('id' => 'is_tourism_tax_rule_off', 'value' => 0, 'label' => $this->l('No')),
+                    )
+                ),
             ),
             'submit' => array(
                 'title' => $this->l('Save and stay'),
@@ -309,7 +382,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                         $this->l('- This tax only: Will apply only this tax').'<br>',
                         $this->l('- Combine: Combine taxes (e.g.: 10% + 5% = 15%)').'<br>',
                         $this->l('- One after another: Apply taxes one after another (e.g.: 0 + 10% = 0 + 5% = 5.5)')
-                    )
+                    ),
                 ),
                 array(
                     'type' => 'select',
@@ -317,7 +390,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                     'name' => 'id_tax',
                     'required' => false,
                     'options' => array(
-                        'query' => Tax::getTaxes((int)$this->context->language->id),
+                        'query' => $this->getTaxOptionsForGroup(),
                         'id' => 'id_tax',
                         'name' => 'name',
                         'default' => array(
@@ -325,7 +398,7 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                             'label' => $this->l('No Tax')
                         )
                     ),
-                    'hint' => sprintf($this->l('(Total tax: %s)'), '9%')
+                    'hint' => $this->l('Select the tax to apply for this rule.')
                 ),
                 array(
                     'type' => 'text',
@@ -373,6 +446,75 @@ class AdminTaxRulesGroupControllerCore extends AdminController
         return $helper->generateForm($this->fields_form);
     }
 
+
+    /**
+     * List column callback: render the Tax column in the tax rules list.
+     * Tourism-fixed taxes show the currency sign; tourism-percent and regular VAT taxes show %.
+     *
+     * @param mixed $value  t.rate (always 0 for tourism taxes)
+     * @param array $row    Full list row — includes is_tourism_tax, tourism_tax_calc_type, tourism_tax_value
+     * @return string
+     */
+    public function displayTaxRuleRate($value, $row)
+    {
+        return TaxConfiguration::getFormattedRateForDisplay($value, $row, $this->context->currency);
+    }
+
+    public function postProcess()
+    {
+        if ($this->action == 'save') {
+            $idGroup = (int) Tools::getValue('id_tax_rules_group');
+            $newIsTourism = (int) Tools::getValue('is_tourism_tax_rule_group');
+
+            if ($idGroup) {
+                $taxRulesGroup = new TaxRulesGroup($idGroup);
+                if (Validate::isLoadedObject($taxRulesGroup)) {
+                    $oldIsTourism = (int) $taxRulesGroup->is_tourism_tax_rule_group;
+
+                    if ($oldIsTourism && !$newIsTourism) {
+                        if ($taxRulesGroup->hasTourismTaxRules()) {
+                            $this->errors[] = $this->l(
+                                'Cannot convert this to a VAT group: it still contains tourism taxes. Remove the tourism tax rules first.'
+                            );
+                            $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
+                            $this->display = 'edit';
+                            return;
+                        }
+
+                        if ($taxRulesGroup->hasProductsUsingAsTourismGroup()) {
+                            $this->errors[] = $this->l(
+                                'Cannot convert this to a VAT group: one or more products still use it as their tourism tax rule. Reassign them first.'
+                            );
+                            $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
+                            $this->display = 'edit';
+                            return;
+                        }
+                    }
+
+                    if (!$oldIsTourism && $newIsTourism) {
+                        if ($taxRulesGroup->hasVatTaxRules()) {
+                            $this->errors[] = $this->l(
+                                'Cannot convert this to a tourism group: it still contains VAT taxes. Remove the VAT tax rules first.'
+                            );
+                            $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
+                            $this->display = 'edit';
+                            return;
+                        }
+
+                        if ($taxRulesGroup->hasProductsUsingAsVatGroup()) {
+                            $this->errors[] = $this->l(
+                                'Cannot convert this to a tourism group: one or more products or services still use it as their regular tax rule. Reassign them first.'
+                            );
+                            $_POST['is_tourism_tax_rule_group'] = $oldIsTourism;
+                            $this->display = 'edit';
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        parent::postProcess();
+    }
 
     public function initProcess()
     {
@@ -430,27 +572,27 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('A tax rule already exists for this country/state with tax only behavior.');
                     continue;
                 }
-                $tr = new TaxRule();
+                $taxRule = new TaxRule();
 
                 // update or creation?
                 if (isset($id_rule) && $first) {
-                    $tr->id = $id_rule;
+                    $taxRule->id = $id_rule;
                     $first = false;
                 }
 
-                $tr->id_tax = $id_tax;
+                $taxRule->id_tax = $id_tax;
                 $tax_rules_group = new TaxRulesGroup((int)$id_tax_rules_group);
-                $tr->id_tax_rules_group = (int)$tax_rules_group->id;
-                $tr->id_country = (int)$id_country;
-                $tr->id_state = (int)$id_state;
-                list($tr->zipcode_from, $tr->zipcode_to) = $tr->breakDownZipCode($zip_code);
+                $taxRule->id_tax_rules_group = (int)$tax_rules_group->id;
+                $taxRule->id_country = (int)$id_country;
+                $taxRule->id_state = (int)$id_state;
+                list($taxRule->zipcode_from, $taxRule->zipcode_to) = $taxRule->breakDownZipCode($zip_code);
 
                 // Construct Object Country
                 $country = new Country((int)$id_country, (int)$this->context->language->id);
 
                 if ($zip_code && $country->need_zip_code) {
                     if ($country->zip_code_format) {
-                        foreach (array($tr->zipcode_from, $tr->zipcode_to) as $zip_code) {
+                        foreach (array($taxRule->zipcode_from, $taxRule->zipcode_to) as $zip_code) {
                             if ($zip_code) {
                                 if (!$country->checkZipCode($zip_code)) {
                                     $this->errors[] = sprintf(
@@ -463,19 +605,19 @@ class AdminTaxRulesGroupControllerCore extends AdminController
                     }
                 }
 
-                $tr->behavior = (int)$behavior;
-                $tr->description = $description;
-                $this->tax_rule = $tr;
-                $_POST['id_state'] = $tr->id_state;
+                $taxRule->behavior = (int)$behavior;
+                $taxRule->description = $description;
+                $this->tax_rule = $taxRule;
+                $_POST['id_state'] = $taxRule->id_state;
 
-                $this->errors = array_merge($this->errors, $this->validateTaxRule($tr));
+                $this->errors = array_merge($this->errors, $this->validateTaxRule($taxRule));
 
                 if (count($this->errors) == 0) {
                     $tax_rules_group = $this->updateTaxRulesGroup($tax_rules_group);
-                    $tr->id = (int)$tax_rules_group->getIdTaxRuleGroupFromHistorizedId((int)$tr->id);
-                    $tr->id_tax_rules_group = (int)$tax_rules_group->id;
+                    $taxRule->id = (int)$tax_rules_group->getIdTaxRuleGroupFromHistorizedId((int)$taxRule->id);
+                    $taxRule->id_tax_rules_group = (int)$tax_rules_group->id;
 
-                    if (!$tr->save()) {
+                    if (!$taxRule->save()) {
                         $this->errors[] = Tools::displayError('An error has occurred: Cannot save the current tax rule.');
                     }
                 }
@@ -525,14 +667,14 @@ class AdminTaxRulesGroupControllerCore extends AdminController
     /**
      * Check if the tax rule could be added in the database
      *
-     * @param TaxRule $tr
+     * @param TaxRule $taxRule
      *
      * @return array
      */
-    protected function validateTaxRule(TaxRule $tr)
+    protected function validateTaxRule(TaxRule $taxRule)
     {
         // @TODO: check if the rule already exists
-        return $tr->validateController();
+        return $taxRule->validateController();
     }
 
     protected function displayAjaxUpdateTaxRule()
