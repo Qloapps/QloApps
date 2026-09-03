@@ -55,9 +55,6 @@ class HotelReservationSystem extends Module
             'advance_payments' => array('description' => 'Room type advance payment', 'class' => 'HotelAdvancedPayment'),
             'cart_bookings' => array('description' => 'Cart bookings', 'class' => 'HotelCartBookingData'),
             'room_bookings' => array('description' => 'Room bookings', 'class' => 'HotelBookingDetail'),
-            'booking_extra_demands' => array('description' => 'Booking extra demands', 'class' => 'HotelBookingDemands'),
-            'extra_demands' => array('description' => 'Extra demands', 'class' => 'HotelRoomTypeGlobalDemand'),
-            'demand_advance_options' => array('description' => 'Extra demand advance options', 'class' => 'HotelRoomTypeGlobalDemandAdvanceOption'),
             'hotel_ari' => array('description' => 'Search availability, rates and inventory', 'specific_management' => true),
         );
 
@@ -119,10 +116,7 @@ class HotelReservationSystem extends Module
             $obj_cart_bk_data = new HotelCartBookingData();
             $obj_htl_bk_dtl = new HotelBookingDetail();
             $obj_rm_type = new HotelRoomType();
-            $objBookingDemand = new HotelBookingDemands();
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
-            $result['total_extra_demands_te'] = 0;
-            $result['total_extra_demands_ti'] = 0;
             $cart_htl_data = array();
             if (!empty($products)) {
                 foreach ($products as $type_key => $type_value) {
@@ -171,34 +165,6 @@ class HotelReservationSystem extends Module
 
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $roomTypeDateRangePrice['total_price_tax_incl']*$vart_quant;
-                                // extra demands prices
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                    $order->id,
-                                    $type_value['product_id'],
-                                    0,
-                                    $data_v['date_from'],
-                                    $data_v['date_to']
-                                );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                    $order->id,
-                                    $type_value['product_id'],
-                                    0,
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    0,
-                                    1,
-                                    0
-                                );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                    $order->id,
-                                    $type_value['product_id'],
-                                    0,
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    0,
-                                    1,
-                                    1
-                                );
                             } else {
                                 $num_days = HotelHelper::getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
@@ -212,34 +178,6 @@ class HotelReservationSystem extends Module
                                 $roomTypeDateRangePrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($type_value['id_product'], $data_v['date_from'], $data_v['date_to']);
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['amount'] = $roomTypeDateRangePrice['total_price_tax_incl'];
-                                // extra demands prices
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                    $order->id,
-                                    $type_value['product_id'],
-                                    0,
-                                    $data_v['date_from'],
-                                    $data_v['date_to']
-                                );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                    $order->id,
-                                    $type_value['product_id'],
-                                    0,
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    0,
-                                    1,
-                                    0
-                                );
-                                $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'] = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                                    $order->id,
-                                    $type_value['product_id'],
-                                    0,
-                                    $data_v['date_from'],
-                                    $data_v['date_to'],
-                                    0,
-                                    1,
-                                    1
-                                );
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['additional_services'] = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                                     $order->id,
@@ -271,8 +209,6 @@ class HotelReservationSystem extends Module
                                     1,
                                     0
                                 );
-                                $result['total_extra_demands_te'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_te'];
-                                $result['total_extra_demands_ti'] += $cart_htl_data[$type_key]['date_diff'][$date_join]['extra_demands_price_ti'];
                             }
                         }
                     }
@@ -408,12 +344,6 @@ class HotelReservationSystem extends Module
             // delete the disable dates (temporary inactive status) of the room type
             $objRoomDisableDates = new HotelRoomDisableDates();
             $objRoomDisableDates->deleteRoomDisableDatesByIdRoomType($idProduct);
-
-            // delete all the additional demand prices and demands of this room type
-            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-            $objRoomTypeDemandPrice->deleteRoomTypeDemandPrices($idProduct); // delete prices for room type
-            $objRoomTypeDemand = new HotelRoomTypeDemand();
-            $objRoomTypeDemand->deleteRoomTypeDemands($idProduct); // delete additional demands for room type
         }
     }
 
@@ -473,9 +403,8 @@ class HotelReservationSystem extends Module
             $langTables = array(
                 'htl_room_type_feature_pricing',
                 'htl_branch_info',
+                'htl_features',
                 'htl_amenity',
-                'htl_room_type_global_demand',
-                'htl_room_type_global_demand_advance_option',
                 'htl_order_refund_rules',
                 'htl_settings_link'
             );
@@ -503,14 +432,6 @@ class HotelReservationSystem extends Module
 
     public function HookActionCartSummary($params)
     {
-        // $objCartBookingData = new HotelCartBookingData();
-        // $totalFacilityCostTI = $objCartBookingData->getCartExtraDemands($params['cart']->id, 0, 0, 0, 0, 1, 0, 1);
-        // $totalFacilityCostTE = $objCartBookingData->getCartExtraDemands($params['cart']->id, 0, 0, 0, 0, 1, 0, 0);
-        // return array(
-        //     'additional_facilities_tax' => ($totalFacilityCostTI - $totalFacilityCostTE),
-        //     'totalFacilityCostTE' => $totalFacilityCostTE,
-        //     'totalFacilityCostTI' => $totalFacilityCostTI,
-        // );
         return array();
     }
 
@@ -527,8 +448,8 @@ class HotelReservationSystem extends Module
         // Controllers without tabs
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
-        $this->installTab('AdminRoomTypeGlobalDemand', 'Additional Demand Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminBookingDocument', 'Booking Documents', false, false);
+        $this->installTab('AdminHotelImageCategory', 'Hotel Image Category', false, false);
 
         return true;
     }

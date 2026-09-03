@@ -26,6 +26,7 @@ $(document).ready(function(){
         var idOrder = $(this).data('id_order');
         var dateFrom = $(this).data('date_from');
         var dateTo = $(this).data('date_to');
+        var secureKey = $(this).data('secure_key');
         var action = $(this).data('action');
         $.ajax({
             type: 'POST',
@@ -40,15 +41,16 @@ $(document).ready(function(){
                 date_to: dateTo,
                 id_product: idProduct,
                 id_order: idOrder,
-                action: 'getRoomTypeBookingDemands',
-                method: 'getRoomTypeBookingDemands',
+                action: 'getRoomTypeBookingServices',
+                method: 'getRoomTypeBookingServices',
+                secure_key: secureKey,
                 ajax: true,
                 token: static_token
             },
             success: function(result) {
-                if (result.extra_demands) {
+                if (result.extra_services) {
                     $('#rooms_extra_services').html('');
-                    $('#rooms_extra_services').append(result.extra_demands);
+                    $('#rooms_extra_services').append(result.extra_services);
                 }
                 $.fancybox({
                     href: "#rooms_extra_services",

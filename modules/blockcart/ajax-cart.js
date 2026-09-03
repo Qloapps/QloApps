@@ -392,21 +392,29 @@ var ajaxCart = {
         req.append('id_hotel', idHotel);
 
         if (parseInt(booking_product)) {
-            // get the selected extra demands by customer
+            // get the selected extra services by customer
             if (typeof dateFrom != 'undefined')
-                req.append('dateFrom', dateFrom);
+                req.append('date_from', dateFrom);
             if (typeof dateTo != 'undefined')
-                req.append('dateTo', dateTo);
+                req.append('date_to', dateTo);
 
-            if (occupancy_required_for_booking) {
-                req.append('occupancy', JSON.stringify(occupancy));
+             if (occupancy_required_for_booking) {
+                occupancy.forEach(function(room, i) {
+                    req.append('occupancy['+i+'][adults]', room.adults);
+                    req.append('occupancy['+i+'][children]', room.children || 0);
+                    if (room.child_ages && room.child_ages.length) {
+                        room.child_ages.forEach(function(age) {
+                            req.append('occupancy['+i+'][child_ages][]', age);
+                        });
+                    }
+                });
             } else {
                 req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
             }
 
-            var roomDemands = getRoomsExtraDemands();
-            req.append('roomDemands', JSON.stringify(roomDemands) );
-            req.append('serviceProducts', JSON.stringify(getRoomsServiceProducts()) );
+            getRoomsServiceProducts().forEach(function(product) {
+                req.append('service_product['+product.id_product+'][quantity]', product.quantity);
+            });
         } else {
             req.append('qty', ((occupancy && occupancy != null) ? occupancy : '1'));
         }
@@ -426,9 +434,6 @@ var ajaxCart = {
             processData: false,
             success: function(jsonData, textStatus, jqXHR) {
                 if (pagename == 'product') {
-                    if (jsonData.avail_rooms == 0) {
-                        disableRoomTypeDemands(1);
-                    }
 
                     resetRoomtypeServices();
 
@@ -555,7 +560,7 @@ var ajaxCart = {
             async: true,
             cache: false,
             dataType: "json",
-            data: 'controller=cart&add=1&op=down&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&ajax=true&qty=' + ((quantity && quantity != null) ? quantity : '1') + '&id_product=' + idProduct + '&token=' + static_token + ((parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination) : '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
+            data: 'controller=cart&add=1&op=down&date_from=' + dateFrom + '&date_to=' + dateTo + '&ajax=true&qty=' + ((quantity && quantity != null) ? quantity : '1') + '&id_product=' + idProduct + '&token=' + static_token + ((parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination) : '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
             success: function(jsonData, textStatus, jqXHR) {
                 /*by webkul checking and setting availability of rooms*/
                 /*for product page add to cart quantity management*/
@@ -565,9 +570,6 @@ var ajaxCart = {
                     var product_page_id_product = $('#product_page_product_id').val();
                     if (idProduct == product_page_id_product && dateFrom < date_checkOut && dateTo >= date_checkIn) {
                         $(".max_avail_type_qty").val(jsonData.avail_rooms);
-                        if (jsonData.avail_rooms == 0) {
-                            disableRoomTypeDemands(1);
-                        }
                     }
                     BookingForm.refresh();
                 }
@@ -629,10 +631,9 @@ var ajaxCart = {
             async: true,
             cache: false,
             dataType: "json",
-            data: 'controller=cart&delete=1&dateFrom=' + dateFrom + '&dateTo=' + dateTo + '&id_product=' + idProduct + '&id_hotel=' + idHotel + '&id_product_option=' + ((idCombination != null && parseInt(idCombination)) ? idCombination : '') + ((customizationId && customizationId != null) ? '&id_customization=' + customizationId : '') + '&id_address_delivery=' + idAddressDelivery + '&token=' + static_token + '&ajax=true',
+            data: 'controller=cart&delete=1&date_from=' + dateFrom + '&date_to=' + dateTo + '&id_product=' + idProduct + '&id_hotel=' + idHotel + '&id_product_option=' + ((idCombination != null && parseInt(idCombination)) ? idCombination : '') + ((customizationId && customizationId != null) ? '&id_customization=' + customizationId : '') + '&id_address_delivery=' + idAddressDelivery + '&token=' + static_token + '&ajax=true',
             success: function(jsonData) {
                 if (pagename == 'product') {
-                    disableRoomTypeDemands(0);
                     BookingForm.refresh();
                 }
 
@@ -953,7 +954,7 @@ var ajaxCart = {
                         content += '<tr class="rooms_remove_container">';
                         content += '<td>' + moment(new Date(date_diff_v.data_form)).format(dateFormatToUse) + '&nbsp;-&nbsp;' + moment(new Date(date_diff_v.data_to)).format(dateFormatToUse) + '</td>';
                         content += '<td class="num_rooms_in_date">' + date_diff_v.num_rm + '</td>';
-                        content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount) + parseFloat(date_diff_v.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
+                        content += '<td>' + formatCurrency(parseFloat(date_diff_v.amount) + parseFloat(date_diff_v.additional_price), currency_format, currency_sign, currency_blank) + '</td>';
                         content += '<td>';
                         content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v.amount + ' id_product=' + productId + ' date_from=' + date_diff_v.data_form + ' date_to=' + date_diff_v.data_to + ' num_rooms=' + date_diff_v.num_rm + ' title="' + remove_rm_title + '"></a>';
                         content += '</td>';
@@ -1031,7 +1032,7 @@ var ajaxCart = {
                         booking_dates_content += '<tr class="rooms_remove_container">';
                         booking_dates_content += '<td>' + moment(new Date(date_diff_v1.data_form)).format(dateFormatToUse) + '&nbsp;-&nbsp;' + moment(new Date(date_diff_v1.data_to)).format(dateFormatToUse) + '</td>';
                         booking_dates_content += '<td class="num_rooms_in_date">' + date_diff_v1.num_rm + '</td>';
-                        booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount) + parseFloat(date_diff_v1.demand_price), currency_format, currency_sign, currency_blank) + '</td>';
+                        booking_dates_content += '<td>' + formatCurrency(parseFloat(date_diff_v1.amount) + parseFloat(date_diff_v1.additional_price), currency_format, currency_sign, currency_blank) + '</td>';
                         booking_dates_content += '<td>';
                         booking_dates_content += '<a class="remove_rooms_from_cart_link" href="#" rm_price=' + date_diff_v1.amount + ' id_product=' + productId + ' date_from=' + date_diff_v1.data_form + ' date_to=' + date_diff_v1.data_to + ' num_rooms=' + date_diff_v1.num_rm + ' title="' + remove_rm_title + '"></a>';
                         booking_dates_content += '</td>';
@@ -1389,25 +1390,11 @@ function crossselling_serialScroll() {
 }
 
 function resetRoomtypeServices(refresh = true) {
-    $('.room_demands_container').find('input.id_room_type_demand:checked').prop('checked', false).uniform();
     $('#additional_products').empty();
     $('#additional_products div')
     $('.remove_roomtype_product').text(select_txt).removeClass('btn-danger remove_roomtype_product').addClass('btn-success add_roomtype_product');
     if (refresh) {
         BookingForm.refresh();
-    }
-}
-
-function disableRoomTypeDemands(show) {
-    if (show) {
-        $('.room_demands_container_overlay').show();
-        $('.room_demands_container').find('input:checkbox.id_room_type_demand').prop('checked', false);
-        $('.room_demand_block').find('.id_room_type_demand').prop('checked', false).parent().removeClass('checked');
-        $('.room_demands_container').find('input:checkbox.id_room_type_demand').attr('disabled', 'disabled');
-    } else {
-        $('.room_demands_container_overlay').hide();
-        $('.room_demands_container').find('input:checkbox.id_room_type_demand').removeAttr('disabled');
-        $('.room_demands_container').find('.checker').removeClass('disabled');
     }
 }
 
@@ -1420,20 +1407,6 @@ function disableRoomTypeServices(disable) {
         $('#service_products_cont').find('button.add_roomtype_product').removeAttr('disabled');
         $('#service_products_cont').find('.qty_container .qty_direction a').removeAttr('disabled');
     }
-}
-
-function getRoomsExtraDemands()
-{
-    var roomDemands = [];
-
-    $('input:checkbox.id_room_type_demand:checked').each(function () {
-        roomDemands.push({
-            'id_global_demand':$(this).val(),
-            'id_option': $(this).closest('.room_demand_block').find('.id_option').val()
-        });
-    });
-
-    return roomDemands;
 }
 
 function getRoomsServiceProducts()

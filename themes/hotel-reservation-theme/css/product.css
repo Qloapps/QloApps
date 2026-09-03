@@ -44,7 +44,9 @@ a.fancybox-nav {
   .pb-left-column #image-block img {
     background: #fbfbfb;
     border-radius: 4px;
-    width: 100%; }
+    width: 100%;
+    min-height: 420px;
+    object-fit: cover; }
   .pb-left-column #image-block #view_full_size .span_link {
     position: absolute;
     bottom: 20px;
@@ -1369,8 +1371,8 @@ Quick View Styles
 #booking_action_loader.active {
   display: block;
 }
-/* room type extra demands container */
-.room_demands_container_overlay {
+/* room type extra service container */
+.room_service_container_overlay {
   display: none;
   position: absolute;
   left: 0;
@@ -1409,15 +1411,15 @@ Quick View Styles
   top: 0;
 }
 
-.room_demands_container .room_demand_block {
+.room_service_container .room_service_block {
   margin-bottom: 15px;
   color: #333;
   font-size: 14px;
 }
-.room_demands_container .checkbox {
+.room_service_container .checkbox {
   margin-top: 2px;
 }
-.room_demands_container label {
+.room_service_container label {
   opacity: 0.5;
   margin-bottom: 15px;
   text-transform: uppercase;
@@ -1432,7 +1434,7 @@ Quick View Styles
 .price_desc_block .total_price_block {
   color: #333;
 }
-.price_desc_block .extra_demands_price_block {
+.price_desc_block .extra_services_price_block {
   color: #299DFF;
 }
 .price_desc_block .plus-sign {
@@ -1486,49 +1488,46 @@ Quick View Styles
 /* end */
 
 
-/* extra demands Css */
-#rooms_extra_demands {
+/* extra services Css */
+#rooms_extra_services {
   position: relative;
   font-size: 16px;}
-.room_extra_demands .open_rooms_extra_demands {
+.rooms_extra_services .open_rooms_extra_services {
 	font-size:12px;
 	font-weight: 600;
 	color: #0000FF;}
-#rooms_extra_demands .demand_header {
+#rooms_extra_services .additional_service_header {
 	padding-bottom: 15px;}
-#rooms_extra_demands .room_demand_detail .demand_detail_price_block {
-	font-size: 14px;
-	margin-bottom: 15px;}
-#rooms_extra_demands .rooms_extra_demands_head {
+#rooms_extra_services .rooms_extra_services_head {
 	margin-bottom: 18px;}
-#rooms_extra_demands .card {
+#rooms_extra_services .card {
 	padding-bottom: 0px;}
-#rooms_extra_demands .room_demand_block {
+#rooms_extra_services .room_service_block {
 	margin-bottom: 15px;
 	color: #333;
 	font-size: 14px;}
-#rooms_extra_demands .checkbox {
+#rooms_extra_services .checkbox {
 	margin-top: 3px;}
-#rooms_extra_demands label {
+#rooms_extra_services label {
 	opacity: 0.5;
 	margin-bottom: 15px;
 	text-transform: uppercase;}
 
 /* fancybox accordian css */
-/* #rooms_extra_demands .accordion, #rooms_extra_demands .accordion * {
+/* #rooms_extra_services .accordion, #rooms_extra_services .accordion * {
 	-webkit-box-sizing:border-box;
 	-moz-box-sizing:border-box;
 	box-sizing:border-box;}
-#rooms_extra_demands .accordion {
+#rooms_extra_services .accordion {
 	overflow:hidden;
 	border-bottom: 1px solid #CCCCCC;}
-#rooms_extra_demands .accordion-section-title {
+#rooms_extra_services .accordion-section-title {
 	width:100%;
 	display:inline-block;
 	transition:all linear 0.15s;
 	color:#252525 !important;
 	text-decoration:none !important;}
-#rooms_extra_demands .accordion-section-content {
+#rooms_extra_services .accordion-section-content {
 	display:none;
 	border-top: 1px solid #eee;
 	padding-top: 15px;} */

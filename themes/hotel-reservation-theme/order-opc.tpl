@@ -392,9 +392,11 @@
 								{addJsDefL name=titleDelivery}{$smarty.capture.default|@addcslashes:'\''}{/addJsDefL}
 								{capture}<a class="button button-small btn btn-default" href="{$smarty.capture.addressUrlAdd}" title="{l s='Update' js=1}"><span>{l s='Update' js=1}<i class="icon-chevron-right right"></i></span></a>{/capture}
 								{addJsDefL name=liUpdate}{$smarty.capture.default|@addcslashes:'\''}{/addJsDefL}
-								{addJsDefL name=txtExtraDemandSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
+								{addJsDefL name=txtExtraServiceSucc}{l s='Updated Successfully' js=1}{/addJsDefL}
 								{addJsDefL name=txtMaxQuantityAdded}{l s='Maximum quantity of service added' js=1}{/addJsDefL}
 								{addJsDefL name=txtExtraDemandErr}{l s='Some error occurred while updating demands' js=1}{/addJsDefL}
+								{addJsDefL name=freeShippingTranslation}{l s='Free shipping!' mod='blockcart' js=1}{/addJsDefL}
+
 							{/strip}
 						{/block}
 					{/if}
