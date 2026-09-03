@@ -507,7 +507,7 @@ class HotelReservationSystemDb
             ORDER BY `id_lang`;",
 
             "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
-            SELECT 6, `id_lang`, 'Landing Page Header Media', 'Configure and manage header images or videos displayed on the home page.'
+            SELECT 5, `id_lang`, 'Landing Page Header Media', 'Configure and manage header images or videos displayed on the home page.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_connected_room` (
