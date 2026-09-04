@@ -454,12 +454,11 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_header_image` (
                 `id_header_image` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
                 `name` VARCHAR(512) NOT NULL,
-                `tag_line_color` VARCHAR(7) NOT NULL DEFAULT '#ffffff',
-                `tag_line_font_size` TINYINT(3) UNSIGNED NOT NULL DEFAULT '16',
-                `tag_line_font_weight` VARCHAR(10) NOT NULL DEFAULT '400',
+                `description_color` VARCHAR(7) NOT NULL DEFAULT '#ffffff',
+                `description_font_size` TINYINT(3) UNSIGNED NOT NULL DEFAULT '16',
+                `description_font_weight` VARCHAR(10) NOT NULL DEFAULT '400',
                 `position` INT(10) UNSIGNED NOT NULL DEFAULT '0',
                 `active` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
-                `show_hotel_chain_name` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
                 `date_add` DATETIME NOT NULL,
                 `date_upd` DATETIME NOT NULL,
                 PRIMARY KEY (`id_header_image`)
@@ -467,7 +466,8 @@ class HotelReservationSystemDb
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_header_image_lang` (
                 `id_header_image` INT(10) UNSIGNED NOT NULL,
                 `id_lang` INT(11) NOT NULL,
-                `tag_line` VARCHAR(512) NOT NULL DEFAULT '',
+                `title` VARCHAR(512) NOT NULL DEFAULT '',
+                `description` VARCHAR(512) NOT NULL DEFAULT '',
                 PRIMARY KEY (`id_header_image`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 

@@ -80,9 +80,9 @@ $(document).ready(function () {
 
     $(document).on('change', 'input[name="QLO_HEADER_SLIDER_AUTO_PLAY"]', function () {
         if ($(this).val() === '1') {
-            $('#qlo-slide-interval-group, #qlo-slide-anim-group').show(200);
+            $('#qlo-slide-interval-group').show(200);
         } else {
-            $('#qlo-slide-interval-group, #qlo-slide-anim-group').hide(200);
+            $('#qlo-slide-interval-group').hide(200);
         }
     });
 
@@ -193,14 +193,14 @@ $(document).ready(function () {
     $(document).on('click', '.qlo-edit-img', function () {
         var $row          = $(this).closest('tr.qlo-img-row');
         var id            = parseInt($row.data('id'), 10);
-        var tagLines      = $row.data('tag-lines') || {};
+        var titles        = $row.data('titles') || {};
+        var descriptions  = $row.data('descriptions') || {};
         var isActive      = $row.find('.js-toggle-active').hasClass('action-enabled');
-        var showHotelName = $row.find('.js-toggle-hotel-name').hasClass('action-enabled');
         var thumbSrc      = $row.attr('data-thumb-src') || '';
-        var tlColor       = $row.attr('data-tag-line-color') || '#ffffff';
-        var tlFontSize    = parseInt($row.attr('data-tag-line-font-size') || 16, 10);
-        var tlFontWeight  = $row.attr('data-tag-line-font-weight') || '400';
-        openImgForm('edit', id, tagLines, isActive, thumbSrc, tlColor, tlFontSize, tlFontWeight, showHotelName);
+        var descColor     = $row.attr('data-description-color') || '#ffffff';
+        var descFontSize  = parseInt($row.attr('data-description-font-size') || 16, 10);
+        var descFontWeight = $row.attr('data-description-font-weight') || '400';
+        openImgForm('edit', id, titles, descriptions, isActive, thumbSrc, descColor, descFontSize, descFontWeight);
     });
 
     function updateBulkUpdateTriggerState() {
@@ -215,40 +215,56 @@ $(document).ready(function () {
             return false;
         }
         $('#qlo-bulk-active').val('');
-        $('#qlo-bulk-hotelname').val('');
-        $('#qlo_bulk_update_tagline_off').prop('checked', true);
-        $('#qlo-bulk-tagline-fields-wrap').hide();
-        $('.qlo-bulk-tagline-field').val('');
-        $('#qlo-bulk-tl-color').val('').trigger('keyup');
-        $('#qlo-bulk-tl-font-size').val(0);
-        $('#qlo-bulk-tl-font-weight').val('');
+        $('#qlo_bulk_update_title_off').prop('checked', true);
+        $('#qlo-bulk-title-fields-wrap').hide();
+        $('.qlo-bulk-title-field').val('');
+        $('#qlo_bulk_update_description_off').prop('checked', true);
+        $('#qlo-bulk-description-fields-wrap').hide();
+        $('.qlo-bulk-description-field').val('');
+        $('#qlo-bulk-desc-color').val('').trigger('keyup');
+        $('#qlo-bulk-desc-font-size').val(0);
+        $('#qlo-bulk-desc-font-weight').val('');
         hideOtherLanguage(qloHmDefaultLangId);
     });
 
-    $(document).on('change', 'input[name="qlo_bulk_update_tagline"]', function () {
+    $(document).on('change', 'input[name="qlo_bulk_update_title"]', function () {
         if ($(this).val() === '1') {
-            $('#qlo-bulk-tagline-fields-wrap').show(200);
+            $('#qlo-bulk-title-fields-wrap').show(200);
         } else {
-            $('#qlo-bulk-tagline-fields-wrap').hide(200);
+            $('#qlo-bulk-title-fields-wrap').hide(200);
+        }
+    });
+
+    $(document).on('change', 'input[name="qlo_bulk_update_description"]', function () {
+        if ($(this).val() === '1') {
+            $('#qlo-bulk-description-fields-wrap').show(200);
+        } else {
+            $('#qlo-bulk-description-fields-wrap').hide(200);
         }
     });
 
     $('#qlo-bulk-update-apply').on('click', function () {
         var ids = $('.qlo-img-checkbox:checked').map(function () { return $(this).val(); }).get();
-        var updateTagline = $('input[name="qlo_bulk_update_tagline"]:checked').val() === '1';
+        var updateTitle = $('input[name="qlo_bulk_update_title"]:checked').val() === '1';
+        var updateDescription = $('input[name="qlo_bulk_update_description"]:checked').val() === '1';
         var postData = {
             ajax: 1, action: 'bulkUpdateImages', token: qloHmToken,
             id_header_image: ids,
             active: $('#qlo-bulk-active').val(),
-            show_hotel_chain_name: $('#qlo-bulk-hotelname').val(),
-            update_tagline: updateTagline ? 1 : 0,
-            tag_line_color: $.trim($('#qlo-bulk-tl-color').val()),
-            tag_line_font_size: $('#qlo-bulk-tl-font-size').val(),
-            tag_line_font_weight: $('#qlo-bulk-tl-font-weight').val()
+            update_title: updateTitle ? 1 : 0,
+            update_description: updateDescription ? 1 : 0,
+            description_color: $.trim($('#qlo-bulk-desc-color').val()),
+            description_font_size: $('#qlo-bulk-desc-font-size').val(),
+            description_font_weight: $('#qlo-bulk-desc-font-weight').val()
         };
-        if (updateTagline) {
-            $('.qlo-bulk-tagline-field').each(function () {
-                postData['tag_line_' + $(this).data('lang')] = $.trim($(this).val());
+        if (updateTitle) {
+            $('.qlo-bulk-title-field').each(function () {
+                postData['title_' + $(this).data('lang')] = $.trim($(this).val());
+            });
+        }
+        if (updateDescription) {
+            $('.qlo-bulk-description-field').each(function () {
+                postData['description_' + $(this).data('lang')] = $.trim($(this).val());
             });
         }
 
@@ -283,7 +299,7 @@ $(document).ready(function () {
             showErrorMessage((typeof qloHmI18n !== 'undefined') ? qloHmI18n.noFileSelected : 'Please select at least one image file.');
             return;
         }
-        uploadImagesWithTagLine(files);
+        uploadImagesWithDetails(files);
     });
 
     $('#qlo-img-form-save-btn').on('click', function () {
@@ -304,31 +320,6 @@ $(document).ready(function () {
             url:  qloHmCurrentIndex,
             type: 'POST',
             data: { ajax: 1, action: 'toggle_image_active', id_header_image: id, active: active, token: qloHmToken },
-            success: function (raw) {
-                var data = safeParseJsonHm(raw);
-                if (data && data.success) {
-                    $link.toggleClass('action-enabled action-disabled');
-                    $link.find('i').toggleClass('hidden');
-                    showSuccessMessage(data.confirmations);
-                } else {
-                    showErrorMessage(data ? data.errors.join('<br>') : qloHmI18n.updateFailed);
-                }
-            },
-            error: function () { showErrorMessage(qloHmI18n.requestFailed); }
-        }).always(function () { $('#page-loader').hide(); });
-    });
-
-    $(document).on('click', '.qlo-img-row .js-toggle-hotel-name', function (e) {
-        e.preventDefault();
-        var $link          = $(this);
-        var $row           = $link.closest('tr.qlo-img-row');
-        var id             = parseInt($row.data('id'), 10);
-        var showHotelName  = $link.hasClass('action-enabled') ? 0 : 1;
-        $('#page-loader').show();
-        $.ajax({
-            url:  qloHmCurrentIndex,
-            type: 'POST',
-            data: { ajax: 1, action: 'toggle_image_hotel_name', id_header_image: id, show_hotel_chain_name: showHotelName, token: qloHmToken },
             success: function (raw) {
                 var data = safeParseJsonHm(raw);
                 if (data && data.success) {
@@ -412,7 +403,7 @@ $(document).ready(function () {
         });
     }
 
-    function openImgForm(mode, id, tagLines, isActive, imgUrl, tlColor, tlFontSize, tlFontWeight, showHotelName) {
+    function openImgForm(mode, id, titles, descriptions, isActive, imgUrl, descColor, descFontSize, descFontWeight) {
         $('#qlo-img-form-id').val(id || '');
         $('#qlo-form-upload-progress').hide();
 
@@ -423,7 +414,6 @@ $(document).ready(function () {
             $('#qlo-img-edit-footer').show();
             $('#qlo-img-form-file-group').hide();
             $('#qlo-img-form-add-active-group').hide();
-            $('#qlo-img-form-add-hotelname-group').hide();
             $('#qlo-img-form-edit-group').show();
             $('#qlo-img-edit-file-group').show();
             var editFileInput = document.getElementById('qlo-img-edit-file');
@@ -432,21 +422,20 @@ $(document).ready(function () {
             }
             $('#qlo-img-edit-file-name').val('');
             revokeEditImagePreview();
-            $('#qlo-img-form-edit-hotelname-group').show();
             if (isActive) {
                 $('#qlo_img_active_edit_on').prop('checked', true);
             } else {
                 $('#qlo_img_active_edit_off').prop('checked', true);
             }
-            if (showHotelName) {
-                $('#qlo_img_hotelname_edit_on').prop('checked', true);
-            } else {
-                $('#qlo_img_hotelname_edit_off').prop('checked', true);
-            }
-            tagLines = tagLines || {};
-            $('.qlo-form-tagline-field').each(function () {
+            titles = titles || {};
+            descriptions = descriptions || {};
+            $('.qlo-form-title-field').each(function () {
                 var langId = $(this).data('lang');
-                $(this).val(tagLines[langId] || '');
+                $(this).val(titles[langId] || '');
+            });
+            $('.qlo-form-description-field').each(function () {
+                var langId = $(this).data('lang');
+                $(this).val(descriptions[langId] || '');
             });
             if (imgUrl) {
                 $('#qlo-img-edit-thumb').attr('src', imgUrl);
@@ -454,10 +443,10 @@ $(document).ready(function () {
             } else {
                 $('#qlo-img-edit-preview-group').hide();
             }
-            $('#qlo-img-tl-color').val(tlColor || '#ffffff');
-            $('#qlo-img-tl-font-size').val(tlFontSize || 16);
-            var fw = tlFontWeight || '400';
-            $('#qlo-img-tl-font-weight').val(fw);
+            $('#qlo-img-desc-color').val(descColor || '#ffffff');
+            $('#qlo-img-desc-font-size').val(descFontSize || 16);
+            var fw = descFontWeight || '400';
+            $('#qlo-img-desc-font-weight').val(fw);
         } else {
             $('#qlo-img-modal-title-edit').hide();
             $('#qlo-img-modal-title-add').show();
@@ -465,9 +454,7 @@ $(document).ready(function () {
             $('#qlo-img-add-footer').show();
             $('#qlo-img-form-file-group').show();
             $('#qlo-img-form-add-active-group').show();
-            $('#qlo-img-form-add-hotelname-group').show();
             $('#qlo-img-form-edit-group').hide();
-            $('#qlo-img-form-edit-hotelname-group').hide();
             $('#qlo-img-edit-preview-group').hide();
             $('#qlo-img-edit-file-group').hide();
             var fileInput = document.getElementById('qlo-img-form-file');
@@ -476,14 +463,14 @@ $(document).ready(function () {
             }
             $('#qlo-img-form-file-name').val('');
             $('#qlo_img_active_add_on').prop('checked', true);
-            $('#qlo_img_hotelname_add_on').prop('checked', true);
-            $('.qlo-form-tagline-field').val('');
-            $('#qlo-img-tl-color').val('#ffffff');
-            $('#qlo-img-tl-font-size').val(16);
-            $('#qlo-img-tl-font-weight').val('400');
+            $('.qlo-form-title-field').val('');
+            $('.qlo-form-description-field').val('');
+            $('#qlo-img-desc-color').val('#ffffff');
+            $('#qlo-img-desc-font-size').val(16);
+            $('#qlo-img-desc-font-weight').val('400');
         }
 
-        $('#qlo-img-tl-color').trigger('keyup');
+        $('#qlo-img-desc-color').trigger('keyup');
 
         hideOtherLanguage(id_language);
 
@@ -495,21 +482,29 @@ $(document).ready(function () {
         revokeEditImagePreview();
     }
 
-    function getFormTagLines() {
-        var tagLines = {};
-        $('.qlo-form-tagline-field').each(function () {
-            tagLines[$(this).data('lang')] = $.trim($(this).val());
+    function getFormTitles() {
+        var titles = {};
+        $('.qlo-form-title-field').each(function () {
+            titles[$(this).data('lang')] = $.trim($(this).val());
         });
-        return tagLines;
+        return titles;
+    }
+
+    function getFormDescriptions() {
+        var descriptions = {};
+        $('.qlo-form-description-field').each(function () {
+            descriptions[$(this).data('lang')] = $.trim($(this).val());
+        });
+        return descriptions;
     }
 
     function saveEditedImage(id) {
-        var tagLines      = getFormTagLines();
-        var active        = parseInt($('input[name="qlo_img_active_edit"]:checked').val() || 0, 10);
-        var showHotelName = parseInt($('input[name="qlo_img_hotelname_edit"]:checked').val() || 0, 10);
-        var tlColor      = $('#qlo-img-tl-color').val() || '#ffffff';
-        var tlFontSize   = parseInt($('#qlo-img-tl-font-size').val() || 16, 10);
-        var tlFontWeight = $('#qlo-img-tl-font-weight').val() || '400';
+        var titles          = getFormTitles();
+        var descriptions    = getFormDescriptions();
+        var active          = parseInt($('input[name="qlo_img_active_edit"]:checked').val() || 0, 10);
+        var descColor       = $('#qlo-img-desc-color').val() || '#ffffff';
+        var descFontSize    = parseInt($('#qlo-img-desc-font-size').val() || 16, 10);
+        var descFontWeight  = $('#qlo-img-desc-font-weight').val() || '400';
         var editFileInput = document.getElementById('qlo-img-edit-file');
         var newFile      = editFileInput && editFileInput.files && editFileInput.files[0] ? editFileInput.files[0] : null;
 
@@ -523,13 +518,15 @@ $(document).ready(function () {
         fd.append('action', 'edit_image');
         fd.append('id_header_image', id);
         fd.append('active', active);
-        fd.append('show_hotel_chain_name', showHotelName);
         fd.append('token', qloHmToken);
-        fd.append('tag_line_color', tlColor);
-        fd.append('tag_line_font_size', tlFontSize);
-        fd.append('tag_line_font_weight', tlFontWeight);
-        $.each(tagLines, function (langId, val) {
-            fd.append('tag_line_' + langId, val);
+        fd.append('description_color', descColor);
+        fd.append('description_font_size', descFontSize);
+        fd.append('description_font_weight', descFontWeight);
+        $.each(titles, function (langId, val) {
+            fd.append('title_' + langId, val);
+        });
+        $.each(descriptions, function (langId, val) {
+            fd.append('description_' + langId, val);
         });
         if (newFile) {
             fd.append('header_image_file', newFile);
@@ -557,14 +554,14 @@ $(document).ready(function () {
         }).always(function () { $('#page-loader').hide(); });
     }
 
-    function uploadImagesWithTagLine(files) {
-        var index         = 0;
-        var tagLines      = getFormTagLines();
-        var active        = parseInt($('input[name="qlo_img_active_add"]:checked').val() || 1, 10);
-        var showHotelName = parseInt($('input[name="qlo_img_hotelname_add"]:checked').val() || 1, 10);
-        var tlColor      = $('#qlo-img-tl-color').val() || '#ffffff';
-        var tlFontSize   = parseInt($('#qlo-img-tl-font-size').val() || 16, 10);
-        var tlFontWeight = $('#qlo-img-tl-font-weight').val() || '400';
+    function uploadImagesWithDetails(files) {
+        var index           = 0;
+        var titles          = getFormTitles();
+        var descriptions    = getFormDescriptions();
+        var active          = parseInt($('input[name="qlo_img_active_add"]:checked').val() || 1, 10);
+        var descColor       = $('#qlo-img-desc-color').val() || '#ffffff';
+        var descFontSize    = parseInt($('#qlo-img-desc-font-size').val() || 16, 10);
+        var descFontWeight  = $('#qlo-img-desc-font-weight').val() || '400';
         $('#qlo-form-upload-progress').show();
         $('#qlo-img-form-upload-btn').prop('disabled', true);
         $('#page-loader').show();
@@ -589,12 +586,14 @@ $(document).ready(function () {
             fd.append('action', 'uploadImage');
             fd.append('token',  qloHmToken);
             fd.append('active', active);
-            fd.append('show_hotel_chain_name', showHotelName);
-            fd.append('tag_line_color',       tlColor);
-            fd.append('tag_line_font_size',   tlFontSize);
-            fd.append('tag_line_font_weight', tlFontWeight);
-            $.each(tagLines, function (langId, val) {
-                fd.append('tag_line_' + langId, val);
+            fd.append('description_color',       descColor);
+            fd.append('description_font_size',   descFontSize);
+            fd.append('description_font_weight', descFontWeight);
+            $.each(titles, function (langId, val) {
+                fd.append('title_' + langId, val);
+            });
+            $.each(descriptions, function (langId, val) {
+                fd.append('description_' + langId, val);
             });
 
             $.ajax({
@@ -648,16 +647,25 @@ $(document).ready(function () {
         if (data.thumb_src) {
             $row.attr('data-thumb-src', data.thumb_src);
         }
-        var updatedTagLines = safeParseJsonHm(data.tag_lines_json) || {};
-        $row.attr('data-tag-lines', data.tag_lines_json);
-        $row.data('tag-lines', updatedTagLines);
-        $row.attr('data-tag-line-color', data.tag_line_color || '#ffffff');
-        $row.attr('data-tag-line-font-size', data.tag_line_font_size || 16);
-        $row.attr('data-tag-line-font-weight', data.tag_line_font_weight || '400');
-        var display = data.tag_line || '';
-        $row.find('.qlo-img-tagline-cell').text(
-            display.length > 50 ? display.substring(0, 50) + '...' : (display || '—')
+        var updatedTitles = safeParseJsonHm(data.titles_json) || {};
+        $row.attr('data-titles', data.titles_json);
+        $row.data('titles', updatedTitles);
+        var titleDisplay = data.title || '';
+        $row.find('.qlo-img-title-cell').text(
+            titleDisplay.length > 50 ? titleDisplay.substring(0, 50) + '...' : (titleDisplay || '—')
         );
+
+        var updatedDescriptions = safeParseJsonHm(data.descriptions_json) || {};
+        $row.attr('data-descriptions', data.descriptions_json);
+        $row.data('descriptions', updatedDescriptions);
+        $row.attr('data-description-color', data.description_color || '#ffffff');
+        $row.attr('data-description-font-size', data.description_font_size || 16);
+        $row.attr('data-description-font-weight', data.description_font_weight || '400');
+        var descDisplay = data.description || '';
+        $row.find('.qlo-img-description-cell').text(
+            descDisplay.length > 50 ? descDisplay.substring(0, 50) + '...' : (descDisplay || '—')
+        );
+
         var nowActive = parseInt(data.active, 10);
         var $toggle = $row.find('.js-toggle-active');
         $toggle.toggleClass('action-enabled', !!nowActive)
@@ -666,17 +674,6 @@ $(document).ready(function () {
         $toggle.find('i.icon-remove').toggleClass('hidden', !!nowActive);
         $toggle.attr('href', $toggle.attr('href').replace(/id_header_image=\d+/, 'id_header_image=' + id)
                                                 .replace(/active=\d+/, 'active=' + (nowActive ? 0 : 1)));
-
-        if (data.show_hotel_chain_name !== undefined) {
-            var nowShowHotelName = parseInt(data.show_hotel_chain_name, 10);
-            var $hnToggle = $row.find('.js-toggle-hotel-name');
-            $hnToggle.toggleClass('action-enabled', !!nowShowHotelName)
-                     .toggleClass('action-disabled', !nowShowHotelName);
-            $hnToggle.find('i.icon-check').toggleClass('hidden', !nowShowHotelName);
-            $hnToggle.find('i.icon-remove').toggleClass('hidden', !!nowShowHotelName);
-            $hnToggle.attr('href', $hnToggle.attr('href').replace(/id_header_image=\d+/, 'id_header_image=' + id)
-                                                        .replace(/show_hotel_chain_name=\d+/, 'show_hotel_chain_name=' + (nowShowHotelName ? 0 : 1)));
-        }
     }
 
     function safeParseJsonHm(raw) {

@@ -75,57 +75,61 @@ $(document).ready(function () {
     };
 
 
-    var $taglineEl   = $('.js-header-tagline');
-    var $hotelNameEl = $('.js-header-hotel-name');
-    var _fadeTimer   = null;
-    var _shownIndex  = -1;
+    var $descriptionEl = $('.js-header-description');
+    var $titleEl       = $('.js-header-title');
+    var _fadeTimer      = null;
+    var _shownIndex     = -1;
 
     var $slides = $imgCarousel.find('.owl-item:not(.cloned) .header-slide-img');
-    var taglines = $slides.map(function () { return $(this).data('tagline') || ''; }).get();
-    var tlStyles = $slides.map(function () {
+    var titles = $slides.map(function () { return $(this).data('title') || ''; }).get();
+    var descriptions = $slides.map(function () { return $(this).data('description') || ''; }).get();
+    var descStyles = $slides.map(function () {
         return {
-            color:      $(this).data('tl-color')       || '#ffffff',
-            fontSize:   $(this).data('tl-font-size')   || 16,
-            fontWeight: $(this).data('tl-font-weight') || '400'
+            color:      $(this).data('desc-color')       || '#ffffff',
+            fontSize:   $(this).data('desc-font-size')   || 16,
+            fontWeight: $(this).data('desc-font-weight') || '400'
         };
     }).get();
-    var showHotelNames = $slides.map(function () { return $(this).data('show-hotel-name') == 1; }).get();
 
-    function showTagline(tag, style, showHotelName) {
-        if ($hotelNameEl.length) {
-            $hotelNameEl.toggle(!!showHotelName);
-        }
+    function showTitle(title) {
+        if (!$titleEl.length) { return; }
+        $titleEl.text(title);
+        $titleEl.toggle(!!title);
+    }
 
-        if (!$taglineEl.length) { return; }
+    function showDescription(text, style) {
+        if (!$descriptionEl.length) { return; }
         if (_fadeTimer) { clearTimeout(_fadeTimer); _fadeTimer = null; }
 
         style = style || { color: '#ffffff', fontSize: 16, fontWeight: '400' };
-        $taglineEl.css({
+        $descriptionEl.css({
             color:       style.color,
             fontSize:    style.fontSize + 'px',
             fontWeight:  style.fontWeight
         });
 
-        $taglineEl.removeClass('wk-tagline-out wk-tagline-in').text(tag);
-        if (!tag) { $taglineEl.hide(); return; }
+        $descriptionEl.removeClass('wk-tagline-out wk-tagline-in').text(text);
+        if (!text) { $descriptionEl.hide(); return; }
 
-        $taglineEl.show();
-        $taglineEl[0].offsetHeight; // force reflow so the transition actually runs
-        $taglineEl.addClass('wk-tagline-in');
+        $descriptionEl.show();
+        $descriptionEl[0].offsetHeight; // force reflow so the transition actually runs
+        $descriptionEl.addClass('wk-tagline-in');
         _fadeTimer = setTimeout(function () {
             _fadeTimer = null;
-            $taglineEl.removeClass('wk-tagline-in');
+            $descriptionEl.removeClass('wk-tagline-in');
         }, 400);
     }
 
     _shownIndex = owl.relative(owl.current());
-    showTagline(taglines[_shownIndex] || '', tlStyles[_shownIndex], showHotelNames[_shownIndex]);
+    showTitle(titles[_shownIndex] || '');
+    showDescription(descriptions[_shownIndex] || '', descStyles[_shownIndex]);
 
     $imgCarousel.on('changed.owl.carousel', function () {
         var realIndex = owl.relative(owl.current());
         if (realIndex === _shownIndex) { return; } // loop-snap second fire — no-op
         _shownIndex = realIndex;
-        showTagline(taglines[realIndex] || '', tlStyles[realIndex], showHotelNames[realIndex]);
+        showTitle(titles[realIndex] || '');
+        showDescription(descriptions[realIndex] || '', descStyles[realIndex]);
     });
 
 

@@ -105,11 +105,11 @@
 										{foreach from=$headerMediaItems item=imgItem}
 											<div class="header-slide-img"
 												style="background-image:url('{$link->getMediaLink("`$smarty.const._PS_IMG_`hotel_header_media/{$imgItem.name}")}')"
-												data-tagline="{$imgItem.tag_line|escape:'html':'UTF-8'}"
-												data-tl-color="{$imgItem.tag_line_color|default:'#ffffff'|escape:'html':'UTF-8'}"
-												data-tl-font-size="{$imgItem.tag_line_font_size|default:16|intval}"
-												data-tl-font-weight="{$imgItem.tag_line_font_weight|default:'400'|escape:'html':'UTF-8'}"
-												data-show-hotel-name="{$imgItem.show_hotel_chain_name|intval}">
+												data-title="{$imgItem.title|escape:'html':'UTF-8'}"
+												data-description="{$imgItem.description|escape:'html':'UTF-8'}"
+												data-desc-color="{$imgItem.description_color|default:'#ffffff'|escape:'html':'UTF-8'}"
+												data-desc-font-size="{$imgItem.description_font_size|default:16|intval}"
+												data-desc-font-weight="{$imgItem.description_font_weight|default:'400'|escape:'html':'UTF-8'}">
 											</div>
 										{/foreach}
 									</div>

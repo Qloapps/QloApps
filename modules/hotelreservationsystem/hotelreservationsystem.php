@@ -102,7 +102,7 @@ class HotelReservationSystem extends Module
                 'QLO_HEADER_ANIM_TYPE_SLIDE'    => HotelHeaderImage::ANIMATION_TYPE_SLIDE,
                 'headerMediaItems'              => $headerMediaItems,
                 'headerSliderConfig'            => array(
-                    'nav_type'  => (int)(Configuration::get('QLO_HEADER_SLIDER_NAV_TYPE') ?: HotelHeaderImage::NAV_TYPE_DOTS),
+                    'nav_type'  => (int)(Configuration::get('QLO_HEADER_SLIDER_NAV_TYPE') ?: HotelHeaderImage::NAV_TYPE_ARROWS),
                     'auto_play' => (int)Configuration::get('QLO_HEADER_SLIDER_AUTO_PLAY'),
                     'interval'  => (int)Configuration::get('QLO_HEADER_SLIDER_INTERVAL'),
                     'anim_type' => (int)(Configuration::get('QLO_HEADER_SLIDER_ANIM_TYPE') ?: HotelHeaderImage::ANIMATION_TYPE_SLIDE),
@@ -301,14 +301,12 @@ class HotelReservationSystem extends Module
         if (Tools::getValue('controller') == 'index') {
             $headerMediaItems = $this->context->smarty->getTemplateVars('headerMediaItems');
             $firstItem = ($headerMediaItems && !empty($headerMediaItems[0])) ? $headerMediaItems[0] : array();
-            $tagLine   = !empty($firstItem['tag_line']) ? $firstItem['tag_line'] : '';
             $this->context->smarty->assign(array(
-                'WK_HTL_CHAIN_NAME'          => Configuration::get('WK_HTL_CHAIN_NAME', $this->context->language->id),
-                'wkHeaderMediaTagLine'       => $tagLine,
-                'wkTagLineColor'             => !empty($firstItem['tag_line_color'])       ? $firstItem['tag_line_color']       : '#ffffff',
-                'wkTagLineFontSize'          => !empty($firstItem['tag_line_font_size'])   ? (int)$firstItem['tag_line_font_size']   : 16,
-                'wkTagLineFontWeight'        => !empty($firstItem['tag_line_font_weight']) ? $firstItem['tag_line_font_weight'] : '400',
-                'QLO_HOTEL_NAME_ENABLE'      => !empty($firstItem['show_hotel_chain_name']),
+                'wkHeaderMediaTitle'         => !empty($firstItem['title']) ? $firstItem['title'] : '',
+                'wkHeaderMediaDescription'   => !empty($firstItem['description']) ? $firstItem['description'] : '',
+                'wkDescriptionColor'         => !empty($firstItem['description_color'])       ? $firstItem['description_color']       : '#ffffff',
+                'wkDescriptionFontSize'      => !empty($firstItem['description_font_size'])   ? (int)$firstItem['description_font_size']   : 16,
+                'wkDescriptionFontWeight'    => !empty($firstItem['description_font_weight']) ? $firstItem['description_font_weight'] : '400',
                 'wkHeaderContentAlign'       => (int)(Configuration::get('QLO_HEADER_CONTENT_ALIGN') ?: HotelHeaderImage::CONTENT_ALIGN_CENTER),
                 'QLO_HEADER_MEDIA_TYPE'      => (int)(Configuration::get('QLO_HEADER_MEDIA_TYPE') ?: HotelHeaderImage::MEDIA_TYPE_IMAGE),
                 'QLO_HEADER_MEDIA_TYPE_IMAGE' => HotelHeaderImage::MEDIA_TYPE_IMAGE,

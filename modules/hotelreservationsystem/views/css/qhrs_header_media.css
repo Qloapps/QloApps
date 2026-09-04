@@ -123,15 +123,15 @@
 @keyframes wkSlideOut { from { opacity:1; transform:translateX(0);    } to { opacity:0; transform:translateX(-60px); } }
 @keyframes wkSlideIn  { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:translateX(0);     } }
 
-/* Tag-line slide animation on slide change */
-.js-header-tagline {
+/* Description slide animation on slide change */
+.js-header-description {
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
-.js-header-tagline.wk-tagline-out {
+.js-header-description.wk-tagline-out {
     opacity: 0;
     transform: translateY(-10px);
 }
-.js-header-tagline.wk-tagline-in {
+.js-header-description.wk-tagline-in {
     opacity: 1;
     transform: translateY(0);
 }

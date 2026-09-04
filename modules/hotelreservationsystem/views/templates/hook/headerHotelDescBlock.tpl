@@ -29,12 +29,12 @@
 						<div class="col-md-offset-1 col-md-10 col-lg-offset-0 col-lg-12">
 							<div class="header-desc-inner-wrapper">
 								{if $QLO_HEADER_MEDIA_TYPE == $QLO_HEADER_MEDIA_TYPE_IMAGE}
-								{block name='header_hotel_chain_name'}
-									<h1 class="header-hotel-name js-header-hotel-name"{if !$QLO_HOTEL_NAME_ENABLE} style="display:none"{/if}>{$WK_HTL_CHAIN_NAME|escape:'htmlall':'UTF-8'}</h1>
+								{block name='header_hotel_title'}
+									<h1 class="header-hotel-name js-header-title"{if !isset($wkHeaderMediaTitle) || !$wkHeaderMediaTitle} style="display:none"{/if}>{if isset($wkHeaderMediaTitle) && $wkHeaderMediaTitle}{$wkHeaderMediaTitle|escape:'htmlall':'UTF-8'}{/if}</h1>
 								{/block}
 								{/if}
 								{block name='header_hotel_description'}
-									<p class="header-hotel-desc js-header-tagline"{if !isset($wkHeaderMediaTagLine) || !$wkHeaderMediaTagLine} style="display:none"{else} style="color:{$wkTagLineColor|default:'#ffffff'|escape:'html':'UTF-8'};font-size:{$wkTagLineFontSize|default:16|intval}px;font-weight:{$wkTagLineFontWeight|default:'400'|escape:'html':'UTF-8'}"{/if}>{if isset($wkHeaderMediaTagLine) && $wkHeaderMediaTagLine}{$wkHeaderMediaTagLine|escape:'html':'UTF-8'}{/if}</p>
+									<p class="header-hotel-desc js-header-description"{if !isset($wkHeaderMediaDescription) || !$wkHeaderMediaDescription} style="display:none"{else} style="color:{$wkDescriptionColor|default:'#ffffff'|escape:'html':'UTF-8'};font-size:{$wkDescriptionFontSize|default:16|intval}px;font-weight:{$wkDescriptionFontWeight|default:'400'|escape:'html':'UTF-8'}"{/if}>{if isset($wkHeaderMediaDescription) && $wkHeaderMediaDescription}{$wkHeaderMediaDescription|escape:'html':'UTF-8'}{/if}</p>
 								{/block}
 								<hr class="heasder-desc-hr-second"/>
 							</div>

@@ -70,7 +70,8 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $imageItems = HotelHeaderImage::getItems(null, $defaultLangId, true);
         $shopId = (int)$this->context->shop->id;
         foreach ($imageItems as &$item) {
-            $item['tag_lines_json'] = json_encode((object)$item['tag_lines']);
+            $item['titles_json'] = json_encode((object)$item['titles']);
+            $item['descriptions_json'] = json_encode((object)$item['descriptions']);
             $srcPath = _PS_IMG_DIR_.'hotel_header_media/'.$item['name'];
             $cacheName = 'htl_header_image_mini_'.(int)$item['id_header_image'].'_'.$shopId.'.jpg';
             $item['thumb'] = ImageManager::thumbnail($srcPath, $cacheName, 45, 'jpg', false);
@@ -130,7 +131,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             'showVideoUrlPreview' => $showVideoUrlPreview,
             'config' => array(
                 'QLO_HEADER_MEDIA_TYPE' => $mediaType,
-                'QLO_HEADER_SLIDER_NAV_TYPE' => (int)Tools::getValue('QLO_HEADER_SLIDER_NAV_TYPE', (int)(Configuration::get('QLO_HEADER_SLIDER_NAV_TYPE') ?: HotelHeaderImage::NAV_TYPE_DOTS)),
+                'QLO_HEADER_SLIDER_NAV_TYPE' => (int)Tools::getValue('QLO_HEADER_SLIDER_NAV_TYPE', (int)(Configuration::get('QLO_HEADER_SLIDER_NAV_TYPE') ?: HotelHeaderImage::NAV_TYPE_ARROWS)),
                 'QLO_HEADER_SLIDER_AUTO_PLAY' => (int)Tools::getValue('QLO_HEADER_SLIDER_AUTO_PLAY', (int)Configuration::get('QLO_HEADER_SLIDER_AUTO_PLAY')),
                 'QLO_HEADER_SLIDER_INTERVAL' => Tools::getValue('QLO_HEADER_SLIDER_INTERVAL', (int)Configuration::get('QLO_HEADER_SLIDER_INTERVAL') ?: 5000),
                 'QLO_HEADER_SLIDER_ANIM_TYPE' => (int)Tools::getValue('QLO_HEADER_SLIDER_ANIM_TYPE', (int)(Configuration::get('QLO_HEADER_SLIDER_ANIM_TYPE') ?: HotelHeaderImage::ANIMATION_TYPE_SLIDE)),
@@ -141,6 +142,8 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             'imgBaseUrl' => $this->context->link->getMediaLink(_PS_IMG_.'hotel_header_media/'),
             'maxUpload' => Tools::formatBytes(Tools::getMaxUploadSize()),
             'maxImageUpload' => Tools::formatBytes(Tools::getMaxUploadSize((int)Configuration::get('PS_LIMIT_UPLOAD_IMAGE_VALUE') * 1024 * 1024)),
+            'descriptionLimit' => (int)Configuration::get('PS_SHORT_DESC_LIMIT') ?: Configuration::PS_SHORT_DESC_LIMIT,
+            'titleLimit' => HotelHeaderImage::TITLE_LIMIT,
         );
 
         return parent::renderView();
@@ -195,7 +198,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         }
         $autoPlay = 0;
         $interval = 0;
-        $navType = HotelHeaderImage::NAV_TYPE_DOTS;
+        $navType = HotelHeaderImage::NAV_TYPE_ARROWS;
         $animType = HotelHeaderImage::ANIMATION_TYPE_SLIDE;
         $contentAlign = HotelHeaderImage::CONTENT_ALIGN_CENTER;
 
@@ -210,9 +213,9 @@ class AdminHotelHeaderImageController extends ModuleAdminController
                 $interval = (int)$interval;
             }
 
-            $navType = (int)Tools::getValue('QLO_HEADER_SLIDER_NAV_TYPE', HotelHeaderImage::NAV_TYPE_DOTS);
+            $navType = (int)Tools::getValue('QLO_HEADER_SLIDER_NAV_TYPE', HotelHeaderImage::NAV_TYPE_ARROWS);
             if (!in_array($navType, array(HotelHeaderImage::NAV_TYPE_DOTS, HotelHeaderImage::NAV_TYPE_ARROWS, HotelHeaderImage::NAV_TYPE_BOTH))) {
-                $navType = HotelHeaderImage::NAV_TYPE_DOTS;
+                $navType = HotelHeaderImage::NAV_TYPE_ARROWS;
             }
             $animType = (int)Tools::getValue('QLO_HEADER_SLIDER_ANIM_TYPE', HotelHeaderImage::ANIMATION_TYPE_SLIDE);
             if (!in_array($animType, array(HotelHeaderImage::ANIMATION_TYPE_SLIDE, HotelHeaderImage::ANIMATION_TYPE_FADE, HotelHeaderImage::ANIMATION_TYPE_ZOOM, HotelHeaderImage::ANIMATION_TYPE_BLUR))) {
@@ -231,7 +234,7 @@ class AdminHotelHeaderImageController extends ModuleAdminController
                 array_shift($imagesToDrop);
             }
             if ($imagesToDrop && Tools::getValue('confirm_delete_images') !== '1') {
-                $this->errors[] = $this->l('Switching to Video will delete all images except the first one. Please confirm this action.');
+                $this->errors[] = $this->l('Switching to Video will delete all images except the one in the first position. Please confirm this action.');
                 return;
             }
 
@@ -254,9 +257,9 @@ class AdminHotelHeaderImageController extends ModuleAdminController
                 Configuration::updateValue('QLO_HEADER_CONTENT_ALIGN', $contentAlign);
                 Configuration::updateValue('QLO_HEADER_SLIDER_NAV_TYPE', $navType);
                 Configuration::updateValue('QLO_HEADER_SLIDER_AUTO_PLAY', $autoPlay);
+                Configuration::updateValue('QLO_HEADER_SLIDER_ANIM_TYPE', $animType);
                 if ($autoPlay) {
                     Configuration::updateValue('QLO_HEADER_SLIDER_INTERVAL', $interval);
-                    Configuration::updateValue('QLO_HEADER_SLIDER_ANIM_TYPE', $animType);
                 }
             }
             Tools::redirectAdmin(self::$currentIndex.'&conf=4&token='.$this->token);
@@ -360,33 +363,54 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             $this->ajaxDie(json_encode($response));
         }
 
-        $tagLineByLang = array();
+        $titleByLang = array();
+        $descriptionByLang = array();
         foreach (Language::getLanguages(false) as $lang) {
-            $tagLineByLang[$lang['id_lang']] = trim(Tools::getValue('tag_line_'.$lang['id_lang'], ''));
+            $titleByLang[$lang['id_lang']] = trim(Tools::getValue('title_'.$lang['id_lang'], ''));
+            $descriptionByLang[$lang['id_lang']] = trim(Tools::getValue('description_'.$lang['id_lang'], ''));
         }
-        foreach ($tagLineByLang as $tagLineValue) {
-            if (!Validate::isGenericName($tagLineValue)) {
+        foreach (array_merge($titleByLang, $descriptionByLang) as $textValue) {
+            if (!Validate::isGenericName($textValue)) {
                 if (file_exists($destPath)) {
                     unlink($destPath);
                 }
-                $response['errors'][] = $this->l('Invalid tag line. Characters < > = { } are not allowed.');
+                $response['errors'][] = $this->l('Invalid title or description. Characters < > = { } are not allowed.');
+                $this->ajaxDie(json_encode($response));
+            }
+        }
+        foreach ($titleByLang as $titleValue) {
+            if (Tools::strlen($titleValue) > HotelHeaderImage::TITLE_LIMIT) {
+                if (file_exists($destPath)) {
+                    unlink($destPath);
+                }
+                $response['errors'][] = sprintf($this->l('Title is too long: %d chars max.'), HotelHeaderImage::TITLE_LIMIT);
+                $this->ajaxDie(json_encode($response));
+            }
+        }
+        $descriptionLimit = (int)Configuration::get('PS_SHORT_DESC_LIMIT') ?: Configuration::PS_SHORT_DESC_LIMIT;
+        foreach ($descriptionByLang as $descriptionValue) {
+            if (Tools::strlen($descriptionValue) > $descriptionLimit) {
+                if (file_exists($destPath)) {
+                    unlink($destPath);
+                }
+                $response['errors'][] = sprintf($this->l('Description is too long: %d chars max.'), $descriptionLimit);
                 $this->ajaxDie(json_encode($response));
             }
         }
 
-        $tagLineColor = Tools::getValue('tag_line_color', '#ffffff');
-        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $tagLineColor)) {
-            $response['errors'][] = $this->l('Invalid tag line color. Use a 6-digit hex value (e.g. #ffffff).');
+        $descriptionColor = Tools::getValue('description_color', '#ffffff');
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $descriptionColor)) {
+            $response['errors'][] = $this->l('Invalid description color. Use a 6-digit hex value (e.g. #ffffff).');
             $this->ajaxDie(json_encode($response));
         }
-        $tagLineFontSize = (int)Tools::getValue('tag_line_font_size', 16);
-        if ($tagLineFontSize < 8 || $tagLineFontSize > 72) {
-            $response['errors'][] = $this->l('Tag line font size must be between 8 and 72 pixels.');
+        $descriptionFontSize = (int)Tools::getValue('description_font_size', 16);
+        if ($descriptionFontSize < 8 || $descriptionFontSize > 72) {
+            $response['errors'][] = $this->l('Description font size must be between 8 and 72 pixels.');
             $this->ajaxDie(json_encode($response));
         }
-        $tagLineFontWeight = Tools::getValue('tag_line_font_weight', '400');
-        if (!in_array($tagLineFontWeight, array('300', '400', '600', '700'))) {
-            $response['errors'][] = $this->l('Invalid tag line font weight.');
+        $descriptionFontWeight = Tools::getValue('description_font_weight', '400');
+        if (!in_array($descriptionFontWeight, array('400', '700'))) {
+            $response['errors'][] = $this->l('Invalid description font weight.');
             $this->ajaxDie(json_encode($response));
         }
 
@@ -394,11 +418,11 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $objImage->name = $uniqueName;
         $objImage->position = $objImage->getHigherPosition();
         $objImage->active = (int)(bool)Tools::getValue('active', 1);
-        $objImage->show_hotel_chain_name = (int)(bool)Tools::getValue('show_hotel_chain_name', 1);
-        $objImage->tag_line = $tagLineByLang;
-        $objImage->tag_line_color = $tagLineColor;
-        $objImage->tag_line_font_size = $tagLineFontSize;
-        $objImage->tag_line_font_weight = $tagLineFontWeight;
+        $objImage->title = $titleByLang;
+        $objImage->description = $descriptionByLang;
+        $objImage->description_color = $descriptionColor;
+        $objImage->description_font_size = $descriptionFontSize;
+        $objImage->description_font_weight = $descriptionFontWeight;
 
         if (!$objImage->save()) {
             if (file_exists($destPath)) {
@@ -417,13 +441,14 @@ class AdminHotelHeaderImageController extends ModuleAdminController
                 'id_header_image' => (int)$objImage->id,
                 'name' => $uniqueName,
                 'thumb' => $thumb,
-                'tag_line' => isset($tagLineByLang[$defaultLangId]) ? $tagLineByLang[$defaultLangId] : '',
-                'tag_lines_json' => json_encode((object)$tagLineByLang),
-                'tag_line_color' => $tagLineColor,
-                'tag_line_font_size' => $tagLineFontSize,
-                'tag_line_font_weight' => $tagLineFontWeight,
+                'title' => isset($titleByLang[$defaultLangId]) ? $titleByLang[$defaultLangId] : '',
+                'titles_json' => json_encode((object)$titleByLang),
+                'description' => isset($descriptionByLang[$defaultLangId]) ? $descriptionByLang[$defaultLangId] : '',
+                'descriptions_json' => json_encode((object)$descriptionByLang),
+                'description_color' => $descriptionColor,
+                'description_font_size' => $descriptionFontSize,
+                'description_font_weight' => $descriptionFontWeight,
                 'active' => (int)$objImage->active,
-                'show_hotel_chain_name' => (int)$objImage->show_hotel_chain_name,
             ),
             'position' => count(HotelHeaderImage::getItems(null)),
             'current' => self::$currentIndex,
@@ -454,9 +479,28 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             $this->ajaxDie(json_encode($response));
         }
 
-        $tagLineByLang = array();
+        $titleByLang = array();
+        $descriptionByLang = array();
         foreach (Language::getLanguages(false) as $lang) {
-            $tagLineByLang[$lang['id_lang']] = trim(Tools::getValue('tag_line_'.$lang['id_lang'], ''));
+            $titleByLang[$lang['id_lang']] = trim(Tools::getValue('title_'.$lang['id_lang'], ''));
+            $descriptionByLang[$lang['id_lang']] = trim(Tools::getValue('description_'.$lang['id_lang'], ''));
+        }
+        foreach ($titleByLang as $titleValue) {
+            if (!Validate::isGenericName($titleValue)) {
+                $response['errors'][] = $this->l('Invalid title. Characters < > = { } are not allowed.');
+                $this->ajaxDie(json_encode($response));
+            }
+            if (Tools::strlen($titleValue) > HotelHeaderImage::TITLE_LIMIT) {
+                $response['errors'][] = sprintf($this->l('Title is too long: %d chars max.'), HotelHeaderImage::TITLE_LIMIT);
+                $this->ajaxDie(json_encode($response));
+            }
+        }
+        $descriptionLimit = (int)Configuration::get('PS_SHORT_DESC_LIMIT') ?: Configuration::PS_SHORT_DESC_LIMIT;
+        foreach ($descriptionByLang as $descriptionValue) {
+            if (Tools::strlen($descriptionValue) > $descriptionLimit) {
+                $response['errors'][] = sprintf($this->l('Description is too long: %d chars max.'), $descriptionLimit);
+                $this->ajaxDie(json_encode($response));
+            }
         }
 
         $activeVal = Tools::getValue('active');
@@ -472,24 +516,19 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             $objImage->active = $newActive;
         }
 
-        $showHotelChainNameVal = Tools::getValue('show_hotel_chain_name');
-        if ($showHotelChainNameVal !== false) {
-            $objImage->show_hotel_chain_name = (int)(bool)$showHotelChainNameVal;
-        }
-
-        $tagLineColor = Tools::getValue('tag_line_color', $objImage->tag_line_color);
-        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $tagLineColor)) {
-            $response['errors'][] = $this->l('Invalid tag line color. Use a 6-digit hex value (e.g. #ffffff).');
+        $descriptionColor = Tools::getValue('description_color', $objImage->description_color);
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $descriptionColor)) {
+            $response['errors'][] = $this->l('Invalid description color. Use a 6-digit hex value (e.g. #ffffff).');
             $this->ajaxDie(json_encode($response));
         }
-        $tagLineFontSize = (int)Tools::getValue('tag_line_font_size', $objImage->tag_line_font_size);
-        if ($tagLineFontSize < 8 || $tagLineFontSize > 72) {
-            $response['errors'][] = $this->l('Tag line font size must be between 8 and 72 pixels.');
+        $descriptionFontSize = (int)Tools::getValue('description_font_size', $objImage->description_font_size);
+        if ($descriptionFontSize < 8 || $descriptionFontSize > 72) {
+            $response['errors'][] = $this->l('Description font size must be between 8 and 72 pixels.');
             $this->ajaxDie(json_encode($response));
         }
-        $tagLineFontWeight = Tools::getValue('tag_line_font_weight', $objImage->tag_line_font_weight);
-        if (!in_array($tagLineFontWeight, array('300', '400', '600', '700'))) {
-            $response['errors'][] = $this->l('Invalid tag line font weight.');
+        $descriptionFontWeight = Tools::getValue('description_font_weight', $objImage->description_font_weight);
+        if (!in_array($descriptionFontWeight, array('400', '700'))) {
+            $response['errors'][] = $this->l('Invalid description font weight.');
             $this->ajaxDie(json_encode($response));
         }
 
@@ -524,10 +563,11 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         }
 
         $oldImageName = $objImage->name;
-        $objImage->tag_line = $tagLineByLang;
-        $objImage->tag_line_color = $tagLineColor;
-        $objImage->tag_line_font_size = $tagLineFontSize;
-        $objImage->tag_line_font_weight = $tagLineFontWeight;
+        $objImage->title = $titleByLang;
+        $objImage->description = $descriptionByLang;
+        $objImage->description_color = $descriptionColor;
+        $objImage->description_font_size = $descriptionFontSize;
+        $objImage->description_font_weight = $descriptionFontWeight;
         if ($newImageName) {
             $objImage->name = $newImageName;
         }
@@ -549,13 +589,14 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $defaultLangId = (int)Configuration::get('PS_LANG_DEFAULT');
         $response['success'] = true;
         $response['active'] = (int)$objImage->active;
-        $response['show_hotel_chain_name'] = (int)$objImage->show_hotel_chain_name;
         $response['confirmations'] = $this->l('Image updated successfully.');
-        $response['tag_line'] = isset($tagLineByLang[$defaultLangId]) ? $tagLineByLang[$defaultLangId] : '';
-        $response['tag_lines_json'] = json_encode((object)$tagLineByLang);
-        $response['tag_line_color'] = $tagLineColor;
-        $response['tag_line_font_size'] = $tagLineFontSize;
-        $response['tag_line_font_weight'] = $tagLineFontWeight;
+        $response['title'] = isset($titleByLang[$defaultLangId]) ? $titleByLang[$defaultLangId] : '';
+        $response['titles_json'] = json_encode((object)$titleByLang);
+        $response['description'] = isset($descriptionByLang[$defaultLangId]) ? $descriptionByLang[$defaultLangId] : '';
+        $response['descriptions_json'] = json_encode((object)$descriptionByLang);
+        $response['description_color'] = $descriptionColor;
+        $response['description_font_size'] = $descriptionFontSize;
+        $response['description_font_weight'] = $descriptionFontWeight;
 
         if ($newImageName) {
             $shopId = (int)$this->context->shop->id;
@@ -653,34 +694,6 @@ class AdminHotelHeaderImageController extends ModuleAdminController
         $this->ajaxDie(json_encode($response));
     }
 
-    public function ajaxProcessToggleImageHotelName()
-    {
-        $response = array('errors' => array(), 'success' => false);
-        $id = (int)Tools::getValue('id_header_image');
-        $showHotelChainName = (int)(bool)Tools::getValue('show_hotel_chain_name');
-
-        if (!$id) {
-            $response['errors'][] = $this->l('Invalid item ID.');
-            $this->ajaxDie(json_encode($response));
-        }
-
-        $objImage = new HotelHeaderImage($id);
-        if (!Validate::isLoadedObject($objImage)) {
-            $response['errors'][] = $this->l('Image not found.');
-            $this->ajaxDie(json_encode($response));
-        }
-
-        $objImage->show_hotel_chain_name = $showHotelChainName;
-        if (!$objImage->save()) {
-            $response['errors'][] = $this->l('Unable to update hotel name status.');
-            $this->ajaxDie(json_encode($response));
-        }
-
-        $response['success'] = true;
-        $response['confirmations'] = $this->l('The status has been successfully updated.');
-        $this->ajaxDie(json_encode($response));
-    }
-
     public function ajaxProcessSaveImagePositions()
     {
         $ids = Tools::getValue('image_ids', array());
@@ -728,41 +741,58 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             }
         }
 
-        $showHotelChainNameVal = Tools::getValue('show_hotel_chain_name', '');
-        if ($showHotelChainNameVal !== '' && !in_array($showHotelChainNameVal, array('0', '1'))) {
-            $response['errors'][] = $this->l('Invalid hotel name status selected.');
-            $this->ajaxDie(json_encode($response));
-        }
-
-        $updateTagline = (bool)Tools::getValue('update_tagline', false);
-        $tagLineByLang = array();
-        if ($updateTagline) {
+        $updateTitle = (bool)Tools::getValue('update_title', false);
+        $titleByLang = array();
+        if ($updateTitle) {
             foreach (Language::getLanguages(false) as $lang) {
-                $tagLineByLang[$lang['id_lang']] = trim(Tools::getValue('tag_line_'.$lang['id_lang'], ''));
+                $titleByLang[$lang['id_lang']] = trim(Tools::getValue('title_'.$lang['id_lang'], ''));
             }
-            foreach ($tagLineByLang as $tagLineValue) {
-                if (!Validate::isGenericName($tagLineValue)) {
-                    $response['errors'][] = $this->l('Invalid tag line. Characters < > = { } are not allowed.');
+            foreach ($titleByLang as $titleValue) {
+                if (!Validate::isGenericName($titleValue)) {
+                    $response['errors'][] = $this->l('Invalid title. Characters < > = { } are not allowed.');
+                    $this->ajaxDie(json_encode($response));
+                }
+                if (Tools::strlen($titleValue) > HotelHeaderImage::TITLE_LIMIT) {
+                    $response['errors'][] = sprintf($this->l('Title is too long: %d chars max.'), HotelHeaderImage::TITLE_LIMIT);
                     $this->ajaxDie(json_encode($response));
                 }
             }
         }
 
-        $tagLineColor = trim(Tools::getValue('tag_line_color', ''));
-        if ($tagLineColor !== '' && !preg_match('/^#[0-9a-fA-F]{6}$/', $tagLineColor)) {
-            $response['errors'][] = $this->l('Invalid tag line color. Use a 6-digit hex value (e.g. #ffffff).');
+        $updateDescription = (bool)Tools::getValue('update_description', false);
+        $descriptionByLang = array();
+        if ($updateDescription) {
+            $descriptionLimit = (int)Configuration::get('PS_SHORT_DESC_LIMIT') ?: Configuration::PS_SHORT_DESC_LIMIT;
+            foreach (Language::getLanguages(false) as $lang) {
+                $descriptionByLang[$lang['id_lang']] = trim(Tools::getValue('description_'.$lang['id_lang'], ''));
+            }
+            foreach ($descriptionByLang as $descriptionValue) {
+                if (!Validate::isGenericName($descriptionValue)) {
+                    $response['errors'][] = $this->l('Invalid description. Characters < > = { } are not allowed.');
+                    $this->ajaxDie(json_encode($response));
+                }
+                if (Tools::strlen($descriptionValue) > $descriptionLimit) {
+                    $response['errors'][] = sprintf($this->l('Description is too long: %d chars max.'), $descriptionLimit);
+                    $this->ajaxDie(json_encode($response));
+                }
+            }
+        }
+
+        $descriptionColor = trim(Tools::getValue('description_color', ''));
+        if ($descriptionColor !== '' && !preg_match('/^#[0-9a-fA-F]{6}$/', $descriptionColor)) {
+            $response['errors'][] = $this->l('Invalid description color. Use a 6-digit hex value (e.g. #ffffff).');
             $this->ajaxDie(json_encode($response));
         }
 
-        $tagLineFontSize = (int)Tools::getValue('tag_line_font_size', 0);
-        if ($tagLineFontSize !== 0 && ($tagLineFontSize < 8 || $tagLineFontSize > 72)) {
-            $response['errors'][] = $this->l('Tag line font size must be between 8 and 72 pixels.');
+        $descriptionFontSize = (int)Tools::getValue('description_font_size', 0);
+        if ($descriptionFontSize !== 0 && ($descriptionFontSize < 8 || $descriptionFontSize > 72)) {
+            $response['errors'][] = $this->l('Description font size must be between 8 and 72 pixels.');
             $this->ajaxDie(json_encode($response));
         }
 
-        $tagLineFontWeight = Tools::getValue('tag_line_font_weight', '');
-        if ($tagLineFontWeight !== '' && !in_array($tagLineFontWeight, array('300', '400', '600', '700'))) {
-            $response['errors'][] = $this->l('Invalid tag line font weight.');
+        $descriptionFontWeight = Tools::getValue('description_font_weight', '');
+        if ($descriptionFontWeight !== '' && !in_array($descriptionFontWeight, array('400', '700'))) {
+            $response['errors'][] = $this->l('Invalid description font weight.');
             $this->ajaxDie(json_encode($response));
         }
 
@@ -777,33 +807,35 @@ class AdminHotelHeaderImageController extends ModuleAdminController
             if ($activeVal !== '') {
                 $objImage->active = (int)$activeVal;
             }
-            if ($showHotelChainNameVal !== '') {
-                $objImage->show_hotel_chain_name = (int)$showHotelChainNameVal;
+            if ($updateTitle) {
+                $objImage->title = $titleByLang;
             }
-            if ($updateTagline) {
-                $objImage->tag_line = $tagLineByLang;
+            if ($updateDescription) {
+                $objImage->description = $descriptionByLang;
             }
-            if ($tagLineColor !== '') {
-                $objImage->tag_line_color = $tagLineColor;
+            if ($descriptionColor !== '') {
+                $objImage->description_color = $descriptionColor;
             }
-            if ($tagLineFontSize !== 0) {
-                $objImage->tag_line_font_size = $tagLineFontSize;
+            if ($descriptionFontSize !== 0) {
+                $objImage->description_font_size = $descriptionFontSize;
             }
-            if ($tagLineFontWeight !== '') {
-                $objImage->tag_line_font_weight = $tagLineFontWeight;
+            if ($descriptionFontWeight !== '') {
+                $objImage->description_font_weight = $descriptionFontWeight;
             }
             $objImage->save();
 
-            $currentTagLines = is_array($objImage->tag_line) ? $objImage->tag_line : array();
+            $currentTitles = is_array($objImage->title) ? $objImage->title : array();
+            $currentDescriptions = is_array($objImage->description) ? $objImage->description : array();
             $updatedRows[] = array(
                 'id' => (int)$objImage->id,
                 'active' => (int)$objImage->active,
-                'show_hotel_chain_name' => (int)$objImage->show_hotel_chain_name,
-                'tag_line' => isset($currentTagLines[$defaultLangId]) ? $currentTagLines[$defaultLangId] : '',
-                'tag_lines_json' => json_encode((object)$currentTagLines),
-                'tag_line_color' => $objImage->tag_line_color,
-                'tag_line_font_size' => $objImage->tag_line_font_size,
-                'tag_line_font_weight' => $objImage->tag_line_font_weight,
+                'title' => isset($currentTitles[$defaultLangId]) ? $currentTitles[$defaultLangId] : '',
+                'titles_json' => json_encode((object)$currentTitles),
+                'description' => isset($currentDescriptions[$defaultLangId]) ? $currentDescriptions[$defaultLangId] : '',
+                'descriptions_json' => json_encode((object)$currentDescriptions),
+                'description_color' => $objImage->description_color,
+                'description_font_size' => $objImage->description_font_size,
+                'description_font_weight' => $objImage->description_font_weight,
             );
         }
 

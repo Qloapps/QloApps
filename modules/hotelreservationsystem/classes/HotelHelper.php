@@ -1070,7 +1070,7 @@ class HotelHelper
         Configuration::updateValue('WK_TITLE_HEADER_BLOCK', $home_banner_default_title);
         Configuration::updateValue('WK_CONTENT_HEADER_BLOCK', $home_banner_default_content);
         Configuration::updateValue('QLO_HEADER_MEDIA_TYPE', HotelHeaderImage::MEDIA_TYPE_IMAGE);
-        Configuration::updateValue('QLO_HEADER_SLIDER_NAV_TYPE', HotelHeaderImage::NAV_TYPE_DOTS);
+        Configuration::updateValue('QLO_HEADER_SLIDER_NAV_TYPE', HotelHeaderImage::NAV_TYPE_ARROWS);
         Configuration::updateValue('QLO_HEADER_SLIDER_AUTO_PLAY', 1);
         Configuration::updateValue('QLO_HEADER_SLIDER_INTERVAL', 5000);
         Configuration::updateValue('QLO_HEADER_SLIDER_ANIM_TYPE', HotelHeaderImage::ANIMATION_TYPE_SLIDE);
@@ -1092,20 +1092,13 @@ class HotelHelper
             );
             $newId = (int)Db::getInstance()->Insert_ID();
             if ($newId) {
-                $defaultTagLines = array(
-                    'en' => 'A place where comfort and luxury are blended with nature!',
-                    'nl' => 'Een plek waar comfort en luxe worden gecombineerd met de natuur!',
-                    'fr' => 'Un endroit où le confort et le luxe se mêlent à la nature!',
-                    'de' => 'Ein Ort, an dem Komfort und Luxus mit der Natur verschmelzen!',
-                    'ru' => 'Место, где комфорт и роскошь сочетаются с природой!',
-                    'es' => '¡Un lugar donde el confort y el lujo se mezclan con la naturaleza!',
-                );
                 foreach (Language::getLanguages(false) as $lang) {
-                    $tagLine = isset($defaultTagLines[$lang['iso_code']]) ? $defaultTagLines[$lang['iso_code']] : $defaultTagLines['en'];
+                    $title = isset($homeBannerTitleLang[$lang['iso_code']]) ? $homeBannerTitleLang[$lang['iso_code']] : $homeBannerTitleLang['en'];
+                    $description = isset($homeBannerContentLang[$lang['iso_code']]) ? $homeBannerContentLang[$lang['iso_code']] : $homeBannerContentLang['en'];
                     Db::getInstance()->execute(
                         'INSERT INTO `'._DB_PREFIX_.'htl_header_image_lang`
-                        (`id_header_image`, `id_lang`, `tag_line`)
-                        VALUES ('.$newId.', '.(int)$lang['id_lang'].', \''.pSQL($tagLine).'\')'
+                        (`id_header_image`, `id_lang`, `title`, `description`)
+                        VALUES ('.$newId.', '.(int)$lang['id_lang'].', \''.pSQL($title).'\', \''.pSQL($description).'\')'
                     );
                 }
             }

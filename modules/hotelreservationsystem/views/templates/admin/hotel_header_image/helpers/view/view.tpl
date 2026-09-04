@@ -51,8 +51,8 @@
 					<label class="control-label col-lg-3">{l s='Navigation Type' mod='hotelreservationsystem'}</label>
 					<div class="col-lg-9">
 						<select name="QLO_HEADER_SLIDER_NAV_TYPE" class="fixed-width-lg">
-							<option value="{HotelHeaderImage::NAV_TYPE_DOTS}"{if $config.QLO_HEADER_SLIDER_NAV_TYPE == HotelHeaderImage::NAV_TYPE_DOTS} selected{/if}>{l s='Dots' mod='hotelreservationsystem'}</option>
 							<option value="{HotelHeaderImage::NAV_TYPE_ARROWS}"{if $config.QLO_HEADER_SLIDER_NAV_TYPE == HotelHeaderImage::NAV_TYPE_ARROWS} selected{/if}>{l s='Arrows' mod='hotelreservationsystem'}</option>
+							<option value="{HotelHeaderImage::NAV_TYPE_DOTS}"{if $config.QLO_HEADER_SLIDER_NAV_TYPE == HotelHeaderImage::NAV_TYPE_DOTS} selected{/if}>{l s='Dots' mod='hotelreservationsystem'}</option>
 							<option value="{HotelHeaderImage::NAV_TYPE_BOTH}"{if $config.QLO_HEADER_SLIDER_NAV_TYPE == HotelHeaderImage::NAV_TYPE_BOTH} selected{/if}>{l s='Both (Dots + Arrows)' mod='hotelreservationsystem'}</option>
 						</select>
 						<p class="help-block">{l s='Visible only when 2 or more active images exist.' mod='hotelreservationsystem'}</p>
@@ -85,7 +85,7 @@
 					</div>
 				</div>
 
-				<div class="form-group" id="qlo-slide-anim-group"{if !$config.QLO_HEADER_SLIDER_AUTO_PLAY} style="display:none"{/if}>
+				<div class="form-group" id="qlo-slide-anim-group">
 					<label class="control-label col-lg-3">{l s='Slide Animation' mod='hotelreservationsystem'}</label>
 					<div class="col-lg-9">
 						<select name="QLO_HEADER_SLIDER_ANIM_TYPE" class="fixed-width-lg">
@@ -102,11 +102,11 @@
 					<label class="control-label col-lg-3">{l s='Content Alignment' mod='hotelreservationsystem'}</label>
 					<div class="col-lg-9">
 						<select name="QLO_HEADER_CONTENT_ALIGN" class="fixed-width-lg">
-							<option value="{HotelHeaderImage::CONTENT_ALIGN_LEFT}"{if $config.QLO_HEADER_CONTENT_ALIGN == HotelHeaderImage::CONTENT_ALIGN_LEFT} selected{/if}>{l s='Left' mod='hotelreservationsystem'}</option>
 							<option value="{HotelHeaderImage::CONTENT_ALIGN_CENTER}"{if $config.QLO_HEADER_CONTENT_ALIGN == HotelHeaderImage::CONTENT_ALIGN_CENTER || !$config.QLO_HEADER_CONTENT_ALIGN} selected{/if}>{l s='Center' mod='hotelreservationsystem'}</option>
+							<option value="{HotelHeaderImage::CONTENT_ALIGN_LEFT}"{if $config.QLO_HEADER_CONTENT_ALIGN == HotelHeaderImage::CONTENT_ALIGN_LEFT} selected{/if}>{l s='Left' mod='hotelreservationsystem'}</option>
 							<option value="{HotelHeaderImage::CONTENT_ALIGN_RIGHT}"{if $config.QLO_HEADER_CONTENT_ALIGN == HotelHeaderImage::CONTENT_ALIGN_RIGHT} selected{/if}>{l s='Right' mod='hotelreservationsystem'}</option>
 						</select>
-						<p class="help-block">{l s='Horizontal alignment of the hotel name and tagline on the header.' mod='hotelreservationsystem'}</p>
+						<p class="help-block">{l s='Horizontal alignment of the title and description on the header.' mod='hotelreservationsystem'}</p>
 					</div>
 				</div>
 
@@ -208,7 +208,7 @@
 				</h4>
 			</div>
 			<div class="modal-body">
-				<p>{l s='Switching to Video will delete all images except the first one. This cannot be undone. Continue?' mod='hotelreservationsystem'}</p>
+				<p>{l s='Switching to Video will delete all images except the one in the first position. This cannot be undone. Continue?' mod='hotelreservationsystem'}</p>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default btn-close" data-dismiss="modal">{l s='Close' mod='hotelreservationsystem'}</button>
@@ -268,10 +268,10 @@
 					<tr class="nodrag nodrop">
 						<th class="center fixed-width-xs"></th>
 						<th>{l s='Image' mod='hotelreservationsystem'}</th>
-						<th>{l s='Tag Line' mod='hotelreservationsystem'}</th>
+						<th>{l s='Title' mod='hotelreservationsystem'}</th>
+						<th>{l s='Description' mod='hotelreservationsystem'}</th>
 						<th class="center fixed-width-xs">{l s='Position' mod='hotelreservationsystem'}</th>
 						<th class="center">{l s='Active' mod='hotelreservationsystem'}</th>
-						<th class="center">{l s='Hotel Brand Name' mod='hotelreservationsystem'}</th>
 						<th></th>
 					</tr>
 				</thead>
@@ -358,33 +358,21 @@
 					</div>
 
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Hotel Brand Name' mod='hotelreservationsystem'}</label>
-						<div class="col-lg-9">
-							<select id="qlo-bulk-hotelname" class="fixed-width-lg">
-								<option value="" selected="selected">{l s='Select status' mod='hotelreservationsystem'}</option>
-								<option value="1">{l s='Yes' mod='hotelreservationsystem'}</option>
-								<option value="0">{l s='No' mod='hotelreservationsystem'}</option>
-							</select>
-							<p class="help-block">{l s='Leave \'Select status\' to keep the current status.' mod='hotelreservationsystem'}</p>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Update Tag Line' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Update Title' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="qlo_bulk_update_tagline" id="qlo_bulk_update_tagline_on" value="1">
-								<label for="qlo_bulk_update_tagline_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-								<input type="radio" name="qlo_bulk_update_tagline" id="qlo_bulk_update_tagline_off" value="0" checked="checked">
-								<label for="qlo_bulk_update_tagline_off">{l s='No' mod='hotelreservationsystem'}</label>
+								<input type="radio" name="qlo_bulk_update_title" id="qlo_bulk_update_title_on" value="1">
+								<label for="qlo_bulk_update_title_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+								<input type="radio" name="qlo_bulk_update_title" id="qlo_bulk_update_title_off" value="0" checked="checked">
+								<label for="qlo_bulk_update_title_off">{l s='No' mod='hotelreservationsystem'}</label>
 								<a class="slide-button btn"></a>
 							</span>
-							<p class="help-block">{l s='Turn on to overwrite the tag line text for all selected images.' mod='hotelreservationsystem'}</p>
+							<p class="help-block">{l s='Turn on to overwrite the title text for all selected images.' mod='hotelreservationsystem'}</p>
 						</div>
 					</div>
 
-					<div class="form-group" id="qlo-bulk-tagline-fields-wrap" style="display:none">
-						<label class="control-label col-lg-3">{l s='Tag Line' mod='hotelreservationsystem'}</label>
+					<div class="form-group" id="qlo-bulk-title-fields-wrap" style="display:none">
+						<label class="control-label col-lg-3">{l s='Title' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							{foreach from=$languages item=lang}
 							{if count($languages) > 1}
@@ -392,9 +380,10 @@
 								<div class="col-lg-10">
 							{/if}
 									<input type="text"
-										   class="form-control qlo-bulk-tagline-field"
+										   class="form-control qlo-bulk-title-field"
 										   data-lang="{$lang.id_lang}"
-										   placeholder="{l s='Tag line...' mod='hotelreservationsystem'}" />
+										   maxlength="{$titleLimit|intval}"
+										   placeholder="{l s='Title...' mod='hotelreservationsystem'}" />
 							{if count($languages) > 1}
 								</div>
 								<div class="col-lg-2">
@@ -410,15 +399,61 @@
 							</div>
 							{/if}
 							{/foreach}
-							<p class="help-block">{l s='Leave empty to clear the tag line for all selected images.' mod='hotelreservationsystem'}</p>
+							<p class="help-block">{l s='Leave empty to clear the title for all selected images.' mod='hotelreservationsystem'}</p>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Tag Line Color' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Update Description' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-9">
+							<span class="switch prestashop-switch fixed-width-lg">
+								<input type="radio" name="qlo_bulk_update_description" id="qlo_bulk_update_description_on" value="1">
+								<label for="qlo_bulk_update_description_on">{l s='Yes' mod='hotelreservationsystem'}</label>
+								<input type="radio" name="qlo_bulk_update_description" id="qlo_bulk_update_description_off" value="0" checked="checked">
+								<label for="qlo_bulk_update_description_off">{l s='No' mod='hotelreservationsystem'}</label>
+								<a class="slide-button btn"></a>
+							</span>
+							<p class="help-block">{l s='Turn on to overwrite the description text for all selected images.' mod='hotelreservationsystem'}</p>
+						</div>
+					</div>
+
+					<div class="form-group" id="qlo-bulk-description-fields-wrap" style="display:none">
+						<label class="control-label col-lg-3">{l s='Description' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-9">
+							{foreach from=$languages item=lang}
+							{if count($languages) > 1}
+							<div class="translatable-field row lang-{$lang.id_lang}"{if $lang.id_lang != $defaultLangId} style="display:none"{/if}>
+								<div class="col-lg-10">
+							{/if}
+									<input type="text"
+										   class="form-control qlo-bulk-description-field"
+										   data-lang="{$lang.id_lang}"
+										   maxlength="{$descriptionLimit|intval}"
+										   placeholder="{l s='Description...' mod='hotelreservationsystem'}" />
+							{if count($languages) > 1}
+								</div>
+								<div class="col-lg-2">
+									<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+										{$lang.iso_code|escape:'html':'UTF-8'} <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										{foreach from=$languages item=lang2}
+										<li><a href="javascript:hideOtherLanguage({$lang2.id_lang});">{$lang2.name|escape:'html':'UTF-8'}</a></li>
+										{/foreach}
+									</ul>
+								</div>
+							</div>
+							{/if}
+							{/foreach}
+							<p class="help-block">{l s='Leave empty to clear the description for all selected images.' mod='hotelreservationsystem'}</p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-lg-3">{l s='Description Color' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							<div class="input-group fixed-width-lg">
-								<input type="color" id="qlo-bulk-tl-color" name="bulk_tag_line_color"
+								<input type="color" id="qlo-bulk-desc-color" name="bulk_description_color"
 									   class="color mColorPickerInput" data-hex="true" value="">
 							</div>
 							<p class="help-block">{l s='Leave empty to keep each image\'s current color unchanged.' mod='hotelreservationsystem'}</p>
@@ -426,10 +461,10 @@
 					</div>
 
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Tag Line Font Size' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Description Font Size' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							<div class="input-group fixed-width-lg">
-								<input type="number" id="qlo-bulk-tl-font-size" class="form-control" value="0" min="0" max="72">
+								<input type="number" id="qlo-bulk-desc-font-size" class="form-control" value="0" min="0" max="72">
 								<span class="input-group-addon">px</span>
 							</div>
 							<p class="help-block">{l s='Leave as 0 to keep the current size.' mod='hotelreservationsystem'}</p>
@@ -437,14 +472,12 @@
 					</div>
 
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Tag Line Font Weight' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Description Font Weight' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-3">
-							<select id="qlo-bulk-tl-font-weight" class="fixed-width-lg">
+							<select id="qlo-bulk-desc-font-weight" class="fixed-width-lg">
 								<option value="" selected="selected">{l s='Select font weight' mod='hotelreservationsystem'}</option>
-								<option value="300">{l s='300 (Light)' mod='hotelreservationsystem'}</option>
-								<option value="400">{l s='400 (Normal)' mod='hotelreservationsystem'}</option>
-								<option value="600">{l s='600 (Semi-Bold)' mod='hotelreservationsystem'}</option>
-								<option value="700">{l s='700 (Bold)' mod='hotelreservationsystem'}</option>
+								<option value="400">{l s='Normal' mod='hotelreservationsystem'}</option>
+								<option value="700">{l s='Bold' mod='hotelreservationsystem'}</option>
 							</select>
 						</div>
 						<div class="col-lg-9 col-lg-offset-3">
@@ -536,19 +569,6 @@
 						</div>
 					</div>
 
-					<div class="form-group" id="qlo-img-form-add-hotelname-group">
-						<label class="control-label col-lg-3">{l s='Hotel Brand Name' mod='hotelreservationsystem'}</label>
-						<div class="col-lg-6">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="qlo_img_hotelname_add" id="qlo_img_hotelname_add_on" value="1" checked>
-								<label for="qlo_img_hotelname_add_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-								<input type="radio" name="qlo_img_hotelname_add" id="qlo_img_hotelname_add_off" value="0">
-								<label for="qlo_img_hotelname_add_off">{l s='No' mod='hotelreservationsystem'}</label>
-								<a class="slide-button btn"></a>
-							</span>
-						</div>
-					</div>
-
 					<div class="form-group" id="qlo-img-form-edit-group" style="display:none">
 						<label class="control-label col-lg-3">{l s='Enable Image' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
@@ -562,21 +582,8 @@
 						</div>
 					</div>
 
-					<div class="form-group" id="qlo-img-form-edit-hotelname-group" style="display:none">
-						<label class="control-label col-lg-3">{l s='Hotel Brand Name' mod='hotelreservationsystem'}</label>
-						<div class="col-lg-9">
-							<span class="switch prestashop-switch fixed-width-lg">
-								<input type="radio" name="qlo_img_hotelname_edit" id="qlo_img_hotelname_edit_on" value="1">
-								<label for="qlo_img_hotelname_edit_on">{l s='Yes' mod='hotelreservationsystem'}</label>
-								<input type="radio" name="qlo_img_hotelname_edit" id="qlo_img_hotelname_edit_off" value="0">
-								<label for="qlo_img_hotelname_edit_off">{l s='No' mod='hotelreservationsystem'}</label>
-								<a class="slide-button btn"></a>
-							</span>
-						</div>
-					</div>
-
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Tag Line' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Title' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							{foreach from=$languages item=lang}
 							{if count($languages) > 1}
@@ -584,10 +591,44 @@
 								<div class="col-lg-10">
 							{/if}
 									<input type="text"
-										   id="qlo-form-tagline-{$lang.id_lang}"
-										   class="form-control qlo-form-tagline-field"
+										   id="qlo-form-title-{$lang.id_lang}"
+										   class="form-control qlo-form-title-field"
 										   data-lang="{$lang.id_lang}"
-										   placeholder="{l s='Tag line...' mod='hotelreservationsystem'}" />
+										   maxlength="{$titleLimit|intval}"
+										   placeholder="{l s='Title...' mod='hotelreservationsystem'}" />
+							{if count($languages) > 1}
+								</div>
+								<div class="col-lg-2">
+									<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" tabindex="-1">
+										{$lang.iso_code|escape:'html':'UTF-8'} <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu">
+										{foreach from=$languages item=lang2}
+										<li><a href="javascript:hideOtherLanguage({$lang2.id_lang});">{$lang2.name|escape:'html':'UTF-8'}</a></li>
+										{/foreach}
+									</ul>
+								</div>
+							</div>
+							{/if}
+							{/foreach}
+							<p class="help-block">{l s='Short title shown as an input field on this image. Leave empty for no title.' mod='hotelreservationsystem'}</p>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="control-label col-lg-3">{l s='Description' mod='hotelreservationsystem'}</label>
+						<div class="col-lg-9">
+							{foreach from=$languages item=lang}
+							{if count($languages) > 1}
+							<div class="translatable-field row lang-{$lang.id_lang}"{if $lang.id_lang != $defaultLangId} style="display:none"{/if}>
+								<div class="col-lg-10">
+							{/if}
+									<input type="text"
+										   id="qlo-form-description-{$lang.id_lang}"
+										   class="form-control qlo-form-description-field"
+										   data-lang="{$lang.id_lang}"
+										   maxlength="{$descriptionLimit|intval}"
+										   placeholder="{l s='Description...' mod='hotelreservationsystem'}" />
 							{if count($languages) > 1}
 								</div>
 								<div class="col-lg-2">
@@ -608,21 +649,21 @@
 					</div>
 
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Tag Line Color' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Description Color' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							<div class="input-group fixed-width-lg">
-								<input type="color" id="qlo-img-tl-color" name="tag_line_color"
+								<input type="color" id="qlo-img-desc-color" name="description_color"
 									   class="color mColorPickerInput" data-hex="true" value="#ffffff">
 							</div>
-							<p class="help-block">{l s='Text color for the tag line overlay.' mod='hotelreservationsystem'}</p>
+							<p class="help-block">{l s='Text color for the description overlay.' mod='hotelreservationsystem'}</p>
 						</div>
 					</div>
 
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Tag Line Font Size' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Description Font Size' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
 							<div class="input-group fixed-width-lg">
-								<input type="number" id="qlo-img-tl-font-size" name="tag_line_font_size"
+								<input type="number" id="qlo-img-desc-font-size" name="description_font_size"
 									   class="form-control" value="16" min="8" max="72">
 								<span class="input-group-addon">px</span>
 							</div>
@@ -631,13 +672,11 @@
 					</div>
 
 					<div class="form-group">
-						<label class="control-label col-lg-3">{l s='Tag Line Font Weight' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-lg-3">{l s='Description Font Weight' mod='hotelreservationsystem'}</label>
 						<div class="col-lg-9">
-							<select id="qlo-img-tl-font-weight" name="tag_line_font_weight" class="fixed-width-lg">
-								<option value="300">{l s='300 (Light)' mod='hotelreservationsystem'}</option>
-								<option value="400" selected="selected">{l s='400 (Normal)' mod='hotelreservationsystem'}</option>
-								<option value="600">{l s='600 (Semi-Bold)' mod='hotelreservationsystem'}</option>
-								<option value="700">{l s='700 (Bold)' mod='hotelreservationsystem'}</option>
+							<select id="qlo-img-desc-font-weight" name="description_font_weight" class="fixed-width-lg">
+								<option value="400" selected="selected">{l s='Normal' mod='hotelreservationsystem'}</option>
+								<option value="700">{l s='Bold' mod='hotelreservationsystem'}</option>
 							</select>
 						</div>
 					</div>

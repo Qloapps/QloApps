@@ -47,15 +47,16 @@ class HotelHeaderImage extends ObjectModel
     const CONTENT_ALIGN_LEFT   = 1;
     const CONTENT_ALIGN_CENTER = 2;
     const CONTENT_ALIGN_RIGHT  = 3;
+    const TITLE_LIMIT = 128;
 
     public $name;
     public $position;
-    public $tag_line;
-    public $tag_line_color       = '#ffffff';
-    public $tag_line_font_size   = 16;
-    public $tag_line_font_weight = '400';
+    public $title;
+    public $description;
+    public $description_color       = '#ffffff';
+    public $description_font_size   = 16;
+    public $description_font_weight = '400';
     public $active;
-    public $show_hotel_chain_name = 1;
     public $date_add;
     public $date_upd;
 
@@ -64,16 +65,16 @@ class HotelHeaderImage extends ObjectModel
         'primary'   => 'id_header_image',
         'multilang' => true,
         'fields'    => array(
-            'name'                 => array('type' => self::TYPE_STRING, 'size' => 512),
-            'tag_line'             => array('type' => self::TYPE_STRING, 'lang' => true, 'size' => 512),
-            'tag_line_color'       => array('type' => self::TYPE_STRING, 'validate' => 'isColor', 'size' => 7),
-            'tag_line_font_size'   => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedInt'),
-            'tag_line_font_weight' => array('type' => self::TYPE_STRING, 'size' => 10),
-            'position'             => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedInt'),
-            'active'               => array('type' => self::TYPE_BOOL,   'validate' => 'isBool'),
-            'show_hotel_chain_name' => array('type' => self::TYPE_BOOL,   'validate' => 'isBool'),
-            'date_add'             => array('type' => self::TYPE_DATE,   'validate' => 'isDate'),
-            'date_upd'             => array('type' => self::TYPE_DATE,   'validate' => 'isDate'),
+            'name'                     => array('type' => self::TYPE_STRING, 'size' => 512),
+            'title'                    => array('type' => self::TYPE_STRING, 'lang' => true, 'size' => self::TITLE_LIMIT),
+            'description'              => array('type' => self::TYPE_STRING, 'lang' => true, 'size' => 512),
+            'description_color'       => array('type' => self::TYPE_STRING, 'validate' => 'isColor', 'size' => 7),
+            'description_font_size'   => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedInt'),
+            'description_font_weight' => array('type' => self::TYPE_STRING, 'size' => 10),
+            'position'                 => array('type' => self::TYPE_INT,    'validate' => 'isUnsignedInt'),
+            'active'                   => array('type' => self::TYPE_BOOL,   'validate' => 'isBool'),
+            'date_add'                 => array('type' => self::TYPE_DATE,   'validate' => 'isDate'),
+            'date_upd'                 => array('type' => self::TYPE_DATE,   'validate' => 'isDate'),
         ),
     );
 
@@ -118,8 +119,8 @@ class HotelHeaderImage extends ObjectModel
      * Fetches image rows, optionally filtered by active status.
      *
      * @param int|null  $active       1 = active only, 0 = inactive only, null = all
-     * @param int|null  $idLang       Language id for tag_line; null = context default
-     * @param bool      $withAllLangs true = also include tag_lines[id_lang] map (admin edit forms)
+     * @param int|null  $idLang       Language id for title/description; null = context default
+     * @param bool      $withAllLangs true = also include titles[id_lang]/descriptions[id_lang] maps (admin edit forms)
      * @return array
      */
     public static function getItems($active = 1, $idLang = null, $withAllLangs = false)
@@ -129,7 +130,7 @@ class HotelHeaderImage extends ObjectModel
         }
 
         if (!$withAllLangs) {
-            $sql = 'SELECT m.*, IFNULL(ml.`tag_line`, \'\') AS `tag_line`
+            $sql = 'SELECT m.*, IFNULL(ml.`title`, \'\') AS `title`, IFNULL(ml.`description`, \'\') AS `description`
                     FROM `'._DB_PREFIX_.'htl_header_image` m
                     LEFT JOIN `'._DB_PREFIX_.'htl_header_image_lang` ml
                         ON (m.`id_header_image` = ml.`id_header_image`
@@ -141,7 +142,7 @@ class HotelHeaderImage extends ObjectModel
             return Db::getInstance()->executeS($sql) ?: array();
         }
 
-        $sql = 'SELECT m.*, ml.`id_lang`, IFNULL(ml.`tag_line`, \'\') AS `lang_tag_line`
+        $sql = 'SELECT m.*, ml.`id_lang`, IFNULL(ml.`title`, \'\') AS `lang_title`, IFNULL(ml.`description`, \'\') AS `lang_description`
                 FROM `'._DB_PREFIX_.'htl_header_image` m
                 LEFT JOIN `'._DB_PREFIX_.'htl_header_image_lang` ml
                     ON m.`id_header_image` = ml.`id_header_image`';
@@ -160,16 +161,21 @@ class HotelHeaderImage extends ObjectModel
             $id = (int)$row['id_header_image'];
             if (!isset($itemsMap[$id])) {
                 $itemsMap[$id] = $row;
-                $itemsMap[$id]['tag_line'] = '';
-                $itemsMap[$id]['tag_lines'] = array();
-                unset($itemsMap[$id]['id_lang'], $itemsMap[$id]['lang_tag_line']);
+                $itemsMap[$id]['title'] = '';
+                $itemsMap[$id]['titles'] = array();
+                $itemsMap[$id]['description'] = '';
+                $itemsMap[$id]['descriptions'] = array();
+                unset($itemsMap[$id]['id_lang'], $itemsMap[$id]['lang_title'], $itemsMap[$id]['lang_description']);
             }
             if (isset($row['id_lang'])) {
                 $langId = (int)$row['id_lang'];
-                $tagLine = $row['lang_tag_line'];
-                $itemsMap[$id]['tag_lines'][$langId] = $tagLine;
+                $title = $row['lang_title'];
+                $description = $row['lang_description'];
+                $itemsMap[$id]['titles'][$langId] = $title;
+                $itemsMap[$id]['descriptions'][$langId] = $description;
                 if ($langId === (int)$idLang) {
-                    $itemsMap[$id]['tag_line'] = $tagLine;
+                    $itemsMap[$id]['title'] = $title;
+                    $itemsMap[$id]['description'] = $description;
                 }
             }
         }
