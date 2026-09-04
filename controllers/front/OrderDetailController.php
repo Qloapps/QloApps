@@ -165,7 +165,7 @@ class OrderDetailControllerCore extends FrontController
                                         $anyBackOrder = 1;
                                     }
 
-                                    if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $objOrderReturn->hasCompletedRefund($data_v['id'])) {
+                                    if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $objOrderReturn->hasCompletelyRefundedBooking($data_v['id'])) {
                                         if ($data_v['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
                                             $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
                                         } elseif ($bookingRefundDetail && $bookingRefundDetail['refunded'] && $bookingRefundDetail['id_customization']) {
@@ -194,7 +194,7 @@ class OrderDetailControllerCore extends FrontController
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] = 0;
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] = 0;
-                                    if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $objOrderReturn->hasCompletedRefund($data_v['id'])) {
+                                    if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $objOrderReturn->hasCompletelyRefundedBooking($data_v['id'])) {
                                         if ($data_v['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
                                             $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
                                         } elseif ($bookingRefundDetail && $bookingRefundDetail['refunded'] && $bookingRefundDetail['id_customization']) {
@@ -208,7 +208,7 @@ class OrderDetailControllerCore extends FrontController
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['adults'] = $data_v['adults'];
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['children'] = $data_v['children'];
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['child_ages'] = $data_v['child_ages'];
-                                $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['is_refunded'] = $objOrderReturn->hasCompletedRefund($data_v['id']);
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['is_refunded'] = $objOrderReturn->hasCompletelyRefundedBooking($data_v['id']);
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['is_cancelled'] = ($data_v['id_status'] == HotelBookingDetail::STATUS_CANCELLED);
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['id_status'] = $data_v['id_status'];
 
@@ -217,7 +217,7 @@ class OrderDetailControllerCore extends FrontController
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['hotel_booking_details'][$data_v['id']]['refund_denied'] = 1;
                                 }
 
-                                $cartHotelData[$type_key]['date_diff'][$date_join]['is_refunded'] = $objOrderReturn->hasCompletedRefund($data_v['id']);
+                                $cartHotelData[$type_key]['date_diff'][$date_join]['is_refunded'] = $objOrderReturn->hasCompletelyRefundedBooking($data_v['id']);
 
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['ids_htl_booking_detail'][] = $data_v['id'];
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['ids_rooms'][] = $data_v['id_room'];
@@ -571,7 +571,7 @@ class OrderDetailControllerCore extends FrontController
 
                         // multiple refund requests are now allowed per booking — only still
                         // block a booking that's already fully refunded, not a re-request
-                        if ($objOrderReturn->hasCompletedRefund($idHtlBooking)) {
+                        if ($objOrderReturn->hasCompletelyRefundedBooking($idHtlBooking)) {
                             $this->errors[] = Tools::displayError('Some selected rooms have already been requested for cancellation.');
                             break;
                         }
