@@ -921,33 +921,37 @@ class HotelBranchInformation extends ObjectModel
 
     public static function addHotelRestriction($idsHotel, $alias = null, $identifier = 'id_hotel', $idProfile = null)
     {
-        if (!$idProfile) {
-            $idProfile = Context::getContext()->employee->id_profile;
-        }
-
-        $accessedIds = self::getProfileAccessedHotels($idProfile, 1, 1);
-        if (!$idsHotel) {
-            $idsHotel = $accessedIds;
-        } else {
-            if (!is_array($idsHotel)) {
-                $idsHotel = array($idsHotel);
-            }
-            // check if passed hotel id's are available for current employee
-            $idsHotel = array_filter($idsHotel, function ($idHotel) use($accessedIds)  {
-                return in_array($idHotel, $accessedIds);
-            });
-        }
-
-        $restriction = ' AND ';
-        if (count($idsHotel)) {
-            if ($alias) {
-                $alias .= '.';
+        $restriction = '';
+        if (defined('_PS_ADMIN_DIR_')) {
+            if (!$idProfile) {
+                $idProfile = Context::getContext()->employee->id_profile;
             }
 
-            $identifier = "`$identifier`";
-            $restriction .= $alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
-        } else {
-            $restriction .= 0;
+            $accessedIds = self::getProfileAccessedHotels($idProfile, 1, 1);
+            if (!$idsHotel) {
+                $idsHotel = $accessedIds;
+            } else {
+                if (!is_array($idsHotel)) {
+                    $idsHotel = array($idsHotel);
+                }
+                // check if passed hotel id's are available for current employee
+                $idsHotel = array_filter($idsHotel, function ($idHotel) use($accessedIds) {
+                    return in_array($idHotel, $accessedIds);
+                });
+            }
+
+            $restriction .= ' AND ';
+            if (count($idsHotel)) {
+                if ($alias) {
+                    $alias .= '.';
+                }
+                $identifier = "`$identifier`";
+                $restriction .= $alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
+            } else {
+                $restriction .= 0;
+            }
+        } elseif ($ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)))) {
+            $restriction .= ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
         }
 
         return $restriction;

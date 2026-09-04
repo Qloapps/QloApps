@@ -106,6 +106,9 @@ class StatsForecast extends Module
         $to2 = min(date('Y-m-d H:i:s', strtotime('+1 day')), $to);
 		$interval =  HotelHelper::getNumberOfDays($from, $to);
 		$interval2 =  HotelHelper::getNumberOfDays($from, $to2);
+        if (!$interval2) {
+            return;
+        }
         $prop30 = $interval / $interval2;
 		$to = strtotime($to);
 		$to2 = strtotime($to2);
