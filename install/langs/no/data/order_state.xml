@@ -48,4 +48,8 @@
     <name>Partial payment received</name>
     <template>partial_payment_accepted</template>
   </order_state>
+  <order_state id="No_show">
+    <name>Ikke-møtt</name>
+    <template>no_show</template>
+  </order_state>
 </entity_order_state>

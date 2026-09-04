@@ -109,32 +109,29 @@
 	<td class="center">
 		{convertPriceWithCurrency price=($data['total_room_price_ti']) currency=$currency->id}
 	</td>
+	<td>
+		{if isset($htl_booking_statuses[$data.id_status])}
+			<span class="badge" style="background-color:{$htl_booking_statuses[$data.id_status].color|escape:'html':'UTF-8'}">{$htl_booking_statuses[$data.id_status].name|escape:'html':'UTF-8'}</span>
+		{/if}
+	</td>
 	{if (isset($refundReqBookings) && $refundReqBookings)}
 		<td class="center">
-			<p>
-	            {if $data.id|in_array:$refundReqBookings}
-				    {if $data.is_cancelled}
-					    <span class="badge badge-danger">{l s='Cancelled'}</span>
-				    {elseif isset($data.refund_info) && (!$data.refund_info.refunded || $data.refund_info.id_customization)}
-					    <span class="badge" style="background-color:{$data.refund_info.color|escape:'html':'UTF-8'}">{$data.refund_info.name|escape:'html':'UTF-8'}</span>
-	                {else}
-		    			<span>--</span>
-	                {/if}
-				{else}
-	                <span>--</span>
-	            {/if}
-			</p>
-				{if $data.is_refunded && isset($data.refund_info) && $data.refund_info}
-					<p class="badge badge-success refunded_amount">
-						{convertPriceWithCurrency price=$data.refund_info.refunded_amount currency=$currency->id}
-					</p>
-				{/if}
+		{if $data.refund_count}
+			{if $data.refund_amount}
+				<p class="refunded_amount">
+					{convertPriceWithCurrency price=$data.refund_amount currency=$currency->id}
+				</p>
+			{/if}
+				<a href="{$link->getAdminLink('AdminOrderRefundRequests')|escape:'html':'UTF-8'}&id_order={$order->id|intval}&id_htl_booking={$data.id|intval}" target="_blank" class="badge badge-danger">{$data.refund_count}</a>
+		{else}
+			<p>--</p>
+		{/if}
 		</td>
 	{/if}
-	{if ($can_edit && !$order->hasBeenDelivered())}
+	{if ($can_edit)}
 		<td class="product_action center">
             <div class="btn-group pull-right">
-                {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_cancelled}
+                {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && ($data.id_status == $ROOM_STATUS_CANCELLED || $data.id_status == $ROOM_STATUS_NO_SHOW)}
                     <button href="#" class="btn btn-default delete_room_line">
                         <i class="icon-trash"></i>
                         {l s='Delete'}
@@ -148,15 +145,12 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" role="menu">
-                        {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
-                        {else}
-                            <li>
-                                <a href="#" class="open_room_status_form" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}" data-check_in="{$data['check_in']}" data-check_out="{$data['check_out']}">
-                                    <i class="icon-clock-o"></i>
-                                    {l s='Room Status'}
-                                </a>
-                            </li>
-                        {/if}
+                        <li>
+                            <a href="#" class="open_room_status_form" data-id_hotel_booking_detail="{$data['id']}" data-id_order="{$data['id_order']}" data-id_status="{$data['id_status']}" data-id_room="{$data['id_room']}" data-date_from="{$data['date_from']|date_format:"%Y-%m-%d"}" data-date_to="{$data['date_to']|date_format:"%Y-%m-%d"}" data-check_in_time="{$data['check_in_time']}" data-check_out_time="{$data['check_out_time']}" data-check_in="{$data['check_in']}" data-check_out="{$data['check_out']}">
+                                <i class="icon-clock-o"></i>
+                                {l s='Room Status'}
+                            </a>
+                        </li>
                         <li>
                             <a href="#" onclick="BookingDocumentsModal.init({$data.id|intval}, this); return false;">
                                 <i class="icon-file-text"></i>

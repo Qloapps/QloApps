@@ -293,7 +293,7 @@ class HotelRoomInformation extends ObjectModel
 
     public function getFutureBookings($idRoom)
     {
-        return Db::getInstance()->executeS('SELECT `id`, `id_order`, `date_from`, `date_to` FROM `'._DB_PREFIX_.'htl_booking_detail` where `date_to` > \''.pSQL(date('Y-m-d')).'\' AND `is_refunded` = 0 AND `id_room`='.(int) $idRoom);
+        return Db::getInstance()->executeS('SELECT `id`, `id_order`, `date_from`, `date_to` FROM `'._DB_PREFIX_.'htl_booking_detail` where `date_to` > \''.pSQL(date('Y-m-d')).'\' AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND `id_room`='.(int) $idRoom);
     }
 
     // Webservice :: webservice add function

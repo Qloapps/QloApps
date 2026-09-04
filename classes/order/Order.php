@@ -45,6 +45,7 @@ class OrderCore extends ObjectModel
     const ORDER_COMPLETE_REFUND_FLAG = 1;
     const ORDER_COMPLETE_CANCELLATION_FLAG = 2;
     const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
+    const ORDER_COMPLETE_NOSHOW_FLAG = 4;
 
     /** @var int Delivery address id */
     public $id_address_delivery;
@@ -2899,7 +2900,15 @@ class OrderCore extends ObjectModel
 
         // check rooms in booking
         $objHotelBooking = new HotelBookingdetail();
-        if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
+        $orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id);
+
+        // No-show is a room-only concept — a product-only order (no rooms at all)
+        // can never be "No-show", no matter how resolved its products are
+        if ($action == Order::ORDER_COMPLETE_NOSHOW_FLAG && !$orderBookings) {
+            return false;
+        }
+
+        if ($orderBookings) {
             $res &= $this->checkList($orderBookings, $action, $includeCheckIn);
             $hasRoomsOrProducts = 1;
         }
@@ -2919,9 +2928,36 @@ class OrderCore extends ObjectModel
     }
 
     public function checkList($list, $action = 0, $includeCheckIn = 0) {
+        // room-booking rows (from htl_booking_detail) carry id_status; service-product
+        // rows (from service_product_order_detail) never do — that's a different table
+        // with its own, unrelated is_refunded/is_cancelled columns, out of scope for
+        // this migration (only htl_booking_detail's flags are being retired). checkList()
+        // is always called with one or the other, never a mix of both (see callers in
+        // hasCompletelyRefunded()), so this check only needs to happen once per call.
+        $isRoomList = $list && isset($list[0]['id_status']);
+        if ($isRoomList) {
+            // one query for the whole list instead of one query per row
+            $refundedIds = array_flip(array_column(
+                Db::getInstance()->executeS(OrderReturn::getRefundedBookingIdsSubquery()),
+                'id_htl_booking'
+            ));
+        }
+
         // If action is Order::ORDER_COMPLETE_REFUND_FLAG (for refunded) then we will check
         // that all rooms must be refunded and at least one booking is not cancelled
         if ($action == Order::ORDER_COMPLETE_REFUND_FLAG) {
+            if ($isRoomList) {
+                $hasNonCancelled = false;
+                foreach ($list as $product) {
+                    if (!isset($refundedIds[$product['id']])) {
+                        return false;
+                    }
+                    if ($product['id_status'] != HotelBookingDetail::STATUS_CANCELLED) {
+                        $hasNonCancelled = true;
+                    }
+                }
+                return $hasNonCancelled;
+            }
             $uniqueRefunded = array_unique(array_column($list, 'is_refunded'));
             if (count($uniqueRefunded) == 1 && $uniqueRefunded[0] == 1) {
                 foreach ($list as $product) {
@@ -2932,14 +2968,50 @@ class OrderCore extends ObjectModel
             }
         // If action is Order::ORDER_COMPLETE_CANCELLATION_FLAG (for cancelled) then we will check that all rooms must be cancelled
         } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_FLAG) {
+            if ($isRoomList) {
+                foreach ($list as $product) {
+                    if ($product['id_status'] != HotelBookingDetail::STATUS_CANCELLED) {
+                        return false;
+                    }
+                }
+                return true;
+            }
             $uniqueRefunded = array_unique(array_column($list, 'is_cancelled'));
             if (count($uniqueRefunded) == 1 && $uniqueRefunded[0] == 1) {
                 return true;
             }
+        // If action is Order::ORDER_COMPLETE_NOSHOW_FLAG then every room must be
+        // terminal (No-show or Cancelled), with at least one actually No-show —
+        // No-show wins over Cancelled when an order mixes both.
+        } elseif ($action == Order::ORDER_COMPLETE_NOSHOW_FLAG) {
+            if (empty($list)) {
+                return false;
+            }
+            $hasNoShow = false;
+            foreach ($list as $product) {
+                if (isset($product['id_status'])) {
+                    // room booking row
+                    if ($product['id_status'] != HotelBookingDetail::STATUS_NO_SHOW
+                        && $product['id_status'] != HotelBookingDetail::STATUS_CANCELLED
+                    ) {
+                        return false;
+                    }
+                    if ($product['id_status'] == HotelBookingDetail::STATUS_NO_SHOW) {
+                        $hasNoShow = true;
+                    }
+                } elseif (!$product['is_cancelled']) {
+                    // service products can't be "no-show" — just require them to
+                    // already be resolved, same bar as ORDER_COMPLETE_CANCELLATION_FLAG
+                    return false;
+                }
+            }
+
+            return $hasNoShow;
         // If action is Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG (for cancelled and refund requests) then we will check that all rooms are either cancelled or requested for refund
         } elseif ($action == Order::ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG) {
             foreach ($list as $product) {
-                if (!$product['is_refunded']) {
+                $isResolved = $isRoomList ? isset($refundedIds[$product['id']]) : $product['is_refunded'];
+                if (!$isResolved) {
                     // If booking refund request is created and request is completed but booking is not refunded then return false
                     if ($refundDetail = OrderReturn::getOrdersReturnDetail(
                         $this->id,
@@ -2960,20 +3032,35 @@ class OrderCore extends ObjectModel
             return true;
         // Default process to check if order is fully refunded or cancelled or not
         } else {
-            // if is_refunded is 1 means booking either is cancelled or refunded. So check all bookings must have is_refunded = 1
-            $uniqueRefunded = array_unique(array_column($list, 'is_refunded'));
-            if (count($uniqueRefunded) == 1 && $uniqueRefunded[0] == 1) {
-                return true;
-            } elseif ($includeCheckIn) {
+            if ($isRoomList) {
+                $allResolved = !empty($list);
                 foreach ($list as $product) {
-                    if ($product['is_refunded'] == 0
-                        && !OrderReturn::getOrdersReturnDetail($this->id, 0, isset($product['id']) ? $product['id'] : 0)
-                        && $product['id_status'] == HotelBookingDetail::STATUS_ALLOTED
-                    ) {
-                        return false;
+                    if (!isset($refundedIds[$product['id']])) {
+                        $allResolved = false;
+                        break;
                     }
                 }
-                return true;
+                if ($allResolved) {
+                    return true;
+                } elseif ($includeCheckIn) {
+                    foreach ($list as $product) {
+                        if (!isset($refundedIds[$product['id']])
+                            && !OrderReturn::getOrdersReturnDetail($this->id, 0, $product['id'])
+                            && $product['id_status'] == HotelBookingDetail::STATUS_ASSIGNED
+                        ) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            } else {
+                // if is_refunded is 1 means booking either is cancelled or refunded. So check all bookings must have is_refunded = 1
+                $uniqueRefunded = array_unique(array_column($list, 'is_refunded'));
+                if (count($uniqueRefunded) == 1 && $uniqueRefunded[0] == 1) {
+                    return true;
+                }
+                // note: $includeCheckIn is never true here in practice — hasCompletelyRefunded()
+                // always calls checkList() with $includeCheckIn=false for product lists
             }
         }
 
@@ -2982,9 +3069,23 @@ class OrderCore extends ObjectModel
 
     public function getOrderCompleteRefundStatus()
     {
+        $objHotelBooking = new HotelBookingdetail();
+        foreach ($objHotelBooking->getOrderCurrentDataByOrderId($this->id) as $booking) {
+            if ($booking['id_status'] != HotelBookingDetail::STATUS_CANCELLED
+                && $booking['id_status'] != HotelBookingDetail::STATUS_NO_SHOW
+            ) {
+                return 0;
+            }
+        }
+        // any completed refund anywhere in the order takes priority over
+        // No-show/Cancelled and is sticky (a refund never un-completes)
+        if ((new OrderReturn())->getRefundedAmount($this->id) > 0) {
+            return Configuration::get('PS_OS_REFUND');
+        }
+
         $idOrderState = 0;
-        if ($this->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)) {
-            $idOrderState = Configuration::get('PS_OS_REFUND');
+        if ($this->hasCompletelyRefunded(Order::ORDER_COMPLETE_NOSHOW_FLAG)) {
+            $idOrderState = Configuration::get('PS_OS_NO_SHOW');
         } elseif ($this->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG)) {
             $idOrderState = Configuration::get('PS_OS_CANCELED');
         } elseif ($this->hasCompletelyRefunded()) {
@@ -2992,6 +3093,30 @@ class OrderCore extends ObjectModel
         }
 
         return $idOrderState;
+    }
+
+    /**
+     * Bump the order's own status to match getOrderCompleteRefundStatus(),
+     * if it needs to change — the single place every caller that used to
+     * repeat this same 6-line block now goes through, so the "already at
+     * this state, don't re-bump" guard applies everywhere, not just one caller.
+     *
+     * @param bool $useEmail whether to email the customer about the change
+     * @return bool whether the order status was actually changed
+     */
+    public function syncRefundStatus($useEmail = true)
+    {
+        $idOrderState = $this->getOrderCompleteRefundStatus();
+        if (!$idOrderState || $idOrderState == $this->current_state) {
+            return false;
+        }
+
+        $objOrderHistory = new OrderHistory();
+        $objOrderHistory->id_order = (int) $this->id;
+        $objOrderHistory->changeIdOrderState($idOrderState, $this, !$this->hasInvoice());
+        $useEmail ? $objOrderHistory->addWithemail() : $objOrderHistory->add();
+
+        return true;
     }
 
     public function getWsBookings()
@@ -3034,26 +3159,23 @@ class OrderCore extends ObjectModel
                 if (!$objHotelBooking->getOverbookedRooms($this->id)) {
                     $result['errors'][] = Tools::displayError('Order status can not be changed to any overbooking status as there are no overbooked rooms in the order.');
                 }
-            } elseif ($objNewOrderState->id == Configuration::get('PS_OS_REFUND')
-                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_REFUND_FLAG)
-            ) {
-                $result['errors'][] = Tools::displayError('Order status can not be set to Refunded until all bookings in the order are completely refunded.');
-            } elseif ($objNewOrderState->id == Configuration::get('PS_OS_CANCELED')
-                && !$this->hasCompletelyRefunded(Order::ORDER_COMPLETE_CANCELLATION_FLAG, 0, 1)
-            ) {
-                $result['errors'][] = Tools::displayError('Order status can not be set to Cancelled until all bookings in the order are cancelled.');
+            } elseif (in_array($objNewOrderState->id, array(
+                Configuration::get('PS_OS_REFUND'),
+                Configuration::get('PS_OS_CANCELED'),
+                Configuration::get('PS_OS_NO_SHOW'),
+            ))) {
+                // Refunded/Cancelled/No-show are never a direct manual pick — they're
+                // only ever reached automatically, via Order::syncRefundStatus(), when
+                // a refund completes or a room's status changes to Cancelled/No-show.
+                $result['errors'][] = Tools::displayError('Order status cannot be changed directly to Refunded, Cancelled, or No-show — it is set automatically based on the booking/refund status.');
             } elseif ($objCurrentOrderState->id == Configuration::get('PS_OS_ERROR') && !($objNewOrderState->id == Configuration::get('PS_OS_ERROR'))) {
                 // All rooms must be available before changing status from Payment Error to Other status in which rooms are getting blocked again
                 if ($orderBookings = $objHotelBooking->getOrderCurrentDataByOrderId($this->id)) {
+                    $objOrderReturn = new OrderReturn();
                     foreach ($orderBookings as $orderBooking) {
-                        // If booking is refunded then no need to check inventory
-                        if ($bookingRefundDetail = OrderReturn::getOrdersReturnDetail($this->id, 0, $orderBooking['id'])) {
-                            $bookingRefundDetail = reset($bookingRefundDetail);
-                        }
-
-                        // $bookingRefundDetail['id_customization'] is 1 for only refunded request completed and refunded bookings
-                        if (($bookingRefundDetail && $bookingRefundDetail['refunded'] && $orderBooking['is_refunded'] && $bookingRefundDetail['id_customization'])
-                            || ($orderBooking['is_cancelled'] && $orderBooking['is_refunded'])
+                        // If booking is refunded (or cancelled) then no need to check inventory
+                        if ($objOrderReturn->hasCompletelyRefundedBooking($orderBooking['id'])
+                            || $orderBooking['id_status'] == HotelBookingDetail::STATUS_CANCELLED
                         ) {
                             continue;
                         } else {
@@ -3066,7 +3188,6 @@ class OrderCore extends ObjectModel
                                 'only_search_data' => 1
                             );
 
-                            $objHotelBookingDetail = new HotelBookingDetail($orderBooking['id']);
                             if ($searchRoomsInfo = $objHotelBooking->getBookingData($bookingParams)) {
                                 if (isset($searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available'])
                                     && $searchRoomsInfo['rm_data'][$orderBooking['id_product']]['data']['available']
@@ -3078,9 +3199,6 @@ class OrderCore extends ObjectModel
                                             $result['errors'][] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');
 
                                             break;
-                                        } else {
-                                            $objHotelBookingDetail->is_refunded = 0;
-                                            $objHotelBookingDetail->save();
                                         }
                                     } else {
                                         $result['errors'][] = Tools::displayError('You can not change the order status as some rooms are not available now in this order. You can reallocate/swap rooms with other rooms to make rooms available and then change the order status.');

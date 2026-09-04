@@ -26,11 +26,11 @@
             <label class="control-label">{l s='Status'}</label>
             <select name="booking_order_status" class="form-control booking_order_status margin-bottom-5">
                 {foreach from=$hotel_order_status item=state}
-                    <option value="{$state['id_status']|intval}">{$state.name|escape}</option>
+                    <option value="{$state['id_status']|intval}"{if $state.disabled} disabled{/if}>{$state.name|escape}</option>
                 {/foreach}
             </select>
         </div>
-        <div class="form-group" {if $current_room_status == $ROOM_STATUS_ALLOTED}style="display:none;"{/if}>
+        <div class="form-group" {if $current_room_status == $ROOM_STATUS_ASSIGNED}style="display:none;"{/if}>
             <label class="control-label">{l s='Date'}</label>
             <div class="input-group">
                 <input type="text" name="status_date" class="room_status_date wk-input-date" value="" />
@@ -44,6 +44,11 @@
             <input type="hidden" id="room_status_date_to" name="date_to" />
             <input type="hidden" id="room_status_id_room" name="id_room" />
             <input type="hidden" id="room_status_id_order" name="id_order" />
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">{l s='Remark'}</label>
+            <textarea name="status_remark" class="form-control" rows="2"></textarea>
         </div>
 
         <button class="btn btn-primary" type="submit" name="submitbookingOrderStatus" style="display:none" id="submitbookingOrderStatus"></button>

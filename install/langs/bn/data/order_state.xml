@@ -48,4 +48,8 @@
     <name>আংশিক পেমেন্ট প্রাপ্ত</name>
     <template>partial_payment_accepted</template>
   </order_state>
+  <order_state id="No_show">
+    <name>অনুপস্থিত</name>
+    <template>no_show</template>
+  </order_state>
 </entity_order_state>

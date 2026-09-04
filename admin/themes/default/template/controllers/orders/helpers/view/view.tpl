@@ -32,6 +32,8 @@
             <span class="toolbar_order_status_badge badge badge-danger">{l s='Refunded'}</span>
         {elseif $currentState->id == Configuration::get('PS_OS_CANCELED')}
             <span class="toolbar_order_status_badge badge badge-danger">{l s='Cancelled'}</span>
+        {elseif $currentState->id == Configuration::get('PS_OS_NO_SHOW')}
+            <span class="toolbar_order_status_badge badge badge-danger">{l s='No-show'}</span>
         {else}
             <span class="toolbar_order_status_badge badge badge-success">{l s='Booked'}</span>
         {/if}
@@ -173,13 +175,13 @@
                             </div>
                             <!-- Change status form -->
                             {* If current state is refunded or cancelled the further order status changes are not allowed *}
-                            {if $can_edit && (!isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))))}
+                            {if $can_edit && (!isset($currentState) || (isset($currentState) && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))))}
                                 <form action="{$currentIndex|escape:'html':'UTF-8'}&amp;vieworder&amp;id_order={$order->id|intval}&amp;token={$smarty.get.token}" method="post" class="form-horizontal well hidden-print">
                                     <div class="row">
                                         <div class="col-lg-9">
                                             <select id="id_order_state" class="chosen form-control" name="id_order_state">
                                                 {foreach from=$states item=state}
-                                                    <option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_REFUND') && ($total_paid <= 0 && !$discounts|count))} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_CANCELED') && ($totalRefundedRooms || $discounts|count || $total_paid > 0))} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_UNPAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) && (!isset($orderOverBookings) || !$orderOverBookings)} disabled="disabled"{/if}>{$state['name']|escape}</option>
+                                                    <option value="{$state['id_order_state']|intval}"{if isset($currentState) && $state['id_order_state'] == $currentState->id} selected="selected" disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_REFUND') || $state['id_order_state'] == Configuration::get('PS_OS_CANCELED') || $state['id_order_state'] == Configuration::get('PS_OS_NO_SHOW'))} disabled="disabled"{elseif ($state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_UNPAID') || $state['id_order_state'] == Configuration::get('PS_OS_OVERBOOKING_PARTIAL_PAID')) && (!isset($orderOverBookings) || !$orderOverBookings)} disabled="disabled"{/if}>{$state['name']|escape}</option>
                                                 {/foreach}
                                             </select>
                                             <input type="hidden" name="id_order" value="{$order->id}" />
@@ -765,7 +767,7 @@
                         <div class="panel">
                             <div class="panel-heading">
                                 <i class="icon-bed"></i> &nbsp;{l s='Rooms Booking Detail'} <span class="badge">{$order_detail_data|@count}</span>
-                                {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))}
+                                {if $can_edit && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
                                     <button type="button" id="add_room" class="btn btn-primary pull-right">
                                         <i class="icon-plus-sign"></i> {l s='Add Rooms'}
                                     </button>
@@ -785,7 +787,7 @@
                             <div class="panel">
                                 <div class="panel-heading">
                                     <i class="icon-bed"></i> &nbsp;{l s='Products Detail'} <span class="badge">{$hotel_service_products|count}</span>
-                                    {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))}
+                                    {if $can_edit && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
                                         <button type="button" id="add_product" class="btn btn-primary pull-right">
                                             <i class="icon-plus-sign"></i> {l s='Add Product'}
                                         </button>
@@ -805,7 +807,7 @@
                             <div class="panel">
                                 <div class="panel-heading">
                                     <i class="icon-bed"></i> &nbsp;{l s='Products Detail'} <span class="badge">{$standalone_service_products|count}</span>
-                                    {if $can_edit && (!$order->hasBeenDelivered() && $currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED'))}
+                                    {if $can_edit && ($currentState->id != Configuration::get('PS_OS_REFUND') && $currentState->id != Configuration::get('PS_OS_CANCELED') && $currentState->id != Configuration::get('PS_OS_NO_SHOW'))}
                                         <button type="button" id="add_product" class="btn btn-primary pull-right">
                                             <i class="icon-plus-sign"></i> {l s='Add Product'}
                                         </button>
@@ -1281,9 +1283,12 @@
         {addJsDefL name='no_children_allowed_txt'}{l s='Only adults can be accommodated' js=1}{/addJsDefL}
         {addJsDefL name='invalid_occupancy_txt'}{l s='Invalid occupancy(adults/children) found.' js=1}{/addJsDefL}
         {addJsDefL name='select_room_txt'}{l s='Select room' js=1}{/addJsDefL}
+        {addJsDefL name='room_status_sealed_warning_txt'}{l s='Are you sure? You cannot change the booking status after this.' js=1}{/addJsDefL}
         {addJsDef max_child_age=$max_child_age|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_IN=$ROOM_STATUS_CHECKED_IN|escape:'quotes':'UTF-8'}
         {addJsDef ROOM_STATUS_CHECKED_OUT=$ROOM_STATUS_CHECKED_OUT|escape:'quotes':'UTF-8'}
+        {addJsDef ROOM_STATUS_NO_SHOW=$ROOM_STATUS_NO_SHOW|escape:'quotes':'UTF-8'}
+        {addJsDef ROOM_STATUS_CANCELLED=$ROOM_STATUS_CANCELLED|escape:'quotes':'UTF-8'}
         {addJsDef ALLOTMENT_MANUAL=$ALLOTMENT_MANUAL|escape:'quotes':'UTF-8'}
         {addJsDef PS_OS_CANCELED=Configuration::get('PS_OS_CANCELED')|escape:'quotes':'UTF-8'}
         {addJsDef PS_OS_REFUND=Configuration::get('PS_OS_REFUND')|escape:'quotes':'UTF-8'}

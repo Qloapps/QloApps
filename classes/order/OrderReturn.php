@@ -57,6 +57,9 @@ class OrderReturnCore extends ObjectModel
     /** @var int whether $id_return_type is cart_rule or order_slip */
     public $return_type;
 
+    /** @var int why this refund request exists: EVENT_TYPE_CANCELLATION/_NO_SHOW/_REFUND */
+    public $event_type;
+
     /** @var string Object creation date */
     public $date_add;
 
@@ -66,6 +69,11 @@ class OrderReturnCore extends ObjectModel
     /** possible values for $return_type */
     const RETURN_TYPE_CART_RULE = 1;
     const RETURN_TYPE_ORDER_SLIP = 2;
+
+    /** possible values for $event_type */
+    const EVENT_TYPE_CANCELLATION = 1;
+    const EVENT_TYPE_NO_SHOW = 2;
+    const EVENT_TYPE_REFUND = 3;
 
     /**
      * @see ObjectModel::$definition
@@ -84,6 +92,7 @@ class OrderReturnCore extends ObjectModel
             'by_admin' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true),
             'id_return_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'return_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
+            'event_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate'),
         ),
@@ -178,15 +187,44 @@ class OrderReturnCore extends ObjectModel
     }
 
     /**
+     * Subquery fragment: every id_htl_booking with at least one completed (actually
+     * refunded) return — the replacement for reading htl_booking_detail.is_refunded,
+     * which was only ever set true by processRefundInBookingTables() at this exact
+     * same moment. Used as `id NOT IN (...)` / `id IN (...)` in other queries, since
+     * this exact fragment is needed at many call sites across the codebase.
+     *
+     * @return string raw SQL, not a full query
+     */
+    public static function getRefundedBookingIdsSubquery($eventType = null)
+    {
+        return 'SELECT ord.`id_htl_booking` FROM `'._DB_PREFIX_.'order_return_detail` ord
+            INNER JOIN `'._DB_PREFIX_.'order_return` orr ON orr.`id_order_return` = ord.`id_order_return`
+            INNER JOIN `'._DB_PREFIX_.'order_return_state` ors ON ors.`id_order_return_state` = orr.`state`
+            WHERE ors.`refunded` = 1'.(!is_null($eventType) ? ' AND orr.`event_type` = '.(int) $eventType : '');
+    }
+
+    /**
+     * Whether this one room booking has at least one completed (actually refunded) return.
+     *
+     * @param int $idHtlBooking
+     * @return bool
+     */
+    public function hasCompletelyRefundedBooking($idHtlBooking)
+    {
+        return (bool) Db::getInstance()->getValue(
+            'SELECT '.(int) $idHtlBooking.' IN ('.self::getRefundedBookingIdsSubquery().')'
+        );
+    }
+
+    /**
      * Get order refund requested bookings
      * @param integer $idOrder
      * @param integer $idOrderReturn
      * @param integer $onlyBookingIds
      * @param integer $customerView
-     * @param integer $skipReqCompletedNonRefunded: send 1 if you want to skip refund request completed but non-refunded booking
      * @return array of refund requested bookings
      */
-    public function getOrderRefundRequestedBookings($idOrder, $idOrderReturn = 0, $onlyBookingIds = 0, $customerView = 0, $skipReqCompletedNonRefunded = 0)
+    public function getOrderRefundRequestedBookings($idOrder, $idOrderReturn = 0, $onlyBookingIds = 0, $customerView = 0)
     {
         $sql = 'SELECT hbd.*, ord.*, orr.`state` as id_return_state FROM `'._DB_PREFIX_.'order_return` orr';
         $sql .= ' INNER JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (orr.`id_order_return` = ord.`id_order_return`)';
@@ -211,14 +249,6 @@ class OrderReturnCore extends ObjectModel
             }
 
             foreach ($returnDetails as $key => &$bookingRow) {
-                if ($skipReqCompletedNonRefunded) {
-                    $objReturnState = new OrderReturnState($bookingRow['id_return_state']);
-                    if ($objReturnState->refunded && !$bookingRow['is_refunded']) {
-                        unset($returnDetails[$key]);
-                        continue;
-                    }
-                }
-
                 if (!$onlyBookingIds) {
                     $bookingRow['extra_service_total_paid_amount'] = 0;
                     $bookingRow['extra_service_total_price_tax_incl'] = 0;
@@ -284,7 +314,7 @@ class OrderReturnCore extends ObjectModel
             }
 
             if ($onlyBookingIds) {
-                return array_column($returnDetails, 'id_htl_booking');
+                return array_values(array_unique(array_column($returnDetails, 'id_htl_booking')));
             }
 
             if ($customerView) {
@@ -298,7 +328,7 @@ class OrderReturnCore extends ObjectModel
     /**
      * Get order refund request products
      */
-    public function getOrderRefundRequestedProducts($idOrder, $idOrderReturn = 0, $onlyIds = 0, $skipReqCompletedNonRefunded = 0)
+    public function getOrderRefundRequestedProducts($idOrder, $idOrderReturn = 0, $onlyIds = 0)
     {
         $sql = 'SELECT spod.*, ord.*, orr.`state` as id_return_state, p.`allow_multiple_quantity` FROM `'._DB_PREFIX_.'order_return` orr';
         $sql .= ' INNER JOIN `'._DB_PREFIX_.'order_return_detail` ord ON (orr.`id_order_return` = ord.`id_order_return`)';
@@ -312,14 +342,6 @@ class OrderReturnCore extends ObjectModel
         if ($returnDetails = Db::getInstance()->executeS($sql)) {
             $objOrder = new Order($idOrder);
             foreach ($returnDetails as $key => &$product) {
-                if ($skipReqCompletedNonRefunded) {
-                    $objReturnState = new OrderReturnState($product['id_return_state']);
-                    if ($objReturnState->refunded && !$product['is_refunded']) {
-                        unset($returnDetails[$key]);
-                        continue;
-                    }
-                }
-
                 $product['paid_amount'] = 0;
                 if ($product['total_price_tax_incl'] > 0) {
                     if ($objOrder->total_paid_real > 0) {
@@ -343,7 +365,7 @@ class OrderReturnCore extends ObjectModel
         }
         $sql = 'SELECT orr.`id_order`, orr.`state`, orr.`id_order_return`, orr.`payment_mode`, orr.`id_transaction`,
             orr.`id_return_type`, orr.`return_type`, ors.`id_cart_rule`, orr.`date_add`, orr.`date_upd`, orr.`refunded_amount`,
-            hbd.`is_cancelled`, SUM(IF(ord.`id_htl_booking`, 1, 0)) AS total_rooms, SUM(IF(ord.`id_service_product_order_detail`, 1, 0)) AS total_products
+            IF(hbd.`id_status` = '.HotelBookingDetail::STATUS_CANCELLED.', 1, 0) AS `is_cancelled`, SUM(IF(ord.`id_htl_booking`, 1, 0)) AS total_rooms, SUM(IF(ord.`id_service_product_order_detail`, 1, 0)) AS total_products
             FROM `'._DB_PREFIX_.'order_return` orr
             LEFT JOIN `'._DB_PREFIX_.'order_return_detail` ord
             ON (ord.`id_order_return` = orr.`id_order_return`)
@@ -745,20 +767,40 @@ class OrderReturnCore extends ObjectModel
         return false;
     }
 
-    public function getRefundedAmount($idOrder, $idOrderReturn = 0, $idHtlBooking = 0)
+    /**
+     * @param int $idOrder
+     * @param int $idOrderReturn
+     * @param int $idHtlBooking
+     * @param bool $detailedInfo when true, also returns the number of refund
+     *        requests (not just the refunded amount) — e.g. for the order
+     *        detail page's per-room "Refund" column
+     * @return float|array plain refunded amount by default; array('amount', 'count') when $detailedInfo
+     */
+    public function getRefundedAmount($idOrder, $idOrderReturn = 0, $idHtlBooking = 0, $detailedInfo = false, $idServiceProductOrderDetail = 0)
     {
-        $sql = 'SELECT SUM(ord.`refunded_amount`) FROM `'._DB_PREFIX_.'order_return_detail` ord';
-        $sql .= ' LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON (orr.`id_order_return` = ord.`id_order_return`)';
-        $sql .= ' WHERE orr.`id_order` = '.(int)$idOrder;
+        $where = ' WHERE orr.`id_order` = '.(int) $idOrder;
 
         if ($idOrderReturn) {
-            $sql .= ' AND ord.`id_order_return` = '.(int)$idOrderReturn;
+            $where .= ' AND ord.`id_order_return` = '.(int) $idOrderReturn;
         }
 
         if ($idHtlBooking) {
-            $sql .= ' AND ord.`id_htl_booking` = '.(int)$idHtlBooking;
+            $where .= ' AND ord.`id_htl_booking` = '.(int) $idHtlBooking;
         }
 
+        if ($idServiceProductOrderDetail) {
+            $where .= ' AND ord.`id_service_product_order_detail` = '.(int) $idServiceProductOrderDetail;
+        }
+
+        $from = ' FROM `'._DB_PREFIX_.'order_return_detail` ord
+            LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON (orr.`id_order_return` = ord.`id_order_return`)';
+
+        if ($detailedInfo) {
+            $sql = 'SELECT COUNT(ord.`id_order_return_detail`) AS count, SUM(ord.`refunded_amount`) AS amount'.$from.$where;
+            return Db::getInstance()->getRow($sql);
+        }
+
+        $sql = 'SELECT SUM(ord.`refunded_amount`) AS amount'.$from.$where;
         return Db::getInstance()->getValue($sql);
     }
 }

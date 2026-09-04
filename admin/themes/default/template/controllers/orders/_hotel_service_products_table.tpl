@@ -25,18 +25,17 @@
         <table class="table" id="customer_products_details">
             <thead>
                 <tr>
-                    <th><span class="title_box">{l s='Image'}</th>
+                    <th><span class="title_box">{l s='Image'}</span></th>
                     <th><span class="title_box">{l s='Name'}</span></th>
                     <th><span class="title_box">{l s='Quantity'}</span></th>
                     <th><span class="title_box">{l s='Price (Tax excl.)'}</span></th>
                     <th><span class="title_box">{l s='Total Tax'}</span></th>
                     <th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
                     {if isset($refundReqProducts) && $refundReqProducts}
-                        <th><span class="title_box">{l s='Refund State'}</span></th>
-                        <th><span class="title_box">{l s='Refunded amount'}</span></th>
+                        <th><span class="title_box"><div>{l s='Refund'}</div><div>{l s='Refund requests'}</div></span></th>
                     {/if}
-                    {if $can_edit}
-                        <th><span class="title_box">{l s='Actions'}</th>
+                    {if ($can_edit)}
+                        <th class="fixed-width-md center"><span class="title_box">{l s='Actions'}</span></th>
                     {/if}
                 </tr>
             </thead>
@@ -75,27 +74,19 @@
                             </td>
                             {if (isset($refundReqProducts) && $refundReqProducts)}
                                 <td>
-                                    {if $product.id_service_product_order_detail|in_array:$refundReqProducts}
-                                        {if $product.is_cancelled}
-                                            <span class="badge badge-danger">{l s='Cancelled'}</span>
-                                        {elseif isset($product.refund_info) && (!$product.refund_info.refunded || $product.refund_info.id_customization)}
-                                            <span class="badge" style="background-color:{$product.refund_info.color|escape:'html':'UTF-8'}">{$product.refund_info.name|escape:'html':'UTF-8'}</span>
-                                        {else}
-                                            <span>--</span>
+                                    {if $product.refund_count}
+                                        {if $product.refund_amount}
+                                            <p class="refunded_amount">
+                                                {convertPriceWithCurrency price=$product.refund_amount currency=$currency->id}
+                                            </p>
                                         {/if}
+                                        <a href="{$link->getAdminLink('AdminOrderRefundRequests')|escape:'html':'UTF-8'}&id_order={$order->id|intval}&id_service_product_order_detail={$product.id_service_product_order_detail|intval}" class="badge badge-danger">{$product.refund_count}</a>
                                     {else}
-                                        <span>--</span>
-                                    {/if}
-                                </td>
-                                <td>
-                                    {if $product.is_refunded && isset($product.refund_info) && $product.refund_info}
-                                        {convertPriceWithCurrency price=$product.refund_info.refunded_amount currency=$currency->id}
-                                    {else}
-                                        --
+                                        <p>--</p>
                                     {/if}
                                 </td>
                             {/if}
-                            {if ($can_edit && !$order->hasBeenDelivered())}
+                            {if ($can_edit)}
                                 <td class="room_invoice" style="display: none;">
                                 {if sizeof($invoices_collection)}
                                 <select name="product_invoice" class="edit_product_invoice">
@@ -109,7 +100,7 @@
                                 &nbsp;
                                 {/if}
                                 </td>
-                                <td class="product_action">
+                                <td class="product_action center">
                                     {* edit/delete controls *}
                                      {if isset($refundReqProducts) && $refundReqProducts && $product.id_service_product_order_detail|in_array:$refundReqProducts && $product.is_cancelled}
                                         <button href="#" class="btn btn-default delete_product_line">
@@ -156,7 +147,7 @@
                     <tr>
                         {assign var=colspan value=6}
                         {if isset($refundReqProducts) && $refundReqProducts}
-                            {assign var=colspan value=($colspan+2)}
+                            {assign var=colspan value=($colspan+1)}
                         {/if}
                         {if ($can_edit)}
                             {assign var=colspan value=($colspan+1)}

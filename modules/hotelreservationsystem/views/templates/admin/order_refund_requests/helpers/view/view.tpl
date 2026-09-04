@@ -125,6 +125,17 @@
 								<span class="badge" style="background-color:{$currentStateInfo['color']|escape:'html':'UTF-8'}">{$currentStateInfo['name']|escape:'html':'UTF-8'}</span>
 							</div>
 						</div>
+						<div class="form-group row">
+							<div class="col-sm-3">
+								<strong>{l s='Request type' mod='hotelreservationsystem'} :</strong>
+							</div>
+							<div class="col-sm-9">
+								{if $orderReturnInfo['event_type'] == OrderReturn::EVENT_TYPE_CANCELLATION}{l s='Cancellation' mod='hotelreservationsystem'}
+								{elseif $orderReturnInfo['event_type'] == OrderReturn::EVENT_TYPE_NO_SHOW}{l s='No-show' mod='hotelreservationsystem'}
+								{elseif $orderReturnInfo['event_type'] == OrderReturn::EVENT_TYPE_REFUND}{l s='Refund' mod='hotelreservationsystem'}
+								{else}--{/if}
+							</div>
+						</div>
 
 						{* list of booking requested for refund by the customer *}
 						{if isset($refundReqBookings) && $refundReqBookings}
@@ -151,13 +162,11 @@
 											{if !$isRefundCompleted}
 												<th>{l s='Rooms cancelation charges' mod='hotelreservationsystem'}</th>
 											{/if}
-											{if $hasOrderDiscountOrPayment || $isRefundCompleted}
-												<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
+											<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
 
                                                 {if $isRefundCompleted}
                                                     <th>{l s='Refund status' mod='hotelreservationsystem'}</th>
                                                 {/if}
-											{/if}
 										</tr>
 										{foreach $refundReqBookings as $booking}
 											<tr>
@@ -205,21 +214,20 @@
 														{/if}
 													</td>
 												{/if}
-												{if $hasOrderDiscountOrPayment || $isRefundCompleted}
-													<td>
-														<div class="input-group">
-															{if $isRefundCompleted}
+												<td>
+													<div class="input-group">
+														{if $isRefundCompleted}
                                                                 {displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
-															{else}
-																<span class="input-group-addon">{$orderCurrency['sign']|escape:'html':'UTF-8'}</span>
-																<input placeholder="" type="text" name="refund_amounts[{$booking['id_order_return_detail']|escape:'html':'UTF-8'}]" value="{if ($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] - $booking['cancelation_charge']) > 0}{Tools::ps_round(($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] - $booking['cancelation_charge']), 2)}{else}0{/if}">
-																<span class="input-group-addon">{l s='tax incl.' mod='hotelreservationsystem'}</span>
-															{/if}
-														</div>
-													</td>
+														{else}
+															<span class="input-group-addon">{$orderCurrency['sign']|escape:'html':'UTF-8'}</span>
+															<input placeholder="" type="text" name="refund_amounts[{$booking['id_order_return_detail']|escape:'html':'UTF-8'}]" value="{if ($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] - $booking['cancelation_charge']) > 0}{Tools::ps_round(($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount'] - $booking['cancelation_charge']), 2)}{else}0{/if}">
+															<span class="input-group-addon">{l s='tax incl.' mod='hotelreservationsystem'}</span>
+														{/if}
+													</div>
+												</td>
                                                     {if $isRefundCompleted}
                                                         <td>
-                                                            {if $booking['is_cancelled']}
+                                                            {if $booking['id_status'] == $ROOM_STATUS_CANCELLED}
                                                                 <span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
                                                             {* used id_customization to check if in this request which bookings are refunded or not*}
                                                             {else if $booking['id_customization']}
@@ -229,7 +237,6 @@
                                                             {/if}
                                                         </td>
                                                     {/if}
-												{/if}
 											</tr>
 										{/foreach}
 									</table>
@@ -257,12 +264,10 @@
 											<th>{l s='Total cost (tax incl.)' mod='hotelreservationsystem'}</th>
 											<th>{l s='Total paid amount (tax incl.)' mod='hotelreservationsystem'}</th>
 
-											{if $hasOrderDiscountOrPayment || $isRefundCompleted}
-												<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
+											<th>{l s='Refund amount' mod='hotelreservationsystem'}</th>
 
-												{if $isRefundCompleted}
-													<th>{l s='Refund status' mod='hotelreservationsystem'}</th>
-												{/if}
+											{if $isRefundCompleted}
+												<th>{l s='Refund status' mod='hotelreservationsystem'}</th>
 											{/if}
 										</tr>
 										{foreach $refundReqProducts as $product}
@@ -274,30 +279,28 @@
 												<td>{if $product['allow_multiple_quantity']}{$product['quantity']|escape:'htmlall':'UTF-8'}{else}--{/if}</td>
 												<td>{displayPrice price=$product['total_price_tax_incl'] currency=$orderCurrency['id']}</td>
 												<td>{displayPrice price=$product['paid_amount'] currency=$orderCurrency['id']}</td>
-												{if $hasOrderDiscountOrPayment || $isRefundCompleted}
+												<td>
+													<div class="input-group">
+														{if $isRefundCompleted}
+															{displayPrice price=$product['refunded_amount'] currency=$orderCurrency['id']}
+														{else}
+															<span class="input-group-addon">{$orderCurrency['sign']|escape:'html':'UTF-8'}</span>
+															<input placeholder="" type="text" name="refund_amounts[{$product['id_order_return_detail']|escape:'html':'UTF-8'}]" value="0">
+															<span class="input-group-addon">{l s='tax incl.' mod='hotelreservationsystem'}</span>
+														{/if}
+													</div>
+												</td>
+												{if $isRefundCompleted}
 													<td>
-														<div class="input-group">
-															{if $isRefundCompleted}
-																{displayPrice price=$product['refunded_amount'] currency=$orderCurrency['id']}
-															{else}
-																<span class="input-group-addon">{$orderCurrency['sign']|escape:'html':'UTF-8'}</span>
-																<input placeholder="" type="text" name="refund_amounts[{$product['id_order_return_detail']|escape:'html':'UTF-8'}]" value="0">
-																<span class="input-group-addon">{l s='tax incl.' mod='hotelreservationsystem'}</span>
-															{/if}
-														</div>
+														{if $product['is_cancelled']}
+															<span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
+														{* used id_customization to check if in this request which bookings are refunded or not*}
+														{else if $product['id_customization']}
+															<span class="badge badge-success">{l s='Refunded' mod='hotelreservationsystem'}</span>
+														{else}
+															<span class="badge badge-danger">{l s='Denied' mod='hotelreservationsystem'}</span>
+														{/if}
 													</td>
-													{if $isRefundCompleted}
-														<td>
-															{if $product['is_cancelled']}
-																<span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
-															{* used id_customization to check if in this request which bookings are refunded or not*}
-															{else if $product['id_customization']}
-																<span class="badge badge-success">{l s='Refunded' mod='hotelreservationsystem'}</span>
-															{else}
-																<span class="badge badge-danger">{l s='Denied' mod='hotelreservationsystem'}</span>
-															{/if}
-														</td>
-													{/if}
 												{/if}
 											</tr>
 										{/foreach}
@@ -381,7 +384,6 @@
 							</div>
 
 							{* Fields to submit refund information *}
-							{if $hasOrderDiscountOrPayment}
 								<div class="refunded_state_fields" style="display:none;">
 									<div class="form-group">
 										<div class="col-sm-3">
@@ -472,7 +474,6 @@
 										</div>
 									</div>
 								</div>
-							{/if}
 						{/if}
 					</div>
 				</div>

@@ -1204,6 +1204,101 @@ class HotelHelper
         );
     }
 
+    public function createDefaultBookingStatuses()
+    {
+        $htlBookingStatuses = array(
+            array(
+                'id' => HotelBookingDetail::STATUS_ASSIGNED,
+                'color' => '#4169E1',
+                'is_terminal' => 0,
+                'name' => array(
+                    'en' => 'Assigned',
+                    'nl' => 'Toegewezen',
+                    'fr' => 'Assignée',
+                    'de' => 'Zugewiesen',
+                    'ru' => 'Назначено',
+                    'es' => 'Asignada',
+                ),
+            ),
+            array(
+                'id' => HotelBookingDetail::STATUS_CHECKED_IN,
+                'color' => '#17A2B8',
+                'is_terminal' => 0,
+                'name' => array(
+                    'en' => 'Checked-in',
+                    'nl' => 'Ingecheckt',
+                    'fr' => 'Enregistrée',
+                    'de' => 'Eingecheckt',
+                    'ru' => 'Заселено',
+                    'es' => 'Registrada',
+                ),
+            ),
+            array(
+                'id' => HotelBookingDetail::STATUS_CHECKED_OUT,
+                'color' => '#108510',
+                'is_terminal' => 0,
+                'name' => array(
+                    'en' => 'Checked-out',
+                    'nl' => 'Uitgecheckt',
+                    'fr' => 'Départ effectué',
+                    'de' => 'Ausgecheckt',
+                    'ru' => 'Выселено',
+                    'es' => 'Salida realizada',
+                ),
+            ),
+            array(
+                'id' => HotelBookingDetail::STATUS_NO_SHOW,
+                'color' => '#DC143C',
+                'is_terminal' => 1,
+                'name' => array(
+                    'en' => 'No-show',
+                    'nl' => 'Niet verschenen',
+                    'fr' => 'Non présentée',
+                    'de' => 'Nicht erschienen',
+                    'ru' => 'Неявка',
+                    'es' => 'No presentada',
+                ),
+            ),
+            array(
+                'id' => HotelBookingDetail::STATUS_CANCELLED,
+                'color' => '#FF8C00',
+                'is_terminal' => 1,
+                'name' => array(
+                    'en' => 'Cancelled',
+                    'nl' => 'Geannuleerd',
+                    'fr' => 'Annulée',
+                    'de' => 'Storniert',
+                    'ru' => 'Отменено',
+                    'es' => 'Cancelada',
+                ),
+            ),
+        );
+
+        $languages = Language::getLanguages(true);
+        foreach ($htlBookingStatuses as $htlBookingStatus) {
+            $objBookingStatus = new HotelBookingStatus();
+            // fixed id: this catalog's rows are referenced by the HotelBookingDetail::STATUS_* constants
+            $objBookingStatus->id = $htlBookingStatus['id'];
+            $objBookingStatus->force_id = true;
+            $objBookingStatus->color = $htlBookingStatus['color'];
+            $objBookingStatus->is_terminal = $htlBookingStatus['is_terminal'];
+
+            foreach ($languages as $lang) {
+                if (isset($htlBookingStatus['name'][$lang['iso_code']])) {
+                    $objBookingStatus->name[$lang['id_lang']] = $htlBookingStatus['name'][$lang['iso_code']];
+                } else {
+                    $objBookingStatus->name[$lang['id_lang']] = $htlBookingStatus['name']['en'];
+                }
+            }
+
+            if (!$objBookingStatus->add()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static function getPsProducts($id_lang, $start = 0, $limit = 0, $booking_product = null)
     {
         $sql = 'SELECT p.`id_product`, pl.`name`, p.`booking_product`

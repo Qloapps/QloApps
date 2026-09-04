@@ -310,8 +310,8 @@ class GuestTrackingControllerCore extends FrontController
                                             $anyBackOrder = 1;
                                         }
 
-                                        if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $data_v['is_refunded']) {
-                                            if ($data_v['is_cancelled']) {
+                                        if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $objOrderReturn->hasCompletelyRefundedBooking($data_v['id'])) {
+                                            if ($data_v['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
                                                 $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
                                             } else {
                                                 $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
@@ -339,8 +339,8 @@ class GuestTrackingControllerCore extends FrontController
 
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] = 0;
                                         $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] = 0;
-                                        if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $data_v['is_refunded']) {
-                                            if ($data_v['is_cancelled']) {
+                                        if ($refundReqBookings && in_array($data_v['id'], $refundReqBookings) && $objOrderReturn->hasCompletelyRefundedBooking($data_v['id'])) {
+                                            if ($data_v['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
                                                 $cartHotelData[$type_key]['date_diff'][$date_join]['count_cancelled'] += 1;
                                             } else {
                                                 $cartHotelData[$type_key]['date_diff'][$date_join]['count_refunded'] += 1;
@@ -348,7 +348,7 @@ class GuestTrackingControllerCore extends FrontController
                                         }
                                     }
 
-                                    $cartHotelData[$type_key]['date_diff'][$date_join]['is_refunded'] = $data_v['is_refunded'];
+                                    $cartHotelData[$type_key]['date_diff'][$date_join]['is_refunded'] = $objOrderReturn->hasCompletelyRefundedBooking($data_v['id']);
 
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['ids_htl_booking_detail'][] = $data_v['id'];
 

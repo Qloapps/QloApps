@@ -375,16 +375,12 @@ class HotelReservationSystem extends Module
     {
         $objHtlBkDtl = new HotelBookingDetail();
 
-        // Make rooms available for booking if order status is cancelled, refunded or error
-        if (in_array($params['newOrderStatus']->id, $objHtlBkDtl->getOrderStatusToFreeBookedRoom())) {
-            // do not change is_cancelled if room is not getting cancelled
-            $isCancelled = null;
-            if ($params['newOrderStatus']->id == Configuration::get('PS_OS_CANCELED')) {
-                $isCancelled = 1;
-            }
-            if (!$objHtlBkDtl->updateOrderRefundStatus($params['id_order'], false, false, array(), 1, $isCancelled)) {
-                $this->context->controller->errors[] = $this->l('Error while making booked rooms available, attached with this order. Please try again !!');
-            }
+        // If order status is cancelled, refunded or error, a room may have just
+        // become free — try to resolve any overbookings waiting on it
+        if (Configuration::get('PS_OVERBOOKING_AUTO_RESOLVE')
+            && in_array($params['newOrderStatus']->id, $objHtlBkDtl->getOrderStatusToFreeBookedRoom())
+        ) {
+            $objHtlBkDtl->resolveOverBookings();
         }
     }
 
@@ -445,6 +441,8 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminOrderRefundRequests', 'Manage Order Refund Requests', 'AdminHotelReservationSystemManagement');
 
         $this->installTab('AdminHotelConfigurationSetting', 'General Settings', 'AdminHotelReservationSystemManagement');
+        // parented under core Orders, next to the existing "Statuses" tab — same idea, for room statuses
+        $this->installTab('AdminRoomStatuses', 'Room Statuses', 'AdminParentOrders');
         // Controllers without tabs
         $this->installTab('AdminHotelGeneralSettings', 'Hotel General Configuration', 'AdminHotelConfigurationSetting', false);
         $this->installTab('AdminHotelFeaturePricesSettings', 'Advanced Price Rules', 'AdminHotelConfigurationSetting', false);
@@ -494,6 +492,7 @@ class HotelReservationSystem extends Module
             || !$this->callInstallTab()
             || !$objHtlHelper->insertDefaultHotelEntries()
             || !$objHtlHelper->createHotelRoomDefaultFeatures()
+            || !$objHtlHelper->createDefaultBookingStatuses()
             || !$objHtlHelper->insertHotelCommonAmenities()
         ) {
             return false;

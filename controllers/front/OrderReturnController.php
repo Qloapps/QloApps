@@ -52,8 +52,8 @@ class OrderReturnControllerCore extends FrontController
 
                     $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($objOrderReturn->id_order, $objOrderReturn->id);
                     $isCanceledBookings = false;
-                    if (count(array_unique(array_column($refundReqBookings, 'is_cancelled'))) === 1
-                        && array_unique(array_column($refundReqBookings, 'is_cancelled'))[0] != 0
+                    if (count(array_unique(array_column($refundReqBookings, 'id_status'))) === 1
+                        && array_unique(array_column($refundReqBookings, 'id_status'))[0] == HotelBookingDetail::STATUS_CANCELLED
                     ) {
                         $isCanceledBookings = true;
                     }
@@ -76,6 +76,7 @@ class OrderReturnControllerCore extends FrontController
                             $this->context->language->id),
                             'isRefundCompleted' => $objOrderReturn->hasBeenCompleted(),
                             'voucher' => $voucher,
+                            'room_status_cancelled' => HotelBookingDetail::STATUS_CANCELLED,
                         )
                     );
 

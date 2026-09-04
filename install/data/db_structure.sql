@@ -1358,6 +1358,7 @@ CREATE TABLE `PREFIX_order_return` (
   `by_admin` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `id_return_type` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `return_type` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `event_type` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `date_add` datetime NOT NULL,
   `date_upd` datetime NOT NULL,
   PRIMARY KEY (`id_order_return`),
