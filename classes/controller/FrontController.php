@@ -665,6 +665,42 @@ class FrontControllerCore extends Controller
     public function initCursedPage()
     {
         $this->displayMaintenancePage();
+
+        header('HTTP/1.1 403 Forbidden');
+
+        $this->setMedia();
+        $this->initHeader();
+
+        if (!isset($this->context->cart)) {
+            $this->context->cart = new Cart();
+        }
+
+        if (!$this->useMobileTheme()) {
+            $this->context->smarty->assign(array(
+                'HOOK_HEADER'       => Hook::exec('displayHeader'),
+                'HOOK_TOP'          => Hook::exec('displayTop'),
+                'show_breadcrump'   => $this->show_breadcrump,
+            ));
+        } else {
+            $this->context->smarty->assign('HOOK_MOBILE_HEADER', Hook::exec('displayMobileHeader'));
+        }
+
+        $this->initFooter();
+
+        $this->context->smarty->assign(array(
+            'css_files'      => $this->css_files,
+            'js_files'       => ($this->getLayout() && (bool)Configuration::get('PS_JS_DEFER')) ? array() : $this->js_files,
+            'js_defer'       => (bool)Configuration::get('PS_JS_DEFER'),
+            'errors'         => $this->errors,
+            'display_header' => $this->display_header,
+            'display_footer' => $this->display_footer,
+        ));
+
+        $front_controller = preg_match('/ModuleFrontController$/', get_class($this)) ? new FrontController() : $this;
+        $template = $this->context->smarty->fetch($front_controller->getTemplatePath($this->getThemeDir().'access-denied.tpl'));
+        $this->context->controller = $this;
+        $this->context->smarty->assign('template', $template);
+        $this->layout = $this->getLayout();
     }
 
     /**
