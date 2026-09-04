@@ -1,0 +1,217 @@
+/**
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*/
+
+.header-ext-dots {
+    position: absolute;
+    bottom: 120px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 15;
+    pointer-events: none;
+}
+.header-ext-dots .owl-dot {
+    display: inline-block;
+    margin: 0 5px;
+    cursor: pointer;
+    pointer-events: all;
+}
+.header-ext-dots .owl-dot span {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    transition: background 0.25s ease;
+}
+.header-ext-dots .owl-dot.active span,
+.header-ext-dots .owl-dot:hover span {
+    background: #ffffff;
+}
+
+/* ===== Content alignment (1=left, 2=center, 3=right) ===== */
+.header-align-1 { text-align: left; }
+.header-align-2 { text-align: center; }
+.header-align-3 { text-align: right; }
+
+.header-align-1 .heasder-desc-hr-second { margin-left: 0; margin-right: auto; }
+.header-align-3 .heasder-desc-hr-second { margin-left: auto; margin-right: 0; }
+
+
+/* ===== headerHotelDescBlock.tpl ===== */
+.header-desc-container {
+	bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: -10;
+    /*height: 100%;*/
+}
+
+.header-bg-video {
+    min-height: 100%;
+}
+.header-desc-wrapper  {
+	display: table;
+    height: 100%;
+    width: 100%;
+}
+.header-desc-primary {
+	display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    color: #FFFFFF;
+}
+.header-desc-primary hr {
+    margin-bottom: 10px;
+}
+
+.header-hotel-name {
+	font-size: 55px;
+	font-weight: 400;
+	margin-top: 5px;
+    margin-bottom: 25px;
+}
+
+.header-hotel-desc {
+	font-size: 400;
+	font-size: 18px;
+    line-height: 24px;
+}
+
+.heasder-desc-hr-second {
+    display: none;
+}
+
+/* Owl carousel slide animation classes */
+.wkFadeOut  { animation: wkFadeOut  0.7s forwards; }
+.wkFadeIn   { animation: wkFadeIn   0.7s forwards; }
+.wkZoomOut  { animation: wkZoomOut  0.7s forwards; }
+.wkZoomIn   { animation: wkZoomIn   0.7s forwards; }
+.wkBlurOut  { animation: wkBlurOut  0.7s forwards; }
+.wkBlurIn   { animation: wkBlurIn   0.7s forwards; }
+.wkSlideOut { animation: wkSlideOut 0.7s forwards; }
+.wkSlideIn  { animation: wkSlideIn  0.7s forwards; }
+
+@keyframes wkFadeOut  { from { opacity:1; } to { opacity:0; } }
+@keyframes wkFadeIn   { from { opacity:0; } to { opacity:1; } }
+@keyframes wkZoomOut  { from { opacity:1; transform:scale(1);   } to { opacity:0; transform:scale(1.15); } }
+@keyframes wkZoomIn   { from { opacity:0; transform:scale(0.88); } to { opacity:1; transform:scale(1);   } }
+@keyframes wkBlurOut  { from { opacity:1; filter:blur(0);   } to { opacity:0; filter:blur(10px); } }
+@keyframes wkBlurIn   { from { opacity:0; filter:blur(10px); } to { opacity:1; filter:blur(0);   } }
+@keyframes wkSlideOut { from { opacity:1; transform:translateX(0);    } to { opacity:0; transform:translateX(-60px); } }
+@keyframes wkSlideIn  { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:translateX(0);     } }
+
+/* Description slide animation on slide change */
+.js-header-description {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.js-header-description.wk-tagline-out {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+.js-header-description.wk-tagline-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.header-media-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -11;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.header-media-layer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.header-media-layer .owl-carousel,
+.header-media-layer .owl-stage-outer,
+.header-media-layer .owl-stage,
+.header-media-layer .owl-item {
+    height: 100%;
+}
+
+.header-slide-img {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+
+.header-media-nav-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 15;
+    pointer-events: none;
+}
+
+.header-media-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: all;
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    padding: 8px 14px;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s;
+    outline: none;
+}
+
+.header-media-btn:hover {
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+}
+
+.js-header-media-prev {
+    left: 15px;
+}
+
+.js-header-media-next {
+    right: 15px;
+}

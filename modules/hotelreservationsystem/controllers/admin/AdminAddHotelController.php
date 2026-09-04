@@ -1204,7 +1204,7 @@ class AdminAddHotelController extends ModuleAdminController
 
         $this->addJqueryUI('ui.sortable');
 
-        $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/hotelImage.js');
+        $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/admin/qhrs_hotel_image.js');
         $this->addJS(_MODULE_DIR_.$this->module->name.'/views/js/HotelReservationAdmin.js');
         $this->addCSS(_MODULE_DIR_.$this->module->name.'/views/css/HotelReservationAdmin.css');
     }

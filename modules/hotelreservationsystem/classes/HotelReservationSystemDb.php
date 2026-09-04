@@ -451,11 +451,32 @@ class HotelReservationSystemDb
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_settings_link`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_header_image` (
+                `id_header_image` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+                `name` VARCHAR(512) NOT NULL,
+                `description_color` VARCHAR(7) NOT NULL DEFAULT '#ffffff',
+                `description_font_size` TINYINT(3) UNSIGNED NOT NULL DEFAULT '16',
+                `description_font_weight` VARCHAR(10) NOT NULL DEFAULT '400',
+                `position` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+                `active` TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
+                `date_add` DATETIME NOT NULL,
+                `date_upd` DATETIME NOT NULL,
+                PRIMARY KEY (`id_header_image`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_header_image_lang` (
+                `id_header_image` INT(10) UNSIGNED NOT NULL,
+                `id_lang` INT(11) NOT NULL,
+                `title` VARCHAR(512) NOT NULL DEFAULT '',
+                `description` VARCHAR(512) NOT NULL DEFAULT '',
+                PRIMARY KEY (`id_header_image`, `id_lang`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+
             "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link` (`id_settings_link`, `icon`, `link`, `new_window`, `position`, `unremovable`, `active`, `date_add`, `date_upd`) VALUES
             (1, 'icon-cogs', 'index.php?controller=AdminHotelGeneralSettings', 0, 0, 1, 1, NOW(), NOW()),
             (2, 'icon-dollar', 'index.php?controller=AdminHotelFeaturePricesSettings', 0, 2, 1, 1, NOW(), NOW()),
             (3, 'icon-file-text', 'index.php?controller=AdminAboutHotelBlockSetting', 0, 4, 0, 1, NOW(), NOW()),
-            (4, 'icon-th-list', 'index.php?controller=AdminFeaturesModuleSetting', 0, 5, 0, 1, NOW(), NOW());",
+            (4, 'icon-th-list', 'index.php?controller=AdminFeaturesModuleSetting', 0, 5, 0, 1, NOW(), NOW()),
+            (5, 'icon-picture', 'index.php?controller=AdminHotelHeaderImage', 0, 6, 0, 1, NOW(), NOW());",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_settings_link_lang` (
                 `id_settings_link` int(10) unsigned NOT NULL,
@@ -482,6 +503,11 @@ class HotelReservationSystemDb
 
             "INSERT INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
             SELECT 4, `id_lang`, 'Hotel Amenities Block', 'Configure Hotels Amenities settings. You can display hotel amenities images using this block. This block will be displayed on home page.'
+            FROM `"._DB_PREFIX_."lang`
+            ORDER BY `id_lang`;",
+
+            "INSERT IGNORE INTO `"._DB_PREFIX_."htl_settings_link_lang` (`id_settings_link`, `id_lang`, `name`, `hint`)
+            SELECT 5, `id_lang`, 'Landing Page Header Media', 'Configure and manage header images or videos displayed on the home page.'
             FROM `"._DB_PREFIX_."lang`
             ORDER BY `id_lang`;",
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_connected_room` (
@@ -554,6 +580,8 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_access`,
             `'._DB_PREFIX_.'htl_settings_link`,
             `'._DB_PREFIX_.'htl_settings_link_lang`,
+            `'._DB_PREFIX_.'htl_header_image`,
+            `'._DB_PREFIX_.'htl_header_image_lang`,
             `'._DB_PREFIX_.'htl_connected_room`'
         );
     }

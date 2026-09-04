@@ -1069,7 +1069,40 @@ class HotelHelper
 
         Configuration::updateValue('WK_TITLE_HEADER_BLOCK', $home_banner_default_title);
         Configuration::updateValue('WK_CONTENT_HEADER_BLOCK', $home_banner_default_content);
-        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', 'hotel_header_image.jpg');
+        Configuration::updateValue('QLO_HEADER_MEDIA_TYPE', HotelHeaderImage::MEDIA_TYPE_IMAGE);
+        Configuration::updateValue('QLO_HEADER_SLIDER_NAV_TYPE', HotelHeaderImage::NAV_TYPE_ARROWS);
+        Configuration::updateValue('QLO_HEADER_SLIDER_AUTO_PLAY', 1);
+        Configuration::updateValue('QLO_HEADER_SLIDER_INTERVAL', 5000);
+        Configuration::updateValue('QLO_HEADER_SLIDER_ANIM_TYPE', HotelHeaderImage::ANIMATION_TYPE_SLIDE);
+        Configuration::updateValue('QLO_HEADER_CONTENT_ALIGN', HotelHeaderImage::CONTENT_ALIGN_CENTER);
+        Configuration::updateValue('QLO_HEADER_VIDEO_SOURCE_TYPE', '');
+        Configuration::updateValue('QLO_HEADER_VIDEO_NAME', '');
+        HotelHeaderImage::createMediaDirectory();
+        $defaultImgSrc  = _PS_IMG_DIR_.'hotel_header_image.jpg';
+        $defaultImgDest = 'default_hotel_header_image.jpg';
+        $mediaDir       = _PS_IMG_DIR_.'hotel_header_media/';
+        if (file_exists($defaultImgSrc) && !file_exists($mediaDir.$defaultImgDest)) {
+            @copy($defaultImgSrc, $mediaDir.$defaultImgDest);
+        }
+        if (file_exists($mediaDir.$defaultImgDest)) {
+            Db::getInstance()->execute(
+                'INSERT INTO `'._DB_PREFIX_.'htl_header_image`
+                (`name`, `position`, `active`, `date_add`, `date_upd`)
+                VALUES (\''.pSQL($defaultImgDest).'\', 0, 1, NOW(), NOW())'
+            );
+            $newId = (int)Db::getInstance()->Insert_ID();
+            if ($newId) {
+                foreach (Language::getLanguages(false) as $lang) {
+                    $title = isset($homeBannerTitleLang[$lang['iso_code']]) ? $homeBannerTitleLang[$lang['iso_code']] : $homeBannerTitleLang['en'];
+                    $description = isset($homeBannerContentLang[$lang['iso_code']]) ? $homeBannerContentLang[$lang['iso_code']] : $homeBannerContentLang['en'];
+                    Db::getInstance()->execute(
+                        'INSERT INTO `'._DB_PREFIX_.'htl_header_image_lang`
+                        (`id_header_image`, `id_lang`, `title`, `description`)
+                        VALUES ('.$newId.', '.(int)$lang['id_lang'].', \''.pSQL($title).'\', \''.pSQL($description).'\')'
+                    );
+                }
+            }
+        }
         Configuration::updateValue('WK_ALLOW_ADVANCED_PAYMENT', 1);
         Configuration::updateValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT', 10);
         Configuration::updateValue('WK_ADVANCED_PAYMENT_INC_TAX', 1);
@@ -1092,14 +1125,6 @@ class HotelHelper
 
         // lang fields
         $languages = Language::getLanguages(false);
-        $htlTagLineLang = array(
-            'en' => 'A place where comfort and luxury are blended with nature!',
-            'nl' => 'Een plek waar comfort en luxe worden gecombineerd met de natuur!',
-            'fr' => 'Un endroit où le confort et le luxe se mêlent à la nature!',
-            'de' => 'Ein Ort, an dem Komfort und Luxus mit der Natur verschmelzen!',
-            'ru' => 'Место, где комфорт и роскошь сочетаются с природой!',
-            'es' => '¡Un lugar donde el confort y el lujo se mezclan con la naturaleza!',
-        );
 
         $htlShortDescLang = array(
             'en' => 'We offer elegant rooms, gourmet dining, and attentive service for a memorable stay.',
@@ -1118,25 +1143,21 @@ class HotelHelper
             'es' => 'ft',
         );
         $WK_HTL_CHAIN_NAME = array();
-        $WK_HTL_TAG_LINE = array();
         $WK_HTL_SHORT_DESC = array();
         $defaultDimensionUnit = array();
         foreach ($languages as $lang) {
-            if (isset($htlTagLineLang[$lang['iso_code']])) {
-                $WK_HTL_TAG_LINE[$lang['id_lang']] = $htlTagLineLang[$lang['iso_code']];
+            if (isset($htlShortDescLang[$lang['iso_code']])) {
                 $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang[$lang['iso_code']];
                 $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang[$lang['iso_code']];
                 $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang[$lang['iso_code']];
             } else {
                 $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang['en'];
                 $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang['en'];
-                $WK_HTL_TAG_LINE[$lang['id_lang']] = $htlTagLineLang['en'];
                 $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang['en'];
             }
         }
 
         Configuration::updateValue('WK_HTL_CHAIN_NAME', $WK_HTL_CHAIN_NAME);
-        Configuration::updateValue('WK_HTL_TAG_LINE', $WK_HTL_TAG_LINE);
         Configuration::updateValue('WK_HTL_SHORT_DESC', $WK_HTL_SHORT_DESC);
         Configuration::updateValue('WK_DIMENSION_UNIT', $defaultDimensionUnit);
 
