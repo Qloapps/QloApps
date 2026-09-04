@@ -323,6 +323,7 @@ class QloHotelReports extends Module
         if (in_array($report, array('revenue', 'refund', 'payment', 'tax', 'outstanding'))) {
             $idProduct         = (int) Tools::getValue('id_product', 0);
             $refundStatus      = (int) Tools::getValue('refund_status', 0);
+            $outstandingStatus = pSQL(Tools::getValue('outstanding_status', ''));
             $paymentMethod     = pSQL(Tools::getValue('payment_method', ''));
             $idTax             = (int) Tools::getValue('id_tax', 0);
             $revenueSource     = Tools::getValue('revenue_source', 'all');
