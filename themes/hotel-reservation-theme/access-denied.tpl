@@ -21,6 +21,7 @@
 *}
 <div id="pagenotfound">
 	<div class="pagenotfound">
+		<h1 style="font-size: 85px;"><i class="icon-ban text-danger"></i></h1>
 		<h1>{l s='Access denied'}</h1>
 
 		<p>
