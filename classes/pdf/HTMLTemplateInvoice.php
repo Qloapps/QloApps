@@ -358,7 +358,31 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                         $order_bk_data = $obj_htl_bk_dtl->getOnlyOrderBookingData($this->order->id, 0, $type_value['product_id'], $idCustomer, $type_value['id_order_detail']);
                         $cart_htl_data[$type_key]['id_product'] = $type_value['product_id'];
                         foreach ($order_bk_data as $data_k => $data_v) {
-                            $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
+                            $display_date_from = $data_v['date_from'];
+                            $display_date_to = $data_v['date_to'];
+                            if ($data_v['id_status'] === HotelBookingDetail::STATUS_CHECKED_OUT) {
+                                if ($data_v['check_in']) {
+                                    $display_date_from = $data_v['check_in'];
+                                }
+                                if ($data_v['check_out']) {
+                                    $display_date_to = $data_v['check_out'];
+                                }
+                            } elseif ($data_v['id_status'] === HotelBookingDetail::STATUS_CHECKED_IN) {
+                                if ($data_v['check_in']) {
+                                    $display_date_from = $data_v['check_in'];
+                                }
+                                if ($data_v['check_out_time']) {
+                                    $display_date_to = date('Y-m-d', strtotime($data_v['date_to'])) . ' ' . date('H:i:s', strtotime($data_v['check_out_time']));
+                                }
+                            } else {
+                                if ($data_v['check_in_time']) {
+                                    $display_date_from = date('Y-m-d', strtotime($data_v['date_from'])) . ' ' . date('H:i:s', strtotime($data_v['check_in_time']));
+                                }
+                                if ($data_v['check_out_time']) {
+                                    $display_date_to = date('Y-m-d', strtotime($data_v['date_to'])) . ' ' . date('H:i:s', strtotime($data_v['check_out_time']));
+                                }
+                            }
+                            $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']).strtotime($display_date_from).strtotime($display_date_to);
 
                             /*Product price when order was created*/
                             $order_details_obj = new OrderDetail($data_v['id_order_detail']);
@@ -445,31 +469,6 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
                                 $num_days = HotelHelper::getNumberOfDays($data_v['date_from'], $data_v['date_to']);
 
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_rm'] = 1;
-                                $fullDate = (isset($context->controller->show_full_date) && $context->controller->show_full_date && (date('Y-m-d', strtotime($data_v['date_from'])) == date('Y-m-d', strtotime($data_v['date_to'])))) ? true : false;
-                                $display_date_from = $data_v['date_from'];
-                                $display_date_to = $data_v['date_to'];
-                                if ((int)$data_v['id_status'] === HotelBookingDetail::STATUS_CHECKED_OUT) {
-                                    if ($data_v['check_in']) {
-                                        $display_date_from = $data_v['check_in'];
-                                    }
-                                    if ($data_v['check_out']) {
-                                        $display_date_to = $data_v['check_out'];
-                                    }
-                                } elseif ((int)$data_v['id_status'] === HotelBookingDetail::STATUS_CHECKED_IN) {
-                                    if ($data_v['check_in']) {
-                                        $display_date_from = $data_v['check_in'];
-                                    }
-                                    if ($data_v['check_out_time']) {
-                                        $display_date_to = date('Y-m-d', strtotime($data_v['date_to'])) . ' ' . date('H:i:s', strtotime($data_v['check_out_time']));
-                                    }
-                                } else {
-                                    if ($data_v['check_in_time']) {
-                                        $display_date_from = date('Y-m-d', strtotime($data_v['date_from'])) . ' ' . date('H:i:s', strtotime($data_v['check_in_time']));
-                                    }
-                                    if ($data_v['check_out_time']) {
-                                        $display_date_to = date('Y-m-d', strtotime($data_v['date_to'])) . ' ' . date('H:i:s', strtotime($data_v['check_out_time']));
-                                    }
-                                }
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_form'] = Tools::displayDate($display_date_from, null, true);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['data_to'] = Tools::displayDate($display_date_to, null, true);
                                 $cart_htl_data[$type_key]['date_diff'][$date_join]['num_days'] = $num_days;
