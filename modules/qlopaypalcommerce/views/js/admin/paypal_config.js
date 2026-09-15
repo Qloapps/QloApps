@@ -20,9 +20,9 @@
 * @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
 */
 
-jQuery(document).ready(function () {
-    function toggleFields() {
-        var mode = $('[name="WK_PAYPAL_COMMERCE_PAYMENT_MODE"]').val();
+$(document).ready(function() {
+    $('[name="WK_PAYPAL_COMMERCE_PAYMENT_MODE"]').on('change', function() {
+        var mode = $(this).val();
 
         var $liveFields = $(
             '#WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID,' +
@@ -45,9 +45,5 @@ jQuery(document).ready(function () {
             $liveFields.hide();
             $sandboxFields.show();
         }
-    }
-
-    $('[name="WK_PAYPAL_COMMERCE_PAYMENT_MODE"]').on('change', toggleFields);
-
-    toggleFields();
+    }).trigger('change');
 });

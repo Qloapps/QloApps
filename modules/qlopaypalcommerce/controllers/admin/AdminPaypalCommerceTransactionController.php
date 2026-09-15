@@ -124,7 +124,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
     {
         $safeReference = Tools::safeOutput($reference);
         $str = $safeReference.'<br/>(';
-        $arrIdOrders = Tools::jsonDecode($row['id_orders']);
+        $arrIdOrders = json_decode($row['id_orders']);
         if (is_array($arrIdOrders)) {
             $arrIdOrders = array_values(array_unique(array_map('intval', $arrIdOrders)));
             foreach ($arrIdOrders as $key => $id_order) {
@@ -137,13 +137,39 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
         return $str.')';
     }
 
-    public function getStatus($pp_payment_status)
+    /**
+     * Renders the "Status" list column as a colored badge for known PayPal
+     * payment statuses, falling back to plain escaped text for any other value.
+     * @param string $ppPaymentStatus Raw PayPal payment status stored on the transaction
+     * @return string HTML for the list cell
+     */
+    public function getStatus($ppPaymentStatus)
     {
-        if ($pp_payment_status == 'COMPLETED') {
-            return '<span class="badge badge-success">'.$this->l('Completed').'</span>';
-        } else {
-            return Tools::safeOutput($pp_payment_status);
+        $statusBadges = array(
+            WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED => array(
+                'class' => 'badge-success',
+                'label' => $this->l('Completed'),
+            ),
+            WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_APPROVED => array(
+                'class' => 'badge-info',
+                'label' => $this->l('Approved'),
+            ),
+            WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_PENDING => array(
+                'class' => 'badge-warning',
+                'label' => $this->l('Pending'),
+            ),
+            WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_DENIED => array(
+                'class' => 'badge-danger',
+                'label' => $this->l('Denied'),
+            ),
+        );
+
+        if (isset($statusBadges[$ppPaymentStatus])) {
+            return '<span class="badge '.$statusBadges[$ppPaymentStatus]['class'].'">'
+                .$statusBadges[$ppPaymentStatus]['label'].'</span>';
         }
+
+        return Tools::safeOutput($ppPaymentStatus);
     }
 
     public function setCurrency($val, $row)
@@ -196,11 +222,12 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
 
             $totalRefunded = WkPaypalCommerceRefund::getTotalRefundedAmount((int)$idTrans, false);
             $remainingRefund = (float)($transactionData['pp_paid_total'] - $totalRefunded);
-            $response = Tools::jsonDecode($transactionData['response'], true);
+            $response = json_decode($transactionData['response'], true);
 
             // Buyer making a payment in a different currency (ex: EUR) which is different from the default currency of merchant (Ex: USD), In all those cross currency cases, After Capture, transaction will fall into Pending state and will require merchant to manually go to his PayPal account and accept the payment.
             if (isset($response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason'])
-                && ($transactionData['pp_payment_status'] == 'PENDING' || $transactionData['pp_payment_status'] == 'DENIED')
+                && ($transactionData['pp_payment_status'] == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_PENDING
+                    || $transactionData['pp_payment_status'] == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_DENIED)
             ) {
                 if (isset($objPPOrder->ppStatusDetail[$response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason']])) {
                     $smartyVars['ppstatusDetailMsg'] = $objPPOrder->ppStatusDetail[$response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason']];
@@ -229,6 +256,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
             $smartyVars['currency'] = $orderCurrency;
             $smartyVars['WK_PAYPAL_COMMERCE_REFUND_TYPE_FULL'] = WkPaypalCommerceRefund::WK_PAYPAL_COMMERCE_REFUND_TYPE_FULL;
             $smartyVars['WK_PAYPAL_COMMERCE_REFUND_TYPE_PARTIAL'] = WkPaypalCommerceRefund::WK_PAYPAL_COMMERCE_REFUND_TYPE_PARTIAL;
+            $smartyVars['WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED'] = WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED;
 
             $this->context->smarty->assign($smartyVars);
             $this->base_tpl_view = 'view.tpl';
@@ -284,7 +312,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                 $postData = array();
                                 $postData['amount'] = array(
                                     'currency_code' => $transactionData['pp_paid_currency'],
-                                    'value' => (string) Tools::ps_round($refundAmt, 2)
+                                    'value' => number_format(Tools::ps_round($refundAmt, 2), 2, '.', '')
                                 );
                                 $postData['transaction_id'] = $transactionData['pp_transaction_id'];
                                 $postData['refund_reason'] = $refundReason;
@@ -297,7 +325,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                 WkPaypalCommerceHelper::logMsg('refund', 'PayPal Transaction ID: '. $transactionData['pp_transaction_id']);
                                 WkPaypalCommerceHelper::logMsg('refund', 'PayPal Order ID: '. $transactionData['pp_order_id']);
                                 WkPaypalCommerceHelper::logMsg('refund', 'Refund request data: ');
-                                WkPaypalCommerceHelper::logMsg('refund', Tools::jsonEncode($postData));
+                                WkPaypalCommerceHelper::logMsg('refund', json_encode($postData));
 
                                 $objPPCommerce = new PayPalCommerce();
                                 $refundData = $objPPCommerce->orders->refund($postData);
@@ -309,7 +337,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                     WkPaypalCommerceHelper::logMsg('refund', 'Refund success: ', true);
                                     WkPaypalCommerceHelper::logMsg('refund', 'PayPal Refund Id: '. $refundID);
                                     WkPaypalCommerceHelper::logMsg('refund', 'Refund reponse data: ');
-                                    WkPaypalCommerceHelper::logMsg('refund', Tools::jsonEncode($refundData));
+                                    WkPaypalCommerceHelper::logMsg('refund', json_encode($refundData));
                                     WkPaypalCommerceHelper::logMsg('refund', '----------------------- ', true);
 
                                     $refundObj = new WkPaypalCommerceRefund();
@@ -319,7 +347,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                     $refundObj->refund_type = (int)$refundType;
                                     $refundObj->currency_code = $transactionData['pp_paid_currency'];
                                     $refundObj->refund_reason = $refundReason;
-                                    $refundObj->response = Tools::jsonEncode($refundData);
+                                    $refundObj->response = json_encode($refundData);
                                     $refundObj->refund_status = $refundData['data']['status'];
                                     if ($refundObj->save()) {
                                         $urlString = '&viewwk_paypal_commerce_order=&id_paypal_commerce_order=' . (int)Tools::getValue('id_paypal_commerce_order');
@@ -329,7 +357,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                 } else {
                                     WkPaypalCommerceHelper::logMsg('refund', 'Refund failed: ', true);
                                     WkPaypalCommerceHelper::logMsg('refund', 'Refund reponse data: ');
-                                    WkPaypalCommerceHelper::logMsg('refund', Tools::jsonEncode($refundData));
+                                    WkPaypalCommerceHelper::logMsg('refund', json_encode($refundData));
                                     WkPaypalCommerceHelper::logMsg('refund', '----------------------- ', true);
                                     $this->errors[] = $refundData['data']['message'];
                                 }

@@ -83,6 +83,14 @@ class WkPaypalCommerceRefund extends ObjectModel
         )
     );
 
+    public static function getIdByPaypalRefundId($paypalRefundId)
+    {
+        return Db::getInstance()->getValue(
+            'SELECT `id_paypal_commerce_refund` FROM `'._DB_PREFIX_.'wk_paypal_commerce_refund`
+            WHERE `paypal_refund_id` = "'.pSQL($paypalRefundId).'"'
+        );
+    }
+
     public static function getRefundListByTransID($idTrans)
     {
         $refunds = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(

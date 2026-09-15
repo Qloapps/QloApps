@@ -39,11 +39,11 @@ class WkPaypalCommerceHelper
         } else {
             $wkEnvironment = Configuration::get('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
             if ($wkEnvironment == QloPaypalCommerce::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) {
-                $wkClientID = trim(Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'));
-                $wkClientSecret = trim(Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'));
+                $wkClientID = Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID');
+                $wkClientSecret = Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET');
             } else {
-                $wkClientID = trim(Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'));
-                $wkClientSecret = trim(Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'));
+                $wkClientID = Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID');
+                $wkClientSecret = Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET');
             }
         }
 
@@ -75,7 +75,7 @@ class WkPaypalCommerceHelper
         if ($err) {
             throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
         } else {
-            $accessToken = Tools::jsonDecode($response, true);
+            $accessToken = json_decode($response, true);
             if (isset($accessToken['error']) && !empty($accessToken['error'])) {
                 $apiResp['success'] = false;
                 $apiResp['message'] = $accessToken['error_description'];
@@ -93,22 +93,22 @@ class WkPaypalCommerceHelper
         $temp = array(
             "alg" => "none"
         );
-        $returnData = base64_encode(Tools::jsonEncode($temp)) . '.';
+        $returnData = base64_encode(json_encode($temp)) . '.';
 
         $wkEnvironment = Configuration::get('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
         if ($wkEnvironment == QloPaypalCommerce::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) {
-            $wkClientID = trim(Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'));
-            $wkMerchantID = trim(Configuration::get('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID'));
+            $wkClientID = Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID');
+            $wkMerchantID = Configuration::get('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID');
         } else {
-            $wkClientID = trim(Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'));
-            $wkMerchantID = trim(Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID'));
+            $wkClientID = Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID');
+            $wkMerchantID = Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID');
         }
 
         $temp = array(
             "iss" => $wkClientID,
             "payer_id" => $wkMerchantID
         );
-        $returnData .= base64_encode(Tools::jsonEncode($temp)) . '.';
+        $returnData .= base64_encode(json_encode($temp)) . '.';
         return $returnData;
     }
 
@@ -165,7 +165,7 @@ class WkPaypalCommerceHelper
                 CURLOPT_TIMEOUT => 30,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => Tools::jsonEncode($postData),
+                CURLOPT_POSTFIELDS => json_encode($postData),
                 CURLOPT_HTTPHEADER => array(
                     "PayPal-Partner-Attribution-Id: " . PayPalHelper::WK_PAYPAL_COMMERCE_ATTRIBUTION_ID,
                     "authorization: Bearer " . $token,
@@ -181,7 +181,7 @@ class WkPaypalCommerceHelper
             if ($err) {
                 throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
             } else {
-                $webhookResponse = Tools::jsonDecode($response, true);
+                $webhookResponse = json_decode($response, true);
                 if (isset($webhookResponse['id']) && !empty($webhookResponse['id'])) {
                     $apiResp['success'] = true;
                     $apiResp['webhook_id'] = $webhookResponse['id'];
@@ -263,7 +263,7 @@ class WkPaypalCommerceHelper
                 CURLOPT_TIMEOUT => 30,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => Tools::jsonEncode($postData),
+                CURLOPT_POSTFIELDS => json_encode($postData),
                 CURLOPT_HTTPHEADER => array(
                     "PayPal-Partner-Attribution-Id: " . PayPalHelper::WK_PAYPAL_COMMERCE_ATTRIBUTION_ID,
                     "authorization: Bearer " . $accessToken['access_token'],
@@ -280,7 +280,7 @@ class WkPaypalCommerceHelper
             if ($err) {
                 throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
             } else {
-                $apiResp = Tools::jsonDecode($response, true);
+                $apiResp = json_decode($response, true);
             }
         }
         return $apiResp;

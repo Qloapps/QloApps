@@ -44,25 +44,25 @@ class QloPaypalCommerceCallbackModuleFrontController extends ModuleFrontControll
         }
 
         if ($json) {
-            $payload['webhook_event'] = Tools::jsonDecode($json, true);
+            $payload['webhook_event'] = json_decode($json, true);
         }
 
         if ($payload) {
             WkPaypalCommerceHelper::logMsg('webhook', 'Webhook initiated...', true);
             WkPaypalCommerceHelper::logMsg('webhook', 'Environment: '. Configuration::get('WK_PAYPAL_COMMERCE_PAYMENT_MODE'));
             WkPaypalCommerceHelper::logMsg('webhook', 'Webhook payload data: ');
-            WkPaypalCommerceHelper::logMsg('webhook', Tools::jsonEncode($payload));
+            WkPaypalCommerceHelper::logMsg('webhook', json_encode($payload));
             WkPaypalCommerceHelper::logMsg('webhook', 'Validating webhook signature...');
 
             $validateSig = WkPaypalCommerceHelper::validateWebhookSig($payload);
 
             WkPaypalCommerceHelper::logMsg('webhook', 'Webhook respose data: ');
-            WkPaypalCommerceHelper::logMsg('webhook', Tools::jsonEncode($validateSig));
+            WkPaypalCommerceHelper::logMsg('webhook', json_encode($validateSig));
 
             if (isset($validateSig['verification_status'])
                 && $validateSig['verification_status'] == 'SUCCESS'
             ) {
-                $eventData = Tools::jsonDecode($json, true);
+                $eventData = json_decode($json, true);
                 $objWebhook = new WkPaypalCommerceWebhook();
                 switch ($eventData['event_type']) {
                     case 'CHECKOUT.ORDER.APPROVED':

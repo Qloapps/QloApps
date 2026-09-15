@@ -175,6 +175,27 @@ class WKPayPalCommerceOrder extends ObjectModel
         );
     }
 
+    public static function updateOrderCapturePaypalOrderStatus($transaction_id, $payment_status)
+    {
+        return Db::getInstance()->execute(
+            'UPDATE `'._DB_PREFIX_.'wk_paypal_commerce_order`
+            SET `pp_payment_status` = "'.pSQL($payment_status).'"
+            WHERE `pp_transaction_id` = "'.pSQL($transaction_id).'"
+            '
+        );
+    }
+
+    public static function updateOrderPaypalOrderStatus($transaction_id, $payment_status, $orderData)
+    {
+        return Db::getInstance()->execute(
+            'UPDATE `'._DB_PREFIX_.'wk_paypal_commerce_order`
+            SET `pp_payment_status` = "'.pSQL($payment_status).'",
+            `response` = "'.pSQL(json_encode($orderData)).'"
+            WHERE `pp_transaction_id` = "'.pSQL($transaction_id).'"
+            '
+        );
+    }
+
     /**
      * Get currency formatted price
      * @param  float $price

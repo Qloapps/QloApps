@@ -83,8 +83,8 @@
                     <tr class="row">
                         <th class="col-sm-2"><strong>{l s='Payment Status' mod='qlopaypalcommerce'}</strong></th>
                         <td class="col-sm-10">
-                            {if $transaction_data.pp_payment_status == 'COMPLETED'}
-                                <label class="label label-success">{l s='COMPLETED' mod='qlopaypalcommerce'}</label>
+                            {if $transaction_data.pp_payment_status == $WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED}
+                                <label class="label label-success">{l s='Completed' mod='qlopaypalcommerce'}</label>
                             {else}
                                 <div class="row ppstatusDetail">
                                     <label class="label label-danger col-md-1 col-sm-2 col-xs-4">{$transaction_data.pp_payment_status|escape:'html':'UTF-8'}</label>{if isset($ppstatusDetailMsg) && $ppstatusDetailMsg} &nbsp;<label class="ppstatusDetailMsg label label-warning  col-md-10 col-sm-9 col-xs-7"><i class="icon-info-circle"></i> {$ppstatusDetailMsg|escape:'htmlall':'UTF-8'}</label>{/if}
@@ -109,7 +109,7 @@
 </div>
 
 {* If transaction is completed then admin can refund the transaction *}
-{if $transaction_data and $transaction_data.pp_payment_status == 'COMPLETED'}
+{if $transaction_data and $transaction_data.pp_payment_status == $WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED}
     {* show refund form only if there is any remaing amount for refund *}
     {if $remaining_refund > 0}
         <form action="" method="post" class="form-horizontal" id="refund_form">
@@ -121,9 +121,9 @@
                 <div class="form-wrapper">
                     <div class="alert alert-info">
                         {if $refund_data && $refunded_amount}
-                            <p>{l s='Total refunded amount' mod='qlopaypalcommerce'} : <strong>{$refunded_amount|escape:'html':'UTF-8'}</strong><p>
+                            <p>{l s='Total refunded amount' mod='qlopaypalcommerce'} : <strong>{$refunded_amount|escape:'html':'UTF-8'}</strong></p>
                         {/if}
-                        <p>{l s='Total available amount to refund' mod='qlopaypalcommerce'}: <strong>{$remaining_refund_format|escape:'html':'UTF-8'}</strong><p>
+                        <p>{l s='Total available amount to refund' mod='qlopaypalcommerce'}: <strong>{$remaining_refund_format|escape:'html':'UTF-8'}</strong></p>
                     </div>
 
                     <div class="form-group">
@@ -190,15 +190,15 @@
                                 <td style="text-align: center">{$refund.paypal_refund_id|escape:'html':'UTF-8'}</td>
                                 <td style="text-align: center">{$refund.amount_refunded_formatted|escape:'html':'UTF-8'}</td>
                                 <td style="text-align: center">
-                                    {if $refund.refund_type == 1}
+                                    {if $refund.refund_type == $WK_PAYPAL_COMMERCE_REFUND_TYPE_FULL}
                                         {l s='Full Refund' mod='qlopaypalcommerce'}
                                     {else}
                                         {l s='Partial Refund' mod='qlopaypalcommerce'}
                                     {/if}
                                 </td>
                                 <td style="text-align: center">
-                                    {if $refund.refund_status == 'COMPLETED'}
-                                        <label class="label label-success">{l s='COMPLETED' mod='qlopaypalcommerce'}</label>
+                                    {if $refund.refund_status == $WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED}
+                                        <label class="label label-success">{l s='Completed' mod='qlopaypalcommerce'}</label>
                                     {else}
                                         <label class="label label-danger">{$refund.refund_status|escape:'html':'UTF-8'}</label>
                                     {/if}

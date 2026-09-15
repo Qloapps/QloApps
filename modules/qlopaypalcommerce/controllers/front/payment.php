@@ -23,6 +23,10 @@
 
 class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontController
 {
+    const WK_PAYPAL_COMMERCE_ACTION_CREATE_ORDER = 1;
+    const WK_PAYPAL_COMMERCE_ACTION_CAPTURE_ORDER = 2;
+    const WK_PAYPAL_COMMERCE_ACTION_CANCELLED = 3;
+
     public function init()
     {
         parent::init();
@@ -61,15 +65,15 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
         parent::initContent();
 
         if ($this->module->secure_key != Tools::getValue('token')) {
-            die('Invalid token.');
+            die($this->module->l('Invalid token.', 'payment'));
         }
 
         if (Tools::isSubmit('action')) {
             $action = (int)Tools::getValue('action');
             switch ($action) {
-                case 1:
+                case self::WK_PAYPAL_COMMERCE_ACTION_CREATE_ORDER:
                     $json = Tools::file_get_contents('php://input');
-                    $orderDetails = Tools::jsonDecode($json, true);
+                    $orderDetails = json_decode($json, true);
 
                     $cart = $this->context->cart;
 
@@ -86,23 +90,23 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
 
                     // create order
                     $orderDetails['original'] = $this->getOrderDetails();
-                    WkPaypalCommerceHelper::logMsg('payment', Tools::jsonEncode($orderDetails));
+                    WkPaypalCommerceHelper::logMsg('payment', json_encode($orderDetails));
 
                     $ppOrderData = $ppCommerce->orders->create($orderDetails);
 
                     WkPaypalCommerceHelper::logMsg('payment', 'Payment response data: ', true);
-                    WkPaypalCommerceHelper::logMsg('payment', Tools::jsonEncode($ppOrderData));
+                    WkPaypalCommerceHelper::logMsg('payment', json_encode($ppOrderData));
 
-                    die(Tools::jsonEncode($ppOrderData));
-                case 2:
+                    die(json_encode($ppOrderData));
+                case self::WK_PAYPAL_COMMERCE_ACTION_CAPTURE_ORDER:
                     $json = Tools::file_get_contents('php://input');
-                    $orderData = Tools::jsonDecode($json, true);
+                    $orderData = json_decode($json, true);
 
                     if ($orderData['orderID'] && $orderData['getOrderData']) {
                         $ppCommerce = new PayPalCommerce();
                         $returnData = $ppCommerce->orders->capture($orderData['orderID']);
                         header('Content-Type: application/json');
-                        echo Tools::jsonEncode($returnData['data']);
+                        echo json_encode($returnData['data']);
                         die;
                     } elseif (Tools::getIsset('order_id')) {
                         $orderID = Tools::getValue('order_id');
@@ -116,7 +120,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                         WkPaypalCommerceHelper::logMsg('payment', 'Customer ID: '. $cart->id_customer);
                         WkPaypalCommerceHelper::logMsg('payment', 'Currency ID: '. $cart->id_currency);
                         WkPaypalCommerceHelper::logMsg('payment', 'Cart Total: '. $cart->getOrderTotal(true, Cart::BOTH));
-                        WkPaypalCommerceHelper::logMsg('payment', Tools::jsonEncode($returnData));
+                        WkPaypalCommerceHelper::logMsg('payment', json_encode($returnData));
 
                         if (isset($returnData['data']['id']) && !empty($returnData['data']['id'])) {
                             // Payment success
@@ -131,7 +135,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                             $paypalOrderCartId = isset($returnData['data']['purchase_units'][0]['custom_id']) ? $returnData['data']['purchase_units'][0]['custom_id'] : null;
                             $belongsToCurrentCart = ((int) $paypalOrderCartId === (int) $cart->id);
 
-                            if ($paypalOrderID && $paymentStatus == 'COMPLETED' && $belongsToCurrentCart) {
+                            if ($paypalOrderID && $paymentStatus == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED && $belongsToCurrentCart) {
                                 // Save order data
                                 $this->saveOrderData($returnData);
                                 $currency = $this->context->currency;
@@ -144,7 +148,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                 $isFullyPaid = $capturedAmount >= $fullTotal;
 
                                 // set order status
-                                if ($returnData['data']['status'] == 'COMPLETED') {
+                                if ($returnData['data']['status'] == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED) {
                                     $orderStatus = $isFullyPaid
                                         ? Configuration::get('PS_OS_PAYMENT_ACCEPTED')
                                         : Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
@@ -194,7 +198,7 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                 );
                                 Tools::redirect($orderLink);
                             } else {
-                                if ($paypalOrderID && $paymentStatus == 'COMPLETED' && !$belongsToCurrentCart) {
+                                if ($paypalOrderID && $paymentStatus == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED && !$belongsToCurrentCart) {
                                     WkPaypalCommerceHelper::logMsg(
                                         'payment',
                                         'PayPal order/cart mismatch. Expected cart: '.$cart->id.', PayPal custom_id: '.$paypalOrderCartId
@@ -227,9 +231,9 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                         }
                     }
                     break;
-                case 3:
+                case self::WK_PAYPAL_COMMERCE_ACTION_CANCELLED:
                     WkPaypalCommerceHelper::logMsg('payment', 'Payment cancelled by customer...', true);
-                    WkPaypalCommerceHelper::logMsg('payment', Tools::jsonEncode(Tools::getAllValues()));
+                    WkPaypalCommerceHelper::logMsg('payment', json_encode(Tools::getAllValues()));
                     WkPaypalCommerceHelper::logMsg('payment', '--------------', true);
 
                     Tools::redirect($this->context->link->getPageLink('order-opc', true, null).'?pp_cancel=1');
@@ -248,10 +252,10 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
         if ($orderData) {
             $purchaseUnits = $orderData['data']['purchase_units'];
             foreach ($purchaseUnits as $purchase) {
-                $transaction_id = $purchase['payments']['captures'][0]['id'];
-                $payment_status = $purchase['payments']['captures'][0]['status'];
-                $payment_total = $purchase['payments']['captures'][0]['amount']['value'];
-                $payment_curr = $purchase['payments']['captures'][0]['amount']['currency_code'];
+                $transactionId = $purchase['payments']['captures'][0]['id'];
+                $paymentStatus = $purchase['payments']['captures'][0]['status'];
+                $paymentTotal = $purchase['payments']['captures'][0]['amount']['value'];
+                $paymentCurrency = $purchase['payments']['captures'][0]['amount']['currency_code'];
 
                 $cart = $this->context->cart;
                 $currency = Currency::getCurrency((int) $cart->id_currency);
@@ -273,13 +277,13 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                 $orderObj->checkout_currency = $currency['iso_code'];
 
                 // PayPal Returned Data
-                $orderObj->pp_paid_total = (float)$payment_total;
-                $orderObj->pp_paid_currency = $payment_curr;
+                $orderObj->pp_paid_total = (float)$paymentTotal;
+                $orderObj->pp_paid_currency = $paymentCurrency;
                 $orderObj->pp_reference_id = $purchase['reference_id'];
                 $orderObj->pp_order_id = $orderData['data']['id'];
-                $orderObj->pp_transaction_id = $transaction_id;
-                $orderObj->pp_payment_status = $payment_status;
-                $orderObj->response = Tools::jsonEncode($orderData);
+                $orderObj->pp_transaction_id = $transactionId;
+                $orderObj->pp_payment_status = $paymentStatus;
+                $orderObj->response = json_encode($orderData);
                 $orderObj->order_date = date('Y-m-d H:i:s');
                 $orderObj->save();
             }
@@ -310,17 +314,17 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
         );
 
         // address is not required in paypal payment, if customer has added an address then we add tha address to paypal payer object
-        if ($bilAddr = $ppHelper->getSimpleAddress(
+        if ($billingAddress = $ppHelper->getSimpleAddress(
             (int)$cart->id_customer,
             (int)$cart->id_address_invoice
         )) {
             $orderData['payer']['address'] = array(
-                'address_line_1' => $bilAddr['address1'],
-                'address_line_2' => $bilAddr['address2'],
-                'admin_area_2' => $bilAddr['city'],
-                'admin_area_1' => $bilAddr['state_iso'],
-                'postal_code' => $bilAddr['postcode'],
-                'country_code' => $bilAddr['country_iso'],
+                'address_line_1' => $billingAddress['address1'],
+                'address_line_2' => $billingAddress['address2'],
+                'admin_area_2' => $billingAddress['city'],
+                'admin_area_1' => $billingAddress['state_iso'],
+                'postal_code' => $billingAddress['postcode'],
+                'country_code' => $billingAddress['country_iso'],
             );
         }
 
@@ -359,27 +363,27 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
 
         $orderData['purchase_units'][0]['amount'] = array(
             'currency_code' => $currency['iso_code'],
-            'value' => (string) Tools::ps_round($cartTotalAmountTI, 2),
+            'value' => number_format(Tools::ps_round($cartTotalAmountTI, 2), 2, '.', ''),
             'breakdown' => array(
                 'item_total' => array(
                     'currency_code' => $currency['iso_code'],
-                    'value' => (string) Tools::ps_round($itemTotalAmountTE, 2),
+                    'value' => number_format(Tools::ps_round($itemTotalAmountTE, 2), 2, '.', ''),
                 ),
                 'shipping' => array(
                     'currency_code' => $currency['iso_code'],
-                    'value' => (string) 0,
+                    'value' => '0.00',
                 ),
                 'shipping_discount' => array(
                     'currency_code' => $currency['iso_code'],
-                    'value' => (string) 0,
+                    'value' => '0.00',
                 ),
                 'tax_total' => array(
                     'currency_code' => $currency['iso_code'],
-                    'value' => (string) Tools::ps_round(($itemTotalAmountTI - $itemTotalAmountTE), 2),
+                    'value' => number_format(Tools::ps_round(($itemTotalAmountTI - $itemTotalAmountTE), 2), 2, '.', ''),
                 ),
                 'discount' => array(
                     'currency_code' => $currency['iso_code'],
-                    'value' => (string) Tools::ps_round($discountTI, 2),
+                    'value' => number_format(Tools::ps_round($discountTI, 2), 2, '.', ''),
                 ),
             )
         );
@@ -400,14 +404,5 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
         );
 
         return $orderData;
-    }
-
-    /**
-     * getPriceDecimalPrecision
-     * @return void
-     */
-    private function getPriceDecimalPrecision()
-    {
-        return _PS_PRICE_COMPUTE_PRECISION_;
     }
 }

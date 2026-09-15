@@ -36,6 +36,16 @@ class QloPaypalCommerce extends PaymentModule
     private $postErrors = array();
     private $token = '';
 
+    private $sandboxMerchantId = '';
+    private $sandboxEmail = '';
+    private $sandboxClientId = '';
+    private $sandboxClientSecret = '';
+
+    private $liveMerchantId = '';
+    private $liveEmail = '';
+    private $liveClientId = '';
+    private $liveClientSecret = '';
+
     public $ppMode;
     public $merchantId;
     public $paypalEmail;
@@ -126,6 +136,8 @@ class QloPaypalCommerce extends PaymentModule
 
     public function getContent()
     {
+        $this->context->controller->addJS($this->_path.'views/js/admin/paypal_config.js');
+
         if (!$this->checkPaypalCommerceConfigured()) {
             $this->context->controller->warnings[] = $this->l('PayPal Merchant ID, Email, Client ID and Secret must be configured.');
         }
@@ -284,21 +296,32 @@ class QloPaypalCommerce extends PaymentModule
     {
         if (Tools::isSubmit('btnConfigSubmit')) {
             $mode = Tools::getValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
+
+            $this->sandboxMerchantId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID'));
+            $this->sandboxEmail = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_EMAIL'));
+            $this->sandboxClientId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'));
+            $this->sandboxClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'));
+
+            $this->liveMerchantId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID'));
+            $this->liveEmail = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_EMAIL'));
+            $this->liveClientId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'));
+            $this->liveClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'));
+
             if ($mode == self::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) {
-                $wkMerchantId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID'));
-                $wkEmail = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_EMAIL'));
-                $wkClientID = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'));
-                $wkClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'));
+                $wkMerchantId = $this->liveMerchantId;
+                $wkEmail = $this->liveEmail;
+                $wkClientID = $this->liveClientId;
+                $wkClientSecret = $this->liveClientSecret;
             } else {
-                $wkMerchantId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID'));
-                $wkEmail = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_EMAIL'));
-                $wkClientID = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'));
-                $wkClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'));
+                $wkMerchantId = $this->sandboxMerchantId;
+                $wkEmail = $this->sandboxEmail;
+                $wkClientID = $this->sandboxClientId;
+                $wkClientSecret = $this->sandboxClientSecret;
             }
 
             if (!$wkMerchantId) {
                 $this->postErrors[] = $this->l('Please enter Merchant ID');
-            } elseif (!preg_match(Tools::cleanNonUnicodeSupport('/^[a-zA-Z0-9]+$/'), $wkMerchantId)) {
+            } elseif (!preg_match('/^[a-zA-Z0-9]+$/', $wkMerchantId)) {
                 $this->postErrors[] = $this->l('Invalid Merchant ID provided.');
             }
             if (!$wkEmail) {
@@ -308,12 +331,12 @@ class QloPaypalCommerce extends PaymentModule
             }
             if (!$wkClientID) {
                 $this->postErrors[] = $this->l('Please enter Client ID');
-            } elseif (!preg_match(Tools::cleanNonUnicodeSupport('/^[A-Za-z0-9._-]+$/'), $wkClientID)) {
+            } elseif (!preg_match('/^[A-Za-z0-9._-]+$/', $wkClientID)) {
                 $this->postErrors[] = $this->l('Invalid Client ID provided.');
             }
             if (!$wkClientSecret) {
                 $this->postErrors[] = $this->l('Please enter Client Secret');
-            } elseif (!preg_match(Tools::cleanNonUnicodeSupport('/^[A-Za-z0-9._-]+$/'), $wkClientSecret)) {
+            } elseif (!preg_match('/^[A-Za-z0-9._-]+$/', $wkClientSecret)) {
                 $this->postErrors[] = $this->l('Invalid Client Secret provided.');
             }
 
@@ -326,7 +349,7 @@ class QloPaypalCommerce extends PaymentModule
                 if (empty(Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_WEBHOOK_ID'))) {
                     // Create webhook URL first time
                     $this->createWebhookUrl('sandbox');
-                } elseif (trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID')) != Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID')) {
+                } elseif ($this->sandboxClientId != Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID')) {
                     // Delete existing webhook URL if PayPal credential changed
                     WkPaypalCommerceHelper::deleteWebhookUrl();
                     $this->createWebhookUrl('sandbox');
@@ -337,7 +360,7 @@ class QloPaypalCommerce extends PaymentModule
                 if (empty(Configuration::get('WK_PAYPAL_COMMERCE_LIVE_WEBHOOK_ID'))) {
                     // Create webhook URL first time
                     $this->createWebhookUrl('production');
-                } elseif (trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID')) != Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID')) {
+                } elseif ($this->liveClientId != Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID')) {
                     // Delete existing webhook URL if PayPal credential changed
                     WkPaypalCommerceHelper::deleteWebhookUrl();
                     $this->createWebhookUrl('production');
@@ -381,25 +404,15 @@ class QloPaypalCommerce extends PaymentModule
         if (Tools::isSubmit('btnConfigSubmit')) {
             $mode = Tools::getValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
 
-            $sandboxMerchant = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID'));
-            $sandboxEmail = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_EMAIL'));
-            $sandboxClientId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'));
-            $sandboxClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'));
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID', $this->sandboxMerchantId);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_EMAIL', $this->sandboxEmail);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID', $this->sandboxClientId);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET', $this->sandboxClientSecret);
 
-            $liveMerchant = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID'));
-            $liveEmail = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_EMAIL'));
-            $liveClientId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'));
-            $liveClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'));
-
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID', $sandboxMerchant);
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_EMAIL', $sandboxEmail);
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID', $sandboxClientId);
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET', $sandboxClientSecret);
-
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID', $liveMerchant);
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_EMAIL', $liveEmail);
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID', $liveClientId);
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET', $liveClientSecret);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID', $this->liveMerchantId);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_EMAIL', $this->liveEmail);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID', $this->liveClientId);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET', $this->liveClientSecret);
 
             Configuration::updateValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE', $mode);
 
@@ -414,11 +427,6 @@ class QloPaypalCommerce extends PaymentModule
     {
         // css for razorpay menu will be applicable for all pages
         $this->context->controller->addCSS($this->_path.'views/css/admin/wk_module_menu.css');
-
-        if (Tools::getValue('configure') == $this->name) {
-            $this->context->controller->addJQuery();
-            $this->context->controller->addJS($this->_path.'views/js/admin/paypal_config.js');
-        }
     }
 
     public function hookDisplayTopColumn()
