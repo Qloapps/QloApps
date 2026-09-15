@@ -98,7 +98,7 @@
                 </div>
             {/if}
             <div class="form-group">
-                <label class="control-label">{l s='Reason to Cancel'}</label>
+                <label class="control-label">{l s='Reason to Refund'}</label>
                 <textarea rows="3" class="textarea-autosize cancellation_reason" name="cancellation_reason"></textarea>
             </div>
 
@@ -111,7 +111,7 @@
         <div class="list-empty">
             <div class="list-empty-msg">
                 <i class="icon-warning-sign list-empty-icon"></i>
-                {l s='No room bookings found to cancel'}
+                {l s='No room bookings found to refund.'}
             </div>
         </div>
     {/if}
