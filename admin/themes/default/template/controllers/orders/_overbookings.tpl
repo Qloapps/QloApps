@@ -38,7 +38,6 @@
                         <th>{l s='Resolve'}</th>
                     </tr>
                     {foreach from=$orderOverBookings item=data}
-                        {if !$data.is_refunded}
                             <tr>
                                 <td>{$data['room_num']}</td>
                                 <td>{$data['room_type_name']}</td>
@@ -87,7 +86,6 @@
                                     {/if}
                                 </td>
                             </tr>
-                        {/if}
                     {/foreach}
                 </table>
             </div>
