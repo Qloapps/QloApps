@@ -1007,11 +1007,11 @@
                                                                 <div class="rooms-summary">
                                                                     {foreach from=$rm_v['hotel_booking_details'] item=$hotel_booking_detail name=foreachRefundRooms}
                                                                         {assign var=is_room_cancelled value=(isset($refundReqBookings) && in_array($hotel_booking_detail.id_htl_booking, $refundReqBookings))}
-                                                                        <div class="refund_element_details {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}cancelled{/if} clearfix">
+                                                                        <div class="refund_element_details {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ASSIGNED)}cancelled{/if} clearfix">
                                                                             <div class="occupancy-wrap">
                                                                                 <div class="checkbox">
                                                                                     <label for="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}">
-                                                                                        <input type="checkbox" class="bookings_to_refund" id="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}" name="bookings_to_refund[]" value="{$hotel_booking_detail.id_htl_booking|escape:'html':'UTF-8'}" {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ALLOTED)}disabled{/if}/>
+                                                                                        <input type="checkbox" class="bookings_to_refund" id="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}" name="bookings_to_refund[]" value="{$hotel_booking_detail.id_htl_booking|escape:'html':'UTF-8'}" {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ASSIGNED)}disabled{/if}/>
                                                                                         {l s='Room'} - {$smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d'}
                                                                                     </label>
 

@@ -81,6 +81,13 @@ class DashGuestCycle extends Module
                 'value'   => $kpiValues['box-dgc-departures'],
             ),
             array(
+                'id'      => 'box-dgc-no-show',
+                'color'   => 'color6',
+                'title'   => $this->l('No-show Bookings'),
+                'tooltip' => $this->l('The number of bookings marked No-show today so far.'),
+                'value'   => $kpiValues['box-dgc-no-show'],
+            ),
+            array(
                 'id'      => 'box-dgc-new-bookings',
                 'color'   => 'color3',
                 'title'   => $this->l('New Bookings'),
@@ -141,6 +148,7 @@ class DashGuestCycle extends Module
             $occupied          = rand(10, 500);
             $newMessages       = rand(0, 20);
             $cancelledBookings = rand(0, 20);
+            $noShowBookings    = rand(0, 20);
             $totalAdults       = rand(100, 1000);
             $children          = rand(0, $totalAdults);
         } else {
@@ -161,6 +169,7 @@ class DashGuestCycle extends Module
             );
             $newMessages       = (int) CustomerMessage::getMessagesByDate($dateToday);
             $cancelledBookings = (int) AdminStatsController::getCancelledBookingsByDate($dateToday, $idHotel);
+            $noShowBookings    = count(AdminStatsController::getCancellationsInfoByDate($dateToday, $idHotel, OrderReturn::EVENT_TYPE_NO_SHOW));
             $totalAdults       = (int) $guestsData['adults'];
             $children          = (int) $guestsData['children'];
         }
@@ -172,6 +181,7 @@ class DashGuestCycle extends Module
             'box-dgc-occupied'     => sprintf('%02d', $occupied),
             'box-dgc-messages'     => sprintf('%02d', $newMessages),
             'box-dgc-cancelled'    => sprintf('%02d', $cancelledBookings),
+            'box-dgc-no-show'      => sprintf('%02d', $noShowBookings),
             'box-dgc-guests'       => sprintf('%02d', $totalAdults).'/'.sprintf('%02d', $children),
         );
     }
@@ -209,12 +219,16 @@ class DashGuestCycle extends Module
         $tableCancellations = $this->getCancellationsTableContentsByDate($dateToday, $params['id_hotel']);
         $dataValue['dgc_count_cancellations'] = count($tableCancellations['body']);
 
+        $tableNoShow = $this->getNoShowTableContentsByDate($dateToday, $params['id_hotel']);
+        $dataValue['dgc_count_no_show'] = count($tableNoShow['body']);
+
         $dataTable = array(
             'dgc_table_current_arrivals' => $tableCurrentArrivals,
             'dgc_table_current_departures' => $tableCurrentDepartures,
             'dgc_table_current_in_house' => $tableCurrentInHouse,
             'dgc_table_new_bookings' => $tableNewBookings,
             'dgc_table_cancellations' => $tableCancellations,
+            'dgc_table_no_show' => $tableNoShow,
         );
 
         return array('data_value' => $dataValue, 'data_table' => $dataTable);
@@ -485,7 +499,7 @@ class DashGuestCycle extends Module
             unset($header['hotel']);
         }
 
-        $cancellationsInfo = AdminStatsController::getCancellationsInfoByDate($date, $idHotel);
+        $cancellationsInfo = AdminStatsController::getCancellationsInfoByDate($date, $idHotel, OrderReturn::EVENT_TYPE_CANCELLATION);
 
         $body = array();
         foreach ($cancellationsInfo as $cancellationInfo) {
@@ -530,6 +544,76 @@ class DashGuestCycle extends Module
             );
             $tr[] = array(
                 'value' => '<a href="'.$this->context->link->getAdminLink('AdminOrders', true).'&id_order='.$cancellationInfo['id_order'].'&vieworder" target="_blank">#'.Tools::htmlentitiesUTF8($cancellationInfo['id_order']).'</a>',
+                'class' => 'text-center',
+            );
+
+            $body[] = $tr;
+        }
+
+        return array('header' => array_values($header), 'body' => $body);
+    }
+
+    public function getNoShowTableContentsByDate($date, $idHotel)
+    {
+        $header = array(
+            'request_id' => array('title' => $this->l('Request ID'), 'class' => 'text-center'),
+            'name' => array('title' => $this->l('Customer Name'), 'class' => 'text-left'),
+            'room_num' => array('title' => $this->l('Room No.'), 'class' => 'text-center'),
+            'room_type' => array('title' => $this->l('Room Type'), 'class' => 'text-left'),
+            'hotel' => array('title' => $this->l('Hotel'), 'class' => 'text-left'),
+            'guests' => array('title' => $this->l('Guests'), 'class' => 'text-center'),
+            'check_in' => array('title' => $this->l('Check-in'), 'class' => 'text-left'),
+            'check_out' => array('title' => $this->l('Check-out'), 'class' => 'text-left'),
+            'order_id' => array('title' => $this->l('Order ID'), 'class' => 'text-center'),
+        );
+
+        if ($idHotel != 0) {
+            unset($header['hotel']);
+        }
+
+        $noShowInfo = AdminStatsController::getCancellationsInfoByDate($date, $idHotel, OrderReturn::EVENT_TYPE_NO_SHOW);
+
+        $body = array();
+        foreach ($noShowInfo as $noShow) {
+            $tr = array();
+            $tr[] = array(
+                'value' => '<a href="'.$this->context->link->getAdminLink('AdminOrderRefundRequests', true).'&id_order_return='.$noShow['id_order_return'].'&vieworder_return" target="_blank">#'.Tools::htmlentitiesUTF8($noShow['id_order_return']).'</a>',
+                'class' => 'text-center',
+            );
+            $tr[] = array(
+                'value' => '<a href="'.$this->context->link->getAdminLink('AdminCustomers', true).'&id_customer='.$noShow['id_customer'].'&viewcustomer" target="_blank">'.Tools::htmlentitiesUTF8($noShow['customer_name']).'</a>',
+                'class' => 'text-left',
+            );
+            $tr[] = array(
+                'value' => $noShow['room_num'],
+                'class' => 'text-center',
+            );
+            $tr[] = array(
+                'value' => '<a href="'.$this->context->link->getAdminLink('AdminProducts', true).'&id_product='.$noShow['id_product'].'&updateproduct" target="_blank">'.Tools::htmlentitiesUTF8($noShow['room_type_name']).'</a>',
+                'class' => 'text-left',
+            );
+
+            if ($idHotel == 0) {
+                $tr[] = array(
+                    'value' => '<a href="'.$this->context->link->getAdminLink('AdminAddHotel', true).'&id='.$noShow['id_hotel'].'&updatehtl_branch_info" target="_blank">'.Tools::htmlentitiesUTF8($noShow['hotel_name']).'</a>',
+                    'class' => 'text-left',
+                );
+            }
+
+            $tr[] = array(
+                'value' => $noShow['with_occupancy'] ? $noShow['total_guests'] : '--',
+                'class' => 'text-center',
+            );
+            $tr[] = array(
+                'value' => Tools::displayDate($noShow['date_from']),
+                'class' => 'text-left',
+            );
+            $tr[] = array(
+                'value' => Tools::displayDate($noShow['date_to']),
+                'class' => 'text-left',
+            );
+            $tr[] = array(
+                'value' => '<a href="'.$this->context->link->getAdminLink('AdminOrders', true).'&id_order='.$noShow['id_order'].'&vieworder" target="_blank">#'.Tools::htmlentitiesUTF8($noShow['id_order']).'</a>',
                 'class' => 'text-center',
             );
 

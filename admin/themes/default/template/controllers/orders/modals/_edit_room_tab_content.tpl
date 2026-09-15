@@ -31,7 +31,7 @@
     <input type="hidden" name="product_price_tax_excl" value="{Tools::ps_round($data.original_unit_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_)}" />
     <input type="hidden" name="product_price_tax_incl" value="{Tools::ps_round($data.original_unit_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_)}" />
 
-    {if isset($data.id_status) && ($data.id_status != HotelBookingDetail::STATUS_ALLOTED)}
+    {if isset($data.id_status) && ($data.id_status != HotelBookingDetail::STATUS_ASSIGNED)}
         <div class="alert alert-info">
             {if $data.id_status == HotelBookingDetail::STATUS_CHECKED_IN}
                 {l s='The check-in date cannot be changed as the booking has already been checked in.'}
@@ -49,7 +49,7 @@
                     {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && $data.is_refunded}
                         {dateFormat date=$data.date_from}
                     {else}
-                        <input type="text" class="form-control edit_product_date_from" readonly {if isset($data.id_status) && ($data.id_status != HotelBookingDetail::STATUS_ALLOTED)}disabled{/if}/>
+                        <input type="text" class="form-control edit_product_date_from" readonly {if isset($data.id_status) && ($data.id_status != HotelBookingDetail::STATUS_ASSIGNED)}disabled{/if}/>
                         <div class="input-group-addon"><i class="icon-calendar"></i></div>
                     {/if}
                 </div>

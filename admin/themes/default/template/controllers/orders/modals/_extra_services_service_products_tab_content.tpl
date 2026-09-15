@@ -52,7 +52,7 @@
                         {if isset($additionalServices) && $additionalServices}
                             {foreach $additionalServices['additional_services'] as $service}
                                 <tr class="room_service_block" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}">
-                                    <td>
+                                    <td width="22%">
                                         <div>
                                             {$service['name']|escape:'html':'UTF-8'}
                                             {capture name='room_type_service_tooltip_content'}

@@ -260,7 +260,7 @@ class DashProducts extends Module
 			FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
 			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
 			WHERE o.`invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
-			AND o.`valid` = 1 AND hbd.`is_refunded` = 0.'.
+			AND o.`valid` = 1 AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().').'.
 			(!is_null($id_hotel) ? HotelBranchInformation::addHotelRestriction($id_hotel, 'hbd') : '').'
 			GROUP BY hbd.`id_product`
 			ORDER BY `sales` DESC
@@ -568,7 +568,7 @@ class DashProducts extends Module
 		return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
 			'SELECT COUNT(hbd.`id_product`) AS `count`
 			FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-			WHERE hbd.`is_refunded` = 0 AND hbd.`is_back_order` = 0 AND hbd.`id_product` = '.(int)$id_product.'
+			WHERE hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND hbd.`is_back_order` = 0 AND hbd.`id_product` = '.(int)$id_product.'
 			AND hbd.`date_add` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"'
 		);
 	}

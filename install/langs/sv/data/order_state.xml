@@ -48,4 +48,8 @@
     <name>Delbetalning mottagen</name>
     <template>partial_payment_accepted</template>
   </order_state>
+  <order_state id="No_show">
+    <name>Utebliven ankomst</name>
+    <template>no_show</template>
+  </order_state>
 </entity_order_state>
