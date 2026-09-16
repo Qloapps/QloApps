@@ -8353,9 +8353,10 @@ class AdminOrdersControllerCore extends AdminController
                     )) {
                         $name = trim(Tools::getValue('new_service_name'));
                         $price = Tools::getValue('new_service_price');
-                        $priceCalcMethod = Tools::getValue('new_service_price_calc_method');
-                        if (is_array($priceCalcMethod)) {
-                            $priceCalcMethod = array_sum(array_map('intval', $priceCalcMethod));
+                        if (Tools::getValue('price_calculation_type') == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING) {
+                            $priceCalcMethod = Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING;
+                        } elseif (is_array(Tools::getValue('new_service_price_calc_method'))) {
+                            $priceCalcMethod = array_sum(array_map('intval', Tools::getValue('new_service_price_calc_method')));
                         }
                         $priceAdditionType = Tools::getValue('new_service_price_addition_type');
                         $productQty = Tools::getValue('new_service_qty');
@@ -8392,7 +8393,7 @@ class AdminOrdersControllerCore extends AdminController
 
                         if (empty($priceCalcMethod)) {
                             $response['hasError'] = true;
-                            $response['errors'][] = Tools::displayError('Please select at least one price calculation method.');
+                            $response['errors'][] = Tools::displayError('Please select at least one day to apply the price calculation method.');
                         } elseif (
                             !Validate::isUnsignedInt($priceCalcMethod)) {
                             $response['hasError'] = true;

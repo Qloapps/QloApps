@@ -35,6 +35,7 @@
 	var can_edit_booking_carts = {if isset($can_edit_booking_carts) && $can_edit_booking_carts}true{else}false{/if};
 	var can_add_addresses = {if isset($can_add_addresses) && $can_add_addresses}true{else}false{/if};
 	var admin_order_tab_link = "{$link->getAdminLink('AdminOrders')|addslashes}";
+	var new_service_pcm_once_for_booking = {Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval};
 	var changed_shipping_price = false;
 	var shipping_price_selected_carrier = '';
 	var current_index = '{$current|escape:'html':'UTF-8'}&token={$token|escape:'html':'UTF-8'}';
@@ -53,6 +54,13 @@
 	var priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval};
 
 	$(document).ready(function() {
+		$(document).on('change', '#add_new_room_services_form select[name="price_calculation_type"]', function() {
+			if ($(this).val() == new_service_pcm_once_for_booking) {
+				$('#new_service_pcm_days_container').hide();
+			} else {
+				$('#new_service_pcm_days_container').show();
+			}
+		});
 
 		$('.total_taxes_price_info img').tooltip({
 			content: function () {

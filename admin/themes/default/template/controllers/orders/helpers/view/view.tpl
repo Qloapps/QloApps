@@ -44,6 +44,7 @@
 	<script type="text/javascript">
 	var admin_order_tab_link = "{$link->getAdminLink('AdminOrders')|addslashes}";
     var rooms_reallocation_url = "{$link->getAdminLink('AdminOrders')|addslashes}";
+	var new_service_pcm_once_for_booking = {Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval};
 	var id_order = {$order->id};
 	var id_lang = {$current_id_lang};
 	var id_currency = {$order->id_currency};

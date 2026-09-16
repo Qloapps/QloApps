@@ -1083,6 +1083,14 @@ $(document).ready(function() {
         $('#btn_new_room_service').hide();
     });
 
+    $(document).on('change', '#add_new_room_services_form select[name="price_calculation_type"]', function() {
+        if ($(this).val() == new_service_pcm_once_for_booking) {
+            $('#new_service_pcm_days_container').hide();
+        } else {
+            $('#new_service_pcm_days_container').show();
+        }
+    });
+
     // Add new custom service: change auto added option
     $(document).on('change', '#add_new_room_services_form input[name="new_service_auto_added"]', function() {
         var room_type_tax_rule_group_exist = $("#room_type_tax_rule_group_exist").val();
