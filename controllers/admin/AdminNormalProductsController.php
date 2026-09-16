@@ -207,6 +207,7 @@ class AdminNormalProductsControllerCore extends AdminController
             Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY => $this->l('Check-in day | During-stay days'),
             Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY => $this->l('Check-out day | During-stay days'),
             Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY => $this->l('Check-in day | During-stay days | Check-out day'),
+            Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING => $this->l('Once per booking'),
         );
 
         $this->_join .= '
@@ -433,31 +434,28 @@ class AdminNormalProductsControllerCore extends AdminController
 
     public function getBuyingOption($selling_preference_type, $row)
     {
-        return $this->renderMultiSelectTooltip('selling_preference_type', $selling_preference_type);
+        $list = $this->fields_list['selling_preference_type']['list'];
+
+        if (empty($list[$selling_preference_type])) {
+            return '--';
+        }
+
+        $options = array_map('trim', explode('|', $list[$selling_preference_type]));
+
+        return implode(', ', $options);
     }
 
     public function getPriceCalculationMethod($price_calculation_method, $row)
     {
-        return $this->renderMultiSelectTooltip('price_calculation_method', $price_calculation_method);
-    }
+        $list = $this->fields_list['price_calculation_method']['list'];
 
-    private function renderMultiSelectTooltip($fieldKey, $value)
-    {
-        $list = $this->fields_list[$fieldKey]['list'];
-
-        if (empty($list[$value])) {
+        if (empty($list[$price_calculation_method])) {
             return '--';
         }
 
-        $options = array_map('trim', explode('|', $list[$value]));
+        $options = array_map('trim', explode('|', $list[$price_calculation_method]));
 
-        $this->context->smarty->assign(array(
-            'tooltip_items' => $options,
-        ));
-
-        $tooltip = $this->context->smarty->fetch('controllers/normal_products/_price_calculation_method_options.tpl');
-
-        return count($options) . ' ' . $this->l('Selected') . ' ' . $tooltip;
+        return implode(', ', $options);
     }
 
     public function getHotelName($hotelName, $row)
@@ -522,7 +520,9 @@ class AdminNormalProductsControllerCore extends AdminController
      */
     protected function copyFromPost(&$object, $table)
     {
-        if (is_array(Tools::getValue('price_calculation_method'))) {
+        if (Tools::getValue('price_calculation_type') == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING) {
+            $_POST['price_calculation_method'] = Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING;
+        } elseif (is_array(Tools::getValue('price_calculation_method'))) {
             $_POST['price_calculation_method'] = array_sum(array_map('intval', Tools::getValue('price_calculation_method')));
         }
         parent::copyFromPost($object, $table);
@@ -2254,7 +2254,9 @@ class AdminNormalProductsControllerCore extends AdminController
      */
     public function checkProduct()
     {
-        if (is_array(Tools::getValue('price_calculation_method'))) {
+        if (Tools::getValue('price_calculation_type') == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING) {
+            $_POST['price_calculation_method'] = Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING;
+        } elseif (is_array(Tools::getValue('price_calculation_method'))) {
             $_POST['price_calculation_method'] = array_sum(array_map('intval', Tools::getValue('price_calculation_method')));
         }
 
@@ -2420,7 +2422,7 @@ class AdminNormalProductsControllerCore extends AdminController
         // }
 
         if (Tools::getValue('id_product') && !Tools::getValue('price_calculation_method')) {
-            $this->errors[] = $this->l('Please select at least one price calculation method.');
+            $this->errors[] = $this->l('Please select at least one day to apply the price calculation method on.');
         }
 
         // Tags

@@ -212,8 +212,21 @@ $(document).ready(function () {
 	</div> *}
 		<div class="form-group">
 			<label class="control-label required col-lg-3">
-				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select which booking days should be counted when calculating the service price.'}">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Choose whether this price is added once for the whole booking range, or added again for each day of the booking.'}">
 					{l s='Price calculation method'}
+				</span>
+			</label>
+			<div class="col-lg-3">
+				<select id="pcm_type" name="price_calculation_type">
+					<option value="{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}" {if !$product->price_calculation_method || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}selected="selected"{/if}>{l s='Once for the booking range'}</option>
+					<option value="0" {if $product->price_calculation_method && $product->price_calculation_method != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}selected="selected"{/if}>{l s='For each day of the booking'}</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group" id="pcm_days_container" style="margin-top: 10px;{if !$product->price_calculation_method || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING} display:none;{/if}">
+			<label class="control-label required col-lg-3">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select which booking days should be counted when calculating the service price.'}">
+					{l s='Applied on: '}
 				</span>
 			</label>
 			<div class="col-lg-9">
@@ -240,6 +253,19 @@ $(document).ready(function () {
 				</div>
 			</div>
 		</div>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				var togglePcmDays = function() {
+					if ($('#pcm_type').val() == '{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}') {
+						$('#pcm_days_container').hide();
+					} else {
+						$('#pcm_days_container').show();
+					}
+				};
+				togglePcmDays();
+				$('#pcm_type').on('change', togglePcmDays);
+			});
+		</script>
 	{* As no use in QloApps currently so commented *}
 	{* <div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="unit_price" type="unit_price"}</span></div>

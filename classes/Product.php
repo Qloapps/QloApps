@@ -567,11 +567,12 @@ class ProductCore extends ObjectModel
 
     const PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY = 1;
     const PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY = 2;
-    const PRICE_CALCULATION_METHOD_ON_DURING_STAY = 4;
     const PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY = 3;
+    const PRICE_CALCULATION_METHOD_ON_DURING_STAY = 4;
     const PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY = 5;
     const PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY = 6;
     const PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY = 7;
+    const PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING = 8;
 
     const STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOMER = 1;
     const STANDARD_PRODUCT_ADDRESS_PREFERENCE_HOTEL = 2;
@@ -6913,6 +6914,9 @@ class ProductCore extends ObjectModel
         $stayDay = $numNights - 1;
 
         switch ((int) $priceCalculationMethod) {
+            case self::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING:
+                return 1;
+
             case self::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY:
                 return $checkinDay;
 
@@ -6947,6 +6951,12 @@ class ProductCore extends ObjectModel
         if (is_null($module)) {
             $module = Module::getInstanceByName('hotelreservationsystem');
         }   
+        if ($priceCalculationMethod == self::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING) {
+            $labels[] = $module->l('Once per booking');
+
+            return $labels;
+        }
+
         if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY) {
             $labels[] = $module->l('Check-in day');
         }
