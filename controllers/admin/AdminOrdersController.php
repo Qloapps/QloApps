@@ -169,7 +169,7 @@ class AdminOrdersControllerCore extends AdminController
                 'visible_default' => true
             ),
             'hotel_name' => array(
-                'title' => $this->l('Hotel'),
+                'title' => $this->l('Property Name'),
                 'type' => 'select',
                 'filter_key' => 'hbd!id_hotel',
                 'list' => $this->hotelsArray,
@@ -5585,11 +5585,15 @@ class AdminOrdersControllerCore extends AdminController
                     $objBookingDetail->email = $objHotelBranch->email;
                     $objBookingDetail->check_in_time = $objHotelBranch->check_in;
                     $objBookingDetail->check_out_time = $objHotelBranch->check_out;
+                    $objBookingDetail->property_type_name = $objHotelBranch->propertyTypeName;
+
                 }
-                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct)) {
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct, $idLang)) {
                     $objBookingDetail->adults = $objCartBookingData->adults;
                     $objBookingDetail->children = $objCartBookingData->children;
                     $objBookingDetail->child_ages = $objCartBookingData->child_ages;
+                    $objBookingDetail->selling_object_name = $roomTypeInfo['selling_object_name'];
+                    $objBookingDetail->selling_object_plural_name = $roomTypeInfo['selling_object_plural_name'];
                 }
 
                 if ($objBookingDetail->save()) {

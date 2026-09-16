@@ -179,7 +179,7 @@ class AdminPPreferencesControllerCore extends AdminController
                     ),
                     'PS_BACKOFFICE_ROOM_BOOKING_TYPE' => array(
                         'title' => $this->l('In back-office, add rooms to cart with'),
-                        'hint' => $this->l('In Room occupancy, while adding rooms in cart customer has to select per room occupancy and in room quantity customer only has to select number of rooms.'),
+                        'hint' => $this->l('In Room occupancy, while adding room in cart customer has to select per room occupancy and in rooms quantity customer only has to select number of rooms.'),
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(
@@ -435,14 +435,6 @@ class AdminPPreferencesControllerCore extends AdminController
             Db::getInstance()->execute($sql_shop);
             Db::getInstance()->execute($sql_stock);
             Db::getInstance()->execute($sql);
-        }
-
-        if (Tools::getValue('PS_FRONT_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $_POST['PS_FRONT_ROOM_UNIT_SELECTION_TYPE'] = HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
-        }
-
-        if (Tools::getValue('PS_BACKOFFICE_SEARCH_TYPE') == HotelBookingDetail::SEARCH_TYPE_OWS) {
-            $_POST['PS_BACKOFFICE_ROOM_BOOKING_TYPE'] = HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY;
         }
 
         if (Tools::getIsset('PS_CATALOG_MODE')) {

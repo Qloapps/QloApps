@@ -263,7 +263,7 @@
     <div class="form-group" id="associated_hotel_tree" {if !Product::isSellableWithHotel($product->id)}style="display:none;"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="category_box" type="category_box"}</span></div>
 		<label class="control-label col-lg-2" for="hotel_block">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select hotels for which this service will be available.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select properties for which this service will be available.'}">
 				{l s='Associated Hotels'}
 			</span>
 		</label>
@@ -276,7 +276,7 @@
 	<div class="form-group" id="associated_hotel_rooms_tree" {if !Product::isSellableWithRoomType($product->id) && $product->selling_preference_type != 0}style="display:none;"{/if}>
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="category_box" type="category_box"}</span></div>
 		<label class="control-label col-lg-2" for="hotel_room_block">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select room type and hotels for which this service will be available.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select Room type and properties for which this service will be available.'}">
 				{l s='Associated Room Types'}
 			</span>
 		</label>

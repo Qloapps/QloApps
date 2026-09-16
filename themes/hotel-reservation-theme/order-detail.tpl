@@ -78,7 +78,7 @@
                     {if isset($obj_hotel_branch_information) && $obj_hotel_branch_information}
                         <div class="card hotel-details">
                             <div class="card-header">
-                                {l s='Hotel Details'}
+                                {l s='%s Details'  sprintf=$property_type}
                                 <div class="booking-actions-wrap">
                                     <div class="row">
                                         <div class="col-xs-12 clearfix">
@@ -102,7 +102,7 @@
                                     <div class="description-list">
                                         <dl class="">
                                             <div class="row">
-                                                <dt class="col-xs-6 col-sm-3">{l s='Hotel Name'}</dt>
+                                                <dt class="col-xs-6 col-sm-3">{l s='%s Name' sprintf=$property_type}</dt>
                                                 <dd class="col-xs-6 col-sm-3">{$obj_hotel_branch_information->hotel_name}</dd>
                                                 <dt class="col-xs-6 col-sm-3">{l s='Phone Number'}</dt>
                                                 <dd class="col-xs-6 col-sm-3">
@@ -121,7 +121,7 @@
                                         </dl>
                                     </div>
                                 {else}
-                                    <div class="card-text">{l s='Hotel details not available.'}</div>
+                                    <div class="card-text">{l s='Property details not available.'}</div>
                                 {/if}
                             </div>
                         </div>
@@ -186,7 +186,7 @@
                     {if isset($obj_hotel_branch_information)}
                         <div class="card hotel-location visible-xs visible-sm hidden-md hidden-lg">
                             <div class="card-header">
-                                {l s='Hotel Location'}
+                                {l s='%s Location' sprintf=$property_type}
                             </div>
                             <div class="card-body">
                                 <p class="card-subtitle">
@@ -201,7 +201,7 @@
                                         {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
                                     </p>
                                 {else}
-                                    <div class="card-text">{l s='Hotel location not available.'}</div>
+                                    <div class="card-text">{l s='%s location not available.' sprintf=$property_type}</div>
                                 {/if}
 
                                 {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
@@ -258,7 +258,7 @@
                                         {/block}
                                     </div>
                                 {else}
-                                    <div class="no-rooms card-text">{l s='Room details not available.'}</div>
+                                    <div class="no-stays card-text">{l s='Room details not available.'}</div>
                                 {/if}
                             </div>
                         </div>
@@ -337,7 +337,7 @@
                                         {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL))}
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
-                                                <td>{l s='Total rooms cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
+                                                <td>{l s='Total Rooms Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
                                                 <td class="text-right">
                                                     {if $priceDisplay && $use_tax}
                                                         <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $room_services_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
@@ -513,7 +513,7 @@
                                     <ul class="nav nav-tabs">
                                         {if $has_general_hotel_policies}
                                             <li class="active">
-                                                <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='Hotel Policies'}</a>
+                                                <a href="#tab-hotel-policies-general" data-toggle="tab">{l s='%s Policies' sprintf=$property_type}</a>
                                             </li>
                                         {/if}
                                         {if $has_refund_hotel_policies}
@@ -704,7 +704,7 @@
                     {if isset($obj_hotel_branch_information)}
                         <div class="card hotel-location hidden-xs hidden-sm visible-md">
                             <div class="card-header">
-                                {l s='Hotel Location'}
+                                {l s='%s Location' sprintf=$property_type}
                             </div>
                             <div class="card-body">
                                 <p class="card-subtitle">
@@ -720,7 +720,7 @@
                                         {$hotel_address_info['country']}, {$hotel_address_info['postcode']}
                                     </p>
                                 {else}
-                                    <div class="card-text">{l s='Hotel location not available.'}</div>
+                                    <div class="card-text">{l s='%s location not available.' sprintf=$property_type}</div>
                                 {/if}
 
                                 {if ($obj_hotel_branch_information->latitude|floatval != 0 && $obj_hotel_branch_information->longitude|floatval != 0) && $view_on_map}
@@ -765,7 +765,7 @@
 
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
-                                                <td>{l s='Total rooms cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
+                                                <td>{l s='Total Rooms Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
                                                 <td class="text-right">
                                                     {if $priceDisplay && $use_tax}
                                                         <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $room_services_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
@@ -996,11 +996,11 @@
                                                                 <div class="refund_element_summary clearfix">
                                                                     <p class="refund_element_name">{$data_v.name}</p>
                                                                     <div class="col-xs-3">
-                                                                        <p>{l s='Total Rooms'}</p>
+                                                                        <p>{l s='Total %s' sprintf=$data_v.selling_object_plural_name|escape:'html':'UTF-8'}</p>
                                                                         <strong>{$rm_v.num_rm|string_format:'%02d'}</strong>
                                                                     </div>
                                                                     <div class="col-xs-3">
-                                                                        <p>{l s='Cancelled Rooms'}</p>
+                                                                        <p>{l s='Cancelled %s' sprintf=$data_v.selling_object_plural_name|escape:'html':'UTF-8'}</p>
                                                                         <strong>{($rm_v.count_cancelled + $rm_v.count_refunded)|string_format:'%02d'}</strong>
                                                                     </div>
                                                                 </div>
@@ -1012,7 +1012,7 @@
                                                                                 <div class="checkbox">
                                                                                     <label for="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}">
                                                                                         <input type="checkbox" class="bookings_to_refund" id="bookings_to_refund_{$hotel_booking_detail.id_htl_booking}" name="bookings_to_refund[]" value="{$hotel_booking_detail.id_htl_booking|escape:'html':'UTF-8'}" {if $is_room_cancelled || ($hotel_booking_detail.id_status != $ROOM_STATUS_ASSIGNED)}disabled{/if}/>
-                                                                                        {l s='Room'} - {$smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d'}
+                                                                                        {l s='%s - %s' sprintf=[$data_v.selling_object_name|escape:'html':'UTF-8', $smarty.foreach.foreachRefundRooms.iteration|string_format:'%02d']}
                                                                                     </label>
 
                                                                                     <span>({$hotel_booking_detail.adults|string_format:'%02d'} {if $hotel_booking_detail.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $hotel_booking_detail.children > 0}{l s=', '}{$hotel_booking_detail.children|string_format:'%02d'} {if $hotel_booking_detail.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
@@ -1039,7 +1039,7 @@
                                                                                 </div>
                                                                             {else}
                                                                                 <div class="extra-services-wrap clearfix">
-                                                                                    <p class="text-muted">{l s='No extra services added for this room.'}</p>
+                                                                                    <p class="text-muted">{l s='No extra services added for this %s.' sprintf=$data_v.selling_object_name|escape:'html':'UTF-8'}</p>
                                                                                 </div>
                                                                             {/if}
                                                                         </div>
