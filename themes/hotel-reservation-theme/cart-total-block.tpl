@@ -25,7 +25,7 @@
     {if $total_rooms_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt}
         <p>
             <span>
-                {l s='Total Room cost'}
+                {l s='Total rooms cost'}
                 {if $display_tax_label}
                     {if $use_taxes && $priceDisplay == 0}
                         {l s='(tax incl)'}

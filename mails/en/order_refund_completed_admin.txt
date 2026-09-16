@@ -12,7 +12,7 @@ Transaction Id: {id_transaction}
 
 Booking details
 
-Stay Num
+Room Num
 Room Type
 Hotel
 Duration

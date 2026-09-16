@@ -5,7 +5,7 @@
                 <th colspan="9" class="table-caption">{l s='Rooms Bookings Detail'}</th>
             </tr>
             <tr>
-                <th>{l s="Stay Num"}</th>
+                <th>{l s="Room Num"}</th>
                 <th>{l s="Room Type"}</th>
                 <th>{l s="Property Name"}</th>
                 <th>{l s="Duration"}</th>

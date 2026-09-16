@@ -57,7 +57,7 @@
 								{/if}
 
 								{hook h='displayRoomNumAfter' data=$data type='adminOrder'}</td>
-								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Stay image" /></td>
+								<td><img src="{$data.image_link|escape:'html':'UTF-8'}" title="Room image" /></td>
 								<td>
 									<p>{$data.room_type|escape:'html':'UTF-8'}</p>
 								</td>

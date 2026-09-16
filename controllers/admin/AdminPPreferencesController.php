@@ -175,11 +175,11 @@ class AdminPPreferencesControllerCore extends AdminController
                             array('id' => HotelBookingDetail::SEARCH_ALL_ROOM_TYPE_ALGO, 'name' => $this->l('Show all available room types'))
                         ),
                         'identifier' => 'id',
-                        'desc' => $this->l('This option is only for fully available rooms. For partially available room, always all possible rooms will be displayed.'),
+                        'desc' => $this->l('This option is only for fully available rooms. For partially available rooms, always all possible rooms will be displayed.'),
                     ),
                     'PS_BACKOFFICE_ROOM_BOOKING_TYPE' => array(
                         'title' => $this->l('In back-office, add rooms to cart with'),
-                        'hint' => $this->l('In room occupancy, while adding room in cart customer has to select per room occupancy and in room quantity customer only has to select number of rooms.'),
+                        'hint' => $this->l('In Room occupancy, while adding room in cart customer has to select per room occupancy and in rooms quantity customer only has to select number of rooms.'),
                         'cast' => 'intval',
                         'type' => 'select',
                         'list' => array(

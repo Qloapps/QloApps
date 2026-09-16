@@ -382,7 +382,7 @@
                     </div>
                 </div>
 				<div class="from-group table-responsive-row clearfix" style="display:none;">
-                    <div class="stays-disable-dates-title">{l s='Disable Dates'}</div>
+                    <div class="rooms-disable-dates-title">{l s='Disable Dates'}</div>
                     <table class="table rooms-disable-dates">
                         <thead>
                             <tr class="nodrag nodrop">
@@ -496,7 +496,7 @@
                     </div>
                 </div>
 				<div class="from-group table-responsive-row clearfix" style="display:none;">
-                    <div class="stays-disable-dates-title">{l s='Disable Dates'}</div>
+                    <div class="rooms-disable-dates-title">{l s='Disable Dates'}</div>
                     <table class="table rooms-disable-dates">
                         <thead>
                             <tr class="nodrag nodrop">

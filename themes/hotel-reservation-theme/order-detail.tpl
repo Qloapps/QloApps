@@ -337,7 +337,7 @@
                                         {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
-                                                <td>{l s='Total Room Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
+                                                <td>{l s='Total Rooms Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
                                                 <td class="text-right">
                                                     {if $priceDisplay && $use_tax}
                                                         <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $room_services_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
@@ -765,7 +765,7 @@
 
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
-                                                <td>{l s='Total Room Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
+                                                <td>{l s='Total Rooms Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
                                                 <td class="text-right">
                                                     {if $priceDisplay && $use_tax}
                                                         <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $room_services_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
@@ -1080,7 +1080,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="selected-rooms-wrap">
-                                        {l s='Selected: '}<span class="num-selected-stays">{l s='00'}</span>
+                                        {l s='Selected: '}<span class="num-selected-rooms">{l s='00'}</span>
                                     </div>
                                     <div class="actions-wrap">
                                         <button class="btn btn-secondary btn-cancel">
@@ -1101,7 +1101,7 @@
                                     <div class="errors" style="display: none;"></div>
 
                                     <div class="well well-sm">
-                                        <p class="text">{l s='Total cancel request:'} <span class="count-total-stays">{l s='00'}</span></p>
+                                        <p class="text">{l s='Total cancel request:'} <span class="count-total-rooms">{l s='00'}</span></p>
                                     </div>
 
                                     <div class="form-group">

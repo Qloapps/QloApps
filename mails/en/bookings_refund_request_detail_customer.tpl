@@ -7,7 +7,7 @@
             <tr>
                 <th>{l s="Room Type"}</th>
                 <th>{l s="Property Name"}</th>
-                <th>{l s="Stays Qty"}</th>
+                <th>{l s="Rooms Qty"}</th>
                 <th>{l s="Duration"}</th>
             </tr>
         </thead>

@@ -156,6 +156,6 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button type="button" id="submitRoomChange" class="btn btn-primary"><i class="icon icon-bed"></i> &nbsp;{l s="Update Stays"}</button>
+        <button type="button" id="submitRoomChange" class="btn btn-primary"><i class="icon icon-bed"></i> &nbsp;{l s="Update Rooms"}</button>
     </div>
 </div>

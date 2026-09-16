@@ -424,7 +424,7 @@
 														{if isset($cart_htl_data)}
 															<tr class="item">
 																<td>
-																	<strong>{l s='Total Room Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</strong>
+																	<strong>{l s='Total Rooms Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</strong>
 																</td>
 																<td class="text-right">
 																	{if $priceDisplay && $use_tax}

@@ -263,7 +263,7 @@
 							{block name='blockcart_layer_cart_room_total_price'}
 								<div class="layer_cart_row">
 									<strong class="dark">
-										{l s='Total Room Cost in cart' mod='blockcart'}
+										{l s='Total Rooms Cost in cart' mod='blockcart'}
 										{if $display_tax_label}
 											{if $priceDisplay == 1}
 												{l s='(tax excl.)' mod='blockcart'}

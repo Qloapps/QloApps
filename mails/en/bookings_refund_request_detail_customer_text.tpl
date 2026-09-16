@@ -7,7 +7,7 @@
 
 {l s="Property Name"}
 
-{l s="Stays Qty"}
+{l s="Rooms Qty"}
 
 {l s="Duration"}
 

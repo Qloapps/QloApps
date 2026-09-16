@@ -10,7 +10,7 @@ Refund Status: {status_name}
 
 Booking details
 
-Stay Num
+Room Num
 Room Type
 Hotel
 Duration
