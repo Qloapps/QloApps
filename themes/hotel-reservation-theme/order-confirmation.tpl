@@ -64,7 +64,7 @@
 				{if $any_back_order}
 					{if $shw_bo_msg}
 						<br>
-						<p class="back_o_msg"><strong><sup>*</sup>{l s='Some of your stays are on back order. Please read the following message for stays with status on backorder'}</strong></p>
+						<p class="back_o_msg"><strong><sup>*</sup>{l s='Some of your rooms are on back order. Please read the following message for rooms with status on backorder'}</strong></p>
 						<p>
 							-&nbsp;&nbsp;{$back_ord_msg}
 						</p>
@@ -76,7 +76,7 @@
 							<div class="col-md-8 order-product-summary">
 								{if isset($cart_htl_data)}
 									<div class="card">
-										<div class="card-header">{l s='Stay Details'}</div>
+										<div class="card-header">{l s='Room Details'}</div>
 										<div class="card-body">
 											{foreach from=$cart_htl_data key=data_k item=data_v}
 												{foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
@@ -424,7 +424,7 @@
 														{if isset($cart_htl_data)}
 															<tr class="item">
 																<td>
-																	<strong>{l s='Total Stay Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</strong>
+																	<strong>{l s='Total Room Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</strong>
 																</td>
 																<td class="text-right">
 																	{if $priceDisplay && $use_tax}
@@ -475,7 +475,7 @@
 														{/if}
 														<tr class="item">
 															<td>
-																<strong>{l s='Stay and Service Tax'}</strong>
+																<strong>{l s='Room and Service Tax'}</strong>
 															</td>
 															<td class="text-right">
 																<span class="price-discount">{displayWtPriceWithCurrency price=$orderTotalInfo['total_tax_without_discount'] currency=$objOrderCurrency convert=1}</span>

@@ -158,7 +158,7 @@
 	{/foreach}
 {else}
 	<div class="noRoomsAvailAlert">
-		<span>{l s='No stay available for this property!'}</span>
+		<span>{l s='No room available for this property!'}</span>
 	</div>
 {/if}
 

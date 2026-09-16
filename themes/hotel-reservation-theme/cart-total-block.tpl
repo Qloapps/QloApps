@@ -25,7 +25,7 @@
     {if $total_rooms_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt}
         <p>
             <span>
-                {l s='Total Stay cost'}
+                {l s='Total Room cost'}
                 {if $display_tax_label}
                     {if $use_taxes && $priceDisplay == 0}
                         {l s='(tax incl)'}
@@ -91,7 +91,7 @@
     {/block}
     {if $show_taxes}
         <p class="cart_total_tax">
-            <span>{l s='Stay and Service Tax'}</span>
+            <span>{l s='Room and Service Tax'}</span>
             <span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
         </p>
     {/if}

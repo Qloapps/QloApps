@@ -188,7 +188,7 @@ class AdminOrdersControllerCore extends AdminController
                 'displayed' => false,
             ),
             'id_room_information' => array(
-                'title' => $this->l('Stays'),
+                'title' => $this->l('Rooms'),
                 'type' => 'select',
                 'filter_key' => 'hbd!id_room',
                 'list' => $this->roomsArray,
@@ -226,7 +226,7 @@ class AdminOrdersControllerCore extends AdminController
                 'havingFilter' => true,
             ),
             'num_rooms' => array(
-                'title' => $this->l('No. of stays'),
+                'title' => $this->l('No. of rooms'),
                 'align' => 'text-center',
                 'type' => 'range',
                 'optional' => true,
@@ -333,13 +333,13 @@ class AdminOrdersControllerCore extends AdminController
                 'optional' => true,
             ),
             'is_refunded' => array(
-                'title' => $this->l('Refunded / Cancelled Stays'),
+                'title' => $this->l('Refunded / Cancelled Rooms'),
                 'filter_key' => 'rrb!is_room_refunded',
                 'type'=>'bool',
                 'displayed' => false,
             ),
             'id_status' => array(
-                'title' => $this->l('Stay status'),
+                'title' => $this->l('Room status'),
                 'filter_key' => 'hbd!id_status',
                 'displayed' => false,
                 'type' => 'select',
@@ -378,8 +378,8 @@ class AdminOrdersControllerCore extends AdminController
 
         // overbooking success status
         $this->_conf[51] = $this->l('Overbooking is successfully resolved');
-        $this->_conf[52] = $this->l('Stay in the booking is successfully reallocated');
-        $this->_conf[53] = $this->l('Stay in the booking is successfully swapped');
+        $this->_conf[52] = $this->l('Room in the booking is successfully reallocated');
+        $this->_conf[53] = $this->l('Room in the booking is successfully swapped');
     }
 
     public static function setOrderCurrency($echo, $row)
@@ -971,7 +971,7 @@ class AdminOrdersControllerCore extends AdminController
             $modal = array(
                 'modal_id' => 'room-reallocation-modal',
                 'modal_class' => 'modal-md order_detail_modal',
-                'modal_title' => '<i class="icon icon-refresh"></i> &nbsp'.$this->l('Stay Reallocation / Swap'),
+                'modal_title' => '<i class="icon icon-refresh"></i> &nbsp'.$this->l('Room Reallocation / Swap'),
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_room_reallocation.tpl'),
                 'modal_actions' => null,
             );
@@ -1001,14 +1001,14 @@ class AdminOrdersControllerCore extends AdminController
             $modal = array(
                 'modal_id' => 'add-room-booking-modal',
                 'modal_class' => 'modal-md order_detail_modal',
-                'modal_title' => '<i class="icon icon-bed"></i> &nbsp'.$this->l('Add Stay'),
+                'modal_title' => '<i class="icon icon-bed"></i> &nbsp'.$this->l('Add Room'),
                 'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_add_room_booking.tpl'),
                 'modal_actions' => array(
                     array(
                         'type' => 'button',
                         'value' => 'submitAddRoom',
                         'class' => 'submitAddRoom btn-primary pull-right',
-                        'label' => '<i class="icon-bed"></i> '.$this->l('Add Stay'),
+                        'label' => '<i class="icon-bed"></i> '.$this->l('Add Room'),
                     ),
                 ),
             );
@@ -1146,7 +1146,7 @@ class AdminOrdersControllerCore extends AdminController
                 $modal = array(
                     'modal_id' => 'edit-room-booking-modal',
                     'modal_class' => 'modal-lg order_detail_modal',
-                    'modal_title' => '<i class="icon icon-bed"></i> &nbsp'.$this->l('Edit Stay'),
+                    'modal_title' => '<i class="icon icon-bed"></i> &nbsp'.$this->l('Edit Room'),
                     'modal_content' => $this->context->smarty->fetch('controllers/orders/modals/_edit_room_booking.tpl'),
                 );
 
@@ -1590,7 +1590,7 @@ class AdminOrdersControllerCore extends AdminController
                     'title' => $this->l('Room Types')
                 ),
                 'rooms' => array(
-                    'title' => $this->l('Stays')
+                    'title' => $this->l('Rooms')
                 ),
                 'currency' => array(
                     'title' => $this->l('Currency')
@@ -1617,7 +1617,7 @@ class AdminOrdersControllerCore extends AdminController
                     'filter_key' => 'a!date_add',
                 ),
                 'room_status' => array(
-                    'title' => $this->l('Stay Status'),
+                    'title' => $this->l('Room Status'),
                 ),
                 'country' => array(
                     'title' => $this->l('Country'),
@@ -1671,7 +1671,7 @@ class AdminOrdersControllerCore extends AdminController
                     // check if room is from selected room type
                     if (Validate::isLoadedObject($objRoomInfo = new HotelRoomInformation($idRoomToReallocate))) {
                         if ($objRoomInfo->id_product != $idNewRoomType) {
-                            $this->errors[] = $this->l('Invalid stay selected for reallocation.');
+                            $this->errors[] = $this->l('Invalid room selected for reallocation.');
                         } elseif (!Validate::isLoadedObject($objHotelBooking = new HotelBookingDetail($idHtlBookingFrom))) {
                             $this->errors[] = $this->l('Invalid booking found for reallocation.');
                         } elseif (!$availableRooms = $objBookingDetail->getAvailableRoomsForReallocation(
@@ -1680,17 +1680,17 @@ class AdminOrdersControllerCore extends AdminController
                             $idNewRoomType,
                             $objHotelBooking->id_hotel
                         )) {
-                            $this->errors[] = $this->l('Selected stay is not available for reallocation.');
+                            $this->errors[] = $this->l('Selected room is not available for reallocation.');
                         } elseif (!in_array($idRoomToReallocate, array_column($availableRooms, 'id_room'))) {
-                            $this->errors[] = $this->l('Selected stay is not available for reallocation.');
+                            $this->errors[] = $this->l('Selected room is not available for reallocation.');
                         } elseif (!Validate::isFloat($priceDiff)) {
                             $this->errors[] = $this->l('Invalid price difference of the room types.');
                         }
                     } else {
-                        $this->errors[] = $this->l('Selected stay is not available for reallocation.');
+                        $this->errors[] = $this->l('Selected room is not available for reallocation.');
                     }
                 } else {
-                    $this->errors[] = $this->l('Please select a stay to reallocate with this stay.');
+                    $this->errors[] = $this->l('Please select a room to reallocate with this room.');
                 }
 
                 if (!count($this->errors)) {
@@ -1730,10 +1730,10 @@ class AdminOrdersControllerCore extends AdminController
                 $idHtlBookingToSwap = Tools::getValue('swap_avail_rooms');
 
                 if (!Validate::isLoadedObject($objHotelBooking = new HotelBookingDetail($idHtlBookingFrom))) {
-                    $this->errors[] = $this->l('Selected stay is not available to swap.');
+                    $this->errors[] = $this->l('Selected room is not available to swap.');
                 } else {
                     if (!Validate::isLoadedObject($objHotelBookingTo = new HotelBookingDetail($idHtlBookingToSwap))) {
-                        $this->errors[] = $this->l('Please select a stay to swap with this stay booking.');
+                        $this->errors[] = $this->l('Please select a room to swap with this room booking.');
                     } else {
                         if ($availableRooms = $objHotelBooking->getAvailableRoomsForSwapping(
                             $objHotelBooking->date_from,
@@ -1743,10 +1743,10 @@ class AdminOrdersControllerCore extends AdminController
                             $objHotelBooking->id_room
                         )) {
                             if (!in_array($idHtlBookingToSwap, array_column($availableRooms, 'id_hotel_booking'))) {
-                                $this->errors[] = $this->l('Selected stay is not available to swap.');
+                                $this->errors[] = $this->l('Selected room is not available to swap.');
                             }
                         } else {
-                            $this->errors[] = $this->l('Selected stay is not available to swap.');
+                            $this->errors[] = $this->l('Selected room is not available to swap.');
                         }
                     }
                 }
@@ -2998,8 +2998,8 @@ class AdminOrdersControllerCore extends AdminController
             $helper->id = 'box-total-rooms';
             $helper->icon = 'icon-home';
             $helper->color = 'color1';
-            $helper->title = $this->l('Total Stays');
-            $helper->tooltip = $this->l('Total stays is the number of stays booked in this order.');
+            $helper->title = $this->l('Total Rooms');
+            $helper->tooltip = $this->l('Total rooms is the number of rooms booked in this order.');
             $helper->href = '#start_products';
             $helper->value = $numRooms;
             $this->kpis[] = $helper;
@@ -3140,11 +3140,11 @@ class AdminOrdersControllerCore extends AdminController
             $helper->id = 'box-today-stay-over';
             $helper->icon = 'icon-user';
             $helper->color = 'color4';
-            $helper->title = $this->l('Occupied Stays', null, null, false);
+            $helper->title = $this->l('Occupied Rooms', null, null, false);
             $helper->subtitle = $this->l('Today', null, null, false);
             $helper->href = $this->context->link->getAdminLink('AdminOrders').'&submitResetorder&submitFilterorder=1&orderFilter_rrb!is_room_refunded=0&orderFilter_hbd!id_status='.HotelBookingDetail::STATUS_CHECKED_IN.'&orderFilter_hbd!date_to[]='.pSQL(date('Y-m-d', strtotime('+ 1 days'))).'&orderFilter_hbd!date_to[]=';
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=occupied_rooms';
-            $helper->tooltip = $this->l('The count of stays that are currently occupied by guests.', null, null, false);
+            $helper->tooltip = $this->l('The count of rooms that are currently occupied by guests.', null, null, false);
             $this->kpis[] = $helper;
 
             $helper = new HelperKpi();
@@ -3196,7 +3196,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->color = 'color4';
             $helper->title = $this->l('Average Lead Time', null, null, false);
             $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=average_lead_time';
-            $helper->tooltip = $this->l('Average number of days between the time guests book their stays and the time guest schedule to arrive at the hotel.', null, null, false);
+            $helper->tooltip = $this->l('Average number of days between the time guests book their rooms and the time guest schedule to arrive at the hotel.', null, null, false);
             $this->kpis[] = $helper;
 
             $helper = new HelperKpi();

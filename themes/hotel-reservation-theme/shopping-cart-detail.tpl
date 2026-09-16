@@ -23,7 +23,7 @@
 <div class="order-detail-content">
     {if isset($cart_htl_data) && $cart_htl_data}
         {block name='shopping_cart_heading'}
-            <p class="cart_section_title">{l s='stays information'}</p>
+            <p class="cart_section_title">{l s='rooms information'}</p>
         {/block}
         {foreach from=$cart_htl_data key=data_k item=data_v}
             {foreach from=$data_v['date_diff'] key=rm_k item=rm_v}
@@ -143,7 +143,7 @@
                                                             </span>
                                                             <div class="room-price-detail-container" style="display: none;">
                                                                 <div class="room-price-detail-tooltip-cont">
-                                                                    <div><label>{l s='Stay price'}</label> : {displayPrice price=($rm_v['amount_without_auto_add'])}</div>
+                                                                    <div><label>{l s='Room price'}</label> : {displayPrice price=($rm_v['amount_without_auto_add'])}</div>
                                                                     <div><label>{l s='Additional charges'}</label> : {displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</div>
                                                                 </div>
                                                             </div>

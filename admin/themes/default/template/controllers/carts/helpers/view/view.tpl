@@ -83,7 +83,7 @@
 					<th><span class="title_box">{l s='Hotel'}</span></th>
 					<th><span class="title_box">{l s='Duration'}</span></th>
 					<th><span class="title_box">{l s='occupancy'}</span></th>
-					<th><span class="title_box">{l s='Stay price'}</span></th>
+					<th><span class="title_box">{l s='Room price'}</span></th>
 					<th><span class="title_box">{l s='Extra services'}</span></th>
 					<th class="text-right"><span class="title_box">{l s='Total'}</span></th>
 				</tr>

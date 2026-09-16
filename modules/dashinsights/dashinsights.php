@@ -60,7 +60,7 @@ class DashInsights extends Module
             Media::addJsDef(array(
                 'hotel_txt' => $this->l('Property'),
                 'nights_booked_txt' => $this->l('Nights Booked'),
-                'room_booked_txt' => $this->l('Stays Booked'),
+                'room_booked_txt' => $this->l('Rooms Booked'),
                 'length_of_stay_txt' => $this->l('Length Of Stay'),
                 'total_nights_booked_txt' => $this->l('Total Nights Booked'),
                 'date_txt' => $this->l('Date'),
@@ -145,13 +145,13 @@ class DashInsights extends Module
                     'chart_type' => 'multibar_chart_dotw_dashinsights',
                     'data' => $daysOfTheWeekData,
                     'date_format' => $this->context->language->date_format_lite,
-                    'axis_labels' => array('y' => $this->l('Stays occupied')),
+                    'axis_labels' => array('y' => $this->l('Rooms occupied')),
                 ),
                 'dashinsights_multibar_chart2' => array(
                 'chart_type' => 'multibar_chart_los_dashinsights',
                     'data' => $lengthOfStayData,
                     'date_format' => $this->context->language->date_format_lite,
-                    'axis_labels' => array('x' => $this->l('Length of stay'), 'y' => $this->l('Stays occupied')),
+                    'axis_labels' => array('x' => $this->l('Length of stay'), 'y' => $this->l('Rooms occupied')),
                 ),
             ),
         );

@@ -25,7 +25,7 @@
         {if $bookingOrderInfo|count > 0 && $serviceProducts|count > 0}
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active">
-                    <a href="#refund_rooms_tab" role="tab" data-toggle="tab">{l s='Stays'}</a>
+                    <a href="#refund_rooms_tab" role="tab" data-toggle="tab">{l s='Rooms'}</a>
                 </li>
                 <li role="presentation">
                     <a href="#refund_products_tab" aria-controls="products" role="tab" data-toggle="tab">{l s='Products'}</a>
@@ -43,7 +43,7 @@
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th>{l s='Stay No.'}</th>
+                                    <th>{l s='Room No.'}</th>
                                     <th>{l s='Room Type'}</th>
                                     <th>{l s='Property Name'}</th>
                                     <th>{l s='Duration'}</th>
@@ -111,7 +111,7 @@
         <div class="list-empty">
             <div class="list-empty-msg">
                 <i class="icon-warning-sign list-empty-icon"></i>
-                {l s='No stay bookings found to refund.'}
+                {l s='No room bookings found to refund.'}
             </div>
         </div>
     {/if}

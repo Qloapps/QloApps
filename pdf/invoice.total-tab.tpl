@@ -27,7 +27,7 @@
 	{if isset($footer.room_price_tax_excl) && $footer.room_price_tax_excl}
 		<tr>
 			<td class="grey" width="70%">
-				{l s='Total Stays Cost (tax excl.)' pdf='true'}
+				{l s='Total Rooms Cost (tax excl.)' pdf='true'}
 			</td>
 			<td class="white" width="30%">
 				{displayPrice currency=$order->id_currency price=$footer.room_price_tax_excl}
@@ -67,7 +67,7 @@
 	{* {if isset($footer.product_taxes) && $footer.product_taxes}
 		<tr>
 			<td class="grey" width="70%">
-				{l s='Stays Tax' pdf='true'}
+				{l s='Rooms Tax' pdf='true'}
 			</td>
 			<td class="white" width="30%">
 				{displayPrice currency=$order->id_currency price=($footer.room_price_tax_incl - $footer.room_price_tax_excl)}
@@ -109,7 +109,7 @@
 	{if $footer.total_tax_without_discount > 0}
 	<tr class="bold">
 		<td class="grey">
-			{l s='Stay and Service Tax' pdf='true'}
+			{l s='Room and Service Tax' pdf='true'}
 		</td>
 		<td class="white">
 			{displayPrice currency=$order->id_currency price=$footer.total_tax_without_discount}

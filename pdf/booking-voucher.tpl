@@ -257,7 +257,7 @@
                     </tr>
                     {if $footer.total_tax_without_discount > 0}
                         <tr>
-                            <td class="grey small bold" width="70%">{l s='Stay and Service Tax' pdf='true'}</td>
+                            <td class="grey small bold" width="70%">{l s='Room and Service Tax' pdf='true'}</td>
                             <td class="white right small bold" width="30%">{displayPrice currency=$order->id_currency price=$footer.total_tax_without_discount}</td>
                         </tr>
                     {/if}

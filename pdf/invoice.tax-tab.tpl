@@ -92,7 +92,7 @@
 							{if $label == 'additional_services_tax'}
 								{l s='Services' pdf='true'}
 							{elseif $label == 'room_tax'}
-								{l s='Stays' pdf='true'}
+								{l s='Rooms' pdf='true'}
 							{elseif $label == 'convenience_fee_tax'}
 								{l s='Convenience Fees' pdf='true'}
 							{elseif $label == 'service_products_tax'}

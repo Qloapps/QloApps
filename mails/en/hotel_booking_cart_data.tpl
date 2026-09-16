@@ -2,7 +2,7 @@
     <table class="table table-recap room-booking-table">
         <thead>
             <tr>
-                <th colspan="9" class="table-caption">{l s='Stays Booking Detail'}</th>
+                <th colspan="9" class="table-caption">{l s='Rooms Booking Detail'}</th>
             </tr>
             <tr>
                 <th>{l s="Stay Image"}</th>

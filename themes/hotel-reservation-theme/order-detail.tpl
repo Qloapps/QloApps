@@ -227,7 +227,7 @@
                 {block name='order_detail_refund_requests'}
                     {if (isset($refundReqBookings) && $refundReqBookings) || (isset($refundReqProducts) && $refundReqProducts)}
                         <div class="alert alert-info-light cancel_requests_link_wrapper">
-                            <i class="icon-info-circle"></i> <span>{l s='Your cancellation request for'} {if (isset($refundReqBookings) && $refundReqBookings) && (isset($refundReqProducts) && $refundReqProducts)}{l s='%d stay(s) and %d product(s)' sprintf=[count($refundReqBookings), count($refundReqProducts)]}{elseif isset($refundReqBookings) && $refundReqBookings}{l s='%d stay(s)' sprintf=[count($refundReqBookings)]}{elseif isset($refundReqProducts) && $refundReqProducts}{l s='%d product(s)' sprintf=[count($refundReqProducts)]}{/if} {l s='is being processed. To check request status' sprintf=[count($refundReqBookings)]} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
+                            <i class="icon-info-circle"></i> <span>{l s='Your cancellation request for'} {if (isset($refundReqBookings) && $refundReqBookings) && (isset($refundReqProducts) && $refundReqProducts)}{l s='%d room(s) and %d product(s)' sprintf=[count($refundReqBookings), count($refundReqProducts)]}{elseif isset($refundReqBookings) && $refundReqBookings}{l s='%d room(s)' sprintf=[count($refundReqBookings)]}{elseif isset($refundReqProducts) && $refundReqProducts}{l s='%d product(s)' sprintf=[count($refundReqProducts)]}{/if} {l s='is being processed. To check request status' sprintf=[count($refundReqBookings)]} <a target="_blank" href="{$link->getPageLink('order-follow')|escape:'html':'UTF-8'}?id_order={$order->id|escape:'html':'UTF-8'}">{l s='click here.'}</a>
                         </div>
                     {/if}
                 {/block}
@@ -240,7 +240,7 @@
                     {if isset($cart_htl_data) && $cart_htl_data}
                         <div class="card room-details">
                             <div class="card-header">
-                                {l s='Stay Details'}
+                                {l s='Room Details'}
                             </div>
                             <div class="card-body">
                                 {if isset($cart_htl_data) && $cart_htl_data}
@@ -258,7 +258,7 @@
                                         {/block}
                                     </div>
                                 {else}
-                                    <div class="no-stays card-text">{l s='Stay details not available.'}</div>
+                                    <div class="no-stays card-text">{l s='Room details not available.'}</div>
                                 {/if}
                             </div>
                         </div>
@@ -337,7 +337,7 @@
                                         {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE))}
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
-                                                <td>{l s='Total Stay Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
+                                                <td>{l s='Total Room Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
                                                 <td class="text-right">
                                                     {if $priceDisplay && $use_tax}
                                                         <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $room_services_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
@@ -374,7 +374,7 @@
                                         {/if}
 
                                         <tr class="totalprice item">
-                                            <td>{l s='Stay and Service Tax'}</td>
+                                            <td>{l s='Room and Service Tax'}</td>
                                             <td class="text-right">
                                                 <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
                                             </td>
@@ -765,7 +765,7 @@
 
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
-                                                <td>{l s='Total Stay Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
+                                                <td>{l s='Total Room Cost'} {if $use_taxes && $display_tax_label == 1}{if $priceDisplay == 1}{l s='(tax excl.)'}{elseif $priceDisplay == 0}{l s='(tax incl.)'}{/if} {/if}</td>
                                                 <td class="text-right">
                                                     {if $priceDisplay && $use_tax}
                                                         <span class="price">{displayWtPriceWithCurrency price=($room_price_tax_excl + $room_services_price_tax_excl - $total_convenience_fee_te) currency=$currency}</span>
@@ -802,7 +802,7 @@
                                         {/if}
 
                                         <tr class="totalprice item">
-                                            <td>{l s='Stay and Service Tax'}</td>
+                                            <td>{l s='Room and Service Tax'}</td>
                                             <td class="text-right">
                                                 <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
                                             </td>
@@ -1156,7 +1156,7 @@
             {addJsDefL name=pending_state_msg}{l s='Pending...' js=1}{/addJsDefL}
             {addJsDefL name=mail_sending_err}{l s='Some error occurred while sending mail to the customer' js=1}{/addJsDefL}
             {addJsDefL name=refund_request_sending_error}{l s='Some error occurred while processing request for booking cancellation.' js=1}{/addJsDefL}
-            {addJsDefL name=no_bookings_selected}{l s='Please select at least one stay to proceed for cancellation.' js=1}{/addJsDefL}
+            {addJsDefL name=no_bookings_selected}{l s='Please select at least one room to proceed for cancellation.' js=1}{/addJsDefL}
             {addJsDefL name=refund_request_success_txt}{l s='Request for booking cancellation is successffully created.' js=1}{/addJsDefL}
             {addJsDefL name=order_message_choose_txt}{l s='-- Choose --' js=1}{/addJsDefL}
             {addJsDefL name=order_message_success_txt}{l s='Order message sent successfully.' js=1}{/addJsDefL}

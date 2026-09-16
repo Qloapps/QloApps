@@ -184,7 +184,7 @@
             {block name='occupancy_field_actions'}
                 <div class="occupancy_block_actions">
                     <span class="add_occupancy_block">
-                        <a class="add_new_occupancy_btn {if isset($occupancies) && $occupancies && isset($total_available_rooms) && $total_available_rooms <= count($occupancies)} disabled{/if}" data-title-available="{l s='Click to add more stays.'}" data-title-unavailable="{l s='No more stays available.'}" href="#">
+                        <a class="add_new_occupancy_btn {if isset($occupancies) && $occupancies && isset($total_available_rooms) && $total_available_rooms <= count($occupancies)} disabled{/if}" data-title-available="{l s='Click to add more rooms.'}" data-title-unavailable="{l s='No more rooms available.'}" href="#">
                             <i class="icon-plus"></i>
                             <span>{l s='Add'} {$room_type_info['selling_object_name']|escape:'html':'UTF-8'}</span>
                         </a>

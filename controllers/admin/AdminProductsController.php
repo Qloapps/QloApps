@@ -109,7 +109,7 @@ class AdminProductsControllerCore extends AdminController
             // 'Associations' => $this->l('Associations'),
             'Amenities' => $this->l('Amenities'),
             'Features' => $this->l('Features'),
-            'Configuration' => $this->l('Stays'),
+            'Configuration' => $this->l('Rooms'),
             'Occupancy' => $this->l('Occupancy'),
             'LengthOfStay' => $this->l('Length of Stay'),
         );
@@ -321,7 +321,7 @@ class AdminProductsControllerCore extends AdminController
         );
         // use it for total rooms
         $this->fields_list['num_rooms'] = array(
-            'title' => $this->l('Total Stays'),
+            'title' => $this->l('Total Rooms'),
             'align' => 'center',
             'type' => 'range',
             'havingFilter' => true,
@@ -2671,70 +2671,70 @@ class AdminProductsControllerCore extends AdminController
         $helper->id = 'box-total-rooms';
         $helper->icon = 'icon-bed';
         $helper->color = 'color3';
-        $helper->title = $this->l('Total Stays', null, null, false);
+        $helper->title = $this->l('Total Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_rooms';
-        $helper->tooltip = $this->l('The total number of stays in all hotels.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms in all hotels.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-occupied-rooms';
         $helper->icon = 'icon-user';
         $helper->color = 'color1';
-        $helper->title = $this->l('Occupied Stays', null, null, false);
+        $helper->title = $this->l('Occupied Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=occupied_rooms';
-        $helper->tooltip = $this->l('The count of stays that are currently occupied by guests.', null, null, false);
+        $helper->tooltip = $this->l('The count of rooms that are currently occupied by guests.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-vacant-rooms';
         $helper->icon = 'icon-check-empty';
         $helper->color = 'color3';
-        $helper->title = $this->l('Vacant Stays', null, null, false);
+        $helper->title = $this->l('Vacant Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=vacant_rooms';
-        $helper->tooltip = $this->l('The count of stays that are either booked but currently unoccupied or available for booking', null, null, false);
+        $helper->tooltip = $this->l('The count of rooms that are either booked but currently unoccupied or available for booking', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-reserved-rooms';
         $helper->icon = 'icon-calendar';
         $helper->color = 'color4';
-        $helper->title = $this->l('Booked Stays', null, null, false);
+        $helper->title = $this->l('Booked Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=booked_rooms';
-        $helper->tooltip = $this->l('The total number of stays that are currently booked and awaiting guest check-in', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that are currently booked and awaiting guest check-in', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-disabled-rooms';
         $helper->icon = 'icon-ban';
         $helper->color = 'color2';
-        $helper->title = $this->l('Disabled Stays', null, null, false);
+        $helper->title = $this->l('Disabled Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=disabled_rooms';
-        $helper->tooltip = $this->l('The total number of stays that are currently disabled.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that are currently disabled.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-online-bookable-rooms';
         $helper->icon = 'icon-globe';
         $helper->color = 'color4';
-        $helper->title = $this->l('Online Bookable Stays', null, null, false);
+        $helper->title = $this->l('Online Bookable Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=online_bookable_rooms';
-        $helper->tooltip = $this->l('The total number of stays that can be booked directly from the front office.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms that can be booked directly from the front office.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
         $helper->id = 'box-offline-bookable-rooms';
         $helper->icon = 'icon-building';
         $helper->color = 'color1';
-        $helper->title = $this->l('Offline Bookable Stays', null, null, false);
+        $helper->title = $this->l('Offline Bookable Rooms', null, null, false);
         $helper->subtitle = $this->l('Today', null, null, false);
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=offline_bookable_rooms';
-        $helper->tooltip = $this->l('The total number of stays available for booking through the back office.', null, null, false);
+        $helper->tooltip = $this->l('The total number of rooms available for booking through the back office.', null, null, false);
         $this->kpis[] = $helper;
 
         $helper = new HelperKpi();
@@ -3209,7 +3209,7 @@ class AdminProductsControllerCore extends AdminController
                 $this->displayWarning($this->l('You must save the room type in this shop before managing hotel configuration.'));
             }
         } else {
-            $this->displayWarning($this->l('You must save this room type before managing stays.'));
+            $this->displayWarning($this->l('You must save this room type before managing rooms.'));
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -3812,14 +3812,14 @@ class AdminProductsControllerCore extends AdminController
             $idRoom = Tools::getValue('id');
             $objRoomInfo = new HotelRoomInformation((int) $idRoom);
             if ($objRoomInfo->getFutureBookings($idRoom)) {
-                $this->errors[] = $this->l('This stay cannot be deleted as this stay contains future booking.');
+                $this->errors[] = $this->l('This room cannot be deleted as this room contains future booking.');
             }
             if (empty($this->errors)) {
                 $response['affected_rooms'] = HotelConnectedRoom::getTotalConnectedRooms(null, $idRoom);
                 if ($objRoomInfo->delete()) {
                     $response['success'] = true;
                 } else {
-                    $this->errors[] = $this->l('Unable to delete stay. Please try again!.');
+                    $this->errors[] = $this->l('Unable to delete room. Please try again!.');
                 }
             }
         }
@@ -5154,7 +5154,7 @@ class AdminProductsControllerCore extends AdminController
         $idProduct = Tools::getValue('id_product');
         if ($this->tabAccess['edit'] === 1) {
             if (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo)) {
-                $this->errors[] = $this->l('Please select a valid date range to temporary disable this stay');
+                $this->errors[] = $this->l('Please select a valid date range to temporary disable this room');
             } else if ($idRoom && Validate::isLoadedObject($objHotelRoomInfo = new HotelRoomInformation((int) $idRoom))) {
                 $dateTo = date('Y-m-d', strtotime($dateTo));
                 $objHotelBookingDetail = new HotelBookingDetail();

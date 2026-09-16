@@ -7,7 +7,7 @@
             <span style="color:#333"><strong>{l s='Property Name'}:</strong></span> {$list['hotel_name']}<br />
             <span style="color:#333"><strong>{l s='Property Phone'}:</strong></span> {$list['hotel_phone']}<br />
             <span style="color:#333"><strong>{l s='Property Email'}:</strong></span> {$list['hotel_email']}<br />
-            <span style="color:#333"><strong>{l s='Total Stays'}:</strong></span> {$list['num_rooms']}<br />
+            <span style="color:#333"><strong>{l s='Total Rooms'}:</strong></span> {$list['num_rooms']}<br />
         </p>
     </div>
 {/if}

@@ -80,7 +80,7 @@ class AdminImportControllerCore extends AdminController
         $this->entities = array(
             $this->l('Properties'),
             $this->l('Room Types'),
-            $this->l('Stays'),
+            $this->l('Rooms'),
             $this->l('Categories'),
             $this->l('Service Products'),
             $this->l('Bookings'),
@@ -191,7 +191,7 @@ class AdminImportControllerCore extends AdminController
                     'base_children' => array('label' => $this->l('Base children')),
                     'max_adults' => array('label' => $this->l('Maximum adults')),
                     'max_children' => array('label' => $this->l('Maximum children')),
-                    'max_room_occupancy' => array('label' => $this->l('Maximum stay occupancy')),
+                    'max_room_occupancy' => array('label' => $this->l('Maximum room occupancy')),
                     'show_at_front' => array('label' => $this->l('Show at front (0/1)')),
                     'id_service_products' => array('label' => $this->l('Service products IDs (x, y, z...)')),
                     'id_features' => array('label' => $this->l('Feature IDs (x, y, z...)')),
@@ -221,17 +221,17 @@ class AdminImportControllerCore extends AdminController
                     'date_upd' => date('Y-m-d H:i:s'),
                 );
             break;
-            case $this->entities[$this->l('Stays')]:
+            case $this->entities[$this->l('Rooms')]:
                 $this->required_fields = array('room_num', 'id_status', 'id_product');
 
                 self::$validators['dates'] = array('AdminImportController', 'split');
                 $this->available_fields = array(
                     'no' => array('label' => $this->l('Ignore this column')),
-                    'room_num' => array('label' => $this->l('Stay No *'),),
+                    'room_num' => array('label' => $this->l('Room No *'),),
                     'floor' => array('label' => $this->l('Floor')),
                     'id_product' => array('label' => $this->l('Room Type ID *')),
                     'id_status' => array(
-                        'label' => $this->l('Stay status (1/2/3)'),
+                        'label' => $this->l('Room status (1/2/3)'),
                         'help' => $this->l('1 = Active, 2 = Inactive, 3 = Temporarily Inactive')),
                     'comment' => array('label' => $this->l('Extra Information')),
                     'dates' => array('label' => $this->l('Inactive date ranges and Reason(yyyy-mm-dd)'),
@@ -255,7 +255,7 @@ class AdminImportControllerCore extends AdminController
                     'id_tax_rules_group' => array('label' => $this->l('Tax rule ID')),
                     'auto_add_to_cart' => array('label' => $this->l('Auto add to cart (0 = No, 1 = Yes)')),
                     'price_addition_type' => array('label' => $this->l('Price display preference'),
-                        'help' => $this->l('1 = With stay price, 2 = As convenience fee')),
+                        'help' => $this->l('1 = With room price, 2 = As convenience fee')),
                     'show_at_front' => array('label' => $this->l('Show at front office (0 = No, 1 = Yes)')),
                     'price_calculation_method' => array('label' => $this->l('Price calculation method'),
                         'help' => $this->l('1 = Once per booking, 2 = Each day')),
@@ -300,7 +300,7 @@ class AdminImportControllerCore extends AdminController
                         'label' => $this->l('Duration * (yyyy-mm-dd)'),
                         'help' => $this->l('Check_in, Check_out')
                     ),
-                    'num_rooms' => array('label' => $this->l('Number Of Stays')),
+                    'num_rooms' => array('label' => $this->l('Number Of Rooms')),
                     'amount' => array('label' => $this->l('Order Price')),
                     'due_amount' => array('label' => $this->l('Due Amount')),
                     'id_currency' => array('label' => $this->l('Currency ID')),
@@ -3344,7 +3344,7 @@ class AdminImportControllerCore extends AdminController
                 if (!file_exists(_PS_PROD_IMG_DIR_)) {
                     mkdir(_PS_PROD_IMG_DIR_);
                 }
-            case $this->entities[$this->l('Stays')]:
+            case $this->entities[$this->l('Rooms')]:
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_information`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_disable_dates`');
             break;
@@ -3470,7 +3470,7 @@ class AdminImportControllerCore extends AdminController
                         $this->roomTypeImport();
                         $this->clearSmartyCache();
                         break;
-                    case $this->entities[$import_type = $this->l('Stays')]:
+                    case $this->entities[$import_type = $this->l('Rooms')]:
                         $this->roomImport();
                         $this->clearSmartyCache();
                         break;

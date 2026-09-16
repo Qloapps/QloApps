@@ -23,17 +23,17 @@
 <div class="modal-body">
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active">
-            <a  href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Stay Reallocation'}</a>
+            <a  href="#reallocate_room_tab" aria-controls="reallocate" role="tab" data-toggle="tab">{l s='Room Reallocation'}</a>
         </li>
         <li role="presentation">
-            <a  href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Stay'}</a>
+            <a  href="#swap_room_tab" aria-controls="swap" role="tab" data-toggle="tab">{l s='Swap Room'}</a>
         </li>
     </ul>
     <div class="tab-content active">
         <div role="tabpanel" class="tab-pane active" id="reallocate_room_tab">
             <div class="row">
                 <dl class="list-detail col-sm-6">
-                    <label class="label-title">{l s='Current Stay Number'}</label>
+                    <label class="label-title">{l s='Current Room Number'}</label>
                     <dd><i class="icon-bed"></i> &nbsp;<span class="modal_curr_room_num"></span></dd>
                 </dl>
                 <dl class="list-detail col-sm-6">
@@ -68,10 +68,10 @@
                             <p class="error_text" id="realloc_sel_rm_type_err_p"></p>
                         </div>
                         <div class="form-group col-sm-6">
-                            <label for="realloc_avail_rooms" class="control-label model-label">{l s='Stay To Reallocate:'}</label>
+                            <label for="realloc_avail_rooms" class="control-label model-label">{l s='Room To Reallocate:'}</label>
                             <div class="realloc_avail_rooms_container">
                                 <select class="form-control" name="realloc_avail_rooms" id="realloc_avail_rooms">
-                                    <option value="0" selected="selected">{l s='Select Stays'}</option>
+                                    <option value="0" selected="selected">{l s='Select Rooms'}</option>
                                 </select>
                             </div>
                             <p class="error_text" id="realloc_sel_rm_err_p"></p>
@@ -111,7 +111,7 @@
         <div role="tabpanel" class="tab-pane" id="swap_room_tab">
             <div class="row">
                 <dl class="list-detail col-sm-6">
-                    <label class="label-title">{l s='Current Stay Number'}</label>
+                    <label class="label-title">{l s='Current Room Number'}</label>
                     <dd><i class="icon-bed"></i> &nbsp;<span class="modal_curr_room_num"></span></dd>
                 </dl>
                 <dl class="list-detail col-sm-6">
@@ -137,7 +137,7 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-sm-6">
-                            <label for="swap_avail_rooms" class="control-label model-label">{l s='Available stays to swap'}</label>
+                            <label for="swap_avail_rooms" class="control-label model-label">{l s='Available rooms to swap'}</label>
                             <input type="hidden" class="form-control modal_id_htl_booking" name="id_htl_booking">
                             <div class="swap_avail_rooms_container"></div>
 

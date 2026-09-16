@@ -104,7 +104,7 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
 
             if ($refundReqBookings) {
                 $this->fields_list['num_rooms'] = array(
-                    'title' => $this->l('Total Stays'),
+                    'title' => $this->l('Total Rooms'),
                     'align' => 'center',
                     'havingFilter' => true,
                 );

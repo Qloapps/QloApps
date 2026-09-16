@@ -340,7 +340,7 @@
 								{include file="$tpl_dir./errors.tpl"}
 							{/block}
 
-							<p class="alert alert-warning">{l s='You have not added any stays or products to your cart yet.'}</p>
+							<p class="alert alert-warning">{l s='You have not added any rooms or products to your cart yet.'}</p>
 						{/if}
 						{block name='order_opc_js_vars'}
 							{strip}

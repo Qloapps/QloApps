@@ -151,7 +151,24 @@
 		{/if}
 	</div>
 
+	{if isset($selling_object_info) && $selling_object_info}
+		<div class="form-group" id="room_type_selection">
+			<label class="control-label col-sm-3">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select the room selling type for this room type.'}">
+					{l s='Selling Object'}
+				</span>
+			</label>
+			<div class="col-sm-5">
+				<select name="id_selling_object" id="id_selling_object" class="form-control chosen" >
+					{foreach from=$selling_object_info item=selling_object_type}
+						<option value="{$selling_object_type['id_room_type_selling_object']}" {if isset($selected_room_type_selling_object) && $selling_object_type['id_room_type_selling_object'] == $selected_room_type_selling_object}selected{/if}>{$selling_object_type['name']}</option>
+					{/foreach}
+				</select>
+			</div>
+		</div>
+	{/if}
 
+	
 	<div class="form-group hidden">
 		<label class="control-label col-lg-3" for="reference">
 			<span class="label-tooltip" data-toggle="tooltip"
@@ -464,24 +481,6 @@
 			</div>
 		</div>
 	{/if}
-
-	{if isset($selling_object_info) && $selling_object_info}
-		<div class="form-group" id="room_type_selection">
-			<label class="control-label col-sm-3">
-				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select the stay selling type for this room type.'}">
-					{l s='Selling Object'}
-				</span>
-			</label>
-			<div class="col-sm-5">
-				<select name="id_selling_object" id="id_selling_object" class="form-control chosen" >
-					{foreach from=$selling_object_info item=selling_object_type}
-						<option value="{$selling_object_type['id_room_type_selling_object']}" {if isset($selected_room_type_selling_object) && $selling_object_type['id_room_type_selling_object'] == $selected_room_type_selling_object}selected{/if}>{$selling_object_type['name']}</option>
-					{/foreach}
-				</select>
-			</div>
-		</div>
-	{/if}
-
 
 	{* <div class="form-group">
 		<label class="control-label col-lg-3" for="tags_{$id_lang}">

@@ -392,7 +392,7 @@
 													{/block}
 													<!-- <div class="info_margin_div">
 														<div class="room_info_heading">
-															<span>{l s='Stays'}</span>
+															<span>{l s='Rooms'}</span>
 														</div>
 														<div class="room_info_content row"></div>
 													</div> -->
@@ -750,7 +750,7 @@
 		{else}
 			<div class="bootstrap">
 				<div class="alert alert-warning">
-					{l s='This room type has not enough information. Please save information of related hotel and other required stay information for the booking of this room type.'}
+					{l s='This room type has not enough information. Please save information of related hotel and other required room information for the booking of this room type.'}
 				</div>
 			</div>
 		{/if}
@@ -868,8 +868,8 @@
 			{addJsDef currency_blank = $currency->blank}
 			{addJsDefL name=correct_date_cond}{l s='Check Out Date should be greater than Check in date.' js=1}{/addJsDefL}
 			{addJsDefL name=some_error_cond}{l s='Some error occured .Please try again.' js=1}{/addJsDefL}
-			{addJsDefL name=unavail_qty_text}{l s='Required quantity of stays are Not available.' js=1}{/addJsDefL}
-			{addJsDefL name=out_of_stock_cond}{l s='No stay is available for this period.' js=1}{/addJsDefL}
+			{addJsDefL name=unavail_qty_text}{l s='Required quantity of rooms are Not available.' js=1}{/addJsDefL}
+			{addJsDefL name=out_of_stock_cond}{l s='No room is available for this period.' js=1}{/addJsDefL}
 			{addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
 			{addJsDefL name=select_txt}{l s='Select' js=1}{/addJsDefL}
 			{addJsDefL name=remove_txt}{l s='Remove' js=1}{/addJsDefL}

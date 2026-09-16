@@ -667,7 +667,7 @@
                 }
             } else {
                 $('#room-dates-modal .room-booked-dates-table tbody').append(`<tr>
-                    <td colspan="3" class="center">{/literal}{l s='No Booking for this stay'}{literal}</td>
+                    <td colspan="3" class="center">{/literal}{l s='No Booking for this room'}{literal}</td>
                 </tr>`);
             }
         });
@@ -1244,7 +1244,7 @@
                 });
             },
             submitBulkDelete: function() {
-                if (confirm("{l s='Delete selected stays?'}")) {
+                if (confirm("{l s='Delete selected rooms?'}")) {
                     $('#product_form').append('<input type="hidden" name="submitBulkDeleteRooms" value="1"/>');
                     $('form#product_form').submit();
                 }
