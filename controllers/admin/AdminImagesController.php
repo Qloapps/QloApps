@@ -86,7 +86,7 @@ class AdminImagesControllerCore extends AdminController
                 'orderby' => false
             ),
             'hotels' => array(
-                'title' => $this->l('Hotels'),
+                'title' => $this->l('Properties'),
                 'align' => 'center',
                 'type' => 'bool',
                 'active' => 'hotels',
@@ -301,7 +301,7 @@ class AdminImagesControllerCore extends AdminController
                 ),
                 array(
                     'type' => 'switch',
-                    'label' => $this->l('Hotels'),
+                    'label' => $this->l('Properties'),
                     'name' => 'hotels',
                     'required' => false,
                     'is_bool' => true,
@@ -503,7 +503,7 @@ class AdminImagesControllerCore extends AdminController
         $types = array(
             'categories' => $this->l('Categories'),
             'products' => $this->l('Room Types/Products'),
-            'hotels' => $this->l('Hotels'),
+            'hotels' => $this->l('Properties'),
             // 'manufacturers' => $this->l('Manufacturers'),
             // 'suppliers' => $this->l('Suppliers'),
             // 'scenes' => $this->l('Scenes'),

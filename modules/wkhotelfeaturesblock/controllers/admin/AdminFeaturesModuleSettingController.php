@@ -42,7 +42,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
         // field options for global fields
         $this->fields_options = array(
             'global' => array(
-                'title' =>    $this->l('Hotel Amenity Setting'),
+                'title' =>    $this->l('Property Amenity Setting'),
                 'icon' =>   'icon-cogs',
                 'fields' =>    array(
                     'HOTEL_AMENITIES_HEADING' => array(
@@ -278,7 +278,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
         }
         if (!$hotelAmenityId || $file['size']) {
             if (!$file['size']) {
-                $this->errors[] = $this->l('Hotel Amenity Image Required.');
+                $this->errors[] = $this->l('Property Amenity Image Required.');
             } elseif ($error = ImageManager::validateUpload($file, Tools::getMaxUploadSize())) {
                 $this->errors[] = $error;
             }

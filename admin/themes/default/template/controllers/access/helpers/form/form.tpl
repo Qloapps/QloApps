@@ -302,11 +302,11 @@
 				<div class="col-lg-6">
 					{if isset($hotels) && $hotels}
 						<div class="panel">
-							<h3>{l s='Hotel Permissions'}</h3>
+							<h3>{l s='Property Permissions'}</h3>
 							<table class="table" id="table_hotel_{$profile.id_profile}">
 								<thead>
 									<tr>
-										<th>{l s='Hotel'}</th>
+										<th>{l s='Property'}</th>
 										<th>
 											<input type="checkbox"{if $access_edit == 1} class="changeHotelAccess" data-rel="-1||all||{$profile.id_profile}"{else} disabled="disabled"{/if}/>
 											{l s='All'}
