@@ -146,6 +146,7 @@ class AdminThemesControllerCore extends AdminController
                     'PS_LOGO' => array(
                         'title' => $this->l('Header logo'),
                         'hint' => $this->l('Will appear on header of website. Maximum height on default theme: 60px.'),
+                        'desc' => $this->l('Recommended size: 240 x 60 px.'),
                         'type' => 'file',
                         'name' => 'PS_LOGO',
                         'tab' => 'logo',
@@ -153,7 +154,10 @@ class AdminThemesControllerCore extends AdminController
                     ),
                     'PS_LOGO_MOBILE' => array(
                         'title' => $this->l('Header logo for mobile'),
-                        'desc' => ((Configuration::get('PS_LOGO_MOBILE') === false) ? '<span class="light-warning">'.$this->l('Warning: No mobile logo has been defined. The header logo will be used instead.').'</span><br />' : ''),
+                        'desc' => array_filter(array(
+                            ((Configuration::get('PS_LOGO_MOBILE') === false) ? '<span class="light-warning">'.$this->l('Warning: No mobile logo has been defined. The header logo will be used instead.').'</span>' : ''),
+                            $this->l('Recommended size: 240 x 60 px.'),
+                        )),
                         'hint' => $this->l('Will appear on the header of your mobile template. If left undefined, the header logo will be used.'),
                         'type' => 'file',
                         'name' => 'PS_LOGO_MOBILE',
@@ -162,7 +166,10 @@ class AdminThemesControllerCore extends AdminController
                     ),
                     'PS_LOGO_MAIL' => array(
                         'title' => $this->l('Mail logo'),
-                        'desc' => ((Configuration::get('PS_LOGO_MAIL') === false) ? '<span class="light-warning">'.$this->l('Warning: if no email logo is available, the main logo will be used instead.').'</span><br />' : ''),
+                        'desc' => array_filter(array(
+                            ((Configuration::get('PS_LOGO_MAIL') === false) ? '<span class="light-warning">'.$this->l('Warning: if no email logo is available, the main logo will be used instead.').'</span>' : ''),
+                            $this->l('Recommended size: 240 x 60 px.'),
+                        )),
                         'hint' => $this->l('Will appear on email headers. If undefined, the header logo will be used.'),
                         'type' => 'file',
                         'name' => 'PS_LOGO_MAIL',
@@ -171,7 +178,10 @@ class AdminThemesControllerCore extends AdminController
                     ),
                     'PS_LOGO_INVOICE' => array(
                         'title' => $this->l('Invoice logo'),
-                        'desc' => ((Configuration::get('PS_LOGO_INVOICE') === false) ? '<span class="light-warning">'.$this->l('Warning: if no invoice logo is available, the main logo will be used instead.').'</span><br />' : ''),
+                        'desc' => array_filter(array(
+                            ((Configuration::get('PS_LOGO_INVOICE') === false) ? '<span class="light-warning">'.$this->l('Warning: if no invoice logo is available, the main logo will be used instead.').'</span>' : ''),
+                            $this->l('Recommended size: 240 x 60 px.'),
+                        )),
                         'hint' => $this->l('Will appear on invoice headers.').' '.$this->l('Warning: you can use a PNG file for transparency, but it can take up to 1 second per page for processing. Please consider using JPG instead.'),
                         'type' => 'file',
                         'name' => 'PS_LOGO_INVOICE',
@@ -181,6 +191,7 @@ class AdminThemesControllerCore extends AdminController
                     'PS_FAVICON' => array(
                         'title' => $this->l('Favicon'),
                         'hint' => $this->l('Will appear in the address bar of your web browser.'),
+                        'desc' => $this->l('Recommended size: 64 x 64 px.'),
                         'type' => 'file',
                         'name' => 'PS_FAVICON',
                         'tab' => 'icons',
@@ -189,6 +200,7 @@ class AdminThemesControllerCore extends AdminController
                     'PS_STORES_ICON' => array(
                         'title' => $this->l('Map icon'),
                         'hint' => $this->l('This icon will be displayed at hotel locations on Google Maps.').'<br />'.$this->l('Suggested size: 30x30, transparent GIF.'),
+                        'desc' => $this->l('Recommended size: 30 x 30 px.'),
                         'type' => 'file',
                         'name' => 'PS_STORES_ICON',
                         'tab' => 'icons',
