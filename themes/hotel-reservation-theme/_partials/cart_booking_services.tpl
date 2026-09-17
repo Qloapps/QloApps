@@ -42,7 +42,7 @@
 										<div class="row accordion-section">
 											<div class="col-sm-12 additional_service_header">
 												<a class="accordion-section-title {if $roomCount == 1}active{/if}" href="#accordion_service_{$key|escape:'html':'UTF-8'}">
-													{l s='Room'} {$roomCount|escape:'html':'UTF-8'}&nbsp;
+													{$room_type_info['selling_object_name']} {$roomCount|escape:'html':'UTF-8'}&nbsp;
 													<span>({if {$cartRoom['adults']} <= 9}0{$cartRoom['adults']}{else}{$cartRoom['adults']}{/if} {if $cartRoom['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}, {if {$cartRoom['children']} <= 9}0{$cartRoom['children']}{else}{$cartRoom['children']}{/if} {if $cartRoom['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if})</span>
 												</a>
 											</div>
@@ -67,8 +67,19 @@
 																		{/if}
 																	</div>
 																	<div class="col-xs-10">
-																		<p>{$product['name']|escape:'html':'UTF-8'}</p>
-																		{if $product.allow_multiple_quantity}
+																			<span>{$product['name']|escape:'html':'UTF-8'}</span>
+																			{assign var='priceCalcMethod' value=$product.price_calculation_method|default:0}
+																			{capture name='htl_pcm_tooltip'}
+																			<div class="htl-tooltip-cont">
+																				<p class="htl-tooltip-title">{l s='Applied on:'}</p>
+																				<ul>
+																					{foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+																						<li>{$pcmDayLabel}</li>
+																					{/foreach}
+																				</ul>
+																			</div>
+																			{/capture}
+																			{include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}																		{if $product.allow_multiple_quantity}
 																			<div class="qty_container">
 																				<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="room_service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
 																				<input type="hidden" class="qty_hidden" id="qty_{$product.id_product}_hidden" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}0{/if}">
@@ -83,7 +94,15 @@
 															</div>
 															<div class="col-xs-4">
 																{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
-																	<span class="pull-right">{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}{if $product.price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY}{l s='/Night'}{/if}</span>
+																	<span class="pull-right">{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}
+																		{if Product::getServicePriceBillableDays(
+																			$product.price_calculation_method,
+																			$product.date_from|default:$date_from|default:'',
+																			$product.date_to|default:$date_to|default:''
+																		) > 1}
+																			<span class="price-label">{l s='/Night'}</span>
+																		{/if}
+																	</span>
 
 																{/if}
 															</div>

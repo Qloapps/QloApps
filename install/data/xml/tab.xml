@@ -84,9 +84,9 @@
     <tab id="Features" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminFeatures</class_name>
     </tab>
-    <!-- <tab id="Manufacturers" id_parent="Catalog" active="1" hide_host_mode="0">
-      <class_name>AdminManufacturers</class_name>
-    </tab> -->
+    <tab id="Room_Type_Selling_Objects" id_parent="Catalog" active="1" hide_host_mode="0">
+      <class_name>AdminRoomTypeSellingObjects</class_name>
+    </tab>
     <!-- <tab id="Suppliers" id_parent="Catalog" active="1" hide_host_mode="0">
       <class_name>AdminSuppliers</class_name>
     </tab> -->

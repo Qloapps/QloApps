@@ -31,6 +31,8 @@ require_once 'classes/HotelAmenities.php';
 require_once 'classes/HotelBranchAmenities.php';
 require_once 'classes/HotelRoomTypeAmenities.php';
 require_once 'classes/HotelBookingDetail.php';
+require_once 'classes/HotelBookingStatus.php';
+require_once 'classes/HotelBookingStatusHistory.php';
 require_once 'classes/HotelCartBookingData.php';
 require_once 'classes/HotelAdvancedPayment.php';
 require_once 'classes/HotelOrderRefundRules.php';
@@ -44,6 +46,7 @@ require_once 'classes/HotelRoomTypeRestrictionDateRange.php';
 
 require_once 'classes/HotelRoomDisableDates.php';
 require_once 'classes/HotelBranchRefundRules.php';
+require_once 'classes/HotelPropertyType.php';
 require_once 'classes/HotelConnectedRoom.php';
 
 // linked products

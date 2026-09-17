@@ -117,7 +117,7 @@
 																<div class="row">
 																	<div class="col-xs-12 col-md-6">
 																		<div class="row">
-																			<dt class="col-xs-5">{l s='Rooms'}</dt>
+																			<dt class="col-xs-5">{if $rm_v.num_rm > 1}{$data_v['selling_object_plural_name']|escape:'html':'UTF-8'}{else}{$data_v['selling_object_name']}{/if}</dt>
 																			<dd class="col-xs-7">{$rm_v.num_rm|string_format:'%02d'}</dd>
 																		</div>
 																	</div>
@@ -159,41 +159,37 @@
 																					{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['additional_services_price_te'] +  $rm_v['additional_services_price_auto_add_te']) currency=$objOrderCurrency}
 																				{/if}
 																				{if isset($rm_v['additional_services']) && $rm_v['additional_services']}
-																					<span class="order-price-info">
-																						<img src="{$img_dir}icon/icon-info.svg" />
-																					</span>
-																					<div class="price-info-container" style="display:none">
-																						<div class="price-info-tooltip-cont">
-																							<div class="list-row">
-																								<div>
-																									<p>{l s='Room cost'} : </p>
-																								</div>
-																								<div class="text-right">
-																									<p>
-																										{if $group_use_tax}
-																											{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['additional_services_price_auto_add_ti']) currency=$objOrderCurrency}
-																										{else}
-																											{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] +  $rm_v['additional_services_price_auto_add_te']) currency=$objOrderCurrency}
-																										{/if}
-																									</p>
-																								</div>
+																					{capture name='htl_order_price_tooltip'}
+																					<div class="htl-tooltip-cont">
+																						<div class="htl-tooltip-row">
+																							<div>
+																								<p>{l s='%s cost' sprintf=$data_v['selling_object_plural_name']} : </p>
 																							</div>
-																							<div class="list-row">
-																								<div>
-																									<p>{l s='Service cost'} : </p>
-																								</div>
-																								<div class="text-right">
-																									<p>
-																										{if $group_use_tax}
-																											{displayWtPriceWithCurrency price=($rm_v['additional_services_price_ti'])  currency=$objOrderCurrency}
-																										{else}
-																											{displayWtPriceWithCurrency price=($rm_v['additional_services_price_te']) currency=$objOrderCurrency}
-																										{/if}
-																									</p>
-																								</div>
+																							<div class="text-right">
+																								<p>
+																									{if $group_use_tax}
+																										{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['additional_services_price_auto_add_ti']) currency=$objOrderCurrency}
+																									{else}
+																										{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['additional_services_price_auto_add_te']) currency=$objOrderCurrency}
+																									{/if}
+																								</p>
+																							</div>
+																						</div>
+																						<div class="htl-tooltip-row">
+																							<div><p>{l s='Service cost'} : </p></div>
+																							<div class="text-right">
+																								<p>
+																									{if $group_use_tax}
+																										{displayWtPriceWithCurrency price=($rm_v['additional_services_price_ti']) currency=$objOrderCurrency}
+																									{else}
+																										{displayWtPriceWithCurrency price=($rm_v['additional_services_price_te']) currency=$objOrderCurrency}
+																									{/if}
+																								</p>
 																							</div>
 																						</div>
 																					</div>
+																					{/capture}
+																					{include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_order_price_tooltip allow_html=true}
 																				{/if}
 																			</dd>
 																		</div>
@@ -254,9 +250,9 @@
 																								<dt class="col-xs-5">{l s='Unit Price'}</dt>
 																								<dd class="col-xs-7">
 																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$objOrderCurrency}
 																									{else}
-																										{displayWtPriceWithCurrency price=$product.unit_price_tax_excl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.unit_price_tax_excl  currency=$objOrderCurrency}
 																									{/if}
 																								</dd>
 																							</div>
@@ -272,9 +268,9 @@
 																								<dt class="col-xs-5">{l s='Total Pricing'}</dt>
 																								<dd class="col-xs-7">
 																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$objOrderCurrency}
 																									{else}
-																										{displayWtPriceWithCurrency price=$product.total_price_tax_excl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.total_price_tax_excl  currency=$objOrderCurrency}
 																									{/if}
 																								</dd>
 																							</div>
@@ -328,9 +324,9 @@
 																								<dt class="col-xs-5">{l s='Unit Price'}</dt>
 																								<dd class="col-xs-7">
 																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.unit_price_tax_incl  currency=$objOrderCurrency}
 																									{else}
-																										{displayWtPriceWithCurrency price=$product.unit_price_tax_excl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.unit_price_tax_excl  currency=$objOrderCurrency}
 																									{/if}
 																								</dd>
 																							</div>
@@ -346,9 +342,9 @@
 																								<dt class="col-xs-5">{l s='Total Pricing'}</dt>
 																								<dd class="col-xs-7">
 																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.total_price_tax_incl  currency=$objOrderCurrency}
 																									{else}
-																										{displayWtPriceWithCurrency price=$product.total_price_tax_excl  currency=$currency}
+																										{displayWtPriceWithCurrency price=$product.total_price_tax_excl  currency=$objOrderCurrency}
 																									{/if}
 																								</dd>
 																							</div>

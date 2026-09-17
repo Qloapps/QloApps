@@ -465,10 +465,11 @@ class OrderDetailCore extends ObjectModel
                     $totalPriceTaxExcl = 0.0;
                     $firstServiceProduct = null;
                     foreach ($serviceProductData as $bookingServiceData) {
-                        $bookingNumDays = 1;
-                        if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method) {
-                            $bookingNumDays = HotelHelper::getNumberOfDays($bookingServiceData['date_from'], $bookingServiceData['date_to']) ?: 1;
-                        }
+                        $bookingNumDays = Product::getServicePriceBillableDays(
+                            $this->product_price_calculation_method,
+                            $bookingServiceData['date_from'],
+                            $bookingServiceData['date_to']
+                        );
                         foreach ($bookingServiceData['additional_services'] as $item) {
                             $itemQuantity = (isset($item['quantity']) ? $item['quantity'] : 0) * $bookingNumDays;
                             $quantity += $itemQuantity;
@@ -498,10 +499,11 @@ class OrderDetailCore extends ObjectModel
                     $quantity = 0;
                     $totalPriceTaxExcl = 0.0;
                     foreach ($serviceProductData as $cartServiceItem) {
-                        $itemNumDays = 1;
-                        if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $this->product_price_calculation_method) {
-                            $itemNumDays = HotelHelper::getNumberOfDays($cartServiceItem['date_from'], $cartServiceItem['date_to']) ?: 1;
-                        }
+                        $itemNumDays = Product::getServicePriceBillableDays(
+                            $this->product_price_calculation_method,
+                            $cartServiceItem['date_from'],
+                            $cartServiceItem['date_to']
+                        );  
                         $itemQuantity = (isset($cartServiceItem['quantity']) ? $cartServiceItem['quantity'] : 0) * $itemNumDays;
                         $quantity += $itemQuantity;
                         $totalPriceTaxExcl += $itemQuantity * (isset($cartServiceItem['unit_price_tax_excl']) ? $cartServiceItem['unit_price_tax_excl'] : 0);

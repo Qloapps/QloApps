@@ -122,7 +122,7 @@ class AdminHotelConfigurationSettingController extends ModuleAdminController
     {
         parent::initToolbar();
         if ($this->display == 'view') {
-            $this->toolbar_title = $this->l('Hotel Settings');
+            $this->toolbar_title = $this->l('Property Settings');
             $this->page_header_toolbar_btn['manage_links'] = array(
                 'icon' => 'process-icon-cogs',
                 'href' => self::$currentIndex.'&display=list&token='.$this->token,

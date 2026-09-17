@@ -27,7 +27,7 @@
                 <table class="table" id="customer_cart_details">
                     <thead>
                         <tr>
-                            <th class="center"><span ><p>{l s='Room'}</p></span></th>
+                            <th class="center"><span ><p>{l s='Unit'}</p></span></th>
                             <th class="center"><span >{l s='Image'}</span></th>
                             <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Booking check-in and check-out dates'}">{l s='Duration'}</span></th>
                             <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Number of adults and children'}">{l s='Occupancy'}</span></th>
@@ -37,10 +37,11 @@
                             <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Total cost of extra services, auto added services and convenience fee for this room, excluding tax'}"><div>{l s='Extra Services'}</div><div>{l s='(Tax excl.)'}</div></span></th>
                             <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Total tax applied on this room booking'}">{l s='Total Tax'}</span></th>
                             <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Total price of the room including extra services/fees, tax included'}"><div>{l s='Total Price'}</div><div>{l s='(Tax incl.)'}</div></span></th>
+                            <th><span class="title_box">{l s='Room status'}</span></th>
                             {if (isset($refundReqBookings) && $refundReqBookings)}
-                                <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Refund or cancellation status and refunded amount for this room booking'}">{l s='Refund'}</span></th>
+                                <th class="center"><span class="title_box help-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Refund or cancellation status and refunded amount for this room booking'}"><div>{l s='Refunds'}</div></span></th>
                             {/if}
-                            {if (isset($can_edit) && $can_edit && !$order->hasBeenDelivered())}
+                            {if (isset($can_edit) && $can_edit)}
                             <th class="fixed-width-md"><span class="title_box">{l s='Actions'}</th>
                             {/if}
                         </tr>

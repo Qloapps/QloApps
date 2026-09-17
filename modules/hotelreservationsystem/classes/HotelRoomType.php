@@ -26,6 +26,7 @@ class HotelRoomType extends ObjectModel
     public $id;
     public $id_product;
     public $id_hotel;
+    public $id_selling_object;
     public $adults;
     public $children;
     public $max_adults;
@@ -35,6 +36,8 @@ class HotelRoomType extends ObjectModel
     public $max_los;
     public $date_add;
     public $date_upd;
+    public $selling_object_name;
+    public $selling_object_plural_name;
 
     public static $definition = array(
         'table' => 'htl_room_type',
@@ -42,6 +45,7 @@ class HotelRoomType extends ObjectModel
         'fields' => array(
             'id_product' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'id_hotel' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'id_selling_object' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => false),
             'adults' => array('type' => self::TYPE_INT, 'validate' => 'isInt', 'default' => 2),
             'children' => array('type' => self::TYPE_INT, 'validate' => 'isInt'),
             'max_adults' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'default' => 2),
@@ -77,6 +81,14 @@ class HotelRoomType extends ObjectModel
         ),
     );
 
+    public function __construct($id = null, $idLang = null, $idShop = null)
+    {
+        parent::__construct($id, $idLang, $idShop);
+        $module = Module::getInstanceByName('hotelreservationsystem');
+        $this->selling_object_name = $module->l('Room', 'HotelRoomType');
+        $this->selling_object_plural_name = $module->l('Rooms', 'HotelRoomType');
+    }
+
     /**
      * [duplicateRoomType :: duplicates room type].
      *
@@ -108,6 +120,7 @@ class HotelRoomType extends ObjectModel
         $objHotelRoomType = new HotelRoomType();
         $objHotelRoomType->id_product = $idProductNew;
         $objHotelRoomType->id_hotel = $idHotelNew;
+        $objHotelRoomType->id_selling_object = $roomType['id_selling_object'];
         $objHotelRoomType->adults = $roomType['adults'];
         $objHotelRoomType->children = $roomType['children'];
         $objHotelRoomType->max_adults = $roomType['max_adults'];
@@ -234,13 +247,32 @@ class HotelRoomType extends ObjectModel
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
-        $sql = 'SELECT hrt.*, hbl.`hotel_name`
-                FROM `'._DB_PREFIX_.'htl_room_type` AS hrt
-                INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbl
-                ON (hbl.`id` = hrt.`id_hotel` AND hbl.`id_lang` = '.(int)$idLang.')
-                WHERE hrt.`id_product` = '.(int)$id_product;
+        $cache_key = 'HotelRoomType::getRoomTypeInfoByIdProduct_'.$id_product.'_'.$idLang;
+        if (!Cache::isStored($cache_key)) {
+            $sql = 'SELECT hrt.*, hbl.`hotel_name`,
+                    COALESCE(hrtstl.`name`, "'.pSQL($this->selling_object_name).'") AS `selling_object_name`,
+                    COALESCE(hrtstl.`plural_name`, "'.pSQL($this->selling_object_plural_name).'") AS `selling_object_plural_name`
+                    FROM `'._DB_PREFIX_.'htl_room_type` AS hrt
+                    INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` AS hbl
+                        ON (hbl.`id` = hrt.`id_hotel`
+                            AND hbl.`id_lang` = '.(int)$idLang.')
+                    LEFT JOIN `'._DB_PREFIX_.'product` AS p
+                        ON (p.`id_product` = hrt.`id_product`)
+                    LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object` AS hrtso
+                        ON (hrtso.`id_room_type_selling_object` = hrt.`id_selling_object`
+                            AND hrtso.`active` = 1)
+                    LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object_lang` AS hrtstl
+                        ON (hrtstl.`id_room_type_selling_object` = hrtso.`id_room_type_selling_object`
+                            AND hrtstl.`id_lang` = '.(int)$idLang.')
+                    WHERE hrt.`id_product` = '.(int)$id_product;
 
-        return Db::getInstance()->getRow($sql);
+            $result = Db::getInstance()->getRow($sql);
+
+            Cache::store($cache_key, $result);
+        } else {
+            $result = Cache::retrieve($cache_key);
+        }
+        return $result;
     }
 
     /**
@@ -298,23 +330,39 @@ class HotelRoomType extends ObjectModel
             $idLang = Context::getContext()->language->id;
         }
 
-        $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`
-        '.($position ? ', cp.`position`' : '').'
-        '.($fullDetail ? ', pl.`link_rewrite`, pl.`description_short`' : '').'
-        FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
-        INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)';
-        $sql .= ' INNER JOIN `'._DB_PREFIX_.'product_lang` pl ON (hrt.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int)$idLang.')';
+        $cache_key = 'HotelRoomType::getRoomTypeDetailByRoomTypeIds_'.$roomTypesList.'_'.$position.'_'.$fullDetail.'_'.$idLang;
+        if (!Cache::isStored($cache_key)) {
 
-        if ($position) {
-            $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hrt.`id_hotel`)
-            INNER JOIN `'._DB_PREFIX_.'category_product` cp ON cp.`id_category` = hbi.`id_category` AND cp.`id_product` = hrt.`id_product`';
+            $sql = 'SELECT pl.`name`, COUNT(hri.`id`) AS `numberOfRooms`, hrt.`id_product`, `adults`, `children`, `max_adults`, `max_children`, `max_guests`, COALESCE(hrtstl.`name`, "'.pSQL($this->selling_object_name).'") AS `selling_object_name`, COALESCE(hrtstl.`plural_name`, "'.pSQL($this->selling_object_plural_name).'") AS `selling_object_plural_name`
+            '.($position ? ', cp.`position`' : '').'
+            '.($fullDetail ? ', pl.`link_rewrite`, pl.`description_short`' : '').'
+            FROM `'._DB_PREFIX_.'htl_room_type` AS `hrt`
+            INNER JOIN `'._DB_PREFIX_.'htl_room_information` AS `hri` ON (hri.`id_product` = hrt.`id_product`)';
+            $sql .= ' INNER JOIN `'._DB_PREFIX_.'product_lang` pl ON (hrt.`id_product` = pl.`id_product` AND pl.`id_lang` = '.(int)$idLang.')';
+            $sql .= ' LEFT JOIN `'._DB_PREFIX_.'product` AS p ON (p.`id_product` = hrt.`id_product`)
+            LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object` AS hrtso
+                ON (hrtso.`id_room_type_selling_object` = p.`id_selling_object`
+                    AND hrtso.`active` = 1)
+            LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object_lang` AS hrtstl
+                ON (hrtstl.`id_room_type_selling_object` = hrtso.`id_room_type_selling_object`
+                    AND hrtstl.`id_lang` = '.(int)$idLang.')';
+
+            if ($position) {
+                $sql .= ' INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id` = hrt.`id_hotel`)
+                INNER JOIN `'._DB_PREFIX_.'category_product` cp ON cp.`id_category` = hbi.`id_category` AND cp.`id_product` = hrt.`id_product`';
+            }
+
+            $sql .= 'WHERE hrt.`id_product` IN ('.$roomTypesList.')
+            GROUP BY hrt.`id_product`'.
+            ($position ? ' ORDER BY cp.`position`' : '');
+
+            $result = Db::getInstance()->executeS($sql);
+            Cache::store($cache_key, $result);
+
+        } else {
+            $result = Cache::retrieve($cache_key);
         }
-
-        $sql .= 'WHERE hrt.`id_product` IN ('.$roomTypesList.')
-        GROUP BY hrt.`id_product`'.
-        ($position ? ' ORDER BY cp.`position`' : '');
-
-        return Db::getInstance()->executeS($sql);
+        return $result;
     }
 
     /**
@@ -456,4 +504,101 @@ class HotelRoomType extends ObjectModel
         return parent::validateFields($die, $error_return);
     }
 
+    // ── REPORT METHODS ────────────────────────────────────────────────────────
+
+    /**
+     * Performance metrics per room type: revenue, ADR, RevPAR, occupancy, LOS.
+     * Used by room-type performance report tab.
+     *
+     * @param array $params date_from, date_to, id_hotel, id_product, id_lang
+     * @return array
+     */
+
+    /**
+     * Room type list for filter dropdowns in reports.
+     *
+     * @param array $params id_hotel, id_lang
+     * @return array rows: id_product, room_type_name
+     */
+    public static function getRoomTypes(array $params)
+    {
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
+        $idLang   = !empty($params['id_lang']) ? (int) $params['id_lang'] : (int) Context::getContext()->language->id;
+
+        return Db::getInstance()->executeS(
+            'SELECT hrt.`id_product`, pl.`name` AS room_type_name
+            FROM `'._DB_PREFIX_.'htl_room_type` hrt
+            INNER JOIN `'._DB_PREFIX_.'product` p
+                ON (p.`id_product` = hrt.`id_product` AND p.`active` = 1 AND p.`booking_product` = 1)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = hrt.`id_product` AND pl.`id_lang` = '.$idLang.')'
+            . HotelBranchInformation::addHotelRestriction($idsHotel, 'hrt')
+            . ' ORDER BY pl.`name`'
+        );
+    }
+
+    public static function getRoomTypePerformance(array $params)
+    {
+        $dateFrom  = pSQL($params['date_from']);
+        $dateTo    = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
+        $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
+        $idProduct = isset($params['id_product']) ? (int) $params['id_product'] : 0;
+        $idLang    = isset($params['id_lang'])    ? (int) $params['id_lang']     : 0;
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $numNights = max(1, (int)(new DateTime($dateTo))->diff(new DateTime($dateFrom))->days);
+
+        $rows = Db::getInstance()->executeS(
+            'SELECT hrt.`id_product`, hrt.`id_hotel`,
+            pl.`name` AS room_type_name, hbil.`hotel_name`,
+            (
+                SELECT COUNT(r.`id`)
+                FROM `'._DB_PREFIX_.'htl_room_information` r
+                WHERE r.`id_product` = hrt.`id_product` AND r.`id_hotel` = hrt.`id_hotel`
+            ) AS total_rooms,
+            COUNT(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN hbd.`id` END) AS bookings,
+            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END), 0) AS room_nights,
+            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN hbd.`total_price_tax_excl` / o.`conversion_rate` ELSE 0 END), 0) AS room_revenue,
+            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN (hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate` ELSE 0 END), 0) AS tax_amount,
+            COUNT(CASE WHEN hbd.`is_refunded` = 1 THEN hbd.`id` END) AS cancel_count
+            FROM `'._DB_PREFIX_.'htl_room_type` hrt
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hrt.`id_product`)
+            INNER JOIN `'._DB_PREFIX_.'product_lang` pl
+                ON (pl.`id_product` = p.`id_product` AND pl.`id_lang` = '.(int) $idLang.')
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil
+                ON (hbil.`id` = hrt.`id_hotel` AND hbil.`id_lang` = '.(int) $idLang.')
+            LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
+                ON (hbd.`id_product` = hrt.`id_product`
+                    AND hbd.`date_from` < "'.$dateTo.' 23:59:59"
+                    AND hbd.`date_to` > "'.$dateFrom.' 00:00:00")
+            LEFT JOIN `'._DB_PREFIX_.'orders` o
+                ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
+            WHERE p.`active` = 1 AND p.`booking_product` = 1'
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hrt')
+            .($idProduct ? ' AND hrt.`id_product` = '.$idProduct : '').'
+            GROUP BY hrt.`id_product`, hrt.`id_hotel`
+            ORDER BY room_revenue DESC'
+        );
+
+        foreach ($rows as &$row) {
+            $roomNights  = (int) $row['room_nights'];
+            $totalRooms  = (int) $row['total_rooms'];
+            $roomRevenue = (float) $row['room_revenue'];
+            $taxAmount   = (float) $row['tax_amount'];
+            $row['total_revenue']          = $roomRevenue + $taxAmount;
+            $row['total_nights_available'] = $totalRooms * $numNights;
+            $row['adr']                    = $roomNights ? round($roomRevenue / $roomNights, 2) : 0.0;
+            $row['revpar']                 = ($totalRooms && $numNights)
+                ? round($roomRevenue / ($totalRooms * $numNights), 2) : 0.0;
+            $row['occupancy_pct']          = ($totalRooms && $numNights)
+                ? round(($roomNights / ($totalRooms * $numNights)) * 100, 1) : 0.0;
+            $row['avg_los']                = (int) $row['bookings'] > 0
+                ? round($roomNights / (int) $row['bookings'], 1) : 0.0;
+        }
+        unset($row);
+
+        return $rows;
+    }
 }

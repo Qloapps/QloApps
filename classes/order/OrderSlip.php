@@ -468,6 +468,12 @@ class OrderSlipCore extends ObjectModel
         }
 
         foreach ($product_list as $productRow) {
+            // rows the loop above skipped (nothing left to credit — see the
+            // $quantity == 0 continue) never got unit_price_tax_excl/incl and
+            // total_price_tax_excl/incl set, so they must be skipped here too
+            if (!isset($productRow['unit_price_tax_excl'])) {
+                continue;
+            }
             $order_slip->addProductOrderSlip($productRow);
         }
         return $order_slip->id;

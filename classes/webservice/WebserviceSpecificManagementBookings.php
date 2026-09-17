@@ -159,7 +159,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         'id_order' => 'o.id_order',
         'reference' => 'o.reference',
         'id_room' => 'hbd.id_room',
-        'is_cancelled' => 'hbd.is_cancelled',
+        'is_cancelled' => 'IF(hbd.id_status = '.HotelBookingDetail::STATUS_CANCELLED.', 1, 0)',
         'stay' => 'stay',
         'room_status' => 'hbd.id_status',
         'booking_status' => 'o.current_state',
@@ -1146,12 +1146,11 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                             $objOrderDetail = new OrderDetail($service['id_order_detail']);
                             $objServiceProductOrderDetail = new ServiceProductOrderDetail($service['id_service_product_order_detail']);
                             $quantity = $objServiceProductOrderDetail->quantity;
-                            if ($objOrderDetail->product_price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                $quantity = $quantity * HotelHelper::getNumberOfDays(
-                                    $objHotelBookingDetail->date_from,
-                                    $objHotelBookingDetail->date_to
-                                );
-                            }
+                            $quantity *= Product::getServicePriceBillableDays(
+                                $objOrderDetail->product_price_calculation_method,
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to
+                            );
 
                             if (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']])) {
                                 $oldPriceTaxExcl = $objServiceProductOrderDetail->total_price_tax_excl;
@@ -2195,10 +2194,13 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         ))) {
                             foreach ($services as $service) {
                                 $insertedServiceProductIdOrderDetail = $objBookingDetail->getLastInsertedServiceIdOrderDetail($objOrder->id, $service['id_product']);
-                                $numDays = 1;
-                                if (Product::getProductPriceCalculation($service['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                    $numDays = HotelHelper::getNumberOfDays($objBookingDetail->date_from, $objBookingDetail->date_to);
-                                }
+                                
+                                $numDays = Product::getServicePriceBillableDays(
+                                    Product::getProductPriceCalculation($service['id_product']),
+                                    $objBookingDetail->date_from,
+                                    $objBookingDetail->date_to
+                                );
+
                                 $totalPriceTaxExcl = Product::getServiceProductPrice(
                                     $service['id_product'],
                                     0,
@@ -2528,9 +2530,12 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     foreach ($selectedAdditonalServices[$idHotelBooking]['additional_services'] as $service) {
                         $serviceOrderDetail = new OrderDetail($service['id_order_detail']);
                         $cart_quantity = $service['quantity'];
-                        if ($service['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                            $cart_quantity = $cart_quantity * $quantity;
-                        }
+                        $serviceApplicableDays = Product::getServicePriceBillableDays(
+                            $service['price_calculation_method'],
+                            $dateFrom,
+                            $dateTo
+                        );
+                        $cart_quantity = $cart_quantity * $serviceApplicableDays;
 
                         if ($cart_quantity >= $serviceOrderDetail->product_quantity) {
                             $serviceOrderDetail->delete();
@@ -3036,10 +3041,11 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     $priceTaxExcl = $objServiceProductOrderDetail->total_price_tax_excl;
                     $priceTaxIncl = $objServiceProductOrderDetail->total_price_tax_incl;
                     $objHotelBookingDetail = new HotelBookingDetail($objServiceProductOrderDetail->id_htl_booking_detail);
-                    $numDays = 1;
-                    if (Product::getProductPriceCalculation($service['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                        $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
-                    }
+                    $numDays = Product::getServicePriceBillableDays(
+                        Product::getProductPriceCalculation($service['id_product']),
+                        $objHotelBookingDetail->date_from,
+                        $objHotelBookingDetail->date_to
+                    );
 
                     $quantity = $objOrderDetail->product_quantity * $numDays;
                     if ($objServiceProductOrderDetail->delete()) {
@@ -3131,10 +3137,11 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                     $insertedServiceProductIdOrderDetail = $objHotelBookingDetail->getLastInsertedServiceIdOrderDetail($objOrder->id, $service['id_product']);
                     $objOrderDetail = new OrderDetail($insertedServiceProductIdOrderDetail);
 
-                    $numDays = 1;
-                    if (Product::getProductPriceCalculation($product['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                        $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
-                    }
+                    $numDays = Product::getServicePriceBillableDays(
+                        Product::getProductPriceCalculation($product['id_product']),
+                        $objHotelBookingDetail->date_from,
+                        $objHotelBookingDetail->date_to
+                    );
 
                     $quantity = $objServiceProductCartDetail->quantity * $numDays;
 
@@ -3691,7 +3698,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
 
                                 $objProduct = new Product($service['id_product']);
                                 $services['per_night'] = 0;
-                                if ($objProduct->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                                if ($objProduct->price_calculation_method & Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY) {
                                     $services['per_night'] = 1;
                                 }
 
@@ -3922,17 +3929,18 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                 $services['id_service'] = (int) $service['id_product'];
                                 $services['name'] = $service['name'];
                                 $services['quantity'] = (int) $service['quantity'];
-                                $services['unit_price_without_tax'] = Tools::ps_round(($service['total_price_tax_excl'] / $services['quantity']), _PS_PRICE_COMPUTE_PRECISION_);
+                                $applicableDays = Product::getServicePriceBillableDays(
+                                    $service['price_calculation_method'],
+                                    $additionalService['date_from'],
+                                    $additionalService['date_to']
+                                );
+                                $unitDivisor = max(1, ((int) $services['quantity'] * (int) $applicableDays));
+                                $services['unit_price_without_tax'] = Tools::ps_round(($service['total_price_tax_excl'] / $unitDivisor), _PS_PRICE_COMPUTE_PRECISION_);
                                 $services['total_price_without_tax'] = Tools::ps_round(($service['total_price_tax_excl']), _PS_PRICE_COMPUTE_PRECISION_);
                                 $services['total_tax'] = Tools::ps_round(($service['total_price_tax_incl'] - $service['total_price_tax_excl']), _PS_PRICE_COMPUTE_PRECISION_);
 
-                                $objProduct = new Product($service['id_product']);
-                                $services['per_night'] = 0;
-                                if ($objProduct->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                    $services['per_night'] = 1;
-                                }
-
-                                $services['price_mode'] = (int) $objProduct->price_calculation_method;
+                                $services['per_night'] = ((int) $applicableDays > 1) ? 1 : 0;
+                                $services['price_mode'] = (int) $service['price_calculation_method'];
                                 $roomInfo['services'][] = $services;
                             }
                         }

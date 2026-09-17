@@ -38,5 +38,7 @@
     </order_state>
     <order_state id="Overbooking_partial_paid" invoice="0" send_email="0" color="#FF69B4" unremovable="1" hidden="0" logable="0" delivery="0" shipped="0" paid="0" pdf_delivery="0" pdf_invoice="0">
     </order_state>
+    <order_state id="No_show" invoice="0" send_email="1" color="#DC143C" unremovable="1" hidden="0" logable="0" delivery="0" shipped="0" paid="0" pdf_delivery="0" pdf_invoice="0">
+    </order_state>
   </entities>
 </entity_order_state>

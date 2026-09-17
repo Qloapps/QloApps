@@ -41,7 +41,7 @@
                                     {foreach $additionalServices as $key => $roomAdditionalService}
                                         <div class="room_additional_services">
                                             <div class="additional_service_header">
-                                                {l s='Room'} {$roomCount|string_format:'%02d'}&nbsp;
+                                                {$room_type_info['selling_object_name']} {$roomCount|string_format:'%02d'}&nbsp;
                                                 <span>({if {$roomAdditionalService['adults']} <= 9}0{$roomAdditionalService['adults']}{else}{$roomAdditionalService['adults']}{/if} {if $roomAdditionalService['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $roomAdditionalService['children'] > 0}, {if {$roomAdditionalService['children']} <= 9}0{$roomAdditionalService['children']}{else}{$roomAdditionalService['children']}{/if} {if $roomAdditionalService['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
                                             </div>
                                             <div class="room_service_detail">
@@ -53,6 +53,18 @@
                                                                 {if $additionalService['allow_multiple_quantity']}
                                                                     <span class="quantity">{l s='(Quantity: %s)' sprintf=[$additionalService['quantity']|string_format:'%02d']}</span>
                                                                 {/if}
+                                                                {assign var='priceCalcMethod' value=$additionalService.price_calculation_method|default:0}
+                                                                {capture name='htl_pcm_tooltip'}
+                                                                <div class="htl-tooltip-cont">
+                                                                    <p class="htl-tooltip-title">{l s='Applied on:'}</p>
+                                                                    <ul>
+                                                                        {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                                                            <li>{$pcmDayLabel}</li>
+                                                                        {/foreach}
+                                                                    </ul>
+                                                                </div>
+                                                                {/capture}
+                                                                {include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}
                                                             </div>
                                                         </div>
                                                         <div class="">
