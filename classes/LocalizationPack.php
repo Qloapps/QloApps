@@ -342,11 +342,7 @@ class LocalizationPackCore
                 $version = isset($attributes['version']) ? (string)$attributes['version'] : null;
                 $lang_pack_response = Language::downloadAndInstallLanguagePack($attributes['iso_code'], $version, null);
                 if ($lang_pack_response !== true) {
-                    if (!Language::checkAndAddLanguage($attributes['iso_code'], false, $install_mode)) {
-                        $this->_errors[] = sprintf(Tools::displayError('Cannot install language "%s"'), $attributes['iso_code']);
-                    } else {
-                        Language::loadLanguages();
-                    }
+                    Language::checkAndAddLanguage($attributes['iso_code'], false, false);
                 }
             }
         }
