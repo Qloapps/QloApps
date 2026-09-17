@@ -1381,12 +1381,12 @@ class ToolsCore
             $has_mb_strtolower = function_exists('mb_strtolower');
         }
 
-        if (isset($array_str[$str])) {
-            return $array_str[$str];
-        }
-
         if (!is_string($str)) {
             return false;
+        }
+
+        if (isset($array_str[$str])) {
+            return $array_str[$str];
         }
 
         if ($str == '') {
