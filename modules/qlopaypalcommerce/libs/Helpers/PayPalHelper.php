@@ -2,10 +2,10 @@
 /**
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
+* This source file is subject to the Academic Free License (AFL 3.0)
 * that is bundled with this package in the file LICENSE.md
 * It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
+* https://opensource.org/licenses/afl-3.0.php
 * If you did not receive a copy of the license and are unable to
 * obtain it through the world-wide-web, please send an email
 * to support@qloapps.com so we can send you a copy immediately.
@@ -18,7 +18,7 @@
 *
 * @author Webkul IN
 * @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
 */
 
 include_once(dirname(__FILE__) . '/HttpHelper.php');
@@ -67,7 +67,14 @@ class PayPalHelper {
 		$this->_setDefaultHeaders();
         $this->_setAPIVersion('1');
 		$this->_http->setUrl($this->_createApiUrl("oauth2/token"));
-        $this->_http->setAuthentication(Configuration::get('WK_PAYPAL_COMMERCE_CLIENT_ID') . ":" . Configuration::get('WK_PAYPAL_COMMERCE_CLIENT_SECRET'));
+        if (self::isSanboxEnvironment()) {
+            $wkClientId = trim(Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'));
+            $wkClientSecret = trim(Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'));
+        } else {
+            $wkClientId = trim(Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'));
+            $wkClientSecret = trim(Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'));
+        }
+        $this->_http->setAuthentication($wkClientId . ":" . $wkClientSecret);
         $this->_http->setBody("grant_type=client_credentials");
         $returnData = $this->_http->sendRequest();
         $this->_token = $returnData['access_token'];
