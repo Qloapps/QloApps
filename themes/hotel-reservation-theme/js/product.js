@@ -1156,6 +1156,7 @@ $(document).ready(function() {
                                 triggerElement.hide();
                             }
                         }
+                        initHtlTooltip();
                     } else {
                         triggerElement.hide();
                     }
@@ -1584,3 +1585,11 @@ function getBookingOccupancy()
 
     return occupancy;
 }
+
+$(document).on('change', 'input[name="buying_option"]', function() {
+    if ($(this).val() == '2') {
+        $('#hotel_selection_block').hide();
+    } else {
+        $('#hotel_selection_block').show();
+    }
+});

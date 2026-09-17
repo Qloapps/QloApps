@@ -603,9 +603,9 @@ abstract class PaymentModuleCore extends Module
                         }
 
                         if (!$product['booking_product']
-                            && ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE
-                                || $product['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                                || $product['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
+                            && ($product['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_STANDALONE
+                                || $product['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTEL
+                                || $product['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE
                             )
                         ) {
                             $cover_image_arr = $objProduct->getCover($product['id_product']);
@@ -983,6 +983,9 @@ abstract class PaymentModuleCore extends Module
                                 )) {
                                     $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, $product['selling_preference_type']);
                                     foreach ($roomTypeServices as $roomTypeService) {
+                                        if (!$roomTypeService['id_hotel_cart_booking']) {
+                                            continue;
+                                        }
                                         $roomBookingDetail = $objBookingDetail->getRowByIdOrderIdProductInDateRange(
                                             $order->id,
                                             $roomTypeService['id_room_type'],
@@ -1029,7 +1032,7 @@ abstract class PaymentModuleCore extends Module
                                         }
                                     }
                                 }
-                            } elseif (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $product['selling_preference_type']) {
+                            } elseif (Product::SELLING_PREFERENCE_WITH_HOTEL == $product['selling_preference_type']) {
                                 if ($hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $this->context->cart->id,
                                     [],
@@ -1086,12 +1089,12 @@ abstract class PaymentModuleCore extends Module
 
                                     }
                                 }
-                            } elseif (Product::SELLING_PREFERENCE_STANDALONE == $product['selling_preference_type']) {
+                            } elseif (Product::SELLING_PREFERENCE_WITH_STANDALONE == $product['selling_preference_type']) {
                                 if ($standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                     $this->context->cart->id,
-                                    [Product::SELLING_PREFERENCE_STANDALONE],
-                                    null,
-                                    null,
+                                    [],
+                                    0,
+                                    0,
                                     null,
                                     $product['id_product']
                                 )) {
@@ -1137,7 +1140,7 @@ abstract class PaymentModuleCore extends Module
 
                                     }
                                 }
-                            } elseif (Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE == $product['selling_preference_type']) {
+                            } elseif (Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE == $product['selling_preference_type']) {
                                 $idProductRoomType = null;
                                 $idProductHotel = null;
                                 if (isset($product['id_room_type']) && $product['id_room_type']) {
@@ -1155,7 +1158,7 @@ abstract class PaymentModuleCore extends Module
                                 )) {
                                     foreach ($serviceProducts as $serviceProduct) {
                                         if ($serviceProduct['id_hotel']) {
-                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
+                                            $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, Product::SELLING_PREFERENCE_WITH_HOTEL);
                                         } else {
                                             $idOrderDetail = $objBookingDetail->getPsOrderDetailIdByIdProduct($idProduct, $order->id, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
                                         }
@@ -1344,10 +1347,10 @@ abstract class PaymentModuleCore extends Module
                         $total_convenience_fee_tax = $total_convenience_fee_ti - $total_convenience_fee_te;
 
                         // service products
-                        $standalone_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE);
-                        $standalone_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE);
-                        $hotel_standalone_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
-                        $hotel_standalone_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE);
+                        $standalone_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE);
+                        $standalone_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE);
+                        $hotel_standalone_products_price_tax_excl = $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL);
+                        $hotel_standalone_products_price_tax_incl = $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL);
 
                         $service_products_tax = ($standalone_products_price_tax_incl + $hotel_standalone_products_price_tax_incl) - ($standalone_products_price_tax_excl + $hotel_standalone_products_price_tax_excl);
 

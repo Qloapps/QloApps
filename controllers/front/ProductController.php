@@ -40,6 +40,7 @@ class ProductControllerCore extends FrontController
         if (count($this->errors)) {
             return;
         }
+        $this->addJqueryUI(array('ui.tooltip'), 'base', true);
 
         if (!$this->useMobileTheme()) {
             $this->addCSS(_THEME_CSS_DIR_.'product.css');
@@ -138,10 +139,14 @@ class ProductControllerCore extends FrontController
 
         // if product is a service product then check type of selling preference
         if (!$this->product->booking_product) {
-            if ($this->product->selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) {
+            if (
+                Product::isSellableWithRoomType($this->product->id)
+                && !Product::isSellableWithHotel($this->product->id)
+                && !Product::isSellableAsStandalone($this->product->id)
+            ) {
                 Tools::redirect($this->context->link->getPageLink('pagenotfound'));
-            } elseif ($this->product->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE) {
-                // if selling preference is hotel standalone and with room type then check if product is associated to any hotel
+            } elseif (Product::isSellableWithHotel($this->product->id)) {
+                // For any hotel-sellable service product, ensure hotel associations exist.
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $associatedHotels = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($this->product->id);
                 if (!isset($associatedHotels['hotel']) || !$associatedHotels['hotel']) {
@@ -898,12 +903,13 @@ class ProductControllerCore extends FrontController
     public function assignServiceProductVars(
         $idProductOption = false,
         $quantity = 1,
-        $idHotel = false
+        $idHotel = false,
+        $buying_option = false
     ) {
         $smartyVars = array();
-        if (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $this->product->selling_preference_type
-            || Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE == $this->product->selling_preference_type
-        ) {
+        $smartyVars['sellable_with_hotel'] = Product::isSellableWithHotel($this->product->id);
+        $smartyVars['sellable_as_standalone'] = Product::isSellableAsStandalone($this->product->id);
+        if (Product::isSellableWithHotel($this->product->id)) {
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
 
             if ($associatedHotels = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($this->product->id)['hotel']) {
@@ -925,6 +931,9 @@ class ProductControllerCore extends FrontController
         }
         if ($idHotel) {
             $smartyVars['service_id_hotel'] = $idHotel;
+        }
+        if($buying_option) {
+            $smartyVars['buying_option'] = $buying_option;
         }
         $useTax = HotelBookingDetail::useTax();
         $includeTourismTax = $useTax && Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
@@ -1490,13 +1499,15 @@ class ProductControllerCore extends FrontController
             )) {
             }
         } else {
-            $idHotel = Tools::getValue('id_hotel');
+            $idHotel = Tools::getValue('service_id_hotel');
+            $buying_option = Tools::getValue('buying_option');
             $id_product_option = Tools::getValue('id_product_option');
             $quantity = Tools::getValue('qty');
             $this->assignServiceProductVars(
                 $id_product_option,
                 $quantity,
-                $idHotel
+                $idHotel,
+                $buying_option
             );
         }
 

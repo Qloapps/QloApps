@@ -124,41 +124,37 @@
                                                     {displayWtPriceWithCurrency price=($rm_v.amount_tax_excl + $rm_v.additional_services_price_te + $rm_v.additional_services_price_auto_add_te) currency=$currency}
                                                 {/if}
                                                 {if isset($rm_v.additional_services) && $rm_v.additional_services}
-                                                    <span class="order-price-info">
-                                                        <img src="{$img_dir}icon/icon-info.svg" />
-                                                    </span>
-                                                    <div class="price-info-container" style="display: none;">
-                                                        <div class="price-info-tooltip-cont">
-                                                            <div class="list-row">
-                                                                <div>
-                                                                    <p>{l s='%s cost:' sprintf=$data_v.selling_object_plural_name|escape:'html':'UTF-8'}</p>
-                                                                </div>
-                                                                <div class="text-right">
-                                                                    <p>
-                                                                        {if $group_use_tax}
-                                                                            {displayWtPriceWithCurrency price=($rm_v.amount_tax_incl + $rm_v.additional_services_price_auto_add_ti) currency=$currency}
-                                                                        {else}
-                                                                            {displayWtPriceWithCurrency price=($rm_v.amount_tax_excl + $rm_v.additional_services_price_auto_add_te) currency=$currency}
-                                                                        {/if}
-                                                                    </p>
-                                                                </div>
+                                                    {capture name='htl_room_price_tooltip'}
+                                                    <div class="htl-tooltip-cont">
+                                                        <div class="htl-tooltip-row">
+                                                            <div>
+                                                                <p>{l s='%s cost:' sprintf=$data_v.selling_object_plural_name|escape:'html':'UTF-8'}</p>
                                                             </div>
-                                                            <div class="list-row">
-                                                                <div>
-                                                                    <p>{l s='Service(s) cost:'}</p>
-                                                                </div>
-                                                                <div class="text-right">
-                                                                    <p>
-                                                                        {if $group_use_tax}
-                                                                            {displayWtPriceWithCurrency price=$rm_v.additional_services_price_ti  currency=$currency}
-                                                                        {else}
-                                                                            {displayWtPriceWithCurrency price=$rm_v.additional_services_price_te currency=$currency}
-                                                                        {/if}
-                                                                    </p>
-                                                                </div>
+                                                            <div class="text-right">
+                                                                <p>
+                                                                    {if $group_use_tax}
+                                                                        {displayWtPriceWithCurrency price=($rm_v.amount_tax_incl + $rm_v.additional_services_price_auto_add_ti) currency=$currency}
+                                                                    {else}
+                                                                        {displayWtPriceWithCurrency price=($rm_v.amount_tax_excl + $rm_v.additional_services_price_auto_add_te) currency=$currency}
+                                                                    {/if}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="htl-tooltip-row">
+                                                            <div><p>{l s='Service(s) cost:'}</p></div>
+                                                            <div class="text-right">
+                                                                <p>
+                                                                    {if $group_use_tax}
+                                                                        {displayWtPriceWithCurrency price=$rm_v.additional_services_price_ti currency=$currency}
+                                                                    {else}
+                                                                        {displayWtPriceWithCurrency price=$rm_v.additional_services_price_te currency=$currency}
+                                                                    {/if}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    {/capture}
+                                                    {include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_room_price_tooltip allow_html=true tooltip_class='htl-tooltip-room-price-detail'}
                                                 {/if}
                                             </dd>
                                         </div>

@@ -751,7 +751,7 @@ public function ajaxProcessGetCalenderData()
             if (!$product->id || !$product->active) {
                 $this->errors[] = $this->l('This product is no longer available.');
             }
-            if ($product->booking_product || ($product->selling_preference_type != Product::SELLING_PREFERENCE_STANDALONE)) {
+            if ($product->booking_product || !Product::isSellableAsStandalone($product->id)) {
                 // cannot be added without room type or is a booking product.
                 $this->errors[] = $this->l('This product is either a room type or extra service and cannot be added thorugh this method.');
             } elseif (!$product->allow_multiple_quantity) {
@@ -921,7 +921,7 @@ public function ajaxProcessGetCalenderData()
     public function assignServiceProductsForm()
     {
         $objProduct = new Product();
-        $serviceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
+        $serviceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_WITH_STANDALONE);
         $hotelAddressInfo = HotelBranchInformation::getAddress($this->id_hotel);
         $serviceProducts = Product::getProductsProperties($this->context->language->id, $serviceProducts);
         $this->context->smarty->assign(array(
@@ -1106,7 +1106,7 @@ public function ajaxProcessGetCalenderData()
             'ALLOTMENT_AUTO' => HotelBookingDetail::ALLOTMENT_AUTO,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
             'SELLING_PREFERENCE_WITH_ROOM_TYPE' => Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
-            'SELLING_PREFERENCE_STANDALONE' => Product::SELLING_PREFERENCE_STANDALONE,
+            'SELLING_PREFERENCE_WITH_STANDALONE' => Product::SELLING_PREFERENCE_WITH_STANDALONE,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
             'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
