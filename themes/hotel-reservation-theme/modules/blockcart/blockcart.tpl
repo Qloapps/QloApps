@@ -204,7 +204,7 @@
 							<span class="cross" title="{l s='Close window' mod='blockcart'}"></span>
 							{block name='blockcart_layer_cart_left_heading'}
 								<h2 class="layer_cart_room_txt">
-									<i class="icon-check"></i>{l s='Room successfully added to your cart' mod='blockcart'}
+									<i class="icon-check"></i><span class="layer_cart_room_success_msg">{l s='Room successfully added to your cart' mod='blockcart'}</span>
 								</h2>
 								<h2 class="layer_cart_product_txt">
 									<i class="icon-check"></i>{l s='Product successfully added to your cart' mod='blockcart'}
@@ -223,7 +223,7 @@
 										<span id="layer_cart_product_time_duration"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_product_txt">{l s='Hotel Name' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_product_txt">{l s='Property Name' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_hotel_name"></span>
 									</div>
 									<div>
@@ -231,12 +231,12 @@
 										<span id="layer_cart_product_unit_price"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_room_txt">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_room_txt"><span class="layer_cart_attribute_type">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if}</span> &nbsp;-&nbsp;</strong>
 										<strong class="dark layer_cart_product_txt">{l s='Quantity' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_quantity"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_room_txt">{l s='Room type cost' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_room_txt"><span class="layer_cart_room_type_cost_label">{l s='Room type cost' mod='blockcart'}</span> &nbsp;-&nbsp;</strong>
 										<strong class="dark layer_cart_product_txt">{l s='Total' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_price"></span>
 									</div>

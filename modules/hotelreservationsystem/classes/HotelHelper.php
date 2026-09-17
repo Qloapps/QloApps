@@ -1227,6 +1227,280 @@ class HotelHelper
         );
     }
 
+    public function createHotelDefaultPropertyTypes()
+    {
+        $propertyTypes = array(
+            'Hotel',
+            'Motel',
+            'Resort',
+            'Hostel',
+            'Guest House',
+            'Bed & Breakfast',
+            'Lodge',
+            'Apartment',
+            'Vacation Rental',
+            'Homestay',
+            'Co-Living',
+            'Camping',
+            'Glamping',
+            'Farm Stay',
+            'Houseboat',
+            'Boat Stay',
+        );
+
+        $languages = Language::getLanguages(true);
+        foreach ($propertyTypes as $typeName) {
+            $objType = new HotelPropertyType();
+            $objType->active = 1;
+            foreach ($languages as $lang) {
+                $objType->name[$lang['id_lang']] = $typeName;
+            }
+            $objType->save();
+        }
+
+        return true;
+    }
+
+    public function createDefaultRoomSellingObjects()
+    {
+       $roomTypeSellingObjects = array(
+            array(
+                'name' => 'Room',
+                'plural_name' => 'Rooms',
+            ),
+            array(
+                'name' => 'Bed',
+                'plural_name' => 'Beds',
+            ),
+            array(
+                'name' => 'Apartment',
+                'plural_name' => 'Apartments',
+            ),
+            array(
+                'name' => 'Villa',
+                'plural_name' => 'Villas',
+            ),
+            array(
+                'name' => 'Cottage',
+                'plural_name' => 'Cottages',
+            ),
+            array(
+                'name' => 'Bungalow',
+                'plural_name' => 'Bungalows',
+            ),
+            array(
+                'name' => 'House',
+                'plural_name' => 'Houses',
+            ),
+            array(
+                'name' => 'Chalet',
+                'plural_name' => 'Chalets',
+            ),
+            array(
+                'name' => 'Cabin',
+                'plural_name' => 'Cabins',
+            ),
+            array(
+                'name' => 'Studio',
+                'plural_name' => 'Studios',
+            ),
+            array(
+                'name' => 'Condo',
+                'plural_name' => 'Condos',
+            ),
+            array(
+                'name' => 'Penthouse',
+                'plural_name' => 'Penthouses',
+            ),
+            array(
+                'name' => 'Tent',
+                'plural_name' => 'Tents',
+            ),
+            array(
+                'name' => 'Camping Pitch',
+                'plural_name' => 'Camping Pitches',
+            ),
+            array(
+                'name' => 'Caravan Site',
+                'plural_name' => 'Caravan Sites',
+            ),
+            array(
+                'name' => 'RV Site',
+                'plural_name' => 'RV Sites',
+            ),
+            array(
+                'name' => 'Pod',
+                'plural_name' => 'Pods',
+            ),
+            array(
+                'name' => 'Capsule',
+                'plural_name' => 'Capsules',
+            ),
+            array(
+                'name' => 'Treehouse',
+                'plural_name' => 'Treehouses',
+            ),
+            array(
+                'name' => 'Hut',
+                'plural_name' => 'Huts',
+            ),
+            array(
+                'name' => 'Yurt',
+                'plural_name' => 'Yurts',
+            ),
+            array(
+                'name' => 'Igloo',
+                'plural_name' => 'Igloos',
+            ),
+            array(
+                'name' => 'Houseboat',
+                'plural_name' => 'Houseboats',
+            ),
+            array(
+                'name' => 'Boat Cabin',
+                'plural_name' => 'Boat Cabins',
+            ),
+            array(
+                'name' => 'Overwater Bungalow',
+                'plural_name' => 'Overwater Bungalows',
+            ),
+            array(
+                'name' => 'Heritage Room',
+                'plural_name' => 'Heritage Rooms',
+            ),
+            array(
+                'name' => 'Holiday Home',
+                'plural_name' => 'Holiday Homes',
+            ),
+            array(
+                'name' => 'Farm Stay Unit',
+                'plural_name' => 'Farm Stay Units',
+            ),
+            array(
+                'name' => 'Cave Room',
+                'plural_name' => 'Cave Rooms',
+            ),
+            array(
+                'name' => 'Container Stay',
+                'plural_name' => 'Container Stays',
+            ),
+            array(
+                'name' => 'Train Cabin',
+                'plural_name' => 'Train Cabins',
+            ),
+            array(
+                'name' => 'Motorhome',
+                'plural_name' => 'Motorhomes',
+            ),
+        );
+
+        $languages = Language::getLanguages(true);
+        foreach ($roomTypeSellingObjects as $typeName) {
+            $objType = new RoomTypeSellingObject();
+            $objType->active = 1;
+            foreach ($languages as $lang) {
+                $objType->name[$lang['id_lang']] = $typeName['name'];
+                $objType->plural_name[$lang['id_lang']] = $typeName['plural_name'];
+            }
+            $objType->save();
+        }
+    }
+
+    public function createDefaultBookingStatuses()
+    {
+        $htlBookingStatuses = array(
+            array(
+                'id' => HotelBookingDetail::STATUS_ASSIGNED,
+                'color' => '#4169E1',
+                'is_terminal' => 0,
+                'name' => array(
+                    'en' => 'Assigned',
+                    'nl' => 'Toegewezen',
+                    'fr' => 'Assignée',
+                    'de' => 'Zugewiesen',
+                    'ru' => 'Назначено',
+                    'es' => 'Asignada',
+                ),
+            ),
+            array(
+                'id' => HotelBookingDetail::STATUS_CHECKED_IN,
+                'color' => '#17A2B8',
+                'is_terminal' => 0,
+                'name' => array(
+                    'en' => 'Checked-in',
+                    'nl' => 'Ingecheckt',
+                    'fr' => 'Enregistrée',
+                    'de' => 'Eingecheckt',
+                    'ru' => 'Заселено',
+                    'es' => 'Registrada',
+                ),
+            ),
+            array(
+                'id' => HotelBookingDetail::STATUS_CHECKED_OUT,
+                'color' => '#108510',
+                'is_terminal' => 0,
+                'name' => array(
+                    'en' => 'Checked-out',
+                    'nl' => 'Uitgecheckt',
+                    'fr' => 'Départ effectué',
+                    'de' => 'Ausgecheckt',
+                    'ru' => 'Выселено',
+                    'es' => 'Salida realizada',
+                ),
+            ),
+            array(
+                'id' => HotelBookingDetail::STATUS_NO_SHOW,
+                'color' => '#DC143C',
+                'is_terminal' => 1,
+                'name' => array(
+                    'en' => 'No-show',
+                    'nl' => 'Niet verschenen',
+                    'fr' => 'Non présentée',
+                    'de' => 'Nicht erschienen',
+                    'ru' => 'Неявка',
+                    'es' => 'No presentada',
+                ),
+            ),
+            array(
+                'id' => HotelBookingDetail::STATUS_CANCELLED,
+                'color' => '#FF8C00',
+                'is_terminal' => 1,
+                'name' => array(
+                    'en' => 'Cancelled',
+                    'nl' => 'Geannuleerd',
+                    'fr' => 'Annulée',
+                    'de' => 'Storniert',
+                    'ru' => 'Отменено',
+                    'es' => 'Cancelada',
+                ),
+            ),
+        );
+
+        $languages = Language::getLanguages(true);
+        foreach ($htlBookingStatuses as $htlBookingStatus) {
+            $objBookingStatus = new HotelBookingStatus();
+            // fixed id: this catalog's rows are referenced by the HotelBookingDetail::STATUS_* constants
+            $objBookingStatus->id = $htlBookingStatus['id'];
+            $objBookingStatus->force_id = true;
+            $objBookingStatus->color = $htlBookingStatus['color'];
+            $objBookingStatus->is_terminal = $htlBookingStatus['is_terminal'];
+
+            foreach ($languages as $lang) {
+                if (isset($htlBookingStatus['name'][$lang['iso_code']])) {
+                    $objBookingStatus->name[$lang['id_lang']] = $htlBookingStatus['name'][$lang['iso_code']];
+                } else {
+                    $objBookingStatus->name[$lang['id_lang']] = $htlBookingStatus['name']['en'];
+                }
+            }
+
+            if (!$objBookingStatus->add()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static function getPsProducts($id_lang, $start = 0, $limit = 0, $booking_product = null)
     {
         $sql = 'SELECT p.`id_product`, pl.`name`, p.`booking_product`
@@ -1245,6 +1519,7 @@ class HotelHelper
     {
         $obj_hotel_info = new HotelBranchInformation();
         $obj_hotel_info->active = 1;
+        $obj_hotel_info->id_property_type = 1;
         $obj_hotel_info->email = 'hotelprime@htl.com';
         $obj_hotel_info->check_in = '12:00';
         $obj_hotel_info->check_out = '11:00';
@@ -1843,6 +2118,7 @@ class HotelHelper
             $product->show_at_front = 1;
             $product->is_virtual = 1;
             $product->indexed = 1;
+            $product->id_selling_object = 1;
             $product->save();
             $product_id = $product->id;
 
@@ -1923,6 +2199,7 @@ class HotelHelper
             $htl_rm_type = new HotelRoomType();
             $htl_rm_type->id_product = $product_id;
             $htl_rm_type->id_hotel = $id_hotel;
+            $htl_rm_type->id_selling_object = $product->id_selling_object;
             $htl_rm_type->adults = 2;
             $htl_rm_type->children = 2;
             $htl_rm_type->max_adults = 2;
@@ -2323,6 +2600,8 @@ class HotelHelper
         $this->saveDummyHotelAmenities($htl_id);
         $this->saveDummyProductsAndRelatedInfo($htl_id);
         $this->saveDummyServiceProductsAndRelatedInfo();
+        $this->createHotelDefaultPropertyTypes();
+        $this->createDefaultRoomSellingObjects();
 
         return true;
     }

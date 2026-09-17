@@ -1021,9 +1021,11 @@ $(document).ready(function() {
         },
     });
 
-    // when change order state to cancel or refund then show modal of bookings cancellation
+    // when changing order state to Refund, show the booking/product selection
+    // modal first — Cancelled is no longer handled here, cancelling a booking
+    // only happens through Room Status now
     $(document).on('change', '#id_order_state', function(e) {
-        if ($(this).val() == PS_OS_CANCELED || $(this).val() == PS_OS_REFUND) {
+        if ($(this).val() == PS_OS_REFUND) {
             e.preventDefault();
             CancelRoomBookingModal.show();
         }
@@ -1236,6 +1238,57 @@ $(document).ready(function() {
         });
     });
 
+    $(document).on('click', '.del_room_additional_service', function(e){
+        e.preventDefault();
+        if (confirm(txt_confirm)) {
+            var idServiceProductOrderDetail = $(this).data('id_service_product_order_detail');
+            $currentItem = $(this);
+            if (idServiceProductOrderDetail) {
+                $(".loading_overlay").show();
+                $.ajax({
+                    type: 'POST',
+                    headers: {
+                        "cache-control": "no-cache"
+                    },
+                    url: admin_order_tab_link,
+                    dataType: 'JSON',
+                    cache: false,
+                    data: {
+                        id_service_product_order_detail: idServiceProductOrderDetail,
+                        action: 'DeleteRoomAdditionalService',
+                        ajax: true
+                    },
+                    success: function(jsonData) {
+                        if (!jsonData.hasError) {
+                            if (jsonData.service_panel) {
+                                $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+                            }
+                            showSuccessMessage(txtExtraServiceSucc);
+                        } else {
+                            showErrorMessage(jsonData.errors);
+
+                        }
+                    },
+                    complete: function() {
+                        $(".loading_overlay").hide();
+                    }
+                });
+            } else {
+                showErrorMessage(txtInvalidDemandVal);
+            }
+        }
+
+    });
+
+    // change advance option of extra demand
+    $(document).on('change', '.demand_adv_option_block .id_option', function(e) {
+        var option_selected = $(this).find('option:selected');
+        var extra_demand_price = option_selected.attr("optionPrice")
+        extra_demand_price = parseFloat(extra_demand_price);
+        // extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+        $(this).closest('.room_demand_block').find('.unit_price').val(extra_demand_price);
+    });
+
     $(".textarea-autosize").autosize();
 
     var date = new Date();
@@ -1422,8 +1475,10 @@ $(document).ready(function() {
     // for updating Room status
     // toggle date input of check-in checkout dates as per status selected
     $(document).on('change', '.booking_order_status', function() {
-        var status = $(this).val();
-        var $form = $(this).closest('.room_status_info_form');
+        var $select = $(this);
+        var status = $select.val();
+        var $form = $select.closest('.room_status_info_form');
+
         if (status == ROOM_STATUS_CHECKED_IN || status == ROOM_STATUS_CHECKED_OUT) {
             $form.find('.room_status_date').closest('.form-group').show();
             var currentStatus = $form.data('current_status');
@@ -1468,6 +1523,10 @@ $(document).ready(function() {
 
     $(document).on('click', '.submitRoomStatus', function(e) {
         e.preventDefault();
+        var status = $('#room-status-modal .booking_order_status').val();
+        if ((status == ROOM_STATUS_NO_SHOW || status == ROOM_STATUS_CANCELLED) && !confirm(room_status_sealed_warning_txt)) {
+            return;
+        }
         RoomStatusModal.submit();
     });
     // End: RoomStatusModal: Processes

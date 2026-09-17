@@ -25,10 +25,15 @@
 <div id="container" class="row">
 	<div class="sidebar navigation col-md-3">
 		<nav class="list-group categorieList">
-		{if count($modules)}
-			{foreach $modules as $module}
-				{if $module_instance[$module.name]}
-					<a class="list-group-item{if ($current_module_name && $current_module_name == $module.name)} active{/if}" href="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;module={$module.name}">{$module_instance[$module.name]->displayName}</a>
+		{if count($module_tabs)}
+			{foreach $module_tabs as $module_name => $moduleData}
+				{if isset($moduleData.tabs) && $moduleData.tabs}
+					{foreach $moduleData.tabs as $tab}
+						{assign var="tab_active" value=($current_module_name == $module_name && $current_tab == $tab.key)}
+						<a class="list-group-item{if $tab_active} active{/if}" href="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;module={$module_name|escape:'html':'UTF-8'}&amp;tab={$tab.key|escape:'html':'UTF-8'}">{$tab.label}</a>
+					{/foreach}
+				{else}
+					<a class="list-group-item{if $current_module_name == $module_name} active{/if}" href="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}&amp;module={$module_name|escape:'html':'UTF-8'}">{$moduleData.display_name}</a>
 				{/if}
 			{/foreach}
 		{else}

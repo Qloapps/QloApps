@@ -48,4 +48,8 @@
     <name>תשלום חלקי התקבל</name>
     <template>partial_payment_accepted</template>
   </order_state>
+  <order_state id="No_show">
+    <name>אי-הגעה</name>
+    <template>no_show</template>
+  </order_state>
 </entity_order_state>

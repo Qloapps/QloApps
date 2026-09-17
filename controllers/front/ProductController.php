@@ -338,15 +338,15 @@ class ProductControllerCore extends FrontController
                 /*By webkul To send All needed Hotel Information on product.tpl*/
                 #####################################################################
 
-                    $htl_features = array();
+                $htl_features = array();
                 $obj_hotel_room_type = new HotelRoomType();
                 $room_info_by_product_id = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($this->product->id);
                 if ($hotel_id = $room_info_by_product_id['id_hotel']) {
-                    $obj_hotel_branch = new HotelBranchInformation();
+                    $obj_hotel_branch = new HotelBranchInformation($hotel_id);
                     $hotel_info_by_id = $obj_hotel_branch->hotelBranchesInfo(false, 2, 1, $hotel_id);
                     $hotel_policies = $hotel_info_by_id['policies'];
                     $hotel_name = $hotel_info_by_id['hotel_name'];
-
+                    $propertyType = $obj_hotel_branch->propertyTypeName;
                     $addressInfo = HotelBranchInformation::getAddress($room_info_by_product_id['id_hotel']);
                     $hotel_location = $addressInfo['city'].
                     ($addressInfo['id_state']?', '.$addressInfo['state']:'').', '.$addressInfo['country'];
@@ -431,6 +431,7 @@ class ProductControllerCore extends FrontController
                             'hotel_rating' => $hotel_info_by_id['rating'],
                             'hotel_description' => $hotel_info_by_id['description'],
                             'hotel_policies' => $hotel_policies,
+                            'property_type' => $propertyType,
                             'hotel_features' => $htl_features,
                             'room_type_features' => $roomFeatures,
                             'room_dynamic_amenities' => $roomAmenities,

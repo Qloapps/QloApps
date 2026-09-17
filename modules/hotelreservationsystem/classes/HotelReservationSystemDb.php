@@ -30,6 +30,7 @@ class HotelReservationSystemDb
                 `id` int(11) NOT NULL AUTO_INCREMENT,
                 `id_product` int(11) NOT NULL,
                 `id_hotel` int(11) NOT NULL,
+                `id_selling_object` int(10) unsigned DEFAULT NULL,
                 `adults` smallint(6) NOT NULL DEFAULT '2',
                 `children` smallint(6) NOT NULL DEFAULT '0',
                 `max_adults` smallint(6) NOT NULL DEFAULT '2',
@@ -59,6 +60,7 @@ class HotelReservationSystemDb
                 `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_category` int(10) unsigned NOT NULL,
                 `email` varchar(128) NOT NULL,
+                `id_property_type` int(10) unsigned NOT NULL DEFAULT '0',
                 `check_in` varchar(255) DEFAULT NULL,
                 `check_out` varchar(255) DEFAULT NULL,
                 `rating` int(2) unsigned NOT NULL,
@@ -128,6 +130,20 @@ class HotelReservationSystemDb
                 PRIMARY KEY (`id_amenity`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
 
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_property_type` (
+                `id_htl_property_type` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `active` tinyint(1) unsigned NOT NULL DEFAULT '1',
+                `date_add` datetime NOT NULL,
+                `date_upd` datetime NOT NULL,
+                PRIMARY KEY (`id_htl_property_type`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_property_type_lang` (
+                `id_htl_property_type` int(10) unsigned NOT NULL,
+                `id_lang` int(10) unsigned NOT NULL,
+                `name` varchar(255) NOT NULL,
+                PRIMARY KEY (`id_htl_property_type`, `id_lang`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_branch_amenity` (
                 `id_branch_amenity` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_hotel` int(10) unsigned NOT NULL,
@@ -201,6 +217,9 @@ class HotelReservationSystemDb
                 `is_back_order` tinyint(4) NOT NULL,
                 `hotel_name` varchar(255) DEFAULT NULL,
                 `room_type_name` varchar(255) DEFAULT NULL,
+                `selling_object_name` varchar(255) DEFAULT NULL,
+                `selling_object_plural_name` varchar(255) DEFAULT NULL,
+                `property_type_name` varchar(255) DEFAULT NULL,
                 `city` varchar(255) NOT NULL,
                 `state` varchar(255) DEFAULT NULL,
                 `country` varchar(255) DEFAULT NULL,
@@ -213,12 +232,36 @@ class HotelReservationSystemDb
                 `adults` smallint(6) NOT NULL DEFAULT '0',
                 `children` smallint(6) NOT NULL DEFAULT '0',
                 `child_ages` text NOT NULL,
-                `is_refunded` tinyint(1) NOT NULL DEFAULT '0',
-                `is_cancelled` tinyint(1) NOT NULL DEFAULT '0',
                 -- `available_for_order` tinyint(1) NOT NULL DEFAULT '0',
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_status` (
+                `id_booking_status` int(11) NOT NULL AUTO_INCREMENT,
+                `color` varchar(32) NOT NULL,
+                `is_terminal` tinyint(1) NOT NULL DEFAULT '0',
+                PRIMARY KEY (`id_booking_status`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_status_lang` (
+                `id_booking_status` int(11) NOT NULL,
+                `id_lang` int(11) NOT NULL,
+                `name` varchar(64) NOT NULL,
+                PRIMARY KEY (`id_booking_status`, `id_lang`)
+            ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
+
+            "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_status_history` (
+                `id_booking_status_history` int(11) NOT NULL AUTO_INCREMENT,
+                `id_htl_booking` int(11) NOT NULL,
+                `id_status_from` int(11) DEFAULT NULL,
+                `id_status_to` int(11) NOT NULL,
+                `id_employee` int(11) DEFAULT NULL,
+                `id_customer` int(11) DEFAULT NULL,
+                `remark` text,
+                `date_add` datetime NOT NULL,
+                PRIMARY KEY (`id_booking_status_history`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_booking_document` (
@@ -556,6 +599,9 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_amenity_lang`,
             `'._DB_PREFIX_.'htl_cart_booking_data`,
             `'._DB_PREFIX_.'htl_booking_detail`,
+            `'._DB_PREFIX_.'htl_booking_status`,
+            `'._DB_PREFIX_.'htl_booking_status_lang`,
+            `'._DB_PREFIX_.'htl_booking_status_history`,
             `'._DB_PREFIX_.'htl_booking_document`,
             `'._DB_PREFIX_.'htl_room_status`,
             `'._DB_PREFIX_.'htl_advance_payment`,
@@ -578,6 +624,8 @@ class HotelReservationSystemDb
             `'._DB_PREFIX_.'htl_bed_type`,
             `'._DB_PREFIX_.'htl_bed_type_lang`,
             `'._DB_PREFIX_.'htl_room_type_bed_type`,
+            `'._DB_PREFIX_.'htl_property_type`,
+            `'._DB_PREFIX_.'htl_property_type_lang`,
             `'._DB_PREFIX_.'htl_access`,
             `'._DB_PREFIX_.'htl_settings_link`,
             `'._DB_PREFIX_.'htl_settings_link_lang`,
