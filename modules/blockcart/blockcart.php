@@ -117,11 +117,11 @@ class Blockcart extends Module
             $product['hasCustomizedDatas'] = false;
             $product['hasAttributes'] = false;
             $product['hasOptions'] = false;
+            $product['standalone_total_qty'] = 0;
 
             if (!$product['booking_product']) {
                 $product['hasOptions'] = ServiceProductOption::productHasOptions($product['id_product']);
-                if (Product::SELLING_PREFERENCE_STANDALONE == $product['selling_preference_type']) {
-                    $nbTotalProducts += (int) $product['cart_quantity'];
+                if (Product::isSellableAsStandalone($product['id_product'])) {
                     $product['total_price_tax_incl'] = 0;
                     $product['total_price_tax_excl'] = 0;
                     $product['amount'] = 0;
@@ -129,9 +129,9 @@ class Blockcart extends Module
 
                     if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                         $params['cart']->id,
-                        [Product::SELLING_PREFERENCE_STANDALONE],
+                        [(int) $product['selling_preference_type']],
                         0,
-                        null,
+                        0,
                         null,
                         $product['id_product'],
                     )) {
@@ -144,15 +144,17 @@ class Blockcart extends Module
                                 $product['total_price_tax_incl'] += $serviceProduct['total_price_tax_incl'] + $tourismTaxGrossUp;
                                 $product['total_price_tax_excl'] += $serviceProduct['total_price_tax_excl'];
                                 $product['amount'] += $useTax ? ($serviceProduct['total_price_tax_incl'] + $tourismTaxGrossUp) : $serviceProduct['total_price_tax_excl'];
+                                $product['standalone_total_qty'] += (int) $serviceProduct['quantity'];
                             }
                         }
                     }
-                } elseif (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $product['selling_preference_type']
-                    || Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE == $product['selling_preference_type']
-                ) {
+                    $nbTotalProducts += (int) $product['standalone_total_qty'];
+                }
+
+                if (Product::isSellableWithHotel($product['id_product'])) {
                     if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                         $params['cart']->id,
-                        [Product::SELLING_PREFERENCE_HOTEL_STANDALONE, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE],
+                        [(int) $product['selling_preference_type']],
                         null,
                         0,
                         null,
@@ -162,7 +164,6 @@ class Blockcart extends Module
                             if ($serviceProduct['id_hotel']
                                 && $serviceProduct['id_product'] == $product['id_product']
                             ) {
-                                $nbTotalProducts += (int) $serviceProduct['quantity'];
                                 if (!isset($product['hotel_wise_data'][$serviceProduct['id_hotel']])) {
                                     $product['hotel_wise_data'][$serviceProduct['id_hotel']] = array(
                                         'id_hotel' => $serviceProduct['id_hotel'],
@@ -178,6 +179,7 @@ class Blockcart extends Module
                                 $product['hotel_wise_data'][$serviceProduct['id_hotel']]['total_price_tax_excl'] += $serviceProduct['total_price_tax_excl'];
                                 $product['hotel_wise_data'][$serviceProduct['id_hotel']]['amount'] += $useTax ? $serviceProduct['total_price_tax_incl'] : $serviceProduct['total_price_tax_excl'];
                                 $product['hotel_wise_data'][$serviceProduct['id_hotel']]['total_qty'] += $serviceProduct['quantity'];
+                                $nbTotalProducts += (int) $serviceProduct['quantity'];
                                 $product['hotel_wise_data'][$serviceProduct['id_hotel']]['options'][] = $serviceProduct;
                             }
                         }
@@ -341,34 +343,10 @@ class Blockcart extends Module
                 $addedProduct['date_from'] = Tools::displayDate($addedProduct['date_from'], null, $fullDate);
                 $addedProduct['date_to'] = Tools::displayDate($addedProduct['date_to'], null, $fullDate);
             } else {
+                $canSellWithHotel = Product::isSellableWithHotel($objProduct->id);
+                $canSellStandalone = Product::isSellableAsStandalone($objProduct->id);
                 $includeTourismTax = $useTax && (bool) Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
-                if ($objProduct->selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
-                    $addedProduct['unit_price'] = Product::getServiceProductPrice(
-                        $objProduct->id,
-                        isset($addedProduct['id_product_option']) ? $addedProduct['id_product_option'] : null,
-                        0,
-                        false,
-                        $useTax,
-                        1,
-                        null,
-                        null,
-                        false,
-                        null,
-                        1,
-                        null,
-                        0,
-                        $includeTourismTax
-                    );
-
-                    if (isset($addedProduct['id_product_option'])
-                        && $addedProduct['id_product_option']
-                        && Validate::isLoadedObject($productOption = new ServiceProductOption($addedProduct['id_product_option'], $this->context->language->id))
-                    ) {
-                        $addedProduct['option_name'] = $productOption->name;
-                    }
-                } elseif ($objProduct->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
-                    || $objProduct->selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE
-                ) {
+                if ($canSellWithHotel && !empty($addedProduct['id_hotel'])) {
                     $addedProduct['unit_price'] = Product::getServiceProductPrice(
                         $objProduct->id,
                         isset($addedProduct['id_product_option']) ? $addedProduct['id_product_option'] : null,
@@ -394,9 +372,36 @@ class Blockcart extends Module
                     ) {
                         $addedProduct['option_name'] = $productOption->name;
                     }
+                } elseif ($canSellStandalone) {
+                    $addedProduct['unit_price'] = Product::getServiceProductPrice(
+                        $objProduct->id,
+                        isset($addedProduct['id_product_option']) ? $addedProduct['id_product_option'] : null,
+                        0,
+                        false,
+                        $useTax,
+                        1,
+                        null,
+                        null,
+                        false,
+                        null,
+                        1,
+                        null,
+                        0,
+                        $includeTourismTax
+                    );
+
+                    if (isset($addedProduct['id_product_option'])
+                        && $addedProduct['id_product_option']
+                        && Validate::isLoadedObject($productOption = new ServiceProductOption($addedProduct['id_product_option'], $this->context->language->id))
+                    ) {
+                        $addedProduct['option_name'] = $productOption->name;
+                    }
                 }
-                $addedProduct['price'] = Tools::displayPrice($addedProduct['unit_price'] * $addedProduct['qty']);
-                $addedProduct['unit_price'] = Tools::displayPrice($addedProduct['unit_price']);
+                $quantity = $addedProduct['qty'];
+                $totalPrice = (float) $addedProduct['unit_price'];
+                $unitPrice = $totalPrice / $quantity;
+                $addedProduct['price'] = Tools::displayPrice($totalPrice);
+                $addedProduct['unit_price'] = Tools::displayPrice($unitPrice);
             }
             unset($this->context->cookie->currentAddedProduct);
         }
@@ -437,7 +442,7 @@ class Blockcart extends Module
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
             'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
             'room_total' => ($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice),
-            'room_total_format' => Tools::displayPrice($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice - $totalConvenienceFee),
+            'room_total_format' => Tools::displayPrice($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice),
             'totalToPay' => $totalToPay,
             'total_convenience_fee' => $totalConvenienceFee,
             'total_convenience_fee_format' => Tools::displayPrice(($totalConvenienceFee), $currency),

@@ -457,3 +457,42 @@ window.addEventListener('online', function () {
 window.addEventListener('offline', function () {
 	onlineFlag = false;
 });
+
+function initHtlTooltip() {
+    if (!$('.htl-tooltip').length) {
+        return;
+    }
+    $('.htl-tooltip').each(function () {
+        if ($(this).hasClass('ui-tooltip-content')) {
+            return;
+        }		
+        $(this).tooltip({
+            content: $(this).siblings('.htl-tooltip-content').html(),
+            items: 'span',
+            trigger: 'hover',
+            tooltipClass: 'htl-tooltip-popup',
+            open: function (event, ui) {
+                if (typeof (event.originalEvent) === 'undefined') {
+                    return false;
+                }
+                var $id = $(ui.tooltip).attr('id');
+                if ($('div.ui-tooltip').not('#' + $id).length) {
+                    return false;
+                }
+            },
+            close: function (event, ui) {
+                ui.tooltip.hover(function () {
+                    $(this).stop(true).fadeTo(400, 1);
+                }, function () {
+                    $(this).fadeOut('400', function () {
+                        $(this).remove();
+                    });
+                });
+            }
+        });
+    });
+}
+
+$(document).ready(function () {
+    initHtlTooltip();
+});

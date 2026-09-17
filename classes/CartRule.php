@@ -361,7 +361,7 @@ class CartRuleCore extends ObjectModel
 
             // Remove cart rule if the cart contains a product from a hotel not covered by its hotel restriction
             foreach ($result as $key => $cart_rule) {
-                if ($cart_rule['hotel_restriction']) {
+                if (isset($cart_rule['hotel_restriction']) && $cart_rule['hotel_restriction']) {
                     $total_cart_products = (int)Db::getInstance()->getValue('
                         SELECT COUNT(cp.id_product)
                         FROM '._DB_PREFIX_.'cart_product cp
@@ -1007,7 +1007,7 @@ class CartRuleCore extends ObjectModel
                     continue;
                 }
             }
-            $cache_id .= '_'.(int)$product['id_product'].'_'.(int)$product['id_product_attribute'].(isset($product['in_stock']) ? '_'.(int)$product['in_stock'] : '');
+            $cache_id .= '_'.(int)$product['id_product'].'_'.(int)$product['id_product_attribute'].'_'.(int)$product['cart_quantity'].(isset($product['in_stock']) ? '_'.(int)$product['in_stock'] : '');
         }
 
         $package_products = $package['products'];
