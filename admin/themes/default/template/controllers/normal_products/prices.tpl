@@ -219,7 +219,7 @@ $(document).ready(function () {
 			<div class="col-lg-3">
 				<select id="pcm_type" name="price_calculation_type">
 					<option value="{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}" {if !$product->price_calculation_method || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}selected="selected"{/if}>{l s='Once for the booking range'}</option>
-					<option value="0" {if $product->price_calculation_method && $product->price_calculation_method != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}selected="selected"{/if}>{l s='For each day of the booking'}</option>
+					<option value="0" {if $product->price_calculation_method && $product->price_calculation_method != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}selected="selected"{/if}>{l s='Select applicable days'}</option>
 				</select>
 			</div>
 		</div>

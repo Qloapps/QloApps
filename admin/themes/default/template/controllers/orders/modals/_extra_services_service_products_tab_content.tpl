@@ -228,7 +228,7 @@
                         <label class="control-label required">{l s='Price calculation method'}</label>
                         <select id="new_service_pcm_type" name="price_calculation_type">
                             <option value="{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}" selected="selected">{l s='Once for the booking range'}</option>
-                            <option value="0">{l s='For each day of the booking'}</option>
+                            <option value="0">{l s='Select applicable days'}</option>
                         </select>
                         <div id="new_service_pcm_days_container" style="margin-top: 10px; display:none;">
                             <div class="row">

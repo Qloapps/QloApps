@@ -200,9 +200,9 @@ class AdminNormalProductsControllerCore extends AdminController
             Product::PRICE_ADDITION_TYPE_INDEPENDENT => $this->l('Convenience Fee')
         );
         $priceCalculationMethod = array(
-            Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY => $this->l('On Check-in day'),
-            Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY => $this->l('On Check-out day'),
-            Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY => $this->l('On During-stay days'),
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY => $this->l('Check-in day'),
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY => $this->l('Check-out day'),
+            Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY => $this->l('During-stay days'),
             Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY => $this->l('Check-in day | Check-out days'),
             Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY => $this->l('Check-in day | During-stay days'),
             Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY => $this->l('Check-out day | During-stay days'),
