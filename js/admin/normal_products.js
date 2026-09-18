@@ -476,6 +476,11 @@ product_tabs['Informations'] = new function(){
 	this.bindAutoAddProduct = function (){
 		$('input[name="auto_add_to_cart"]').on('change',function(){
 			if ($(this).val() == 1) {
+				$('#sp_with_room_type').prop('checked', true);
+				var $checkedSpOthers = $('#sp_with_hotel, #sp_standalone').filter(':checked');
+				if ($checkedSpOthers.length) {
+					$checkedSpOthers.prop('checked', false).trigger('change');
+				}
 				$("#price_addition_type_container").show('fast');
 				$("#show_at_front_container").hide('fast');
 				// $('#show_at_front_off').prop("checked", true).change();
@@ -547,59 +552,58 @@ product_tabs['Informations'] = new function(){
 	};
 
 	this.switchProductType = function(){
-
-		$('#selling_preference_type').on('change',function(){
-			if (parseInt($(this).val()) == SELLING_PREFERENCE_WITH_ROOM_TYPE) {
-				$('#associated_hotel_tree').hide('fast').find('input').each(function() {
-					$(this).attr('data-name', $(this).attr('name'));
-					$(this).removeAttr('name');
-				});
-				$('#associated_hotel_rooms_tree').show('fast').find('input').each(function() {
+		function toggleAssociationFieldNames(containerSelector, shouldShow)
+		{
+			var $container = $(containerSelector);
+			if (shouldShow) {
+				$container.show('fast').find('input').each(function() {
 					$(this).attr('name', $(this).attr('data-name'));
 					$(this).removeAttr('data-name');
 				});
-				$('#auto_add_to_cart_container').show('fast');
-				$('#show_at_front_container').show('fast');
-				$('#product_options').show('fast');
-			} else if (parseInt($(this).val()) == SELLING_PREFERENCE_HOTEL_STANDALONE) {
-				$('#associated_hotel_rooms_tree').hide('fast').find('input').each(function() {
+			} else {
+				$container.hide('fast').find('input').each(function() {
 					$(this).attr('data-name', $(this).attr('name'));
 					$(this).removeAttr('name');
 				});
-				$('#associated_hotel_tree').show('fast').find('input').each(function() {
-					$(this).attr('name', $(this).attr('data-name'));
-					$(this).removeAttr('data-name');
-				});
-				$('#auto_add_to_cart_container').hide('fast');
-				$('#show_at_front_container').show('fast');
-				$('#product_options').show('fast');
-            } else if (parseInt($(this).val()) == SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE) {
-				$('#associated_hotel_rooms_tree').show('fast').find('input').each(function() {
-					$(this).attr('name', $(this).attr('data-name'));
-					$(this).removeAttr('data-name');
-				});
-				$('#associated_hotel_tree').show('fast').find('input').each(function() {
-					$(this).attr('name', $(this).attr('data-name'));
-					$(this).removeAttr('data-name');
-				});
-				$('#auto_add_to_cart_container').hide('fast');
-				$('#show_at_front_container').show('fast');
-				$('#product_options').show('fast');
-            } else if (parseInt($(this).val()) == SELLING_PREFERENCE_STANDALONE) {
-				$('#associated_hotel_rooms_tree').hide('fast').find('input').each(function() {
-					$(this).attr('data-name', $(this).attr('name'));
-					$(this).removeAttr('name');
-				});
-				$('#associated_hotel_tree').hide('fast').find('input').each(function() {
-					$(this).attr('data-name', $(this).attr('name'));
-					$(this).removeAttr('name');
-				});
-				$('#auto_add_to_cart_container').hide('fast');
-				$('#show_at_front_container').show('fast');
-				$('#product_options').show('fast');
 			}
+		}
+
+		function applySellingPreferenceUIState()
+		{
+			var withRoomType = $('#sp_with_room_type').is(':checked');
+			var withHotel = $('#sp_with_hotel').is(':checked');
+			var standalone = $('#sp_standalone').is(':checked');
+
+			var $autoAddOff = $('#auto_add_to_cart_off');
+			var $autoAddCheckedInput;
+
+			toggleAssociationFieldNames('#associated_hotel_tree', withHotel);
+			toggleAssociationFieldNames('#associated_hotel_rooms_tree', withRoomType);
+
+			if (withRoomType) {
+				$('#auto_add_to_cart_container').show('fast');
+				$autoAddCheckedInput = $('input[name="auto_add_to_cart"]:checked');
+				if (!$autoAddCheckedInput.length) {
+					$autoAddOff.prop('checked', true);
+					$autoAddCheckedInput = $autoAddOff;
+				}
+			} else {
+				$autoAddOff.prop('checked', true);
+				$('#auto_add_to_cart_container').hide('fast');
+				$autoAddCheckedInput = $autoAddOff;
+			}
+
+			$autoAddCheckedInput.trigger('change');
+			$('#product_options').show('fast');
+		}
+
+		$('#sp_with_room_type, #sp_with_hotel, #sp_standalone').on('change', function(){
+			setTimeout(function() {
+				applySellingPreferenceUIState();
+			}, 0);
 		});
-		$('#selling_preference_type').trigger('change');
+		// Code For Standard product working
+		///applySellingPreferenceUIState();
 		$('#simple_product').attr('checked', true);
 
 		$('input[name="type_product"]').on('click', function(e)

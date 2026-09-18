@@ -99,6 +99,7 @@ class OrderDetailControllerCore extends FrontController
                 $total_convenience_fee_te = 0;
                 $total_convenience_fee_ti = 0;
                 $roomTypes = array();
+                $propertyType = null;
                 $objOrderReturn = new OrderReturn();
                 $refundedAmount = 0;
                 $refundedAmount = $objOrderReturn->getRefundedAmount($order->id);
@@ -129,6 +130,13 @@ class OrderDetailControllerCore extends FrontController
                             }
                             $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                             $cartHotelData[$type_key]['cover_img'] = $type_value['cover_img'];
+
+                            // Prefer the name stored at order-creation time so it stays historically accurate
+                            if (!empty($order_bk_data[0]['selling_object_name'])) {
+                                $cartHotelData[$type_key]['selling_object_name'] = $order_bk_data[0]['selling_object_name'];
+                                $cartHotelData[$type_key]['selling_object_plural_name'] = $order_bk_data[0]['selling_object_plural_name'];
+                            }
+
 
                             foreach ($order_bk_data as $data_k => $data_v) {
                                 $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
@@ -234,6 +242,7 @@ class OrderDetailControllerCore extends FrontController
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
 
                                 $cartHotelData[$type_key]['hotel_name'] = $data_v['hotel_name'];
+                                $propertyType = $data_v['property_type_name'];
                                 // add extra services products in hotel detail.
                                 $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services'] = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                                     $id_order,
@@ -321,7 +330,7 @@ class OrderDetailControllerCore extends FrontController
                                 $value['avg_price_diff_tax_excl'] = abs(Tools::ps_round($value['avg_paid_unit_price_tax_excl'] - $value['product_price_tax_excl'], 6));
                                 $value['avg_price_diff_tax_incl'] = abs(Tools::ps_round($value['avg_paid_unit_price_tax_incl'] - $value['product_price_tax_incl'], 6));
                             }
-                        } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) {
+                        } else if (Product::SELLING_PREFERENCE_WITH_ROOM_TYPE ==$type_value['selling_preference_type']) {
                             if ($type_value['product_auto_add'] && $type_value['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT) {
                                 $total_convenience_fee_ti += $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                                     $id_order,
@@ -348,7 +357,7 @@ class OrderDetailControllerCore extends FrontController
                                     1
                                 );
                             }
-                        } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
+                        } else if (Product::SELLING_PREFERENCE_WITH_HOTEL == $type_value['selling_preference_type']) {
                             $hotelProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($id_order, $type_value['id_order_detail'], $type_value['product_id']);
                             foreach ($hotelProducts as $hotelProduct) {
                                 $hotelServiceProducts[] = array_merge($type_value, $hotelProduct);
@@ -367,7 +376,7 @@ class OrderDetailControllerCore extends FrontController
                                 }
                                 $serviceProductsFormatted[$hotelProduct['id_product']]['options'][] = $hotelProduct;
                             }
-                        } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE) {
+                        } else if (Product::SELLING_PREFERENCE_WITH_STANDALONE == $type_value['selling_preference_type']) {
                             $standaloneProducts = $objServiceProductOrderDetail->getServiceProductsInOrder($id_order, $type_value['id_order_detail'], $type_value['product_id']);
                             foreach ($standaloneProducts as $standaloneProduct) {
                                 $standaloneServiceProducts[] = array_merge($type_value, $standaloneProduct);
@@ -410,10 +419,12 @@ class OrderDetailControllerCore extends FrontController
                 if ($idHotel = $addressTax->id_hotel) {
                     $objHotelBranchInformation = new HotelBranchInformation($idHotel, $this->context->language->id);
                     $hotelAddressInfo = HotelBranchInformation::getAddress($idHotel);
+                    // Prefer the name stored at order-creation time so it stays historically accurate
                     $objHotelBranchRefundRules = new HotelBranchRefundRules();
                     $hotelRefundRules = $objHotelBranchRefundRules->getHotelRefundRules($idHotel, 0, 1);
                     $this->context->smarty->assign(array(
                         'obj_hotel_branch_information' => $objHotelBranchInformation,
+                        'property_type' => $propertyType,
                         'hotel_address_info' => $hotelAddressInfo,
                         'hotel_refund_rules' => $hotelRefundRules,
                     ));
@@ -501,6 +512,8 @@ class OrderDetailControllerCore extends FrontController
             && ($dateFrom = Tools::getValue('date_from'))
             && ($dateTo = Tools::getValue('date_to'))
         ) {
+            
+            $objRoomType = new HotelRoomType();
             $useTax = 0;
             if (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC) {
                 $useTax = 1;
@@ -525,8 +538,10 @@ class OrderDetailControllerCore extends FrontController
                 ));
             }
 
+            $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
             $this->context->smarty->assign(array(
-                'objOrder' => $order,
+                'objOrder' => new Order($idOrder),
+                'room_type_info' => $roomTypeInfo,
             ));
 
             $response['extra_services'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');

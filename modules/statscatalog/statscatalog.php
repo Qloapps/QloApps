@@ -46,7 +46,7 @@ class StatsCatalog extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Hotel statistics');
+        $this->displayName = $this->l('Property statistics');
         $this->description = $this->l('Adds a tab containing general statistics about your catalog to the Stats dashboard.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.7.0.99');
     }
@@ -278,7 +278,7 @@ class StatsCatalog extends Module
 			<ul class="list-group">
 				<li class="list-group-item">'.$this->returnLine($this->l('Available room types'), '<span class="badge">'.(int)$total).'</span></li>
 				<li class="list-group-item">'.$this->returnLine($this->l('Average base price'), '<span class="badge">'.Tools::displayPrice($average_price, $this->context->currency)).'</span></li>
-				<li class="list-group-item">'.$this->returnLine($this->l('Hotel page views'), '<span class="badge">'.(int)$total_hotel_page_viewed).'</span></li>
+				<li class="list-group-item">'.$this->returnLine($this->l('Property page views'), '<span class="badge">'.(int)$total_hotel_page_viewed).'</span></li>
 				<li class="list-group-item">'.$this->returnLine($this->l('Room type page views'), '<span class="badge">'.(int)$total_room_type_page_viewed).'</span></li>
 				<li class="list-group-item">'.$this->returnLine($this->l('Booked room nights'), '<span class="badge">'.(int)$total_booked_rooms).'</span></li>
 				<li class="list-group-item">'.$this->returnLine($this->l('Average number of page visits'), '<span class="badge">'.number_format((float)$average_viewed, 2, '.', '')).'</span></li>

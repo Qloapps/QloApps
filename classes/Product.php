@@ -56,6 +56,13 @@ class ProductCore extends ObjectModel
     /** @var string Manufacturer name */
     public $manufacturer_name;
 
+    /** @var string Room Type Selling Object  name */
+    public $selling_object_name;
+
+    /** @var string Room Type Selling Object  plural name */
+    public $selling_object_plural_name;
+
+
     /** @var string Supplier name */
     public $supplier_name;
 
@@ -250,6 +257,7 @@ class ProductCore extends ObjectModel
     public $is_virtual;
     public $booking_product;
     public $id_pack_product_attribute;
+    public $id_selling_object;
     public $cache_default_attribute;
 
     /**
@@ -345,6 +353,7 @@ class ProductCore extends ObjectModel
             'show_price' =>                array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'indexed' =>                    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'visibility' =>                array('type' => self::TYPE_STRING, 'shop' => true, 'validate' => 'isProductVisibility', 'values' => array('both', 'catalog', 'search', 'none'), 'default' => 'both'),
+            'id_selling_object' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => false),
             'cache_default_attribute' =>    array('type' => self::TYPE_INT, 'shop' => true),
             'advanced_stock_management' =>    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'date_add' =>                    array('type' => self::TYPE_DATE, 'shop' => true, 'validate' => 'isDate'),
@@ -555,15 +564,24 @@ class ProductCore extends ObjectModel
 
     // Product selling preference types
     const SELLING_PREFERENCE_WITH_ROOM_TYPE = 1; // Product to be sold with Room types
-    const SELLING_PREFERENCE_HOTEL_STANDALONE = 2; // Product to be sold Standalone with Hotels
-    const SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE = 3; // Product to be sold Standalone with Hotels and with Room types also
-    const SELLING_PREFERENCE_STANDALONE = 4; // Product to be sold standalone
+    const SELLING_PREFERENCE_WITH_HOTEL = 2; // Product to be sold Standalone with Hotels
+    const SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE = 3; // Product to be sold Standalone with Hotels and with Room types also
+    const SELLING_PREFERENCE_WITH_STANDALONE = 4; // Product to be sold standalone
+    const SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE = 5; // Product to be sold standalone and with Room types also
+    const SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE = 6; // Product to be sold standalone with Hotels and with Room types also
+    const SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE = 7; // Product to be sold standalone with Hotels and with Room types also and standalone
 
     const PRICE_ADDITION_TYPE_WITH_ROOM = 1;
     const PRICE_ADDITION_TYPE_INDEPENDENT = 2;
 
-    const PRICE_CALCULATION_METHOD_PER_BOOKING = 1;
-    const PRICE_CALCULATION_METHOD_PER_DAY = 2;
+    const PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY = 1;
+    const PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY = 2;
+    const PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY = 3;
+    const PRICE_CALCULATION_METHOD_ON_DURING_STAY = 4;
+    const PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY = 5;
+    const PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY = 6;
+    const PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY = 7;
+    const PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING = 8;
 
     const STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOMER = 1;
     const STANDARD_PRODUCT_ADDRESS_PREFERENCE_HOTEL = 2;
@@ -581,6 +599,9 @@ class ProductCore extends ObjectModel
             $this->tax_name = 'deprecated'; // The applicable tax may be BOTH the product one AND the state one (moreover this variable is some deadcode)
             $this->manufacturer_name = Manufacturer::getNameById((int)$this->id_manufacturer);
             $this->supplier_name = Supplier::getNameById((int)$this->id_supplier);
+            $sellingObject = RoomTypeSellingObject::getRoomTypeSellingObjectBySellingObjectId((int)$this->id_selling_object, (int)$id_lang);
+            $this->selling_object_name = $sellingObject ? $sellingObject['name'] : null;
+            $this->selling_object_plural_name = $sellingObject ? $sellingObject['plural_name'] : null;
             $address = null;
             $id_address = Cart::getIdAddressForTaxCalculation($this->id);
             $this->tax_rate = $this->getTaxesRate(new Address($id_address));
@@ -1441,7 +1462,10 @@ class ProductCore extends ObjectModel
                     ('.
                         '(`element_type` = '.RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$this->id.')
                     )
-                    AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE.')'. '
+                    AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. ' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE.')
                     AND product_shop.`id_shop` = '.(int)$context->shop->id
                 .($sub_category? ' AND product_shop.`id_category_default` = '.(int)$sub_category : '')
                 .($front ? ' AND product_shop.`show_at_front` = 1':'')
@@ -1485,7 +1509,10 @@ class ProductCore extends ObjectModel
                     ('.
                         '(`element_type` = '.RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$this->id.')
                     )
-                    AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. '|| p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE.')'. '
+                    AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. '
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE.')'. '
                     AND product_shop.`id_shop` = '.(int)$context->shop->id
                     .($sub_category? ' AND product_shop.`id_category_default` = '.(int)$sub_category : '')
                     .($front ? ' AND product_shop.`show_at_front` = 1':'')
@@ -1534,7 +1561,9 @@ class ProductCore extends ObjectModel
                         '(`element_type` = '.RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$this->id.')
                     )
                     AND p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE.
-                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE.
+                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE.
+                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.
+                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE.
                     ' AND product_shop.`id_shop` = '.(int)$context->shop->id;
 
             $sql .= ' GROUP BY cl.`id_category`';
@@ -3096,7 +3125,7 @@ class ProductCore extends ObjectModel
         }
 
         if (!Product::isBookingProduct($id_product)
-            && (Product::getSellingPreferenceType($id_product) == Product::SELLING_PREFERENCE_STANDALONE)
+            && (Product::getSellingPreferenceType($id_product) == Product::SELLING_PREFERENCE_WITH_STANDALONE)
             && !$id_address
         ) {
             $serviceAddressPrefrenceType = Configuration::get('PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE');
@@ -6821,11 +6850,12 @@ class ProductCore extends ObjectModel
             )
         );
 
-        $isPerDay = Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY
-            && $dateFrom && $dateTo;
-        if ($isPerDay) {
-            $price = $price * HotelHelper::getNumberOfDays($dateFrom, $dateTo);
-        }
+        $numdays = Product::getServicePriceBillableDays(
+            Product::getProductPriceCalculation($idProduct),
+            $dateFrom,
+            $dateTo
+        );
+        $price = $price * $numdays;
 
         $price = $price * $quantity;
 
@@ -6870,9 +6900,118 @@ class ProductCore extends ObjectModel
             );
         }
 
+        if (!$specificPrice || ($specificPrice['id_cart'] == 0 && $specificPrice['id_htl_cart_booking'] == 0)) {
+            if (!$idGroup || !Validate::isLoadedObject(new Group((int)$idGroup))) {
+                $idGroup = (int)Group::getCurrent()->id;
+            }
+            $price =  Product::applyGroupDiscount($price, $idProduct, $idGroup);
+        }
         return $price;
     }
 
+
+    public static function getServicePriceBillableDays(
+        $priceCalculationMethod,
+        $dateFrom,
+        $dateTo,
+    ) {
+
+        $numNights = (int) HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+        if ($numNights < 1) {
+            return 1;
+        }
+
+        $checkinDay = 1;
+        $checkoutDay = 1;
+        $stayDay = $numNights - 1;
+
+        switch ((int) $priceCalculationMethod) {
+            case self::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING:
+                return 1;
+
+            case self::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY:
+                return $checkinDay;
+
+            case self::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY:
+                return $checkoutDay;
+
+            case self::PRICE_CALCULATION_METHOD_ON_DURING_STAY:
+                return $stayDay;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY:
+                return $checkinDay + $checkoutDay;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY:
+                return $checkinDay + $stayDay;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY:
+                return $checkoutDay + $stayDay;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY:
+                return $checkinDay + $checkoutDay + $stayDay;
+
+            default:
+                return $numNights;
+        }
+    }
+
+    public static function getPriceCalculationMethodDaysLabel($priceCalculationMethod)
+    {
+        $priceCalculationMethod = (int) $priceCalculationMethod;
+        $labels = array();
+        static $module = null;
+        if (is_null($module)) {
+            $module = Module::getInstanceByName('hotelreservationsystem');
+        }   
+        if ($priceCalculationMethod == self::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING) {
+            $labels[] = $module->l('Once per booking');
+
+            return $labels;
+        }
+
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY) {
+            $labels[] = $module->l('Check-in day');
+        }
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_DURING_STAY) {
+            $labels[] = $module->l('During-stay days');
+        }
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY) {
+            $labels[] = $module->l('Check-out day');
+        }
+
+        return $labels;
+    }
+
+    public static function isSellableWithRoomType($idProduct)
+    {
+        return in_array((int) self::getSellingPreferenceType($idProduct), [
+            self::SELLING_PREFERENCE_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        ]);
+    }
+
+    public static function isSellableWithHotel($idProduct)
+    {
+        return in_array((int) self::getSellingPreferenceType($idProduct), [
+            self::SELLING_PREFERENCE_WITH_HOTEL,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        ]);
+    }
+
+    public static function isSellableAsStandalone($idProduct)
+    {
+        return in_array((int) self::getSellingPreferenceType($idProduct), [
+            self::SELLING_PREFERENCE_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        ]);
+    }
+    
     /**
      * Prepare grouped core features and values for a room type, with selection state.
      *

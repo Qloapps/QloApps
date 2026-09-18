@@ -182,6 +182,12 @@ class OrderConfirmationControllerCore extends FrontController
                                 $cart_htl_data[$type_key]['adults'] = $rm_dtl['adults'];
                                 $cart_htl_data[$type_key]['children'] = $rm_dtl['children'];
 
+                                // Prefer the name stored at order-creation time so it stays historically accurate
+                                if (!empty($order_bk_data[0]['selling_object_name'])) {
+                                    $cart_htl_data[$type_key]['selling_object_name'] = $order_bk_data[0]['selling_object_name'];
+                                    $cart_htl_data[$type_key]['selling_object_plural_name'] = $order_bk_data[0]['selling_object_plural_name'];
+                                }
+
                                 foreach ($order_bk_data as $data_k => $data_v) {
                                     $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
                                     /*Product price when order was created*/
@@ -325,7 +331,7 @@ class OrderConfirmationControllerCore extends FrontController
 
                                     $totalRoomsBooked += 1;
                                 }
-                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
+                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTEL) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
 
                                 if (!empty($cover_image_arr)) {
@@ -348,7 +354,7 @@ class OrderConfirmationControllerCore extends FrontController
                                     }
                                     $cart_hotel_service_products[] = $type_value;
                                 }
-                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE) {
+                            } else if ($type_value['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_STANDALONE) {
                                 $cover_image_arr = $product->getCover($type_value['product_id']);
 
                                 if (!empty($cover_image_arr)) {
@@ -378,8 +384,8 @@ class OrderConfirmationControllerCore extends FrontController
                     if (!$objCartOrder->hasInvoice()) {
                         $orders_has_invoice = 0;
                     }
-                    $orderTotalInfo['total_standalone_products_ti'] += ($objCartOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)+$objCartOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE));
-                    $orderTotalInfo['total_standalone_products_te'] += ($objCartOrder->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE)+$objCartOrder->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE));
+                    $orderTotalInfo['total_standalone_products_ti'] += ($objCartOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL)+$objCartOrder->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE));
+                    $orderTotalInfo['total_standalone_products_te'] += ($objCartOrder->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL)+$objCartOrder->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE));
                     $orderTotalInfo['total_wrapping'] += $objCartOrder->total_wrapping;
                     $orderTotalInfo['total_rooms_te'] += $objCartOrder->getTotalProductsWithoutTaxes(false, true);
                     $orderTotalInfo['total_rooms_ti'] += $objCartOrder->getTotalProductsWithTaxes(false, true);
@@ -438,6 +444,7 @@ class OrderConfirmationControllerCore extends FrontController
 
         $this->setTemplate(_PS_THEME_DIR_.'order-confirmation.tpl');
     }
+
 
     /**
      * Execute the hook displayPaymentReturn

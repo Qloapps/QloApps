@@ -210,19 +210,62 @@ $(document).ready(function () {
 		</div>
 		{if isset($pack) && $pack->isPack($product->id)}<p class="col-lg-9 col-lg-offset-3 help-block">{l s='The sum of prices of the products in the pack is %s%s%s' sprintf=[$currency->prefix,{toolsConvertPrice price=$pack->noPackPrice($product->id)|string_format:$priceDisplayPrecisionFormat},$currency->suffix]}</p>{/if}
 	</div> *}
-	<div class="form-group">
-		<label class="control-label col-lg-3" for="price_calculation_method">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select whether price for this service will be added for each day of the booking or price will be added to the entire date range of the booking'}">
-				{l s='Price calculation method'}
-			<span>
-		</label>
-		<div class="col-lg-4">
-			<select name="price_calculation_method" id="price_calculation_method">
-				<option value="{Product::PRICE_CALCULATION_METHOD_PER_BOOKING}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_BOOKING}selected="selected"{/if} >{l s='Add price once for the booking range'}</option>
-				<option value="{Product::PRICE_CALCULATION_METHOD_PER_DAY}" {if $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY}selected="selected"{/if} >{l s='Add price for each day of booking'}</option>
-			</select>
+		<div class="form-group">
+			<label class="control-label required col-lg-3">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Choose whether this price is added once for the whole booking range, or added again for each day of the booking.'}">
+					{l s='Price calculation method'}
+				</span>
+			</label>
+			<div class="col-lg-3">
+				<select id="pcm_type" name="price_calculation_type">
+					<option value="{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}" {if !$product->price_calculation_method || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}selected="selected"{/if}>{l s='Once for the booking range'}</option>
+					<option value="0" {if $product->price_calculation_method && $product->price_calculation_method != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}selected="selected"{/if}>{l s='Select applicable days'}</option>
+				</select>
+			</div>
 		</div>
-	</div>
+		<div class="form-group" id="pcm_days_container" style="margin-top: 10px;{if !$product->price_calculation_method || $product->price_calculation_method == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING} display:none;{/if}">
+			<label class="control-label required col-lg-3">
+				<span class="label-tooltip" data-toggle="tooltip" title="{l s='Select which booking days should be counted when calculating the service price.'}">
+					{l s='Applied on: '}
+				</span>
+			</label>
+			<div class="col-lg-9">
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" id="pcm_checkin" name="price_calculation_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY|intval}"
+							{if $product->price_calculation_method & Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY}checked="checked"{/if}>
+						{l s='Check-in day'}
+					</label>
+				</div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" id="pcm_checkout" name="price_calculation_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY|intval}"
+							{if $product->price_calculation_method & Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY}checked="checked"{/if}>
+						{l s='Check-out day'}
+					</label>
+				</div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" id="pcm_duringstay" name="price_calculation_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY|intval}"
+							{if $product->price_calculation_method & Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY}checked="checked"{/if}>
+						{l s='During-stay days'}
+					</label>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				var togglePcmDays = function() {
+					if ($('#pcm_type').val() == '{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}') {
+						$('#pcm_days_container').hide();
+					} else {
+						$('#pcm_days_container').show();
+					}
+				};
+				togglePcmDays();
+				$('#pcm_type').on('change', togglePcmDays);
+			});
+		</script>
 	{* As no use in QloApps currently so commented *}
 	{* <div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="unit_price" type="unit_price"}</span></div>

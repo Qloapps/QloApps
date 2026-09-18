@@ -751,7 +751,7 @@ public function ajaxProcessGetCalenderData()
             if (!$product->id || !$product->active) {
                 $this->errors[] = $this->l('This product is no longer available.');
             }
-            if ($product->booking_product || ($product->selling_preference_type != Product::SELLING_PREFERENCE_STANDALONE)) {
+            if ($product->booking_product || !Product::isSellableAsStandalone($product->id)) {
                 // cannot be added without room type or is a booking product.
                 $this->errors[] = $this->l('This product is either a room type or extra service and cannot be added thorugh this method.');
             } elseif (!$product->allow_multiple_quantity) {
@@ -766,7 +766,7 @@ public function ajaxProcessGetCalenderData()
             if (validate::isLoadedObject($objHotelBranch = new HotelBranchInformation($id_hotel))) {
                 $hotelIdAddress = $objHotelBranch->getHotelIdAddress();
             } else {
-                $this->errrors[] = $this->l('Hotel not found');
+                $this->errrors[] = $this->l('Property not found');
             }
 
         }
@@ -921,7 +921,7 @@ public function ajaxProcessGetCalenderData()
     public function assignServiceProductsForm()
     {
         $objProduct = new Product();
-        $serviceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_STANDALONE);
+        $serviceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_WITH_STANDALONE);
         $hotelAddressInfo = HotelBranchInformation::getAddress($this->id_hotel);
         $serviceProducts = Product::getProductsProperties($this->context->language->id, $serviceProducts);
         $this->context->smarty->assign(array(
@@ -1106,17 +1106,18 @@ public function ajaxProcessGetCalenderData()
             'ALLOTMENT_AUTO' => HotelBookingDetail::ALLOTMENT_AUTO,
             'ALLOTMENT_MANUAL' => HotelBookingDetail::ALLOTMENT_MANUAL,
             'SELLING_PREFERENCE_WITH_ROOM_TYPE' => Product::SELLING_PREFERENCE_WITH_ROOM_TYPE,
-            'SELLING_PREFERENCE_STANDALONE' => Product::SELLING_PREFERENCE_STANDALONE,
+            'SELLING_PREFERENCE_WITH_STANDALONE' => Product::SELLING_PREFERENCE_WITH_STANDALONE,
             'max_child_age' => Configuration::get('WK_GLOBAL_CHILD_MAX_AGE'),
+            'max_child_in_room' => Configuration::get('WK_GLOBAL_MAX_CHILD_IN_ROOM'),
             'occupancy_required_for_booking' => $occupancyRequiredForBooking,
             'rooms_reallocation_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'rooms_booking_url' => $this->context->link->getAdminLink('AdminHotelRoomsBooking'),
             'opt_select_all' => $this->l('All Types', null, true),
-            'slt_another_htl' => $this->l('Select Another Hotel', null, true),
+            'slt_another_htl' => $this->l('Select Another Property', null, true),
             'product_type_cond' => $this->l('Product type is required', null, true),
             'from_date_cond' => $this->l('From date is required', null, true),
             'to_date_cond' => $this->l('To date is required', null, true),
-            'hotel_name_cond' => $this->l('Hotel Name is required', null, true),
+            'hotel_name_cond' => $this->l('Property Name is required', null, true),
             'num_rooms_cond' => $this->l('Number of Rooms is required', null, true),
             'add_to_cart' => $this->l('Add To Cart', null, true),
             'remove' => $this->l('Remove', null, true),

@@ -1083,6 +1083,14 @@ $(document).ready(function() {
         $('#btn_new_room_service').hide();
     });
 
+    $(document).on('change', '#add_new_room_services_form select[name="price_calculation_type"]', function() {
+        if ($(this).val() == new_service_pcm_once_for_booking) {
+            $('#new_service_pcm_days_container').hide();
+        } else {
+            $('#new_service_pcm_days_container').show();
+        }
+    });
+
     // Add new custom service: change auto added option
     $(document).on('change', '#add_new_room_services_form input[name="new_service_auto_added"]', function() {
         var room_type_tax_rule_group_exist = $("#room_type_tax_rule_group_exist").val();
@@ -1238,6 +1246,57 @@ $(document).ready(function() {
         });
     });
 
+    $(document).on('click', '.del_room_additional_service', function(e){
+        e.preventDefault();
+        if (confirm(txt_confirm)) {
+            var idServiceProductOrderDetail = $(this).data('id_service_product_order_detail');
+            $currentItem = $(this);
+            if (idServiceProductOrderDetail) {
+                $(".loading_overlay").show();
+                $.ajax({
+                    type: 'POST',
+                    headers: {
+                        "cache-control": "no-cache"
+                    },
+                    url: admin_order_tab_link,
+                    dataType: 'JSON',
+                    cache: false,
+                    data: {
+                        id_service_product_order_detail: idServiceProductOrderDetail,
+                        action: 'DeleteRoomAdditionalService',
+                        ajax: true
+                    },
+                    success: function(jsonData) {
+                        if (!jsonData.hasError) {
+                            if (jsonData.service_panel) {
+                                $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+                            }
+                            showSuccessMessage(txtExtraServiceSucc);
+                        } else {
+                            showErrorMessage(jsonData.errors);
+
+                        }
+                    },
+                    complete: function() {
+                        $(".loading_overlay").hide();
+                    }
+                });
+            } else {
+                showErrorMessage(txtInvalidDemandVal);
+            }
+        }
+
+    });
+
+    // change advance option of extra demand
+    $(document).on('change', '.demand_adv_option_block .id_option', function(e) {
+        var option_selected = $(this).find('option:selected');
+        var extra_demand_price = option_selected.attr("optionPrice")
+        extra_demand_price = parseFloat(extra_demand_price);
+        // extra_demand_price = formatCurrency(extra_demand_price, currency_format, currency_sign, currency_blank);
+        $(this).closest('.room_demand_block').find('.unit_price').val(extra_demand_price);
+    });
+
     $(".textarea-autosize").autosize();
 
     var date = new Date();
@@ -1300,6 +1359,7 @@ $(document).ready(function() {
             },
             complete: function() {
                 $(".loading_overlay").hide();
+                initTooltip();
             }
         });
     });
@@ -2377,7 +2437,7 @@ const EditRoomBookingModal = {
 
                     // initialize datepickers
                     EditRoomBookingModal.initDatePickers();
-
+                    initTooltip();
                     $('#edit_product .extra-services-container #id_htl_booking').val(jsonProductLineData.id);
                     $('#edit-room-booking-modal').modal('show');
                 } else {

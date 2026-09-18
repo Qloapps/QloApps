@@ -205,14 +205,13 @@
 								{/block}
 							{/if}
 						</div>
-
 						<div class="product_info_containter">
 							<!-- tab hook is added here -->
 							<!--HOOK_PRODUCT_TAB -->
 							<section class="page-product-box">
 								{block name='product_tabs'}
 									<ul class="nav nav-tabs product_description_tabs">
-									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='Room Information'}{else}{l s='Product Information'}{/if}</a></li>
+									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='%s Information' sprintf=$room_type_info['selling_object_name']}{else}{l s='Product Information'}{/if}</a></li>
 										{* Block for booking products *}
 										{if isset($id_hotel) && $id_hotel}
 											<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
@@ -304,7 +303,7 @@
 															{if isset($room_dynamic_amenities) && $room_dynamic_amenities}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Room Amenities'}</span>
+																		<span>{l s='%s Amenities' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$room_dynamic_amenities item=amenity}
@@ -352,7 +351,7 @@
 															{if isset($hotel_description) && $hotel_description}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Description'}</span>
+																		<span>{l s='%s Description' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content">
 																		{$hotel_description}
@@ -366,7 +365,7 @@
 															<div class="room_info_hotel_images_wrap">
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Images'}</span>
+																		<span>{l s='Property Images'}</span>
 																	</div>
 																	<div class="room_info_content" id="room_info_hotel_images">
 																		<div class="row images-wrap"></div>
@@ -401,7 +400,7 @@
 														{if isset($hotel_policies) && $hotel_policies}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
-																	<span>{l s='Hotel Policies'}</span>
+																	<span>{l s='%s Policies' sprintf=$property_type}</span>
 																</div>
 																<div class="room_info_content">
 																	<p class="">{$hotel_policies}</p>
