@@ -301,7 +301,7 @@
 					{if isset($debug_mode) && $debug_mode == true}
 						<li class="hidden-sm hidden-xs">
 							<a href="{$link->getAdminLink('AdminPerformance')|escape:'html':'UTF-8'}" data-html="true"
-							class="toolbar_btn label-tooltip" data-toggle="tooltip" data-placement="bottom"
+							class="toolbar_btn debug-mode-tooltip label-tooltip" data-toggle="tooltip" data-placement="bottom"
 							title="<p class='text-left text-nowrap'><strong>{l s='Your site is in debug mode.'}</strong></p>
 									<p class='text-left'>{l s='All PHP errors and messages are displayed. Disable debug mode from Performance tab.'}</p>">
 								<i class="icon-bug"></i>

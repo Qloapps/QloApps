@@ -377,7 +377,20 @@ $(document).ready(function() {
 
 	//bootstrap components init
 	$('.dropdown-toggle').dropdown();
-	$('.label-tooltip, .help-tooltip').tooltip();
+	$('.label-tooltip, .help-tooltip').not('.debug-mode-tooltip').tooltip();
+
+	$('.debug-mode-tooltip').each(function () {
+		var $tooltip = $(this);
+
+		if ($.isFunction($.fn.bootstrapTooltip)) {
+			if (!$tooltip.data('bs.tooltip')) {
+				$tooltip.bootstrapTooltip({
+					html: true,
+					placement: 'bottom'
+				});
+			}
+		}
+	});
 	$('#error-modal').modal('show');
 
 	//init footer
@@ -478,7 +491,9 @@ $(document).ready(function() {
 	$('.no-htl-access-option').on('click', function() {
 		$(this).prop('selected', false);
 	});
+
 	initTooltip();
+
 }); //end dom ready
 
 function initTooltip($target, contentFn, items) {
