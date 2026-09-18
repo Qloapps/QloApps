@@ -159,13 +159,11 @@ class OrderTaxDetailCore extends ObjectModel
                         MAX(CASE WHEN ex.`id_order_tax_exemption` IS NULL THEN 1 ELSE 0 END) AS applied_count
                  FROM `' . _DB_PREFIX_ . 'order_tax_detail` tt
                  INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = tt.`id_tax` AND t.`is_tourism_tax` = 1
-                 LEFT JOIN `' . _DB_PREFIX_ . 'htl_booking_detail` hbd
-                    ON hbd.`id` = tt.`id_htl_booking`
                  LEFT JOIN `' . _DB_PREFIX_ . 'order_tax_exemption` ex
                     ON ex.`id_htl_booking` = tt.`id_htl_booking`
                  WHERE tt.`id_order` = ' . $idOrder . '
                    AND tt.`id_htl_booking` != 0
-                   AND hbd.`is_refunded` = 0
+                   AND tt.`id_htl_booking` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . ')
                  GROUP BY tt.`id_htl_booking`'
             );
             foreach ((array) $rows as $row) {
@@ -754,8 +752,6 @@ class OrderTaxDetailCore extends ObjectModel
              INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = ott.`id_tax` AND t.`is_tourism_tax` = 1
              LEFT JOIN `' . _DB_PREFIX_ . 'service_product_order_detail` spod
                 ON spod.`id_service_product_order_detail` = ott.`id_service_product_order_detail`
-             LEFT JOIN `' . _DB_PREFIX_ . 'htl_booking_detail` hbd
-                ON hbd.`id` = ott.`id_htl_booking`
              LEFT JOIN `' . _DB_PREFIX_ . 'order_tax_exemption` ex
                 ON (ott.`id_htl_booking` != 0 AND ex.`id_htl_booking` = ott.`id_htl_booking`)
                 OR (ott.`id_htl_booking` = 0 AND spod.`id_htl_booking_detail` != 0 AND ex.`id_htl_booking` = spod.`id_htl_booking_detail`)
@@ -763,7 +759,7 @@ class OrderTaxDetailCore extends ObjectModel
              LEFT JOIN `' . _DB_PREFIX_ . 'tax_lang` tl
                 ON tl.`id_tax` = ott.`id_tax` AND tl.`id_lang` = ' . $idLang . '
              WHERE ott.`id_order` = ' . $idOrder . '
-               AND ((ott.`id_htl_booking` != 0 AND hbd.`is_refunded` = 0)
+               AND ((ott.`id_htl_booking` != 0 AND ott.`id_htl_booking` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))
                     OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0))
                AND ex.`id_order_tax_exemption` IS NULL
              GROUP BY ott.`id_tax`, tl.`name`'
@@ -795,14 +791,12 @@ class OrderTaxDetailCore extends ObjectModel
              INNER JOIN `' . _DB_PREFIX_ . 'tax` t ON t.`id_tax` = ott.`id_tax` AND t.`is_tourism_tax` = 1
              LEFT JOIN `' . _DB_PREFIX_ . 'service_product_order_detail` spod
                 ON spod.`id_service_product_order_detail` = ott.`id_service_product_order_detail`
-             LEFT JOIN `' . _DB_PREFIX_ . 'htl_booking_detail` hbd
-                ON hbd.`id` = ott.`id_htl_booking`
              LEFT JOIN `' . _DB_PREFIX_ . 'order_tax_exemption` ex
                 ON (ott.`id_htl_booking` != 0 AND ex.`id_htl_booking` = ott.`id_htl_booking`)
                 OR (ott.`id_htl_booking` = 0 AND spod.`id_htl_booking_detail` != 0 AND ex.`id_htl_booking` = spod.`id_htl_booking_detail`)
                 OR (ott.`id_htl_booking` = 0 AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL) AND ex.`id_service_product_order_detail` = ott.`id_service_product_order_detail` AND ex.`id_htl_booking` = 0)
              WHERE ott.`id_order` = ' . $idOrder . '
-               AND ((ott.`id_htl_booking` != 0 AND hbd.`is_refunded` = 0)
+               AND ((ott.`id_htl_booking` != 0 AND ott.`id_htl_booking` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))
                     OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0))
                AND ex.`id_order_tax_exemption` IS NULL
              GROUP BY ott.`id_order_detail`'
@@ -842,7 +836,7 @@ class OrderTaxDetailCore extends ObjectModel
         $scopeValue = (int) $scopeValue;
         if ($scopeColumn === self::SCOPE_COLUMN_ROOM) {
             return (bool) Db::getInstance()->getValue(
-                'SELECT `is_refunded` FROM `' . _DB_PREFIX_ . 'htl_booking_detail` WHERE `id` = ' . $scopeValue
+                'SELECT ' . $scopeValue . ' IN (' . OrderReturn::getRefundedBookingIdsSubquery() . ')'
             );
         }
         return (bool) Db::getInstance()->getValue(
@@ -1281,8 +1275,12 @@ class OrderTaxDetailCore extends ObjectModel
         $objBookingDetail = new HotelBookingDetail();
         $bookings = $objBookingDetail->getBookingDataByOrderId($idOrder);
         if ($bookings) {
+            $refundedIds = array_flip(array_column(
+                Db::getInstance()->executeS(OrderReturn::getRefundedBookingIdsSubquery()),
+                'id_htl_booking'
+            ));
             foreach ($bookings as $booking) {
-                if (!empty($booking['is_refunded']) || !empty($booking['is_cancelled'])) {
+                if (isset($refundedIds[$booking['id']]) || $booking['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
                     continue;
                 }
                 $result = self::exemptBooking($booking['id'], $idEmployee, $note, $autoMsgLabel, $remarkLabel);
@@ -1319,8 +1317,12 @@ class OrderTaxDetailCore extends ObjectModel
         $objBookingDetail = new HotelBookingDetail();
         $bookings = $objBookingDetail->getBookingDataByOrderId($idOrder);
         if ($bookings) {
+            $refundedIds = array_flip(array_column(
+                Db::getInstance()->executeS(OrderReturn::getRefundedBookingIdsSubquery()),
+                'id_htl_booking'
+            ));
             foreach ($bookings as $booking) {
-                if (!empty($booking['is_refunded']) || !empty($booking['is_cancelled'])) {
+                if (isset($refundedIds[$booking['id']]) || $booking['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
                     continue;
                 }
                 $result = self::applyBooking($booking['id'], $idEmployee, $autoMsgLabel);
