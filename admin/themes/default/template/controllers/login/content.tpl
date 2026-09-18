@@ -25,7 +25,7 @@
 <div id="login-panel">
 	<div id="login-header">
 		<h1 class="text-center">
-			<img id="logo" src="{$img_dir}qloapps@2x.png" width="123px" alt="PrestaShop" />
+			<img id="logo" src="{$img_dir}qloapps@2x.png" width="123px" alt="QloApps" />
 		</h1>
 		<div class="text-center">{$qloapps_version}</div>
 		<div id="error" class="hide alert alert-danger">

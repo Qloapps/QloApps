@@ -75,7 +75,7 @@
 			</a>
 			{if $host_mode}
 			/&nbsp;
-			<a href="http://status.prestashop.com/" class="footer_link _blank">
+			<a href="https://qloapps.com/pricing/" class="footer_link _blank">
 				<i class="icon-circle status-page-dot"></i>
 				<span class="status-page-description"></span>
 			</a>

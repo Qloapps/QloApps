@@ -447,7 +447,7 @@ class AdminControllerCore extends Controller
     {
         global $timer_start;
         $this->timer_start = $timer_start;
-        // Has to be remove for the next Prestashop version
+        // Has to be remove for the next QloApps version
         global $token;
 
         $this->controller_type = 'admin';
@@ -2966,7 +2966,7 @@ class AdminControllerCore extends Controller
      */
     public function init()
     {
-        // Has to be removed for the next Prestashop version
+        // Has to be removed for the next QloApps version
         global $currentIndex;
 
         parent::init();
