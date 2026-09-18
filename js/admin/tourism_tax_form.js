@@ -153,3 +153,40 @@ $(document).ready(function () {
         $(this).closest('tr').remove();
     });
 });
+
+function toggleTourismTaxOptionFields(animate)
+{
+    var $fields = $('#conf_id_QLO_TOURISM_TAX_GROSSED_UP, #conf_id_QLO_TOURISM_TAX_SHOW_SEPARATE, #conf_id_QLO_TOURISM_TAX_SHOW_SEPARATE_DOCS').closest('.form-group');
+    var taxEnabled = $('#PS_TAX_on').prop('checked') === true;
+    var tourismTaxEnabled = $('#QLO_USE_TOURISM_TAX_on').prop('checked') === true;
+    var show = taxEnabled && tourismTaxEnabled;
+    if (animate) {
+        show ? $fields.fadeIn() : $fields.fadeOut();
+    } else {
+        show ? $fields.show() : $fields.hide();
+    }
+}
+
+function toggleMainTaxOptionFields(animate)
+{
+    var $fields = $('#conf_id_PS_TAX_DISPLAY, #conf_id_QLO_USE_TOURISM_TAX').closest('.form-group');
+    var show = $('#PS_TAX_on').prop('checked') === true;
+    if (animate) {
+        show ? $fields.fadeIn() : $fields.fadeOut();
+    } else {
+        show ? $fields.show() : $fields.hide();
+    }
+    toggleTourismTaxOptionFields(animate);
+}
+
+$(document).ready(function () {
+    toggleMainTaxOptionFields(false);
+
+    $('#PS_TAX_on, #PS_TAX_off').click(function (e) {
+        toggleMainTaxOptionFields(true);
+    });
+
+    $('#QLO_USE_TOURISM_TAX_on, #QLO_USE_TOURISM_TAX_off').click(function (e) {
+        toggleTourismTaxOptionFields(true);
+    });
+});
