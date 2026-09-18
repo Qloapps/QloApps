@@ -21,20 +21,29 @@
 */
 
 $(document).ready(function() {
-    $('#pp_refund_type').change(function() {
-        var refund_type = $(this).val();
-        if (refund_type == 2) {
-            $('#pp-amount-block').show();
-            $('#pp_refund_amount').attr('required', true);
-        } else {
-            $('#pp_refund_amount').val('');
-            $('#pp-amount-block').hide();
-            $('#pp_refund_amount').attr('required', false);
-        }
-    });
+    $('[name="WK_PAYPAL_COMMERCE_PAYMENT_MODE"]').on('change', function() {
+        var mode = $(this).val();
 
-    $(document).on('submit', '#refund_form', function() {
-        $('#refund_form_submit_btn').attr('disabled', true);
-        return true;
-    });
+        var $liveFields = $(
+            '#WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID,' +
+            '#WK_PAYPAL_COMMERCE_LIVE_EMAIL,' +
+            '#WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID,' +
+            '#WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'
+        ).closest('.form-group');
+
+        var $sandboxFields = $(
+            '#WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID,' +
+            '#WK_PAYPAL_COMMERCE_SANDBOX_EMAIL,' +
+            '#WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID,' +
+            '#WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'
+        ).closest('.form-group');
+
+        if (mode === 'production') {
+            $liveFields.show();
+            $sandboxFields.hide();
+        } else {
+            $liveFields.hide();
+            $sandboxFields.show();
+        }
+    }).trigger('change');
 });
