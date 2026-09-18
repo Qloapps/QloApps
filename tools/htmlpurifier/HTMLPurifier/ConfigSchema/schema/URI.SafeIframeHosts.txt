@@ -1,0 +1,14 @@
+URI.SafeIframeHosts
+TYPE: lookup/null
+DEFAULT: null
+--DESCRIPTION--
+<p>
+    A whitelist which indicates what explicit hosts should be
+    allowed to embed iframe.  See also %HTML.SafeIframeRegexp,
+    it has precedence over this config. Here are some example values:
+</p>
+<ul>
+    <li><code>www.youtube.com</code> - Allow YouTube videos</li>
+    <li><code>maps.google.com</code> - Allow Embedding a Google map</li>
+</ul>
+--# vim: et sw=4 sts=4

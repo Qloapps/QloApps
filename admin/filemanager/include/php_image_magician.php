@@ -1148,8 +1148,6 @@ class imageLib
       imagecopy($comp, $im, 0, 0, 0, 0, $width, $height);
       imagecopy($comp, $filter, 0, 0, 0, 0, $width, $height);
       imagecopymerge($im, $comp, 0, 0, 0, 0, $width, $height, $amount);
-
-      imagedestroy($comp);
       return $im;
   }
 
@@ -1261,9 +1259,6 @@ class imageLib
     }
 
       $this->imageResized = $final;
-
-      imagedestroy($li);
-      imagedestroy($im);
   }
 
 
@@ -1571,10 +1566,6 @@ class imageLib
       imagesavealpha($rgb, true);
 
       $this->imageResized = $rgb;
-
-      imagedestroy($image);
-      imagedestroy($newImage);
-      imagedestroy($shadow);
   }
 
 
@@ -3320,7 +3311,6 @@ class imageLib
     public function __destruct()
     {
         if (is_resource($this->imageResized)) {
-            imagedestroy($this->imageResized);
         }
     }
 

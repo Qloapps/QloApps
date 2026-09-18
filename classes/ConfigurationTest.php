@@ -146,7 +146,7 @@ class ConfigurationTestCore
     {
         return (
             version_compare(substr(phpversion(), 0, 5), '8.1.0', '>=')
-            && version_compare(substr(phpversion(), 0, 5), '8.5', '<')
+            && version_compare(substr(phpversion(), 0, 5), '8.6.0', '<')
         );
     }
 

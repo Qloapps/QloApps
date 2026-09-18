@@ -135,7 +135,7 @@ class HTMLPurifier_AttrValidator
             // we'd also want slightly more complicated substitution
             // involving an array as the return value,
             // although we're not sure how colliding attributes would
-            // resolve (certain ones would be completely overriden,
+            // resolve (certain ones would be completely overridden,
             // others would prepend themselves).
         }
 
