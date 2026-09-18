@@ -218,11 +218,14 @@ class Blockcart extends Module
 
         $tax_cost = 0;
         $tourismTaxCost = Tools::displayPrice(0, $currency);
+        $totalTaxesCost = Tools::displayPrice(0, $currency);
         if ($useTax && $useTax) {
             $totalToPayWithoutTaxes = $params['cart']->getOrderTotal(false);
             $tax_cost = Tools::displayPrice(($totalToPay - $totalToPayWithoutTaxes) - $tourismTax, $currency);
             $tourismTaxCost = Tools::displayPrice($tourismTax, $currency);
+            $totalTaxesCost = Tools::displayPrice($totalToPay - $totalToPayWithoutTaxes, $currency);
         }
+        $showTourismTaxSeparately = (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE');
         // The cart content is altered for display
         $orderProcess = Configuration::get('PS_ORDER_PROCESS_TYPE') ? 'order-opc' : 'order';
         foreach ($cart_rules as &$cart_rule) {
@@ -439,6 +442,8 @@ class Blockcart extends Module
             'tax_cost' => $tax_cost,
             'tourism_tax_cost' => $tourismTaxCost,
             'tourism_tax' => $tourismTax,
+            'total_taxes_cost' => $totalTaxesCost,
+            'show_tourism_tax_separately' => $showTourismTaxSeparately,
             'wrapping_cost' => Tools::displayPrice($wrappingCost, $currency),
             'product_total' => Tools::displayPrice($params['cart']->getOrderTotal($useTax, Cart::ONLY_PRODUCTS), $currency),
             'room_total' => ($totalRoomsPrice + $totalAdditionalServicesWithAutoAddPrice + $totalAdditionalServicesWithoutAutoAddPrice),
