@@ -78,7 +78,7 @@
 		var admin_modules_link = '{$link->getAdminLink("AdminModules")|addslashes}';
 		var tab_modules_list = '{if isset($tab_modules_list) && $tab_modules_list}{$tab_modules_list|addslashes}{/if}';
 		var update_success_msg = '{l s='Update successful' js=1}';
-		var errorLogin = '{l s='PrestaShop was unable to log in to Addons. Please check your credentials and your Internet connection.' js=1}';
+		var errorLogin = '{l s='QloApps was unable to log in to Addons. Please check your credentials and your Internet connection.' js=1}';
 		var search_product_msg = '{l s='Search for a product' js=1}';
 	</script>
 {/if}
@@ -343,7 +343,7 @@
 						<ul id="employee_links" class="dropdown-menu">
 							<li><a href="{$link->getAdminLink('AdminEmployees')|escape:'html':'UTF-8'}&amp;id_employee={$employee->id|intval}&amp;updateemployee"><i class="icon-wrench"></i> {l s='My preferences'}</a></li>
 							{if $host_mode}
-							<li><a href="https://www.prestashop.com/cloud/" class="_blank"><i class="icon-wrench"></i> {l s='My PrestaShop account'}</a></li>
+							<li><a href="https://qloapps.com/pricing/" class="_blank"><i class="icon-wrench"></i> {l s='Hosted QloApps'}</a></li>
 							{/if}
 							<li><a id="header_logout" href="{$login_link|escape:'html':'UTF-8'}&amp;logout"><i class="icon-signout"></i> {l s='Sign out'}</a></li>
 						</ul>

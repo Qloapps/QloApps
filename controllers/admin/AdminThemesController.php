@@ -48,7 +48,7 @@ class AdminThemesControllerCore extends AdminController
 
     /**
      * Multidimensional array used to check [theme]/config.xml values,
-     * and also checks prestashop current configuration if not match.
+     * and also checks QloApps current configuration if not match.
      *
      * @var array
      */
@@ -58,7 +58,7 @@ class AdminThemesControllerCore extends AdminController
                 'available' => array(
                     'value' => 'true',
                     /*
-                     * accepted attribute value if value doesn't match, prestashop configuration value must have those values
+                     * accepted attribute value if value doesn't match, QloApps configuration value must have those values
                     */
                     'check_if_not_valid' => array(
                         'PS_CSS_THEME_CACHE' => 0,
@@ -68,7 +68,7 @@ class AdminThemesControllerCore extends AdminController
                     ),
                 ),
             ),
-            'error' => 'This theme may not correctly use PrestaShop\'s "combine, compress and cache" options.',
+            'error' => 'This theme may not correctly use QloApps "combine, compress and cache" options.',
             'tab' => 'AdminPerformance',
         ),
         'guest_checkout' => array(
@@ -78,7 +78,7 @@ class AdminThemesControllerCore extends AdminController
                     'check_if_not_valid' => array('PS_GUEST_CHECKOUT_ENABLED' => 0)
                 ),
             ),
-            'error' => 'This theme may not correctly use PrestaShop\'s "guest checkout" feature.',
+            'error' => 'This theme may not correctly use QloApps "guest checkout" feature.',
             'tab' => 'AdminPreferences',
         ),
         'one_page_checkout' => array(
@@ -88,7 +88,7 @@ class AdminThemesControllerCore extends AdminController
                     'check_if_not_valid' => array('PS_ORDER_PROCESS_TYPE' => 0),
                 ),
             ),
-            'error' => 'This theme may not correctly use PrestaShop\'s "one-page checkout" feature.',
+            'error' => 'This theme may not correctly use QloApps "one-page checkout" feature.',
             'tab' => 'AdminPreferences',
         ),
         'store_locator' => array(
@@ -101,7 +101,7 @@ class AdminThemesControllerCore extends AdminController
                     ),
                 )
             ),
-            'error' => 'This theme may not correctly use PrestaShop\'s "store locator" feature.',
+            'error' => 'This theme may not correctly use QloApps "store locator" feature.',
             'tab' => 'AdminStores',
         )
     );
@@ -377,7 +377,7 @@ class AdminThemesControllerCore extends AdminController
                 'label' => $this->l('Name of the theme\'s directory'),
                 'name' => 'directory',
                 'required' => true,
-                'hint' => $this->l('If the directory does not exist, PrestaShop will create it automatically.'),
+                'hint' => $this->l('If the directory does not exist, QloApps will create it automatically.'),
             );
 
             $theme_query = Theme::getThemes();
@@ -963,7 +963,7 @@ class AdminThemesControllerCore extends AdminController
 
     private function generateXML($theme_to_export, $metas)
     {
-        $theme = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><!-- Copyright PrestaShop --><theme></theme>');
+        $theme = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><!-- Copyright QloApps --><theme></theme>');
         $theme->addAttribute('version', Tools::getValue('theme_version'));
         $theme->addAttribute('name', Tools::htmlentitiesUTF8(Tools::getValue('theme_name')));
         $theme->addAttribute('directory', Tools::htmlentitiesUTF8(Tools::getValue('theme_directory')));
@@ -1928,18 +1928,6 @@ class AdminThemesControllerCore extends AdminController
 
             return parent::initContent();
         }
-    }
-
-    public function ajaxProcessGetAddonsThemes()
-    {
-        $parent_domain = Tools::getHttpHost(true).substr($_SERVER['REQUEST_URI'], 0, -1 * strlen(basename($_SERVER['REQUEST_URI'])));
-        $iso_lang = $this->context->language->iso_code;
-        $iso_currency = $this->context->currency->iso_code;
-        $iso_country = $this->context->country->iso_code;
-        $activity = Configuration::get('PS_SHOP_ACTIVITY');
-        $addons_url = 'http://addons.prestashop.com/iframe/search-1.6.php?psVersion='._PS_VERSION_.'&onlyThemes=1&isoLang='.$iso_lang.'&isoCurrency='.$iso_currency.'&isoCountry='.$iso_country.'&activity='.(int)$activity.'&parentUrl='.$parent_domain;
-
-        die(Tools::file_get_contents($addons_url));
     }
 
     /**

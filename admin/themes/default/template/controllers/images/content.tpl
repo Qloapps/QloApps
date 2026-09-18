@@ -29,7 +29,7 @@
 {if isset($display_move) && $display_move}
 	{if $safe_mode}
         <div class="alert alert-warning">
-            <p>{l s='PrestaShop has detected that your server configuration is not compatible with the new storage system (directive "safe_mode" is activated). You should therefore continue to use the existing system.'}</p>
+            <p>{l s='QloApps has detected that your server configuration is not compatible with the new storage system (directive "safe_mode" is activated). You should therefore continue to use the existing system.'}</p>
         </div>
     {else}
         <form action="{$current|escape:'html':'UTF-8'}&amp;token={$token|escape:'html':'UTF-8'}" method="post" class="form-horizontal">
