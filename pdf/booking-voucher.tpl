@@ -255,17 +255,24 @@
                         <td class="grey small bold" width="70%">{l s='Total (Tax excl.)' pdf='true'}</td>
                         <td class="white right small bold" width="30%">{displayPrice currency=$order->id_currency price=$footer.total_without_discount_te}</td>
                     </tr>
-                    {if $footer.total_tax_without_discount > 0}
-                        <tr>
-                            <td class="grey small bold" width="70%">{l s='Room and Service Tax' pdf='true'}</td>
-                            <td class="white right small bold" width="30%">{displayPrice currency=$order->id_currency price=$footer.total_tax_without_discount}</td>
-                        </tr>
-                    {/if}
-                    {if isset($footer.total_tourism_tax) && $footer.total_tourism_tax > 0}
+                    {if (!isset($footer.show_tourism_tax_separately) || $footer.show_tourism_tax_separately) && isset($footer.total_tourism_tax) && $footer.total_tourism_tax > 0}
+                        {if $footer.total_tax_without_discount > 0}
+                            <tr>
+                                <td class="grey small bold" width="70%">{l s='Room and Service Tax' pdf='true'}</td>
+                                <td class="white right small bold" width="30%">{displayPrice currency=$order->id_currency price=$footer.total_tax_without_discount}</td>
+                            </tr>
+                        {/if}
                         <tr>
                             <td class="grey small bold" width="70%">{l s='Total Tourism Tax' pdf='true'}</td>
                             <td class="white right small bold" width="30%">{displayPrice currency=$order->id_currency price=$footer.total_tourism_tax}</td>
                         </tr>
+                    {else}
+                        {if ($footer.total_tax_without_discount + $footer.total_tourism_tax) > 0}
+                            <tr>
+                                <td class="grey small bold" width="70%">{l s='Total Taxes' pdf='true'}</td>
+                                <td class="white right small bold" width="30%">{displayPrice currency=$order->id_currency price=($footer.total_tax_without_discount + $footer.total_tourism_tax)}</td>
+                            </tr>
+                        {/if}
                     {/if}
                     {if isset($footer.product_discounts_tax_incl) && $footer.product_discounts_tax_incl > 0}
                         <tr>

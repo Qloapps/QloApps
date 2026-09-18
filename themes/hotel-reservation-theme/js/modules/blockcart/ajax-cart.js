@@ -1327,10 +1327,13 @@ var ajaxCart = {
 
         $('.ajax_cart_tax_cost').text(jsonData.tax_cost);
         $('.ajax_cart_tourism_tax_cost').text(jsonData.tourism_tax_cost);
-        if (parseFloat(jsonData.tourism_tax) > 0) {
-            $('.ajax_cart_tourism_tax_line').show();
+        $('.ajax_cart_total_taxes_cost').text(jsonData.total_taxes_cost);
+        if (jsonData.show_tourism_tax_separately && parseFloat(jsonData.tourism_tax) > 0) {
+            $('.ajax_cart_tax_line, .ajax_cart_tourism_tax_line').show();
+            $('.ajax_cart_total_taxes_line').hide();
         } else {
-            $('.ajax_cart_tourism_tax_line').hide();
+            $('.ajax_cart_tax_line, .ajax_cart_tourism_tax_line').hide();
+            $('.ajax_cart_total_taxes_line').show();
         }
         $('.cart_block_wrapping_cost').text(jsonData.wrapping_cost);
 

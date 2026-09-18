@@ -995,5 +995,17 @@
 	<configuration id="PS_CUSTOMER_GUEST_MAX_LIMIT" name="PS_CUSTOMER_GUEST_MAX_LIMIT">
       <value>5</value>
     </configuration>
+	<configuration id="QLO_USE_TOURISM_TAX" name="QLO_USE_TOURISM_TAX">
+      <value>0</value>
+    </configuration>
+	<configuration id="QLO_TOURISM_TAX_GROSSED_UP" name="QLO_TOURISM_TAX_GROSSED_UP">
+      <value>0</value>
+    </configuration>
+	<configuration id="QLO_TOURISM_TAX_SHOW_SEPARATE" name="QLO_TOURISM_TAX_SHOW_SEPARATE">
+      <value>1</value>
+    </configuration>
+	<configuration id="QLO_TOURISM_TAX_SHOW_SEPARATE_DOCS" name="QLO_TOURISM_TAX_SHOW_SEPARATE_DOCS">
+      <value>1</value>
+    </configuration>
   </entities>
 </entity_configuration>

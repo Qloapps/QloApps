@@ -1,24 +1,24 @@
-/**
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License version 3.0
- * that is bundled with this package in the file LICENSE.md
- * It is also available through the world-wide-web at this URL:
- * https://opensource.org/license/osl-3-0-php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to support@qloapps.com so we can send you a copy immediately.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade this module to a newer
- * versions in the future. If you wish to customize this module for your needs
- * please refer to https://store.webkul.com/customisation-guidelines for more information.
- *
- * @author Webkul IN
- * @copyright Since 2010 Webkul
- * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
- */
+/*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*/
 
 $(document).ready(function () {
     var CALCULATION_TYPE_PERCENTAGE = 1;
@@ -151,5 +151,42 @@ $(document).ready(function () {
     $(document).on('click', '.tourism-tax-remove-row', function (e) {
         e.preventDefault();
         $(this).closest('tr').remove();
+    });
+});
+
+function toggleTourismTaxOptionFields(animate)
+{
+    var $fields = $('#conf_id_QLO_TOURISM_TAX_GROSSED_UP, #conf_id_QLO_TOURISM_TAX_SHOW_SEPARATE, #conf_id_QLO_TOURISM_TAX_SHOW_SEPARATE_DOCS').closest('.form-group');
+    var taxEnabled = $('#PS_TAX_on').prop('checked') === true;
+    var tourismTaxEnabled = $('#QLO_USE_TOURISM_TAX_on').prop('checked') === true;
+    var show = taxEnabled && tourismTaxEnabled;
+    if (animate) {
+        show ? $fields.fadeIn() : $fields.fadeOut();
+    } else {
+        show ? $fields.show() : $fields.hide();
+    }
+}
+
+function toggleMainTaxOptionFields(animate)
+{
+    var $fields = $('#conf_id_PS_TAX_DISPLAY, #conf_id_QLO_USE_TOURISM_TAX').closest('.form-group');
+    var show = $('#PS_TAX_on').prop('checked') === true;
+    if (animate) {
+        show ? $fields.fadeIn() : $fields.fadeOut();
+    } else {
+        show ? $fields.show() : $fields.hide();
+    }
+    toggleTourismTaxOptionFields(animate);
+}
+
+$(document).ready(function () {
+    toggleMainTaxOptionFields(false);
+
+    $('#PS_TAX_on, #PS_TAX_off').click(function (e) {
+        toggleMainTaxOptionFields(true);
+    });
+
+    $('#QLO_USE_TOURISM_TAX_on, #QLO_USE_TOURISM_TAX_off').click(function (e) {
+        toggleTourismTaxOptionFields(true);
     });
 });

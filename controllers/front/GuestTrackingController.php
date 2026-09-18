@@ -557,6 +557,7 @@ class GuestTrackingControllerCore extends FrontController
             'guestInformations' => (array)$customer,
             'view_on_map' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
             'total_tourism_tax' => isset($total_tourism_tax) ? $total_tourism_tax : 0,
+            'show_tourism_tax_separately' => (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE'),
         ));
     }
 

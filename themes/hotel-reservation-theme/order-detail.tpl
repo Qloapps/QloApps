@@ -373,18 +373,25 @@
                                             </tr>
                                         {/if}
 
-                                        <tr class="totalprice item">
-                                            <td>{l s='Room and Service Tax'}</td>
-                                            <td class="text-right">
-                                                <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
-                                            </td>
-                                        </tr>
+                                        {if (!isset($show_tourism_tax_separately) || $show_tourism_tax_separately) && isset($total_tourism_tax) && $total_tourism_tax > 0}
+                                            <tr class="totalprice item">
+                                                <td>{l s='Room and Service Tax'}</td>
+                                                <td class="text-right">
+                                                    <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
+                                                </td>
+                                            </tr>
 
-                                        {if isset($total_tourism_tax) && $total_tourism_tax > 0}
                                             <tr class="item">
                                                 <td>{l s='Total Tourism Tax'}</td>
                                                 <td class="text-right">
                                                     <span class="price">{displayWtPriceWithCurrency price=$total_tourism_tax currency=$currency}</span>
+                                                </td>
+                                            </tr>
+                                        {else}
+                                            <tr class="totalprice item">
+                                                <td>{l s='Total Taxes'}</td>
+                                                <td class="text-right">
+                                                    <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount + $total_tourism_tax) currency=$currency}</span>
                                                 </td>
                                             </tr>
                                         {/if}
@@ -801,17 +808,24 @@
                                             </tr>
                                         {/if}
 
-                                        <tr class="totalprice item">
-                                            <td>{l s='Room and Service Tax'}</td>
-                                            <td class="text-right">
-                                                <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
-                                            </td>
-                                        </tr>
-                                        {if isset($total_tourism_tax) && $total_tourism_tax > 0}
+                                        {if (!isset($show_tourism_tax_separately) || $show_tourism_tax_separately) && isset($total_tourism_tax) && $total_tourism_tax > 0}
+                                            <tr class="totalprice item">
+                                                <td>{l s='Room and Service Tax'}</td>
+                                                <td class="text-right">
+                                                    <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount) currency=$currency}</span>
+                                                </td>
+                                            </tr>
                                             <tr class="item">
                                                 <td>{l s='Total Tourism Tax'}</td>
                                                 <td class="text-right">
                                                     <span class="price">{displayWtPriceWithCurrency price=$total_tourism_tax currency=$currency}</span>
+                                                </td>
+                                            </tr>
+                                        {else}
+                                            <tr class="totalprice item">
+                                                <td>{l s='Total Taxes'}</td>
+                                                <td class="text-right">
+                                                    <span class="price">{displayWtPriceWithCurrency price=($total_tax_without_discount + $total_tourism_tax) currency=$currency}</span>
                                                 </td>
                                             </tr>
                                         {/if}

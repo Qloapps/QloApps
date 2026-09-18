@@ -618,6 +618,7 @@ class HTMLTemplateInvoiceCore extends HTMLTemplate
         if ($footer['total_tax_without_discount'] < 0) {
             $footer['total_tax_without_discount'] = 0;
         }
+        $footer['show_tourism_tax_separately'] = (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE_DOCS');
 
         $data = array(
             'cart_htl_data' => $cart_htl_data,

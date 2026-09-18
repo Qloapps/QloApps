@@ -137,7 +137,7 @@
 											{/if} --><!-- commented by webkul unnecessary data -->
 											{block name='blockcart_shopping_cart_total_tax'}
 												{if $show_tax && $use_tax}
-													<div class="cart-prices-line">
+													<div class="cart-prices-line ajax_cart_tax_line"{if !isset($show_tourism_tax_separately) || !$show_tourism_tax_separately || !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
 														<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
 														<span>{l s='Room and Service Tax' mod='blockcart'}</span>
 													</div>
@@ -145,9 +145,17 @@
 											{/block}
 											{block name='blockcart_shopping_cart_total_tourism_tax'}
 												{if $show_tax && $use_tax}
-													<div class="cart-prices-line ajax_cart_tourism_tax_line"{if !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
+													<div class="cart-prices-line ajax_cart_tourism_tax_line"{if !isset($show_tourism_tax_separately) || !$show_tourism_tax_separately || !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
 														<span class="price cart_block_tourism_tax_cost ajax_cart_tourism_tax_cost">{$tourism_tax_cost}</span>
 														<span>{l s='Total Tourism Tax' mod='blockcart'}</span>
+													</div>
+												{/if}
+											{/block}
+											{block name='blockcart_shopping_cart_total_taxes_combined'}
+												{if $show_tax && $use_tax}
+													<div class="cart-prices-line ajax_cart_total_taxes_line"{if isset($show_tourism_tax_separately) && $show_tourism_tax_separately && isset($tourism_tax) && $tourism_tax > 0} style="display:none"{/if}>
+														<span class="price cart_block_total_taxes_cost ajax_cart_total_taxes_cost">{$total_taxes_cost}</span>
+														<span>{l s='Total Taxes' mod='blockcart'}</span>
 													</div>
 												{/if}
 											{/block}
@@ -352,7 +360,7 @@
 							{/block}
 							{block name='blockcart_layer_cart_total_tax'}
 								{if $show_tax && $use_tax}
-									<div class="layer_cart_row">
+									<div class="layer_cart_row ajax_cart_tax_line"{if !isset($show_tourism_tax_separately) || !$show_tourism_tax_separately || !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
 										<strong class="dark">{l s='Room and Service Tax' mod='blockcart'}</strong>
 										<span class="price cart_block_tax_cost ajax_cart_tax_cost pull-right">{$tax_cost}</span>
 									</div>
@@ -360,9 +368,17 @@
 							{/block}
 							{block name='blockcart_layer_cart_total_tourism_tax'}
 								{if $show_tax && $use_tax}
-									<div class="layer_cart_row ajax_cart_tourism_tax_line"{if !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
+									<div class="layer_cart_row ajax_cart_tourism_tax_line"{if !isset($show_tourism_tax_separately) || !$show_tourism_tax_separately || !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
 										<strong class="dark">{l s='Total Tourism Tax' mod='blockcart'}</strong>
 										<span class="price cart_block_tourism_tax_cost ajax_cart_tourism_tax_cost pull-right">{$tourism_tax_cost}</span>
+									</div>
+								{/if}
+							{/block}
+							{block name='blockcart_layer_cart_total_taxes_combined'}
+								{if $show_tax && $use_tax}
+									<div class="layer_cart_row ajax_cart_total_taxes_line"{if isset($show_tourism_tax_separately) && $show_tourism_tax_separately && isset($tourism_tax) && $tourism_tax > 0} style="display:none"{/if}>
+										<strong class="dark">{l s='Total Taxes' mod='blockcart'}</strong>
+										<span class="price cart_block_total_taxes_cost ajax_cart_total_taxes_cost pull-right">{$total_taxes_cost}</span>
 									</div>
 								{/if}
 							{/block}

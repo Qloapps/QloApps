@@ -90,16 +90,21 @@
         {hook h='displayBeforeCartTotalTax'}
     {/block}
     {if $show_taxes}
-        <p class="cart_total_tax">
-            <span>{l s='Room and Service Tax'}</span>
-            <span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
-        </p>
-    {/if}
-    {if $show_taxes && isset($total_tourism_tax) && $total_tourism_tax > 0}
-        <p class="cart_total_tourism_tax">
-            <span>{l s='Total Tourism Tax'}</span>
-            <span class="cart_total_values">{displayPrice price=$total_tourism_tax}</span>
-        </p>
+        {if (!isset($show_tourism_tax_separately) || $show_tourism_tax_separately) && isset($total_tourism_tax) && $total_tourism_tax > 0}
+            <p class="cart_total_tax">
+                <span>{l s='Room and Service Tax'}</span>
+                <span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
+            </p>
+            <p class="cart_total_tourism_tax">
+                <span>{l s='Total Tourism Tax'}</span>
+                <span class="cart_total_values">{displayPrice price=$total_tourism_tax}</span>
+            </p>
+        {else}
+            <p class="cart_total_tax">
+                <span>{l s='Total Taxes'}</span>
+                <span class="cart_total_values">{displayPrice price=($total_tax_without_discount + $total_tourism_tax)}</span>
+            </p>
+        {/if}
     {/if}
     <p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">
         <span>
