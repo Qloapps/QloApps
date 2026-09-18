@@ -2,10 +2,10 @@
 /**
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
+* This source file is subject to the Academic Free License (AFL 3.0)
 * that is bundled with this package in the file LICENSE.md
 * It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
+* https://opensource.org/licenses/afl-3.0.php
 * If you did not receive a copy of the license and are unable to
 * obtain it through the world-wide-web, please send an email
 * to support@qloapps.com so we can send you a copy immediately.
@@ -18,7 +18,7 @@
 *
 * @author Webkul IN
 * @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
 */
 
 class AdminPaypalCommerceTransactionController extends ModuleAdminController
@@ -30,15 +30,35 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
 
         $this->bootstrap = true;
         $this->list_no_link = true;
+        $this->_new_list_header_design = true;
 
         $this->table = 'wk_paypal_commerce_order';
         $this->className = 'WKPayPalCommerceOrder';
 
-        $this->_select = 'a.*, CONCAT(c.firstname, \' \', c.lastname) as customer_name, c.email';
+        $this->_select = 'a.*, CONCAT(c.firstname, \' \', c.lastname) as customer_name, c.email,
+        CONCAT("[", GROUP_CONCAT(DISTINCT ord.`id_order`), "]") as id_orders';
+
         $this->_join = ' LEFT JOIN `' . _DB_PREFIX_ . 'customer` c ON (c.id_customer = a.id_customer)';
+        $this->_join .= ' LEFT JOIN `' . _DB_PREFIX_ . 'orders` ord ON (a.`order_reference` = ord.`reference`)';
         $this->_where = ' AND a.`id_cart` != 0';
         $this->_orderBy = 'id_paypal_commerce_order';
         $this->_defaultOrderWay = 'DESC';
+
+        $this->_group = ' GROUP BY a.`id_cart`';
+
+        $orderBy = Tools::getValue($this->table.'Orderby');
+        $orderWay = Tools::getValue($this->table.'Orderway');
+
+        if (!Validate::isOrderBy($orderBy)) {
+            $orderBy = 'id_paypal_commerce_order'; // fallback
+        }
+
+        if (!Validate::isOrderWay($orderWay)) {
+            $orderWay = 'DESC';
+        }
+
+        $this->_orderBy = pSQL($orderBy);
+        $this->_orderWay = pSQL($orderWay);
 
         $this->toolbar_title = $this->l('PayPal Transactions');
 
@@ -47,6 +67,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                 'title' => $this->l('Order Reference'),
                 'align' => 'center',
                 'havingFilter' => true,
+                'callback' => 'getOrderInfo',
                 'hint' => $this->l('Order reference in QloApps of the PayPal transaction'),
             ),
             'pp_transaction_id' => array(
@@ -80,6 +101,8 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                 'hint' => $this->l('Payment Status'),
                 'orderBy' => false,
                 'hint' => $this->l('Current status of the PayPal transaction.'),
+                'callback' => 'getStatus',
+                'search' => false,
             ),
             'order_date' => array(
                 'title' => $this->l('Order Date'),
@@ -92,7 +115,61 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
 
     public function getCustomerInfo($customerName, $row)
     {
-        return '<a href="'.$this->context->link->getAdminLink('AdminCustomers').'&id_customer='.$row['id_customer'].'&viewcustomer">'.$customerName.'<br>'.'('.$row['email'].')</a>';
+        $safeCustomerName = Tools::safeOutput($customerName);
+        $safeEmail = Tools::safeOutput($row['email']);
+        return '<a href="'.$this->context->link->getAdminLink('AdminCustomers').'&id_customer='.(int)$row['id_customer'].'&viewcustomer">'.$safeCustomerName.'<br>'.'('.$safeEmail.')</a>';
+    }
+
+    public function getOrderInfo($reference, $row)
+    {
+        $safeReference = Tools::safeOutput($reference);
+        $str = $safeReference.'<br/>(';
+        $arrIdOrders = json_decode($row['id_orders']);
+        if (is_array($arrIdOrders)) {
+            $arrIdOrders = array_values(array_unique(array_map('intval', $arrIdOrders)));
+            foreach ($arrIdOrders as $key => $id_order) {
+                $str .= '<a target="_blank" href="'.$this->context->link->getAdminLink('AdminOrders').'&id_order='.$id_order.'&vieworder" >#'.$id_order.'</a>';
+                if ($key < count($arrIdOrders) - 1) {
+                    $str .= ', ';
+                }
+            }
+        }
+        return $str.')';
+    }
+
+    /**
+     * Renders the "Status" list column as a colored badge for known PayPal
+     * payment statuses, falling back to plain escaped text for any other value.
+     * @param string $ppPaymentStatus Raw PayPal payment status stored on the transaction
+     * @return string HTML for the list cell
+     */
+    public function getStatus($ppPaymentStatus)
+    {
+        $statusBadges = array(
+            WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED => array(
+                'class' => 'badge-success',
+                'label' => $this->l('Completed'),
+            ),
+            WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_APPROVED => array(
+                'class' => 'badge-info',
+                'label' => $this->l('Approved'),
+            ),
+            WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_PENDING => array(
+                'class' => 'badge-warning',
+                'label' => $this->l('Pending'),
+            ),
+            WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_DENIED => array(
+                'class' => 'badge-danger',
+                'label' => $this->l('Denied'),
+            ),
+        );
+
+        if (isset($statusBadges[$ppPaymentStatus])) {
+            return '<span class="badge '.$statusBadges[$ppPaymentStatus]['class'].'">'
+                .$statusBadges[$ppPaymentStatus]['label'].'</span>';
+        }
+
+        return Tools::safeOutput($ppPaymentStatus);
     }
 
     public function setCurrency($val, $row)
@@ -133,47 +210,57 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
     public function renderView()
     {
         $idTrans = (int)Tools::getValue('id_paypal_commerce_order');
-        if ($idTrans > 0) {
+        $objPPOrder = new WKPayPalCommerceOrder($idTrans);
+        if (Validate::isLoadedObject($objPPOrder)) {
             $smartyVars = array();
             $refundData = array();
             $totalRefunded = 0;
-            if ($transactionData = WKPayPalCommerceOrder::getTransactionDetails((int)$idTrans)) {
-                $orderCurrency = new Currency((int)$transactionData['id_currency']);
-                $refundData = WkPaypalCommerceRefund::getRefundListByTransID((int)$idTrans);
-                $totalRefundedFormatted = WkPaypalCommerceRefund::getTotalRefundedAmount((int)$idTrans, true);
+            $transactionData = WKPayPalCommerceOrder::getTransactionDetails((int)$idTrans);
+            $orderCurrency = new Currency((int)$transactionData['id_currency']);
+            $refundData = WkPaypalCommerceRefund::getRefundListByTransID((int)$idTrans);
+            $totalRefundedFormatted = WkPaypalCommerceRefund::getTotalRefundedAmount((int)$idTrans, true);
 
-                $totalRefunded = WkPaypalCommerceRefund::getTotalRefundedAmount((int)$idTrans, false);
-                $remainingRefund = (float)($transactionData['pp_paid_total'] - $totalRefunded);
-                $response = Tools::jsonDecode($transactionData['response'], true);
+            $totalRefunded = WkPaypalCommerceRefund::getTotalRefundedAmount((int)$idTrans, false);
+            $remainingRefund = (float)($transactionData['pp_paid_total'] - $totalRefunded);
+            $response = json_decode($transactionData['response'], true);
 
-                // Buyer making a payment in a different currency (ex: EUR) which is different from the default currency of merchant (Ex: USD), In all those cross currency cases, After Capture, transaction will fall into Pending state and will require merchant to manually go to his PayPal account and accept the payment.
-                $objPPOrder = new WKPayPalCommerceOrder();
-                if (
-                    isset($response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason'])
-                    && ($transactionData['pp_payment_status'] == 'PENDING' || $transactionData['pp_payment_status'] == 'DENIED')
-                    && isset($response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason'])
-                ) {
-                    if (isset($objPPOrder->ppStatusDetail[$response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason']])) {
-                        $smartyVars['ppstatusDetailMsg'] = $objPPOrder->ppStatusDetail[$response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason']];
-                    }
+            // Buyer making a payment in a different currency (ex: EUR) which is different from the default currency of merchant (Ex: USD), In all those cross currency cases, After Capture, transaction will fall into Pending state and will require merchant to manually go to his PayPal account and accept the payment.
+            if (isset($response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason'])
+                && ($transactionData['pp_payment_status'] == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_PENDING
+                    || $transactionData['pp_payment_status'] == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_DENIED)
+            ) {
+                if (isset($objPPOrder->ppStatusDetail[$response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason']])) {
+                    $smartyVars['ppstatusDetailMsg'] = $objPPOrder->ppStatusDetail[$response['data']['purchase_units'][0]['payments']['captures'][0]['status_details']['reason']];
                 }
-                
-                $smartyVars['transaction_url'] = $this->context->link->getAdminLink('AdminPaypalCommerceTransaction',Tools::getAdminTokenLite('AdminPaypalCommerceTransaction')).'&viewwk_paypal_commerce_order&id_paypal_commerce_order=' . (int)$idTrans;
-                $smartyVars['transaction_data'] = $transactionData;
-                $smartyVars['refund_data'] = $refundData;
-                $smartyVars['refunded_amount'] = $totalRefundedFormatted;
-                $smartyVars['remaining_refund'] = $remainingRefund;
-                $smartyVars['remaining_refund_format'] = Tools::displayPrice($remainingRefund, $orderCurrency);
-                $smartyVars['currency'] = $orderCurrency;
-                $smartyVars['WK_PAYPAL_COMMERCE_REFUND_TYPE_FULL'] = WkPaypalCommerceRefund::WK_PAYPAL_COMMERCE_REFUND_TYPE_FULL;
-                $smartyVars['WK_PAYPAL_COMMERCE_REFUND_TYPE_PARTIAL'] = WkPaypalCommerceRefund::WK_PAYPAL_COMMERCE_REFUND_TYPE_PARTIAL;
-
-                $this->context->smarty->assign($smartyVars);
-                $this->base_tpl_view = 'view.tpl';
-                return parent::renderView();
-            } else {
-                Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
             }
+
+            $orderLinks = array();
+            if ($transactionData['id_cart']) {
+                $orders = Order::getByReference($transactionData['order_reference']);
+                foreach ($orders as $order) {
+                    $orderLinks[] = array(
+                        'id_order' => (int) $order->id,
+                        'link' => $this->context->link->getAdminLink('AdminOrders')
+                            . '&id_order=' . (int) $order->id
+                            . '&vieworder',
+                    );
+                }
+            }
+
+            $smartyVars['transaction_data'] = $transactionData;
+            $smartyVars['order_links'] = $orderLinks;
+            $smartyVars['refund_data'] = $refundData;
+            $smartyVars['refunded_amount'] = $totalRefundedFormatted;
+            $smartyVars['remaining_refund'] = $remainingRefund;
+            $smartyVars['remaining_refund_format'] = Tools::displayPrice($remainingRefund, $orderCurrency);
+            $smartyVars['currency'] = $orderCurrency;
+            $smartyVars['WK_PAYPAL_COMMERCE_REFUND_TYPE_FULL'] = WkPaypalCommerceRefund::WK_PAYPAL_COMMERCE_REFUND_TYPE_FULL;
+            $smartyVars['WK_PAYPAL_COMMERCE_REFUND_TYPE_PARTIAL'] = WkPaypalCommerceRefund::WK_PAYPAL_COMMERCE_REFUND_TYPE_PARTIAL;
+            $smartyVars['WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED'] = WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED;
+
+            $this->context->smarty->assign($smartyVars);
+            $this->base_tpl_view = 'view.tpl';
+            return parent::renderView();
         } else {
             Tools::redirectAdmin(self::$currentIndex . '&token=' . $this->token);
         }
@@ -225,7 +312,7 @@ class AdminPaypalCommerceTransactionController extends ModuleAdminController
                                 $postData = array();
                                 $postData['amount'] = array(
                                     'currency_code' => $transactionData['pp_paid_currency'],
-                                    'value' => $refundAmt
+                                    'value' => number_format(Tools::ps_round($refundAmt, 2), 2, '.', '')
                                 );
                                 $postData['transaction_id'] = $transactionData['pp_transaction_id'];
                                 $postData['refund_reason'] = $refundReason;
