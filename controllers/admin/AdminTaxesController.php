@@ -143,7 +143,23 @@ class AdminTaxesControllerCore extends AdminController
         if (Configuration::get('QLO_USE_TOURISM_TAX') || Tools::getValue('QLO_USE_TOURISM_TAX')) {
             $this->fields_options['general']['fields']['QLO_TOURISM_TAX_GROSSED_UP'] = array(
                 'title' => $this->l('Include tourism tax in displayed prices'),
-                'desc' => $this->l('When enabled, tourism tax is included in displayed prices. The applicable tourism tax is always shown as a separate line if applicable.'),
+                'desc' => $this->l('When enabled, tourism tax is included in displayed prices. Whether the applicable tourism tax is also shown as a separate line depends on the settings below.'),
+                'validation' => 'isBool',
+                'cast' => 'intval',
+                'type' => 'bool',
+            );
+
+            $this->fields_options['general']['fields']['QLO_TOURISM_TAX_SHOW_SEPARATE'] = array(
+                'title' => $this->l('Show tourism tax separately in price summary'),
+                'desc' => $this->l('When enabled, tourism tax is shown as its own line, separate from the room/service tax, on the cart summary, order confirmation, and order detail pages.'),
+                'validation' => 'isBool',
+                'cast' => 'intval',
+                'type' => 'bool',
+            );
+
+            $this->fields_options['general']['fields']['QLO_TOURISM_TAX_SHOW_SEPARATE_DOCS'] = array(
+                'title' => $this->l('Show tourism tax separately on invoices / booking vouchers'),
+                'desc' => $this->l('When enabled, tourism tax is shown as its own line, separate from the room/service tax, on the invoice and booking voucher totals.'),
                 'validation' => 'isBool',
                 'cast' => 'intval',
                 'type' => 'bool',
@@ -1134,7 +1150,7 @@ class AdminTaxesControllerCore extends AdminController
         parent::setMedia();
         if ($this->display == 'edit' || $this->display == 'add') {
             $this->addCSS(_MODULE_DIR_ . 'hotelreservationsystem/views/css/HotelReservationAdmin.css');
-            $this->addJs(_MODULE_DIR_ . 'hotelreservationsystem/views/js/TourismTaxForm.js');
+            $this->addJs(_PS_JS_DIR_ . 'admin/tourism_tax_form.js');
         }
     }
 

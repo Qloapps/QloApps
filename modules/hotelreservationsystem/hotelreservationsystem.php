@@ -622,8 +622,6 @@ class HotelReservationSystem extends Module
             'QLO_HEADER_SLIDER_AUTO_PLAY',
             'QLO_HEADER_SLIDER_INTERVAL',
             'QLO_HEADER_SLIDER_ANIM_TYPE',
-            'QLO_USE_TOURISM_TAX',
-            'QLO_TOURISM_TAX_GROSSED_UP',
         );
         foreach ($configKeys as $key) {
             if (!Configuration::deleteByName($key)) {

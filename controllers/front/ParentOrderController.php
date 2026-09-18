@@ -406,6 +406,7 @@ class ParentOrderControllerCore extends FrontController
             }
         }
         $this->context->smarty->assign($summary);
+        $this->context->smarty->assign('show_tourism_tax_separately', (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE'));
         $this->context->smarty->assign(array(
             'HOOK_SHOPPING_CART' => Hook::exec('displayShoppingCartFooter', $summary),
             'HOOK_SHOPPING_CART_EXTRA' => Hook::exec('displayShoppingCart', $summary)
@@ -476,6 +477,7 @@ class ParentOrderControllerCore extends FrontController
         }
 
         $this->context->smarty->assign($summary);
+        $this->context->smarty->assign('show_tourism_tax_separately', (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE'));
         $this->context->smarty->assign(array(
             'token_cart' => Tools::getToken(false),
             'isLogged' => $this->isLogged,
