@@ -444,7 +444,6 @@ class HotelReservationSystem extends Module
             $langTables = array(
                 'htl_room_type_feature_pricing',
                 'htl_branch_info',
-                'htl_features',
                 'htl_amenity',
                 'htl_order_refund_rules',
                 'htl_settings_link'
@@ -480,6 +479,7 @@ class HotelReservationSystem extends Module
         $this->installTab('AdminHotelReservationSystemManagement', 'Hotel Reservation System');
         $this->installTab('AdminAddHotel', 'Manage Hotel', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelRoomsBooking', 'Book Now', 'AdminHotelReservationSystemManagement');
+        $this->installTab('AdminHotelFeatures', 'Manage Hotel Features', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelPropertyTypes', 'Manage Property Types', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminHotelAmenities', 'Manage Amenities', 'AdminHotelReservationSystemManagement');
         $this->installTab('AdminOrderRefundRules', 'Manage Order Refund Rules', 'AdminHotelReservationSystemManagement');
