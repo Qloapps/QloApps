@@ -444,7 +444,6 @@ class HotelReservationSystem extends Module
             $langTables = array(
                 'htl_room_type_feature_pricing',
                 'htl_branch_info',
-                'htl_features',
                 'htl_amenity',
                 'htl_order_refund_rules',
                 'htl_settings_link'
