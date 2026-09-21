@@ -70,8 +70,8 @@
 																			<span>{$product['name']|escape:'html':'UTF-8'}</span>
 																			{assign var='priceCalcMethod' value=$product.price_calculation_method|default:0}
 																			{capture name='htl_pcm_tooltip'}
-																			<div class="htl-tooltip-cont">
-																				<p class="htl-tooltip-title">{l s='Applied on:'}</p>
+																			<div class="ui-htl-tooltip-cont">
+																				<p class="ui-htl-tooltip-title">{l s='Applied on:'}</p>
 																				<ul>
 																					{foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
 																						<li>{$pcmDayLabel}</li>
@@ -79,7 +79,7 @@
 																				</ul>
 																			</div>
 																			{/capture}
-																			{include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}																		{if $product.allow_multiple_quantity}
+																			{include file='_partials/tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}																		{if $product.allow_multiple_quantity}
 																			<div class="qty_container">
 																				<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="room_service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
 																				<input type="hidden" class="qty_hidden" id="qty_{$product.id_product}_hidden" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}0{/if}">

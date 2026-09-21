@@ -160,8 +160,8 @@
 																				{/if}
 																				{if isset($rm_v['additional_services']) && $rm_v['additional_services']}
 																					{capture name='htl_order_price_tooltip'}
-																					<div class="htl-tooltip-cont">
-																						<div class="htl-tooltip-row">
+																					<div class="ui-htl-tooltip-cont">
+																						<div class="ui-htl-tooltip-row">
 																							<div>
 																								<p>{l s='%s cost' sprintf=$data_v['selling_object_plural_name']} : </p>
 																							</div>
@@ -175,7 +175,7 @@
 																								</p>
 																							</div>
 																						</div>
-																						<div class="htl-tooltip-row">
+																						<div class="ui-htl-tooltip-row">
 																							<div><p>{l s='Service cost'} : </p></div>
 																							<div class="text-right">
 																								<p>
@@ -189,7 +189,7 @@
 																						</div>
 																					</div>
 																					{/capture}
-																					{include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_order_price_tooltip allow_html=true}
+																					{include file='_partials/tooltip.tpl' tooltip_content=$smarty.capture.htl_order_price_tooltip allow_html=true}
 																				{/if}
 																			</dd>
 																		</div>

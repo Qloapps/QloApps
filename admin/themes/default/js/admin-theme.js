@@ -377,20 +377,7 @@ $(document).ready(function() {
 
 	//bootstrap components init
 	$('.dropdown-toggle').dropdown();
-	$('.label-tooltip, .help-tooltip').not('.debug-mode-tooltip').tooltip();
-
-	$('.debug-mode-tooltip').each(function () {
-		var $tooltip = $(this);
-
-		if ($.isFunction($.fn.bootstrapTooltip)) {
-			if (!$tooltip.data('bs.tooltip')) {
-				$tooltip.bootstrapTooltip({
-					html: true,
-					placement: 'bottom'
-				});
-			}
-		}
-	});
+	$('.label-tooltip, .help-tooltip').tooltip();
 	$('#error-modal').modal('show');
 
 	//init footer
@@ -492,12 +479,12 @@ $(document).ready(function() {
 		$(this).prop('selected', false);
 	});
 
-	initTooltip();
+	initUITooltip();
 
 }); //end dom ready
 
-function initTooltip($target, contentFn, items) {
-	var $elements = $target || $('.tooltip-trigger');
+function initUITooltip($target, contentFn, items) {
+	var $elements = $target || $('.ui-tooltip-trigger');
 	if (!$elements.length) {
 		return;
 	}
@@ -506,11 +493,11 @@ function initTooltip($target, contentFn, items) {
 		if (!contentFn && $this.data('ui-tooltip')) {
 			return;
 		}
-		$this.tooltip({
+		$this.uiTooltip({
 			content: contentFn || $this.next('.tooltip-content').html(),
 			items: items || 'span',
 			trigger: 'hover',
-			tooltipClass: 'tooltip-popup',
+			tooltipClass: 'ui-tooltip-popup',
 			open: function (event, ui) {
 				if (event.buttons == 1 || event.buttons == 3) {
 					ui.tooltip.remove();

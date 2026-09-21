@@ -30,6 +30,7 @@ var onlineFlag = true;
 
 $(document).ready(function(){
 	highdpiInit();
+	initUITooltip();
 	responsiveResize();
 	$(window).resize(responsiveResize);
 	if (navigator.userAgent.match(/Android/i))
@@ -458,19 +459,19 @@ window.addEventListener('offline', function () {
 	onlineFlag = false;
 });
 
-function initHtlTooltip() {
-    if (!$('.htl-tooltip').length) {
+function initUITooltip() {
+    if (!$('.ui-htl-tooltip').length) {
         return;
     }
-    $('.htl-tooltip').each(function () {
+    $('.ui-htl-tooltip').each(function () {
         if ($(this).hasClass('ui-tooltip-content')) {
             return;
         }		
-        $(this).tooltip({
-            content: $(this).siblings('.htl-tooltip-content').html(),
+        $(this).uiTooltip({
+            content: $(this).siblings('.ui-htl-tooltip-content').html(),
             items: 'span',
             trigger: 'hover',
-            tooltipClass: 'htl-tooltip-popup',
+            tooltipClass: 'ui-htl-tooltip-popup',
             open: function (event, ui) {
                 if (typeof (event.originalEvent) === 'undefined') {
                     return false;
@@ -492,7 +493,3 @@ function initHtlTooltip() {
         });
     });
 }
-
-$(document).ready(function () {
-    initHtlTooltip();
-});

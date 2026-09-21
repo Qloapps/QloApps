@@ -707,7 +707,6 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
         parent::setMedia();
 
         if ($this->display == 'view') {
-            $this->addJqueryUI('ui.tooltip', 'base', true);
             $this->removeJS(Media::getJqueryUIPath('ui.effect', 'base', false), false);
 
             $this->addJs(_MODULE_DIR_.$this->module->name.'/views/js/admin/wk_refund_request.js');

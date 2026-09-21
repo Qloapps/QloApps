@@ -9391,13 +9391,13 @@ div a.our_properties_link{
   font-size: 17px;
   font-weight: 400;}
 
-.htl-tooltip {
+.ui-htl-tooltip {
     cursor: pointer;
     display: inline-block;
     vertical-align: text-bottom;
 }
 
-.ui-tooltip.htl-tooltip-popup {
+.ui-tooltip.ui-htl-tooltip-popup {
     box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
     background: #FFFFFF;
     border: unset;
@@ -9405,36 +9405,36 @@ div a.our_properties_link{
     padding: 9px 15px;
 }
 
-.htl-tooltip-cont {
+.ui-htl-tooltip-cont {
     min-width: 160px;
 }
 
-.htl-tooltip-cont .htl-tooltip-title {
+.ui-htl-tooltip-cont .ui-htl-tooltip-title {
     margin: 0 0 6px;
     font-weight: 600;
     font-size: 13px;
 }
 
-.htl-tooltip-cont ul {
+.ui-htl-tooltip-cont ul {
     margin: 0;
     padding-left: 16px;
     font-size: 13px;
     list-style: disc;
 }
 
-.htl-tooltip-cont ul li {
+.ui-htl-tooltip-cont ul li {
     padding: 2px 0;
 }
 
-.htl-tooltip-cont .htl-tooltip-row {
+.ui-htl-tooltip-cont .ui-htl-tooltip-row {
     display: flex;
     justify-content: space-between;
     margin: 5px 0;
     white-space: nowrap;
 }
 
-.htl-tooltip-cont .htl-tooltip-row p,
-.htl-tooltip-cont .htl-tooltip-row label {
+.ui-htl-tooltip-cont .ui-htl-tooltip-row p,
+.ui-htl-tooltip-cont .ui-htl-tooltip-row label {
     margin: 0;
     font-size: 13px;
 }

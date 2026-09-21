@@ -60,6 +60,7 @@
 			{assign var=hotel_service_products value=$order->hotel_service_products}
 			{assign var=standalone_service_products value=$order->standalone_service_products}
 			{assign var=customerGuestDetail value=$order->customerGuestDetail}
+			{assign var=property_type value=$order->property_type}
 			{assign var=obj_hotel_branch_information value=$order->obj_hotel_branch_information}
 			{assign var=hotel_address_info value=$order->hotel_address_info}
 			{assign var=hotel_refund_rules value=$order->hotel_refund_rules}

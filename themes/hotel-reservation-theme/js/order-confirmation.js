@@ -51,7 +51,7 @@ $(document).ready(function(){
                 if (result.extra_services) {
                     $('#rooms_extra_services').html('');
                     $('#rooms_extra_services').append(result.extra_services);
-                    initHtlTooltip();
+                    initUITooltip();
                 }
                 $.fancybox({
                     href: "#rooms_extra_services",
@@ -77,5 +77,5 @@ $(document).ready(function(){
         });
     });
 
-    initHtlTooltip();
+    initUITooltip();
 });

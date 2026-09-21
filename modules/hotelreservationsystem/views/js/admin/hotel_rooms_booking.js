@@ -54,7 +54,7 @@ $(document).ready(function() {
                 if (info.event.extendedProps.is_notification) {
                     var $cell = $(info.el).closest('td');
                     $cell.css('background-color', info.event.backgroundColor);
-                    initTooltip($cell, function() {
+                    initUITooltip($cell, function() {
                         $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
                         $.each(info.event.extendedProps.data.stats, function(elem, val) {
                             if (elem == 'num_part_avai') {
@@ -65,7 +65,7 @@ $(document).ready(function() {
                         });
                         return $('#date-stats-tooltop').html();
                     }, 'td');
-                    $cell.tooltip('option', {
+                    $cell.uiTooltip('option', {
                         position: {
                             my: "left top",
                             at: "left+50% bottom-50%",
@@ -98,7 +98,7 @@ $(document).ready(function() {
                     });
                 } else {
                     $(info.el).addClass('search-result-event');
-                    initTooltip($(info.el), function() {
+                    initUITooltip($(info.el), function() {
                         $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_from_format + ' - ' +info.event.extendedProps.data.date_to_format);
                         $.each(info.event.extendedProps.data.stats, function(elem, val) {
                             if (elem == 'num_part_avai') {
@@ -113,14 +113,14 @@ $(document).ready(function() {
                         });
                         return $('#date-stats-tooltop').html();
                     }, 'div');
-                    $(info.el).tooltip('option', 'track', true);
+                    $(info.el).uiTooltip('option', 'track', true);
                     info.el.style.borderLeftColor = info.event.extendedProps.data.eventColor;
                     resizeSearchResultEventBar($(info.el));
                 }
             },
             datesSet: function(arg) {
-                if($('.fc-event').tooltip()) {
-                    $('.fc-event').tooltip('destroy');
+                if($('.fc-event').uiTooltip()) {
+                    $('.fc-event').uiTooltip('destroy');
                 }
             }
         });
@@ -138,7 +138,7 @@ $(document).ready(function() {
     }
 
     if ($('#fullcalendar').length) {
-        if (typeof initTooltip === 'function') {
+        if (typeof initUITooltip === 'function') {
             initBookingCalendar();
         } else {
             $(document).on('admin-theme.js.ready', initBookingCalendar);
@@ -168,7 +168,7 @@ $(document).ready(function() {
     function removeInitializedTooltips() {
         $('#fullcalendar td.fc-daygrid-day, #fullcalendar .fc-daygrid-event').each(function () {
             if ($(this).data('ui-tooltip')) {
-                $(this).tooltip('destroy');
+                $(this).uiTooltip('destroy');
             }
         });
     }
@@ -492,7 +492,7 @@ $(document).ready(function() {
                 } else {
                     showSuccessMessage(removed_room_success_txt);
                     $("#htl_rooms_list").empty().append(result.data.room_tpl);
-                    initTooltip();
+                    initUITooltip();
                     refreshCartData();
                     refreshStatsData();
                     calendar.refetchEvents();
@@ -931,55 +931,21 @@ $(document).ready(function() {
             success: function(result) {
                 if (result.success) {
                     $(".htl_room_data_cont").html(result.data.stats_panel);
-                    initstatstooltip();
+                    initStatsInfoTooltips();
                 }
             }
         });
     }
-    initstatstooltip();
 
-    function initstatstooltip()
-    {
-        $(".htl_room_data_cont").find('.status-info-tooltip').tooltip({
-            trigger : 'hover',
-            show: {
-                delay: 100,
-            },
-            hide: {
-                delay: 300,
-            },
-            open: function(event, ui)
-            {
-                if(event.buttons == 1 || event.buttons == 3){
-                    ui.tooltip.remove();
-                }
-
-                if (typeof(event.originalEvent) === 'undefined') {
-                    return false;
-                }
-
-                var $id = $(ui.tooltip).attr('id');
-
-                // close any lingering tooltips
-                if ($('div.ui-tooltip').not('#' + $id).length) {
-                    return false;
-                }
-
-                // ajax function to pull in data and add it to the tooltip goes here
-            },
-            close: function(event, ui)
-            {
-                ui.tooltip.hover(function() {
-                    $(this).stop(true).fadeTo(300, 1);
-                },
-                function() {
-                    $(this).fadeOut('300', function()
-                    {
-                        $(this).remove();
-                    });
-                });
-            }
-        });
+    function initStatsInfoTooltips() {
+        var $target = $(".htl_room_data_cont").find('.ui-tooltip-trigger');
+        if (typeof initUITooltip === 'function') {
+            initUITooltip($target);
+        } else {
+            $(document).on('admin-theme.js.ready', function () {
+                initUITooltip($target);
+            });
+        }
     }
 
     var allotmentTypes = {

@@ -21,10 +21,10 @@
 *}
 
 
-<span class="htl-tooltip{if isset($tooltip_class) && $tooltip_class} {$tooltip_class|escape:'html':'UTF-8'}{/if}">
+<span class="ui-htl-tooltip{if isset($tooltip_class) && $tooltip_class} {$tooltip_class|escape:'html':'UTF-8'}{/if}">
 	<img src="{$img_dir}icon/icon-info.svg" />
 </span>
-<div class="htl-tooltip-content" style="display: none;">
+<div class="ui-htl-tooltip-content" style="display: none;">
 	{if isset($allow_html) && $allow_html}
 		{$tooltip_content nofilter}
 	{else}

@@ -40,8 +40,8 @@
                         <span class="service-product-name">{$service_product['name']}</span>
                         {assign var='priceCalcMethod' value=$service_product.price_calculation_method|default:0}
                         {capture name='htl_pcm_tooltip'}
-                        <div class="htl-tooltip-cont">
-                            <p class="htl-tooltip-title">{l s='Applied on:'}</p>
+                        <div class="ui-htl-tooltip-cont">
+                            <p class="ui-htl-tooltip-title">{l s='Applied on:'}</p>
                             <ul>
                                 {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
                                     <li>{$pcmDayLabel}</li>
@@ -49,7 +49,7 @@
                             </ul>
                         </div>
                         {/capture}
-                        {include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}
+                        {include file='_partials/tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}
                     </div>
                 {/block}
                 {block name='service_product_description'}

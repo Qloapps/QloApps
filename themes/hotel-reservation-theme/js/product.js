@@ -1156,7 +1156,7 @@ $(document).ready(function() {
                                 triggerElement.hide();
                             }
                         }
-                        initHtlTooltip();
+                        initUITooltip();
                     } else {
                         triggerElement.hide();
                     }
@@ -1348,7 +1348,7 @@ var BookingForm = {
         }
         // initialize tootltip for extra service
         if ($('.price_desc_block .services-info').length) {
-            $('.price_desc_block .services-info img').tooltip({
+            $('.price_desc_block .services-info img').uiTooltip({
                 content: $('.price_desc_block .services-info-container').html(),
                 items: "div",
                 trigger : 'hover',

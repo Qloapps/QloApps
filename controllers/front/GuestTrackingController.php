@@ -144,8 +144,11 @@ class GuestTrackingControllerCore extends FrontController
                 ));
             }
 
+            $objRoomType = new HotelRoomType();
+            $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
             $this->context->smarty->assign(array(
                 'objOrder' => new Order($idOrder),
+                'room_type_info' => $roomTypeInfo,
             ));
 
             $response['extra_services'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
@@ -216,6 +219,7 @@ class GuestTrackingControllerCore extends FrontController
 
                 $processedProducts = array();
                 $cartHotelData = array();
+                $propertyType = null;
 
                 $order->id_order_state = (int)$order->getCurrentState();
                 $order->invoice = (OrderState::invoiceAvailable((int)$order->id_order_state) && $order->invoice_number);
@@ -279,6 +283,11 @@ class GuestTrackingControllerCore extends FrontController
                                 }
                                 $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                                 $cartHotelData[$type_key]['cover_img'] = $cover_img;
+
+                                if (!empty($order_bk_data[0]['selling_object_name'])) {
+                                    $cartHotelData[$type_key]['selling_object_name'] = $order_bk_data[0]['selling_object_name'];
+                                    $cartHotelData[$type_key]['selling_object_plural_name'] = $order_bk_data[0]['selling_object_plural_name'];
+                                }
 
                                 foreach ($order_bk_data as $data_k => $data_v) {
                                     $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
@@ -362,6 +371,7 @@ class GuestTrackingControllerCore extends FrontController
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['feature_price_diff'] = $feature_price_diff;
 
                                     $cartHotelData[$type_key]['hotel_name'] = $data_v['hotel_name'];
+                                    $propertyType = $data_v['property_type_name'];
                                     // add extra services products in hotel detail.
                                     $cartHotelData[$type_key]['date_diff'][$date_join]['additional_services'] = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                                         $idOrder,
@@ -535,6 +545,7 @@ class GuestTrackingControllerCore extends FrontController
                 $order->hotel_service_products = $hotelServiceProducts;
                 $order->standalone_service_products = $standaloneServiceProducts;
                 $order->customerGuestDetail = $customerGuestDetail;
+                $order->property_type = $propertyType;
                 $order->obj_hotel_branch_information = $objHotelBranchInformation;
                 $order->hotel_address_info = $hotelAddressInfo;
                 $order->hotel_refund_rules = $hotelRefundRules;
@@ -579,7 +590,6 @@ class GuestTrackingControllerCore extends FrontController
             ));
 
             $this->addJqueryPlugin(array('fancybox', 'scrollTo', 'footable', 'footable-sort'));
-            $this->addJqueryUI(array('ui.tooltip'), 'base', true);
 
             // load Google Maps library if configured
             if (!count($this->errors)) {
