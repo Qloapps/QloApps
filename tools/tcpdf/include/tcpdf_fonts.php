@@ -1,13 +1,13 @@
 <?php
 //============================================================+
 // File name   : tcpdf_fonts.php
-// Version     : 1.1.0
+// Version     : 1.1.1
 // Begin       : 2008-01-01
-// Last Update : 2014-12-10
+// Last Update : 2024-12-23
 // Author      : Nicola Asuni - Tecnick.com LTD - www.tecnick.com - info@tecnick.com
-// License     : GNU-LGPL v3 (http://www.gnu.org/copyleft/lesser.html)
+// License     : GNU-LGPL v3 (https://www.gnu.org/copyleft/lesser.html)
 // -------------------------------------------------------------------
-// Copyright (C) 2008-2014 Nicola Asuni - Tecnick.com LTD
+// Copyright (C) 2008-2026 Nicola Asuni - Tecnick.com LTD
 //
 // This file is part of TCPDF software library.
 //
@@ -22,7 +22,7 @@
 // See the GNU Lesser General Public License for more details.
 //
 // You should have received a copy of the GNU Lesser General Public License
-// along with TCPDF.  If not, see <http://www.gnu.org/licenses/>.
+// along with TCPDF.  If not, see <https://www.gnu.org/licenses/>.
 //
 // See LICENSE.TXT file for more information.
 // -------------------------------------------------------------------
@@ -42,7 +42,7 @@
  * @class TCPDF_FONTS
  * Font methods for TCPDF library.
  * @package com.tecnick.tcpdf
- * @version 1.1.0
+ * @version 1.1.1
  * @author Nicola Asuni - info@tecnick.com
  */
 class TCPDF_FONTS {
@@ -191,29 +191,30 @@ class TCPDF_FONTS {
 			fclose($fp);
 			// get font info
 			$fmetric['Flags'] = $flags;
-			preg_match ('#/FullName[\s]*\(([^\)]*)#', $font, $matches);
+			preg_match ('#/FullName[\s]*+\(([^\)]*+)#', $font, $matches);
 			$fmetric['name'] = preg_replace('/[^a-zA-Z0-9_\-]/', '', $matches[1]);
-			preg_match('#/FontBBox[\s]*{([^}]*)#', $font, $matches);
-			$fmetric['bbox'] = trim($matches[1]);
-			$bv = explode(' ', $fmetric['bbox']);
-			$fmetric['Ascent'] = intval($bv[3]);
-			$fmetric['Descent'] = intval($bv[1]);
-			preg_match('#/ItalicAngle[\s]*([0-9\+\-]*)#', $font, $matches);
+			preg_match('#/FontBBox[\s]*+{([^}]*+)#', $font, $matches);
+			$rawbvl = explode(' ', trim($matches[1]));
+			$bvl = [(int) $rawbvl[0], (int) $rawbvl[1], (int) $rawbvl[2], (int) $rawbvl[3]];
+			$fmetric['bbox'] = implode(' ', $bvl);
+			$fmetric['Ascent'] = $bvl[3];
+			$fmetric['Descent'] = $bvl[1];
+			preg_match('#/ItalicAngle[\s]*+([0-9\+\-]*+)#', $font, $matches);
 			$fmetric['italicAngle'] = intval($matches[1]);
 			if ($fmetric['italicAngle'] != 0) {
 				$fmetric['Flags'] |= 64;
 			}
-			preg_match('#/UnderlinePosition[\s]*([0-9\+\-]*)#', $font, $matches);
+			preg_match('#/UnderlinePosition[\s]*+([0-9\+\-]*+)#', $font, $matches);
 			$fmetric['underlinePosition'] = intval($matches[1]);
-			preg_match('#/UnderlineThickness[\s]*([0-9\+\-]*)#', $font, $matches);
+			preg_match('#/UnderlineThickness[\s]*+([0-9\+\-]*+)#', $font, $matches);
 			$fmetric['underlineThickness'] = intval($matches[1]);
-			preg_match('#/isFixedPitch[\s]*([^\s]*)#', $font, $matches);
+			preg_match('#/isFixedPitch[\s]*+([^\s]*+)#', $font, $matches);
 			if ($matches[1] == 'true') {
 				$fmetric['Flags'] |= 1;
 			}
 			// get internal map
 			$imap = array();
-			if (preg_match_all('#dup[\s]([0-9]+)[\s]*/([^\s]*)[\s]put#sU', $font, $fmap, PREG_SET_ORDER) > 0) {
+			if (preg_match_all('#dup[\s]([0-9]+)[\s]*+/([^\s]*+)[\s]put#sU', $font, $fmap, PREG_SET_ORDER) > 0) {
 				foreach ($fmap as $v) {
 					$imap[$v[2]] = $v[1];
 				}
@@ -229,22 +230,22 @@ class TCPDF_FONTS {
 				$eplain .= chr($chr ^ ($r >> 8));
 				$r = ((($chr + $r) * $c1 + $c2) % 65536);
 			}
-			if (preg_match('#/ForceBold[\s]*([^\s]*)#', $eplain, $matches) > 0) {
+			if (preg_match('#/ForceBold[\s]*+([^\s]*+)#', $eplain, $matches) > 0) {
 				if ($matches[1] == 'true') {
 					$fmetric['Flags'] |= 0x40000;
 				}
 			}
-			if (preg_match('#/StdVW[\s]*\[([^\]]*)#', $eplain, $matches) > 0) {
+			if (preg_match('#/StdVW[\s]*+\[([^\]]*+)#', $eplain, $matches) > 0) {
 				$fmetric['StemV'] = intval($matches[1]);
 			} else {
 				$fmetric['StemV'] = 70;
 			}
-			if (preg_match('#/StdHW[\s]*\[([^\]]*)#', $eplain, $matches) > 0) {
+			if (preg_match('#/StdHW[\s]*+\[([^\]]*+)#', $eplain, $matches) > 0) {
 				$fmetric['StemH'] = intval($matches[1]);
 			} else {
 				$fmetric['StemH'] = 30;
 			}
-			if (preg_match('#/BlueValues[\s]*\[([^\]]*)#', $eplain, $matches) > 0) {
+			if (preg_match('#/BlueValues[\s]*+\[([^\]]*+)#', $eplain, $matches) > 0) {
 				$bv = explode(' ', $matches[1]);
 				if (count($bv) >= 6) {
 					$v1 = intval($bv[2]);
@@ -265,7 +266,7 @@ class TCPDF_FONTS {
 				$fmetric['CapHeight'] = 700;
 			}
 			// get the number of random bytes at the beginning of charstrings
-			if (preg_match('#/lenIV[\s]*([0-9]*)#', $eplain, $matches) > 0) {
+			if (preg_match('#/lenIV[\s]*+([\d]*+)#', $eplain, $matches) > 0) {
 				$lenIV = intval($matches[1]);
 			} else {
 				$lenIV = 4;
@@ -273,7 +274,7 @@ class TCPDF_FONTS {
 			$fmetric['Leading'] = 0;
 			// get charstring data
 			$eplain = substr($eplain, (strpos($eplain, '/CharStrings') + 1));
-			preg_match_all('#/([A-Za-z0-9\.]*)[\s][0-9]+[\s]RD[\s](.*)[\s]ND#sU', $eplain, $matches, PREG_SET_ORDER);
+			preg_match_all('#/([A-Za-z0-9\.]*+)[\s][0-9]+[\s]RD[\s](.*)[\s]ND#sU', $eplain, $matches, PREG_SET_ORDER);
 			if (!empty($enc) AND isset(TCPDF_FONT_DATA::$encmap[$enc])) {
 				$enc_map = TCPDF_FONT_DATA::$encmap[$enc];
 			} else {
@@ -1383,7 +1384,7 @@ class TCPDF_FONTS {
 		}
 		// set checkSumAdjustment on head table
 		$checkSumAdjustment = 0xB1B0AFBA - self::_getTTFtableChecksum($font, strlen($font));
-		$font = substr($font, 0, $table['head']['offset'] + $offset + 8).pack('N', $checkSumAdjustment).substr($font, $table['head']['offset'] + $offset + 12);
+		$font = substr($font, 0, $table['head']['offset'] + $offset + 4).pack('N', $checkSumAdjustment).substr($font, $table['head']['offset'] + $offset + 8);
 		return $font;
 	}
 

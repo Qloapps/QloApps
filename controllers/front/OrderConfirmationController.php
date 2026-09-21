@@ -415,6 +415,7 @@ class OrderConfirmationControllerCore extends FrontController
                 }
             }
 
+            $orderTotalInfo['show_tourism_tax_separately'] = (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE');
             $this->context->smarty->assign('orderTotalInfo', $orderTotalInfo);
             $this->context->smarty->assign('orders_has_invoice', $orders_has_invoice);
         }

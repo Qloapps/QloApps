@@ -280,17 +280,17 @@ class AdminWebserviceControllerCore extends AdminController
             if (function_exists('apache_get_modules')) {
                 $apache_modules = apache_get_modules();
                 if (!in_array('mod_auth_basic', $apache_modules)) {
-                    $this->warnings[] = $this->l('Please activate the \'mod_auth_basic\' Apache module to allow authentication of PrestaShop\'s webservice.');
+                    $this->warnings[] = $this->l('Please activate the \'mod_auth_basic\' Apache module to allow authentication of QloApps\'s webservice.');
                 }
                 if (!in_array('mod_rewrite', $apache_modules)) {
-                    $this->warnings[] = $this->l('Please activate the \'mod_rewrite\' Apache module to allow the PrestaShop webservice.');
+                    $this->warnings[] = $this->l('Please activate the \'mod_rewrite\' Apache module to allow the QloApps webservice.');
                 }
             } else {
-                $this->warnings[] = $this->l('We could not check to see if basic authentication and rewrite extensions have been activated. Please manually check if they\'ve been activated in order to use the PrestaShop webservice.');
+                $this->warnings[] = $this->l('We could not check to see if basic authentication and rewrite extensions have been activated. Please manually check if they\'ve been activated in order to use the QloApps webservice.');
             }
         }
         if (!extension_loaded('SimpleXML')) {
-            $this->warnings[] = $this->l('Please activate the \'SimpleXML\' PHP extension to allow testing of PrestaShop\'s webservice.');
+            $this->warnings[] = $this->l('Please activate the \'SimpleXML\' PHP extension to allow testing of QloApps\'s webservice.');
         }
         if (!configuration::get('PS_SSL_ENABLED')) {
             $this->warnings[] = $this->l('It is preferable to use SSL (https:) for webservice calls, as it avoids the "man in the middle" type security issues.');

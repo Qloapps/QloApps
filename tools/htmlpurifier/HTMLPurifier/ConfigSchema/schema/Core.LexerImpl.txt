@@ -16,7 +16,7 @@ DEFAULT: NULL
   </dd>
   <dt><em>string</em> lexer identifier</dt>
   <dd>
-    This is a slim way of manually overridding the implementation.
+    This is a slim way of manually overriding the implementation.
     Currently recognized values are: DOMLex (the default PHP5
 implementation)
     and DirectLex (the default PHP4 implementation). Only use this if

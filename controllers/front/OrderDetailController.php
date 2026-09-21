@@ -403,6 +403,7 @@ class OrderDetailControllerCore extends FrontController
                         'total_convenience_fee_ti' => $total_convenience_fee_ti,
                         'total_convenience_fee_te' => $total_convenience_fee_te,
                         'total_tourism_tax' => $totalTourismTax,
+                        'show_tourism_tax_separately' => (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE'),
                         'any_back_order' => $anyBackOrder,
                         'shw_bo_msg' => Configuration::get('WK_SHOW_MSG_ON_BO'),
                         'back_ord_msg' => Configuration::get('WK_BO_MESSAGE'),

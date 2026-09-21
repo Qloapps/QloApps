@@ -195,7 +195,7 @@ class HTMLPurifier_AttrDef_CSS_FontFamily extends HTMLPurifier_AttrDef
             // transforms don't pose a security risk (as \\ and \"
             // might--these escapes are not supported by most browsers).
             // We could try to be clever and use single-quote wrapping
-            // when there is a double quote present, but I have choosen
+            // when there is a double quote present, but I have chosen
             // not to implement that.  (NOTE: you can reduce the amount
             // of escapes by one depending on what quoting style you use)
             // $font = str_replace('\\', '\\5C ', $font);
