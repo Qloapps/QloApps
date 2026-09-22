@@ -1,0 +1,18 @@
+[/{shop_url}]
+
+Great news!
+
+Your hotel is now live on Google Hotel Center
+
+Hi,
+
+Your hotel {hotel_name} has been successfully verified and is now live on Google Hotel Center.
+
+Travelers can now discover the property on Google and access the available booking options.
+
+The Google Hotel Connector will continue to synchronize the hotel's relevant information, rates, availability, and other supported data with Google based on the configured connection.
+
+View Your Hotel Page [/{hotel_url}]
+
+{shop_name} [/{shop_url}] powered by Webkul(tm)
+[https://webkul.com]
