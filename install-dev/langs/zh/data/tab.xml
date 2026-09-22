@@ -22,6 +22,7 @@
   <tab id="Stock" name="Stock"/>
   <tab id="Products" name="Manage Service Products"/>
   <tab id="Room_Types" name="Manage Room Types"/>
+  <tab id="Room_Type_Selling_Objects" name="客房销售对象"/>
   <tab id="Categories" name="Categories"/>
   <tab id="Monitoring" name="Monitoring"/>
   <tab id="Attributes_and_Values" name="Product Attributes"/>
@@ -32,10 +33,12 @@
   <tab id="Attachments" name="Attachments"/>
   <tab id="Orders_1" name="Orders"/>
   <tab id="Invoices" name="Invoices"/>
+  <tab id="Payment_Receipts" name="付款收据"/>
   <!-- <tab id="Merchandise_Returns" name="Merchandise Returns"/> -->
   <tab id="Delivery_Slips" name="Delivery Slips"/>
   <tab id="Credit_Slips" name="Credit Slips"/>
   <tab id="Statuses" name="Statuses"/>
+  <tab id="Sources" name="业务来源"/>
   <tab id="Order_Messages" name="Order Messages"/>
   <tab id="Guest_Registration" name="住客登记卡"/>
   <tab id="Customers_1" name="Customers"/>

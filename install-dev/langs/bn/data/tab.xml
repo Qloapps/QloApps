@@ -24,6 +24,7 @@
   <tab id='Stock' name='স্টক'/>
   <tab id='Products' name='Manage Service Products'/>
   <tab id='Room_Types' name='Manage Room Types'/>
+  <tab id='Room_Type_Selling_Objects' name='রুম বিক্রয় সামগ্রী'/>
   <tab id='Categories' name='শ্রেণি'/>
   <tab id='Monitoring' name='নিয়ন্ত্রণ'/>
   <tab id='Attributes_and_Values' name='বিভাগসমূহ এবং মান'/>
@@ -34,10 +35,12 @@
   <tab id='Attachments' name='সংযুক্তিসমূহ'/>
   <tab id='Orders_1' name='ফরমায়েশ'/>
   <tab id='Invoices' name='চালান'/>
+  <tab id='Payment_Receipts' name='পেমেন্ট রশিদ'/>
   <tab id='Merchandise_Returns' name='পণ্যদ্রব্য ফেরত'/>
   <tab id='Delivery_Slips' name='বিতরন রশিদ'/>
   <tab id='Credit_Slips' name='বকেয়া বিল'/>
   <tab id='Statuses' name='অবস্থা'/>
+  <tab id='Sources' name='ব্যবসার উৎস'/>
   <tab id='Order_Messages' name='অর্ডার এর মাসাআজ'/>
   <tab id='Guest_Registration' name='অতিথি নিবন্ধন কার্ড'/>
   <tab id='Customers_1' name='গ্রাহকরা'/>
