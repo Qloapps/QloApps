@@ -722,6 +722,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'blockcart',
                 'blockuserinfo',
                 'qlochannelmanagerconnector',
+                'qlogooglehotelconnector'
             );
         }
         return $modules;
