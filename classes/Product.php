@@ -4041,7 +4041,7 @@ class ProductCore extends ObjectModel
             $id_value = Db::getInstance()->Insert_ID();
         }
         $row = array('id_feature' => (int)$id_feature, 'id_product' => (int)$this->id, 'id_feature_value' => (int)$id_value);
-        Db::getInstance()->insert('feature_product', $row);
+        Db::getInstance()->insert('feature_product', $row, false, true, Db::INSERT_IGNORE);
         SpecificPriceRule::applyAllRules(array((int)$this->id));
         if ($id_value) {
             return ($id_value);
