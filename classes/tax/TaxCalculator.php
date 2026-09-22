@@ -120,8 +120,10 @@ class TaxCalculatorCore
     public function getTaxesName()
     {
         $name = '';
+        $idLang = (int)Context::getContext()->language->id;
         foreach ($this->taxes as $tax) {
-            $name .= $tax->name[(int)Context::getContext()->language->id].' - ';
+            $taxIdLang = isset($tax->name[$idLang]) ? $idLang : (int)Configuration::get('PS_LANG_DEFAULT');
+            $name .= (isset($tax->name[$taxIdLang]) ? $tax->name[$taxIdLang] : '').' - ';
         }
 
         $name = rtrim($name, ' - ');
