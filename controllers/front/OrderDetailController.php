@@ -423,6 +423,7 @@ class OrderDetailControllerCore extends FrontController
                     // Prefer the name stored at order-creation time so it stays historically accurate
                     $objHotelBranchRefundRules = new HotelBranchRefundRules();
                     $hotelRefundRules = $objHotelBranchRefundRules->getHotelRefundRules($idHotel, 0, 1);
+                    $order->property_type = $propertyType;
                     $this->context->smarty->assign(array(
                         'obj_hotel_branch_information' => $objHotelBranchInformation,
                         'property_type' => $propertyType,
