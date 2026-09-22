@@ -836,6 +836,8 @@ class LanguageCore extends ObjectModel
             return false;
         }
 
+        Cache::store('Language::getIdByIso_'.$iso_code, $lang->id);
+
         if (isset($params_lang['allow_accented_chars_url']) && in_array($params_lang['allow_accented_chars_url'], array('1', 'true'))) {
             Configuration::updateGlobalValue('PS_ALLOW_ACCENTED_CHARS_URL', 1);
         }
