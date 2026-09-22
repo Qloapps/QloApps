@@ -112,7 +112,13 @@ class ProfileCore extends ObjectModel
     {
         // getProfileAccesses is cached so there is no performance leak
         $accesses = Profile::getProfileAccesses($id_profile);
-        return (isset($accesses[$id_tab]) ? $accesses[$id_tab] : false);
+        return (isset($accesses[$id_tab]) ? $accesses[$id_tab] : array(
+            'view' => 0,
+            'add' => 0,
+            'edit' => 0,
+            'delete' => 0,
+            'kpi' => 0,
+        ));
     }
 
     public static function getProfileAccesses($id_profile, $type = 'id_tab')
