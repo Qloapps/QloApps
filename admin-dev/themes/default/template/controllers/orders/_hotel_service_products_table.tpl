@@ -70,20 +70,16 @@
                                 <span>{displayPrice price=($product.total_price_tax_incl - $product.total_price_tax_excl) currency=$currency->id}</span>
                                 {if isset($use_tourism_tax) && $use_tourism_tax && isset($product.tourism_tax_status)}
                                     {capture name='service_tax_tooltip_content'}
-                                        <div class="tooltip_cont">
-                                            <div class="ui-tooltip-popup-row">
-                                                <label>{l s='Service Tax:'}</label>
-                                                <span>{displayPrice price=$product.total_service_tax_only currency=$currency->id}</span>
-                                            </div>
+                                        <div class="ui-tooltip-body">
+                                            <div class="ui-tooltip-label">{l s='Service Tax:'}</div>
+                                            <span class="ui-tooltip-elem-txt">{displayPrice price=$product.total_service_tax_only currency=$currency->id}</span>
                                             {if $product.tourism_tax_total > 0}
-                                            <div class="ui-tooltip-popup-row">
-                                                <label>{l s='Tourism Tax:'}</label>
-                                                <span>{displayPrice price=$product.tourism_tax_total currency=$currency->id}</span>
-                                            </div>
+                                            <div class="ui-tooltip-label">{l s='Tourism Tax:'}</div>
+                                            <span class="ui-tooltip-elem-txt">{displayPrice price=$product.tourism_tax_total currency=$currency->id}</span>
                                             {/if}
                                         </div>
                                     {/capture}
-                                    {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.service_tax_tooltip_content}
+                                    {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.service_tax_tooltip_content}
                                 {/if}
                             </td>
                             <td>

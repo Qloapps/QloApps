@@ -333,6 +333,4 @@ $(document).ready(function () {
 
         sendOrderMessage();
     });
-
-    initUITooltip();
 });

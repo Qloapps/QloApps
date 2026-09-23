@@ -55,12 +55,12 @@ $(document).ready(function() {
                     var $cell = $(info.el).closest('td');
                     $cell.css('background-color', info.event.backgroundColor);
                     initUITooltip($cell, function() {
-                        $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_format);
+                        $('#date-stats-tooltop .ui-tooltip-label').text(info.event.extendedProps.data.date_format);
                         $.each(info.event.extendedProps.data.stats, function(elem, val) {
                             if (elem == 'num_part_avai') {
-                                $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
+                                $('#date-stats-tooltop').find('.'+elem).hide().find('.ui-tooltip-elem-txt').text('');
                             } else {
-                                $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
+                                $('#date-stats-tooltop').find('.'+elem).show().find('.ui-tooltip-elem-txt').text(val);
                             }
                         });
                         return $('#date-stats-tooltop').html();
@@ -99,16 +99,16 @@ $(document).ready(function() {
                 } else {
                     $(info.el).addClass('search-result-event');
                     initUITooltip($(info.el), function() {
-                        $('#date-stats-tooltop .tip_date').text(info.event.extendedProps.data.date_from_format + ' - ' +info.event.extendedProps.data.date_to_format);
+                        $('#date-stats-tooltop .ui-tooltip-label').text(info.event.extendedProps.data.date_from_format + ' - ' +info.event.extendedProps.data.date_to_format);
                         $.each(info.event.extendedProps.data.stats, function(elem, val) {
                             if (elem == 'num_part_avai') {
                                 if (val > 0) {
-                                    $('#date-stats-tooltop').find('.'+elem).show().find('.tip_element_value').text(val);
+                                    $('#date-stats-tooltop').find('.'+elem).show().find('.ui-tooltip-elem-txt').text(val);
                                 } else {
-                                    $('#date-stats-tooltop').find('.'+elem).hide().find('.tip_element_value').text('');
+                                    $('#date-stats-tooltop').find('.'+elem).hide().find('.ui-tooltip-elem-txt').text('');
                                 }
                             } else {
-                                $('#date-stats-tooltop').find('.'+elem).find('.tip_element_value').text(val);
+                                $('#date-stats-tooltop').find('.'+elem).find('.ui-tooltip-elem-txt').text(val);
                             }
                         });
                         return $('#date-stats-tooltop').html();

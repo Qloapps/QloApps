@@ -160,36 +160,26 @@
 																				{/if}
 																				{if isset($rm_v['additional_services']) && $rm_v['additional_services']}
 																					{capture name='htl_order_price_tooltip'}
-																					<div class="ui-htl-tooltip-cont">
-																						<div class="ui-htl-tooltip-row">
-																							<div>
-																								<p>{l s='%s cost' sprintf=$data_v['selling_object_plural_name']} : </p>
-																							</div>
-																							<div class="text-right">
-																								<p>
-																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['additional_services_price_auto_add_ti']) currency=$objOrderCurrency}
-																									{else}
-																										{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['additional_services_price_auto_add_te']) currency=$objOrderCurrency}
-																									{/if}
-																								</p>
-																							</div>
-																						</div>
-																						<div class="ui-htl-tooltip-row">
-																							<div><p>{l s='Service cost'} : </p></div>
-																							<div class="text-right">
-																								<p>
-																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=($rm_v['additional_services_price_ti']) currency=$objOrderCurrency}
-																									{else}
-																										{displayWtPriceWithCurrency price=($rm_v['additional_services_price_te']) currency=$objOrderCurrency}
-																									{/if}
-																								</p>
-																							</div>
-																						</div>
+																					<div class="ui-tooltip-body">
+																						<div class="ui-tooltip-label">{l s='%s cost' sprintf=$data_v['selling_object_plural_name']} : </div>
+																						<span class="ui-tooltip-elem-txt">
+																							{if $group_use_tax}
+																								{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['additional_services_price_auto_add_ti']) currency=$objOrderCurrency}
+																							{else}
+																								{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['additional_services_price_auto_add_te']) currency=$objOrderCurrency}
+																							{/if}
+																						</span>
+																						<div class="ui-tooltip-label">{l s='Service cost'} : </div>
+																						<span class="ui-tooltip-elem-txt">
+																							{if $group_use_tax}
+																								{displayWtPriceWithCurrency price=($rm_v['additional_services_price_ti']) currency=$objOrderCurrency}
+																							{else}
+																								{displayWtPriceWithCurrency price=($rm_v['additional_services_price_te']) currency=$objOrderCurrency}
+																							{/if}
+																						</span>
 																					</div>
 																					{/capture}
-																					{include file='_partials/tooltip.tpl' tooltip_content=$smarty.capture.htl_order_price_tooltip allow_html=true}
+																					{include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.htl_order_price_tooltip allow_html=true}
 																				{/if}
 																			</dd>
 																		</div>

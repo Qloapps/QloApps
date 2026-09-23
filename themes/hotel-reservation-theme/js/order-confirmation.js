@@ -76,6 +76,4 @@ $(document).ready(function(){
             },
         });
     });
-
-    initUITooltip();
 });

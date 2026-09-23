@@ -1130,6 +1130,7 @@ $(document).ready(function() {
                 if (!jsonData.hasError) {
                     if (jsonData.service_panel) {
                         $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+                        initUITooltip();
                     }
                     showSuccessMessage(txtExtraServiceSucc);
                 } else {
@@ -1191,6 +1192,7 @@ $(document).ready(function() {
                 if (!jsonData.hasError) {
                     if (jsonData.service_panel) {
                         $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+                        initUITooltip();
                     }
                     showSuccessMessage(txtExtraServiceSucc);
                 } else {

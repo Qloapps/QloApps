@@ -778,7 +778,7 @@
 		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount) + parseFloat(jsonSummary.summary.total_tourism_tax || 0), currency_format, currency_sign, currency_blank));
 		$('#total_taxes_vat').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount || 0), currency_format, currency_sign, currency_blank));
 		var totalTaxesTourismAmt = parseFloat(jsonSummary.summary.total_tourism_tax || 0);
-		$('#total_taxes_tourism').closest('div').toggle(totalTaxesTourismAmt > 0);
+		$('#total_taxes_tourism').prev('.ui-tooltip-label').addBack().toggle(totalTaxesTourismAmt > 0);
 		$('#total_taxes_tourism').html(formatCurrency(totalTaxesTourismAmt, currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
@@ -1299,7 +1299,7 @@
 		$('#total_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount) + parseFloat(jsonSummary.summary.total_tourism_tax || 0), currency_format, currency_sign, currency_blank));
 		$('#total_taxes_vat').html(formatCurrency(parseFloat(jsonSummary.summary.total_tax_without_discount || 0), currency_format, currency_sign, currency_blank));
 		var totalTaxesTourismAmt2 = parseFloat(jsonSummary.summary.total_tourism_tax || 0);
-		$('#total_taxes_tourism').closest('div').toggle(totalTaxesTourismAmt2 > 0);
+		$('#total_taxes_tourism').prev('.ui-tooltip-label').addBack().toggle(totalTaxesTourismAmt2 > 0);
 		$('#total_taxes_tourism').html(formatCurrency(totalTaxesTourismAmt2, currency_format, currency_sign, currency_blank));
 		$('#total_without_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.cart_total_without_discount_te), currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
@@ -2282,18 +2282,14 @@
 						<div class="data-focus">
 							<span>{l s='Total taxes'}</span>
 							{capture name='total_taxes_tooltip_content'}
-								<div class="tooltip_cont">
-									<div class="ui-tooltip-popup-row">
-										<label>{l s='Room & Service Tax:'}</label>
-										<span id="total_taxes_vat"></span>
-									</div>
-									<div class="ui-tooltip-popup-row">
-										<label>{l s='Tourism Tax:'}</label>
-										<span id="total_taxes_tourism"></span>
-									</div>
+								<div class="ui-tooltip-body">
+									<div class="ui-tooltip-label">{l s='Room & Service Tax:'}</div>
+									<span id="total_taxes_vat" class="ui-tooltip-elem-txt"></span>
+									<div class="ui-tooltip-label">{l s='Tourism Tax:'}</div>
+									<span id="total_taxes_tourism" class="ui-tooltip-elem-txt"></span>
 								</div>
 							{/capture}
-							{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.total_taxes_tooltip_content}
+							{include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.total_taxes_tooltip_content}
 							<br/>
 							<span id="total_taxes" class="size_l"></span>
 						</div>

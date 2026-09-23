@@ -460,26 +460,27 @@ window.addEventListener('offline', function () {
 });
 
 function initUITooltip() {
-    if (!$('.ui-htl-tooltip').length) {
+    if (!$('.ui-tooltip-trigger').length) {
         return;
     }
-    $('.ui-htl-tooltip').each(function () {
+    $('.ui-tooltip-trigger').each(function () {
         if ($(this).hasClass('ui-tooltip-content')) {
             return;
-        }		
+        }
+        if ($(this).data('ui-tooltip')) {
+            return;
+        }
         $(this).uiTooltip({
-            content: $(this).siblings('.ui-htl-tooltip-content').html(),
+            content: $(this).siblings('.ui-tooltip-content').html(),
             items: 'span',
             trigger: 'hover',
-            tooltipClass: 'ui-htl-tooltip-popup',
+            tooltipClass: 'ui-tooltip-popup',
             open: function (event, ui) {
                 if (typeof (event.originalEvent) === 'undefined') {
                     return false;
                 }
                 var $id = $(ui.tooltip).attr('id');
-                if ($('div.ui-tooltip').not('#' + $id).length) {
-                    return false;
-                }
+                $('div.ui-tooltip').not('#' + $id).remove();
             },
             close: function (event, ui) {
                 ui.tooltip.hover(function () {

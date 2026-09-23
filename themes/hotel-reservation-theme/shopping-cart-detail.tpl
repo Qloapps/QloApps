@@ -137,12 +137,12 @@
                                                         {displayPrice price=($rm_v['amount'])}
                                                         {if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && (in_array($data_v['id_product'], $discounted_products) || $PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN)}
                                                             {capture name='htl_room_price_detail_tooltip'}
-                                                            <div class="ui-htl-tooltip-cont">
-                                                                <div class="ui-htl-tooltip-row"><label>{l s='Room price'}</label><span>{displayPrice price=($rm_v['amount_without_auto_add'])}</span></div>
-                                                                <div class="ui-htl-tooltip-row"><label>{l s='Additional charges'}</label><span>{displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</span></div>
+                                                            <div class="ui-tooltip-body">
+                                                                <div class="ui-tooltip-label">{l s='Room price'}</div><span class="ui-tooltip-elem-txt">{displayPrice price=($rm_v['amount_without_auto_add'])}</span>
+                                                                <div class="ui-tooltip-label">{l s='Additional charges'}</div><span class="ui-tooltip-elem-txt">{displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</span>
                                                             </div>
                                                             {/capture}
-                                                            {include file='_partials/tooltip.tpl' tooltip_content=$smarty.capture.htl_room_price_detail_tooltip allow_html=true tooltip_class='ui-htl-tooltip-room-price-detail'}
+                                                            {include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.htl_room_price_detail_tooltip allow_html=true tooltip_class='ui-htl-tooltip-room-price-detail'}
                                                         {/if}
                                                     </div>
                                                     <p class="total_price_detial">

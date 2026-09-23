@@ -243,30 +243,30 @@
 </div>
 
 <div id="date-stats-tooltop" style="display:none">
-	<div class="tooltip_cont">
-		<div class="tip_header">
-			<div class="tip_date"></div>
+	<div class="ui-tooltip-wrapper">
+		<div class="ui-tooltip-header">
+			<div class="ui-tooltip-label"></div>
 		</div>
-		<div class="tip-body">
+		<div class="ui-tooltip-body">
 			<div class="total_rooms">
-				<div class="tip_element_head">{l s='Total Rooms' mod='hotelreservationsystem'}</div>
-				<div class="tip_element_value"></div>
+				<div class="ui-tooltip-elem-head">{l s='Total Rooms' mod='hotelreservationsystem'}</div>
+				<div class="ui-tooltip-elem-txt"></div>
 			</div>
 			<div class="num_avail">
-				<div class="tip_element_head">{l s='Total Available' mod='hotelreservationsystem'}</div>
-				<div class="tip_element_value"></div>
+				<div class="ui-tooltip-elem-head">{l s='Total Available' mod='hotelreservationsystem'}</div>
+				<div class="ui-tooltip-elem-txt"></div>
 			</div>
 			<div class="num_booked">
-				<div class="tip_element_head">{l s='Booked Rooms' mod='hotelreservationsystem'}</div>
-				<div class="tip_element_value"></div>
+				<div class="ui-tooltip-elem-head">{l s='Booked Rooms' mod='hotelreservationsystem'}</div>
+				<div class="ui-tooltip-elem-txt"></div>
 			</div>
 			<div class="num_unavail">
-				<div class="tip_element_head">{l s='Unavailable Rooms' mod='hotelreservationsystem'}</div>
-				<div class="tip_element_value"></div>
+				<div class="ui-tooltip-elem-head">{l s='Unavailable Rooms' mod='hotelreservationsystem'}</div>
+				<div class="ui-tooltip-elem-txt"></div>
 			</div>
             <div class="num_part_avai">
-				<div class="tip_element_head">{l s='Partially Available Rooms' mod='hotelreservationsystem'}</div>
-				<div class="tip_element_value"></div>
+				<div class="ui-tooltip-elem-head">{l s='Partially Available Rooms' mod='hotelreservationsystem'}</div>
+				<div class="ui-tooltip-elem-txt"></div>
 			</div>
 		</div>
 	</div>
