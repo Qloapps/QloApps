@@ -71,11 +71,15 @@
                                 {if isset($use_tourism_tax) && $use_tourism_tax && isset($product.tourism_tax_status)}
                                     {capture name='service_tax_tooltip_content'}
                                         <div class="ui-tooltip-body">
-                                            <div class="ui-tooltip-label">{l s='Service Tax:'}</div>
-                                            <span class="ui-tooltip-elem-txt">{displayPrice price=$product.total_service_tax_only currency=$currency->id}</span>
+                                            <div class="ui-tooltip-service-tax-row">
+                                                <label class="ui-tooltip-label">{l s='Service Tax:'}</label>
+                                                <span class="ui-tooltip-elem-txt">{displayPrice price=$product.total_service_tax_only currency=$currency->id}</span>
+                                            </div>
                                             {if $product.tourism_tax_total > 0}
-                                            <div class="ui-tooltip-label">{l s='Tourism Tax:'}</div>
-                                            <span class="ui-tooltip-elem-txt">{displayPrice price=$product.tourism_tax_total currency=$currency->id}</span>
+                                            <div class="ui-tooltip-tourism-tax-row">
+                                                <label class="ui-tooltip-label">{l s='Tourism Tax:'}</label>
+                                                <span class="ui-tooltip-elem-txt">{displayPrice price=$product.tourism_tax_total currency=$currency->id}</span>
+                                            </div>
                                             {/if}
                                         </div>
                                     {/capture}

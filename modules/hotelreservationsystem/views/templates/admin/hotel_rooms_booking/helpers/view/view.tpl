@@ -247,7 +247,7 @@
 		<div class="ui-tooltip-header">
 			<div class="ui-tooltip-label"></div>
 		</div>
-		<div class="ui-tooltip-body">
+		<div class="ui-tooltip-body ui-tooltip-body-grid">
 			<div class="total_rooms">
 				<div class="ui-tooltip-elem-head">{l s='Total Rooms' mod='hotelreservationsystem'}</div>
 				<div class="ui-tooltip-elem-txt"></div>

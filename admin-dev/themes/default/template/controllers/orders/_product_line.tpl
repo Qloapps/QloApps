@@ -107,11 +107,15 @@
 		{convertPriceWithCurrency price=($data['total_room_tax']) currency=$currency->id}
 		{capture name='room_tax_tooltip_content'}
 			<div class="ui-tooltip-body">
-				<div class="ui-tooltip-label">{l s='Room & Service Tax:'}</div>
-				<span class="ui-tooltip-elem-txt">{convertPriceWithCurrency price=$data.total_room_service_tax_only currency=$currency->id}</span>
+				<div class="ui-tooltip-service-tax-row">
+					<label class="ui-tooltip-label">{l s='Room & Service Tax:'}</label>
+					<span class="ui-tooltip-elem-txt">{convertPriceWithCurrency price=$data.total_room_service_tax_only currency=$currency->id}</span>
+				</div>
 				{if isset($data.tourism_tax_total) && $data.tourism_tax_total > 0}
-				<div class="ui-tooltip-label">{l s='Tourism Tax:'}</div>
-				<span class="ui-tooltip-elem-txt">{convertPriceWithCurrency price=$data.tourism_tax_total currency=$currency->id}</span>
+				<div class="ui-tooltip-tourism-tax-row">
+					<label class="ui-tooltip-label">{l s='Tourism Tax:'}</label>
+					<span class="ui-tooltip-elem-txt">{convertPriceWithCurrency price=$data.tourism_tax_total currency=$currency->id}</span>
+				</div>
 				{/if}
 			</div>
 		{/capture}
