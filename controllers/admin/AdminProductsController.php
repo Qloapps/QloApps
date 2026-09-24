@@ -5715,6 +5715,19 @@ class AdminProductsControllerCore extends AdminController
         $idHotel = (int) $objRoom->id_hotel;
 
         if ($mode === 'add') {
+            if (!Validate::isLoadedObject($objRoom)) {
+                die(json_encode(['success' => false, 'message' => $this->l('Invalid room selected.')]));
+            }
+
+            $objConnectedRoom = new HotelRoomInformation($connectedRoomId);
+            if (
+                $connectedRoomId === $roomId
+                || !Validate::isLoadedObject($objConnectedRoom)
+                || (int) $objConnectedRoom->id_hotel !== $idHotel
+            ) {
+                die(json_encode(['success' => false, 'message' => $this->l('Invalid room selected for connection.')]));
+            }
+
             $connection = new HotelConnectedRoom();
             $connection->id_room = $roomId;
             $connection->id_room_connected = $connectedRoomId;
