@@ -63,6 +63,7 @@
 			{assign var=obj_hotel_branch_information value=$order->obj_hotel_branch_information}
 			{assign var=hotel_address_info value=$order->hotel_address_info}
 			{assign var=hotel_refund_rules value=$order->hotel_refund_rules}
+			{assign var=property_type value=$order->property_type}
 
 			{if isset($order->total_old)}
 				{assign var=total_old value=$order->total_old}
