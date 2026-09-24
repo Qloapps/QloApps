@@ -188,7 +188,7 @@ class OrderPaymentCore extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
             LEFT JOIN `'._DB_PREFIX_.'currency` cur ON (cur.`id_currency` = op.`id_currency`)
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
-                ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0)
+                ON (hbd.`id_order` = o.`id_order`)
             WHERE op.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idOrder       ? ' AND o.`id_order` = '.$idOrder                       : '')
             .($idCustomer    ? ' AND o.`id_customer` = '.$idCustomer                 : '')
@@ -213,7 +213,7 @@ class OrderPaymentCore extends ObjectModel
             INNER JOIN `'._DB_PREFIX_.'orders` o
                 ON (o.`reference` = op.`order_reference` AND o.`valid` = 1)
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
-                ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0)
+                ON (hbd.`id_order` = o.`id_order`)
             WHERE op.`payment_method` IS NOT NULL AND op.`payment_method` != ""'
             .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
             ORDER BY op.`payment_method`'

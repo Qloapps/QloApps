@@ -3377,7 +3377,7 @@ class OrderCore extends ObjectModel
             FROM `'._DB_PREFIX_.'orders` o
             INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
-                ON (hbd.`id_order` = o.`id_order` AND hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0)
+                ON (hbd.`id_order` = o.`id_order`)
             LEFT JOIN `'._DB_PREFIX_.'address` a
                 ON (a.`id_customer` = c.`id_customer` AND a.`deleted` = 0
                 AND a.`id_address` = (SELECT MAX(`id_address`) FROM `'._DB_PREFIX_.'address`
