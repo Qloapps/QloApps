@@ -359,12 +359,13 @@ class CartRuleCore extends ObjectModel
                 }
             }
 
-            // Remove cart rule if the cart contains a product from a hotel not covered by its hotel restriction
+            // Remove cart rule if the cart contains a room from a hotel not covered by its hotel restriction.
             foreach ($result as $key => $cart_rule) {
                 if (isset($cart_rule['hotel_restriction']) && $cart_rule['hotel_restriction']) {
                     $total_cart_products = (int)Db::getInstance()->getValue('
                         SELECT COUNT(cp.id_product)
                         FROM '._DB_PREFIX_.'cart_product cp
+                        INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
                         WHERE cp.id_cart = '.(int)$cart->id
                     );
                     $allowed_cart_products = (int)Db::getInstance()->getValue('
@@ -662,11 +663,12 @@ class CartRuleCore extends ObjectModel
             }
         }
 
-        // Check if all the products in the cart belong to the restricted hotel(s)
+        // Check if all the rooms in the cart belong to the restricted hotel(s). Only room-type cart
         if ($this->hotel_restriction) {
             $total_cart_products = (int)Db::getInstance()->getValue('
                 SELECT COUNT(cp.id_product)
                 FROM '._DB_PREFIX_.'cart_product cp
+                INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
                 WHERE cp.id_cart = '.(int)$context->cart->id
             );
             $allowed_cart_products = (int)Db::getInstance()->getValue('
