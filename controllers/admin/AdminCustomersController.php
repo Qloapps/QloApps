@@ -1217,6 +1217,15 @@ class AdminCustomersControllerCore extends AdminController
                         $objCustomerGuestDetail->email = $objCustomer->email;
                         $objCustomerGuestDetail->save();
                     }
+
+                    $threads = Db::getInstance()->executeS(
+                        'SELECT `id_customer_thread` FROM `'._DB_PREFIX_.'customer_thread` WHERE `id_customer` = '.(int) $objCustomer->id
+                    );
+                    foreach ($threads as $thread) {
+                        $objThread = new CustomerThread($thread['id_customer_thread']);
+                        $objThread->email = $objCustomer->email;
+                        $objThread->save();
+                    }
                 }
 
                 $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
