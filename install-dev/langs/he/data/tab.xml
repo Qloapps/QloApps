@@ -22,6 +22,7 @@
   <tab id="Stock" name="מלאי"/>
   <tab id="Products" name="ניהול מוצרי שירות"/>
   <tab id="Room_Types" name="נהל סוגי חדרים"/>
+  <tab id="Room_Type_Selling_Objects" name="פריטי מכירת חדרים"/>
   <tab id="Categories" name="קטגוריות"/>
   <tab id="Monitoring" name="בקרה"/>
   <tab id="Attributes_and_Values" name="מאפייני מוצר"/>
@@ -32,10 +33,12 @@
   <tab id="Attachments" name="קבצים מצורפים"/>
   <tab id="Orders_1" name="הזמנות"/>
   <tab id="Invoices" name="חשבוניות"/>
+  <tab id="Payment_Receipts" name="קבלות תשלום"/>
   <!-- <tab id="Merchandise_Returns" name="החזרת מוצרים"/> -->
   <tab id="Delivery_Slips" name="שוברי משלוח"/>
   <tab id="Credit_Slips" name="שוברי זיכוי"/>
   <tab id="Statuses" name="סטטוסי הזמנה ומלאי"/>
+  <tab id="Sources" name="מקורות עסקיים"/>
   <tab id="Order_Messages" name="תבניות עבור הודעות הזמנה"/>
   <tab id="Guest_Registration" name="כרטיס רישום אורח"/>
   <tab id="Customers_1" name="לקוחות"/>

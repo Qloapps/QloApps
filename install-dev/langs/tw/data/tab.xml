@@ -24,6 +24,7 @@
   <tab id="Stock" name="庫存"/>
   <tab id="Products" name="管理服務產品"/>
   <tab id="Room_Types" name="管理房間類型"/>
+  <tab id="Room_Type_Selling_Objects" name="房間銷售物件"/>
   <tab id="Categories" name="分類"/>
   <tab id="Monitoring" name="追蹤"/>
   <tab id="Attributes_and_Values" name="屬性與數值"/>
@@ -34,10 +35,12 @@
   <tab id="Attachments" name="附加檔案"/>
   <tab id="Orders_1" name="訂單"/>
   <tab id="Invoices" name="發票"/>
+  <tab id="Payment_Receipts" name="付款收據"/>
   <!-- <tab id="Merchandise_Returns" name="退貨"/> -->
   <tab id="Delivery_Slips" name="出貨單"/>
   <tab id="Credit_Slips" name="折讓單"/>
   <tab id="Statuses" name="狀態"/>
+  <tab id="Sources" name="業務來源"/>
   <tab id="Order_Messages" name="訂單訊息"/>
   <tab id="Guest_Registration" name="住客登記表"/>
   <tab id="Customers_1" name="客戶"/>

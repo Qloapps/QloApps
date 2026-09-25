@@ -39,6 +39,7 @@
   <tab id="Images" name="изображения"/>
   <tab id="Instant_Stock_Status" name="Текущее состояние склада"/>
   <tab id="Invoices" name="Инвойсы"/>
+  <tab id="Payment_Receipts" name="Квитанции об оплате"/>
   <tab id="Languages" name="Языки"/>
   <tab id="Localization" name="Локализация"/>
   <tab id="Localization_1" name="Локализация"/>
@@ -71,6 +72,7 @@
   <tab id="Products_1" name="товары"/>
   <tab id="Products" name="Управление сервисными продуктами"/>
   <tab id="Room_Types" name="Управление типами комнат"/>
+  <tab id="Room_Type_Selling_Objects" name="Объекты продажи номеров"/>
   <tab id="Profiles" name="Профили"/>
   <tab id="Quick_Access" name="Быстрый доступ"/>
   <tab id="Referrers" name="Реферы"/>
@@ -88,6 +90,7 @@
   <tab id="Stats" name="Статистика"/>
   <tab id="Stats_1" name="Статистика"/>
   <tab id="Statuses" name="Статусы"/>
+  <tab id="Sources" name="Источники бизнеса"/>
   <tab id="Stock" name="Запас"/>
   <tab id="Stock_Coverage" name="Покрытие запасов"/>
   <tab id="Stock_Management" name="Управление складом"/>

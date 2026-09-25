@@ -37,6 +37,7 @@
   <tab id="Images" name="&#x1EA2;nh"/>
   <tab id="Instant_Stock_Status" name="Tr&#x1EA1;ng th&#xE1;i h&#xE0;ng trong kho hi&#x1EC7;n t&#x1EA1;i"/>
   <tab id="Invoices" name="Bi&#xEA;n nh&#x1EAD;n"/>
+  <tab id="Payment_Receipts" name="Biên nhận thanh toán"/>
   <tab id="Languages" name="Ng&#xF4;n ng&#x1EEF;"/>
   <tab id="Localization" name="&#x110;&#x1ECB;a ph&#x1B0;&#x1A1;ng h&#xF3;a"/>
   <tab id="Localization_1" name="&#x110;&#x1ECB;a ph&#x1B0;&#x1A1;ng h&#xF3;a"/>
@@ -68,6 +69,7 @@
   <tab id="Price_Rules" name="Khuy&#x1EBF;n m&#x1EA1;i"/>
   <tab id="Products" name="Quản lý sản phẩm dịch vụ"/>
   <tab id="Room_Types" name="Quản lý loại phòng"/>
+  <tab id="Room_Type_Selling_Objects" name="Đối tượng bán phòng"/>
   <tab id="Products_1" name="S&#x1EA3;n ph&#x1EA9;m"/>
   <tab id="Profiles" name="H&#x1ED3; s&#x1A1; c&#xE1; nh&#xE2;n"/>
   <tab id="Quick_Access" name="Truy c&#x1EAD;p nhanh"/>
@@ -86,6 +88,7 @@
   <tab id="Stats" name="Th&#x1ED1;ng k&#xEA;"/>
   <tab id="Stats_1" name="Th&#x1ED1;ng k&#xEA;"/>
   <tab id="Statuses" name="Tr&#x1EA1;ng th&#xE1;i"/>
+  <tab id="Sources" name="Nguồn kinh doanh"/>
   <tab id="Stock" name="Kho"/>
   <tab id="Stock_Coverage" name="Ph&#x1EA1;m vi kho h&#xE0;ng"/>
   <tab id="Stock_Management" name="Qu&#x1EA3;n l&#xFD; kho"/>
