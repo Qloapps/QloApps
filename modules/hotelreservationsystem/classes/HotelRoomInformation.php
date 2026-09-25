@@ -373,8 +373,7 @@ class HotelRoomInformation extends ObjectModel
             'SELECT hbd.`id_product`, hbd.`id_room`, hbd.`date_from`, hbd.`date_to`
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
-            WHERE hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
-            AND hbd.`date_from` < "'.$dateToNext.'" AND hbd.`date_to` > "'.$dateFrom.'"'
+            WHERE hbd.`date_from` < "'.$dateToNext.'" AND hbd.`date_to` > "'.$dateFrom.'"'
             .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd')
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
         );
@@ -472,8 +471,7 @@ class HotelRoomInformation extends ObjectModel
                     MIN(hbd.`id_status`) AS `id_status`,
                     MIN(hbd.`id_customer`) AS `id_customer`
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                WHERE hbd.`is_refunded` = 0
-                AND hbd.`date_from` < "'.$dateToNext.'" AND hbd.`date_to` > "'.$dateFrom.'"
+                WHERE hbd.`date_from` < "'.$dateToNext.'" AND hbd.`date_to` > "'.$dateFrom.'"
                 GROUP BY hbd.`id_room`
             ) bkgs ON (bkgs.`id_room` = hri.`id`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = bkgs.`id_customer`)
