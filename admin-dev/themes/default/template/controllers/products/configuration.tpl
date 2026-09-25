@@ -434,7 +434,7 @@
                     <p>
                         <strong>{l s='Example:'}</strong>
                         {l s='For the Room Type'}
-                        <strong id="bulk_create_room_example_name">{$product->name[$id_lang]|escape:'html':'UTF-8'}</strong>,
+                        <strong id="bulk_create_room_example_name">{$product->name[$id_lang]|default:''|escape:'html':'UTF-8'}</strong>,
                         {l s='the room name will be'}
                         <strong id="room_type_acronym">{$room_type_acronym|escape:'html':'UTF-8'}</strong>.
                     </p>

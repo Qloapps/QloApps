@@ -371,7 +371,7 @@
 								<input type="text"
 								id="link_rewrite_{$language.id_lang}"
 								name="link_rewrite_{$language.id_lang}"
-								value="{if isset($smarty.post.$link_rewrite)}{$smarty.post.$link_rewrite|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$link_rewrite_info[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
+								value="{if isset($smarty.post.$link_rewrite)}{$smarty.post.$link_rewrite|escape:'htmlall':'UTF-8'}{elseif isset($edit) && isset($link_rewrite_info[$language.id_lang])}{$link_rewrite_info[$language.id_lang]|escape:'htmlall':'UTF-8'}{/if}"
 								class="form-control wk_text_field_all wk_text_field_{$language.id_lang}"
 								maxlength="128"
 								{if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if} />
@@ -396,7 +396,7 @@
 								<input type="text"
 								id="meta_title_{$language.id_lang}"
 								name="meta_title_{$language.id_lang}"
-								value="{if isset($smarty.post.$meta_title)}{$smarty.post.$meta_title|truncate:128:'':true|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_title_info[$language.id_lang]|truncate:128:'':true|escape:'htmlall':'UTF-8'}{/if}"
+								value="{if isset($smarty.post.$meta_title)}{$smarty.post.$meta_title|truncate:128:'':true|escape:'htmlall':'UTF-8'}{elseif isset($edit) && isset($meta_title_info[$language.id_lang])}{$meta_title_info[$language.id_lang]|truncate:128:'':true|escape:'htmlall':'UTF-8'}{/if}"
 								class="form-control"
 								maxlength="128"
 								data-maxchar="128" />
@@ -422,7 +422,7 @@
 									class="form-control textarea-autosize"
 									rows="1"
 									maxlength="255"
-									data-maxchar="255">{if isset($smarty.post.$meta_description)}{$smarty.post.$meta_description|truncate:255:'':true|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_description_info[{$language.id_lang}]|truncate:255:'':true|escape:'htmlall':'UTF-8'}{/if}</textarea>
+									data-maxchar="255">{if isset($smarty.post.$meta_description)}{$smarty.post.$meta_description|truncate:255:'':true|escape:'htmlall':'UTF-8'}{elseif isset($edit) && isset($meta_description_info[$language.id_lang])}{$meta_description_info[$language.id_lang]|truncate:255:'':true|escape:'htmlall':'UTF-8'}{/if}</textarea>
 								</div>
 							{/foreach}
 						</div>
@@ -448,7 +448,7 @@
 									<input type="text"
 									id="meta_keywords_{$language.id_lang}"
 									name="meta_keywords_{$language.id_lang}"
-									value="{if isset($smarty.post.$meta_keywords)}{$smarty.post.$meta_keywords|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$meta_keywords_info[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}"
+									value="{if isset($smarty.post.$meta_keywords)}{$smarty.post.$meta_keywords|escape:'htmlall':'UTF-8'}{elseif isset($edit) && isset($meta_keywords_info[$language.id_lang])}{$meta_keywords_info[$language.id_lang]|escape:'htmlall':'UTF-8'}{/if}"
 									class="form-control tagify"
 									maxlength="225">
 								</div>
