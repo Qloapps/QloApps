@@ -170,7 +170,7 @@ class AdminThemesControllerCore extends AdminController
                         'thumb' => (Configuration::get('PS_LOGO_MAIL') !== false && (bool)Tools::file_get_contents($this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_MAIL')))) ? $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO_MAIL')) : $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('PS_LOGO'))
                     ),
                     'PS_LOGO_INVOICE' => array(
-                        'title' => $this->l('Invoice logo'),
+                        'title' => $this->l('Invoice and GRC logo'),
                         'desc' => ((Configuration::get('PS_LOGO_INVOICE') === false) ? '<span class="light-warning">'.$this->l('Warning: if no invoice logo is available, the main logo will be used instead.').'</span><br />' : ''),
                         'hint' => $this->l('Will appear on invoice headers.').' '.$this->l('Warning: you can use a PNG file for transparency, but it can take up to 1 second per page for processing. Please consider using JPG instead.'),
                         'type' => 'file',
