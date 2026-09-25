@@ -21,10 +21,16 @@
 *}
 
 
-<span class="htl-tooltip{if isset($tooltip_class) && $tooltip_class} {$tooltip_class|escape:'html':'UTF-8'}{/if}">
-	<img src="{$img_dir}icon/icon-info.svg" />
+<span class="ui-tooltip-trigger{if isset($tooltip_class) && $tooltip_class} {$tooltip_class|escape:'html':'UTF-8'}{/if}">
+	{if isset($tooltip_title) && $tooltip_title}
+		{$tooltip_title nofilter}
+	{elseif isset($tooltip_icon_class) && $tooltip_icon_class}
+		<i class="{$tooltip_icon_class|escape:'html':'UTF-8'}"{if isset($tooltip_icon_style) && $tooltip_icon_style} style="{$tooltip_icon_style|escape:'html':'UTF-8'}"{/if}></i>
+	{else}
+		<img src="{$img_dir}icon/icon-info.svg" alt="" />
+	{/if}
 </span>
-<div class="htl-tooltip-content" style="display: none;">
+<div class="ui-tooltip-content" style="display: none;">
 	{if isset($allow_html) && $allow_html}
 		{$tooltip_content nofilter}
 	{else}

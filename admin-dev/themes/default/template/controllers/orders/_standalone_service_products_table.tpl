@@ -69,21 +69,21 @@
                             <td>
                                 <span>{displayPrice price=($product.total_price_tax_incl - $product.total_price_tax_excl) currency=$currency->id}</span>
                                 {if isset($use_tourism_tax) && $use_tourism_tax && isset($product.tourism_tax_status)}
-                                    <span class="price_info">
-                                        &nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
-                                    </span>
-                                    <div class="price_info_container" style="display: none;">
-                                        <div>
-                                            <label>{l s='Service Tax:'}</label>
-                                            <span class="pull-right">{displayPrice price=$product.total_service_tax_only currency=$currency->id}</span>
+                                    {capture name='service_tax_tooltip_content'}
+                                        <div class="ui-tooltip-body">
+                                            <div class="ui-tooltip-service-tax-row">
+                                                <label class="ui-tooltip-label">{l s='Service Tax:'}</label>
+                                                <span class="ui-tooltip-elem-txt">{displayPrice price=$product.total_service_tax_only currency=$currency->id}</span>
+                                            </div>
+                                            {if $product.tourism_tax_total > 0}
+                                            <div class="ui-tooltip-tourism-tax-row">
+                                                <label class="ui-tooltip-label">{l s='Tourism Tax:'}</label>
+                                                <span class="ui-tooltip-elem-txt">{displayPrice price=$product.tourism_tax_total currency=$currency->id}</span>
+                                            </div>
+                                            {/if}
                                         </div>
-                                        {if $product.tourism_tax_total > 0}
-                                        <div>
-                                            <label>{l s='Tourism Tax:'}</label>
-                                            <span class="pull-right">{displayPrice price=$product.tourism_tax_total currency=$currency->id}</span>
-                                        </div>
-                                        {/if}
-                                    </div>
+                                    {/capture}
+                                    {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.service_tax_tooltip_content}
                                 {/if}
                             </td>
                             <td>

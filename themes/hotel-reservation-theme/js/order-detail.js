@@ -308,7 +308,7 @@ $(document).on('click', '.btn-view-extra-services', function(e) {
             if (result.extra_services) {
                 $('#popup-view-extra-services').html('');
                 $('#popup-view-extra-services').append(result.extra_services);
-                initHtlTooltip();
+                initUITooltip();
 
                 $.fancybox.open({
                     href: '#popup-view-extra-services',
@@ -333,6 +333,4 @@ $(document).ready(function () {
 
         sendOrderMessage();
     });
-
-    initHtlTooltip();
 });

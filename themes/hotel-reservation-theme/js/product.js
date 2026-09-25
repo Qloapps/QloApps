@@ -1156,7 +1156,7 @@ $(document).ready(function() {
                                 triggerElement.hide();
                             }
                         }
-                        initHtlTooltip();
+                        initUITooltip();
                     } else {
                         triggerElement.hide();
                     }
@@ -1346,47 +1346,8 @@ var BookingForm = {
         if (parseInt($('#product_page_booking_product').val())) {
             BookingForm.initDatepicker(max_order_date, min_booking_offset, $('#room_check_in').val(), $('#room_check_out').val());
         }
-        // initialize tootltip for extra service
-        if ($('.price_desc_block .services-info').length) {
-            $('.price_desc_block .services-info img').tooltip({
-                content: $('.price_desc_block .services-info-container').html(),
-                items: "div",
-                trigger : 'hover',
-                position: { my: "left-15 top", at: "left bottom" },
-                tooltipClass: "services-tootip",
-                open: function(event, ui)
-                    {
-                        if (typeof(event.originalEvent) === 'undefined')
-                        {
-                            return false;
-                        }
-
-                        var $id = $(ui.tooltip).attr('id');
-
-                        // close any lingering tooltips
-                        if ($('div.ui-tooltip').not('#' + $id).length) {
-                            return false;
-                        }
-
-                        // ajax function to pull in data and add it to the tooltip goes here
-                    },
-                    close: function(event, ui)
-                    {
-                        ui.tooltip.hover(function()
-                        {
-                            $(this).stop(true).fadeTo(400, 1);
-                        },
-                        function()
-                        {
-                            $(this).fadeOut('400', function()
-                            {
-                                $(this).remove();
-                            });
-                        });
-                    }
-
-            });
-        }
+        // initialize tooltip for extra service
+        initUITooltip();
         if (!$('.max_avail_type_qty').length || $('.max_avail_type_qty').val() < 1) {
             disableRoomTypeServices(1);
         } else {

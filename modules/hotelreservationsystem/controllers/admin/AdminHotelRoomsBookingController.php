@@ -1162,7 +1162,6 @@ public function ajaxProcessGetCalenderData()
         MediaCore::addJsDef($jsVars);
 
         // add fullcalender plugin
-        $this->addJqueryUI('ui.tooltip', 'base', true);
         $this->removeJS(Media::getJqueryUIPath('ui.effect', 'base', false), false);
         $this->addCSS(array(_MODULE_DIR_.'hotelreservationsystem/views/css/HotelReservationAdmin.css'));
 

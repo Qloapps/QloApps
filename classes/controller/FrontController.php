@@ -1183,6 +1183,7 @@ class FrontControllerCore extends Controller
             $this->addJS(_PS_JS_DIR_.'hookLiveEdit.js');
         }
         $this->addJqueryUI('ui.tooltip', 'base', true);
+        $this->addJS(_PS_JS_DIR_.'jquery-ui-tooltip-alias.js');
 
         if (Configuration::get('PS_QUICK_VIEW')) {
             $this->addjqueryPlugin('fancybox');

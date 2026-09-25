@@ -279,7 +279,7 @@ class GuestTrackingControllerCore extends FrontController
                                 }
                                 $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                                 $cartHotelData[$type_key]['cover_img'] = $cover_img;
-
+                               
                                 foreach ($order_bk_data as $data_k => $data_v) {
                                     $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
 
@@ -580,7 +580,6 @@ class GuestTrackingControllerCore extends FrontController
             ));
 
             $this->addJqueryPlugin(array('fancybox', 'scrollTo', 'footable', 'footable-sort'));
-            $this->addJqueryUI(array('ui.tooltip'), 'base', true);
 
             // load Google Maps library if configured
             if (!count($this->errors)) {

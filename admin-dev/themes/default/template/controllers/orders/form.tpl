@@ -22,11 +22,6 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<style>
-.ui-tooltip.price_info-tooltip { border: unset; padding: 10px; box-shadow: 0px 0px 15px 0px #00000026; }
-.ui-tooltip.price_info-tooltip span { margin-left: 15px; }
-.ui-tooltip.price_info-tooltip label { font-weight: 600; }
-</style>
 <script type="text/javascript">
 	{if isset($cart->id) && $cart->id}
 		var id_cart = {$cart->id|intval};
@@ -62,31 +57,8 @@
 			}
 		});
 
-		$('.total_taxes_price_info img').tooltip({
-			content: function () {
-				return $(this).closest('.data-focus').find('.price_info_container').html();
-			},
-			items: 'img',
-			trigger: 'hover',
-			tooltipClass: 'price_info-tooltip',
-			open: function (event, ui) {
-				if (typeof(event.originalEvent) === 'undefined') {
-					return false;
-				}
-				var $id = $(ui.tooltip).attr('id');
-				if ($('div.ui-tooltip').not('#' + $id).length) {
-					return false;
-				}
-			},
-			close: function (event, ui) {
-				ui.tooltip.hover(function () {
-					$(this).stop(true).fadeTo(400, 1);
-				}, function () {
-					$(this).fadeOut('400', function () {
-						$(this).remove();
-					});
-				});
-			}
+		$(document).on('admin-theme.js.ready', function () {
+			initUITooltip();
 		});
 
 		$('#customer').typeWatch({
@@ -1462,7 +1434,7 @@
 			{
 				$("#customer_cart_details").empty();
 				$("#customer_cart_details").append(res.cart_detail_html);
-				initTooltip();
+				initUITooltip();
 
 				displaySummary(res);
 			}
@@ -1667,7 +1639,7 @@
 				},
                 complete: function() {
                     $(".loading_overlay").hide();
-					initTooltip();
+					initUITooltip();
                 }
 			});
 		});
@@ -1803,7 +1775,7 @@
 				},
 				complete: function() {
 					$(".loading_overlay").hide();
-					initTooltip();
+					initUITooltip();
 				}
 			});
 		});
@@ -1854,7 +1826,7 @@
                 },
                 complete: function() {
                     $(".loading_overlay").hide();
-					initTooltip();
+					initUITooltip();
                 }
             });
         });
@@ -2308,20 +2280,22 @@
 					</div>
 					<div class="col-lg-2">
 						<div class="data-focus">
-							<span>{l s='Total taxes'}
-								<span class="price_info total_taxes_price_info">&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" /></span>
-							</span><br/>
+							<span>{l s='Total taxes'}</span>
+							{capture name='total_taxes_tooltip_content'}
+								<div class="ui-tooltip-body">
+									<div class="ui-tooltip-service-tax-row">
+										<label class="ui-tooltip-label">{l s='Room & Service Tax:'}</label>
+										<span class="ui-tooltip-elem-txt" id="total_taxes_vat"></span>
+									</div>
+									<div class="ui-tooltip-tourism-tax-row">
+										<label class="ui-tooltip-label">{l s='Tourism Tax:'}</label>
+										<span class="ui-tooltip-elem-txt" id="total_taxes_tourism"></span>
+									</div>
+								</div>
+							{/capture}
+							{include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.total_taxes_tooltip_content}
+							<br/>
 							<span id="total_taxes" class="size_l"></span>
-							<div class="price_info_container" style="display: none;">
-								<div>
-									<label>{l s='Room & Service Tax:'}</label>
-									<span class="pull-right" id="total_taxes_vat"></span>
-								</div>
-								<div>
-									<label>{l s='Tourism Tax:'}</label>
-									<span class="pull-right" id="total_taxes_tourism"></span>
-								</div>
-							</div>
 						</div>
 					</div>
                     <div class="col-lg-2">
