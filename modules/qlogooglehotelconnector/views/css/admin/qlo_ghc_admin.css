@@ -1,0 +1,165 @@
+/**
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*/
+
+/* ── Table spacing & vertical alignment ───────────────────────── */
+.qlo-ghc-table th,
+.qlo-ghc-table td {
+    padding: 12px 16px !important;
+    vertical-align: middle !important;
+}
+
+/* ── Dashboard notification widget (left-align overrides RTL-safe dashboards) */
+#ghc-dashboard-notification,
+#ghc-dashboard-notification h3,
+#ghc-dashboard-notification p,
+#ghc-dashboard-notification ul,
+#ghc-dashboard-notification li,
+#ghc-dashboard-notification .btn {
+    text-align: left;
+}
+
+/* ── Prevent scrollbar jitter on GHC admin pages ─────────────────
+   Scoped to exactly the controllers this stylesheet is loaded on
+   (see hookActionAdminControllerSetMedia) via QloApps admin's own
+   body.{controller} class, instead of a bare `html` selector that
+   would silently apply to any future page this CSS gets added to. */
+body.admingooglehotelconfig,
+body.admingooglehotellogs,
+body.adminaddhotel,
+body.admindashboard {
+    overflow-y: scroll;
+}
+
+/* ── Admin list — shrink actions column to content width ────────── */
+table.qghc_api_log th.actions,
+table.qghc_api_log thead tr.nodrag th:last-child {
+    width: 1px;
+    white-space: nowrap;
+}
+
+table.qghc_api_log th.actions .pull-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+/* ── Log detail view — copy-to-clipboard block ─────────────────── */
+.qlo-ghc-log-block {
+    position: relative;
+}
+
+.qlo-ghc-copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    opacity: 0.75;
+}
+
+.qlo-ghc-copy-btn:hover {
+    opacity: 1;
+}
+
+.qlo-ghc-log-pre {
+    background: #f8f8f8;
+    border: 1px solid #e1e1e1;
+    border-radius: 4px;
+    padding: 12px 14px;
+    padding-top: 36px;
+    max-height: 420px;
+    overflow: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* ── Dashboard notification widget ─────────────────────────────── */
+.qlo-ghc-notif-title  { margin-bottom: 6px; }
+.qlo-ghc-notif-desc   { font-size: 12px; margin-bottom: 8px; }
+.qlo-ghc-notif-list   { margin-bottom: 10px; }
+.qlo-ghc-notif-item   { margin-bottom: 4px; }
+.qlo-ghc-badge-urgent { font-size: 10px; vertical-align: middle; }
+.qlo-ghc-notif-dot    { font-size: 8px; vertical-align: middle; }
+
+/* ── Hotel tab content ─────────────────────────────────────────── */
+.qlo-ghc-alert-margin  { margin: 16px; }
+.qlo-ghc-alert-offset  { margin: 0 15px 15px; }
+.qlo-ghc-alert-mb      { margin-bottom: 16px; }
+.qlo-ghc-col-padded    { padding-top: 6px; }
+.qlo-ghc-status-label  { font-size: 12px; padding: 5px 10px; }
+.qlo-ghc-missing-list  { margin: 8px 0 0 0; padding-left: 20px; }
+.qlo-ghc-switch-disabled { opacity: 0.5; cursor: not-allowed; }
+/* Double class to out-specify core's ".bootstrap p { margin: ... }" without !important. */
+.qlo-ghc-helpblock-top.qlo-ghc-helpblock-top { margin-top: 10px; }
+.qlo-ghc-label-normal  { font-weight: normal; margin: 0; }
+.qlo-ghc-hidden        { display: none; }
+
+/* ── Config page ───────────────────────────────────────────────── */
+.qlo-ghc-flash-wrap { margin-bottom: 16px; }
+
+.qlo-ghc-panel-heading-flex {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.qlo-ghc-heading-text { line-height: 1.4; }
+.qlo-ghc-conn-badge   { font-size: 11px; padding: 4px 8px; white-space: nowrap; }
+
+.qlo-ghc-panel-footer-flex {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+
+.qlo-ghc-no-margin       { margin: 0; }
+.qlo-ghc-panel-body-no-pt { padding-top: 0; }
+.qlo-ghc-no-mb           { margin-bottom: 0; }
+.qlo-ghc-nowrap          { white-space: nowrap; }
+
+/* ── Left-align form labels — PS admin theme defaults .control-label to
+   right-aligned. Scoped only to the standalone GHC pages (Config, Logs) —
+   NOT #hotel-tab, since that pane sits inside the shared Add/Edit Hotel form
+   alongside native tabs (Information, SEO, ...) that all use the standard
+   right-aligned label style; overriding it there made GHC's tab look
+   inconsistent with its own siblings instead of matching them. */
+.qlo-ghc-form-left-labels .control-label {
+    text-align: left;
+}
