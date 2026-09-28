@@ -39,6 +39,8 @@ class AdminAddHotelController extends ModuleAdminController
 
         parent::__construct();
 
+        $this->allow_export = true;
+
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
         ON (a.id = hbl.id AND hbl.`id_lang` = '.(int) $this->context->language->id.')';
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = a.`id`)';

@@ -22,6 +22,7 @@
   <tab id="Stock" name="Lager"/>
   <tab id="Products" name="Hantera serviceprodukter"/>
   <tab id="Room_Types" name="Hantera rumstyper"/>
+  <tab id="Room_Type_Selling_Objects" name="Rumsförsäljningsobjekt"/>
   <tab id="Categories" name="Kategorier"/>
   <tab id="Monitoring" name="Övervakning"/>
   <tab id="Attributes_and_Values" name="Attribut &amp; grupper"/>
@@ -32,10 +33,12 @@
   <tab id="Attachments" name="Bilagor"/>
   <tab id="Orders_1" name="Ordrar"/>
   <tab id="Invoices" name="Fakturor"/>
+  <tab id="Payment_Receipts" name="Betalningskvitton"/>
   <!-- <tab id="Merchandise_Returns" name="Varureturer"/> -->
   <tab id="Delivery_Slips" name="Följesedel"/>
   <tab id="Credit_Slips" name="Kreditnota"/>
   <tab id="Statuses" name="Statusar"/>
+  <tab id="Sources" name="Affärskällor"/>
   <tab id="Order_Messages" name="Ordermeddelanden"/>
   <tab id="Guest_Registration" name="Gästregistreringskort"/>
   <tab id="Customers_1" name="Kunder"/>
