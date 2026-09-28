@@ -22,6 +22,7 @@
   <tab id="Stock" name="Likutis"/>
   <tab id="Products" name="Tvarkykite paslaugų produktus"/>
   <tab id="Room_Types" name="Tvarkyti kambarių tipus"/>
+  <tab id="Room_Type_Selling_Objects" name="Kambarių pardavimo objektai"/>
   <tab id="Categories" name="Kategorijos"/>
   <tab id="Monitoring" name="Kontrolė"/>
   <tab id="Attributes_and_Values" name="Prekės savybė"/>
@@ -32,10 +33,12 @@
   <tab id="Attachments" name="Priedai"/>
   <tab id="Orders_1" name="Užsakymai"/>
   <tab id="Invoices" name="Sąskaitos"/>
+  <tab id="Payment_Receipts" name="Mokėjimo kvitai"/>
   <!-- <tab id="Merchandise_Returns" name="Prekių grąžinimai"/> -->
   <tab id="Delivery_Slips" name="Važtaražščiai"/>
   <tab id="Credit_Slips" name="Grąžinimo kuponai"/>
   <tab id="Statuses" name="Būsenos"/>
+  <tab id="Sources" name="Verslo šaltiniai"/>
   <tab id="Order_Messages" name="Užsakymo pranešimai"/>
   <tab id="Guest_Registration" name="Svečio registracijos kortelė"/>
   <tab id="Customers_1" name="Klientai"/>
