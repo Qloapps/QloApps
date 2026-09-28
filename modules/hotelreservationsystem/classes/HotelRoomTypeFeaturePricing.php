@@ -354,11 +354,10 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI;
                 $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE;
             } else {
-
-                $productPriceTI = Product::applyGroupDiscount($productPriceTI, $id_product, $id_group);
-                $productPriceTE = Product::applyGroupDiscount($productPriceTE, $id_product, $id_group);
-                $totalPrice['total_price_tax_incl'] += $productPriceTI;
-                $totalPrice['total_price_tax_excl'] += $productPriceTE;
+                $dayPriceTI = Product::applyGroupDiscount($productPriceTI, $id_product, $id_group);
+                $dayPriceTE = Product::applyGroupDiscount($productPriceTE, $id_product, $id_group);
+                $totalPrice['total_price_tax_incl'] += $dayPriceTI;
+                $totalPrice['total_price_tax_excl'] += $dayPriceTE;
             }
         }
         Hook::exec('actionRoomTypeTotalPriceModifier',
