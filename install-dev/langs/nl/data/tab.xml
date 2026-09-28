@@ -22,6 +22,7 @@
   <tab id="Stock" name="Voorraad"/>
   <tab id="Products" name="Serviceproducten beheren"/>
   <tab id="Room_Types" name="Beheer kamertypes"/>
+  <tab id="Room_Type_Selling_Objects" name="Kamerverkoopobjecten"/>
   <tab id="Categories" name="Categorieën"/>
   <tab id="Monitoring" name="Monitoring"/>
   <tab id="Attributes_and_Values" name="Productattributen"/>
@@ -32,10 +33,12 @@
   <tab id="Attachments" name="Bijlagen"/>
   <tab id="Orders_1" name="Bestellingen"/>
   <tab id="Invoices" name="Facturen"/>
+  <tab id="Payment_Receipts" name="Betalingsbewijzen"/>
   <!-- <tab id="Merchandise_Returns" name="Retourzendingen"/> -->
   <tab id="Delivery_Slips" name="Pakbonnen"/>
   <tab id="Credit_Slips" name="Creditnota's"/>
   <tab id="Statuses" name="Statussen"/>
+  <tab id="Sources" name="Zakelijke bronnen"/>
   <tab id="Order_Messages" name="Bestellingsberichten"/>
   <tab id="Guest_Registration" name="Gasten registratiekaart"/>
   <tab id="Customers_1" name="Klanten"/>
