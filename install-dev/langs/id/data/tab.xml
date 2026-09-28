@@ -22,6 +22,7 @@
   <tab id="Stock" name="Stok"/>
   <tab id="Products" name="Kelola Produk Layanan"/>
   <tab id="Room_Types" name="Kelola Jenis Kamar"/>
+  <tab id="Room_Type_Selling_Objects" name="Objek Penjualan Kamar"/>
   <tab id="Categories" name="Kategori"/>
   <tab id="Monitoring" name="Monitoring"/>
   <tab id="Attributes_and_Values" name="Atribut produk"/>
@@ -32,10 +33,12 @@
   <tab id="Attachments" name="Lampiran"/>
   <tab id="Orders_1" name="Penjualan"/>
   <tab id="Invoices" name="Invoice"/>
+  <tab id="Payment_Receipts" name="Kwitansi Pembayaran"/>
   <!-- <tab id="Merchandise_Returns" name="Retur barang"/> -->
   <tab id="Delivery_Slips" name="Nota pengiriman"/>
   <tab id="Credit_Slips" name="Nota kredit"/>
   <tab id="Statuses" name="Status"/>
+  <tab id="Sources" name="Sumber Bisnis"/>
   <tab id="Order_Messages" name="Pesan"/>
   <tab id="Guest_Registration" name="Kartu Registrasi Tamu"/>
   <tab id="Customers_1" name="Pelanggan"/>
