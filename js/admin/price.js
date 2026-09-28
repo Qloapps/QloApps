@@ -187,8 +187,9 @@ function calcPriceTI()
 
 function calcPriceTE()
 {
-	var ecotaxValue = parseFloat($('#ecotax').val());
-	ecotax_tax_excl = isNaN(ecotaxValue) ? 0 : (ecotaxValue / (1 + ecotaxTaxRate));
+	if ($('#ecotax').length) {
+		ecotax_tax_excl = $('#ecotax').val() / (1 + ecotaxTaxRate);
+	}
 	var priceTI = parseFloat($('#priceTI').val().replace(/,/g, '.'));
 	var newPrice = removeTaxes(ps_round(priceTI - getEcotaxTaxIncluded(), priceDisplayPrecision));
 	var tourismTaxIncluded = getTourismTaxIncluded(newPrice);
