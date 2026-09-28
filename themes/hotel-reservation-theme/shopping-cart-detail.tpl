@@ -83,7 +83,7 @@
                                 <div class="room-type-features">
                                 {foreach $data_v['hotel_info']['room_features'] as $feature}
                                     <span class="room-type-feature">
-                                        <img src="{$THEME_DIR}img/icon/form-ok-circle.svg" /> {$feature['name']}
+                                        <img src="{$THEME_DIR}img/icon/form-ok-circle.svg" /> {$feature['value']|escape:'html':'UTF-8'}
                                     </span>
                                 {/foreach}
                                 </div>
