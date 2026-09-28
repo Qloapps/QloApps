@@ -37,6 +37,7 @@
   <tab id="Images" name="Imagens"/>
   <tab id="Instant_Stock_Status" name="Estado atual do stock"/>
   <tab id="Invoices" name="Faturas"/>
+  <tab id="Payment_Receipts" name="Recibos de Pagamento"/>
   <tab id="Languages" name="Idiomas"/>
   <tab id="Localization" name="Localização"/>
   <tab id="Localization_1" name="Localização"/>
@@ -69,6 +70,7 @@
   <tab id="Products_1" name="Produtos"/>
   <tab id="Products" name="Gerenciar produtos de serviço"/>
   <tab id="Room_Types" name="Gerenciar tipos de quarto"/>
+  <tab id="Room_Type_Selling_Objects" name="Objetos de Venda de Quartos"/>
   <tab id="Profiles" name="Perfis"/>
   <tab id="Quick_Access" name="Acesso Rápido"/>
   <tab id="Referrers" name="Referências"/>
@@ -86,6 +88,7 @@
   <tab id="Stats" name="Estatísticas"/>
   <tab id="Stats_1" name="Estatísticas"/>
   <tab id="Statuses" name="Estado"/>
+  <tab id="Sources" name="Fontes de Negócio"/>
   <tab id="Stock" name="Stock"/>
   <tab id="Stock_Coverage" name="Cobertura do Stock"/>
   <tab id="Stock_Management" name="Gestão de Stock"/>

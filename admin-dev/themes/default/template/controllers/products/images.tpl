@@ -59,7 +59,7 @@
 				<div class="translatable-field row lang-{$language.id_lang}">
 					<div class="col-lg-8">
 				{/if}
-						<input type="text" id="legend_{$language.id_lang}"{if isset($input_class)} class="{$input_class}"{/if} name="legend_{$language.id_lang}" value="{if $images|count}{$images[0]->legend[$language.id_lang]|escape:'html':'UTF-8'}{else}{$product->name[$language.id_lang]|escape:'html':'UTF-8'}{/if}"{if !$product->id} disabled="disabled"{/if}/>
+						<input type="text" id="legend_{$language.id_lang}"{if isset($input_class)} class="{$input_class}"{/if} name="legend_{$language.id_lang}" value="{if $images|count}{$images[0]->legend[$language.id_lang]|default:''|escape:'html':'UTF-8'}{else}{$product->name[$language.id_lang]|default:''|escape:'html':'UTF-8'}{/if}"{if !$product->id} disabled="disabled"{/if}/>
 				{if $languages|count > 1}
 					</div>
 					<div class="col-lg-2">
