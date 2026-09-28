@@ -36,7 +36,7 @@
 </div>
 
 <div class="row">
-    <label class="control-label col-lg-3">{l s='Hotel' mod='qlohotelreview'}</label>
+    <label class="control-label col-lg-3">{l s='Property' mod='qlohotelreview'}</label>
     <div class="col-lg-9">
         <p class="form-control-static">
             <a href="{$link->getAdminLink('AdminAddHotel')}&updatehtl_branch_info&id={$currentObject->id_hotel}" target="_blank">

@@ -89,7 +89,7 @@ class WkHotelFeaturesBlock extends Module
     public function callInstallTab()
     {
         //Controllers which are to be used in this modules but we have not to create tab for those Controllers...
-        $this->installTab('AdminFeaturesModuleSetting', 'Hotel Amenities Configurations');
+        $this->installTab('AdminFeaturesModuleSetting', 'Property Amenities Configurations');
         return true;
     }
 
