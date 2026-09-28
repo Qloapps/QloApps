@@ -22,6 +22,7 @@
   <tab id="Stock" name="Zalihe"/>
   <tab id="Products" name="Upravljajte uslužnim proizvodima"/>
   <tab id="Room_Types" name="Upravljajte tipovima soba"/>
+  <tab id="Room_Type_Selling_Objects" name="Prodajni objekti soba"/>
   <tab id="Categories" name="Kategorije"/>
   <tab id="Monitoring" name="Praćenje"/>
   <tab id="Attributes_and_Values" name="Osobine proizvoda"/>
@@ -32,10 +33,12 @@
   <tab id="Attachments" name="Prilozi"/>
   <tab id="Orders_1" name="Porudžbine"/>
   <tab id="Invoices" name="Fakture"/>
+  <tab id="Payment_Receipts" name="Potvrde o plaćanju"/>
   <!-- <tab id="Merchandise_Returns" name="Povraćaj robe"/> -->
   <tab id="Delivery_Slips" name="Komadi dostave"/>
   <tab id="Credit_Slips" name="Komadi kredita"/>
   <tab id="Statuses" name="Statusi"/>
+  <tab id="Sources" name="Poslovni izvori"/>
   <tab id="Order_Messages" name="Poruke porudžbina"/>
   <tab id="Guest_Registration" name="Kartica za registraciju gosta"/>
   <tab id="Customers_1" name="Kupci"/>
