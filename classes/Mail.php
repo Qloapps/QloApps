@@ -142,12 +142,12 @@ class MailCore extends ObjectModel
             }
         }
 
-        if (!isset($configuration['PS_MAIL_SMTP_ENCRYPTION'])
-            || Tools::strtolower($configuration['PS_MAIL_SMTP_ENCRYPTION']) === 'off'
+        if (isset($configuration['PS_MAIL_SMTP_ENCRYPTION'])
+            && Tools::strtolower($configuration['PS_MAIL_SMTP_ENCRYPTION']) === 'ssl'
         ) {
-            $isTls = false;
-        } else {
             $isTls = true;
+        } else {
+            $isTls = false;
         }
 
         if (!isset($configuration['PS_MAIL_SMTP_PORT'])) {
@@ -501,10 +501,10 @@ class MailCore extends ObjectModel
         $result = false;
         try {
             if ($smtp_checked) {
-                if (Tools::strtolower($smtp_encryption) === 'off') {
-                    $isTls = false;
-                } else {
+                if (Tools::strtolower($smtp_encryption) === 'ssl') {
                     $isTls = true;
+                } else {
+                    $isTls = false;
                 }
                 $transport = (new EsmtpTransport(
                     $smtp_server,
