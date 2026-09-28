@@ -22,6 +22,7 @@
   <tab id="Stock" name="موجودی"/>
   <tab id="Products" name="مدیریت محصولات خدماتی"/>
   <tab id="Room_Types" name="مدیریت انواع اتاق"/>
+  <tab id="Room_Type_Selling_Objects" name="موارد فروش اتاق"/>
   <tab id="Categories" name="شاخه‌ها"/>
   <tab id="Monitoring" name="بازرسی"/>
   <tab id="Attributes_and_Values" name="مشخصه‌های محصول"/>
@@ -32,10 +33,12 @@
   <tab id="Attachments" name="پیوست‌ها"/>
   <tab id="Orders_1" name="سفارش‌ها"/>
   <tab id="Invoices" name="صورت حساب‌ها"/>
+  <tab id="Payment_Receipts" name="رسیدهای پرداخت"/>
   <!-- <tab id="Merchandise_Returns" name="بازگشت‌های کالا"/> -->
   <tab id="Delivery_Slips" name="رسیدهای تحویل"/>
   <tab id="Credit_Slips" name="رسیدهای اعتبار"/>
   <tab id="Statuses" name="وضعیت‌ها"/>
+  <tab id="Sources" name="منابع کسب و کار"/>
   <tab id="Order_Messages" name="پیام‌های سفارش"/>
   <tab id="Guest_Registration" name="کارت ثبت نام مهمان"/>
   <tab id="Customers_1" name="مشتریان"/>

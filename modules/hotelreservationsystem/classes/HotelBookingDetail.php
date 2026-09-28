@@ -2199,6 +2199,13 @@ class HotelBookingDetail extends ObjectModel
                         $objBookingDetail->comment = $objCartBookingData->comment;
                         $objBookingDetail->id_status = 1;
                         $objBookingDetail->room_type_name = Product::getProductName($idNewRoomType, null, $objOrder->id_lang);
+
+                        // Save room selling object names as they are at the time of reallocation
+                        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idNewRoomType, $objOrder->id_lang)) {
+                            $objBookingDetail->selling_object_name = $roomTypeInfo['selling_object_name'];
+                            $objBookingDetail->selling_object_plural_name = $roomTypeInfo['selling_object_plural_name'];
+                        }
+
                         $objBookingDetail->date_from = $objCartBookingData->date_from;
                         $objBookingDetail->date_to = $objCartBookingData->date_to;
                         $objBookingDetail->adults = $objCartBookingData->adults;
