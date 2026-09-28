@@ -22,6 +22,7 @@
   <tab id="Stock" name="Stocuri"/>
   <tab id="Products" name="Gestionați produsele de service"/>
   <tab id="Room_Types" name="Gestionați tipurile de camere"/>
+  <tab id="Room_Type_Selling_Objects" name="Obiecte de vânzare a camerelor"/>
   <tab id="Categories" name="Categorii"/>
   <tab id="Monitoring" name="Monitorizare"/>
   <tab id="Attributes_and_Values" name="Atribute de produs"/>
@@ -32,10 +33,12 @@
   <tab id="Attachments" name="Fișiere anexate"/>
   <tab id="Orders_1" name="Comenzi"/>
   <tab id="Invoices" name="Facturi"/>
+  <tab id="Payment_Receipts" name="Chitanțe de plată"/>
   <!-- <tab id="Merchandise_Returns" name="Returnări de marfă"/> -->
   <tab id="Delivery_Slips" name="Avize de expediție"/>
   <tab id="Credit_Slips" name="Note de credit"/>
   <tab id="Statuses" name="Stadii"/>
+  <tab id="Sources" name="Surse de afaceri"/>
   <tab id="Order_Messages" name="Mesaje la comenzi"/>
   <tab id="Guest_Registration" name="Card de înregistrare a oaspeților"/>
   <tab id="Customers_1" name="Clienți"/>
