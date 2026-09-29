@@ -1717,21 +1717,22 @@ class AdminCartsControllerCore extends AdminController
                                 $idCartBooking
                             ))) {
                                 $originalPrice = Product::getPriceStatic($idServiceProduct, false);
+                                $specificPriceInfo = SpecificPrice::getSpecificPrice(
+                                    (int)$idServiceProduct,
+                                    0,
+                                    $objCart->id_currency,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
+                                    0,
+                                    $objCart->id,
+                                    0,
+                                    $objHotelCartBookingData->id
+                                );
                                 // if price is different than the original service price then update the price
                                 if ($canEdit && $operator == 'up' && $originalPrice != $unitPrice) {
-                                    if ($specificPriceInfo = SpecificPrice::getSpecificPrice(
-                                        (int)$idServiceProduct,
-                                        0,
-                                        $objCart->id_currency,
-                                        0,
-                                        0,
-                                        1,
-                                        0,
-                                        0,
-                                        $objCart->id,
-                                        0,
-                                        $objHotelCartBookingData->id
-                                    )) {
+                                    if ($specificPriceInfo) {
                                         $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
                                     } else {
                                         $objSpecificPrice = new SpecificPrice();
@@ -1755,6 +1756,9 @@ class AdminCartsControllerCore extends AdminController
                                     $objSpecificPrice->to = '0000-00-00 00:00:00';
 
                                     $result &= $objSpecificPrice->save();
+                                } elseif ($canEdit && $operator == 'up' && $specificPriceInfo) {
+                                    $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
+                                    $result &= $objSpecificPrice->delete();
                                 }
                             }
                         }
