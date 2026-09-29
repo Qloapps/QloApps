@@ -937,6 +937,7 @@ class AdminProductsControllerCore extends AdminController
                     && Product::duplicateCustomizationFields($id_product_old, $product->id)
                     && Product::duplicateTags($id_product_old, $product->id)
                     && Product::duplicateDownload($id_product_old, $product->id)
+                    && HotelAdvancedPayment::duplicateAdvancePayment($id_product_old, $product->id)
                 ) {
                     $obj_hotel_room_type = new HotelRoomType();
                     $room_type_info = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($id_product_old);
