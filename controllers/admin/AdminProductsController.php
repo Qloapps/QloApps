@@ -5347,12 +5347,37 @@ class AdminProductsControllerCore extends AdminController
         $this->ajaxDie(json_encode($response));
     }
 
+    /**
+     * Check that every given room exists and belongs to a hotel the current employee's profile can access.
+     *
+     * @param array $idRooms Room ids to validate
+     *
+     * @return bool
+     */
+    protected function validateRoomsAccess($idRooms)
+    {
+        $accessibleHotels = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1);
+        foreach ($idRooms as $idRoom) {
+            $objRoomInfo = new HotelRoomInformation((int) $idRoom);
+            if (!Validate::isLoadedObject($objRoomInfo)
+                || ($accessibleHotels && !in_array((int) $objRoomInfo->id_hotel, array_map('intval', $accessibleHotels)))
+            ) {
+                $this->errors[] = Tools::displayError('You do not have permission to perform this operation.');
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function ajaxProcessBulkUpdateRooms()
     {
         $response = array('status' => false);
         $roomsInfo = array();
         if ($this->tabAccess['edit'] === 1) {
-            if ($idRooms = Tools::getValue('id_rooms')) {
+            if (($idRooms = Tools::getValue('id_rooms')) && is_array($idRooms) && $this->validateRoomsAccess($idRooms)) {
+                $idRooms = array_map('intval', $idRooms);
                 $rowsToHighlight = array();
                 $room = array();
                 $bookedRows = array();
