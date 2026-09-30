@@ -1294,6 +1294,9 @@ Quick View Styles
 .room_info_content.row .col-sm-4 .amenity-name {
   white-space: nowrap;
   overflow: hidden;}
+.room_info_content.row .col-sm-4.featured_amenity {
+  font-weight: 700;
+  border-radius: 4px;}
 .room_feature_group {
   margin-bottom: 15px;}
 .room_feature_group .room_info_heading {
