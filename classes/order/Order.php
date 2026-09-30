@@ -3286,17 +3286,17 @@ class OrderCore extends ObjectModel
             'SELECT o.`id_order`, o.`reference`, o.`id_customer`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             c.`email`, a.`phone`,
-            o.`total_paid_tax_incl` / o.`conversion_rate` AS total_charges,
+            o.`total_paid_tax_incl` / '.Currency::getReportConversionRateSql('o').' AS total_charges,
             IFNULL((
                 SELECT SUM(op.`amount`)
                 FROM `'._DB_PREFIX_.'order_payment` op
                 WHERE op.`order_reference` = o.`reference`
-            ), 0) / o.`conversion_rate` AS total_paid,
+            ), 0) / '.Currency::getReportConversionRateSql('o').' AS total_paid,
             (o.`total_paid_tax_incl` - IFNULL((
                 SELECT SUM(op.`amount`)
                 FROM `'._DB_PREFIX_.'order_payment` op
                 WHERE op.`order_reference` = o.`reference`
-            ), 0)) / o.`conversion_rate` AS balance_due,
+            ), 0)) / '.Currency::getReportConversionRateSql('o').' AS balance_due,
             (
                 SELECT MAX(op.`date_add`)
                 FROM `'._DB_PREFIX_.'order_payment` op
@@ -3335,7 +3335,7 @@ class OrderCore extends ObjectModel
             .')';
 
         return (float) Db::getInstance()->getValue(
-            'SELECT IFNULL(SUM(o.`total_discounts_tax_excl` / o.`conversion_rate`), 0)
+            'SELECT IFNULL(SUM(o.`total_discounts_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0)
             FROM `'._DB_PREFIX_.'orders` o
             WHERE o.`valid` = 1
             AND o.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
@@ -3371,8 +3371,8 @@ class OrderCore extends ObjectModel
             st.`name` AS state,
             COUNT(DISTINCT o.`id_order`) AS total_stays,
             SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS total_nights,
-            IFNULL(SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`), 0) AS lifetime_revenue,
-            IFNULL(SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`) / NULLIF(COUNT(DISTINCT o.`id_order`), 0), 0) AS avg_spend_per_stay,
+            IFNULL(SUM(hbd.`total_price_tax_incl` / '.Currency::getReportConversionRateSql('o').'), 0) AS lifetime_revenue,
+            IFNULL(SUM(hbd.`total_price_tax_incl` / '.Currency::getReportConversionRateSql('o').') / NULLIF(COUNT(DISTINCT o.`id_order`), 0), 0) AS avg_spend_per_stay,
             MAX(hbd.`date_from`) AS last_stay
             FROM `'._DB_PREFIX_.'orders` o
             INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
