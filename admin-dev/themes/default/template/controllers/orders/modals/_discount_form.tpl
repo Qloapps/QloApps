@@ -64,19 +64,6 @@
                     </select>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <p class="checkbox">
-                        <label class="control-label" for="discount_all_invoices">
-                            <input type="checkbox" name="discount_all_invoices" id="discount_all_invoices" value="1" />
-                            {l s='Apply on all invoices'}
-                        </label>
-                    </p>
-                    <p class="help-block">
-                        {l s='If you chooses to create this discount for all invoices, only one discount will be created per order invoice.'}
-                    </p>
-                </div>
-            </div>
         {/if}
         <button class="btn btn-default" type="submit" name="submitNewVoucher" style="display:none" id="submitNewVoucher"></button>
     </form>
