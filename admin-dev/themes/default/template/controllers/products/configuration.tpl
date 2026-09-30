@@ -95,20 +95,20 @@
                                     <input type="checkbox" {if isset($room_info['id'])}value="{$room_info['id']}"{else}disabled{/if} name="selected_room_ids[]">
 								</td>
 								<td class="col-sm-1 center">
-									<input class="form-control" type="text" value="{$room_info['room_num']}" name="{$var_name_room_info|cat:'[room_num]'}">
+									<input class="form-control" type="text" value="{$room_info['room_num']|escape:'html':'UTF-8'}" name="{$var_name_room_info|cat:'[room_num]'}">
 								</td>
 								<td class="col-sm-2 center">
-									<input class="form-control" type="text" value="{$room_info['floor']}" name="{$var_name_room_info|cat:'[floor]'}">
+									<input class="form-control" type="text" value="{$room_info['floor']|escape:'html':'UTF-8'}" name="{$var_name_room_info|cat:'[floor]'}">
 								</td>
 								<td class="col-sm-2 center">
 									<select class="form-control room_status" name="{$var_name_room_info|cat:'[id_status]'}">
 										{foreach from=$rm_status item=room_stauts}
-											<option value="{$room_stauts['id']}" {if $room_info['id_status'] == {$room_stauts['id']}}selected="selected"{/if}>{$room_stauts['status']}</option>
+											<option value="{$room_stauts['id']}" {if $room_info['id_status'] == {$room_stauts['id']}}selected="selected"{/if}>{$room_stauts['status']|escape:'html':'UTF-8'}</option>
 										{/foreach}
 									</select>
 								</td>
 								<td class="col-sm-3 center">
-									<input type="text" class="form-control room_comment" value="{if isset($room_info['comment'])}{$room_info['comment']}{/if}" name="{$var_name_room_info|cat:'[comment]'}">
+									<input type="text" class="form-control room_comment" value="{if isset($room_info['comment'])}{$room_info['comment']|escape:'html':'UTF-8'}{/if}" name="{$var_name_room_info|cat:'[comment]'}">
 								</td>
 								<td class="col-sm-2 center">
 									<a class="btn btn-default deactiveDatesModal {if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }disabled{/if}" data-toggle="modal" data-target="#deactiveDatesModal" data-id-room="{if isset($room_info['id'])}{$room_info['id']}{/if}">{if $room_info['id_status'] != $rm_status['STATUS_TEMPORARY_INACTIVE']['id'] }{l s='Add Dates'}{else}{l s='View Dates'}{/if}
@@ -1609,7 +1609,7 @@
                     roomNum = '( '+'{l s='%s No' sprintf=$htl_room_type['selling_object_plural_name']}'+' '+roomNum+')';
                 }
 
-                $('#deactiveDatesModal .disable_dates_room_num').html(roomNum);
+                $('#deactiveDatesModal .disable_dates_room_num').text(roomNum);
                 if (isNaN(idRoom)) {
                     DisableDatesObj.restrictCalendarActions();
                     return;
