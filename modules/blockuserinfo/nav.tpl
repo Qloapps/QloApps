@@ -1,23 +1,25 @@
 {**
-* Copyright since 2007 Webkul.
-*
 * NOTICE OF LICENSE
 *
-* All right is reserved,
-* Please go through LICENSE.txt file inside our module
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
 *
 * DISCLAIMER
 *
-* Do not edit or add to this file if you wish to upgrade this module to newer
-* versions in the future. If you wish to customize this module for your
-* needs please refer to CustomizationPolicy.txt file inside our module for more information.
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
 *
 * @author Webkul IN
-* @copyright Since 2007 Webkul IN
-* @license LICENSE.txt
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<!-- Block user information module NAV  -->
 {block name='user_navigation'}
     {if !isset($ajaxCustomerLogin)}
         <div class="header-top-item header_user_info hidden-xs">
@@ -40,7 +42,7 @@
                     </ul>
                 </li>
             </ul>
-        {else}
+        {elseif !$PS_CATALOG_MODE}
             <a class="header-top-link" href="{$link->getPageLink('my-account', true)|escape:'html'}" rel="nofollow" title="{l s='Log in to your customer account' mod='blockuserinfo'}">
                 <span class="hide_xs">{l s='Sign in' mod='blockuserinfo'}</span>
                 <span class="visi_xs"><i class="icon-user"></i></span>
@@ -50,4 +52,3 @@
         </div>
     {/if}
 {/block}
-<!-- /Block user information module NAV -->

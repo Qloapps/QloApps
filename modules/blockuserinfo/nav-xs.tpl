@@ -31,7 +31,7 @@
 		<li>
 			<a class="navigation-link" href="{$link->getPageLink('index', true, NULL, "mylogout=1&token={$static_token}")|escape:'html':'UTF-8'}"  title="{l s='Log me out' mod='blockuserinfo'}">{l s='Sign Out' mod='blockuserinfo'}</a>
 		</li>
-	{else}
+	{elseif !$PS_CATALOG_MODE}
 		<li>
 			<a class="navigation-link" href="{$link->getPageLink('my-account', true)|escape:'html'}" rel="nofollow" title="{l s='Log in to your customer account' mod='blockuserinfo'}">{l s='Sign in' mod='blockuserinfo'}</a>
 		</li>
