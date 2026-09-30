@@ -62,7 +62,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
                 $fieldSelected = $allSelected || in_array($fieldId, $sectionFields);
                 $fieldNodes[] = array(
                     'value'      => $fieldId,
-                    'name'       => $fieldName,
+                    'name'       => html_entity_decode($fieldName, ENT_QUOTES, 'UTF-8'),
                     'input_name' => 'grc_field_'.$sectionId,
                     'selected'   => $fieldSelected,
                 );
@@ -70,7 +70,7 @@ class AdminGuestRegistrationControllerCore extends AdminController
             $fieldsSelected = $allSelected || !empty(array_filter($fieldNodes, function ($n) { return $n['selected']; }));
             $nodes[] = array(
                 'value'      => $sectionId,
-                'name'       => $section['name'],
+                'name'       => html_entity_decode($section['name'], ENT_QUOTES, 'UTF-8'),
                 'input_name' => 'grc_section',
                 'selected'   => $fieldsSelected,
                 'children'   => $fieldNodes,
