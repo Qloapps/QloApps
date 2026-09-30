@@ -119,7 +119,7 @@
 					<div class="form-group">
 						<label class="control-label col-lg-3">
 							<span>
-								{l s='Enable' mod='hotelreservationsystem'}
+								<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Enable or disable this property. Disabled properties are not available for booking.' mod='hotelreservationsystem'}">{l s='Enable' mod='hotelreservationsystem'}</span>
 							</span>
 						</label>
 						<div class="col-lg-9 ">
@@ -136,7 +136,7 @@
 						<div class="form-group">
 							<label class="control-label col-sm-3 " for="id_property_type">
 								<span>
-									{l s='Property Type :' mod='hotelreservationsystem'}
+									<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Select the type of this property.' mod='hotelreservationsystem'}">{l s='Property Type :' mod='hotelreservationsystem'}</span>
 								</span>
 							</label>
 							<div class="col-sm-6">
@@ -153,7 +153,7 @@
 					{/if}
 					<div class="form-group">
 						<label class="col-sm-3 control-label required" for="hotel_name" >
-							{l s='Name :' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Enter the name of the property.' mod='hotelreservationsystem'}">{l s='Name :' mod='hotelreservationsystem'}</span>
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -171,7 +171,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label">
-							{l s='Short Description :' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='A brief summary of the property shown in listings.' mod='hotelreservationsystem'}">{l s='Short Description :' mod='hotelreservationsystem'}</span>
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -190,7 +190,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label">
-							{l s='Description :' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Detailed description of the property shown on its page.' mod='hotelreservationsystem'}">{l s='Description :' mod='hotelreservationsystem'}</span>
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -207,13 +207,13 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label required">{l s='Phone :' mod='hotelreservationsystem'}</label>
+						<label class="col-sm-3 control-label required"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Contact phone number of the property.' mod='hotelreservationsystem'}">{l s='Phone :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<input type="text" name="phone" id="phone" value="{if isset($smarty.post.phone)}{$smarty.post.phone}{elseif isset($edit)}{$address_info.phone|escape:'htmlall':'UTF-8'}{/if}"/>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-lg-3 control-label required">{l s='Email :' mod='hotelreservationsystem'}</label>
+						<label class="col-lg-3 control-label required"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Contact email address of the property.' mod='hotelreservationsystem'}">{l s='Email :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<div class="input-group">
 								<span class="input-group-addon">
@@ -224,25 +224,25 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label" for="vat_number">{l s='VAT Number' mod='hotelreservationsystem'}</label>
+						<label class="col-sm-3 control-label" for="vat_number"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='VAT registration number of the property, if applicable.' mod='hotelreservationsystem'}">{l s='VAT Number' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<input autocomplete="off" type="text" class="form-control" id="vat_number" name="vat_number" value="{if isset($smarty.post.vat_number)}{$smarty.post.vat_number|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$address_info.vat_number|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label required">{l s='Address :' mod='hotelreservationsystem'}</label>
+						<label class="col-sm-3 control-label required"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Street address of the property.' mod='hotelreservationsystem'}">{l s='Address :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<textarea name="address" rows="4" cols="35" >{if isset($smarty.post.address)}{$smarty.post.address}{elseif isset($edit)}{$address_info.address1|escape:'htmlall':'UTF-8'}{/if}</textarea>
 						</div>
 					</div>
 					<div class="form-group check_in_div" style="position:relative">
-						<label class="col-sm-3 control-label" for="fax">{l s='Fax' mod='hotelreservationsystem'}</label>
+						<label class="col-sm-3 control-label" for="fax"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Fax number of the property, if any.' mod='hotelreservationsystem'}">{l s='Fax' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<input autocomplete="off" type="text" class="form-control" id="fax" name="fax" value="{if isset($smarty.post.fax)}{$smarty.post.fax}{elseif isset($edit)}{$hotel_info.fax|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-3 " for="hotel_country">{l s='Rating :' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-sm-3 " for="hotel_country"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Star rating of the property.' mod='hotelreservationsystem'}">{l s='Rating :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<div style="width: 195px;">
 								<select class="form-control" name="hotel_rating" id="hotel_rating" value="">
@@ -258,7 +258,7 @@
 					</div>
 					<div class="form-group check_in_div" style="position:relative">
 						<label class="col-sm-3 control-label required" for="check_in_time">
-							{l s='Check-in:' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Standard check-in time of the property.' mod='hotelreservationsystem'}">{l s='Check-in:' mod='hotelreservationsystem'}</span>
 						</label>
 						<div class="col-sm-2">
 							<input autocomplete="off" type="text" class="form-control" id="check_in_time" name="check_in" value="{if isset($smarty.post.check_in)}{$smarty.post.check_in}{elseif isset($edit)}{$hotel_info.check_in|escape:'htmlall':'UTF-8'}{/if}" />
@@ -266,14 +266,14 @@
 					</div>
 					<div class="form-group check_out_div" style="position:relative">
 						<label class="col-sm-3 control-label required" for="check_out_time">
-							{l s='Check-out:' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Standard check-out time of the property.' mod='hotelreservationsystem'}">{l s='Check-out:' mod='hotelreservationsystem'}</span>
 						</label>
 						<div class="col-sm-2">
 							<input autocomplete="off" type="text" class="form-control" id="check_out_time" name="check_out" value="{if isset($smarty.post.check_out)}{$smarty.post.check_out}{elseif isset($edit)}{$hotel_info.check_out|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-3 required" for="hotel_country">{l s='Country :' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-sm-3 required" for="hotel_country"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Country where the property is located.' mod='hotelreservationsystem'}">{l s='Country :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-9">
 							<div style="width: 195px;">
 								<select class="form-control" name="hotel_country" id="hotel_country" value="">
@@ -289,7 +289,7 @@
 						</div>
 					</div>
 					<div class="form-group hotel_state_dv" {if !$state_var}style="display:none;"{/if}>
-						<label class="control-label col-sm-3 required hotel_state_lbl" for="hotel_state" {if !$state_var}style="display:none;"{/if}>{l s='State :' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-sm-3 required hotel_state_lbl" for="hotel_state" {if !$state_var}style="display:none;"{/if}><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='State where the property is located.' mod='hotelreservationsystem'}">{l s='State :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<div style="width: 195px;">
 								<select class="form-control" name="hotel_state" id="hotel_state">
@@ -303,32 +303,32 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-3 required" for="hotel_city">{l s='City :' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-sm-3 required" for="hotel_city"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='City where the property is located.' mod='hotelreservationsystem'}">{l s='City :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<input class="form-control" type="" data-validate="" id="hotel_city" name="hotel_city" value="{if isset($smarty.post.hotel_city)}{$smarty.post.hotel_city}{elseif isset($edit)}{$address_info.city|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-3 required" for="hotel_postal_code">{l s='Zip Code :' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-sm-3 required" for="hotel_postal_code"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Postal code of the property location.' mod='hotelreservationsystem'}">{l s='Zip Code :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<input class="form-control" type="" data-validate="" id="hotel_postal_code" name="hotel_postal_code" value="{if isset($smarty.post.hotel_postal_code)}{$smarty.post.hotel_postal_code}{elseif isset($edit)}{$address_info.postcode|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-3" for="loclatitude">{l s='Latitude :' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-sm-3" for="loclatitude"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Latitude of the property location, used to show it on the map.' mod='hotelreservationsystem'}">{l s='Latitude :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<input class="form-control" type="text" id="loclatitude" name="loclatitude" value="{if isset($smarty.post.loclatitude)}{$smarty.post.loclatitude|escape:'htmlall':'UTF-8'}{elseif isset($edit) && $hotel_info.latitude != 0}{$hotel_info.latitude|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="control-label col-sm-3" for="loclongitude">{l s='Longitude :' mod='hotelreservationsystem'}</label>
+						<label class="control-label col-sm-3" for="loclongitude"><span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Longitude of the property location, used to show it on the map.' mod='hotelreservationsystem'}">{l s='Longitude :' mod='hotelreservationsystem'}</span></label>
 						<div class="col-sm-6">
 							<input class="form-control" type="text" id="loclongitude" name="loclongitude" value="{if isset($smarty.post.loclongitude)}{$smarty.post.loclongitude|escape:'htmlall':'UTF-8'}{elseif isset($edit) && $hotel_info.longitude != 0}{$hotel_info.longitude|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label">
-							{l s='Policies :' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Policies of the property, such as cancellation or house rules.' mod='hotelreservationsystem'}">{l s='Policies :' mod='hotelreservationsystem'}</span>
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -362,7 +362,7 @@
 					{hook h='displayAdminAddHotelFormSeoTabBefore' id_hotel=$hook_arg_id_hotel}
 					<div class="form-group">
 						<label class="col-sm-3 control-label required" for="link_rewrite" >
-							{l s='Friendly URL :' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Human-readable URL of the property page. Only letters, numbers and hyphens are allowed.' mod='hotelreservationsystem'}">{l s='Friendly URL :' mod='hotelreservationsystem'}</span>
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -383,7 +383,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label" for="meta_title" >
-							{l s='Meta title:' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Title shown for this property page in search engine results.' mod='hotelreservationsystem'}">{l s='Meta title:' mod='hotelreservationsystem'}</span>
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -406,7 +406,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label" for="meta_title" >
-							{l s='Meta description:' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Short description shown for this property page in search engine results.' mod='hotelreservationsystem'}">{l s='Meta description:' mod='hotelreservationsystem'}</span>
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -429,7 +429,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label" for="meta_title" >
-							{l s='Meta keywords:' mod='hotelreservationsystem'}
+							<span class="label-tooltip" data-toggle="tooltip" title="" data-original-title="{l s='Keywords related to this property. Press Enter or comma to add a keyword.' mod='hotelreservationsystem'}">{l s='Meta keywords:' mod='hotelreservationsystem'}</span>
 							{include file="../../../_partials/htl-form-fields-flag.tpl"}
 						</label>
 						<div class="col-lg-6">
@@ -458,7 +458,7 @@
 					{include file="seo_preview.tpl"
 						languages = $languages
 						preview_link = $rewrite_url|default:''
-						show_label_tooltip = false
+						show_label_tooltip = true
 						show_flag = true
 						inputs = [
     						'meta_title' => $meta_title_info|default:'',
