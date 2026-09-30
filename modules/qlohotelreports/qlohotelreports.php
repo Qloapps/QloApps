@@ -918,7 +918,7 @@ class QloHotelReports extends Module
                         'bookings'            => $bookings,
                         'cancellations'       => $cancels,
                         'cancel_rate_pct'     => $bookings > 0 ? round($cancels / $bookings * 100, 1) : 0.0,
-                        'avg_los'             => ($bookings > 0 && $roomNights > 0) ? round($roomNights / $bookings, 1) : 0.0,
+                        'avg_los'             => ($bookings > 0 && $roomNights > 0) ? max(1, round($roomNights / $bookings, 1)) : 0.0,
                         'outstanding_balance' => $obRows ? array_sum(array_column($obRows, 'balance_due')) : 0.0,
                     );
                 }
@@ -1818,7 +1818,7 @@ class QloHotelReports extends Module
                 $extraRev     = (float) ServiceProductOrderDetail::getTotalRevenue($hotelParams);
                 $grossRevenue = $roomRevenue + $extraRev;
                 $occupancy    = round(AdminStatsController::getAverageOccupancyRate($dateFrom, $dateTo, (int) $hotel['id']), 1);
-                $avgLos       = ($bookings > 0 && $roomNights > 0) ? round($roomNights / $bookings, 1) : 0.0;
+                $avgLos       = ($bookings > 0 && $roomNights > 0) ? max(1, round($roomNights / $bookings, 1)) : 0.0;
                 $obRows       = Order::getOutstandingBalance($hotelParams);
                 $outstanding  = is_array($obRows)
                     ? array_sum(array_column($obRows, 'balance_due')) : 0.0;
