@@ -153,7 +153,7 @@ class StatsBestCustomers extends ModuleGrid
         $this->query = 'SELECT SQL_CALC_FOUND_ROWS c.`id_customer`, c.`lastname`, c.`firstname`, c.`email`,
 			COUNT(co.`id_connections`) as totalVisits,
             IFNULL((
-				SELECT ROUND(SUM(IFNULL(op.`amount`, 0) / o.`conversion_rate`), 2)
+				SELECT ROUND(SUM(IFNULL(op.`amount`, 0) / '.Currency::getReportConversionRateSql('o').'), 2)
 				FROM `'._DB_PREFIX_.'orders` o
 				LEFT JOIN `'._DB_PREFIX_.'order_payment_detail` op ON o.id_order = op.id_order
 				WHERE o.id_customer = c.id_customer

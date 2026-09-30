@@ -3952,8 +3952,8 @@ class HotelBookingDetail extends ObjectModel
 
         $rows = Db::getInstance()->executeS(
             'SELECT DATE(o.`date_add`) AS grp_date,
-            IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS total_price_tax_excl,
-            IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS total_tax,
+            IFNULL(SUM(hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0) AS total_price_tax_excl,
+            IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / '.Currency::getReportConversionRateSql('o').'), 0) AS total_tax,
             COUNT(*) AS rooms_booked,
             SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS room_nights
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -4008,11 +4008,11 @@ class HotelBookingDetail extends ObjectModel
             $row = Db::getInstance()->getRow(
                 'SELECT IFNULL(SUM(
                     ROUND(hbd.`total_price_tax_excl` / NULLIF(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0), 6)
-                    / o.`conversion_rate`
+                    / '.Currency::getReportConversionRateSql('o').'
                 ), 0) AS total_price_tax_excl,
                 IFNULL(SUM(
                     ROUND((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / NULLIF(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0), 6)
-                    / o.`conversion_rate`
+                    / '.Currency::getReportConversionRateSql('o').'
                 ), 0) AS total_tax
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
@@ -4129,7 +4129,7 @@ class HotelBookingDetail extends ObjectModel
                   ' AND hbd.`id_status` != '.(int) self::STATUS_CHECKED_OUT);
 
         return Db::getInstance()->executeS(
-            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
+            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, '.Currency::getReportConversionRateSql('o').' AS conversion_rate,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
             IF(hbd.`check_in` > "0000-00-00 00:00:00", hbd.`check_in`, CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`)) AS actual_checkin,
@@ -4166,7 +4166,7 @@ class HotelBookingDetail extends ObjectModel
         $allStatuses = !empty($params['all_statuses']);
 
         return Db::getInstance()->executeS(
-            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
+            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, '.Currency::getReportConversionRateSql('o').' AS conversion_rate,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
             IF(hbd.`check_in` > "0000-00-00 00:00:00", hbd.`check_in`, CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`)) AS actual_checkin,
@@ -4201,7 +4201,7 @@ class HotelBookingDetail extends ObjectModel
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer']: 0;
 
         return Db::getInstance()->executeS(
-            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
+            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, '.Currency::getReportConversionRateSql('o').' AS conversion_rate,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
             IF(hbd.`check_in` > "0000-00-00 00:00:00", hbd.`check_in`, CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`)) AS actual_checkin,
@@ -4255,7 +4255,7 @@ class HotelBookingDetail extends ObjectModel
             o.`total_paid_tax_incl` AS order_total,
             o.`total_paid_real` AS order_paid,
             (o.`total_paid_tax_incl` - o.`total_paid_real`) AS balance_due,
-            o.`id_currency`, o.`conversion_rate`,
+            o.`id_currency`, '.Currency::getReportConversionRateSql('o').' AS conversion_rate,
             hbd.`id_status`, hbd.`booking_type`, hbd.`date_add`,
             IFNULL(NULLIF(o.`source`, \'\'), \'(direct)\') AS order_source,
             (SELECT CONCAT(e.`firstname`, " ", e.`lastname`)
@@ -4324,9 +4324,9 @@ class HotelBookingDetail extends ObjectModel
                     IFNULL(NULLIF(o.`source`, \'\'), \'(direct)\') AS order_source,
                     COUNT(*) AS rooms_booked,
                     SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS room_nights,
-                    SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`) AS revenue_excl,
-                    SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`) AS revenue_incl,
-                    MAX(o.`total_discounts_tax_excl` / o.`conversion_rate`) AS discount_amount,
+                    SUM(hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').') AS revenue_excl,
+                    SUM(hbd.`total_price_tax_incl` / '.Currency::getReportConversionRateSql('o').') AS revenue_incl,
+                    MAX(o.`total_discounts_tax_excl` / '.Currency::getReportConversionRateSql('o').') AS discount_amount,
                     IFNULL(MAX(ord_ref.`refunded_total`), 0) AS refund_amount,
                     COUNT(*) AS total_rooms,
                     SUM(CASE WHEN hbd.`id_status` = '.(int) self::STATUS_CANCELLED.' THEN 1 ELSE 0 END) AS cancelled_rooms
@@ -4381,8 +4381,8 @@ class HotelBookingDetail extends ObjectModel
         return Db::getInstance()->executeS(
             'SELECT o.`payment` AS payment_method, o.`module`,
             COUNT(DISTINCT hbd.`id_order`) AS bookings,
-            IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS revenue_excl,
-            IFNULL(SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`), 0) AS revenue_incl
+            IFNULL(SUM(hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0) AS revenue_excl,
+            IFNULL(SUM(hbd.`total_price_tax_incl` / '.Currency::getReportConversionRateSql('o').'), 0) AS revenue_incl
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
             WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
@@ -4418,9 +4418,9 @@ class HotelBookingDetail extends ObjectModel
             'SELECT hbd.`id_order`, o.`reference`, hbd.`id_customer`, hbd.`id_product`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             hbd.`room_type_name`, hbd.`room_num`, hbd.`date_add`,
-            hbd.`total_price_tax_excl` / o.`conversion_rate` AS taxable_amount,
+            hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').' AS taxable_amount,
             tl.`name` AS tax_name, t.`rate` AS tax_rate,
-            odt.`total_amount` / o.`conversion_rate` AS tax_amount,
+            odt.`total_amount` / '.Currency::getReportConversionRateSql('o').' AS tax_amount,
             "room" AS revenue_source
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)

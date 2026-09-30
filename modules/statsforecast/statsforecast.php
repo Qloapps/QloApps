@@ -159,7 +159,7 @@ class StatsForecast extends Module
             '.($this->context->cookie->stats_granularity == 42 ? $date_to_ginvoice : '').'
             COUNT(DISTINCT(o.`id_order`)) AS countOrders,
             SUM((SELECT IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE o.`id_order` = hbd.`id_order`)) AS totalRoomsBooked,
-			SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) AS totalSales,
+			SUM(o.`total_paid_tax_excl` / '.Currency::getReportConversionRateSql('o').') AS totalSales,
             SUM((
                 SELECT SUM(ROUND(IFNULL(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1) * (
                     CASE
@@ -716,7 +716,7 @@ class StatsForecast extends Module
 				WHERE l.active = 1';
         $languages = Db::getInstance()->executeS($sql);
         foreach ($languages as $language) {
-            $lang_values .= 'SUM(IF(o.id_lang = '.(int)$language['id_lang'].', total_paid_tax_excl / o.conversion_rate, 0)) as '.pSQL($language['iso_code']).',';
+            $lang_values .= 'SUM(IF(o.id_lang = '.(int)$language['id_lang'].', total_paid_tax_excl / '.Currency::getReportConversionRateSql('o').', 0)) as '.pSQL($language['iso_code']).',';
         }
         $lang_values = rtrim($lang_values, ',');
 
@@ -752,7 +752,7 @@ class StatsForecast extends Module
             $ca['payment'] = array();
         }
 
-        $sql = 'SELECT z.name, SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) as total, COUNT(*) as nb
+        $sql = 'SELECT z.name, SUM(o.`total_paid_tax_excl` / '.Currency::getReportConversionRateSql('o').') as total, COUNT(*) as nb
 				FROM `'._DB_PREFIX_.'orders` o
 				LEFT JOIN `'._DB_PREFIX_.'address` a ON o.id_address_invoice = a.id_address
 				LEFT JOIN `'._DB_PREFIX_.'country` c ON c.id_country = a.id_country
@@ -765,7 +765,7 @@ class StatsForecast extends Module
 				ORDER BY total DESC';
         $ca['zones'] = Db::getInstance()->executeS($sql);
 
-        $sql = 'SELECT cu.name, SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) as total, COUNT(*) as nb
+        $sql = 'SELECT cu.name, SUM(o.`total_paid_tax_excl` / '.Currency::getReportConversionRateSql('o').') as total, COUNT(*) as nb
 				FROM `'._DB_PREFIX_.'orders` o
 				LEFT JOIN `'._DB_PREFIX_.'currency` cu ON o.id_currency = cu.id_currency
 				'.$join.'
@@ -775,8 +775,8 @@ class StatsForecast extends Module
 				ORDER BY total DESC';
         $ca['currencies'] = Db::getInstance()->executeS($sql);
 
-        $sql = 'SELECT SUM(total_paid_tax_excl / o.`conversion_rate`) as total,
-			SUM(total_paid_tax_incl / o.`conversion_rate`) as total_incl, COUNT(*) AS nb
+        $sql = 'SELECT SUM(total_paid_tax_excl / '.Currency::getReportConversionRateSql('o').') as total,
+			SUM(total_paid_tax_incl / '.Currency::getReportConversionRateSql('o').') as total_incl, COUNT(*) AS nb
 				FROM `'._DB_PREFIX_.'orders` o
 				WHERE o.`id_order` IN ('.pSQL($idOrders).')';
         $ca['ventil'] = Db::getInstance()->getRow($sql);

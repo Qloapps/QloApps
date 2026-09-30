@@ -148,13 +148,13 @@ class QloStatsServiceProducts extends ModuleGrid
         $this->query = '(SELECT od.`product_name` as `display_name`, p.`active`,
             od.`product_auto_add` as auto_add_to_cart,
             od.`product_price_addition_type` as price_addition_type,
-            ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) / SUM(
+            ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0), 2) / SUM(
                 ('.$applicableDaysSql.') * spod.`quantity`
             ) AS avgPriceSold,
             IFNULL(SUM(
                 ('.$applicableDaysSql.') * spod.`quantity`
             ), 0) AS totalQuantitySold,
-            ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0), 2) AS totalPriceSold
+            ROUND(IFNULL(SUM(spod.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0), 2) AS totalPriceSold
             FROM '._DB_PREFIX_.'service_product_order_detail spod
             LEFT JOIN  '._DB_PREFIX_.'product p ON (spod.`id_product` = p.`id_product`)
             LEFT JOIN '._DB_PREFIX_.'product_lang pl ON (p.id_product = pl.id_product AND pl.id_lang = '.(int)$this->getLang().')

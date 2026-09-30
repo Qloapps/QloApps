@@ -121,7 +121,7 @@ class StatsBestVouchers extends ModuleGrid
     public function getData()
     {
         $currency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        $this->query = 'SELECT SQL_CALC_FOUND_ROWS ocr.id_cart_rule, cr.code, ocr.name, COUNT(ocr.id_cart_rule) as total, ROUND(SUM(o.total_paid_real) / o.conversion_rate,2) as ca
+        $this->query = 'SELECT SQL_CALC_FOUND_ROWS ocr.id_cart_rule, cr.code, ocr.name, COUNT(ocr.id_cart_rule) as total, ROUND(SUM(o.total_paid_real) / '.Currency::getReportConversionRateSql('o').',2) as ca
 				FROM '._DB_PREFIX_.'order_cart_rule ocr
 				LEFT JOIN '._DB_PREFIX_.'orders o ON o.id_order = ocr.id_order
 				LEFT JOIN '._DB_PREFIX_.'cart_rule cr ON cr.id_cart_rule = ocr.id_cart_rule

@@ -201,7 +201,7 @@ class StatsBestCategories extends ModuleGrid
             )
         ) AS totalOrders,
         (
-            SELECT ROUND(SUM(total_paid_tax_excl / o.`conversion_rate`), 2)
+            SELECT ROUND(SUM(total_paid_tax_excl / '.Currency::getReportConversionRateSql('o').'), 2)
             FROM `'._DB_PREFIX_.'orders` o
             WHERE o.valid = 1 AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"
             AND (

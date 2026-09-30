@@ -560,8 +560,8 @@ class HotelRoomType extends ObjectModel
             ) AS total_rooms,
             COUNT(hbd.`id`) AS bookings,
             IFNULL(SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0) AS room_nights,
-            IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS room_revenue,
-            IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS tax_amount,
+            IFNULL(SUM(hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0) AS room_revenue,
+            IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / '.Currency::getReportConversionRateSql('o').'), 0) AS tax_amount,
             COUNT(CASE WHEN hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CANCELLED.' THEN hbd.`id` END) AS cancel_count
             FROM `'._DB_PREFIX_.'htl_room_type` hrt
             INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hrt.`id_product`)
