@@ -176,6 +176,11 @@ class HotelOrderRefundRules extends ObjectModel
 
                         $daysBeforeCancel = (int) $daysDifference->format('%a');
                         $ruleApplied = false;
+                        // check the rule with the highest days first, so the closest matching rule is applied
+                        usort($refundRules, function ($ruleA, $ruleB) {
+                            return $ruleB['days'] - $ruleA['days'];
+                        });
+                        
                         foreach ($refundRules as $refRule) {
                             if ($daysBeforeCancel >= $refRule['days']) {
                                 if ($objOrder->is_advance_payment) {
