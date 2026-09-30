@@ -6197,6 +6197,50 @@ class AdminOrdersControllerCore extends AdminController
         )));
     }
 
+    /**
+     * Get the per night room price (tax excl.) for the selected dates while editing a room booking.
+     * Advance price rules are applied according to the stay duration.
+     */
+    public function ajaxProcessGetEditRoomPrice()
+    {
+        $response = array('success' => false);
+        $idProduct = (int) Tools::getValue('id_product');
+        $dateFrom = Tools::getValue('date_from');
+        $dateTo = Tools::getValue('date_to');
+        $idRoom = (int) Tools::getValue('id_room');
+        if (Validate::isLoadedObject($objOrder = new Order((int) Tools::getValue('id_order')))
+            && Validate::isLoadedObject(new Product($idProduct))
+            && Validate::isDate($dateFrom)
+            && Validate::isDate($dateTo)
+            && strtotime($dateTo) > strtotime($dateFrom)
+        ) {
+            $this->context->currency = new Currency($objOrder->id_currency);
+            $idGroup = Group::getCurrent()->id;
+            $numDays = (int) HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+            $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
+                $idProduct,
+                $dateFrom,
+                $dateTo,
+                0,
+                $idGroup,
+                0,
+                0,
+                $idRoom,
+                0,
+                1
+            );
+            if ($numDays > 0) {
+                $response['success'] = true;
+                $response['unit_price_tax_excl'] = Tools::ps_round(
+                    (float) $roomTotalPrice['total_price_tax_excl'] / $numDays,
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
+            }
+        }
+
+        $this->ajaxDie(json_encode($response));
+    }
+
     public function ajaxProcessEditRoomOnOrder()
     {
         // Check tab access is allowed to edit
