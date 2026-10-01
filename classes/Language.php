@@ -689,7 +689,11 @@ class LanguageCore extends ObjectModel
         $key = 'Language::getIdByIso_'.$iso_code;
         if ($no_cache || !Cache::isStored($key)) {
             $id_lang = Db::getInstance()->getValue('SELECT `id_lang` FROM `'._DB_PREFIX_.'lang` WHERE `iso_code` = \''.pSQL(strtolower($iso_code)).'\'');
-
+            
+            if (empty($id_lang)) {
+                return null;
+            }
+            
             Cache::store($key, $id_lang);
             return $id_lang;
         }
@@ -835,8 +839,6 @@ class LanguageCore extends ObjectModel
         if (!$lang->validateFields() || !$lang->validateFieldsLang() || !$lang->add(true, false, $only_add)) {
             return false;
         }
-
-        Cache::store('Language::getIdByIso_'.$iso_code, $lang->id);
 
         if (isset($params_lang['allow_accented_chars_url']) && in_array($params_lang['allow_accented_chars_url'], array('1', 'true'))) {
             Configuration::updateGlobalValue('PS_ALLOW_ACCENTED_CHARS_URL', 1);
