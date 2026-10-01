@@ -1073,7 +1073,7 @@ Enjoy!
 if (typeof isMobile != 'undefined' && !isMobile){
 
     $(window).load(function () {
-    	$("select.form-control,input[type='checkbox']:not(.comparator), input[type='radio'],input#id_carrier2, input[type='file']").uniform();
+    	$("select.form-control,input[type='checkbox']:not(.comparator), input[type='radio'],input#id_carrier2, input[type='file']").not('.not_uniform').uniform();
     });
 
     // refresh uniform selects on document width change
