@@ -286,6 +286,8 @@
 			</div>
 		{/if}
 
+		{* keep the block visible when rules are already saved, so they are not hidden from the admin *}
+		{if $total_room_types > 1 || $product_rule_groups|@count}
 			<p class="checkbox">
 				<label>
 					<input type="checkbox" id="product_restriction" name="product_restriction" value="1" {if $product_rule_groups|@count}checked="checked"{/if} />
@@ -303,6 +305,7 @@
 					<i class="icon-plus-sign"></i> {l s='Room Type selection'}
 				</a>
 			</div>
+		{/if}
 
 		{if $shops.unselected|@count + $shops.selected|@count > 1}
 			<p class="checkbox">
