@@ -1606,7 +1606,7 @@
                 $('#deactiveDatesModal').attr('data-room-row-index', roomRowIndex);
                 $('#deactiveDatesModal').attr('data-id-room', idRoom);
                 if ($.trim(roomNum) != '') {
-                    roomNum = '( '+'{l s='%s No' sprintf=$htl_room_type['selling_object_plural_name']}'+' '+roomNum+')';
+                    roomNum = '( '+'{l s='%s No' sprintf=$htl_room_type['selling_object_name']}'+' '+roomNum+')';
                 }
 
                 $('#deactiveDatesModal .disable_dates_room_num').html(roomNum);
