@@ -2358,7 +2358,6 @@ class AdminOrdersControllerCore extends AdminController
                         }
 
                         $order_detail->update();
-                        $order_detail->updateTaxAmount($order);
                     }
 
                     $id_order_carrier = (int)$order->getIdOrderCarrier();
@@ -2520,6 +2519,20 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
+                    // Convert all stored tax rows so their amounts stay in sync with the order currency.
+                    $taxRows = OrderTaxDetail::getTaxRowsByOrder((int) $order->id);
+                    foreach ($taxRows as $taxRow) {
+                        $taxDetail = new OrderTaxDetail((int) $taxRow['id_order_tax_detail']);
+                        $taxDetail->unit_amount = Tools::convertPriceFull($taxRow['unit_amount'], $old_currency, $currency);
+                        $taxDetail->total_amount = Tools::convertPriceFull($taxRow['total_amount'], $old_currency, $currency);
+                        $taxDetail->update();
+                    }
+
+                    // // Recalculate VAT after room and service prices have been converted.
+                    foreach ($order->getOrderDetailList() as $row) {
+                        $orderDetail = new OrderDetail((int) $row['id_order_detail']);
+                        $orderDetail->updateTaxAmount($order);
+                    }
 
                     // update Order refund prices (order_return and order_return_detail)
                     if ($orderReturns = OrderReturn::getOrdersReturn($order->id_customer, $order->id)) {

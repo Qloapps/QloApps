@@ -117,6 +117,21 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
+     * Get the stored tax rows belonging to an order.
+     *
+     * @param int $idOrder
+     * @return array
+     */
+    public static function getTaxRowsByOrder($idOrder)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT otd.`id_order_tax_detail`, otd.`unit_amount`, otd.`total_amount`
+             FROM `' . _DB_PREFIX_ . 'order_tax_detail` otd
+             WHERE otd.`id_order` = ' . (int) $idOrder
+        );
+    }
+
+    /**
      * Applied (non-exempted, non-refunded) tourism tax totals for every booking of an order, keyed by id_htl_booking — cached per order.
      *
      * @param int $idOrder
