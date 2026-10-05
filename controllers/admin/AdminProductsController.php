@@ -1250,6 +1250,10 @@ class AdminProductsControllerCore extends AdminController
 
                 if ($payment_type == 1) {
                     $adv_pay_value = Tools::getValue('adv_pay_percent');
+                    if ($adv_pay_value > 100) {
+                        $this->errors[] = Tools::displayError('Advance payment percentage cannot be more than 100.');
+                        return false;
+                    }
                 } elseif ($payment_type == 2) {
                     $adv_pay_value = Tools::getValue('adv_pay_amount');
                 }
