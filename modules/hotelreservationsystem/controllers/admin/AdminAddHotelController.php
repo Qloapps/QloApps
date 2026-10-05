@@ -229,21 +229,12 @@ class AdminAddHotelController extends ModuleAdminController
         $smartyVars['PS_MAX_CHECKOUT_OFFSET'] = (int) Configuration::get('PS_MAX_CHECKOUT_OFFSET');
         $smartyVars['PS_MIN_BOOKING_OFFSET'] = (int) Configuration::get('PS_MIN_BOOKING_OFFSET');
         $smartyVars['WK_ORDER_REFUND_ALLOWED'] = Configuration::get('WK_ORDER_REFUND_ALLOWED');
-        $hotelPropertyTypes = HotelPropertyType::getPropertyTypes($this->context->language->id, false);
+        $hotelPropertyTypes = HotelPropertyType::getPropertyTypes($this->context->language->id);
+        $smartyVars['hotel_property_types_info'] = $hotelPropertyTypes;
         $selectedHotelPropertyType = Tools::getValue('id_property_type');
         if (!$selectedHotelPropertyType && isset($hotelBranchInfo)) {
             $selectedHotelPropertyType = $hotelBranchInfo->id_property_type;
         }
-        // Remove inactive property types from the list. While editing a hotel, keep the currently assigned one even if it is disabled
-        foreach ($hotelPropertyTypes as $key => $propertyType) {
-            if (!$propertyType['active']
-                && (!isset($idHotel) || (int) $propertyType['id_property_type'] != (int) $selectedHotelPropertyType)
-            ) {
-                unset($hotelPropertyTypes[$key]);
-            }
-        }
-        $hotelPropertyTypes = array_values($hotelPropertyTypes);
-        $smartyVars['hotel_property_types_info'] = $hotelPropertyTypes;
         $smartyVars['selected_hotel_property_type'] = (int) $selectedHotelPropertyType;
         $smartyVars['tourism_tax_collection_type'] = (int) $this->object->tourism_tax_collection_type;
         $smartyVars['use_tourism_tax'] = (int) Configuration::get('QLO_USE_TOURISM_TAX');

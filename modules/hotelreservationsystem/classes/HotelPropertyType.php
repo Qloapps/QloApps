@@ -68,7 +68,7 @@ class HotelPropertyType extends ObjectModel
         $cacheKey = 'HotelPropertyType::getPropertyTypes'.$idLang.'_'.(int) $active;
 
         if (!Cache::isStored($cacheKey)) {
-            $sql = 'SELECT hpt.`id_htl_property_type` AS `id_property_type`, hpt.`active`, hptl.`name`
+            $sql = 'SELECT hpt.`id_htl_property_type` AS `id_property_type`, hptl.`name`
                 FROM `'._DB_PREFIX_.'htl_property_type` hpt
                 LEFT JOIN `'._DB_PREFIX_.'htl_property_type_lang` hptl
                     ON (hpt.`id_htl_property_type` = hptl.`id_htl_property_type`
