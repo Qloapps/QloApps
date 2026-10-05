@@ -782,7 +782,7 @@ class CartControllerCore extends FrontController
                                     $currentQty = $qty * $numDays;
                                     $finalQty = (int)$cartTotalQty + $currentQty;
                                     // max quantity limit applies per room, not on the whole cart
-                                    $roomQty = (int) $qty;
+                                    $serviceQtyInRoom = (int) $qty;
                                     if ($roomServices = (new ServiceProductCartDetail())->getServiceProductsInCart(
                                         (int) $this->context->cart->id,
                                         [],
@@ -791,9 +791,9 @@ class CartControllerCore extends FrontController
                                         null,
                                         (int) $idServiceProduct
                                     )) {
-                                        $roomQty += (int) array_sum(array_column($roomServices, 'quantity'));
+                                        $serviceQtyInRoom += (int) array_sum(array_column($roomServices, 'quantity'));
                                     }
-                                    if ($objProduct->max_quantity && $roomQty > $objProduct->max_quantity) {
+                                    if ($objProduct->max_quantity && $serviceQtyInRoom > $objProduct->max_quantity) {
                                         $this->errors[] = Tools::displayError(sprintf('cannot add more than %d quantity.', $objProduct->max_quantity));
                                     } else if (!Product::isAvailableWhenOutOfStock($objProduct->out_of_stock) && !$objProduct->checkQty($finalQty)) {
                                         $this->errors[] = Tools::displayError('There isn\'t enough product in stock.');
