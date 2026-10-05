@@ -1250,7 +1250,7 @@
                 }
             },
             addInvalidRowDataMarkers: function(rowsToHighlight) {
-                if (rowsToHighlight.length != 0) {
+                if (rowsToHighlight && rowsToHighlight.length != 0) {
                     rowsToHighlight.map(function (rowIndex) {
                         const tr = $('#bulkUpdateRoomModal .rooms-disable-dates tbody tr').eq(rowIndex);
                         BulkUpdateRoomModal.markRowDataInvalid(tr);

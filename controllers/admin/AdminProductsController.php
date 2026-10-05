@@ -5376,7 +5376,10 @@ class AdminProductsControllerCore extends AdminController
         $response = array('status' => false);
         $roomsInfo = array();
         if ($this->tabAccess['edit'] === 1) {
-            if (($idRooms = Tools::getValue('id_rooms')) && is_array($idRooms) && $this->validateRoomsAccess($idRooms)) {
+            $idRooms = Tools::getValue('id_rooms');
+            if (!$idRooms || !is_array($idRooms)) {
+                $this->errors[] = Tools::displayError('Please select at least one room for this operation.');
+            } elseif ($this->validateRoomsAccess($idRooms)) {
                 $idRooms = array_map('intval', $idRooms);
                 $rowsToHighlight = array();
                 $room = array();
@@ -5513,8 +5516,6 @@ class AdminProductsControllerCore extends AdminController
                     $rowsToHighlight = array_values(array_unique($rowsToHighlight));
                     $response['rows_to_highlight'] = $rowsToHighlight;
                 }
-            } else {
-                $this->errors[] = Tools::displayError('Please select at least on room for this operation.');
             }
         } else {
             $this->errors[] = Tools::displayError('You do not have permission to perform this operation.');
