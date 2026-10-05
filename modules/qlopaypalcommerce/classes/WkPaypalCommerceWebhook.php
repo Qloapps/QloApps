@@ -100,6 +100,17 @@ class WkPaypalCommerceWebhook
                         $capturedAmount = isset($purchase['payments']['captures'][0]['amount']['value'])
                             ? (float)$purchase['payments']['captures'][0]['amount']['value']
                             : 0;
+                        $capturedCurrency = isset($purchase['payments']['captures'][0]['amount']['currency_code'])
+                            ? $purchase['payments']['captures'][0]['amount']['currency_code']
+                            : '';
+                        $cartCurrency = Currency::getCurrency((int)$objCart->id_currency);
+                        if (Tools::strtoupper($capturedCurrency) !== Tools::strtoupper($cartCurrency['iso_code'])) {
+                            WkPaypalCommerceHelper::logMsg(
+                                'webhook',
+                                'PayPal currency mismatch for cart '.(int)$cartID.'. Captured currency: '.$capturedCurrency
+                            );
+                            continue;
+                        }
                         $fullTotal = (float)$objCart->getOrderTotal(true, Cart::BOTH);
                         $orderStatus = $capturedAmount >= $fullTotal
                             ? Configuration::get('PS_OS_PAYMENT_ACCEPTED')
@@ -131,6 +142,17 @@ class WkPaypalCommerceWebhook
             $capturedAmount = isset($eventData['resource']['amount']['value'])
                 ? (float)$eventData['resource']['amount']['value']
                 : 0;
+            $capturedCurrency = isset($eventData['resource']['amount']['currency_code'])
+                ? $eventData['resource']['amount']['currency_code']
+                : '';
+            $cartCurrency = Currency::getCurrency((int)$objCart->id_currency);
+            if (Tools::strtoupper($capturedCurrency) !== Tools::strtoupper($cartCurrency['iso_code'])) {
+                WkPaypalCommerceHelper::logMsg(
+                    'webhook',
+                    'PayPal currency mismatch for cart '.(int)$cartID.'. Captured currency: '.$capturedCurrency
+                );
+                return;
+            }
             $fullTotal = (float)$objCart->getOrderTotal(true, Cart::BOTH);
             $orderStatus = $capturedAmount >= $fullTotal
                 ? Configuration::get('PS_OS_PAYMENT_ACCEPTED')
