@@ -831,10 +831,6 @@ class AdminCartRulesControllerCore extends AdminController
 
         $product_rule_groups = $this->getProductRuleGroupsDisplay($current_object);
 
-        // Room type restriction is useful only when there is more than one room type to choose from
-        $objHotelRoomType = new HotelRoomType();
-        $total_room_types = count($objHotelRoomType->getAllRoomTypes());
-
         $attribute_groups = AttributeGroup::getAttributesGroups($this->context->language->id);
         $currencies = Currency::getCurrencies(false, true, true);
         $languages = Language::getLanguages();
@@ -905,7 +901,6 @@ class AdminCartRulesControllerCore extends AdminController
                 'cart_rules' => $cart_rules,
                 'product_rule_groups' => $product_rule_groups,
                 'product_rule_groups_counter' => count($product_rule_groups),
-                'total_room_types' => $total_room_types,
                 'attribute_groups' => $attribute_groups,
                 'currentIndex' => self::$currentIndex,
                 'currentToken' => $this->token,

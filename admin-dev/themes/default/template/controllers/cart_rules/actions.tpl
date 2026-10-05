@@ -97,7 +97,7 @@
 		<p class="radio">
 			<label for="apply_discount_to_selection">
 				<input type="radio" name="apply_discount_to" id="apply_discount_to_selection" value="selection"{if $currentTab->getFieldValue($currentObject, 'reduction_product')|intval == -2} checked="checked"{/if}{if $product_rule_groups|@count == 0}disabled="disabled"{/if} />
-				{l s='Selected Room Type(s)'}{if $product_rule_groups|@count == 0}&nbsp;<span id="apply_discount_to_selection_warning" class="text-muted clearfix"><i class="icon-warning-sign"></i> {if $total_room_types > 1}<a href="#" id="apply_discount_to_selection_shortcut">{l s='You must select some room types first'}</a>{else}{l s='You must select some room types first'}{/if}</span>{/if}
+				{l s='Selected Room Type(s)'}{if $product_rule_groups|@count == 0}&nbsp;<span id="apply_discount_to_selection_warning" class="text-muted clearfix"><i class="icon-warning-sign"></i> <a href="#" id="apply_discount_to_selection_shortcut">{l s='You must select some room types first'}</a></span>{/if}
 			</label>
 		</p>
 	</div>
