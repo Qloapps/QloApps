@@ -2005,7 +2005,7 @@
                                 $('#connected_room_title').html('');
                             }
                         } else {
-                            alert(response.message);
+                            showErrorMessage(response.message);
                         }
                     }
                 });
@@ -2016,7 +2016,7 @@
                 var connectedRoomId = $row.find('.connect-room').val();
 
                 if (!connectedRoomId) {
-                    alert(selectRoomText);
+                    showErrorMessage(selectRoomText);
                     return;
                 }
                 $.ajax({
@@ -2043,7 +2043,7 @@
                                 $icon.text(response.connected_count);
                             }
                         } else {
-                            alert(response.message);
+                            showErrorMessage(response.message);
                         }
                     },
                     complete: function() {
@@ -2132,7 +2132,7 @@
                                 $icon.text(response.connected_count);
                             }
                         } else {
-                            alert(response.message);
+                            showErrorMessage(response.message);
                         }
                     }
                 });
