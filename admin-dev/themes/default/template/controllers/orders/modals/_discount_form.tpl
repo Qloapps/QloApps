@@ -64,7 +64,7 @@
                     </select>
                 </div>
             </div>
-            <div class="row">
+            <div class="row hidden">
                 <div class="col-sm-12">
                     <p class="checkbox">
                         <label class="control-label" for="discount_all_invoices">
