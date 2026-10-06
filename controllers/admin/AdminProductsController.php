@@ -937,6 +937,7 @@ class AdminProductsControllerCore extends AdminController
                     && Product::duplicateCustomizationFields($id_product_old, $product->id)
                     && Product::duplicateTags($id_product_old, $product->id)
                     && Product::duplicateDownload($id_product_old, $product->id)
+                    && HotelAdvancedPayment::duplicateAdvancePayment($id_product_old, $product->id)
                 ) {
                     $obj_hotel_room_type = new HotelRoomType();
                     $room_type_info = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($id_product_old);
@@ -1249,6 +1250,10 @@ class AdminProductsControllerCore extends AdminController
 
                 if ($payment_type == 1) {
                     $adv_pay_value = Tools::getValue('adv_pay_percent');
+                    if ($adv_pay_value > 100) {
+                        $this->errors[] = Tools::displayError('Advance payment percentage cannot be more than 100.');
+                        return false;
+                    }
                 } elseif ($payment_type == 2) {
                     $adv_pay_value = Tools::getValue('adv_pay_amount');
                 }
