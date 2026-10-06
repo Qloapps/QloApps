@@ -1217,6 +1217,14 @@ class AdminCustomersControllerCore extends AdminController
                         $objCustomerGuestDetail->email = $objCustomer->email;
                         $objCustomerGuestDetail->save();
                     }
+
+                    if ($threads = CustomerThread::getCustomerMessages($objCustomer->id)) {
+                        foreach ($threads as $thread) {
+                            $objThread = new CustomerThread($thread['id_customer_thread']);
+                            $objThread->email = $objCustomer->email;
+                            $objThread->save();
+                        }
+                    }
                 }
 
                 $this->redirect_after = self::$currentIndex.'&conf=1&token='.$this->token;
