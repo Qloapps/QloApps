@@ -47,7 +47,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-lg-3 control-label">{l s='Total spent since registration:'}</label>
-						<div class="col-lg-3"><p class="form-control-static">{displayWtPriceWithCurrency price=Tools::convertPrice($customer_stats.total_orders|floatval, $currency) currency=$currency}</p></div>
+						<div class="col-lg-3"><p class="form-control-static">{displayWtPriceWithCurrency price=Tools::convertPrice($customer_stats.total_spent|floatval, $currency) currency=$currency}</p></div>
 					</div>
 				</div>
 			{else}
