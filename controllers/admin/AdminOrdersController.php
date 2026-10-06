@@ -4218,6 +4218,16 @@ class AdminOrdersControllerCore extends AdminController
                 $idHotel = false;
             }
 
+            // Stay dates for feature price calculation (defaults to one night from today)
+            $dateFrom = Tools::getValue('date_from');
+            $dateTo = Tools::getValue('date_to');
+            if (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo) || strtotime($dateTo) <= strtotime($dateFrom)) {
+                $dateFrom = date('Y-m-d');
+                $dateTo = date('Y-m-d', strtotime('+1 day'));
+            }
+            $numDays = max(1, (int) HotelHelper::getNumberOfDays($dateFrom, $dateTo));
+            $this->context->currency = $currency;
+
             if ($products = Product::searchByName((int)$this->context->language->id, pSQL(Tools::getValue('product_search')), 1, null, $idHotel)) {
                 $objRoomType = new HotelRoomType();
                 foreach ($products as $key => &$product) {
@@ -4233,22 +4243,21 @@ class AdminOrdersControllerCore extends AdminController
                     }
 
                     $idHotelAddress = $order->id_address_tax;
-                    // Concret price
-                    $product['price_tax_excl'] = Tools::ps_round(Tools::convertPrice($product['price_tax_excl'], $currency), _PS_PRICE_COMPUTE_PRECISION_);
-                    $product['price_tax_incl'] = Tools::ps_round(Tools::convertPrice(Product::getPriceStatic(
+                    // Apply room type feature price (advance price rules) for the stay duration
+                    $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
                         $product['id_product'],
-                        true,
-                        null,
-                        6,
-                        null,
-                        false,
-                        true,
-                        1,
-                        false,
-                        null,
-                        null,
-                        $idHotelAddress
-                    ), $currency), _PS_PRICE_COMPUTE_PRECISION_);
+                        $dateFrom,
+                        $dateTo,
+                        0,
+                        Group::getCurrent()->id,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1
+                    );
+                    $product['price_tax_excl'] = Tools::ps_round($roomTotalPrice['total_price_tax_excl'] / $numDays, _PS_PRICE_COMPUTE_PRECISION_);
+                    $product['price_tax_incl'] = Tools::ps_round($roomTotalPrice['total_price_tax_incl'] / $numDays, _PS_PRICE_COMPUTE_PRECISION_);
 
                     // Formatted price
                     $product['formatted_price'] = Tools::displayPrice(Tools::convertPrice($product['price_tax_incl'], $currency), $currency);
@@ -6235,6 +6244,10 @@ class AdminOrdersControllerCore extends AdminController
                 $response['success'] = true;
                 $response['unit_price_tax_excl'] = Tools::ps_round(
                     (float) $roomTotalPrice['total_price_tax_excl'] / $numDays,
+                    _PS_PRICE_COMPUTE_PRECISION_
+                );
+                $response['unit_price_tax_incl'] = Tools::ps_round(
+                    (float) $roomTotalPrice['total_price_tax_incl'] / $numDays,
                     _PS_PRICE_COMPUTE_PRECISION_
                 );
             }
