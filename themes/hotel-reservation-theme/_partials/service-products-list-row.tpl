@@ -66,13 +66,6 @@
                             <div class="service-product-price">
                                 {block name='service_product_price'}
                                     {if !$priceDisplay}{convertPrice price=$service_product.price_tax_incl}{else}{convertPrice price=$service_product.price_tax_exc}{/if}
-                                    {if Product::getServicePriceBillableDays(
-                                        $service_product.price_calculation_method,
-                                        $service_product.date_from|default:$date_from|default:'',
-                                        $service_product.date_to|default:$date_to|default:''
-                                    ) > 1}
-                                        <span class="price-label">{l s='/Night'}</span>
-                                    {/if}
                                 {/block}
                                 {if $service_product.allow_multiple_quantity && $service_product.available_for_order && $service_product.max_quantity > 0}
                                     <div class="service-max-quantity-info">

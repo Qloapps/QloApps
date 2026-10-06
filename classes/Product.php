@@ -6868,8 +6868,8 @@ class ProductCore extends ObjectModel
         }
 
         if ($includeTourismTax && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
-            $priceCalcNumDays = $isPerDay ? HotelHelper::getNumberOfDays($dateFrom, $dateTo) : 1;
-            $unitPriceExcl = ($useTax ? Product::getServiceProductPrice($idProduct, $idProductOption, $idHotel, $idProductRoomType, false, 1, $dateFrom, $dateTo, $idCart, $idAddress, $useReduc, $idGroup, $idCartBooking) : $price / (int) $quantity) / $priceCalcNumDays;
+
+            $unitPriceExcl = ($useTax ? Product::getServiceProductPrice($idProduct, $idProductOption, $idHotel, $idProductRoomType, false, 1, $dateFrom, $dateTo, $idCart, $idAddress, $useReduc, $idGroup, $idCartBooking) : $price / (int) $quantity) / max(1, $numdays);
 
             $fallbackAddress = new Address(Cart::getIdAddressForTaxCalculation($idProduct));
             if ($numAdults === null) {
