@@ -96,16 +96,7 @@
 															</div>
 															<div class="col-xs-4">
 																{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
-																	<span class="pull-right">{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}
-																		{if Product::getServicePriceBillableDays(
-																			$product.price_calculation_method,
-																			$product.date_from|default:$date_from|default:'',
-																			$product.date_to|default:$date_to|default:''
-																		) > 1}
-																			<span class="price-label">{l s='/Night'}</span>
-																		{/if}
-																	</span>
-
+																	<span class="pull-right">{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}</span>
 																{/if}
 															</div>
 														</div>
