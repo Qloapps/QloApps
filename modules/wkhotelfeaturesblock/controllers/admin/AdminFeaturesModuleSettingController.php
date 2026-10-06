@@ -155,7 +155,7 @@ class AdminFeaturesModuleSettingController extends ModuleAdminController
         parent::initToolbar();
         $this->page_header_toolbar_btn['new'] = array(
             'href' => self::$currentIndex.'&add'.$this->table.'&token='.$this->token,
-            'desc' => $this->l('Add New Hotel Amenity')
+            'desc' => $this->l('Add New Property Amenity')
         );
     }
 
