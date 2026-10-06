@@ -1731,35 +1731,38 @@ class AdminCartsControllerCore extends AdminController
                                     $objHotelCartBookingData->id
                                 );
                                 // if price is different than the original service price then update the price
-                                if ($canEdit && $operator == 'up' && $originalPrice != $unitPrice) {
-                                    if ($specificPriceInfo) {
-                                        $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
-                                    } else {
-                                        $objSpecificPrice = new SpecificPrice();
-                                    }
-                                    $objSpecificPrice->id_shop = 0;
-                                    $objSpecificPrice->id_shop_group = 0;
-                                    $objSpecificPrice->id_cart = $objCart->id;
-                                    $objSpecificPrice->id_currency = $objCart->id_currency;
-                                    $objSpecificPrice->id_country = 0;
-                                    $objSpecificPrice->id_group = 0;
-                                    $objSpecificPrice->id_customer = 0;
-                                    $objSpecificPrice->id_product = $idServiceProduct;
-                                    $objSpecificPrice->id_product_attribute = 0;
-                                    $objSpecificPrice->price = $unitPrice;
-                                    $objSpecificPrice->from_quantity = 1;
-                                    $objSpecificPrice->reduction = 0;
-                                    $objSpecificPrice->id_htl_cart_booking = $objHotelCartBookingData->id;
-                                    $objSpecificPrice->reduction_type = 'amount';
-                                    $objSpecificPrice->reduction_tax = 0;
-                                    $objSpecificPrice->from = '0000-00-00 00:00:00';
-                                    $objSpecificPrice->to = '0000-00-00 00:00:00';
+                                if($canEdit && $operator == 'up'){
+                                    if ($originalPrice != $unitPrice) {
+                                        if ($specificPriceInfo) {
+                                            $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
+                                        } else {
+                                            $objSpecificPrice = new SpecificPrice();
+                                        }
+                                        $objSpecificPrice->id_shop = 0;
+                                        $objSpecificPrice->id_shop_group = 0;
+                                        $objSpecificPrice->id_cart = $objCart->id;
+                                        $objSpecificPrice->id_currency = $objCart->id_currency;
+                                        $objSpecificPrice->id_country = 0;
+                                        $objSpecificPrice->id_group = 0;
+                                        $objSpecificPrice->id_customer = 0;
+                                        $objSpecificPrice->id_product = $idServiceProduct;
+                                        $objSpecificPrice->id_product_attribute = 0;
+                                        $objSpecificPrice->price = $unitPrice;
+                                        $objSpecificPrice->from_quantity = 1;
+                                        $objSpecificPrice->reduction = 0;
+                                        $objSpecificPrice->id_htl_cart_booking = $objHotelCartBookingData->id;
+                                        $objSpecificPrice->reduction_type = 'amount';
+                                        $objSpecificPrice->reduction_tax = 0;
+                                        $objSpecificPrice->from = '0000-00-00 00:00:00';
+                                        $objSpecificPrice->to = '0000-00-00 00:00:00';
 
-                                    $result &= $objSpecificPrice->save();
-                                } elseif ($canEdit && $operator == 'up' && $specificPriceInfo) {
-                                    $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
-                                    $result &= $objSpecificPrice->delete();
+                                        $result &= $objSpecificPrice->save();
+                                    } elseif ($specificPriceInfo) {
+                                        $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
+                                        $result &= $objSpecificPrice->delete();
+                                    }
                                 }
+                                
                             }
                         }
 
