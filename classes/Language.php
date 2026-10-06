@@ -689,7 +689,11 @@ class LanguageCore extends ObjectModel
         $key = 'Language::getIdByIso_'.$iso_code;
         if ($no_cache || !Cache::isStored($key)) {
             $id_lang = Db::getInstance()->getValue('SELECT `id_lang` FROM `'._DB_PREFIX_.'lang` WHERE `iso_code` = \''.pSQL(strtolower($iso_code)).'\'');
-
+            
+            if (empty($id_lang)) {
+                return null;
+            }
+            
             Cache::store($key, $id_lang);
             return $id_lang;
         }
@@ -796,7 +800,7 @@ class LanguageCore extends ObjectModel
 
     public static function checkAndAddLanguage($iso_code, $lang_pack = false, $only_add = false, $params_lang = null)
     {
-        if (Language::getIdByIso($iso_code)) {
+        if (Language::getIdByIso($iso_code, true)) {
             return true;
         }
 
