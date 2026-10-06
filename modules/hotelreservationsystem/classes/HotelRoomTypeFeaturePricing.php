@@ -385,17 +385,20 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $numNights = max(1, (int) HotelHelper::getNumberOfDays($date_from, $date_to));
                 $unitPriceTe = (float) $totalPrice['total_price_tax_excl'] / $numNights;
                 $taxCalculator = TaxManagerFactory::getManager($objAddress, $idTourismTaxRulesGroup)->getTaxCalculator();
-                $childAges = !empty($occupancy[0]['child_ages']) ? (array) $occupancy[0]['child_ages'] : array();
-                $totalPrice['total_price_tax_incl'] += $taxCalculator->getTaxesTotalAmount(
-                    $unitPriceTe,
-                    $date_from,
-                    $numNights,
-                    $occupancy[0]['adults'],
-                    $childAges,
-                    $collectionType,
-                    1,
-                    $id_currency
-                );
+                $roomsTourismTax = 0;
+                foreach ($occupancy as $roomOccupancy) {
+                    $roomsTourismTax += $taxCalculator->getTaxesTotalAmount(
+                        $unitPriceTe,
+                        $date_from,
+                        $numNights,
+                        isset($roomOccupancy['adults']) ? (int) $roomOccupancy['adults'] : 0,
+                        !empty($roomOccupancy['child_ages']) ? (array) $roomOccupancy['child_ages'] : array(),
+                        $collectionType,
+                        1,
+                        $id_currency
+                    );
+                }
+                $totalPrice['total_price_tax_incl'] += $roomsTourismTax / count($occupancy);
             }
         }
 
