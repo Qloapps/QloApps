@@ -70,7 +70,9 @@ $('document').ready( function() {
 	});
 
 	$('#proceed-install-anyway').on('click', function(e) {
-		e.preventDefault();
+		if ($(this).attr('href') === '#') {
+			e.preventDefault();
+		}
 	})
 
 	function displayErrors(response, module)

@@ -1885,6 +1885,8 @@ class ToolsCore
 
     public static function math_round($value, $places, $mode = PS_ROUND_HALF_UP)
     {
+        $value = (float) $value;
+
         //If PHP_ROUND_HALF_UP exist (PHP 5.3) use it and pass correct mode value (PrestaShop define - 1)
         if (defined('PHP_ROUND_HALF_UP')) {
             return round($value, $places, $mode - 1);
