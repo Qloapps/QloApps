@@ -592,7 +592,7 @@ class OrderDetailCore extends ObjectModel
     {
         $this->setContext((int)$this->id_shop);
         $address = new Address((int)$order->id_address_tax);
-        $tax_manager = TaxManagerFactory::getManager($address, (int)Product::getIdTaxRulesGroupByIdProduct((int)$this->product_id, $this->context));
+        $tax_manager = TaxManagerFactory::getManager($address, (int)$this->id_tax_rules_group);
         $this->tax_calculator = $tax_manager->getTaxCalculator();
 
         $result = $this->saveTaxCalculator($order, true);

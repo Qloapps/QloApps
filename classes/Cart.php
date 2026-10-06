@@ -1895,6 +1895,11 @@ class CartCore extends ObjectModel
                         (int)$product['price_addition_type']
                     )) {
                         foreach ($servicesWithRoom as $service) {
+
+                            if (isset($product['id_hotel']) && $service['id_room_type_hotel'] != $product['id_hotel']) {
+                                continue;
+                            }
+                            
                             if(!empty($service['id_hotel_cart_booking']) && empty($service['id_hotel'])) {
                                if ($with_taxes) {
                                     $servicePrice = $service['total_price_tax_incl'];
