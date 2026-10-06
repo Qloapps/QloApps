@@ -26,6 +26,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
     protected $id_cart;
     protected $id_guest;
     protected $id_hotel;
+    protected $hotelAccessDenied = false;
     protected $id_room_type;
     protected $date_from;
     protected $date_to;
@@ -147,7 +148,11 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
 
             if (Tools::getValue('id_hotel')) {
-                $id_hotel = Tools::getValue('id_hotel');
+                $id_hotel = (int) Tools::getValue('id_hotel');
+                if (!$this->hasHotelAccess($id_hotel)) {
+                    $this->errors[] = $this->l('You do not have permission to access this hotel.');
+                    $this->hotelAccessDenied = true;
+                }
             } else {
                 if ($htl_info = $objHotelBranchInformation->hotelBranchesInfo(false, 1)) {
                     // filter hotels as per accessed hotels
@@ -338,6 +343,10 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
 
     public function renderView()
     {
+        if ($this->hotelAccessDenied) {
+            return '';
+        }
+
         $objHotelBranchInformation = new HotelBranchInformation();
         $hotelBranchesInfo = $objHotelBranchInformation->hotelBranchesInfo(false, 1);
         // filter hotels as per accessed hotels
@@ -725,6 +734,29 @@ public function ajaxProcessGetCalenderData()
 
         $events = array_values($events);
         $this->ajaxDie(Tools::jsonEncode($events));
+    }
+
+    /**
+     * Check whether the current employee's profile has access to the given hotel.
+     *
+     * @param int $idHotel
+     * @return bool
+     */
+    protected function hasHotelAccess($idHotel)
+    {
+        $idHotel = (int) $idHotel;
+        if (!$idHotel) {
+            return false;
+        }
+        if ($this->context->employee->isSuperAdmin()) {
+            return true;
+        }
+        $accessedHotels = HotelBranchInformation::getProfileAccessedHotels(
+            $this->context->employee->id_profile,
+            1,
+            1
+        );   
+        return $accessedHotels && in_array($idHotel, $accessedHotels);
     }
 
     public function ajaxProcessGetRoomType()
