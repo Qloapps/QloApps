@@ -134,13 +134,16 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     $date_from = date('Y-m-d');
                 }
             }
-            if (Tools::getValue('date_to')) {
-                $date_to = Tools::getValue('date_to');
-            } else {
+            if (!Validate::isDate($date_from)) {
+                $date_from = date('Y-m-d');
+            }
+            $date_to = Tools::getValue('date_to');
+            if (!$date_to || !Validate::isDate($date_to)) {
                 $date_to = date('Y-m-d');
-                if (strtotime($date_from) >= strtotime($date_to)) {
-                    $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_to)));
-                }
+            }
+            // Check-out date must always be after check-in date
+            if (strtotime($date_from) >= strtotime($date_to)) {
+                $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
             }
 
             if (Tools::getValue('id_hotel')) {
