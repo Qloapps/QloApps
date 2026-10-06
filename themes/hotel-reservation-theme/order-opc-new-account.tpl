@@ -120,7 +120,7 @@
 					<div class="row">
 						<div class="{if isset($nationality_mandatory) && $nationality_mandatory}required {/if}form-group col-sm-6">
 							<label for="id_nationality">{l s='Nationality'}{if isset($nationality_mandatory) && $nationality_mandatory} <sup>*</sup>{/if}</label>
-							<select name="id_nationality" id="id_nationality" class="form-control not_uniform">
+							<select name="id_nationality" id="id_nationality" >
 								<option value="">-</option>
 								{foreach from=$nationality_countries item=c}
 									<option value="{$c.id_country}"{if isset($smarty.post.id_nationality) && $smarty.post.id_nationality == $c.id_country || (isset($guestInformations) && isset($guestInformations.id_nationality) && $guestInformations.id_nationality == $c.id_country)} selected="selected"{/if}>{$c.name|escape:'html':'UTF-8'}</option>
