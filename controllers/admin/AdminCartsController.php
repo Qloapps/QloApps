@@ -270,12 +270,12 @@ class AdminCartsControllerCore extends AdminController
         if (!($cart = $this->loadObject(true))) {
             return;
         }
+        $this->context->cart = $cart;
         if ($this->tabAccess['kpi'] === 1) {
             $this->content .= $this->renderKpis();
         }
         $customer = new Customer($cart->id_customer);
         $currency = new Currency($cart->id_currency);
-        $this->context->cart = $cart;
         $this->context->currency = $currency;
         $this->context->customer = $customer;
         $this->toolbar_title = sprintf($this->l('Cart #%06d'), $this->context->cart->id);
