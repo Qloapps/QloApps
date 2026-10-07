@@ -662,7 +662,7 @@ class AdminAddHotelController extends ModuleAdminController
                     if ($primaryHotelId == $objHotelBranch->id && !$objHotelBranch->active) {
                         $hotels = $objHotelBranch->hotelBranchesInfo(false, 1);
                         if (!empty($hotel = array_shift($hotels))) {
-                            Configuration::updateValue('WK_PRIMARY_HOTEL', $objHotelBranch['id']);
+                            Configuration::updateValue('WK_PRIMARY_HOTEL', $hotel['id']);
                         } else {
                             $newPrimaryHotelId = Configuration::updateValue('WK_PRIMARY_HOTEL', 0);
                         }
@@ -906,10 +906,22 @@ class AdminAddHotelController extends ModuleAdminController
         $this->ajaxDie(json_encode($response));
     }
 
+    protected function validateHotelAccess($idHotel)
+    {
+        if ($this->tabAccess['edit'] !== 1 || !in_array($idHotel, (array) HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))) {
+            $this->ajaxDie(json_encode(array(
+                'status' => false,
+                'success' => false,
+                'errors' => array($this->l('You do not have permission to edit this hotel.')),
+            )));
+        }
+    }
+
     public function ajaxProcessUploadHotelImage()
     {
         $response = array('success' => false, 'errors' => array());
         $idHotel = (int) Tools::getValue('id_hotel');
+        $this->validateHotelAccess($idHotel);
         $idHtlImageCategory = (int) Tools::getValue('id_htl_image_category');
         $file = isset($_FILES['hotel_image']) ? $_FILES['hotel_image'] : null;
 
@@ -946,6 +958,7 @@ class AdminAddHotelController extends ModuleAdminController
     {
         $idImage = (int) Tools::getValue('id_image');
         $idHotel = (int) Tools::getValue('id_hotel');
+        $this->validateHotelAccess($idHotel);
         $response = array('status' => false);
 
         if ($idImage && $idHotel && Validate::isLoadedObject($objHtlImage = new HotelImage($idImage)) && (int) $objHtlImage->id_hotel === $idHotel) {
@@ -980,6 +993,7 @@ class AdminAddHotelController extends ModuleAdminController
         $response = array('status' => false);
         $idImage = (int) Tools::getValue('id_image');
         $idHotel = (int) Tools::getValue('id_hotel');
+        $this->validateHotelAccess($idHotel);
         $idHtlImageCategory = (int) Tools::getValue('id_htl_image_category');
         $setCover = (bool) Tools::getValue('cover');
 
@@ -1076,6 +1090,7 @@ class AdminAddHotelController extends ModuleAdminController
     {
         $response = array('status' => false, 'errors' => array());
         $idHotel = (int) Tools::getValue('id_hotel');
+        $this->validateHotelAccess($idHotel);
         $idHtlImageCategory = (int) Tools::getValue('id_htl_image_category');
         $imageIds = array_filter(array_map('intval', (array) Tools::getValue('image_ids', array())));
 
@@ -1107,7 +1122,8 @@ class AdminAddHotelController extends ModuleAdminController
     {
         $response = array('status' => false);
         if ($idImage = Tools::getValue('id_image')) {
-            if ($idHotel = Tools::getValue('id_hotel')) {
+            if ($idHotel = (int) Tools::getValue('id_hotel')) {
+                $this->validateHotelAccess($idHotel);
                 if (Validate::isLoadedObject($objHtlImage = new HotelImage((int) $idImage)) && (int) $objHtlImage->id_hotel === (int) $idHotel) {
                     if ($objHtlImage->delete()) {
                         if (!HotelImage::getCover($idHotel)) {
@@ -1133,6 +1149,7 @@ class AdminAddHotelController extends ModuleAdminController
     {
         $response = array('status' => false, 'errors' => array());
         $idHotel = (int) Tools::getValue('id_hotel');
+        $this->validateHotelAccess($idHotel);
         $imageIds = array_filter(array_map('intval', (array) Tools::getValue('image_ids', array())));
 
         if (!$idHotel || !$imageIds) {
@@ -1169,7 +1186,9 @@ class AdminAddHotelController extends ModuleAdminController
     public function ajaxProcessUpdateSlidesPosition()
     {
         if (($slideIds = Tools::getValue('slides'))
-            && ($idHotel = Tools::getValue('id_hotel'))
+            && ($idHotel = (int) Tools::getValue('id_hotel'))
+            && $this->tabAccess['edit'] === 1
+            && in_array($idHotel, (array) HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))
         ) {
             $position = 1;
             $objBranchRefundRule = new HotelBranchRefundRules();

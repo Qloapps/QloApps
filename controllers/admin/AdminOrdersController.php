@@ -4030,7 +4030,9 @@ class AdminOrdersControllerCore extends AdminController
 
         $idHtlBooking = (int) Tools::getValue('id_htl_booking');
         $objHotelBookingDetail = new HotelBookingDetail($idHtlBooking);
-        if (Validate::isLoadedObject($objHotelBookingDetail)) {
+        if (Validate::isLoadedObject($objHotelBookingDetail)
+            && in_array($objHotelBookingDetail->id_hotel, (array) HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))
+        ) {
             $response['html'] = $this->getRenderedBookingDocuments($idHtlBooking);
             $response['status'] = true;
         }
@@ -4050,6 +4052,8 @@ class AdminOrdersControllerCore extends AdminController
             $objHotelBookingDetail = new HotelBookingDetail($idHtlBooking);
             if (!Validate::isLoadedObject($objHotelBookingDetail)) {
                 $this->errors[] = $this->l('Booking detail not found.');
+            } elseif (!in_array($objHotelBookingDetail->id_hotel, (array) HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))) {
+                $this->errors[] = $this->l('You do not have permission to edit this booking.');
             }
 
             if (!$title) {
@@ -4113,7 +4117,11 @@ class AdminOrdersControllerCore extends AdminController
             $idHtlBookingDocument = (int) Tools::getValue('id_htl_booking_document');
 
             $objHotelBookingDocument = new HotelBookingDocument($idHtlBookingDocument);
-            if (Validate::isLoadedObject($objHotelBookingDocument)) {
+            $objHotelBookingDetail = new HotelBookingDetail((int) $objHotelBookingDocument->id_htl_booking);
+            if (Validate::isLoadedObject($objHotelBookingDocument)
+                && Validate::isLoadedObject($objHotelBookingDetail)
+                && in_array($objHotelBookingDetail->id_hotel, (array) HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))
+            ) {
                 $idHtlBooking = $objHotelBookingDocument->id_htl_booking;
                 if ($objHotelBookingDocument->delete()) {
                     $response['html'] = $this->getRenderedBookingDocuments($idHtlBooking);

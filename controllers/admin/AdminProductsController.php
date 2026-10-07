@@ -1744,6 +1744,12 @@ class AdminProductsControllerCore extends AdminController
         $res = true;
         /* Delete product image */
         $image = new Image((int)Tools::getValue('id_image'));
+        $objRoomType = new HotelRoomType();
+        $roomTypeInfo = Validate::isLoadedObject($image) ? $objRoomType->getRoomTypeInfoByIdProduct($image->id_product) : false;
+        if (!$roomTypeInfo
+            || !in_array($roomTypeInfo['id_hotel'], (array) HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))) {
+            return die(json_encode(array('error' => $this->l('You do not have the right permission'))));
+        }
         $this->content['id'] = $image->id;
         $res &= $image->delete();
         // if deleted image was the cover, change it to the first one
@@ -3820,9 +3826,13 @@ class AdminProductsControllerCore extends AdminController
             'success' => false
         );
         if ($this->tabAccess['edit'] === 1) {
-            $idRoom = Tools::getValue('id');
-            $objRoomInfo = new HotelRoomInformation((int) $idRoom);
-            if ($objRoomInfo->getFutureBookings($idRoom)) {
+            $idRoom = (int) Tools::getValue('id');
+            $objRoomInfo = new HotelRoomInformation($idRoom);
+            if (!Validate::isLoadedObject($objRoomInfo)
+                || !in_array($objRoomInfo->id_hotel, (array) HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))
+            ) {
+                $this->errors[] = $this->l('You do not have permission to delete this room.');
+            } elseif ($objRoomInfo->getFutureBookings($idRoom)) {
                 $this->errors[] = $this->l('This room cannot be deleted as this room contains future booking.');
             }
             if (empty($this->errors)) {

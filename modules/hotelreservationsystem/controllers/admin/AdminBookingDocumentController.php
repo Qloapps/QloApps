@@ -28,6 +28,15 @@ class AdminBookingDocumentController extends ModuleAdminController
         $idHtlBookingDocument = (int) Tools::getValue('id_document');
         $objHotelBookingDocument = new HotelBookingDocument($idHtlBookingDocument);
         if (Validate::isLoadedObject($objHotelBookingDocument)) {
+            $objHotelBookingDetail = new HotelBookingDetail((int) $objHotelBookingDocument->id_htl_booking);
+            if (!Validate::isLoadedObject($objHotelBookingDetail)
+                || !in_array($objHotelBookingDetail->id_hotel, (array) HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1))
+            ) {
+                header('HTTP/1.1 403 Forbidden');
+                header('Status: 403 Forbidden');
+                exit;
+            }
+
             Hook::exec('actionDownloadBookingDocument', array('attachment' => &$objHotelBookingDocument));
 
             $contentType = $objHotelBookingDocument->getContentType();
