@@ -2331,6 +2331,8 @@ class AdminOrdersControllerCore extends AdminController
                     if (!Validate::isLoadedObject($currency)) {
                         throw new PrestaShopException('Can\'t load Currency object');
                     }
+                    // update order currency
+                    $order->id_currency = (int) $currency->id;
 
                     // update rooms bookings prices (htl_booking_detail)
                     $objHtlBookingDetail = new HotelBookingDetail();
@@ -2421,16 +2423,6 @@ class AdminOrdersControllerCore extends AdminController
                             $objRoomTypeServProdOrderDtl->save();
                         }
                     }
-
-                    // Convert stored tax rows before recalculating order-detail taxes.
-                    $taxRows = OrderTaxDetail::getTaxRowsByOrder((int) $order->id);
-                    foreach ($taxRows as $taxRow) {
-                        $taxDetail = new OrderTaxDetail((int) $taxRow['id_order_tax_detail']);
-                        $taxDetail->unit_amount = Tools::convertPriceFull($taxRow['unit_amount'], $old_currency, $currency);
-                        $taxDetail->total_amount = Tools::convertPriceFull($taxRow['total_amount'], $old_currency, $currency);
-                        $taxDetail->update();
-                    }
-
                     // Update order detail amount
                     foreach ($order->getOrderDetailList() as $row) {
                         $order_detail = new OrderDetail($row['id_order_detail']);
@@ -2523,8 +2515,6 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
-                    // Update currency in order
-                    $order->id_currency = $currency->id;
                     // Update exchange rate
                     $order->conversion_rate = (float)$currency->conversion_rate;
                     $order->update();
