@@ -662,7 +662,7 @@ class AdminAddHotelController extends ModuleAdminController
                     if ($primaryHotelId == $objHotelBranch->id && !$objHotelBranch->active) {
                         $hotels = $objHotelBranch->hotelBranchesInfo(false, 1);
                         if (!empty($hotel = array_shift($hotels))) {
-                            Configuration::updateValue('WK_PRIMARY_HOTEL', $objHotelBranch['id']);
+                            Configuration::updateValue('WK_PRIMARY_HOTEL', $hotel['id']);
                         } else {
                             $newPrimaryHotelId = Configuration::updateValue('WK_PRIMARY_HOTEL', 0);
                         }
