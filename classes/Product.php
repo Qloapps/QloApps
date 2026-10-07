@@ -4041,7 +4041,7 @@ class ProductCore extends ObjectModel
             $id_value = Db::getInstance()->Insert_ID();
         }
         $row = array('id_feature' => (int)$id_feature, 'id_product' => (int)$this->id, 'id_feature_value' => (int)$id_value);
-        Db::getInstance()->insert('feature_product', $row);
+        Db::getInstance()->insert('feature_product', $row, false, true, Db::INSERT_IGNORE);
         SpecificPriceRule::applyAllRules(array((int)$this->id));
         if ($id_value) {
             return ($id_value);
@@ -6868,8 +6868,8 @@ class ProductCore extends ObjectModel
         }
 
         if ($includeTourismTax && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
-            $priceCalcNumDays = $isPerDay ? HotelHelper::getNumberOfDays($dateFrom, $dateTo) : 1;
-            $unitPriceExcl = ($useTax ? Product::getServiceProductPrice($idProduct, $idProductOption, $idHotel, $idProductRoomType, false, 1, $dateFrom, $dateTo, $idCart, $idAddress, $useReduc, $idGroup, $idCartBooking) : $price / (int) $quantity) / $priceCalcNumDays;
+
+            $unitPriceExcl = ($useTax ? Product::getServiceProductPrice($idProduct, $idProductOption, $idHotel, $idProductRoomType, false, 1, $dateFrom, $dateTo, $idCart, $idAddress, $useReduc, $idGroup, $idCartBooking) : $price / (int) $quantity) / max(1, $numdays);
 
             $fallbackAddress = new Address(Cart::getIdAddressForTaxCalculation($idProduct));
             if ($numAdults === null) {

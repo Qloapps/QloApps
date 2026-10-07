@@ -604,7 +604,7 @@ class HotelBookingDetail extends ObjectModel
         $sql[] = 'SELECT hri.`id` AS `id_room`, hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`, hri.`id_status`, hrdd.`date_from` AS `date_from`, hrdd.`date_to` AS `date_to`
                 FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                 INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.	id_room = hri.`id`)
-                WHERE hri.`id_hotel`='.$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (
+                WHERE hri.`id_hotel`='.(int) $idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (
                     (hrdd.`date_from` <= \''.pSQL($dateFrom).'\' AND hrdd.`date_to` > \''.pSQL($dateFrom).'\' AND hrdd.`date_to` <= \''.pSQL($dateTo).'\') OR
                     (hrdd.`date_from` >= \''.pSQL($dateFrom).'\' AND hrdd.`date_to` > \''.pSQL($dateFrom).'\' AND hrdd.`date_to` <= \''.pSQL($dateTo).'\') OR
                     (hrdd.`date_from` >= \''.pSQL($dateFrom).'\' AND hrdd.`date_from` < \''.pSQL($dateTo).'\' AND hrdd.`date_to` >= \''.pSQL($dateTo).'\') OR
@@ -2199,6 +2199,13 @@ class HotelBookingDetail extends ObjectModel
                         $objBookingDetail->comment = $objCartBookingData->comment;
                         $objBookingDetail->id_status = 1;
                         $objBookingDetail->room_type_name = Product::getProductName($idNewRoomType, null, $objOrder->id_lang);
+
+                        // Save room selling object names as they are at the time of reallocation
+                        if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idNewRoomType, $objOrder->id_lang)) {
+                            $objBookingDetail->selling_object_name = $roomTypeInfo['selling_object_name'];
+                            $objBookingDetail->selling_object_plural_name = $roomTypeInfo['selling_object_plural_name'];
+                        }
+
                         $objBookingDetail->date_from = $objCartBookingData->date_from;
                         $objBookingDetail->date_to = $objCartBookingData->date_to;
                         $objBookingDetail->adults = $objCartBookingData->adults;

@@ -173,7 +173,7 @@ class ServiceProductCartDetail extends ObjectModel
             $language = new Language($idLang);
         }
 
-        $sql = 'SELECT spc.*, p.`selling_preference_type`, hcbd.`date_from`, spc.`id_cart` as service_id_cart, hcbd.`date_to`, p.`price_calculation_method`, hcbd.`id_product` as `id_product_room_type`';
+        $sql = 'SELECT spc.*, p.`selling_preference_type`, hcbd.`date_from`, spc.`id_cart` as service_id_cart, hcbd.`date_to`, p.`price_calculation_method`, hcbd.`id_product` as `id_product_room_type`, hcbd.`id_hotel` as `id_room_type_hotel`';
         if (!$getTotalPrice) {
             $sql .= ', hbil.`hotel_name`, p.`auto_add_to_cart`, p.`price_addition_type` ';
         }
@@ -232,6 +232,9 @@ class ServiceProductCartDetail extends ObjectModel
             $context = Context::getContext();
             foreach ($serviceProducts as $product) {
                 $objProduct = new Product($product['id_product'], false, $language->id);
+                if (!Validate::isLoadedObject($objProduct)) {
+                    continue;
+                }
                 if (!$objProduct->booking_product) {
                     $quantity = $product['quantity'] ? (int) $product['quantity'] : 1;
 

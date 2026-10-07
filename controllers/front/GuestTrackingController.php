@@ -121,6 +121,7 @@ class GuestTrackingControllerCore extends FrontController
             && ($dateFrom = Tools::getValue('date_from'))
             && ($dateTo = Tools::getValue('date_to'))
         ) {
+            $objRoomType = new HotelRoomType();
             $useTax = 0;
             if (Group::getPriceDisplayMethod($this->context->customer->id_default_group) == PS_TAX_INC) {
                 $useTax = 1;
@@ -144,8 +145,10 @@ class GuestTrackingControllerCore extends FrontController
                 ));
             }
 
+            $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
             $this->context->smarty->assign(array(
                 'objOrder' => new Order($idOrder),
+                'room_type_info' => $roomTypeInfo,
             ));
 
             $response['extra_services'] = $this->context->smarty->fetch(_PS_THEME_DIR_.'_partials/order-extra-services.tpl');
@@ -279,6 +282,12 @@ class GuestTrackingControllerCore extends FrontController
                                 }
                                 $cartHotelData[$type_key]['id_product'] = $type_value['product_id'];
                                 $cartHotelData[$type_key]['cover_img'] = $cover_img;
+
+                                // Prefer the name stored at order-creation time so it stays historically accurate
+                                if (!empty($order_bk_data[0]['selling_object_name'])) {
+                                    $cartHotelData[$type_key]['selling_object_name'] = $order_bk_data[0]['selling_object_name'];
+                                    $cartHotelData[$type_key]['selling_object_plural_name'] = $order_bk_data[0]['selling_object_plural_name'];
+                                }
 
                                 foreach ($order_bk_data as $data_k => $data_v) {
                                     $date_join = strtotime($data_v['date_from']).strtotime($data_v['date_to']);
@@ -538,6 +547,7 @@ class GuestTrackingControllerCore extends FrontController
                 $order->obj_hotel_branch_information = $objHotelBranchInformation;
                 $order->hotel_address_info = $hotelAddressInfo;
                 $order->hotel_refund_rules = $hotelRefundRules;
+                $order->property_type = $objHotelBranchInformation ? $objHotelBranchInformation->propertyTypeName : null;
                 //end
 
                 Hook::exec('actionOrderDetail', array('carrier' => $order->carrier, 'order' => $order));
