@@ -271,12 +271,12 @@ class AdminCartsControllerCore extends AdminController
         if (!($cart = $this->loadObject(true))) {
             return;
         }
+        $this->context->cart = $cart;
         if ($this->tabAccess['kpi'] === 1) {
             $this->content .= $this->renderKpis();
         }
         $customer = new Customer($cart->id_customer);
         $currency = new Currency($cart->id_currency);
-        $this->context->cart = $cart;
         $this->context->currency = $currency;
         $this->context->customer = $customer;
         $this->toolbar_title = sprintf($this->l('Cart #%06d'), $this->context->cart->id);
@@ -1718,45 +1718,52 @@ class AdminCartsControllerCore extends AdminController
                                 $idCartBooking
                             ))) {
                                 $originalPrice = Product::getPriceStatic($idServiceProduct, false);
+                                $specificPriceInfo = SpecificPrice::getSpecificPrice(
+                                    (int)$idServiceProduct,
+                                    0,
+                                    $objCart->id_currency,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
+                                    0,
+                                    $objCart->id,
+                                    0,
+                                    $objHotelCartBookingData->id
+                                );
                                 // if price is different than the original service price then update the price
-                                if ($canEdit && $operator == 'up' && $originalPrice != $unitPrice) {
-                                    if ($specificPriceInfo = SpecificPrice::getSpecificPrice(
-                                        (int)$idServiceProduct,
-                                        0,
-                                        $objCart->id_currency,
-                                        0,
-                                        0,
-                                        1,
-                                        0,
-                                        0,
-                                        $objCart->id,
-                                        0,
-                                        $objHotelCartBookingData->id
-                                    )) {
-                                        $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
-                                    } else {
-                                        $objSpecificPrice = new SpecificPrice();
-                                    }
-                                    $objSpecificPrice->id_shop = 0;
-                                    $objSpecificPrice->id_shop_group = 0;
-                                    $objSpecificPrice->id_cart = $objCart->id;
-                                    $objSpecificPrice->id_currency = $objCart->id_currency;
-                                    $objSpecificPrice->id_country = 0;
-                                    $objSpecificPrice->id_group = 0;
-                                    $objSpecificPrice->id_customer = 0;
-                                    $objSpecificPrice->id_product = $idServiceProduct;
-                                    $objSpecificPrice->id_product_attribute = 0;
-                                    $objSpecificPrice->price = $unitPrice;
-                                    $objSpecificPrice->from_quantity = 1;
-                                    $objSpecificPrice->reduction = 0;
-                                    $objSpecificPrice->id_htl_cart_booking = $objHotelCartBookingData->id;
-                                    $objSpecificPrice->reduction_type = 'amount';
-                                    $objSpecificPrice->reduction_tax = 0;
-                                    $objSpecificPrice->from = '0000-00-00 00:00:00';
-                                    $objSpecificPrice->to = '0000-00-00 00:00:00';
+                                if($canEdit && $operator == 'up'){
+                                    if ($originalPrice != $unitPrice) {
+                                        if ($specificPriceInfo) {
+                                            $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
+                                        } else {
+                                            $objSpecificPrice = new SpecificPrice();
+                                        }
+                                        $objSpecificPrice->id_shop = 0;
+                                        $objSpecificPrice->id_shop_group = 0;
+                                        $objSpecificPrice->id_cart = $objCart->id;
+                                        $objSpecificPrice->id_currency = $objCart->id_currency;
+                                        $objSpecificPrice->id_country = 0;
+                                        $objSpecificPrice->id_group = 0;
+                                        $objSpecificPrice->id_customer = 0;
+                                        $objSpecificPrice->id_product = $idServiceProduct;
+                                        $objSpecificPrice->id_product_attribute = 0;
+                                        $objSpecificPrice->price = $unitPrice;
+                                        $objSpecificPrice->from_quantity = 1;
+                                        $objSpecificPrice->reduction = 0;
+                                        $objSpecificPrice->id_htl_cart_booking = $objHotelCartBookingData->id;
+                                        $objSpecificPrice->reduction_type = 'amount';
+                                        $objSpecificPrice->reduction_tax = 0;
+                                        $objSpecificPrice->from = '0000-00-00 00:00:00';
+                                        $objSpecificPrice->to = '0000-00-00 00:00:00';
 
-                                    $result &= $objSpecificPrice->save();
+                                        $result &= $objSpecificPrice->save();
+                                    } elseif ($specificPriceInfo) {
+                                        $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
+                                        $result &= $objSpecificPrice->delete();
+                                    }
                                 }
+                                
                             }
                         }
 
