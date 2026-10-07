@@ -24,9 +24,3 @@ body.adminorderrefundrequests .ui-tooltip {
     padding: 10px;
     box-shadow: 0px 0px 15px 0px #00000026;
 }
-.ui-tooltip.tooltip-popup span {
-    margin-left: 15px;
-}
-.ui-tooltip.tooltip-popup label {
-    font-weight: 600;
-}

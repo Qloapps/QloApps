@@ -21,27 +21,27 @@
 *}
 
 {capture name='stay_periods_tooltip'}
-    <div class="bootstrap tooltip_cont">
-        <div class="tip_header">
-            <div>{l s='Stay Periods'}</div>
+    <div class="bootstrap ui-tooltip-wrapper">
+        <div class="ui-tooltip-header">
+            <div class="ui-tooltip-label">{l s='Stay Periods'}</div>
         </div>
         <table class="table">
             <thead>
                 <tr>
-                    <th class="tip_element_head">{l s='Duration'}</th>
-                    <th class="tip_element_head">{l s='Rooms'}</th>
+                    <th class="ui-tooltip-elem-head">{l s='Duration'}</th>
+                    <th class="ui-tooltip-elem-head">{l s='Rooms'}</th>
                 </tr>
             </thead>
             <tbody>
                 {foreach from=$stay_periods item=stay_period}
                     <tr>
-                        <td class="tip_element_value">{$stay_period.from} &ndash; {$stay_period.to}</td>
-                        <td class="tip_element_value center">{$stay_period.count}</td>
+                        <td class="ui-tooltip-elem-txt">{$stay_period.from} &ndash; {$stay_period.to}</td>
+                        <td class="ui-tooltip-elem-txt center">{$stay_period.count}</td>
                     </tr>
                 {/foreach}
             </tbody>
         </table>
     </div>
 {/capture}
-{capture name='stay_periods_tooltip_title'}<span class="badge tooltip-trigger">+{$extra_stay_periods_count}</span>{/capture}
-{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.stay_periods_tooltip tooltip_title=$smarty.capture.stay_periods_tooltip_title}
+{capture name='stay_periods_tooltip_title'}<span class="badge ui-tooltip-trigger">+{$extra_stay_periods_count}</span>{/capture}
+{include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.stay_periods_tooltip tooltip_title=$smarty.capture.stay_periods_tooltip_title}

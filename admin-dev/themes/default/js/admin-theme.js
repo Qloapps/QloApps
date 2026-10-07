@@ -478,11 +478,13 @@ $(document).ready(function() {
 	$('.no-htl-access-option').on('click', function() {
 		$(this).prop('selected', false);
 	});
-	initTooltip();
+
+	initUITooltip();
+
 }); //end dom ready
 
-function initTooltip($target, contentFn, items) {
-	var $elements = $target || $('.tooltip-trigger');
+function initUITooltip($target, contentFn, items) {
+	var $elements = $target || $('.ui-tooltip-trigger');
 	if (!$elements.length) {
 		return;
 	}
@@ -491,11 +493,11 @@ function initTooltip($target, contentFn, items) {
 		if (!contentFn && $this.data('ui-tooltip')) {
 			return;
 		}
-		$this.tooltip({
+		$this.uiTooltip({
 			content: contentFn || $this.next('.tooltip-content').html(),
 			items: items || 'span',
 			trigger: 'hover',
-			tooltipClass: 'tooltip-popup',
+			tooltipClass: 'ui-tooltip-popup',
 			open: function (event, ui) {
 				if (event.buttons == 1 || event.buttons == 3) {
 					ui.tooltip.remove();

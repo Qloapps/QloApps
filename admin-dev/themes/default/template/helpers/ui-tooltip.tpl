@@ -20,7 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<span class="tooltip-trigger{if isset($tooltip_class) && $tooltip_class} {$tooltip_class|escape:'html':'UTF-8'}{/if}">
+<span class="ui-tooltip-trigger{if isset($tooltip_class) && $tooltip_class} {$tooltip_class|escape:'html':'UTF-8'}{/if}">
 	{if isset($tooltip_title) && $tooltip_title}
 		{$tooltip_title nofilter}
 	{elseif isset($tooltip_icon_class) && $tooltip_icon_class}

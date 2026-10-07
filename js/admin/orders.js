@@ -1130,6 +1130,7 @@ $(document).ready(function() {
                 if (!jsonData.hasError) {
                     if (jsonData.service_panel) {
                         $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+                        initUITooltip();
                     }
                     showSuccessMessage(txtExtraServiceSucc);
                 } else {
@@ -1191,6 +1192,7 @@ $(document).ready(function() {
                 if (!jsonData.hasError) {
                     if (jsonData.service_panel) {
                         $('#room_type_service_product_desc').replaceWith(jsonData.service_panel);
+                        initUITooltip();
                     }
                     showSuccessMessage(txtExtraServiceSucc);
                 } else {
@@ -1359,7 +1361,7 @@ $(document).ready(function() {
             },
             complete: function() {
                 $(".loading_overlay").hide();
-                initTooltip();
+                initUITooltip();
             }
         });
     });
@@ -2437,7 +2439,7 @@ const EditRoomBookingModal = {
 
                     // initialize datepickers
                     EditRoomBookingModal.initDatePickers();
-                    initTooltip();
+                    initUITooltip();
                     $('#edit_product .extra-services-container #id_htl_booking').val(jsonProductLineData.id);
                     $('#edit-room-booking-modal').modal('show');
                 } else {

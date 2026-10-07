@@ -30,6 +30,7 @@ var onlineFlag = true;
 
 $(document).ready(function(){
 	highdpiInit();
+	initUITooltip();
 	responsiveResize();
 	$(window).resize(responsiveResize);
 	if (navigator.userAgent.match(/Android/i))
@@ -458,27 +459,28 @@ window.addEventListener('offline', function () {
 	onlineFlag = false;
 });
 
-function initHtlTooltip() {
-    if (!$('.htl-tooltip').length) {
+function initUITooltip() {
+    if (!$('.ui-tooltip-trigger').length) {
         return;
     }
-    $('.htl-tooltip').each(function () {
+    $('.ui-tooltip-trigger').each(function () {
         if ($(this).hasClass('ui-tooltip-content')) {
             return;
-        }		
-        $(this).tooltip({
-            content: $(this).siblings('.htl-tooltip-content').html(),
+        }
+        if ($(this).data('ui-tooltip')) {
+            return;
+        }
+        $(this).uiTooltip({
+            content: $(this).siblings('.ui-tooltip-content').html(),
             items: 'span',
             trigger: 'hover',
-            tooltipClass: 'htl-tooltip-popup',
+            tooltipClass: 'ui-tooltip-popup',
             open: function (event, ui) {
                 if (typeof (event.originalEvent) === 'undefined') {
                     return false;
                 }
                 var $id = $(ui.tooltip).attr('id');
-                if ($('div.ui-tooltip').not('#' + $id).length) {
-                    return false;
-                }
+                $('div.ui-tooltip').not('#' + $id).remove();
             },
             close: function (event, ui) {
                 ui.tooltip.hover(function () {
@@ -492,7 +494,3 @@ function initHtlTooltip() {
         });
     });
 }
-
-$(document).ready(function () {
-    initHtlTooltip();
-});

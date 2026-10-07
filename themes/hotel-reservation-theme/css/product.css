@@ -1443,21 +1443,10 @@ Quick View Styles
 }
 
 /* service popup design */
-.price_desc_block .services-info {
-  cursor: pointer;
-}
-.ui-tooltip.services-tootip {
-  box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
-  background: #FFFFFF;
-  border: unset;
-  color: #333;
-  /* min-width: 300px; */
-  padding: 9px 15px;
-  max-height: 310px;
-  overflow-y: auto;
-}
 .services-info-tooltip-cont {
   min-width: 240px;
+  max-height: 310px;
+  overflow-y: auto;
 }
 .extra-service-panel + .extra-service-panel {
   margin-top: 15px;

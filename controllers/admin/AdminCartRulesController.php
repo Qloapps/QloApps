@@ -278,7 +278,6 @@ class AdminCartRulesControllerCore extends AdminController
                 'room_rmv_txt' => $this->l('Unselect below room types'),
             )
         );
-        $this->addJqueryUI('ui.tooltip', 'base', true);
         $this->addJS(_PS_JS_DIR_.'admin/cart-rules.js');
         $this->addJqueryPlugin(array('typewatch', 'fancybox', 'autocomplete'));
     }

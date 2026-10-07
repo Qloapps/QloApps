@@ -21,13 +21,13 @@
 *}
 {if isset($htl_connected_rooms) && $htl_connected_rooms|@count > 0}
     {capture name='connected_room_tooltip'}
-        <div class="tooltip_cont">
-            <div class="tip_header"><div class="tip_date">{l s='Connected Rooms'}</div></div>
-            <div class="tip-body tip-body-grid">
+        <div class="ui-tooltip-wrapper">
+            <div class="ui-tooltip-header"><div class="ui-tooltip-label">{l s='Connected Rooms'}</div></div>
+            <div class="ui-tooltip-body ui-tooltip-body-grid">
                 {foreach from=$htl_connected_rooms.connected_room_types item=group}
                     <div>
-                        <div class="tip_element_head">{$group.room_type_name|escape:'html':'UTF-8'}</div>
-                        <div class="tip_element_value">
+                        <div class="ui-tooltip-elem-head">{$group.room_type_name|escape:'html':'UTF-8'}</div>
+                        <div class="ui-tooltip-elem-txt">
                             {foreach from=$group.connected_rooms item=room name=connected_rooms}
                                 {$room.name|escape:'html':'UTF-8'}{if !$smarty.foreach.connected_rooms.last}, {/if}
                             {/foreach}
@@ -37,5 +37,5 @@
             </div>
         </div>
     {/capture}
-    {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.connected_room_tooltip tooltip_icon_class='icon-random' tooltip_icon_style='color: #008abd;' }
+    {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.connected_room_tooltip tooltip_icon_class='icon-random' tooltip_icon_style='color: #008abd;' }
 {/if}

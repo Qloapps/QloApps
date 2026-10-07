@@ -837,7 +837,6 @@ class OrderDetailControllerCore extends FrontController
             ));
 
             $this->addJqueryPlugin(array('fancybox', 'scrollTo', 'footable', 'footable-sort'));
-            $this->addJqueryUI(array('ui.tooltip'), 'base', true);
 
             // load Google Maps library if configured
             if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder(Tools::getValue('id_order'))) {
