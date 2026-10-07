@@ -232,6 +232,9 @@ class ServiceProductCartDetail extends ObjectModel
             $context = Context::getContext();
             foreach ($serviceProducts as $product) {
                 $objProduct = new Product($product['id_product'], false, $language->id);
+                if (!Validate::isLoadedObject($objProduct)) {
+                    continue;
+                }
                 if (!$objProduct->booking_product) {
                     $quantity = $product['quantity'] ? (int) $product['quantity'] : 1;
 
