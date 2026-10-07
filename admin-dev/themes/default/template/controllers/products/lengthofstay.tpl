@@ -148,13 +148,13 @@
 							</td>
 							<td>
 								<div class="input-group">
-									<input class="form-control" type="text" name="restriction_min_los[]" value="{$restrictionInfo['min_los']}">
+									<input class="form-control" type="text" name="restriction_min_los[]" value="{$restrictionInfo['min_los']|escape:'html':'UTF-8'}">
 									<span class="input-group-addon">{l s='day(s)'}</span>
 								</div>
 							</td>
 							<td>
 								<div class="input-group">
-									<input class="form-control" type="text" name="restriction_max_los[]" value="{$restrictionInfo['max_los']}">
+									<input class="form-control" type="text" name="restriction_max_los[]" value="{$restrictionInfo['max_los']|escape:'html':'UTF-8'}">
 									<span class="input-group-addon">{l s='day(s)'}</span>
 								</div>
 							</td>

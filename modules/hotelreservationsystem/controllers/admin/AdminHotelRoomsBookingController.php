@@ -119,8 +119,8 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 'id');
 
         if ($hotelBranchesInfo) {
-            if (Tools::getValue('date_from')) {
-                $date_from = Tools::getValue('date_from');
+            if (Tools::getValue('date_from') && Validate::isDate(Tools::getValue('date_from'))) {
+                $date_from = date('Y-m-d', strtotime(Tools::getValue('date_from')));
             } else {
                 $date_from = date('Y-m-d');
             }
@@ -147,7 +147,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
 
             if (Tools::getValue('id_hotel')) {
-                $id_hotel = Tools::getValue('id_hotel');
+                $id_hotel = (int) Tools::getValue('id_hotel');
             } else {
                 if ($htl_info = $objHotelBranchInformation->hotelBranchesInfo(false, 1)) {
                     // filter hotels as per accessed hotels
@@ -163,7 +163,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             }
 
             if (Tools::getValue('id_room_type')) {
-                $id_room_type = Tools::getValue('id_room_type');
+                $id_room_type = (int) Tools::getValue('id_room_type');
             } else {
                 $id_room_type = 0;
             }

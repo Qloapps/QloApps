@@ -100,8 +100,12 @@
 		var len = values.length;
 
 		list.find('option').prop('selected', false);
-		for (var i = 0; i < len; i++)
-			list.find('option[value="' + $.trim(values[i]) + '"]').prop('selected', true);
+		for (var i = 0; i < len; i++) {
+			var value = $.trim(values[i]);
+			list.find('option').filter(function() {
+				return this.value === value;
+			}).prop('selected', true);
+		}
 	}
 	function position_exception_listchange() {
 		var obj = $(this);
