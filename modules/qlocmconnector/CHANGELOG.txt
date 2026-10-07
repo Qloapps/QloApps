@@ -1,0 +1,34 @@
+---------------------------------------------------------------
+# V5.0.6 | COMPATIBLE:: QloApps V1.7.x
+---------------------------------------------------------------
++ [BO]: Addition of booking source and business source
+- [BO]: Removed all remaining references to the "extra demands" feature
+
+---------------------------------------------------------------
+# V5.0.5 | COMPATIBLE:: QloApps V1.7.x
+---------------------------------------------------------------
++ [BO]: Absorbed the Channel Manager Bookings admin list (previously provided by the separate `qlochannelmanagerconnector` module) — new `AdminQloappsChannelManagerConnector` tab lists orders detected via `orders.id_channel_manager_booking` (with `source` fallback), no separate DB table
++ [BO]: `qlochannelmanagerconnector` module (if present) is now automatically uninstalled and deleted from disk on install/upgrade of this module
++ [BO]: Channel Manager API booking creation no longer produces raw PHP fatal errors for any kind of unexpected failure — all errors now return as structured JSON
++ [BO]: Invalid/malformed guest firstname, lastname, or email no longer breaks booking creation — falls back to a sanitized/dummy value instead of crashing or rejecting the request
++ [BO]: Fixed partial-booking date-range fragmentation bug — a room with a gap in availability that becomes available again now books as one continuous range instead of splitting into multiple incorrect entries
++ [BO]: `id_pms_booking` is now returned even when booking creation succeeds but a later processing step fails, so the Channel Manager can tell the booking genuinely exists in the PMS
+
+---------------------------------------------------------------
+# V5.0.4 | COMPATIBLE:: QloApps V1.7.x
+---------------------------------------------------------------
++ [BO]: `rate_plan_name` column support in `qlo_htl_booking_detail` table
++ [BO]: Hook `displayOrderRoomsBookingsTableHeading` — renders Rate Plan column header in admin order detail room table
++ [BO]: Hook `displayOrderRoomsBookingsTableData` — renders Rate Plan cell per room row in admin order detail
+
+---------------------------------------------------------------
+# V5.0.0 to V5.0.3 | COMPATIBLE:: QloApps V1.7.x
+---------------------------------------------------------------
+
+---------------------------------------------------------------
+# V4.0.0 to V4.0.2  | COMPATIBLE:: QloApps V1.7.x
+---------------------------------------------------------------
+
+---------------------------------------------------------------
+# V1.0.0 to V2.0.4 | COMPATIBLE:: QloApps V1.6.1.0
+---------------------------------------------------------------
