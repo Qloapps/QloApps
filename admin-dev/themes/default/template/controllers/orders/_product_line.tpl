@@ -95,7 +95,7 @@
 			<p class="help-block">{convertPriceWithCurrency price=$data['paid_unit_price_tax_excl'] currency=$currency->id}/{l s='day'}</p>
 
 	</td>
-	<td class="center">
+	<td class="center text-nowrap">
 		{convertPriceWithCurrency price=($data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) currency=$currency->id}
 		{if $data['additional_services']|count}
 			<a class="open_room_extra_services" href="#" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" id_htl_booking="{$data['id']}">
@@ -103,7 +103,7 @@
 			</a>
 		{/if}
 	</td>
-	<td class="center">
+	<td class="center text-nowrap">
 		{convertPriceWithCurrency price=($data['total_room_tax']) currency=$currency->id}
 			<span class="price_info">
 				&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
