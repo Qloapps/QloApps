@@ -2097,7 +2097,17 @@ class HotelBookingDetail extends ObjectModel
 
                 if ($roomAvailabilityInfo = $objOldHotelBooking->dataForFrontSearch($bookingParams)) {
                     if ($availableRooms = $roomAvailabilityInfo['rm_data'][$idNewRoomType]['data']['available']) {
-                        $roomInfo = reset($availableRooms);
+                        $roomInfo = null;
+                        foreach ($availableRooms as $availableRoom) {
+                            if ($availableRoom['id_room'] == $idRoom) {
+                                $roomInfo = $availableRoom;
+                                break;
+                            }
+                        }
+
+                        if (!$roomInfo) {
+                            return false;
+                        }
                         $objCartBookingData = new HotelCartBookingData();
                         $objCartBookingData->id_cart = $context->cart->id;
                         $objCartBookingData->id_guest = $context->cookie->id_guest;
