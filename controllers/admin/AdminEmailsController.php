@@ -33,7 +33,7 @@ class AdminEmailsControllerCore extends AdminController
     {
         $this->bootstrap = true;
 
-        if (Configuration::get('PS_LOG_EMAILS')) {
+        if (Tools::getValue('PS_LOG_EMAILS', Configuration::get('PS_LOG_EMAILS'))) {
             $this->table = 'mail';
             $this->className = 'Mail';
 
