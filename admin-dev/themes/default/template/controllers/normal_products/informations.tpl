@@ -255,7 +255,7 @@
 				<label>
 					<input type="checkbox" id="sp_standalone" name="selling_preference_type[]" value="{Product::SELLING_PREFERENCE_WITH_STANDALONE}"
 						{if Product::isSellableAsStandalone($product->id) }checked="checked"{/if}>
-					{l s='Sell With Standalone'}
+					{l s='Sell as a Standalone'}
 				</label>
 			</div>
 		</div>
