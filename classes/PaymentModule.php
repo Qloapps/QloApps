@@ -619,7 +619,7 @@ abstract class PaymentModuleCore extends Module
                             $serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                                 $order->id_cart,
                                 [],
-                                null,
+                                isset($product['id_hotel']) ? (int) $product['id_hotel'] : null,
                                 0,
                                 null,
                                 $product['id_product']
