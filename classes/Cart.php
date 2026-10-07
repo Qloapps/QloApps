@@ -4066,7 +4066,7 @@ class CartCore extends ObjectModel
                 ) {
                     if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                         $this->id,
-                        [Product::SELLING_PREFERENCE_HOTEL_STANDALONE, Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE],
+                        [Product::SELLING_PREFERENCE_WITH_HOTEL, Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE],
                         null,
                         0,
                         null,
