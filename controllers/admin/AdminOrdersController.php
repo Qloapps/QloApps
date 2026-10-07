@@ -2332,103 +2332,6 @@ class AdminOrdersControllerCore extends AdminController
                         throw new PrestaShopException('Can\'t load Currency object');
                     }
 
-                    // Update order detail amount
-                    foreach ($order->getOrderDetailList() as $row) {
-                        $order_detail = new OrderDetail($row['id_order_detail']);
-                        $fields = array(
-                            'ecotax',
-                            'product_price',
-                            'reduction_amount',
-                            'total_shipping_price_tax_excl',
-                            'total_shipping_price_tax_incl',
-                            'total_price_tax_incl',
-                            'total_price_tax_excl',
-                            'product_quantity_discount',
-                            'purchase_supplier_price',
-                            'reduction_amount',
-                            'reduction_amount_tax_incl',
-                            'reduction_amount_tax_excl',
-                            'unit_price_tax_incl',
-                            'unit_price_tax_excl',
-                            'original_product_price'
-
-                        );
-                        foreach ($fields as $field) {
-                            $order_detail->{$field} = Tools::convertPriceFull($order_detail->{$field}, $old_currency, $currency);
-                        }
-
-                        $order_detail->update();
-                    }
-
-                    $id_order_carrier = (int)$order->getIdOrderCarrier();
-                    if ($id_order_carrier) {
-                        $order_carrier = $order_carrier = new OrderCarrier((int)$order->getIdOrderCarrier());
-                        $order_carrier->shipping_cost_tax_excl = (float)Tools::convertPriceFull($order_carrier->shipping_cost_tax_excl, $old_currency, $currency);
-                        $order_carrier->shipping_cost_tax_incl = (float)Tools::convertPriceFull($order_carrier->shipping_cost_tax_incl, $old_currency, $currency);
-                        $order_carrier->update();
-                    }
-
-                    // update Order Cart rules
-                    if ($orderVouchers = $order->getCartRules()) {
-                        $fields = array(
-                            'value',
-                            'value_tax_excl',
-                        );
-                        foreach($orderVouchers as $orderVoucher) {
-                            $objOrderCartRule = new OrderCartRuleCore($orderVoucher['id_order_cart_rule']);
-                            foreach ($fields as $field) {
-                                $objOrderCartRule->{$field} = Tools::convertPriceFull($objOrderCartRule->{$field}, $old_currency, $currency);
-                            }
-                            $objOrderCartRule->update();
-                        }
-                    }
-
-                    // Update order && order_invoice amount
-                    $fields = array(
-                        'total_discounts',
-                        'total_discounts_tax_incl',
-                        'total_discounts_tax_excl',
-                        'total_discount_tax_excl',
-                        'total_discount_tax_incl',
-                        'total_paid',
-                        'total_paid_tax_incl',
-                        'total_paid_tax_excl',
-                        'total_paid_real',
-                        'total_products',
-                        'total_products_wt',
-                        'total_shipping',
-                        'total_shipping_tax_incl',
-                        'total_shipping_tax_excl',
-                        'total_wrapping',
-                        'total_wrapping_tax_incl',
-                        'total_wrapping_tax_excl',
-                        'advance_paid_amount',
-                    );
-
-                    $invoices = $order->getInvoicesCollection();
-                    if ($invoices) {
-                        foreach ($invoices as $invoice) {
-                            foreach ($fields as $field) {
-                                if (isset($invoice->$field)) {
-                                    $invoice->{$field} = Tools::convertPriceFull($invoice->{$field}, $old_currency, $currency);
-                                }
-                            }
-                            $invoice->save();
-                        }
-                    }
-
-                    foreach ($fields as $field) {
-                        if (isset($order->$field)) {
-                            $order->{$field} = Tools::convertPriceFull($order->{$field}, $old_currency, $currency);
-                        }
-                    }
-
-                    // Update currency in order
-                    $order->id_currency = $currency->id;
-                    // Update exchange rate
-                    $order->conversion_rate = (float)$currency->conversion_rate;
-                    $order->update();
-
                     // update rooms bookings prices (htl_booking_detail)
                     $objHtlBookingDetail = new HotelBookingDetail();
                     if ($orderRoomBookings = $objHtlBookingDetail->getBookingDataByOrderId($order->id)) {
@@ -2519,7 +2422,7 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
-                    // Convert all stored tax rows so their amounts stay in sync with the order currency.
+                    // Convert stored tax rows before recalculating order-detail taxes.
                     $taxRows = OrderTaxDetail::getTaxRowsByOrder((int) $order->id);
                     foreach ($taxRows as $taxRow) {
                         $taxDetail = new OrderTaxDetail((int) $taxRow['id_order_tax_detail']);
@@ -2528,11 +2431,103 @@ class AdminOrdersControllerCore extends AdminController
                         $taxDetail->update();
                     }
 
-                    // // Recalculate VAT after room and service prices have been converted.
+                    // Update order detail amount
                     foreach ($order->getOrderDetailList() as $row) {
-                        $orderDetail = new OrderDetail((int) $row['id_order_detail']);
-                        $orderDetail->updateTaxAmount($order);
+                        $order_detail = new OrderDetail($row['id_order_detail']);
+                        $fields = array(
+                            'ecotax',
+                            'product_price',
+                            'reduction_amount',
+                            'total_shipping_price_tax_excl',
+                            'total_shipping_price_tax_incl',
+                            'total_price_tax_incl',
+                            'total_price_tax_excl',
+                            'product_quantity_discount',
+                            'purchase_supplier_price',
+                            'reduction_amount',
+                            'reduction_amount_tax_incl',
+                            'reduction_amount_tax_excl',
+                            'unit_price_tax_incl',
+                            'unit_price_tax_excl',
+                            'original_product_price'
+
+                        );
+                        foreach ($fields as $field) {
+                            $order_detail->{$field} = Tools::convertPriceFull($order_detail->{$field}, $old_currency, $currency);
+                        }
+
+                        $order_detail->update();
+                        $order_detail->updateTaxAmount($order);
                     }
+
+                    $id_order_carrier = (int)$order->getIdOrderCarrier();
+                    if ($id_order_carrier) {
+                        $order_carrier = $order_carrier = new OrderCarrier((int)$order->getIdOrderCarrier());
+                        $order_carrier->shipping_cost_tax_excl = (float)Tools::convertPriceFull($order_carrier->shipping_cost_tax_excl, $old_currency, $currency);
+                        $order_carrier->shipping_cost_tax_incl = (float)Tools::convertPriceFull($order_carrier->shipping_cost_tax_incl, $old_currency, $currency);
+                        $order_carrier->update();
+                    }
+
+                    // update Order Cart rules
+                    if ($orderVouchers = $order->getCartRules()) {
+                        $fields = array(
+                            'value',
+                            'value_tax_excl',
+                        );
+                        foreach($orderVouchers as $orderVoucher) {
+                            $objOrderCartRule = new OrderCartRuleCore($orderVoucher['id_order_cart_rule']);
+                            foreach ($fields as $field) {
+                                $objOrderCartRule->{$field} = Tools::convertPriceFull($objOrderCartRule->{$field}, $old_currency, $currency);
+                            }
+                            $objOrderCartRule->update();
+                        }
+                    }
+
+                    // Update order && order_invoice amount
+                    $fields = array(
+                        'total_discounts',
+                        'total_discounts_tax_incl',
+                        'total_discounts_tax_excl',
+                        'total_discount_tax_excl',
+                        'total_discount_tax_incl',
+                        'total_paid',
+                        'total_paid_tax_incl',
+                        'total_paid_tax_excl',
+                        'total_paid_real',
+                        'total_products',
+                        'total_products_wt',
+                        'total_shipping',
+                        'total_shipping_tax_incl',
+                        'total_shipping_tax_excl',
+                        'total_wrapping',
+                        'total_wrapping_tax_incl',
+                        'total_wrapping_tax_excl',
+                        'advance_paid_amount',
+                    );
+
+                    $invoices = $order->getInvoicesCollection();
+                    if ($invoices) {
+                        foreach ($invoices as $invoice) {
+                            foreach ($fields as $field) {
+                                if (isset($invoice->$field)) {
+                                    $invoice->{$field} = Tools::convertPriceFull($invoice->{$field}, $old_currency, $currency);
+                                }
+                            }
+                            $invoice->save();
+                        }
+                    }
+
+                    foreach ($fields as $field) {
+                        if (isset($order->$field)) {
+                            $order->{$field} = Tools::convertPriceFull($order->{$field}, $old_currency, $currency);
+                        }
+                    }
+
+                    // Update currency in order
+                    $order->id_currency = $currency->id;
+                    // Update exchange rate
+                    $order->conversion_rate = (float)$currency->conversion_rate;
+                    $order->update();
 
                     // update Order refund prices (order_return and order_return_detail)
                     if ($orderReturns = OrderReturn::getOrdersReturn($order->id_customer, $order->id)) {
