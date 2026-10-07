@@ -120,8 +120,8 @@
 @keyframes wkZoomIn   { from { opacity:0; transform:scale(0.88); } to { opacity:1; transform:scale(1);   } }
 @keyframes wkBlurOut  { from { opacity:1; filter:blur(0);   } to { opacity:0; filter:blur(10px); } }
 @keyframes wkBlurIn   { from { opacity:0; filter:blur(10px); } to { opacity:1; filter:blur(0);   } }
-@keyframes wkSlideOut { from { opacity:1; transform:translateX(0);    } to { opacity:0; transform:translateX(-60px); } }
-@keyframes wkSlideIn  { from { opacity:0; transform:translateX(60px); } to { opacity:1; transform:translateX(0);     } }
+@keyframes wkSlideOut { from { transform:translateX(0);     } to { transform:translateX(-100%); } }
+@keyframes wkSlideIn  { from { transform:translateX(100%);  } to { transform:translateX(0);     } }
 
 /* Description slide animation on slide change */
 .js-header-description {
