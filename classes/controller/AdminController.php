@@ -3991,11 +3991,25 @@ class AdminControllerCore extends Controller
     protected function postImage($id)
     {
         if (isset($this->fieldImageSettings['name']) && isset($this->fieldImageSettings['dir'])) {
-            return $this->uploadImage($id, $this->fieldImageSettings['name'], $this->fieldImageSettings['dir'].'/');
+            return $this->uploadImage(
+                $id,
+                $this->fieldImageSettings['name'],
+                $this->fieldImageSettings['dir'].'/',
+                false,
+                isset($this->fieldImageSettings['width']) ? $this->fieldImageSettings['width'] : null,
+                isset($this->fieldImageSettings['height']) ? $this->fieldImageSettings['height'] : null
+            );
         } elseif (!empty($this->fieldImageSettings)) {
             foreach ($this->fieldImageSettings as $image) {
                 if (isset($image['name']) && isset($image['dir'])) {
-                    $this->uploadImage($id, $image['name'], $image['dir'].'/');
+                    $this->uploadImage(
+                        $id,
+                        $image['name'],
+                        $image['dir'].'/',
+                        false,
+                        isset($image['width']) ? $image['width'] : null,
+                        isset($image['height']) ? $image['height'] : null
+                    );
                 }
             }
         }
