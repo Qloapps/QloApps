@@ -3739,7 +3739,23 @@ class AdminOrdersControllerCore extends AdminController
         $allowBackdateOrder = Configuration::get($backOrderConfigKey);
 
         // applicable refund policies
-        $applicableRefundPolicies = HotelOrderRefundRules::getApplicableRefundRules($order->id);
+        $applicableRefundPolicies = array();
+        if (($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id))
+            && ($maxDate = Db::getInstance()->getValue(
+                'SELECT MAX(DATE(`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail`
+                WHERE `id_order` = '.(int) $order->id
+            ))
+        ) {
+            $objBranchRefundRules = new HotelBranchRefundRules();
+            $applicableRefundPolicies = $objBranchRefundRules->getHotelRefundRules(
+                $idHotel,
+                0,
+                1,
+                $this->context->language->id,
+                1,
+                $maxDate
+            );
+        }
 
         // Overbookings information of the order
         $orderOverBookings = $objHotelBookingDetail->getOverbookedRooms($order->id, 0, '', '', 0, 0, 1);

@@ -40,16 +40,27 @@ class HotelBranchRefundRules extends ObjectModel
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
     ));
 
-    public function getHotelRefundRules($idHotel = 0, $idRefundRule = 0, $detailed = 0, $idLang = 0, $sortPosition = 1)
+    public function getHotelRefundRules($idHotel = 0, $idRefundRule = 0, $detailed = 0, $idLang = 0, $sortPosition = 1, $maxDate = '')
     {
-        $sql = 'SELECT hrr.* ';
-
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
 
+        $days = false;
+        if ($maxDate) {
+            $dateToday = date('Y-m-d');
+            if (strtotime($maxDate) < strtotime($dateToday)) {
+                return array();
+            }
+            $days = HotelBookingDetail::getDays($dateToday, date('Y-m-d', strtotime($maxDate)));
+            $detailed = 1;
+        }
+
+        $sql = 'SELECT hrr.* ';
+
         if ($detailed) {
-            $sql .= ', orr.*, orrl.*';
+            $sql .= ', orr.`payment_type`, orr.`deduction_value_full_pay`, orr.`deduction_value_adv_pay`, orr.`days`,
+            orrl.`name`, orrl.`description`';
         }
         $sql .= ' FROM `'._DB_PREFIX_.'htl_branch_refund_rules` hrr';
 
@@ -57,20 +68,32 @@ class HotelBranchRefundRules extends ObjectModel
             $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules` orr
             ON (orr.`id_refund_rule` = hrr.`id_refund_rule`)';
             $sql .= ' LEFT JOIN `'._DB_PREFIX_.'htl_order_refund_rules_lang` orrl
-            ON (orrl.`id_refund_rule` = orr.`id_refund_rule` AND orrl.`id_lang` = '.(int)$idLang.')';
+            ON (orrl.`id_refund_rule` = orr.`id_refund_rule` AND orrl.`id_lang` = '.(int) $idLang.')';
         }
 
         $sql .= ' WHERE 1';
 
         if ($idHotel) {
-            $sql .= ' AND `id_hotel` = '.(int)$idHotel;
+            $sql .= ' AND hrr.`id_hotel` = '.(int) $idHotel;
         }
         if ($idRefundRule) {
-            $sql .= ' AND `id_refund_rule` = '.(int)$idRefundRule;
+            $sql .= ' AND hrr.`id_refund_rule` = '.(int) $idRefundRule;
+        }
+        if ($days !== false) {
+            $sql .= ' AND orr.`days` <= '.(int) $days;
+        }
+
+        if ($detailed) {
+            // when multiple rules of a hotel have the same days, only the one with the lowest position is applicable
+            $sql .= ' AND hrr.`position` = (
+                SELECT MIN(hrr2.`position`) FROM `'._DB_PREFIX_.'htl_branch_refund_rules` hrr2
+                INNER JOIN `'._DB_PREFIX_.'htl_order_refund_rules` orr2 ON (orr2.`id_refund_rule` = hrr2.`id_refund_rule`)
+                WHERE hrr2.`id_hotel` = hrr.`id_hotel` AND orr2.`days` = orr.`days`
+            )';
         }
 
         if ($sortPosition) {
-            $sql .= ' order by `position`';
+            $sql .= ' ORDER BY hrr.`position`';
         }
 
         return Db::getInstance()->executeS($sql);
