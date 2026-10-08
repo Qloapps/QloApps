@@ -38,12 +38,6 @@
 			<configurable>1</configurable>
 		</meta>
 -->
-<!--
-		<meta id="sitemap">
-			<page>sitemap</page>
-			<configurable>1</configurable>
-		</meta>
--->
 		<meta id="supplier">
 			<page>supplier</page>
 			<configurable>1</configurable>

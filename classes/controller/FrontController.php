@@ -1767,7 +1767,6 @@ class FrontControllerCore extends Controller
             'categoriescmsTree'         => CMSCategory::getRecurseCategory($this->context->language->id, 1, 1, 1),
             'voucherAllowed'            => (int)CartRule::isFeatureActive(),
             'PS_DISPLAY_BEST_SELLERS'   => Configuration::get('PS_DISPLAY_BEST_SELLERS'),
-            'display_store'             => Configuration::get('PS_STORES_DISPLAY_SITEMAP'),
             'conditions'                => Configuration::get('PS_CONDITIONS'),
             'id_cgv'                    => Configuration::get('PS_CONDITIONS_CMS_ID'),
             'PS_SHOP_NAME'              => Configuration::get('PS_SHOP_NAME'),
