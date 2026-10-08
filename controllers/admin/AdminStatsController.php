@@ -226,7 +226,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         if ($granularity == 'day') {
             $sales = array();
             if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
-                'SELECT LEFT(`invoice_date`, 10) AS date, SUM(total_paid_tax_excl / o.`conversion_rate`) AS sales
+                'SELECT LEFT(`invoice_date`, 10) AS date, SUM(total_paid_tax_excl / '.Currency::getReportConversionRateSql('o').') AS sales
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
                 WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').'
@@ -255,7 +255,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         } elseif ($granularity == 'month') {
             $sales = array();
             if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
-                'SELECT LEFT(`invoice_date`, 7) AS date, SUM(total_paid_tax_excl / o.conversion_rate) AS sales
+                'SELECT LEFT(`invoice_date`, 7) AS date, SUM(total_paid_tax_excl / '.Currency::getReportConversionRateSql('o').') AS sales
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
                 WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').'
@@ -285,7 +285,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             return $sales;
         } else {
             return Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue(
-                'SELECT SUM(total_paid_tax_excl / o.`conversion_rate`), t.`id_hotel`
+                'SELECT SUM(total_paid_tax_excl / '.Currency::getReportConversionRateSql('o').'), t.`id_hotel`
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
                 LEFT JOIN (
@@ -466,7 +466,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 			LEFT JOIN (
 				SELECT pr.`id_product`,
 					IFNULL(SUM(cp.`product_quantity`), 0) AS totalQuantitySold,
-					IFNULL(SUM(cp.`product_price` * cp.`product_quantity`), 0) / o.conversion_rate AS totalPriceSold
+					IFNULL(SUM(cp.`product_price` * cp.`product_quantity`), 0) / '.Currency::getReportConversionRateSql('o').' AS totalPriceSold
 				FROM `'._DB_PREFIX_.'product` pr
 				LEFT OUTER JOIN `'._DB_PREFIX_.'order_detail` cp ON pr.`id_product` = cp.`product_id`
 				LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = cp.`id_order`
@@ -712,8 +712,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $orders = Db::getInstance()->ExecuteS('
             SELECT
                 LEFT(`invoice_date`, 10) as date,
-                total_paid_tax_incl / o.conversion_rate as total_paid_tax_incl,
-                total_shipping_tax_excl / o.conversion_rate as total_shipping_tax_excl,
+                total_paid_tax_incl / '.Currency::getReportConversionRateSql('o').' as total_paid_tax_incl,
+                total_shipping_tax_excl / '.Currency::getReportConversionRateSql('o').' as total_shipping_tax_excl,
                 o.module,
                 ad.id_country,
                 o.id_currency,
@@ -996,7 +996,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 $row = Db::getInstance(_PS_USE_SQL_SLAVE_)->getRow('
                 SELECT
                     COUNT(o.`id_order`) as orders,
-                    SUM(o.`total_paid_tax_excl` / o.`conversion_rate`) as total_paid_tax_excl
+                    SUM(o.`total_paid_tax_excl` / '.Currency::getReportConversionRateSql('o').') as total_paid_tax_excl
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON os.`id_order_state` = o.`current_state`
                 WHERE o.`invoice_date` BETWEEN "'.pSQL($dateFrom).' 00:00:00"
@@ -1647,7 +1647,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
     public static function getRevenue($dateFrom, $dateTo, $idHotel = false, $orderSource = '')
     {
         $sql = 'SELECT SUM(total_paid_tax_excl - refunded_amount)
-        FROM (SELECT o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
+        FROM (SELECT o.`total_paid_tax_excl` / '.Currency::getReportConversionRateSql('o').' AS total_paid_tax_excl,
         (SELECT IFNULL(SUM(orr.`refunded_amount`), 0) FROM`'._DB_PREFIX_.'order_return` orr WHERE orr.`id_order` = o.`id_order`) AS refunded_amount,
         (SELECT hbd.`id_hotel` FROM`'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = o.`id_order` LIMIT 1) AS id_hotel
         FROM `'._DB_PREFIX_.'orders` o
@@ -1891,7 +1891,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $cacheKey = 'AdminStats::getRoomsRevenueForDiscreteDates'.'_'.(int) $discreteDate['timestamp_from'].'_'.
             (!is_array($idHotel) ? (int) $idHotel : implode('_', $idHotel));
             if (!Cache::isStored($cacheKey) || !$useCache) {
-                $sql = 'SELECT IFNULL(SUM((hbd.`total_price_tax_excl` / o.`conversion_rate`) / DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
+                $sql = 'SELECT IFNULL(SUM((hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').') / DATEDIFF(hbd.`date_to`, hbd.`date_from`)), 0)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
@@ -1932,7 +1932,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         foreach ($discreteDates as $discreteDate) {
             $totalServicesRevenue = 0;
             // Calculate services revenue
-            $servicesRevenueSql = 'SELECT SUM((rtspod.`total_price_tax_excl` / o.`conversion_rate`) / DATEDIFF(hbd.`date_to`, hbd.`date_from`))
+            $servicesRevenueSql = 'SELECT SUM((rtspod.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').') / DATEDIFF(hbd.`date_to`, hbd.`date_from`))
             FROM `'._DB_PREFIX_.'service_product_order_detail` rtspod
             LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
             ON (rtspod.`id_htl_booking_detail` = hbd.`id`)
@@ -2384,7 +2384,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         WHEN od.`purchase_supplier_price` <> "0.000000"
                         THEN od.`purchase_supplier_price`
                         WHEN od.`purchase_supplier_price` = "0.000000"
-                        THEN (od.`original_product_price` / o.`conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
+                        THEN (od.`original_product_price` / '.Currency::getReportConversionRateSql('o').') * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100
                     END
                 ), 0)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -2408,7 +2408,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                             WHEN od.`purchase_supplier_price` <> "0.000000"
                             THEN (od.`purchase_supplier_price` / (IF (od.`product_price_calculation_method` = '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY.', DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1)))
                             WHEN od.`purchase_supplier_price` = "0.000000"
-                            THEN ((od.`original_product_price` / o.`conversion_rate`) * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100) / (IF (od.`product_price_calculation_method` = '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY.', DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1))
+                            THEN ((od.`original_product_price` / '.Currency::getReportConversionRateSql('o').') * '.(int)Configuration::get('CONF_AVERAGE_PRODUCT_MARGIN').' / 100) / (IF (od.`product_price_calculation_method` = '.Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY.', DATEDIFF(hbd.`date_to`, hbd.`date_from`), 1))
                         END
                     ), 0)
                     FROM `'._DB_PREFIX_.'service_product_order_detail` rtspod
@@ -2713,7 +2713,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $objHotelBooking = new HotelBookingDetail();
         $invalidOrderStates = $objHotelBooking->getOrderStatusToFreeBookedRoom();
 
-        $sql = 'SELECT SUM(IF(((o.`total_paid_tax_incl` / o.`conversion_rate`) - (o.`total_paid_real` / o.`conversion_rate`) > 0), ((o.`total_paid_tax_incl` / o.`conversion_rate`) - (o.`total_paid_real` / o.`conversion_rate`)), 0))
+        $sql = 'SELECT SUM(IF(((o.`total_paid_tax_incl` / '.Currency::getReportConversionRateSql('o').') - (o.`total_paid_real` / '.Currency::getReportConversionRateSql('o').') > 0), ((o.`total_paid_tax_incl` / '.Currency::getReportConversionRateSql('o').') - (o.`total_paid_real` / '.Currency::getReportConversionRateSql('o').')), 0))
         FROM `'._DB_PREFIX_.'orders` o
         LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
         WHERE 1 ' .

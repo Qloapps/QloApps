@@ -3952,11 +3952,10 @@ class HotelBookingDetail extends ObjectModel
 
         $rows = Db::getInstance()->executeS(
             'SELECT DATE(o.`date_add`) AS grp_date,
-            IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS total_price_tax_excl,
-            IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS total_tax,
-            SUM(CASE WHEN hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0 THEN 1 ELSE 0 END) AS rooms_booked,
-            SUM(CASE WHEN hbd.`is_refunded` = 0 AND hbd.`is_cancelled` = 0
-                THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END) AS room_nights
+            IFNULL(SUM(hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0) AS total_price_tax_excl,
+            IFNULL(SUM((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / '.Currency::getReportConversionRateSql('o').'), 0) AS total_tax,
+            COUNT(*) AS rooms_booked,
+            SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS room_nights
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
@@ -4009,17 +4008,16 @@ class HotelBookingDetail extends ObjectModel
             $row = Db::getInstance()->getRow(
                 'SELECT IFNULL(SUM(
                     ROUND(hbd.`total_price_tax_excl` / NULLIF(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0), 6)
-                    / o.`conversion_rate`
+                    / '.Currency::getReportConversionRateSql('o').'
                 ), 0) AS total_price_tax_excl,
                 IFNULL(SUM(
                     ROUND((hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / NULLIF(DATEDIFF(hbd.`date_to`, hbd.`date_from`), 0), 6)
-                    / o.`conversion_rate`
+                    / '.Currency::getReportConversionRateSql('o').'
                 ), 0) AS total_tax
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 LEFT JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hbd.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-                WHERE p.`active` = 1 AND o.`valid` = 1 AND hbd.`is_refunded` = 0
-                AND hbd.`is_cancelled` = 0
+                WHERE p.`active` = 1 AND o.`valid` = 1
                 AND hbd.`date_from` < "'.pSQL($nextDay).' 00:00:00"
                 AND hbd.`date_to` > "'.pSQL($current).' 00:00:00"'
                 .$whereFilters
@@ -4056,9 +4054,7 @@ class HotelBookingDetail extends ObjectModel
             $result[strtotime($current)] = (int) Db::getInstance()->getValue(
                 'SELECT COUNT(hbd.`id_room`)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                WHERE hbd.`is_refunded` = 0
-                AND hbd.`is_cancelled` = 0
-                AND hbd.`is_back_order` = 0
+                WHERE hbd.`is_back_order` = 0
                 AND hbd.`date_from` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"'
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
                 .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom          : '')
@@ -4093,9 +4089,7 @@ class HotelBookingDetail extends ObjectModel
             $result[strtotime($current)] = (int) Db::getInstance()->getValue(
                 'SELECT COUNT(hbd.`id_room`)
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-                WHERE hbd.`is_refunded` = 0
-                AND hbd.`is_cancelled` = 0
-                AND hbd.`date_to` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"
+                WHERE hbd.`date_to` BETWEEN "'.pSQL($current).' 00:00:00" AND "'.pSQL($current).' 23:59:59"
                 AND (hbd.`id_status` = '.(int) self::STATUS_CHECKED_IN
                 .' OR (hbd.`check_in` != "0000-00-00 00:00:00" AND hbd.`check_out` != "0000-00-00 00:00:00"))'
                 .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
@@ -4135,7 +4129,7 @@ class HotelBookingDetail extends ObjectModel
                   ' AND hbd.`id_status` != '.(int) self::STATUS_CHECKED_OUT);
 
         return Db::getInstance()->executeS(
-            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
+            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, '.Currency::getReportConversionRateSql('o').' AS conversion_rate,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
             IF(hbd.`check_in` > "0000-00-00 00:00:00", hbd.`check_in`, CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`)) AS actual_checkin,
@@ -4143,8 +4137,7 @@ class HotelBookingDetail extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
-            WHERE hbd.`is_refunded` = 0
-            AND hbd.`is_back_order` = 0
+            WHERE  hbd.`is_back_order` = 0
             AND hbd.`date_from` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .$statusFilter
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
@@ -4173,7 +4166,7 @@ class HotelBookingDetail extends ObjectModel
         $allStatuses = !empty($params['all_statuses']);
 
         return Db::getInstance()->executeS(
-            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
+            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, '.Currency::getReportConversionRateSql('o').' AS conversion_rate,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
             IF(hbd.`check_in` > "0000-00-00 00:00:00", hbd.`check_in`, CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`)) AS actual_checkin,
@@ -4181,8 +4174,7 @@ class HotelBookingDetail extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
-            WHERE hbd.`is_refunded` = 0
-            AND hbd.`date_to` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            WHERE  hbd.`date_to` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($allStatuses ? '' : ' AND hbd.`id_status` = '.$idStatus)
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
             .($idRoom     ? ' AND hbd.`id_room` = '.$idRoom        : '')
@@ -4209,7 +4201,7 @@ class HotelBookingDetail extends ObjectModel
         $idCustomer = isset($params['id_customer']) ? (int) $params['id_customer']: 0;
 
         return Db::getInstance()->executeS(
-            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, o.`conversion_rate`,
+            'SELECT hbd.*, o.`with_occupancy`, o.`id_currency`, '.Currency::getReportConversionRateSql('o').' AS conversion_rate,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             DATEDIFF(hbd.`date_to`, hbd.`date_from`) AS los,
             IF(hbd.`check_in` > "0000-00-00 00:00:00", hbd.`check_in`, CONCAT(DATE(hbd.`date_from`), " ", hbd.`check_in_time`)) AS actual_checkin,
@@ -4217,8 +4209,7 @@ class HotelBookingDetail extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
-            WHERE hbd.`is_refunded` = 0
-            AND hbd.`id_status` IN ('.(int) self::STATUS_CHECKED_IN.', '.(int) self::STATUS_CHECKED_OUT.')
+            WHERE  hbd.`id_status` IN ('.(int) self::STATUS_CHECKED_IN.', '.(int) self::STATUS_CHECKED_OUT.')
             AND hbd.`date_from` < "'.$dateTo.' 23:59:59"
             AND hbd.`date_to` > "'.$dateFrom.' 00:00:00"'
             .($idProduct  ? ' AND hbd.`id_product` = '.$idProduct  : '')
@@ -4264,7 +4255,7 @@ class HotelBookingDetail extends ObjectModel
             o.`total_paid_tax_incl` AS order_total,
             o.`total_paid_real` AS order_paid,
             (o.`total_paid_tax_incl` - o.`total_paid_real`) AS balance_due,
-            o.`id_currency`, o.`conversion_rate`,
+            o.`id_currency`, '.Currency::getReportConversionRateSql('o').' AS conversion_rate,
             hbd.`id_status`, hbd.`booking_type`, hbd.`date_add`,
             IFNULL(NULLIF(o.`source`, \'\'), \'(direct)\') AS order_source,
             (SELECT CONCAT(e.`firstname`, " ", e.`lastname`)
@@ -4331,17 +4322,14 @@ class HotelBookingDetail extends ObjectModel
                 SELECT
                     hbd.`id_order`,
                     IFNULL(NULLIF(o.`source`, \'\'), \'(direct)\') AS order_source,
-                    SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN 1 ELSE 0 END) AS rooms_booked,
-                    SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
-                        THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END) AS room_nights,
-                    SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
-                        THEN hbd.`total_price_tax_excl` / o.`conversion_rate` ELSE 0 END) AS revenue_excl,
-                    SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0
-                        THEN hbd.`total_price_tax_incl` / o.`conversion_rate` ELSE 0 END) AS revenue_incl,
-                    MAX(o.`total_discounts_tax_excl` / o.`conversion_rate`) AS discount_amount,
+                    COUNT(*) AS rooms_booked,
+                    SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) AS room_nights,
+                    SUM(hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').') AS revenue_excl,
+                    SUM(hbd.`total_price_tax_incl` / '.Currency::getReportConversionRateSql('o').') AS revenue_incl,
+                    MAX(o.`total_discounts_tax_excl` / '.Currency::getReportConversionRateSql('o').') AS discount_amount,
                     IFNULL(MAX(ord_ref.`refunded_total`), 0) AS refund_amount,
                     COUNT(*) AS total_rooms,
-                    SUM(CASE WHEN hbd.`is_refunded` = 1 THEN 1 ELSE 0 END) AS cancelled_rooms
+                    SUM(CASE WHEN hbd.`id_status` = '.(int) self::STATUS_CANCELLED.' THEN 1 ELSE 0 END) AS cancelled_rooms
                 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
                 INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
                 LEFT JOIN (
@@ -4393,13 +4381,11 @@ class HotelBookingDetail extends ObjectModel
         return Db::getInstance()->executeS(
             'SELECT o.`payment` AS payment_method, o.`module`,
             COUNT(DISTINCT hbd.`id_order`) AS bookings,
-            IFNULL(SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`), 0) AS revenue_excl,
-            IFNULL(SUM(hbd.`total_price_tax_incl` / o.`conversion_rate`), 0) AS revenue_incl
+            IFNULL(SUM(hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0) AS revenue_excl,
+            IFNULL(SUM(hbd.`total_price_tax_incl` / '.Currency::getReportConversionRateSql('o').'), 0) AS revenue_incl
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
-            WHERE hbd.`is_cancelled` = 0
-            AND hbd.`is_refunded` = 0
-            AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idCustomer  ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
             .($bookingType ? ' AND hbd.`booking_type` = '.$bookingType : '')
             .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
@@ -4432,15 +4418,15 @@ class HotelBookingDetail extends ObjectModel
             'SELECT hbd.`id_order`, o.`reference`, hbd.`id_customer`, hbd.`id_product`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             hbd.`room_type_name`, hbd.`room_num`, hbd.`date_add`,
-            hbd.`total_price_tax_excl` / o.`conversion_rate` AS taxable_amount,
+            hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').' AS taxable_amount,
             tl.`name` AS tax_name, t.`rate` AS tax_rate,
-            odt.`total_amount` / o.`conversion_rate` AS tax_amount,
+            odt.`total_amount` / '.Currency::getReportConversionRateSql('o').' AS tax_amount,
             "room" AS revenue_source
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
             INNER JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
             INNER JOIN `'._DB_PREFIX_.'order_detail` od ON (od.`id_order_detail` = hbd.`id_order_detail`)
-            INNER JOIN `'._DB_PREFIX_.'order_detail_tax` odt ON (odt.`id_order_detail` = od.`id_order_detail`)
+            INNER JOIN `'._DB_PREFIX_.'order_tax_detail` odt ON (odt.`id_order_detail` = od.`id_order_detail`)
             INNER JOIN `'._DB_PREFIX_.'tax` t ON (t.`id_tax` = odt.`id_tax`)
             LEFT JOIN `'._DB_PREFIX_.'tax_lang` tl ON (tl.`id_tax` = t.`id_tax` AND tl.`id_lang` = '.(int) $idLang.')
             WHERE hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
@@ -4468,7 +4454,7 @@ class HotelBookingDetail extends ObjectModel
 
     /**
      * Refunded booking rows in a date range, one row per booking (requires ORDER RETURN record).
-     * QloApps sets is_refunded=1 on all freed/refunded rooms; is_cancelled is not reliably set.
+     * A booking only appears here once it has a matching order_return_detail row.
      * Refund report filters this further to refunded_amount > 0 in the caller; Cancellation report shows all rows.
      *
      * @param array $params date_from, date_to, id_hotel, id_customer, id_product, detailed_info
@@ -4518,8 +4504,7 @@ class HotelBookingDetail extends ObjectModel
                 ON (orsl.`id_order_return_state` = orr.`state` AND orsl.`id_lang` = '.(int) $idLang.')
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = hbd.`id_customer`)
             LEFT JOIN `'._DB_PREFIX_.'order_slip` os ON (os.`id_order` = orr.`id_order`)
-            WHERE hbd.`is_refunded` = 1
-            AND orr.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
+            WHERE  orr.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             . ($idCustomer ? ' AND hbd.`id_customer` = '.$idCustomer : '')
             . ($idProduct  ? ' AND hbd.`id_product` = '.$idProduct   : '')
             . HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
@@ -4605,8 +4590,6 @@ class HotelBookingDetail extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
             WHERE p.`active` = 1
             AND o.`valid` = 1
-            AND hbd.`is_refunded` = 0
-            AND hbd.`is_cancelled` = 0
             AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct ? ' AND hbd.`id_product` = '.$idProduct : '')
             .($idRoom    ? ' AND hbd.`id_room` = '.$idRoom        : '')
@@ -4673,7 +4656,6 @@ class HotelBookingDetail extends ObjectModel
                 INNER JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hbd.`id_room`)
                 INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product`)
                 WHERE p.`active` = 1
-                AND hbd.`is_cancelled` = 0
                 AND hbd.`date_from` < "'.pSQL($dateNext).' 00:00:00"
                 AND hbd.`date_to` > "'.pSQL($dateTemp).' 00:00:00"'
                 .$statusFilter

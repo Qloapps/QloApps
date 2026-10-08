@@ -169,7 +169,7 @@ class StatsBestProducts extends ModuleGrid
         ) AS totalRoomsBooked,
         (
             SELECT IFNULL(ROUND(
-                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / (o.`conversion_rate` * DATEDIFF(hbd.`date_to`, hbd.`date_from`))) / SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))),
+                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / ('.Currency::getReportConversionRateSql('o').' * DATEDIFF(hbd.`date_to`, hbd.`date_from`))) / SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))),
                 2
             ), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
@@ -180,7 +180,7 @@ class StatsBestProducts extends ModuleGrid
         ) AS sellingPrice,
         (
             SELECT IFNULL(ROUND(
-                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / (o.`conversion_rate` * DATEDIFF(hbd.`date_to`, hbd.`date_from`))),
+                SUM(hbd.`total_price_tax_excl` * DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'")) / ('.Currency::getReportConversionRateSql('o').' * DATEDIFF(hbd.`date_to`, hbd.`date_from`))),
                 2
             ), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd

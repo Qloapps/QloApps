@@ -84,7 +84,7 @@ class StatsProduct extends ModuleGraph
     public function getTotalRevenue($id_product)
     {
         $date_between = ModuleGraph::getDateBetween();
-        $sql = 'SELECT SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`)
+        $sql = 'SELECT SUM(hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').')
         FROM `'._DB_PREFIX_.'orders` o
         INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
         ON (hbd.`id_order` = o.`id_order` AND hbd.`id_product` = '.(int) $id_product.')
@@ -268,7 +268,7 @@ class StatsProduct extends ModuleGraph
                                     <td class="text-left"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'" target="_blank">'.$sale['firstname'].' '.$sale['lastname'].' (#'.(int) $sale['id_customer'].')'.'</a></td>
                                     '.($has_attribute ? '<td>'.$sale['product_name'].'</td>' : '').'
                                     <td>'.(int)$sale['total_booked'].'</td>
-                                    <td>'.Tools::displayprice($sale['total'], (int)$sale['id_currency']).'</td>
+                                    <td>'.Tools::displayprice($sale['total'], $currency).'</td>
                                 </tr>';
                         }
                         $this->html .= '

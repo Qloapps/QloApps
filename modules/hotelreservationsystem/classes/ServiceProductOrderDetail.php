@@ -661,7 +661,6 @@ class ServiceProductOrderDetail extends ObjectModel
         $baseWhere =
             'WHERE p.`active` = 1
             AND o.`valid` = 1
-            AND hbd.`is_refunded` = 0
             AND spod.`is_cancelled` = 0
             AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct        ? ' AND hbd.`id_product` = '.$idProduct  : '')
@@ -673,7 +672,7 @@ class ServiceProductOrderDetail extends ObjectModel
             .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd');
 
         return (float) Db::getInstance()->getValue(
-            'SELECT IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0)
+            'SELECT IFNULL(SUM(spod.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0)
             '.$baseFrom.' '.$baseWhere
         );
     }
@@ -714,7 +713,6 @@ class ServiceProductOrderDetail extends ObjectModel
         $baseWhere =
             'WHERE p.`active` = 1
             AND o.`valid` = 1
-            AND hbd.`is_refunded` = 0
             AND spod.`is_cancelled` = 0
             AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct        ? ' AND hbd.`id_product` = '.$idProduct  : '')
@@ -732,12 +730,12 @@ class ServiceProductOrderDetail extends ObjectModel
             spod.`name` AS service_name,
             IFNULL(cl.`name`, "") AS service_category,
             spod.`quantity`, sp.`allow_multiple_quantity`,
-            (spod.`unit_price_tax_excl` / o.`conversion_rate`) AS unit_price,
+            (spod.`unit_price_tax_excl` / '.Currency::getReportConversionRateSql('o').') AS unit_price,
             spod.`hotel_name`, hbd.`room_num`, hbd.`room_type_name`,
             hbd.`date_from`, hbd.`date_to`,
-            (spod.`total_price_tax_excl` / o.`conversion_rate`) AS total_price_tax_excl,
-            ((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate`) AS tax_amount,
-            (spod.`total_price_tax_incl` / o.`conversion_rate`) AS total_price_tax_incl
+            (spod.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').') AS total_price_tax_excl,
+            ((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / '.Currency::getReportConversionRateSql('o').') AS tax_amount,
+            (spod.`total_price_tax_incl` / '.Currency::getReportConversionRateSql('o').') AS total_price_tax_incl
             '.$baseFrom.'
             LEFT JOIN `'._DB_PREFIX_.'customer` c ON (c.`id_customer` = o.`id_customer`)
             LEFT JOIN `'._DB_PREFIX_.'product` sp ON (sp.`id_product` = spod.`id_product`)
@@ -783,8 +781,8 @@ class ServiceProductOrderDetail extends ObjectModel
 
         $rows = Db::getInstance()->executeS(
             'SELECT DATE(o.`date_add`) AS grp_date,
-            IFNULL(SUM(spod.`total_price_tax_excl` / o.`conversion_rate`), 0) AS service_revenue,
-            IFNULL(SUM((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate`), 0) AS total_tax
+            IFNULL(SUM(spod.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 0) AS service_revenue,
+            IFNULL(SUM((spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / '.Currency::getReportConversionRateSql('o').'), 0) AS total_tax
             '.$joins.'
             WHERE p.`active` = 1 AND o.`valid` = 1
             AND spod.`is_cancelled` = 0
@@ -870,10 +868,10 @@ class ServiceProductOrderDetail extends ObjectModel
             'SELECT hbd.`id_order`, o.`reference`, hbd.`id_customer`, spod.`id_product`,
             CONCAT(c.`firstname`, " ", c.`lastname`) AS customer_name,
             spod.`name` AS room_type_name, hbd.`room_num`, spod.`date_add`,
-            spod.`total_price_tax_excl` / o.`conversion_rate` AS taxable_amount,
+            spod.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').' AS taxable_amount,
             MAX(tl.`name`) AS tax_name,
             MAX(t.`rate`) AS tax_rate,
-            (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / o.`conversion_rate` AS tax_amount,
+            (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) / '.Currency::getReportConversionRateSql('o').' AS tax_amount,
             "service" AS revenue_source
             FROM `'._DB_PREFIX_.'service_product_order_detail` spod
             INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id` = spod.`id_htl_booking_detail`)
@@ -883,7 +881,6 @@ class ServiceProductOrderDetail extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'tax` t ON (t.`id_tax` = tr.`id_tax`)
             LEFT JOIN `'._DB_PREFIX_.'tax_lang` tl ON (tl.`id_tax` = t.`id_tax` AND tl.`id_lang` = '.(int) $idLang.')
             WHERE spod.`is_cancelled` = 0
-            AND hbd.`is_refunded` = 0
             AND (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) > 0
             AND spod.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idTax ? ' AND t.`id_tax` = '.$idTax : '')

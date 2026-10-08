@@ -453,6 +453,22 @@ class CurrencyCore extends ObjectModel
         return self::$currencies[(int)($id)];
     }
 
+    /**
+     * SQL expression giving the current rate of an order's currency relative to the default currency.
+     * Reports divide order-currency amounts by it to express them in the default currency.
+     *
+     * @param string $orderAlias alias of the orders table in the query
+     * @return string
+     */
+    public static function getReportConversionRateSql($orderAlias = 'o')
+    {
+        $orderAlias = bqSQL($orderAlias);
+
+        return 'IFNULL((SELECT IF(cur_rate.`id_currency` = '.(int) Configuration::get('PS_CURRENCY_DEFAULT').', 1, NULLIF(cur_rate.`conversion_rate`, 0))
+            FROM `'._DB_PREFIX_.'currency` cur_rate
+            WHERE cur_rate.`id_currency` = '.$orderAlias.'.`id_currency`), 1)';
+    }
+
     public function getConversationRate()
     {
         return $this->id != (int)Configuration::get('PS_CURRENCY_DEFAULT') ? $this->conversion_rate : 1;

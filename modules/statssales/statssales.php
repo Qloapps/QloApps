@@ -193,7 +193,7 @@ class StatsSales extends ModuleGraph
     private function getTotals()
     {
         $idHotel = (int)Tools::getValue('id_hotel');
-        $sql = 'SELECT COUNT(id_order) AS orderCount, IFNULL(ROUND(SUM(total_paid_tax_excl), 2), 0) AS orderSum
+        $sql = 'SELECT COUNT(id_order) AS orderCount, IFNULL(ROUND(SUM(o.`total_paid_tax_excl` / '.Currency::getReportConversionRateSql('o').'), 2), 0) AS orderSum
             FROM `'._DB_PREFIX_.'orders` o
             '.((int)Tools::getValue('id_country') ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.`id_address_delivery` = a.`id_address`' : '').'
             WHERE o.valid = 1 AND o.`invoice_date` BETWEEN '.ModuleGraph::getDateBetween().'
@@ -253,7 +253,7 @@ class StatsSales extends ModuleGraph
             $this->_formats['y'] = 'd';
         }
 
-        $this->query = 'SELECT o.`invoice_date`, ROUND(total_paid_tax_excl) AS total_revenue
+        $this->query = 'SELECT o.`invoice_date`, ROUND(o.`total_paid_tax_excl` / '.Currency::getReportConversionRateSql('o').') AS total_revenue
             FROM `'._DB_PREFIX_.'orders` o
             '.((int)$this->id_country ? 'LEFT JOIN `'._DB_PREFIX_.'address` a ON o.`id_address_delivery` = a.`id_address`' : '').'
             WHERE o.valid = 1
