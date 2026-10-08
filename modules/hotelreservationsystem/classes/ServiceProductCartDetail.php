@@ -665,8 +665,27 @@ class ServiceProductCartDetail extends ObjectModel
     public static function validateServiceProductsInCart()
     {
         $context = Context::getContext();
+        $objServiceProductCartDetail = new ServiceProductCartDetail();
+
+        // standalone products require customer address before payment
+        if ($context->customer->id
+            && !Customer::getAddressesTotalById((int) $context->customer->id)
+            && count($objServiceProductCartDetail->getServiceProductsInCart(
+                $context->cart->id,
+                [
+                    Product::SELLING_PREFERENCE_WITH_STANDALONE,
+                    Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                    Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+                    Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+                ],
+                0,
+                0
+            ))
+        ) {
+            Tools::redirect('index.php?controller=address&back='.urlencode('order.php?step=1'));
+        }
+
         if ($cartProducts = $context->cart->getProducts()) {
-            $objServiceProductCartDetail = new ServiceProductCartDetail();
             foreach ($cartProducts as $product) {
                 if (!$product['active'] && !$product['booking_product']) {
                     if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
