@@ -80,12 +80,6 @@ class AdminStoresControllerCore extends AdminController
                         'cast' => 'intval',
                         'type' => 'bool'
                     ),
-                    'PS_STORES_DISPLAY_SITEMAP' => array(
-                        'title' => $this->l('Display in the sitemap page'),
-                        'hint' => $this->l('Display a link to the store locator in the sitemap page.'),
-                        'cast' => 'intval',
-                        'type' => 'bool'
-                    ),
                     'PS_STORES_SIMPLIFIED' => array(
                         'title' => $this->l('Show a simplified store locator'),
                         'hint' => $this->l('No map, no search, only a store directory.'),
