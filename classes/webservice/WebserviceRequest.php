@@ -267,6 +267,7 @@ class WebserviceRequestCore
             'contacts' => array('description' => 'Shop contacts','class' => 'Contact'),
             'countries' => array('description' => 'The countries','class' => 'Country'),
             'currencies' => array('description' => 'The currencies', 'class' => 'Currency'),
+            'room_type_selling_objects' => array('description' => 'The room type selling objects', 'class' => 'RoomTypeSellingObject'),
             'customers' => array('description' => 'The e-shop\'s customers','class' => 'Customer'),
             'customer_threads' => array('description' => 'Customer services threads','class' => 'CustomerThread'),
             'customer_messages' => array('description' => 'Customer services messages','class' => 'CustomerMessage'),
