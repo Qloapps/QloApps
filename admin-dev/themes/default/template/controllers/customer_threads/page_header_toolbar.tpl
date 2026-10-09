@@ -28,7 +28,7 @@
             {if is_array($title)}
                 {$title|end|strip_tags}
             {else}
-                <span title="{$title}">
+                <span title="{$title|strip_tags|escape:'html':'UTF-8'}">
                     {$title|strip_tags|truncate:40}
                 </span>
             {/if}

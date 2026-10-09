@@ -62,7 +62,7 @@ class ContactControllerCore extends FrontController
             } elseif (!$id_customer_thread && !$subject) {
                 $this->errors[] = Tools::displayError('The title cannot be blank.');
             } elseif (!$id_customer_thread && !Validate::isCleanHtml($subject)) {
-                $this->errors[] = Tools::displayError('Invalid subject$subject');
+                $this->errors[] = Tools::displayError('Invalid subject.');
             } else if (!$id_customer_thread && $nameRequired && !trim($userName)) {
                 $this->errors[] = Tools::displayError('Name is required.');
             } else if (!$id_customer_thread && trim($nameRequired) && !Validate::isGenericName($userName)) {
