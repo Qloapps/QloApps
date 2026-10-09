@@ -242,6 +242,7 @@ if (isset($_POST['submit'])) {
 		<script>
 			var ext_img = new Array('<?php echo implode("','", $ext_img)?>');
 			var allowed_ext = new Array('<?php echo implode("','", $ext)?>');
+			var fmToken = "<?php echo Tools::getAdminTokenLite($products_accesses['edit'] ? 'AdminProducts' : 'AdminCmsContent'); ?>";
 			var loading_bar =<?php echo $loading_bar?"true":"false";
     ?>;
 			var image_editor =<?php echo $aviary_active?"true":"false";
@@ -257,6 +258,7 @@ if (isset($_POST['submit'])) {
 				maxFilesize: <?php echo $MaxSizeUpload;
     ?>, // MB
 				url: "upload.php",
+				params: {token: fmToken},
 				accept: function (file, done) {
 					var extension = file.name.split('.').pop();
 					extension = extension.toLowerCase();
@@ -390,6 +392,8 @@ if (isset($_POST['submit'])) {
 							<input type="hidden" name="path" value="<?php echo Tools::safeOutput($subfolder.$subdir);
     ?>"/>
 							<input type="hidden" name="path_thumb" value="<?php echo Tools::safeOutput($subfolder.$subdir);
+    ?>"/>
+							<input type="hidden" name="token" value="<?php echo Tools::safeOutput(Tools::getAdminTokenLite($products_accesses['edit'] ? 'AdminProducts' : 'AdminCmsContent'));
     ?>"/>
 
 							<div class="fallback">

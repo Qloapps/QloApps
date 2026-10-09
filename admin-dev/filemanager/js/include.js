@@ -35,7 +35,7 @@ $(document).ready(function(){
 			    $.ajax({
 				type: "POST",
 				url: "ajax_calls.php?action=extract",
-				data: { path: m }
+				data: { path: m, token: fmToken }
 			    }).done(function( msg ) {
 				if (msg!="")
 				    bootbox.alert(msg);
@@ -220,7 +220,7 @@ $(document).ready(function(){
 	sortDescending=!sortDescending;
 	if (js_script) {
 	    $.ajax({
-		url: "ajax_calls.php?action=sort&sort_by="+_this.attr('data-sort')+"&descending="+sortDescending
+		url: "ajax_calls.php?action=sort&sort_by="+_this.attr('data-sort')+"&descending="+sortDescending+"&token="+encodeURIComponent(fmToken)
 	    }).done(function( msg ) {
 		    
 	    });
@@ -318,7 +318,7 @@ $(document).ready(function(){
 		$.ajax({
 			  type: "POST",
 			  url: "execute.php?action=create_folder",
-			  data: {path: folder_path, path_thumb: folder_path_thumb}
+			  data: {path: folder_path, path_thumb: folder_path_thumb, token: fmToken}
 			}).done(function( msg ) {
 			setTimeout(function(){window.location.href = $('#refresh').attr('href') + '&' + new Date().getTime();},300);
 			
@@ -336,7 +336,7 @@ $(document).ready(function(){
 	    _this.find('i').addClass('icon-white');
 	    
 	     $.ajax({
-		url: "ajax_calls.php?action=view&type="+_this.attr('data-value')
+		url: "ajax_calls.php?action=view&type="+_this.attr('data-value')+"&token="+encodeURIComponent(fmToken)
 	    }).done(function( msg ) {
 		if (msg!="") {
 		    bootbox.alert(msg);
@@ -719,7 +719,7 @@ function execute_action(action,file1,file2,name,container,function_name){
 	$.ajax({
 	    type: "POST",
 	    url: "execute.php?action="+action,
-	    data: {path: file1, path_thumb: file2, name: name.replace('/','')}
+	    data: {path: file1, path_thumb: file2, name: name.replace('/',''), token: fmToken}
 	}).done(function( msg ) {
 	    if (msg!="") {
 		bootbox.alert(msg);
