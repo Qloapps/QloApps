@@ -1663,15 +1663,16 @@ abstract class ModuleCore
 
                     if (!in_array($modaddons->name, $modulesOnDisk)) {
                         if (isset($modaddons->img)) {
-                            if (!file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
-                                if (!file_put_contents(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg', Tools::file_get_contents($modaddons->img))) {
-                                    copy(_PS_IMG_DIR_.'404.gif', _PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg');
+                            $imgFile = md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg';
+                            if (!file_exists(_PS_TMP_IMG_DIR_.$imgFile)) {
+                                $imgContent = Tools::file_get_contents($modaddons->img);
+                                if ($imgContent) {
+                                    file_put_contents(_PS_TMP_IMG_DIR_.$imgFile, $imgContent);
                                 }
                             }
 
-                            if (file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
-                                $item->image = '../img/tmp/'.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg';
-                            }
+                            // Show 404 image without caching it, so the download is retried next time
+                            $item->image = file_exists(_PS_TMP_IMG_DIR_.$imgFile) ? '../img/tmp/'.$imgFile : '../img/404.gif';
                         }
                     }
 
