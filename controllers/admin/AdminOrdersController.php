@@ -2332,35 +2332,6 @@ class AdminOrdersControllerCore extends AdminController
                         throw new PrestaShopException('Can\'t load Currency object');
                     }
 
-                    // Update order detail amount
-                    foreach ($order->getOrderDetailList() as $row) {
-                        $order_detail = new OrderDetail($row['id_order_detail']);
-                        $fields = array(
-                            'ecotax',
-                            'product_price',
-                            'reduction_amount',
-                            'total_shipping_price_tax_excl',
-                            'total_shipping_price_tax_incl',
-                            'total_price_tax_incl',
-                            'total_price_tax_excl',
-                            'product_quantity_discount',
-                            'purchase_supplier_price',
-                            'reduction_amount',
-                            'reduction_amount_tax_incl',
-                            'reduction_amount_tax_excl',
-                            'unit_price_tax_incl',
-                            'unit_price_tax_excl',
-                            'original_product_price'
-
-                        );
-                        foreach ($fields as $field) {
-                            $order_detail->{$field} = Tools::convertPriceFull($order_detail->{$field}, $old_currency, $currency);
-                        }
-
-                        $order_detail->update();
-                        $order_detail->updateTaxAmount($order);
-                    }
-
                     $id_order_carrier = (int)$order->getIdOrderCarrier();
                     if ($id_order_carrier) {
                         $order_carrier = $order_carrier = new OrderCarrier((int)$order->getIdOrderCarrier());
@@ -2520,6 +2491,35 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
+
+                    // Update order detail amount and taxes, only after every other line price (room bookings, service products) is converted, otherwise taxes get calculated on the old currency prices
+                    foreach ($order->getOrderDetailList() as $row) {
+                        $order_detail = new OrderDetail($row['id_order_detail']);
+                        $fields = array(
+                            'ecotax',
+                            'product_price',
+                            'reduction_amount',
+                            'total_shipping_price_tax_excl',
+                            'total_shipping_price_tax_incl',
+                            'total_price_tax_incl',
+                            'total_price_tax_excl',
+                            'product_quantity_discount',
+                            'purchase_supplier_price',
+                            'reduction_amount',
+                            'reduction_amount_tax_incl',
+                            'reduction_amount_tax_excl',
+                            'unit_price_tax_incl',
+                            'unit_price_tax_excl',
+                            'original_product_price'
+
+                        );
+                        foreach ($fields as $field) {
+                            $order_detail->{$field} = Tools::convertPriceFull($order_detail->{$field}, $old_currency, $currency);
+                        }
+
+                        $order_detail->update();
+                        $order_detail->updateTaxAmount($order);
+                    }
 
                     // update Order refund prices (order_return and order_return_detail)
                     if ($orderReturns = OrderReturn::getOrdersReturn($order->id_customer, $order->id)) {
