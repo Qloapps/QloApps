@@ -2,6 +2,7 @@
 include('config/config.php');
 
 $_SESSION["verify"] = "RESPONSIVEfilemanager";
+$fmTokenValue = Tools::getAdminTokenLite($products_accesses['edit'] ? 'AdminProducts' : 'AdminCmsContent');
 
 if (isset($_POST['submit'])) {
     include('upload.php');
@@ -242,7 +243,7 @@ if (isset($_POST['submit'])) {
 		<script>
 			var ext_img = new Array('<?php echo implode("','", $ext_img)?>');
 			var allowed_ext = new Array('<?php echo implode("','", $ext)?>');
-			var fmToken = "<?php echo Tools::getAdminTokenLite($products_accesses['edit'] ? 'AdminProducts' : 'AdminCmsContent'); ?>";
+			var fmToken = "<?php echo $fmTokenValue; ?>";
 			var loading_bar =<?php echo $loading_bar?"true":"false";
     ?>;
 			var image_editor =<?php echo $aviary_active?"true":"false";
@@ -288,7 +289,7 @@ if (isset($_POST['submit'])) {
 						$.ajax({
 							type: "POST",
 							url: "ajax_calls.php?action=save_img",
-							data: { url: newURL, path: $('#sub_folder').val() + $('#fldr_value').val(), name: $('#aviary_img').data('name') }
+							data: { url: newURL, path: $('#sub_folder').val() + $('#fldr_value').val(), name: $('#aviary_img').data('name'), token: fmToken }
 						}).done(function (msg) {
 							featherEditor.close();
 							d = new Date();
@@ -393,8 +394,7 @@ if (isset($_POST['submit'])) {
     ?>"/>
 							<input type="hidden" name="path_thumb" value="<?php echo Tools::safeOutput($subfolder.$subdir);
     ?>"/>
-							<input type="hidden" name="token" value="<?php echo Tools::safeOutput(Tools::getAdminTokenLite($products_accesses['edit'] ? 'AdminProducts' : 'AdminCmsContent'));
-    ?>"/>
+							<input type="hidden" name="token" value="<?php echo Tools::safeOutput($fmTokenValue); ?>"/>
 
 							<div class="fallback">
 								<?php echo lang_Upload_file ?>:<br/>
@@ -1142,6 +1142,7 @@ if (isset($_POST['submit'])) {
     ?>"
 						   title="<?php echo lang_Preview ?>" data-url="ajax_calls.php?action=media_preview&title=<?php echo Tools::safeOutput($filename);
     ?>&file=<?php echo Tools::safeOutput(Context::getContext()->shop->physical_uri.'img/cms/'.$subfolder.$subdir.$file);
+    ?>&token=<?php echo urlencode($fmTokenValue);
     ?>"
 						   href="javascript:void('');"><i class=" icon-eye-open"></i></a>
 					<?php
