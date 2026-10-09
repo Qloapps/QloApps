@@ -36,9 +36,62 @@ class HotelPropertyType extends ObjectModel
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
-            'name' => array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true),
+            'name' => array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true, 'size' => 255),
         ),
     );
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'property_types',
+        'objectNodeName' => 'property_type',
+        'objectMethods' => array('update' => 'updateWs', 'delete' => 'deleteWs'),
+        'fields' => array(
+            'name' => array('required' => true),
+            'active' => array('required' => false),
+        ),
+    );
+
+    /**
+     * Webservice: update, refusing to disable a property type that is in use.
+     *
+     * @param bool $nullValues
+     *
+     * @return bool
+     *
+     * @throws WebserviceException
+     */
+    public function updateWs($nullValues = false)
+    {
+        if (!$this->active && $this->id) {
+            $objOld = new HotelPropertyType((int) $this->id);
+            if (Validate::isLoadedObject($objOld) && $objOld->active && $objOld->isUsed()) {
+                throw new WebserviceException(
+                    Tools::displayError('You cannot disable this property type because it is currently assigned.'),
+                    array(400, 400)
+                );
+            }
+        }
+
+        return $this->update($nullValues);
+    }
+
+    /**
+     * Webservice: delete, refusing to delete a property type that is in use.
+     *
+     * @return bool
+     *
+     * @throws WebserviceException
+     */
+    public function deleteWs()
+    {
+        if ($this->isUsed()) {
+            throw new WebserviceException(
+                Tools::displayError('You cannot delete this property type because it is currently assigned.'),
+                array(400, 400)
+            );
+        }
+
+        return $this->delete();
+    }
 
     /**
      * Check if this property type is currently assigned to any property.

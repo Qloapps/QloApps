@@ -106,6 +106,10 @@ class HotelBranchInformation extends ObjectModel
                 'required' => true,
                 'xlink_resource'=> 'countries',
             ),
+            'id_property_type' => array(
+                'required' => true,
+                'xlink_resource'=> 'hotel_property_types',
+            ),
             'id_state' => array(
                 'xlink_resource'=> 'states',
             ),

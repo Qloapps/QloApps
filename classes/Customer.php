@@ -147,6 +147,7 @@ class CustomerCore extends ObjectModel
         'fields' => array(
             'id_default_group' => array('xlink_resource' => 'groups'),
             'id_lang' => array('xlink_resource' => 'languages'),
+            'id_country' => array('xlink_resource' => 'countries'),
             'newsletter_date_add' => array(),
             'ip_registration_newsletter' => array(),
             'last_passwd_gen' => array('setter' => null),
