@@ -596,8 +596,7 @@ class OrderDetailCore extends ObjectModel
         $this->tax_calculator = $tax_manager->getTaxCalculator();
 
         $result = $this->saveTaxCalculator($order, true);
-        $result = OrderTaxDetail::rescopeVatAfterReset((int) $this->id, (int) $order->id_currency) && $result;
-
+        OrderTaxDetail::rescopeVatAfterReset((int) $this->id);
         return $result;
     }
 

@@ -349,10 +349,9 @@ class OrderTaxDetailCore extends ObjectModel
      * @param int $idCurrency Currency to use when recalculating tourism tax
      * @return bool
      */
-    public static function rescopeVatAfterReset($idOrderDetail, $idCurrency)
+    public static function rescopeVatAfterReset($idOrderDetail)
     {
         $idOrderDetail = (int) $idOrderDetail;
-        $idCurrency = (int) $idCurrency;
         $db = Db::getInstance();
         $result = true;
 
@@ -374,7 +373,7 @@ class OrderTaxDetailCore extends ObjectModel
             $result = self::recomputeInclusivePrice($idOrderDetail, 0, 0) && $result;
         }
 
-        $result = self::recalculateTourismTax($idOrderDetail, $idCurrency) && $result;
+        $result = self::recalculateTourismTax($idOrderDetail) && $result;
 
         return $result;
     }
@@ -993,7 +992,7 @@ class OrderTaxDetailCore extends ObjectModel
      * @param array $params
      * @return void
      */
-    protected static function saveTourismTaxFromParams(array $params)
+    public static function saveTourismTaxFromParams(array $params)
     {
         self::saveTourismTax(
             $params['idTaxRulesGroup'],
@@ -1015,69 +1014,34 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
+     * Recalculate the tourism tax of every room booking and service line under an order detail.
+     * Tourism tax depends on the order currency and the booking/service prices, so call this after they are changed (e.g. order currency change).
+     *
      * @param int $idOrderDetail
-     * @param int $idCurrency Currency to use for the calculation
-     * @return bool
+     * @return void
      */
-    public static function recalculateTourismTax($idOrderDetail, $idCurrency)
+    public static function recalculateTourismTax($idOrderDetail)
     {
         $idOrderDetail = (int) $idOrderDetail;
-        $idCurrency = (int) $idCurrency;
-        if (!Configuration::get('QLO_USE_TOURISM_TAX')) {
-            return true;
-        }
+        $db = Db::getInstance();
 
-        $rooms = Db::getInstance()->executeS(
-            'SELECT `id`, `id_status` FROM `' . _DB_PREFIX_ . 'htl_booking_detail`
-             WHERE `id_order_detail` = ' . $idOrderDetail
+        $idsHtlBooking = $db->executeS(
+            'SELECT `id` FROM `' . _DB_PREFIX_ . 'htl_booking_detail` WHERE `id_order_detail` = ' . $idOrderDetail
         );
-        foreach ((array) $rooms as $room) {
-            $idHtlBooking = (int) $room['id'];
-            if ((int) $room['id_status'] === HotelBookingDetail::STATUS_CANCELLED
-                || self::hasRefundedRowsForScope(self::SCOPE_COLUMN_ROOM, $idHtlBooking)
-                || self::isBookingExempted($idHtlBooking)
-            ) {
-                continue;
-            }
-
-            $params = self::buildRoomTaxParams($idHtlBooking);
-            if ($params) {
-                $params['idCurrency'] = $idCurrency;
+        foreach ((array) $idsHtlBooking as $row) {
+            if ($params = self::buildRoomTaxParams((int) $row['id'])) {
                 self::saveTourismTaxFromParams($params);
             }
         }
 
-        $serviceRows = Db::getInstance()->executeS(
-            'SELECT `id_service_product_order_detail`, `id_htl_booking_detail`, `is_refunded`
-             FROM `' . _DB_PREFIX_ . 'service_product_order_detail`
-             WHERE `id_order_detail` = ' . $idOrderDetail
+        $idsServiceLine = $db->executeS(
+            'SELECT `id_service_product_order_detail` FROM `' . _DB_PREFIX_ . 'service_product_order_detail` WHERE `id_order_detail` = ' . $idOrderDetail
         );
-        foreach ((array) $serviceRows as $serviceRow) {
-            $idServiceLine = (int) $serviceRow['id_service_product_order_detail'];
-            $idHtlBooking = (int) $serviceRow['id_htl_booking_detail'];
-            $parentBookingUnavailable = false;
-            if ($idHtlBooking) {
-                $parentBooking = new HotelBookingDetail($idHtlBooking);
-                $parentBookingUnavailable = !Validate::isLoadedObject($parentBooking)
-                    || (int) $parentBooking->id_status === HotelBookingDetail::STATUS_CANCELLED
-                    || self::hasRefundedRowsForScope(self::SCOPE_COLUMN_ROOM, $idHtlBooking);
-            }
-            if ((bool) $serviceRow['is_refunded']
-                || $parentBookingUnavailable
-                || ($idHtlBooking && self::isBookingExempted($idHtlBooking))
-                || (!$idHtlBooking && self::isServiceLineExempted($idServiceLine))
-            ) {
-                continue;
-            }
-
-            $params = self::buildServiceLineTaxParams($idServiceLine);
-            if ($params) {
-                $params['idCurrency'] = $idCurrency;
+        foreach ((array) $idsServiceLine as $row) {
+            if ($params = self::buildServiceLineTaxParams((int) $row['id_service_product_order_detail'])) {
                 self::saveTourismTaxFromParams($params);
             }
         }
-
-        return true;
     }
 
     /**
