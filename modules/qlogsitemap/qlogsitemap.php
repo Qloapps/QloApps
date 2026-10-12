@@ -45,6 +45,7 @@ class Qlogsitemap extends Module
         'contact' => 0.2,
         'category' => 0.6,
         'roomType' => 0.4,
+        'standalone' => 0.4,
         'cms' => 0.2,
         'login' => 0.2,
     );
@@ -170,6 +171,7 @@ class Qlogsitemap extends Module
             $this->addPageUrls($lang, $this->pagesBefore);
             $this->addCategoryUrls($lang);
             $this->addRoomTypeUrls($lang);
+            $this->addStandaloneProductUrls($lang);
             $this->addCmsUrls($lang);
             $this->addPageUrls($lang, $this->pagesAfter);
             $this->closeSitemapFile();
@@ -260,6 +262,26 @@ class Qlogsitemap extends Module
             $this->addUrl(
                 $this->context->link->getProductLink($product, $product->link_rewrite, null, null, $idLang, $idShop),
                 'roomType',
+                $product->date_upd
+            );
+        }
+    }
+
+    protected function addStandaloneProductUrls($lang)
+    {
+        $idLang = (int) $lang['id_lang'];
+        $idShop = (int) $this->context->shop->id;
+
+        foreach (QgsHelper::getStandaloneProductIds($idShop) as $row) {
+            $product = new Product((int) $row['id_product'], false, $idLang);
+            // The product has no content in this language
+            if (!$product->link_rewrite) {
+                continue;
+            }
+
+            $this->addUrl(
+                $this->context->link->getProductLink($product, $product->link_rewrite, null, null, $idLang, $idShop),
+                'standalone',
                 $product->date_upd
             );
         }

@@ -32,21 +32,55 @@ class QgsHelper
 
     const QGS_DEFAULT_FREQUENCY = 'weekly';
 
+    protected static function getProductGroupJoin()
+    {
+        if (!Group::isFeatureActive() || !Configuration::get('PS_UNIDENTIFIED_GROUP')) {
+            return '';
+        }
+
+        return ' INNER JOIN (
+            SELECT DISTINCT cp.`id_product` FROM `'._DB_PREFIX_.'category_product` cp
+            INNER JOIN `'._DB_PREFIX_.'category_group` cg ON (cg.`id_category` = cp.`id_category`)
+            WHERE cg.`id_group` = '.(int) Configuration::get('PS_UNIDENTIFIED_GROUP').'
+        ) g ON ps.`id_product` = g.`id_product`';
+    }
+
     public static function getRoomTypeIds($idShop)
     {
-        $groupJoin = '';
-        if (Group::isFeatureActive() && Configuration::get('PS_UNIDENTIFIED_GROUP')) {
-            $groupJoin = ' INNER JOIN (
-                SELECT DISTINCT cp.`id_product` FROM `'._DB_PREFIX_.'category_product` cp
-                INNER JOIN `'._DB_PREFIX_.'category_group` cg ON (cg.`id_category` = cp.`id_category`)
-                WHERE cg.`id_group` = '.(int) Configuration::get('PS_UNIDENTIFIED_GROUP').'
-            ) g ON ps.`id_product` = g.`id_product`';
-        }
+        return Db::getInstance()->executeS(
+            'SELECT ps.`id_product` FROM `'._DB_PREFIX_.'product_shop` ps
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = ps.`id_product`)'.self::getProductGroupJoin().'
+            WHERE ps.`id_shop` = '.(int) $idShop.' AND ps.`active` = 1 AND ps.`visibility` <> \'none\' AND p.`booking_product` = 1
+            ORDER BY ps.`id_product`'
+        );
+    }
+    public static function getStandaloneProductIds($idShop)
+    {
+        $standaloneTypes = array(
+            Product::SELLING_PREFERENCE_WITH_STANDALONE,
+            Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        );
+        // Types that are also sold with hotels need at least one hotel linked to the product
+        $withHotelTypes = array(
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        );
 
         return Db::getInstance()->executeS(
             'SELECT ps.`id_product` FROM `'._DB_PREFIX_.'product_shop` ps
-            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = ps.`id_product`)'.$groupJoin.'
-            WHERE ps.`id_shop` = '.(int) $idShop.' AND ps.`active` = 1 AND ps.`visibility` <> \'none\' AND p.`booking_product` = 1
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = ps.`id_product`)'.self::getProductGroupJoin().'
+            WHERE ps.`id_shop` = '.(int) $idShop.' AND ps.`active` = 1 AND ps.`show_at_front` = 1
+            AND ps.`visibility` <> \'none\' AND p.`booking_product` = 0
+            AND p.`selling_preference_type` IN ('.implode(', ', array_map('intval', $standaloneTypes)).')
+            AND (
+                p.`selling_preference_type` NOT IN ('.implode(', ', array_map('intval', $withHotelTypes)).')
+                OR EXISTS (
+                    SELECT 1 FROM `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+                    WHERE rsp.`id_product` = p.`id_product` AND rsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.'
+                )
+            )
             ORDER BY ps.`id_product`'
         );
     }
