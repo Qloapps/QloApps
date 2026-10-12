@@ -2407,7 +2407,7 @@ class AdminControllerCore extends Controller
                 }
             } else {
                 foreach (libxml_get_errors() as $error) {
-                    $this->errors[] = Tools::displayError(sprintf('Error found : %1$s in country_module_list.xml file.', $error->message));
+                    $this->errors[] = Tools::displayError(sprintf('Error found : %1$s in %2$s file.', $error->message, basename(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST)));
                 }
             }
         }
