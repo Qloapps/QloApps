@@ -40,19 +40,19 @@ class HotelBranchRefundRules extends ObjectModel
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
     ));
 
-    public function getHotelRefundRules($idHotel = 0, $idRefundRule = 0, $detailed = 0, $idLang = 0, $sortPosition = 1, $maxDate = '')
+    public function getHotelRefundRules($idHotel = 0, $idRefundRule = 0, $detailed = 0, $idLang = 0, $sortPosition = 1, $maxCheckin = '')
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
         }
 
         $days = false;
-        if ($maxDate) {
+        if ($maxCheckin) {
             $dateToday = date('Y-m-d');
-            if (strtotime($maxDate) < strtotime($dateToday)) {
+            if (strtotime($maxCheckin) < strtotime($dateToday)) {
                 return array();
             }
-            $days = HotelBookingDetail::getDays($dateToday, date('Y-m-d', strtotime($maxDate)));
+            $days = HotelBookingDetail::getDays($dateToday, date('Y-m-d', strtotime($maxCheckin)));
             $detailed = 1;
         }
 

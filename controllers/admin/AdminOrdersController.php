@@ -3740,12 +3740,7 @@ class AdminOrdersControllerCore extends AdminController
 
         // applicable refund policies
         $applicableRefundPolicies = array();
-        if (($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id))
-            && ($maxDate = Db::getInstance()->getValue(
-                'SELECT MAX(DATE(`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail`
-                WHERE `id_order` = '.(int) $order->id
-            ))
-        ) {
+        if (($idHotel = HotelBookingDetail::getIdHotelByIdOrder($order->id))) {
             $objBranchRefundRules = new HotelBranchRefundRules();
             $applicableRefundPolicies = $objBranchRefundRules->getHotelRefundRules(
                 $idHotel,
@@ -3753,7 +3748,6 @@ class AdminOrdersControllerCore extends AdminController
                 1,
                 $this->context->language->id,
                 1,
-                $maxDate
             );
         }
 
