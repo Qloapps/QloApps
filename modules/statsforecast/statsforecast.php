@@ -716,7 +716,7 @@ class StatsForecast extends Module
 				WHERE l.active = 1';
         $languages = Db::getInstance()->executeS($sql);
         foreach ($languages as $language) {
-            $lang_values .= 'SUM(IF(o.id_lang = '.(int)$language['id_lang'].', total_paid_tax_excl / o.`conversion_rate`, 0)) as '.pSQL($language['iso_code']).',';
+            $lang_values .= 'SUM(IF(o.id_lang = '.(int)$language['id_lang'].', total_paid_tax_excl / o.conversion_rate, 0)) as '.pSQL($language['iso_code']).',';
         }
         $lang_values = rtrim($lang_values, ',');
 

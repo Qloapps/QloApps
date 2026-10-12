@@ -255,7 +255,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
         } elseif ($granularity == 'month') {
             $sales = array();
             if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->ExecuteS(
-                'SELECT LEFT(`invoice_date`, 7) AS date, SUM(total_paid_tax_excl / o.`conversion_rate`) AS sales
+                'SELECT LEFT(`invoice_date`, 7) AS date, SUM(total_paid_tax_excl / o.conversion_rate) AS sales
                 FROM `'._DB_PREFIX_.'orders` o
                 LEFT JOIN `'._DB_PREFIX_.'order_state` os ON o.current_state = os.id_order_state
                 WHERE os.logable = 1'. (($date_from && $date_to) ? ' AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00" AND "'.pSQL($date_to).' 23:59:59"' : '').'
@@ -466,7 +466,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 			LEFT JOIN (
 				SELECT pr.`id_product`,
 					IFNULL(SUM(cp.`product_quantity`), 0) AS totalQuantitySold,
-					IFNULL(SUM(cp.`product_price` * cp.`product_quantity`), 0) / o.`conversion_rate` AS totalPriceSold
+					IFNULL(SUM(cp.`product_price` * cp.`product_quantity`), 0) / o.conversion_rate AS totalPriceSold
 				FROM `'._DB_PREFIX_.'product` pr
 				LEFT OUTER JOIN `'._DB_PREFIX_.'order_detail` cp ON pr.`id_product` = cp.`product_id`
 				LEFT JOIN `'._DB_PREFIX_.'orders` o ON o.`id_order` = cp.`id_order`
@@ -712,8 +712,8 @@ class AdminStatsControllerCore extends AdminStatsTabController
         $orders = Db::getInstance()->ExecuteS('
             SELECT
                 LEFT(`invoice_date`, 10) as date,
-                total_paid_tax_incl / o.`conversion_rate` as total_paid_tax_incl,
-                total_shipping_tax_excl / o.`conversion_rate` as total_shipping_tax_excl,
+                total_paid_tax_incl / o.conversion_rate as total_paid_tax_incl,
+                total_shipping_tax_excl / o.conversion_rate as total_shipping_tax_excl,
                 o.module,
                 ad.id_country,
                 o.id_currency,

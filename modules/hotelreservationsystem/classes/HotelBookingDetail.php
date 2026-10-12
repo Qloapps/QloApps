@@ -4454,7 +4454,7 @@ class HotelBookingDetail extends ObjectModel
 
     /**
      * Refunded booking rows in a date range, one row per booking (requires ORDER RETURN record).
-     * A booking only appears here once it has a matching order_return_detail row.
+     * QloApps sets is_refunded=1 on all freed/refunded rooms; is_cancelled is not reliably set.
      * Refund report filters this further to refunded_amount > 0 in the caller; Cancellation report shows all rows.
      *
      * @param array $params date_from, date_to, id_hotel, id_customer, id_product, detailed_info
