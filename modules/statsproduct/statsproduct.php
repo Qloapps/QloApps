@@ -84,7 +84,7 @@ class StatsProduct extends ModuleGraph
     public function getTotalRevenue($id_product)
     {
         $date_between = ModuleGraph::getDateBetween();
-        $sql = 'SELECT SUM(hbd.`total_price_tax_excl` / '.Currency::getReportConversionRateSql('o').')
+        $sql = 'SELECT SUM(hbd.`total_price_tax_excl` / o.`conversion_rate`)
         FROM `'._DB_PREFIX_.'orders` o
         INNER JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd
         ON (hbd.`id_order` = o.`id_order` AND hbd.`id_product` = '.(int) $id_product.')
