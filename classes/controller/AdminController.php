@@ -1270,6 +1270,9 @@ class AdminControllerCore extends Controller
                     $callback_obj = (isset($params['callback_object'])) ? $params['callback_object'] : $this->context->controller;
                     if (!preg_match('/<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)/ism', call_user_func_array(array($callback_obj, $params['callback']), array($field_value, $row)))) {
                         $field_value = call_user_func_array(array($callback_obj, $params['callback']), array($field_value, $row));
+                    } elseif (is_string($field_value)) {
+                        // raw value is used for HTML output; ", " makes fputcsv quote it so comma separated values stay in one column
+                        $field_value = preg_replace('/\s*,\s*/', ', ', $field_value);
                     }
                 }
                 $content[] = $field_value;
