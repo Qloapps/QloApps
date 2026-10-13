@@ -407,6 +407,7 @@ class AdminCartsControllerCore extends AdminController
             'total_discounts' => $total_discounts,
             'total_wrapping' => $total_wrapping,
             'total_price' => $total_price,
+            'total_tourism_tax' => isset($summary['total_tourism_tax']) ? $summary['total_tourism_tax'] : 0,
             'total_shipping' => $total_shipping,
             'customized_datas' => $customized_datas,
             'tax_calculation_method' => $tax_calculation_method
