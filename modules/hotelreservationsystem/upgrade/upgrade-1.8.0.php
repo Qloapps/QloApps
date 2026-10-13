@@ -47,9 +47,11 @@ class UpgradeHotelreservationSystem180
             && $this->seedBookingStatuses()
             && $this->migrateFeaturesToAmenities()
             && $this->migrateBranchFeaturesToBranchAmenities()
+            && $this->dropMigratedFeatureTables()
             && $this->backfillBookingStatusHistory()
             && $this->dropObsoleteColumns()
-            && $this->addHeaderImageSettingsLink();
+            && $this->addHeaderImageSettingsLink()
+            && $this->dropDeadDemandTables();
     }
 
     public function updateTables()
@@ -295,6 +297,19 @@ class UpgradeHotelreservationSystem180
     }
 
     /**
+     * Old features data has been copied into htl_amenity/htl_branch_amenity above -
+     * the old tables are now safe to remove.
+     */
+    public function dropMigratedFeatureTables()
+    {
+        foreach (array('htl_features', 'htl_features_lang', 'htl_branch_features') as $tableName) {
+            Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.$tableName.'`');
+        }
+
+        return true;
+    }
+
+    /**
      * htl_booking_detail.is_refunded/is_cancelled are being dropped in 1.8.0 (superseded by
      * htl_booking_status_history). Translate any existing 1/0 flags into a status-history row
      * before the columns go away, so the historical state isn't silently lost.
@@ -382,6 +397,31 @@ class UpgradeHotelreservationSystem180
         }
 
         return (bool) $objSettingsLink->add();
+    }
+
+    /**
+     * The old "Additional Facility" demand system - confirmed zero live code references
+     * (only a decade-old, never-rerun upgrade-1.4.0.php mentions these table names); nothing
+     * to migrate, just drop.
+     */
+    public function dropDeadDemandTables()
+    {
+        $deadTables = array(
+            'htl_booking_demands',
+            'htl_booking_demands_tax',
+            'htl_room_type_global_demand',
+            'htl_room_type_global_demand_lang',
+            'htl_room_type_global_demand_advance_option',
+            'htl_room_type_global_demand_advance_option_lang',
+            'htl_room_type_demand_price',
+            'htl_room_type_demand',
+        );
+
+        foreach ($deadTables as $tableName) {
+            Db::getInstance()->execute('DROP TABLE IF EXISTS `'._DB_PREFIX_.$tableName.'`');
+        }
+
+        return true;
     }
 
     private function tableExists($tableName)

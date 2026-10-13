@@ -207,3 +207,5 @@ INNER JOIN `PREFIX_order_detail` od ON od.`id_order_detail` = odt.`id_order_deta
 INNER JOIN `PREFIX_orders` o ON o.`id_order` = od.`id_order`
 LEFT JOIN `PREFIX_htl_booking_detail` hbd ON hbd.`id_order_detail` = od.`id_order_detail`
 LEFT JOIN `PREFIX_service_product_order_detail` spod ON spod.`id_order_detail` = od.`id_order_detail`;
+
+DROP TABLE IF EXISTS `PREFIX_order_detail_tax`;
