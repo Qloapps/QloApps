@@ -662,46 +662,4 @@ class ServiceProductCartDetail extends ObjectModel
         return parent::delete();
     }
 
-    public static function validateServiceProductsInCart()
-    {
-        $context = Context::getContext();
-        $objServiceProductCartDetail = new ServiceProductCartDetail();
-
-        // standalone products require customer address before payment
-        if ($context->customer->id
-            && !Customer::getAddressesTotalById((int) $context->customer->id)
-            && count($objServiceProductCartDetail->getServiceProductsInCart(
-                $context->cart->id,
-                [
-                    Product::SELLING_PREFERENCE_WITH_STANDALONE,
-                    Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
-                    Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
-                    Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
-                ],
-                0,
-                0
-            ))
-        ) {
-            Tools::redirect('index.php?controller=address&back='.urlencode('order.php?step=1'));
-        }
-
-        if ($cartProducts = $context->cart->getProducts()) {
-            foreach ($cartProducts as $product) {
-                if (!$product['active'] && !$product['booking_product']) {
-                    if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
-                        $context->cart->id,
-                        [],
-                        null,
-                        null,
-                        null,
-                        $product['id_product']
-                    )) {
-                        foreach ($serviceProducts as $serviceProduct) {
-                            $objServiceProductCartDetail->removeServiceProductByIdHtlCartBooking($serviceProduct['htl_cart_booking_id']);
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
