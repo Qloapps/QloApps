@@ -5172,20 +5172,9 @@ class AdminOrdersControllerCore extends AdminController
         $use_taxes = true;
         $this->context->currency = new Currency($order->id_currency);
 
-        $initial_product_price_tax_incl = Product::getPriceStatic(
-            $product->id,
-            $use_taxes,
-            isset($combination) ? $combination->id : null,
-            2,
-            null,
-            false,
-            true,
-            1,
-            false,
-            $order->id_customer,
-            $cart->id,
-            $order->id_address_tax
-        );
+        // price for the selected dates (advance price rules are applied), same as shown in the modal
+        $roomTotalPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice($product->id, $date_from, $date_to, 0, Group::getCurrent()->id, 0, 0, 0, 0, 1);
+        $initial_product_price_tax_incl = Tools::ps_round($roomTotalPrice['total_price_tax_incl'] / $num_days, _PS_PRICE_COMPUTE_PRECISION_);
 
         // create feature price if needed
         $createFeaturePrice = $product_informations['product_price_tax_incl'] != $initial_product_price_tax_incl;
