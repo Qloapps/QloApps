@@ -346,7 +346,6 @@ class OrderTaxDetailCore extends ObjectModel
     /**
      *
      * @param int $idOrderDetail
-     * @param int $idCurrency Currency to use when recalculating tourism tax
      * @return bool
      */
     public static function rescopeVatAfterReset($idOrderDetail)
@@ -372,8 +371,6 @@ class OrderTaxDetailCore extends ObjectModel
         if ($roomIds || $serviceIds) {
             $result = self::recomputeInclusivePrice($idOrderDetail, 0, 0) && $result;
         }
-
-        $result = self::recalculateTourismTax($idOrderDetail) && $result;
 
         return $result;
     }
@@ -886,7 +883,8 @@ class OrderTaxDetailCore extends ObjectModel
             return false;
         }
 
-        $unitPriceTaxExcl = Tools::ps_round((float) $booking->total_price_tax_excl / $numNights, 6);
+        // getTaxesAmount() expects the price in the default currency and converts the amount to 'idCurrency' itself
+        $unitPriceTaxExcl = Tools::ps_round(Tools::convertPrice((float) $booking->total_price_tax_excl / $numNights, (int) $order->id_currency, false), 6);
 
         $childrenAges = array();
         if ($booking->child_ages) {
@@ -970,7 +968,7 @@ class OrderTaxDetailCore extends ObjectModel
         return array(
             'idTaxRulesGroup' => $idTaxRulesGroup,
             'address' => $address,
-            'unitPriceTaxExcl' => (float) $serviceLine->unit_price_tax_excl,
+            'unitPriceTaxExcl' => Tools::convertPrice((float) $serviceLine->unit_price_tax_excl, (int) $order->id_currency, false),
             'checkInDate' => $checkInDate,
             'numNights' => $numNights,
             'numAdults' => $numAdults,
@@ -992,7 +990,7 @@ class OrderTaxDetailCore extends ObjectModel
      * @param array $params
      * @return void
      */
-    public static function saveTourismTaxFromParams(array $params)
+    protected static function saveTourismTaxFromParams(array $params)
     {
         self::saveTourismTax(
             $params['idTaxRulesGroup'],
@@ -1011,37 +1009,6 @@ class OrderTaxDetailCore extends ObjectModel
             $params['idHtlBooking'],
             $params['idServiceProductOrderDetail']
         );
-    }
-
-    /**
-     * Recalculate the tourism tax of every room booking and service line under an order detail.
-     * Tourism tax depends on the order currency and the booking/service prices, so call this after they are changed (e.g. order currency change).
-     *
-     * @param int $idOrderDetail
-     * @return void
-     */
-    public static function recalculateTourismTax($idOrderDetail)
-    {
-        $idOrderDetail = (int) $idOrderDetail;
-        $db = Db::getInstance();
-
-        $idsHtlBooking = $db->executeS(
-            'SELECT `id` FROM `' . _DB_PREFIX_ . 'htl_booking_detail` WHERE `id_order_detail` = ' . $idOrderDetail
-        );
-        foreach ((array) $idsHtlBooking as $row) {
-            if ($params = self::buildRoomTaxParams((int) $row['id'])) {
-                self::saveTourismTaxFromParams($params);
-            }
-        }
-
-        $idsServiceLine = $db->executeS(
-            'SELECT `id_service_product_order_detail` FROM `' . _DB_PREFIX_ . 'service_product_order_detail` WHERE `id_order_detail` = ' . $idOrderDetail
-        );
-        foreach ((array) $idsServiceLine as $row) {
-            if ($params = self::buildServiceLineTaxParams((int) $row['id_service_product_order_detail'])) {
-                self::saveTourismTaxFromParams($params);
-            }
-        }
     }
 
     /**

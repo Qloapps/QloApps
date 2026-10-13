@@ -2521,6 +2521,42 @@ class AdminOrdersControllerCore extends AdminController
                         $order_detail->updateTaxAmount($order);
                     }
 
+                    // Tourism tax depends on the order currency, and updateTaxAmount() only rebuilds VAT, so rebuild it from the converted prices
+                    if (Configuration::get('QLO_USE_TOURISM_TAX')) {
+                        $tourismTaxParamsList = array();
+                        if ($activeRoomBookings = $objHtlBookingDetail->getOrderCurrentDataByOrderId($order->id, array(), false)) {
+                            foreach ($activeRoomBookings as $roomBooking) {
+                                $tourismTaxParamsList[] = OrderTaxDetail::buildRoomTaxParams((int) $roomBooking['id']);
+                            }
+                        }
+                        if ($orderServices = $objRoomTypeServProdOrderDtl->getServiceProductsInOrder($order->id)) {
+                            foreach ($orderServices as $serviceProduct) {
+                                if (!$serviceProduct['is_refunded'] && !$serviceProduct['is_cancelled']) {
+                                    $tourismTaxParamsList[] = OrderTaxDetail::buildServiceLineTaxParams((int) $serviceProduct['id_service_product_order_detail']);
+                                }
+                            }
+                        }
+                        foreach (array_filter($tourismTaxParamsList) as $tourismTaxParams) {
+                            OrderTaxDetail::saveTourismTax(
+                                $tourismTaxParams['idTaxRulesGroup'],
+                                $tourismTaxParams['address'],
+                                $tourismTaxParams['unitPriceTaxExcl'],
+                                $tourismTaxParams['checkInDate'],
+                                $tourismTaxParams['numNights'],
+                                $tourismTaxParams['numAdults'],
+                                $tourismTaxParams['childrenAges'],
+                                $tourismTaxParams['idCurrency'],
+                                $tourismTaxParams['collectionType'],
+                                $tourismTaxParams['idLang'],
+                                $tourismTaxParams['quantity'],
+                                $tourismTaxParams['idOrder'],
+                                $tourismTaxParams['idOrderDetail'],
+                                $tourismTaxParams['idHtlBooking'],
+                                $tourismTaxParams['idServiceProductOrderDetail']
+                            );
+                        }
+                    }
+
                     // update Order refund prices (order_return and order_return_detail)
                     if ($orderReturns = OrderReturn::getOrdersReturn($order->id_customer, $order->id)) {
                         $fields = array(
