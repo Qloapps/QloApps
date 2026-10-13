@@ -307,6 +307,7 @@ class WebserviceRequestCore
             'shops' => array('description' => 'Shops from multi-shop feature', 'class' => 'Shop'),
             'shop_groups' => array('description' => 'Shop groups from multi-shop feature', 'class' => 'ShopGroup'),
             'taxes' => array('description' => 'The tax rate', 'class' => 'Tax'),
+            'tourism_taxes' => array('description' => 'The tourism taxes with their configuration, price tiers, child ranges and validity ranges', 'class' => 'TaxConfiguration'),
             'stock_movements' => array('description' => 'Stock movements', 'class' => 'StockMvtWS', 'forbidden_method' => array('PUT', 'POST', 'DELETE')),
             'stock_movement_reasons' => array('description' => 'Stock movement reason', 'class' => 'StockMvtReason'),
             'warehouses' => array('description' => 'Warehouses', 'class' => 'Warehouse', 'forbidden_method' => array('DELETE')),
