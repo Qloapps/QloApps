@@ -27,18 +27,36 @@ if (!defined('_PS_VERSION_')) {
 
 require_once dirname(__FILE__).'/classes/QgsHelper.php';
 
+/**
+ * Generates XML sitemaps (one set per language) plus a sitemap index file.
+ */
 class Qlogsitemap extends Module
 {
+    /**
+     * Front pages listed before the categories and room types (page name => URL type).
+     *
+     * @var array
+     */
     protected $pagesBefore = array(
         'index' => 'home',
         'our-properties' => 'meta',
     );
 
+    /**
+     * Front pages listed after the CMS pages (page name => URL type).
+     *
+     * @var array
+     */
     protected $pagesAfter = array(
         'contact' => 'contact',
         'authentication' => 'login',
     );
 
+    /**
+     * Fixed priority of each URL type.
+     *
+     * @var array
+     */
     protected $priorities = array(
         'home' => 1.0,
         'meta' => 0.8,
@@ -49,11 +67,22 @@ class Qlogsitemap extends Module
         'cms' => 0.2,
         'login' => 0.2,
     );
+
+    /**
+     * URL types that use their own change frequency instead of the default one.
+     *
+     * @var array
+     */
     protected $fixedFrequencies = array(
         'cms' => 'monthly',
         'login' => 'yearly',
     );
 
+    /**
+     * Writer state while a sitemap is generated.
+     *
+     * @var resource|null
+     */
     protected $fileHandle = null;
     protected $fileUrlCount = 0;
     protected $fileIndex = 0;
@@ -72,7 +101,7 @@ class Qlogsitemap extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Sitemap');
+        $this->displayName = $this->l('QloApps Sitemap Generator');
         $this->description = $this->l('Generates XML sitemaps for your hotel website and keeps them up to date. Compatible with all major search engines.');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall this module?');
     }
@@ -134,9 +163,39 @@ class Qlogsitemap extends Module
             'qgs_cron_manager_enabled' => Module::isEnabled('qlocrontaskmanager'),
             'qgs_cron_manager_installed' => Module::isInstalled('qlocrontaskmanager'),
             'qgs_cron_manager_link' => $this->getCronManagerLink(),
+            'qgs_cron_task' => $this->getCronTaskSchedule(),
         ));
 
         return $this->display(__FILE__, 'views/templates/hook/sitemap-panel.tpl');
+    }
+    protected function getCronTaskSchedule()
+    {
+        if (!Module::isEnabled('qlocrontaskmanager')) {
+            return false;
+        }
+
+        require_once _PS_MODULE_DIR_.'qlocrontaskmanager/classes/QctmRequiredClasses.php';
+
+        $idTask = QctmCronTask::getByModuleAndName((int) $this->id, 'generate_sitemap');
+        if (!$idTask) {
+            return false;
+        }
+
+        $cronTask = new QctmCronTask((int) $idTask);
+        if (!Validate::isLoadedObject($cronTask)) {
+            return false;
+        }
+
+        $readable = $cronTask->cron_expression;
+        if (\Cron\CronExpression::isValidExpression($cronTask->cron_expression)) {
+            $readable = (new QctmCronExpressionTranslator())->getCronExpressionTranslation($cronTask->cron_expression);
+        }
+
+        return array(
+            'active' => (bool) $cronTask->active,
+            'expression' => $cronTask->cron_expression,
+            'readable' => $readable,
+        );
     }
 
     protected function getCronManagerLink()
