@@ -268,7 +268,7 @@ class StatsProduct extends ModuleGraph
                                     <td class="text-left"><a href="?tab=AdminCustomers&id_customer='.$sale['id_customer'].'&viewcustomer&token='.$token_customer.'" target="_blank">'.$sale['firstname'].' '.$sale['lastname'].' (#'.(int) $sale['id_customer'].')'.'</a></td>
                                     '.($has_attribute ? '<td>'.$sale['product_name'].'</td>' : '').'
                                     <td>'.(int)$sale['total_booked'].'</td>
-                                    <td>'.Tools::displayprice($sale['total'], $currency).'</td>
+                                    <td>'.Tools::displayprice($sale['total'], (int)$sale['id_currency']).'</td>
                                 </tr>';
                         }
                         $this->html .= '
