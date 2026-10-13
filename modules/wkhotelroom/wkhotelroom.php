@@ -106,7 +106,7 @@ class WkHotelRoom extends Module
                     0,
                     0,
                     1,
-                    0,
+                    1,
                     array(array('adults' => 1, 'children' => 0, 'child_ages' => array()))
                 );
                 $htlRoom['feature_price'] = $featurePrice;

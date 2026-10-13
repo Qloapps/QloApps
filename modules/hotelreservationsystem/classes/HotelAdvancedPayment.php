@@ -80,6 +80,31 @@ class HotelAdvancedPayment extends ObjectModel
     }
 
     /**
+     * Duplicate the advance payment configuration of a room type for its duplicate
+     *
+     * @param int $id_product_old Id of the room type (product) being duplicated
+     * @param int $id_product_new Id of the newly duplicated room type (product)
+     * @return bool
+     */
+    public static function duplicateAdvancePayment($id_product_old, $id_product_new)
+    {
+        $row = Db::getInstance()->getRow(
+            'SELECT * FROM `'._DB_PREFIX_.'htl_advance_payment` WHERE `id_product` = '.(int)$id_product_old
+        );
+
+        if (!$row) {
+            return true;
+        }
+
+        unset($row['id']);
+        $row['id_product'] = (int)$id_product_new;
+        $row['date_add'] = date('Y-m-d H:i:s');
+        $row['date_upd'] = date('Y-m-d H:i:s');
+
+        return Db::getInstance()->insert('htl_advance_payment', $row);
+    }
+
+    /**
      * Get the advance payment amount of the room type in the cart
      * @param [int] $idCart : cart id
      * @param [int] $idProduct : id_product of room type

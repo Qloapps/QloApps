@@ -228,12 +228,6 @@
                                             </div> {l s='Buy Standalone.'}
                                         </label>
                                     </div>
-                                    <label class="control-label">{l s='Select Property'}</label>
-                                    <select class="chosen input-hotel" name="id_hotel" id="service_id_hotel">
-                                        {foreach $associated_hotels as $hotel}
-                                            <option value="{$hotel.id_hotel}" {if isset($service_id_hotel) && $service_id_hotel == $hotel['id_hotel']}selected{elseif $hotel@first}selected{/if}>{$hotel.name}</option>
-                                        {/foreach}
-                                    </select>
                                 </div>
                             {/if}
                         {/block}
@@ -241,7 +235,7 @@
                             <div id="hotel_selection_block" {if isset($buying_option) && $buying_option == '2'}style="display: none;"{/if}>
                                 {if isset($associated_hotels) && $associated_hotels}
                                     <div class="form-group">
-                                        <label class="control-label">{l s='Select Hotel'}</label>
+                                        <label class="control-label">{l s='Select Property'}</label>
                                         <select class="chosen input-hotel" name="id_hotel" id="service_id_hotel">
                                             {foreach $associated_hotels as $hotel}
                                                 <option value="{$hotel.id_hotel}" {if isset($service_id_hotel) && $service_id_hotel == $hotel['id_hotel']}selected{elseif $hotel@first}selected{/if}>{$hotel.name}</option>
