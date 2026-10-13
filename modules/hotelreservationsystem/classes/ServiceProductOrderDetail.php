@@ -661,6 +661,7 @@ class ServiceProductOrderDetail extends ObjectModel
         $baseWhere =
             'WHERE p.`active` = 1
             AND o.`valid` = 1
+            AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
             AND spod.`is_cancelled` = 0
             AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct        ? ' AND hbd.`id_product` = '.$idProduct  : '')
@@ -713,6 +714,7 @@ class ServiceProductOrderDetail extends ObjectModel
         $baseWhere =
             'WHERE p.`active` = 1
             AND o.`valid` = 1
+            AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
             AND spod.`is_cancelled` = 0
             AND o.`invoice_date` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idProduct        ? ' AND hbd.`id_product` = '.$idProduct  : '')
@@ -881,6 +883,7 @@ class ServiceProductOrderDetail extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'tax` t ON (t.`id_tax` = tr.`id_tax`)
             LEFT JOIN `'._DB_PREFIX_.'tax_lang` tl ON (tl.`id_tax` = t.`id_tax` AND tl.`id_lang` = '.(int) $idLang.')
             WHERE spod.`is_cancelled` = 0
+            AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
             AND (spod.`total_price_tax_incl` - spod.`total_price_tax_excl`) > 0
             AND spod.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idTax ? ' AND t.`id_tax` = '.$idTax : '')
