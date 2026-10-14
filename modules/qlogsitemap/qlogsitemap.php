@@ -50,6 +50,7 @@ class Qlogsitemap extends Module
     protected $pagesAfter = array(
         'contact' => 'contact',
         'authentication' => 'login',
+        'sitemap' => 'sitemapPage',
     );
 
     /**
@@ -66,16 +67,19 @@ class Qlogsitemap extends Module
         'standalone' => 0.4,
         'cms' => 0.2,
         'login' => 0.2,
+        'modulePage' => 0.4,
+        'sitemapPage' => 0.2,
     );
 
     /**
-     * URL types that use their own change frequency instead of the default one.
+     * Cron expression of each automatic generation option (never disables the task).
      *
      * @var array
      */
-    protected $fixedFrequencies = array(
-        'cms' => 'monthly',
-        'login' => 'yearly',
+    protected $cronOptions = array(
+        'weekly' => '0 0 * * 0',
+        'monthly' => '0 0 1 * *',
+        'yearly' => '0 0 1 1 *',
     );
 
     /**
@@ -118,6 +122,8 @@ class Qlogsitemap extends Module
         QgsHelper::deleteSitemapFiles();
 
         Configuration::deleteByName('QLOGSITEMAP_LAST_EXPORT');
+        Configuration::deleteByName('QLOGSITEMAP_FREQUENCY');
+        Configuration::deleteByName('QLOGSITEMAP_DISABLED_PAGES');
 
         return parent::uninstall();
     }
@@ -155,7 +161,168 @@ class Qlogsitemap extends Module
             }
         }
 
+        $this->assignSitemapPanelVars();
+
+        return $this->display(__FILE__, 'views/templates/hook/sitemap-panel.tpl');
+    }
+    public function getContent()
+    {
+        $output = '';
+
+        if (Tools::isSubmit('submitQloGsitemap')) {
+            $saved = true;
+            if (Tools::getIsset('QLOGSITEMAP_FREQUENCY')) {
+                $configOutput = $this->postProcessConfig();
+                $saved = !strpos($configOutput, 'alert-danger');
+                $output .= $configOutput;
+            }
+            if ($saved && $this->createSitemap()) {
+                $output .= $this->displayConfirmation($this->l('Your sitemaps were successfully created.'));
+            } elseif ($saved) {
+                $output .= $this->displayError($this->l('Unable to generate the sitemaps.'));
+            }
+        } elseif (Tools::isSubmit('submitQloGsitemapConfig')) {
+            $output .= $this->postProcessConfig();
+        } elseif (Tools::isSubmit('submitQloGsitemapCron')) {
+            $output .= $this->postProcessCron();
+        }
+
+        $this->assignSitemapPanelVars();
+        $cronLabels = array(
+            'weekly' => $this->l('Weekly'),
+            'monthly' => $this->l('Monthly'),
+            'yearly' => $this->l('Yearly'),
+            'never' => $this->l('Never'),
+        );
+        $frequencies = array();
+        foreach (QgsHelper::getFrequencies() as $frequency) {
+            $frequencies[$frequency] = $this->getFrequencyLabel($frequency);
+        }
+
+        $disabledPages = QgsHelper::getDisabledPages();
+        $pages = array('core' => array(), 'module' => array());
+        $idLang = (int) $this->context->language->id;
+        foreach (array_keys($this->getExcludablePages()) as $page) {
+            $meta = Meta::getMetaByPage($page, $idLang);
+            $pages['core'][] = array(
+                'page' => $page,
+                'title' => !empty($meta['title']) ? $meta['title'] : $page,
+                'show_key' => true,
+                'excluded' => in_array($page, $disabledPages),
+            );
+        }
+        foreach (QgsHelper::getModulePages() as $page) {
+            $meta = Meta::getMetaByPage($page, $idLang);
+            $pages['module'][] = array(
+                'page' => $page,
+                'title' => !empty($meta['title']) ? $meta['title'] : $page,
+                'show_key' => true,
+                'excluded' => in_array($page, $disabledPages),
+            );
+        }
+        foreach ($this->getExcludableTypes() as $type => $title) {
+            $pages['core'][] = array(
+                'page' => $type,
+                'title' => $title,
+                'show_key' => false,
+                'excluded' => in_array($type, $disabledPages),
+            );
+        }
+
         $this->context->smarty->assign(array(
+            'qgs_form_action' => AdminController::$currentIndex.'&configure='.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules'),
+            'qgs_cron_options' => $cronLabels,
+            'qgs_frequencies' => $frequencies,
+            'qgs_frequency' => QgsHelper::getFrequency(),
+            'qgs_pages' => $pages,
+        ));
+
+        return $output.$this->display(__FILE__, 'views/templates/admin/config.tpl');
+    }
+
+    protected function getExcludablePages()
+    {
+        return array_diff_key(array_merge($this->pagesBefore, $this->pagesAfter), array('index' => true));
+    }
+
+    protected function getExcludableTypes()
+    {
+        $types = array(
+            QgsHelper::TYPE_ROOM_TYPES => $this->l('Room types'),
+            QgsHelper::TYPE_PROPERTIES => $this->l('Properties'),
+        );
+        if (QgsHelper::getStandaloneProductIds((int) $this->context->shop->id)) {
+            $types[QgsHelper::TYPE_STANDALONE] = $this->l('Standalone products');
+        }
+        if (QgsHelper::getCmsIds((int) $this->context->language->id, (int) $this->context->shop->id)) {
+            $types[QgsHelper::TYPE_CMS] = $this->l('CMS pages');
+        }
+
+        return $types;
+    }
+
+    protected function postProcessConfig()
+    {
+        $frequency = Tools::getValue('QLOGSITEMAP_FREQUENCY');
+        if (!in_array($frequency, QgsHelper::getFrequencies(), true)) {
+            return $this->displayError($this->l('Invalid update frequency.'));
+        }
+
+        $knownPages = array_merge(array_keys($this->getExcludablePages()), array_keys($this->getExcludableTypes()), QgsHelper::getModulePages());
+        $disabledPages = array_values(array_intersect($knownPages, (array) Tools::getValue('QLOGSITEMAP_DISABLED_PAGES', array())));
+
+        Configuration::updateValue('QLOGSITEMAP_FREQUENCY', $frequency);
+        Configuration::updateValue('QLOGSITEMAP_DISABLED_PAGES', implode(',', $disabledPages));
+
+        return $this->displayConfirmation($this->l('Settings updated successfully. Generate the sitemap to apply them.'));
+    }
+
+    protected function postProcessCron()
+    {
+        $option = Tools::getValue('QLOGSITEMAP_CRON');
+        if ($option !== 'never' && !isset($this->cronOptions[$option])) {
+            return $this->displayError($this->l('Invalid cron schedule.'));
+        }
+
+        $cronTask = $this->getCronTask();
+        if (!$cronTask) {
+            return $this->displayError($this->l('The sitemap cron task was not found in the Cron Task Manager.'));
+        }
+
+        if ($option === 'never') {
+            $cronTask->active = 0;
+        } else {
+            $cronTask->cron_expression = $this->cronOptions[$option];
+            $cronTask->active = 1;
+        }
+
+        if (!$cronTask->save()) {
+            return $this->displayError($this->l('Unable to update the cron task.'));
+        }
+
+        return $this->displayConfirmation($this->l('Cron schedule updated successfully.'));
+    }
+
+    protected function getFrequencyLabel($frequency)
+    {
+        $labels = array(
+            'always' => $this->l('always'),
+            'hourly' => $this->l('hourly'),
+            'daily' => $this->l('daily'),
+            'weekly' => $this->l('weekly'),
+            'monthly' => $this->l('monthly'),
+            'yearly' => $this->l('yearly'),
+            'never' => $this->l('never'),
+        );
+
+        return $labels[$frequency];
+    }
+
+    protected function assignSitemapPanelVars()
+    {
+        $this->context->smarty->assign(array(
+            'qgs_template_dir' => _PS_MODULE_DIR_.$this->name.'/views/templates/',
+            'qgs_config_link' => $this->context->link->getAdminLink('AdminModules').'&configure='.$this->name,
             'qgs_index_url' => $this->context->link->getBaseLink().QgsHelper::QGS_INDEX_FILE_NAME,
             'qgs_store_url' => $this->context->link->getBaseLink(),
             'qgs_sitemap_links' => QgsHelper::getSitemapFiles(),
@@ -165,10 +332,9 @@ class Qlogsitemap extends Module
             'qgs_cron_manager_link' => $this->getCronManagerLink(),
             'qgs_cron_task' => $this->getCronTaskSchedule(),
         ));
-
-        return $this->display(__FILE__, 'views/templates/hook/sitemap-panel.tpl');
     }
-    protected function getCronTaskSchedule()
+
+    protected function getCronTask()
     {
         if (!Module::isEnabled('qlocrontaskmanager')) {
             return false;
@@ -182,7 +348,14 @@ class Qlogsitemap extends Module
         }
 
         $cronTask = new QctmCronTask((int) $idTask);
-        if (!Validate::isLoadedObject($cronTask)) {
+
+        return Validate::isLoadedObject($cronTask) ? $cronTask : false;
+    }
+
+    protected function getCronTaskSchedule()
+    {
+        $cronTask = $this->getCronTask();
+        if (!$cronTask) {
             return false;
         }
 
@@ -191,10 +364,18 @@ class Qlogsitemap extends Module
             $readable = (new QctmCronExpressionTranslator())->getCronExpressionTranslation($cronTask->cron_expression);
         }
 
+        $option = '';
+        if (!$cronTask->active) {
+            $option = 'never';
+        } elseif (($found = array_search($cronTask->cron_expression, $this->cronOptions, true)) !== false) {
+            $option = $found;
+        }
+
         return array(
             'active' => (bool) $cronTask->active,
             'expression' => $cronTask->cron_expression,
             'readable' => $readable,
+            'option' => $option,
         );
     }
 
@@ -225,14 +406,24 @@ class Qlogsitemap extends Module
 
         QgsHelper::deleteSitemapFiles();
 
+        $disabledPages = QgsHelper::getDisabledPages();
         foreach (Language::getLanguages(true, (int) $this->context->shop->id) as $lang) {
             $this->startSitemapSet($lang['iso_code']);
             $this->addPageUrls($lang, $this->pagesBefore);
-            $this->addCategoryUrls($lang);
-            $this->addRoomTypeUrls($lang);
-            $this->addStandaloneProductUrls($lang);
-            $this->addCmsUrls($lang);
+            if (!in_array(QgsHelper::TYPE_PROPERTIES, $disabledPages)) {
+                $this->addCategoryUrls($lang);
+            }
+            if (!in_array(QgsHelper::TYPE_ROOM_TYPES, $disabledPages)) {
+                $this->addRoomTypeUrls($lang);
+            }
+            if (!in_array(QgsHelper::TYPE_STANDALONE, $disabledPages)) {
+                $this->addStandaloneProductUrls($lang);
+            }
+            if (!in_array(QgsHelper::TYPE_CMS, $disabledPages)) {
+                $this->addCmsUrls($lang);
+            }
             $this->addPageUrls($lang, $this->pagesAfter);
+            $this->addPageUrls($lang, array_fill_keys(array_diff(QgsHelper::getModulePages(), $disabledPages), 'modulePage'));
             $this->closeSitemapFile();
         }
 
@@ -289,7 +480,7 @@ class Qlogsitemap extends Module
         }
 
         $priority = $this->priorities[$type];
-        $frequency = isset($this->fixedFrequencies[$type]) ? $this->fixedFrequencies[$type] : QgsHelper::QGS_DEFAULT_FREQUENCY;
+        $frequency = QgsHelper::getFrequency();
         $xml = '<url>'.PHP_EOL.'<loc>'.QgsHelper::escapeXml($loc).'</loc>'.PHP_EOL;
         if ($lastMod && strtotime($lastMod) > 0) {
             $xml .= '<lastmod>'.date('Y-m-d', strtotime($lastMod)).'</lastmod>'.PHP_EOL;
@@ -306,7 +497,11 @@ class Qlogsitemap extends Module
 
     protected function addPageUrls($lang, array $pages)
     {
+        $disabledPages = QgsHelper::getDisabledPages();
         foreach ($pages as $page => $type) {
+            if ($page !== 'index' && in_array($page, $disabledPages)) {
+                continue;
+            }
             $this->addUrl($this->context->link->getPageLink($page, null, (int) $lang['id_lang']), $type);
         }
     }

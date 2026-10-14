@@ -25,46 +25,16 @@
 	<div class="alert alert-info">
 		<p>{l s='Submit the main sitemap URL in your search engine webmaster account (for example Google Search Console).' mod='qlogsitemap'}</p>
 		<p>{l s='The main sitemap lists one sitemap file for each active language.' mod='qlogsitemap'}</p>
+		<p>{l s='You can customize the sitemap configuration (update frequency and excluded pages) on the module configuration page.' mod='qlogsitemap'} <a class="btn btn-default btn-sm" href="{$qgs_config_link|escape:'html':'UTF-8'}"><i class="icon-cogs"></i> {l s='Sitemap configuration' mod='qlogsitemap'}</a></p>
 	</div>
 	<h4>{l s='Your sitemaps' mod='qlogsitemap'}</h4>
 	{if $qgs_sitemap_links}
 		<p>{l s='Please set up the following sitemap URL in your search engine webmaster account:' mod='qlogsitemap'}<br><a href="{$qgs_index_url|escape:'html':'UTF-8'}" target="_blank">{$qgs_index_url|escape:'html':'UTF-8'}</a></p>
-		<p>{l s='The above URL is the master sitemap file. It refers to the following sub-sitemap files:' mod='qlogsitemap'}</p>
-		<ul>
-			{foreach from=$qgs_sitemap_links item=sitemap_link}
-				<li><a href="{$qgs_store_url|escape:'html':'UTF-8'}{$sitemap_link.link|escape:'html':'UTF-8'}" target="_blank">{$sitemap_link.link|escape:'html':'UTF-8'}</a></li>
-			{/foreach}
-		</ul>
 		<p>{l s='Your last update was made on this date:' mod='qlogsitemap'} {$qgs_last_export|escape:'html':'UTF-8'}</p>
 	{else}
 		<p>{l s='No sitemap has been generated yet.' mod='qlogsitemap'}</p>
 	{/if}
-	<div class="alert alert-info">
-		<p><strong>{l s='Sitemap generation' mod='qlogsitemap'}</strong></p>
-		<ul>
-			<li>{l s='Manual: click on the "Generate sitemap" button. This erases the old sitemap files and creates new ones.' mod='qlogsitemap'}</li>
-			{if $qgs_cron_manager_enabled}
-				{if $qgs_cron_task && !$qgs_cron_task.active}
-					<li>{l s='Automatic: the sitemap task is disabled, so the sitemaps are not regenerated automatically. You can enable it in the' mod='qlogsitemap'} <a href="{$qgs_cron_manager_link|escape:'html':'UTF-8'}">{l s='Cron Task Manager' mod='qlogsitemap'}</a>.</li>
-				{elseif $qgs_cron_task}
-					<li>{l s='Automatic: the sitemaps are regenerated automatically. Current schedule:' mod='qlogsitemap'} <strong>{$qgs_cron_task.readable|escape:'html':'UTF-8'}</strong>. {l s='You can configure this schedule in the' mod='qlogsitemap'} <a href="{$qgs_cron_manager_link|escape:'html':'UTF-8'}">{l s='Cron Task Manager' mod='qlogsitemap'}</a>.</li>
-				{else}
-					<li>{l s='Automatic: the sitemaps are regenerated automatically. You can configure the schedule in the' mod='qlogsitemap'} <a href="{$qgs_cron_manager_link|escape:'html':'UTF-8'}">{l s='Cron Task Manager' mod='qlogsitemap'}</a>.</li>
-				{/if}
-			{else}
-				<li>
-					{if $qgs_cron_manager_installed}
-						{l s='Automatic: the Cron Task Manager module is disabled, so the sitemaps are not regenerated automatically.' mod='qlogsitemap'}
-						{if $qgs_cron_manager_link}<a href="{$qgs_cron_manager_link|escape:'html':'UTF-8'}">{l s='Enable the module' mod='qlogsitemap'}</a>{else}{l s='Enable the module' mod='qlogsitemap'}{/if}
-					{else}
-						{l s='Automatic: the Cron Task Manager module is not installed, so the sitemaps are not regenerated automatically.' mod='qlogsitemap'}
-						{if $qgs_cron_manager_link}<a href="{$qgs_cron_manager_link|escape:'html':'UTF-8'}">{l s='Install the module' mod='qlogsitemap'}</a>{else}{l s='Install the module' mod='qlogsitemap'}{/if}
-					{/if}
-					{l s='to turn on the automatic generation.' mod='qlogsitemap'}
-				</li>
-			{/if}
-		</ul>
-	</div>
+	{include file="{$qgs_template_dir}hook/sitemap-cron-info.tpl"}
 	<div class="panel-footer">
 		<button type="submit" name="submitQloGsitemap" class="btn btn-default pull-right"><i class="process-icon-save"></i> {l s='Generate sitemap' mod='qlogsitemap'}</button>
 	</div>

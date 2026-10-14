@@ -31,6 +31,49 @@ class QgsHelper
     const QGS_INDEX_FILE_NAME = 'sitemap.xml';
 
     const QGS_DEFAULT_FREQUENCY = 'weekly';
+    const TYPE_ROOM_TYPES = 'type-room-types';
+    const TYPE_PROPERTIES = 'type-properties';
+    const TYPE_STANDALONE = 'type-standalone';
+    const TYPE_CMS = 'type-cms';
+    public static function getFrequencies()
+    {
+        return array('always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never');
+    }
+    public static function getFrequency()
+    {
+        $frequency = Configuration::get('QLOGSITEMAP_FREQUENCY');
+
+        return in_array($frequency, self::getFrequencies(), true) ? $frequency : self::QGS_DEFAULT_FREQUENCY;
+    }
+    public static function getDisabledPages()
+    {
+        $pages = Configuration::get('QLOGSITEMAP_DISABLED_PAGES');
+
+        return $pages ? explode(',', $pages) : array();
+    }
+
+    public static function getModulePages()
+    {
+        $pages = array();
+        $rows = (array) Db::getInstance()->executeS(
+            'SELECT `page` FROM `'._DB_PREFIX_.'meta` WHERE `page` LIKE \'module-%\' ORDER BY `page`'
+        );
+        foreach ($rows as $row) {
+            if (!preg_match('/^module-(.+)-([a-z0-9]+)$/i', $row['page'], $match)) {
+                continue;
+            }
+            if (in_array(strtolower($match[2]), array('validation', 'payment', 'confirmation'))) {
+                continue;
+            }
+            $module = Module::getInstanceByName($match[1]);
+            if ($module && $module->tab == 'payments_gateways') {
+                continue;
+            }
+            $pages[] = $row['page'];
+        }
+
+        return $pages;
+    }
 
     protected static function getProductGroupJoin()
     {
