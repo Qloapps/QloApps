@@ -229,6 +229,9 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
 				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
 				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)
+				LEFT JOIN `'._DB_PREFIX_.'htl_property_type_lang` hptl ON (hptl.`id_htl_property_type` = hb.`id_property_type` AND hptl.`id_lang` = '.(int) $this->context->language->id.')
+				LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object_lang` rsol ON (rsol.`id_room_type_selling_object` = a.`id_selling_object` AND rsol.`id_lang` = '.(int) $this->context->language->id.')
+				LEFT JOIN `'._DB_PREFIX_.'tax_rules_group` ttrg ON (ttrg.`id_tax_rules_group` = a.`id_tourism_tax_rules_group`)
 				LEFT JOIN `'._DB_PREFIX_.'feature_product` fp ON (fp.`id_product` = a.`id_product`)
 				LEFT JOIN (
                     SELECT rsp.*, GROUP_CONCAT(pl.`name`) AS service_products
@@ -240,7 +243,7 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'htl_advance_payment` hap ON (hap.`id_product` = a.`id_product`)';
 
         $this->_select .= ' a.`show_at_front`, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
-        $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
+        $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, hptl.`name` AS `property_type`, rsol.`name` AS `selling_object`, ttrg.`name` AS `tourism_tax_rules_group`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`, a.`id_tourism_tax_rules_group`';
         $this->_select .= ', IFNULL(hap.`active`, 0) AS advance_payment';
@@ -300,6 +303,48 @@ class AdminProductsControllerCore extends AdminController
                 'visible_default' => true,
             );
         }
+        $propertyTypes = array();
+        foreach (HotelPropertyType::getPropertyTypes($this->context->language->id) as $propertyType) {
+            $propertyTypes[$propertyType['id_property_type']] = $propertyType['name'];
+        }
+        $this->fields_list['property_type'] = array(
+            'title' => $this->l('Property type'),
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
+            'filter_key' => 'hb!id_property_type',
+            'list' => $propertyTypes,
+            'optional' => true,
+            'class' => 'chosen',
+        );
+        $sellingObjects = array();
+        foreach (RoomTypeSellingObject::getRoomTypeSellingObjects($this->context->language->id) as $sellingObject) {
+            $sellingObjects[$sellingObject['id_room_type_selling_object']] = $sellingObject['name'];
+        }
+        $this->fields_list['selling_object'] = array(
+            'title' => $this->l('Selling object'),
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
+            'filter_key' => 'a!id_selling_object',
+            'list' => $sellingObjects,
+            'optional' => true,
+            'class' => 'chosen',
+        );
+        $tourismTaxRulesGroups = array();
+        foreach (TaxRulesGroup::getTaxRulesGroups(true, true) as $taxRulesGroup) {
+            $tourismTaxRulesGroups[$taxRulesGroup['id_tax_rules_group']] = $taxRulesGroup['name'];
+        }
+        $this->fields_list['tourism_tax_rules_group'] = array(
+            'title' => $this->l('Tourism tax rule'),
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
+            'filter_key' => 'a!id_tourism_tax_rules_group',
+            'list' => $tourismTaxRulesGroups,
+            'optional' => true,
+            'class' => 'chosen',
+        );
         $this->fields_list['adults'] = array(
             'title' => $this->l('Adults'),
             'filter_key' => 'hrt!adults',
