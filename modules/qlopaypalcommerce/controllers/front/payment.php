@@ -135,7 +135,31 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                             $paypalOrderCartId = isset($returnData['data']['purchase_units'][0]['custom_id']) ? $returnData['data']['purchase_units'][0]['custom_id'] : null;
                             $belongsToCurrentCart = ((int) $paypalOrderCartId === (int) $cart->id);
 
-                            if ($paypalOrderID && $paymentStatus == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED && $belongsToCurrentCart) {
+                            // captured currency must match the cart currency, otherwise the captured amount cannot be compared with the cart total
+                            $capturedCurrency = isset($returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['currency_code']) ?
+                                $returnData['data']['purchase_units'][0]['payments']['captures'][0]['amount']['currency_code'] : '';
+                            // payment is deducted in the captured currency, so order must be created in that currency
+                            if ($capturedCurrency && $paymentStatus == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED && $belongsToCurrentCart) {
+                                $cartCurrency = Currency::getCurrency((int) $cart->id_currency);
+                                if (Tools::strtoupper($capturedCurrency) !== Tools::strtoupper($cartCurrency['iso_code'])) {
+                                    $idCapturedCurrency = (int) Currency::getIdByIsoCode($capturedCurrency);
+                                    $objCapturedCurrency = new Currency($idCapturedCurrency);
+                                    if (Validate::isLoadedObject($objCapturedCurrency) && $objCapturedCurrency->active && !$objCapturedCurrency->deleted) {
+                                        WkPaypalCommerceHelper::logMsg(
+                                            'payment',
+                                            'Switching cart currency from '.$cartCurrency['iso_code'].' to PayPal captured currency '.$capturedCurrency
+                                        );
+                                        $cart->id_currency = $idCapturedCurrency;
+                                        $cart->update();
+                                        $this->context->currency = $objCapturedCurrency;
+                                        $this->context->cart = $cart;
+                                    }
+                                }
+                            }
+                            $cartCurrency = Currency::getCurrency((int) $cart->id_currency);
+                            $currencyMatches = (Tools::strtoupper($capturedCurrency) === Tools::strtoupper($cartCurrency['iso_code']));
+
+                            if ($paypalOrderID && $paymentStatus == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED && $belongsToCurrentCart && $currencyMatches) {
                                 // Save order data
                                 $this->saveOrderData($returnData);
                                 $currency = $this->context->currency;
@@ -202,6 +226,12 @@ class QloPaypalCommercePaymentModuleFrontController extends ModuleFrontControlle
                                     WkPaypalCommerceHelper::logMsg(
                                         'payment',
                                         'PayPal order/cart mismatch. Expected cart: '.$cart->id.', PayPal custom_id: '.$paypalOrderCartId
+                                    );
+                                }
+                                if ($paypalOrderID && $paymentStatus == WkPaypalCommerceWebhook::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED && $belongsToCurrentCart && !$currencyMatches) {
+                                    WkPaypalCommerceHelper::logMsg(
+                                        'payment',
+                                        'PayPal currency mismatch. Expected currency: '.$cartCurrency['iso_code'].', PayPal captured currency: '.$capturedCurrency
                                     );
                                 }
                                 WkPaypalCommerceHelper::logMsg('payment', 'Payment status'. $returnData['data']['status']);
