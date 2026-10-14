@@ -45,6 +45,7 @@ class SitemapControllerCore extends FrontController
 
         $categoriesTree = Category::getRootCategory()->recurseLiteCategTree(0);
         $this->addRoomTypes($categoriesTree);
+        $categoriesTree['children'] = $this->getHotelNodes($categoriesTree);
         $this->context->smarty->assign('categoriesTree', $categoriesTree);
         $this->context->smarty->assign('categoriescmsTree', CMSCategory::getRecurseCategory($this->context->language->id, 1, 1, 1));
         $this->context->smarty->assign('voucherAllowed', (int)CartRule::isFeatureActive());
@@ -97,5 +98,19 @@ class SitemapControllerCore extends FrontController
         foreach ($node['children'] as &$child) {
             $this->addRoomTypes($child);
         }
+    }
+    protected function getHotelNodes($node)
+    {
+        $hotels = array();
+        if (isset($node['room_types'])) {
+            $node['children'] = array();
+            $hotels[] = $node;
+        } else {
+            foreach ($node['children'] as $child) {
+                $hotels = array_merge($hotels, $this->getHotelNodes($child));
+            }
+        }
+
+        return $hotels;
     }
 }

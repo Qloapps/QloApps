@@ -75,6 +75,13 @@ class QgsHelper
         return $pages;
     }
 
+    public static function getMetaIdByPage($page)
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT `id_meta` FROM `'._DB_PREFIX_.'meta` WHERE `page` = \''.pSQL($page).'\''
+        );
+    }
+
     protected static function getProductGroupJoin()
     {
         if (!Group::isFeatureActive() || !Configuration::get('PS_UNIDENTIFIED_GROUP')) {

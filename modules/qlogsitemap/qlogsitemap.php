@@ -42,22 +42,12 @@ class Qlogsitemap extends Module
         'our-properties' => 'meta',
     );
 
-    /**
-     * Front pages listed after the CMS pages (page name => URL type).
-     *
-     * @var array
-     */
     protected $pagesAfter = array(
         'contact' => 'contact',
         'authentication' => 'login',
         'sitemap' => 'sitemapPage',
     );
 
-    /**
-     * Fixed priority of each URL type.
-     *
-     * @var array
-     */
     protected $priorities = array(
         'home' => 1.0,
         'meta' => 0.8,
@@ -71,22 +61,12 @@ class Qlogsitemap extends Module
         'sitemapPage' => 0.2,
     );
 
-    /**
-     * Cron expression of each automatic generation option (never disables the task).
-     *
-     * @var array
-     */
     protected $cronOptions = array(
         'weekly' => '0 0 * * 0',
         'monthly' => '0 0 1 * *',
         'yearly' => '0 0 1 1 *',
     );
 
-    /**
-     * Writer state while a sitemap is generated.
-     *
-     * @var resource|null
-     */
     protected $fileHandle = null;
     protected $fileUrlCount = 0;
     protected $fileIndex = 0;
@@ -405,6 +385,7 @@ class Qlogsitemap extends Module
         }
 
         QgsHelper::deleteSitemapFiles();
+        $this->sitemapPageMeta();
 
         $disabledPages = QgsHelper::getDisabledPages();
         foreach (Language::getLanguages(true, (int) $this->context->shop->id) as $lang) {
@@ -433,6 +414,30 @@ class Qlogsitemap extends Module
         }
 
         return $result;
+    }
+    protected function sitemapPageMeta()
+    {
+        $idMeta = QgsHelper::getMetaIdByPage('sitemap');
+        $objMeta = new Meta($idMeta ?: null);
+        if (!$idMeta) {
+            $objMeta->page = 'sitemap';
+            $objMeta->configurable = 1;
+        }
+
+        $missing = false;
+        foreach (Language::getLanguages(false) as $lang) {
+            $idLang = (int) $lang['id_lang'];
+            if ($idMeta && Meta::getMetaByPage('sitemap', $idLang)) {
+                continue;
+            }
+            $objMeta->title[$idLang] = $this->l('Sitemap');
+            $objMeta->description[$idLang] = $this->l('Lost? Find what you are looking for');
+            $objMeta->keywords[$idLang] = '';
+            $objMeta->url_rewrite[$idLang] = 'sitemap';
+            $missing = true;
+        }
+
+        return $missing ? (bool) $objMeta->save() : true;
     }
 
     protected function startSitemapSet($iso)
