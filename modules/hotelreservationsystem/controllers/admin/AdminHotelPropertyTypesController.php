@@ -57,6 +57,17 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
         $this->addRowAction('edit');
         $this->addRowAction('delete');
         $this->bulk_actions = array(
+            'enableSelection' => array(
+                'text' => $this->l('Enable selected'),
+                'icon' => 'icon-power-off text-success',
+            ),
+            'disableSelection' => array(
+                'text' => $this->l('Disable selected'),
+                'icon' => 'icon-power-off text-danger',
+            ),
+            'divider' => array(
+                'text' => 'divider',
+            ),
             'delete' => array(
                 'text' => $this->l('Delete selected'),
                 'confirm' => $this->l('Delete selected items?'),
@@ -157,12 +168,47 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
 
             $this->display = $idPropertyType ? 'edit' : 'add';
 
+            if (!$this->errors && !Tools::getValue('active') && $idPropertyType) {
+                $objPropertyType = new HotelPropertyType((int) $idPropertyType);
+                if (Validate::isLoadedObject($objPropertyType) && $objPropertyType->active && $objPropertyType->isUsed()) {
+                    $this->errors[] = $this->l('You cannot disable this property type because it is currently assigned to one or more properties.');
+                }
+            }
+
             if (!$this->errors) {
                 parent::postProcess();
             }
         } else {
             parent::postProcess();
         }
+    }
+
+    public function processStatus()
+    {
+        $object = $this->loadObject();
+        if (Validate::isLoadedObject($object) && $object->active && $object->isUsed()) {
+            $this->errors[] = $this->l('You cannot disable this property type because it is currently assigned to one or more properties.');
+
+            return false;
+        }
+
+        return parent::processStatus();
+    }
+
+    protected function processBulkDisableSelection()
+    {
+        if (is_array($this->boxes) && !empty($this->boxes)) {
+            foreach ($this->boxes as $idPropertyType) {
+                $object = new HotelPropertyType((int) $idPropertyType);
+                if (Validate::isLoadedObject($object) && $object->isUsed()) {
+                    $this->errors[] = $this->l('You cannot disable this property type because it is currently assigned to one or more properties.');
+
+                    return false;
+                }
+            }
+        }
+
+        return parent::processBulkDisableSelection();
     }
 
     public function processDelete()

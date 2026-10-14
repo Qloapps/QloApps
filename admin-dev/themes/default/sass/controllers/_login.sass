@@ -1,3 +1,11 @@
+@font-face
+	font-family: 'FontAwesomePlaceholder'
+	src: url('#{$fa-font-path}/fontawesome-webfont.eot?v=#{$fa-version}')
+	src: url('#{$fa-font-path}/fontawesome-webfont.eot?#iefix&v=#{$fa-version}') format('embedded-opentype'), url('#{$fa-font-path}/fontawesome-webfont.woff2?v=#{$fa-version}') format('woff2'), url('#{$fa-font-path}/fontawesome-webfont.woff?v=#{$fa-version}') format('woff'), url('#{$fa-font-path}/fontawesome-webfont.ttf?v=#{$fa-version}') format('truetype'), url('#{$fa-font-path}/fontawesome-webfont.svg?v=#{$fa-version}#fontawesomeregular') format('svg')
+	font-weight: normal
+	font-style: normal
+	unicode-range: U+f000-f2ff
+
 @mixin background-image-with-ms($image)
 	@include background-image($image) // Compass default version, for everything but IE 10.
 	background-image: -ms-#{$image} // Vendor prefixes for IE 10.
@@ -29,6 +37,16 @@
 	.form-control
 		height: inherit !important
 		padding: 10px 8px !important
+		&::-webkit-input-placeholder
+			font-family: 'FontAwesomePlaceholder', $font-family-sans-serif
+		&:-moz-placeholder
+			font-family: 'FontAwesomePlaceholder', $font-family-sans-serif
+		&::-moz-placeholder
+			font-family: 'FontAwesomePlaceholder', $font-family-sans-serif
+		&:-ms-input-placeholder
+			font-family: 'FontAwesomePlaceholder', $font-family-sans-serif
+		&::placeholder
+			font-family: 'FontAwesomePlaceholder', $font-family-sans-serif
 
 	@media (max-width: $screen-phone)
 		width: 90%

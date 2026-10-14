@@ -97,7 +97,7 @@ function removeTaxes(price)
 
 function getEcotaxTaxIncluded()
 {
-	return ps_round(ecotax_tax_excl * (1 + ecotaxTaxRate), 2);
+	return ps_round((isNaN(ecotax_tax_excl) ? 0 : ecotax_tax_excl) * (1 + ecotaxTaxRate), 2);
 }
 
 
@@ -187,7 +187,9 @@ function calcPriceTI()
 
 function calcPriceTE()
 {
-	ecotax_tax_excl =  $('#ecotax').val() / (1 + ecotaxTaxRate);
+	if ($('#ecotax').length) {
+		ecotax_tax_excl = $('#ecotax').val() / (1 + ecotaxTaxRate);
+	}
 	var priceTI = parseFloat($('#priceTI').val().replace(/,/g, '.'));
 	var newPrice = removeTaxes(ps_round(priceTI - getEcotaxTaxIncluded(), priceDisplayPrecision));
 	var tourismTaxIncluded = getTourismTaxIncluded(newPrice);

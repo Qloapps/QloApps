@@ -30,6 +30,9 @@ class HotelBookingDocument extends ObjectModel
     public $file_name;
     public $date_add;
 
+    /** @var bool True when the file is a PDF but was rejected for unsafe content. */
+    public $isUnsafePdf = false;
+
     const FILE_TYPE_IMAGE = 1;
     const FILE_TYPE_PDF = 2;
 
@@ -139,16 +142,28 @@ class HotelBookingDocument extends ObjectModel
     public function setFileType()
     {
         $content = @file_get_contents($this->fileInfo['tmp_name']);
-        $activeContentPattern = '/\/(JavaScript|JS|OpenAction|AA|Launch|SubmitForm|ImportData)\b/i';
 
+        // PDF names can hide keywords with hex escapes (/J#53 is /JS), so decode them before matching.
+        $decodedContent = ($content === false) ? '' : preg_replace_callback('/#([0-9a-f]{2})/i', function ($match) {
+            return chr(hexdec($match[1]));
+        }, $content);
+
+        // A complete PDF ends with startxref <offset> %%EOF; anything else is truncated or corrupt.
+        // Encrypted PDFs cannot be scanned, so /Encrypt is blocked too.
+        // /OpenAction followed by '[' is a plain page destination (zoom/fit).
+        // for every generated PDF. Any other /OpenAction value is an action and stays blocked.
+        $activeContentPattern = '/\/(JavaScript|JS|AA|Launch|SubmitForm|ImportData|GoToR|GoToE|EmbeddedFile|RichMedia|XFA|Encrypt)\b|\/OpenAction\b(?!\s*\[)/i';
+
+        $this->isUnsafePdf = false;
         $this->imageInfo = @getimagesize($this->fileInfo['tmp_name']);
 
         if ($this->imageInfo && ImageManager::isRealImage($this->fileInfo['tmp_name'])) {
             $this->file_type = self::FILE_TYPE_IMAGE;
-        } elseif ($content !== false && substr($content, 0, 5) === '%PDF-' && !preg_match($activeContentPattern, $content)) {
+        } elseif ($content !== false && substr($content, 0, 5) === '%PDF-' && preg_match('/startxref\s+\d+\s+%%EOF\s*$/', substr($content, -1024)) && !preg_match($activeContentPattern, $decodedContent)) {
             $this->file_type = self::FILE_TYPE_PDF;
         } else {
             $this->file_type = 0;
+            $this->isUnsafePdf = ($content !== false && substr($content, 0, 5) === '%PDF-');
         }
     }
 

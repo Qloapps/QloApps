@@ -510,33 +510,23 @@ class AdminOrderRefundRequestsController extends ModuleAdminController
                                 $objHtlBooking = new HotelBookingDetail($idHtlBooking);
                                 $idOrderDetail = $objHtlBooking->id_order_detail;
 
-                                // split the admin's single tax-incl entry using the booking's
-                                // own tax ratio; (float) cast since DB decimals come back as
-                                // strings like "0.000000", which PHP treats as truthy
-                                $refundedAmountTaxExcl = (float) $objHtlBooking->total_price_tax_incl
-                                    ? $refundedAmount * ($objHtlBooking->total_price_tax_excl / $objHtlBooking->total_price_tax_incl)
-                                    : $refundedAmount;
-
+                                // $refundedAmount is already tax-incl. (see the "tax incl."
                                 $bookingList[$idRetDetail] = array(
                                     'id_htl_booking' => $idHtlBooking,
                                     'id_order_detail' => $idOrderDetail,
                                     'quantity' => $numDays,
                                     'num_days' => $numDays,
-                                    'unit_price' => $refundedAmountTaxExcl / $numDays,
+                                    'unit_price' => $refundedAmount / $numDays,
                                 );
                             } elseif ($idServiceProductOrder = $objOrderReturnDetail->id_service_product_order_detail) {
                                 $objServiceProductOrderDetail = new ServiceProductOrderDetail($idServiceProductOrder);
 
                                 // same reasoning as the booking branch above
-                                $refundedAmountTaxExcl = (float) $objServiceProductOrderDetail->total_price_tax_incl
-                                    ? $refundedAmount * ($objServiceProductOrderDetail->total_price_tax_excl / $objServiceProductOrderDetail->total_price_tax_incl)
-                                    : $refundedAmount;
-
                                 $bookingList[$idRetDetail] = array(
                                     'id_service_product_order_detail' => $idServiceProductOrder,
                                     'id_order_detail' => $objServiceProductOrderDetail->id_order_detail,
                                     'quantity' => $objServiceProductOrderDetail->quantity,
-                                    'unit_price' => $refundedAmountTaxExcl / $objServiceProductOrderDetail->quantity,
+                                    'unit_price' => $refundedAmount / $objServiceProductOrderDetail->quantity,
                                 );
                             }
                         }

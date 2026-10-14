@@ -121,7 +121,7 @@ class HTMLTemplateOrderSlipCore extends HTMLTemplateInvoice
                 }
             }
         } else {
-            $this->order->products = null;
+            $this->order->products = array();
         }
 
         unset($product); // remove reference

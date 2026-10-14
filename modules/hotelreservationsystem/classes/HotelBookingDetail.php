@@ -604,7 +604,7 @@ class HotelBookingDetail extends ObjectModel
         $sql[] = 'SELECT hri.`id` AS `id_room`, hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`, hri.`id_status`, hrdd.`date_from` AS `date_from`, hrdd.`date_to` AS `date_to`
                 FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                 INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.	id_room = hri.`id`)
-                WHERE hri.`id_hotel`='.$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (
+                WHERE hri.`id_hotel`='.(int) $idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (
                     (hrdd.`date_from` <= \''.pSQL($dateFrom).'\' AND hrdd.`date_to` > \''.pSQL($dateFrom).'\' AND hrdd.`date_to` <= \''.pSQL($dateTo).'\') OR
                     (hrdd.`date_from` >= \''.pSQL($dateFrom).'\' AND hrdd.`date_to` > \''.pSQL($dateFrom).'\' AND hrdd.`date_to` <= \''.pSQL($dateTo).'\') OR
                     (hrdd.`date_from` >= \''.pSQL($dateFrom).'\' AND hrdd.`date_from` < \''.pSQL($dateTo).'\' AND hrdd.`date_to` >= \''.pSQL($dateTo).'\') OR
@@ -2097,7 +2097,17 @@ class HotelBookingDetail extends ObjectModel
 
                 if ($roomAvailabilityInfo = $objOldHotelBooking->dataForFrontSearch($bookingParams)) {
                     if ($availableRooms = $roomAvailabilityInfo['rm_data'][$idNewRoomType]['data']['available']) {
-                        $roomInfo = reset($availableRooms);
+                        $roomInfo = null;
+                        foreach ($availableRooms as $availableRoom) {
+                            if ($availableRoom['id_room'] == $idRoom) {
+                                $roomInfo = $availableRoom;
+                                break;
+                            }
+                        }
+
+                        if (!$roomInfo) {
+                            return false;
+                        }
                         $objCartBookingData = new HotelCartBookingData();
                         $objCartBookingData->id_cart = $context->cart->id;
                         $objCartBookingData->id_guest = $context->cookie->id_guest;

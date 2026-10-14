@@ -4068,7 +4068,9 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = $this->l('Uploaded file size is too large.');
             } else {
                 $objHotelBookingDocument->setFileType();
-                if (!$objHotelBookingDocument->file_type) {
+                if ($objHotelBookingDocument->isUnsafePdf) {
+                    $this->errors[] = $this->l('This PDF file is invalid or contains unsafe content and cannot be uploaded.');
+                } elseif (!$objHotelBookingDocument->file_type) {
                     $this->errors[] = $this->l('Please upload an image or a PDF file only. Allowed image formats: .gif, .jpg, .jpeg and .png');
                 }
             }
