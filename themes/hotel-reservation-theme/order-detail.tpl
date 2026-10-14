@@ -148,6 +148,7 @@
                                 </div>
                             </div>
 
+                            {if $has_room_booking}
                             <div class="detail-row">
                                 <div class=" title">{l s='Booking Voucher'}</div>
                                 <div class=" value payment-method">
@@ -157,6 +158,7 @@
                                     </a>
                                 </div>
                             </div>
+                            {/if}
 
                             <div class="detail-row">
                                 <div class="pull-left title">{l s='Status'}</div>
@@ -673,6 +675,7 @@
                                 </div>
                             </div>
 
+                            {if $has_room_booking}
                             <div class="detail-row">
                                 <div class=" title">{l s='Booking Voucher'}</div>
                                 <div class=" value payment-method">
@@ -682,6 +685,7 @@
                                     </a>
                                 </div>
                             </div>
+                            {/if}
 
                             <div class="detail-row">
                                 <div class="pull-left title">{l s='Status'}</div>
