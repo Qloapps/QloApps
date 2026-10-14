@@ -105,6 +105,23 @@
   - #1836: Resolve warning when saving Room Feature configuration in the back office.
   - #1834: Manage Hotel Features menu causes Controller not found error in back-office.
   - #1831: Fatal issue while creating a backoffice order in the back-office.
+  - #1903: Unable to upload pdf in the documents at order detail page in back-office.
+  - #1886: Resolve saving advance price above 100% for room types in the back office.
+  - #1884: Validate checkout date to be after check-in date in back office.
+  - #1880: Allow restoring the original service product price in the cart in the back office.
+  - #1876: Preserve advance payment setting when creating duplicate rooms in the back office.
+  - #1875: Resolve fatal error when generating a voucher with zero amount and prevent credit slip generation with zero amount in the back office.
+  - #1869: Correct refund amount on credit slip when tax is applied to the room in the back office.
+  - #1867: Resolve fatal error when admin views guest cart in the back office.
+  - #1866: Assign the selected room number during reallocation instead of the first available room in the back office.
+  - #1864: Display anonymous consistently after customer deletion in the back office.
+  - #1853: Resolve missing email and password icons on the admin login page.
+  - #1852: Resolve issue preventing admin actions after displaying the unverified module warning in the back office.
+  - #1845: Resolve issue where retail price shows as "NaN" after entering the pre-tax retail price in the back office.
+  - #1841: Resolve fatal error when installing language localization in the back office.
+  - #1909: Text issue in Room Type in the back office.
+  - #1885: Text issue in GRC option.
+  - #1878: Display consistent customer total spent amount regardless of order in the back office.
 
 ## Front Office:
 - Improvements:
@@ -134,6 +151,14 @@
   - #1851: Resolve issue where the parent room feature is displayed instead of the child features on the checkout page.
   - #1837: Resolve error on the Order Detail page after room reallocation on the frontend.
   - #1829: Include all service prices in the booking total calculation on the block cart popup.
+  - #1913: Validate PayPal captured currency along with amount before creating order and updating status in the front-office.
+  - #1910: Prevent duplicate hotel display for attached service products in the frontend.
+  - #1908: Match nationality field shape with other fields on the checkout page in the frontend.
+  - #1881: Resolve fatal error on the cart summary.
+  - #1873: Resolve fatal error when accessing footer.php, header.php, or init.php from the front office.
+  - #1871: Resolve incorrect price display on the home page.
+  - #1868: Fix price mismatch on the order confirmation page for bookings across two different hotels.
+  - #1906: Remove night label from service unit price.
 
 ## Core:
 - Improvements:
@@ -214,6 +239,10 @@
   - #1625: Undefined variable in module.php.
   - #1571: Price filter related issue in the front office on the room type listing page.
   - #1858: Display and validate hotel-restricted vouchers correctly when the hotel matches.
+  - #1902: Same language added multiple times during installation.
+  - #1900: Validate hotel ID input in the room search algorithm.
+  - #1896: Removed/updated prestashop images from imgs folder.
+  - #1848: Resolve duplicate English language entries when installing another language.
 
 ## Web Services:
 - Bugs Fixed:

@@ -4,9 +4,15 @@
 
 ## Improved/Changed Features:
 
+* [BO] : [#1903] Unable to upload pdf in the documents at order detail page in back-office.
+* [BO] : [#1884] Validate checkout date to be after check-in date in back office.
+* [BO] : [#1876] Preserve advance payment setting when creating duplicate rooms in the back office.
+* [BO] : [#1869] Correct Refund Amount on Credit Slip When Tax Is Applied to the Room in the Back Office.
+* [BO] : [#1866] Assign the Selected Room Number During Reallocation Instead of the First Available Room in the Back Office.
 * [BO] : [#1860] Validate minimum length of stay when it exceeds maximum length of stay.
 * [BO] : [#1859] Resolve group discount calculation for multiple nights.
 * [BO] : [#1855] Add missing option to export hotels in the back office.
+* [BO] : [#1841] Resolve fatal error when installing language localization in the back office.
 * [BO] : [#1840] Resolve error on the SEO tab of Hotel and Room Type after changing the language in the back office.
 * [BO] : [#1834] Manage Hotel Features menu causes Controller not found error in back-office.
 * [BO] : [#1830] Configurable options to show or hide tourism tax from the price summary on front office, invoices, and booking voucher.
@@ -38,8 +44,10 @@
 * [BO] : [#1618] Ensured that all order bills are cleared before the last room is checked out.
 * [BO] : [#1601] Show a success message when adding or deleting a room from the cart via Book Now in the back-office.
 
+* [FO] : [#1868] Fix price mismatch on the order confirmation page for bookings across two different hotels.
 * [FO] : [#1837] Resolve error on the Order Detail page after room reallocation on the frontend.
 
+* [CO] : [#1900] Validate hotel ID input in the room search algorithm.
 * [CO] : [#1849] Change the default service product price calculation constant.
 * [CO] : [#1809] Additional facility feature from QloApps.
 * [CO] : [#1786] No Show and Cancellation booking status in back-office, and updated refund request management.
