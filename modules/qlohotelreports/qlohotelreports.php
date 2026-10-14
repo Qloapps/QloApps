@@ -182,7 +182,7 @@ class QloHotelReports extends Module
                 'filter_booking_type'    => $bookingType,
                 'filter_id_order_state'  => $idOrderState,
                 'booking_statuses'       => array(
-                    HotelBookingDetail::STATUS_ALLOTED     => $this->l('Allotted'),
+                    HotelBookingDetail::STATUS_ASSIGNED     => $this->l('Allotted'),
                     HotelBookingDetail::STATUS_CHECKED_IN  => $this->l('Checked In'),
                     HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked Out'),
                 ),
@@ -358,7 +358,7 @@ class QloHotelReports extends Module
                     OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT => $this->l('Remote Payment'),
                 ),
                 'booking_statuses'          => array(
-                    HotelBookingDetail::STATUS_ALLOTED     => $this->l('Allotted'),
+                    HotelBookingDetail::STATUS_ASSIGNED     => $this->l('Allotted'),
                     HotelBookingDetail::STATUS_CHECKED_IN  => $this->l('Checked In'),
                     HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked Out'),
                 ),
@@ -573,7 +573,7 @@ class QloHotelReports extends Module
             if ($report === 'occupancy') {
                 $dailyOccupied  = HotelBookingDetail::getDatewiseOccupiedRooms($baseParams);
                 $dailyBooked    = HotelBookingDetail::getDatewiseOccupiedRooms(
-                    array_merge($baseParams, array('id_status' => HotelBookingDetail::STATUS_ALLOTED))
+                    array_merge($baseParams, array('id_status' => HotelBookingDetail::STATUS_ASSIGNED))
                 );
                 $dailyCheckedIn = HotelBookingDetail::getDatewiseOccupiedRooms(
                     array_merge($baseParams, array('id_status' => HotelBookingDetail::STATUS_CHECKED_IN))
@@ -918,7 +918,7 @@ class QloHotelReports extends Module
                         'bookings'            => $bookings,
                         'cancellations'       => $cancels,
                         'cancel_rate_pct'     => $bookings > 0 ? round($cancels / $bookings * 100, 1) : 0.0,
-                        'avg_los'             => ($bookings > 0 && $roomNights > 0) ? round($roomNights / $bookings, 1) : 0.0,
+                        'avg_los'             => ($bookings > 0 && $roomNights > 0) ? max(1, round($roomNights / $bookings, 1)) : 0.0,
                         'outstanding_balance' => $obRows ? array_sum(array_column($obRows, 'balance_due')) : 0.0,
                     );
                 }
@@ -1100,7 +1100,7 @@ class QloHotelReports extends Module
             $this->attachCurrencyToRows($rows, $csvCurrencyMap, $defaultCurrency->iso_code);
 
             $statusLabels = array(
-                HotelBookingDetail::STATUS_ALLOTED     => $this->l('Allotted'),
+                HotelBookingDetail::STATUS_ASSIGNED     => $this->l('Allotted'),
                 HotelBookingDetail::STATUS_CHECKED_IN  => $this->l('Checked In'),
                 HotelBookingDetail::STATUS_CHECKED_OUT => $this->l('Checked Out'),
             );
@@ -1478,7 +1478,7 @@ class QloHotelReports extends Module
             $totalRoomsOcc  = (int) AdminStatsController::getTotalRooms($idHotel ?: null, 1, $idProduct ?: null);
             $dailyAllOcc    = HotelBookingDetail::getDatewiseOccupiedRooms($baseParams);
             $dailyBooked    = HotelBookingDetail::getDatewiseOccupiedRooms(
-                array_merge($baseParams, array('id_status' => HotelBookingDetail::STATUS_ALLOTED))
+                array_merge($baseParams, array('id_status' => HotelBookingDetail::STATUS_ASSIGNED))
             );
             $dailyCheckedIn = HotelBookingDetail::getDatewiseOccupiedRooms(
                 array_merge($baseParams, array('id_status' => HotelBookingDetail::STATUS_CHECKED_IN))
@@ -1818,7 +1818,7 @@ class QloHotelReports extends Module
                 $extraRev     = (float) ServiceProductOrderDetail::getTotalRevenue($hotelParams);
                 $grossRevenue = $roomRevenue + $extraRev;
                 $occupancy    = round(AdminStatsController::getAverageOccupancyRate($dateFrom, $dateTo, (int) $hotel['id']), 1);
-                $avgLos       = ($bookings > 0 && $roomNights > 0) ? round($roomNights / $bookings, 1) : 0.0;
+                $avgLos       = ($bookings > 0 && $roomNights > 0) ? max(1, round($roomNights / $bookings, 1)) : 0.0;
                 $obRows       = Order::getOutstandingBalance($hotelParams);
                 $outstanding  = is_array($obRows)
                     ? array_sum(array_column($obRows, 'balance_due')) : 0.0;
