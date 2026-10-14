@@ -427,6 +427,7 @@ class ProductCore extends ObjectModel
             //     )
             // ),
             'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'id_tourism_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
             'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
             // 'manufacturer_name' => array(
             //     'getter' => 'getWsManufacturerName',
@@ -523,6 +524,7 @@ class ProductCore extends ObjectModel
                 )
             ),
             'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'id_tourism_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
             'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
             // 'manufacturer_name' => array(
             //     'getter' => 'getWsManufacturerName',

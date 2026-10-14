@@ -72,6 +72,11 @@ class HotelRoomType extends ObjectModel
                     'resourceName' => 'hotels',
                 )
             ),
+            'id_selling_object' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'room_type_selling_objects',
+                )
+            ),
         ),
         'associations' => array(
             'hotel_rooms' => array(
