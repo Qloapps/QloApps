@@ -997,6 +997,9 @@ class HotelCartBookingData extends ObjectModel
                                 // Without hotel/booking context, service must be sellable standalone.
                                 if (!$isSellableAsStandalone) {
                                     $toRemoveService = 1;
+                                }else if($context->customer->id && !Customer::getAddressesTotalById((int) $context->customer->id)) {
+                                    //  customer has no address, so we cannot sell standalone service product to them
+                                    $errors[] = $objModule->l('Please add an address to your account before proceeding with the order.', 'HotelOrderRestrictDate');
                                 }
                             }
                         }
