@@ -52,11 +52,11 @@
 }
 @media (max-width: 530px) {
     #hotelRoomsBlock .col-md-6 > a img.width-100 {
-        width: calc(100% - 30px);
-        margin: 0 15px;
+        width: 100%;
+        margin: 0;
     }
     .hotelRoomDescContainer{
-        padding: 15px;
+        padding: 15px 0px;
     }
     .wk_roomType_price_type{
         font-size: 16px;

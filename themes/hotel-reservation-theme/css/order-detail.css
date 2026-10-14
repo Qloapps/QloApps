@@ -300,9 +300,33 @@
         margin-left: -10px;
     }
 
+    .hotel-details .card-header .booking-actions-wrap {
+        margin-left: -6px;
+    }
+
+    .hotel-details .card-header .booking-actions-wrap .btn {
+        margin-left: 6px;
+        padding-left: 10px;
+        padding-right: 10px;
+        font-size: 13px;
+    }
+
     .product-detail .num-refunded-rooms {
         display: block;
         float: none;
+    }
+}
+
+@media (max-width: 360px) {
+    .hotel-details .card-header .booking-actions-wrap {
+        margin-left: -5px;
+    }
+
+    .hotel-details .card-header .booking-actions-wrap .btn {
+        margin-left: 5px;
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 12px;
     }
 }
 

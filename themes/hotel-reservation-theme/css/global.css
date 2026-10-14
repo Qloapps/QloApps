@@ -9076,6 +9076,9 @@ body .ui-tooltip {
     padding-top: 30px;
     padding-bottom: 30px;
   }
+  .margin-btm-50 {
+      margin-bottom: 0px;
+  }
 }
 .home_block_desc_line {
   border-color: #333333;

@@ -25,8 +25,8 @@
 }
 @media (max-width: 767px) {
     .htlInterior-owlCarousel .owl-carousel {
-        width: calc(100% - 30px);
-        margin: 0 15px;
+        width: 100%;
+        margin: 0;
     }
 }
 .interiorImgWrapper {
@@ -105,3 +105,40 @@
     text-align: center;
     vertical-align: middle;
 }
+
+/* Interior gallery below desktop: one wide image over two smaller ones */
+@media (max-width: 1199px) {
+    #hotelInteriorBlock .interiorImgWrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+    }
+    #hotelInteriorBlock .interiorbox {
+        padding-bottom: 75%;
+    }
+    #hotelInteriorBlock .interiorbox:first-child {
+        grid-column: 1 / -1;
+        padding-bottom: 56.25%;
+    }
+    #hotelInteriorBlock .interiorboxInner {
+        border: 0;
+    }
+    .htlInterior-owlCarousel .owl-stage-outer {
+        border: 0;
+    }
+}
+.htlInterior-owlCarousel .nav-direction-secondary {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.htlInterior-owlCarousel .owl-prev {
+    left: 8px;
+}
+.htlInterior-owlCarousel .owl-next {
+    right: 8px;
+}
+
