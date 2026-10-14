@@ -2358,6 +2358,7 @@ const AddRoomBookingModal = {
                 objDateToMin.setDate(objDateToMin.getDate() + 1);
 
                 $('#new_room .add_room_date_to').datepicker('option', 'minDate', objDateToMin);
+                AddRoomBookingModal.updateRoomPrice();
             },
             beforeShow : function () {
                 if(allowBackdateOrder) {
@@ -2373,11 +2374,51 @@ const AddRoomBookingModal = {
         {
             showOtherMonths: true,
             dateFormat: 'dd-mm-yy',
+            onSelect: function() {
+                AddRoomBookingModal.updateRoomPrice();
+            },
             beforeShow : function () {
                 var date_from = $.datepicker.parseDate('dd-mm-yy', $(this).closest('.bookingDuration').find('.add_room_date_from').val());
                 date_from.setDate(date_from.getDate() + 1);
 
                 $(this).datepicker("option", "minDate", date_from);
+            }
+        });
+    },
+    // Fetch the room price for the selected dates (advance price rules depend on stay duration) and update the price fields
+    updateRoomPrice: function() {
+        const dateFrom = $('#new_room .add_room_date_from').val();
+        const dateTo = $('#new_room .add_room_date_to').val();
+        const idProduct = $('#add_product_product_id').val();
+        if (!dateFrom || !dateTo || !parseInt(idProduct)) {
+            return;
+        }
+
+        const objDateFrom = $.datepicker.parseDate('dd-mm-yy', dateFrom);
+        const objDateTo = $.datepicker.parseDate('dd-mm-yy', dateTo);
+        if (objDateTo <= objDateFrom) {
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: admin_order_tab_link,
+            dataType: 'JSON',
+            cache: false,
+            data: {
+                ajax: 1,
+                token: token,
+                action: 'getEditRoomPrice',
+                id_order: id_order,
+                id_product: idProduct,
+                date_from: $.datepicker.formatDate('yy-mm-dd', objDateFrom),
+                date_to: $.datepicker.formatDate('yy-mm-dd', objDateTo),
+            },
+            success: function(result) {
+                if (result.success) {
+                    $('#add_product_product_price_tax_excl').val(result.unit_price_tax_excl);
+                    $('#add_product_product_price_tax_incl').val(result.unit_price_tax_incl);
+                }
             }
         });
     },
@@ -2450,6 +2491,48 @@ const EditRoomBookingModal = {
             }
         });
     },
+    // Fetch the room price for the selected dates (advance price rules depend on stay duration) and update the price field
+    updateRoomPrice: function() {
+        const dateFrom = $('#edit_product .edit_product_date_from').val();
+        const dateTo = $('#edit_product .edit_product_date_to').val();
+        if (!dateFrom || !dateTo) {
+            return;
+        }
+
+        const objDateFrom = $.datepicker.parseDate('dd-mm-yy', dateFrom);
+        const objDateTo = $.datepicker.parseDate('dd-mm-yy', dateTo);
+        if (objDateTo <= objDateFrom) {
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: admin_order_tab_link,
+            dataType: 'JSON',
+            cache: false,
+            data: {
+                ajax: 1,
+                token: token,
+                action: 'getEditRoomPrice',
+                id_order: $('#edit_product input[name="id_order"]').val(),
+                id_product: $('#edit_product input[name="id_product"]').val(),
+                id_room: $('#edit_product input[name="id_room"]').val(),
+                date_from: $.datepicker.formatDate('yy-mm-dd', objDateFrom),
+                date_to: $.datepicker.formatDate('yy-mm-dd', objDateTo),
+            },
+            beforeSend: function() {
+                $('#edit_product .room_unit_price').prop('readonly', true);
+            },
+            success: function(result) {
+                if (result.success) {
+                    $('#edit_product .room_unit_price').val(result.unit_price_tax_excl);
+                }
+            },
+            complete: function() {
+                $('#edit_product .room_unit_price').prop('readonly', false);
+            }
+        });
+    },
     initDatePickers: function() {
         $('#edit_product .edit_product_date_from').datepicker({
             showOtherMonths: true,
@@ -2460,6 +2543,7 @@ const EditRoomBookingModal = {
                 objDateToMin.setDate(objDateToMin.getDate() + 1);
 
                 $('#edit_product .edit_product_date_to').datepicker('option', 'minDate', objDateToMin);
+                EditRoomBookingModal.updateRoomPrice();
             },
             beforeShow : function () {
                 if(allowBackdateOrder) {
@@ -2475,6 +2559,9 @@ const EditRoomBookingModal = {
             showOtherMonths: true,
             dateFormat: 'dd-mm-yy',
             altField: '#edit_product .edit_product_date_to_actual',
+            onSelect: function() {
+                EditRoomBookingModal.updateRoomPrice();
+            },
             beforeShow : function () {
                 var date_from = $.datepicker.parseDate('dd-mm-yy', $(this).closest('.form-group').find('.edit_product_date_from').val());
                 date_from.setDate(date_from.getDate() + 1);
