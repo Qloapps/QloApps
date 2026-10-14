@@ -336,6 +336,23 @@ class AdminTabsControllerCore extends AdminController
         }
     }
 
+    /**
+     * Prevent creating a tab whose class name is already used.
+     *
+     * @return ObjectModel|false
+     */
+    public function processSave()
+    {
+        $className = trim((string) Tools::getValue('class_name'));
+        $idExisting = Tab::getIdFromClassName($className);
+        if ($idExisting && $idExisting != (int) $this->id_object) {
+            $this->errors[] = Tools::displayError('A tab with this class name already exists.');
+            return false;
+        }
+
+        return parent::processSave();
+    }
+
     protected function afterImageUpload()
     {
         /** @var Tab $obj */

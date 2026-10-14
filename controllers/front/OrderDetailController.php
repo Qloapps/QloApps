@@ -599,6 +599,16 @@ class OrderDetailControllerCore extends FrontController
                 }
                 if ($idServiceProductOrderDetails) {
                     foreach ($idServiceProductOrderDetails as $idServiceProductOrderDetail) {
+                        $objServiceProductOrderDetail = new ServiceProductOrderDetail((int) $idServiceProductOrderDetail);
+
+                        // the service line must exist and belong to the customer's own order
+                        if (!Validate::isLoadedObject($objServiceProductOrderDetail)
+                            || $objServiceProductOrderDetail->id_order != $objOrder->id
+                        ) {
+                            $this->errors[] = Tools::displayError('Something went wrong. Please try later.');
+                            break;
+                        }
+
                         if (OrderReturn::getOrdersReturnDetail($objOrder->id, 0, 0, $idServiceProductOrderDetail)) {
                             $this->errors[] = Tools::displayError('Some selected rooms have already been requested for cancellation.');
                             break;
