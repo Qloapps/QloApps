@@ -101,6 +101,9 @@ class ContactControllerCore extends FrontController
                         $id_order,
                         $id_contact,
                         ' AND a.`status` !='. CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED
+                        .' AND a.`user_name` = \''.pSQL($userName).'\''
+                        .' AND a.`phone` = \''.pSQL($phone).'\''
+                        .' AND a.`subject` = \''.pSQL($subject).'\''
                     );
                 }
 
