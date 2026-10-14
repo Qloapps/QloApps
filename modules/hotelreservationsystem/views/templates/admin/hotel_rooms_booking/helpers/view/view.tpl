@@ -167,7 +167,7 @@
 											{/if}
 										{/if}
 									</select>
-									<input type="hidden" name="search_id_room_type" id="search_id_room_type" value="{$id_room_type}">
+									<input type="hidden" name="search_id_room_type" id="search_id_room_type" value="{$id_room_type|escape:'htmlall':'UTF-8'}">
 								</div>
 							</div>
 							<div class="col-sm-12">
