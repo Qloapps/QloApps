@@ -8898,6 +8898,10 @@ class AdminOrdersControllerCore extends AdminController
             ) {
                 $this->errors[] = Tools::displayError('Room status cannot be changed to No-show or Cancelled once the guest has already checked in.');
             } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN
+                && strtotime($dateFrom) > time()
+            ) {
+                $this->errors[] = Tools::displayError('Check-in is not allowed before the booking\'s check-in date. For an early arrival, please change the stay dates first.');
+            } elseif ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN
                 || $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT
             ) {
                 if (!$statusDate || !Validate::isDate($statusDate)) {
@@ -8951,6 +8955,19 @@ class AdminOrdersControllerCore extends AdminController
                 if ($remainingCheckoutRooms == 1 && $newStatus == HotelBookingDetail::STATUS_CHECKED_OUT && $hasPendingBills) {
                     $this->errors[] = Tools::displayError('You cannot checkout the last room while there are pending bills for this order.');
                 } else {
+                    Hook::exec(
+                        'actionRoomBookingStatusUpdateBefore',
+                        array(
+                            'id_hotel_booking_detail' => $objHotelBookingDetail->id,
+                            'id_order' => $objHotelBookingDetail->id_order,
+                            'id_room' => $objHotelBookingDetail->id_room,
+                            'date_from' => $objHotelBookingDetail->date_from,
+                            'date_to' => $objHotelBookingDetail->date_to,
+                            'id_status_from' => (int) $objHotelBookingDetail->id_status,
+                            'id_status_to' => $newStatus,
+                        )
+                    );
+
                     if ($newStatus == HotelBookingDetail::STATUS_CHECKED_IN) {
                         $objHotelBookingDetail->check_in = $statusDate;
                         // reverting from Checked-out: clear the stale check-out timestamp
