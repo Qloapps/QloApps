@@ -1594,8 +1594,6 @@ class AdminNormalProductsControllerCore extends AdminController
                 _PS_JS_DIR_.'jquery/plugins/timepicker/jquery-ui-timepicker-addon.css',
                 _PS_CSS_DIR_.'ps-hotel-reservation.css',
             ));
-        }else {
-            $this->addJqueryUI('ui.tooltip', 'base', true);
         }
     }
 

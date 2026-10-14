@@ -24,12 +24,6 @@
    room table (_rooms_informaion_table.tpl) and/or a products table (_hotel_service_products_table.tpl /
    _standalone_service_products_table.tpl) with tourism tax columns is rendered. *}
 
-<style>
-.ui-tooltip.price_info-tooltip { border: unset; padding: 10px; box-shadow: 0px 0px 15px 0px #00000026; }
-.ui-tooltip.price_info-tooltip span { margin-left: 15px; }
-.ui-tooltip.price_info-tooltip label { font-weight: 600; }
-</style>
-
 <div class="modal fade" id="exempt-tourism-tax-modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -58,35 +52,6 @@
 
 <script>
 $(document).ready(function () {
-    if ($('#customer_cart_details .price_info, #customer_products_details .price_info').length) {
-        $('#customer_cart_details .price_info, #customer_products_details .price_info').each(function (i, element) {
-            $(this).find('img').tooltip({
-                content: $(this).closest('td').find('.price_info_container').html(),
-                items: 'img',
-                trigger: 'hover',
-                tooltipClass: 'price_info-tooltip',
-                open: function (event, ui) {
-                    if (typeof(event.originalEvent) === 'undefined') {
-                        return false;
-                    }
-                    var $id = $(ui.tooltip).attr('id');
-                    if ($('div.ui-tooltip').not('#' + $id).length) {
-                        return false;
-                    }
-                },
-                close: function (event, ui) {
-                    ui.tooltip.hover(function () {
-                        $(this).stop(true).fadeTo(400, 1);
-                    }, function () {
-                        $(this).fadeOut('400', function () {
-                            $(this).remove();
-                        });
-                    });
-                }
-            });
-        });
-    }
-
     function ttAjax(action, data) {
         $.ajax({
             type: 'POST',

@@ -2936,7 +2936,7 @@ class AdminControllerCore extends Controller
     public function setDeprecatedMedia()
     {
     }
-
+    
     public function setMedia()
     {
         //Bootstrap
@@ -2957,7 +2957,10 @@ class AdminControllerCore extends Controller
         ));
 
         //loads specific javascripts for the admin theme
+        $this->addJqueryUI('ui.tooltip', 'base', true);
+        $this->addJS(_PS_JS_DIR_.'jquery-ui-tooltip-alias.js');
         $this->addJS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/js/vendor/bootstrap.min.js');
+
         $this->addJS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/js/vendor/modernizr.min.js');
         $this->addJS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/js/modernizr-loads.js');
         $this->addJS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/js/vendor/moment-with-langs.min.js');
