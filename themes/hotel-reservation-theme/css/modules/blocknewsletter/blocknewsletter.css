@@ -177,6 +177,15 @@
 .button.button-medium.newsletter-btn {
   position: relative;
   padding: 0px 20px;
+  background: #1292FF;
+  background-image: none;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.button.button-medium.newsletter-btn:hover, .button.button-medium.newsletter-btn:focus {
+  background: #0f7fe0;
+  background-image: none;
 }
 #newsletter-input
 {

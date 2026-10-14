@@ -105,6 +105,9 @@ class WkRoomSearchBlock extends Module
         }
         if ('index' == $controller) {
             $this->context->controller->addCSS($this->_path.'views/css/wk-landing-page-search.css');
+            // the mobile "Make Booking" modal opens via fancybox regardless of the
+            // unrelated PS_QUICK_VIEW setting that core normally gates it behind
+            $this->context->controller->addJqueryPlugin('fancybox');
         }
         if ('product' == $controller) {
             $this->context->controller->addCSS($this->_path.'views/css/wk-roomtype-search.css');

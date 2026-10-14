@@ -30,6 +30,12 @@
     margin-bottom: 0;
 }
 
+@media (max-width: 767px) {
+    .fancybox-wrap.fancybox-extra-services .card {
+        width: calc(100vw - 40px);
+    }
+}
+
 .fancybox-wrap.fancybox-extra-services .fancybox-close {
     background: none;
     top: 12px;

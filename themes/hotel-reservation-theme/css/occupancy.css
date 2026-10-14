@@ -128,7 +128,7 @@
       width: 100%;}
 
 
-  @media (max-width: 450) {
+  @media (max-width: 450px) {
     .booking_occupancy_wrapper .occupancy_info_block .occupancy_count_block {
       width: 100%;}
     .booking_occupancy_wrapper .occupancy_info_block .occupancy_count {

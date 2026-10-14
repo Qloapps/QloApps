@@ -23,6 +23,12 @@
 .htlInterior-owlCarousel .owl-stage-outer {
     border: 1px solid #ccc;
 }
+@media (max-width: 767px) {
+    .htlInterior-owlCarousel .owl-carousel {
+        width: calc(100% - 30px);
+        margin: 0 15px;
+    }
+}
 .interiorImgWrapper {
     width: 100%;
     height: 100%;
@@ -47,31 +53,35 @@
    object-fit: cover;
 }
 .htlInterior-owlCarousel .owl-prev, .htlInterior-owlCarousel .owl-next{
-    font-size: 40px;
-    font-weight: 200;
     position: absolute;
-    top: 0;
-    bottom: 0;
+    top: 50%;
+    transform: translateY(-50%);
     z-index: 10;
 }
 .htlInterior-owlCarousel .owl-prev {
-    left: 0;
+    left: 15px;
 }
 .htlInterior-owlCarousel .owl-next {
-    right: 0;
+    right: 15px;
 }
 .nav-direction-wrapper{
-	display: table;
-    height: 100%;
+	display: block;
 }
 .nav-direction-primary {
-	display: table-cell;
-    vertical-align: middle;
+	display: block;
 }
 .nav-direction-secondary {
-	padding: 40px 18px;
-	opacity: 0.85;
-	background-color: #ffffff;
+	background: rgba(0, 0, 0, 0.4);
+	color: #fff;
+	border-radius: 2px;
+	padding: 8px 14px;
+	font-size: 20px;
+	line-height: 1;
+	transition: background 0.2s;
+}
+.htlInterior-owlCarousel .owl-prev:hover .nav-direction-secondary,
+.htlInterior-owlCarousel .owl-next:hover .nav-direction-secondary {
+	background: rgba(0, 0, 0, 0.65);
 }
 .interiorHoverBlockWrapper {
 	position: absolute;

@@ -235,7 +235,8 @@ table {
 
 html {
   font-size: 62.5%;
-  -webkit-tap-highlight-color: transparent; }
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden; }
 
 
 body {
@@ -243,7 +244,8 @@ body {
   font-size: 13px;
   line-height: 1.42857;
   color: #777777;
-  background-color: #fff; }
+  background-color: #fff;
+  overflow-x: hidden; }
 
 input,
 button,
@@ -7553,6 +7555,9 @@ div.star a:hover {
   .ie8 .breadcrumb .navigation-pipe {
     width: 20px; }
 
+.copyRightWrapper {
+  text-align: center; }
+
 .footer-container {
   background-color: #333333;
   padding-top: 30px; }
@@ -8920,11 +8925,18 @@ body .ui-tooltip {
 
 .payment_option_logo {
   height: 50px;
-  max-height: 50px; }
+  max-height: 50px;
+  max-width: 100%; }
 
 .payment_module_adv {
   height: 120px;
-  max-height: 120px; }
+  max-height: 120px;
+  max-width: 100%; }
+
+@media (max-width: 480px) {
+  .payment_module_adv {
+    height: 80px;
+    max-height: 80px; } }
 
 .payment_option_selected {
   display: none;
@@ -9004,7 +9016,7 @@ body .ui-tooltip {
 
 .home_block_container {
   padding-top: 45px;
-  padding-bottom: 60px;
+  padding-bottom: 15px;
   position: relative;
 }
 .home_block_desc_wrapper {
@@ -9024,6 +9036,26 @@ body .ui-tooltip {
   color: #555555;
   font-weight: 400;
   line-height: 23px;
+}
+@media (max-width: 767px) {
+  .home_block_heading {
+    font-size: 28px;
+    line-height: 32px;
+    margin-bottom: 15px; }
+  .home_block_description {
+    font-size: 15px;
+    line-height: 20px; }
+  .home_block_desc_wrapper {
+    padding: 0 15px;
+    margin-bottom: 30px;
+  }
+  .home_block_seperator {
+  display: none;   
+  }
+  .home_block_container{
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
 }
 .home_block_desc_line {
   border-color: #333333;

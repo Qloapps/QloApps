@@ -60,8 +60,10 @@
     column-gap: 0px;
   }
   .header-rmsearch-wrapper {
-    height: calc(100vw - 60px);
+    height: auto;
     width: calc(100vw - 60px);
+    max-height: 80vh;
+    overflow-y: auto;
   }
 }
 .fancy_search_header_xs {
@@ -75,6 +77,15 @@
     float: left;
     margin-top: 5px;
     width: 125px;}
+#xs_room_search {
+    background: #1292FF;
+    background-image: none;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;}
+#xs_room_search:hover, #xs_room_search:focus {
+    background: #0f7fe0;
+    background-image: none;}
 /* .fancybox-inner #search_hotel_block_form {
   grid-template-columns: 1fr;
 } */
