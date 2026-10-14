@@ -5976,6 +5976,12 @@ textarea {
 #columns {
     padding: 0;
 }
+@media (max-width: 767px) {
+  #columns {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+}
 #columns:has(#center_column > *) {
   position: relative;
   padding-bottom: 50px;
@@ -8247,6 +8253,20 @@ p.p.payment_module {
 
   p.cheque-indent {
   margin-bottom: 9px; }
+
+@media (max-width: 767px) {
+  .cheque-box .form-group > .col-xs-4 {
+    width: 100%; } }
+
+@media (max-width: 480px) {
+  .cheque-box + .cart_navigation .button-exclusive {
+    display: block;
+    margin-bottom: 15px; }
+  .cheque-box + .cart_navigation .button-medium {
+    float: none;
+    display: block;
+    width: 100%;
+    text-align: center; } }
 
 @media (max-width: 480px) {
   p.payment_module a {

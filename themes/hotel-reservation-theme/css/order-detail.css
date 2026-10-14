@@ -288,11 +288,13 @@
 }
 
 @media (max-width: 576px) {
+    .hotel-details .card-header,
     .refund_element_details .card-header {
         flex-direction: column;
         align-items: flex-start;
     }
 
+    .hotel-details .card-header .booking-actions-wrap,
     .refund_element_details .card-header .booking-actions-wrap {
         margin-top: 10px;
         margin-left: -10px;

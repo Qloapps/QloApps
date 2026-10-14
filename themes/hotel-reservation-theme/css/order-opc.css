@@ -568,11 +568,12 @@
 }
 @media (max-width: 480px) {
 	#order-opc .proceed_btn_block .button-medium,
-	#order-opc .proceed_btn_block .btn-edit-guest-info {
+	#order-opc .proceed_btn_block .btn-edit-guest-info,
+	#order-opc #login_form_content #SubmitLogin {
 		float: none !important;
 		display: block;
 		width: 100%;
-		padding: 12px 20px;
+		padding: 0 20px;
 		margin-right: 0;
 		margin-bottom: 10px;
 		text-align: center;
