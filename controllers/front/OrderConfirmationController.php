@@ -43,20 +43,15 @@ class OrderConfirmationControllerCore extends FrontController
         parent::init();
 
         $this->id_cart = (int)(Tools::getValue('id_cart', 0));
-        $is_guest = false;
-        /* check if the cart has been made by a Guest customer, for redirect link */
-        if (Cart::isGuestCartByCartId($this->id_cart)) {
-            $is_guest = true;
-            $redirectLink = 'index.php?controller=guest-tracking';
-        } else {
-            $redirectLink = 'index.php?controller=history';
-        }
-
         $this->id_module = (int)(Tools::getValue('id_module', 0));
         $this->id_order = Order::getOrderByCartId((int)($this->id_cart));
         $this->secure_key = Tools::getValue('key', false);
         $order = new Order((int)($this->id_order));
-        if ($is_guest) {
+
+        $is_guest = Cart::isGuestCartByCartId($this->id_cart);
+        $redirectLink = $is_guest ? 'index.php?controller=guest-tracking' : 'index.php?controller=history';
+
+        if ($is_guest && Validate::isLoadedObject($order) && $this->secure_key && hash_equals((string) $order->secure_key, (string) $this->secure_key)) {
             $customer = new Customer((int)$order->id_customer);
             $redirectLink .= '&id_order='.$order->reference.'&email='.urlencode($customer->email);
         }
