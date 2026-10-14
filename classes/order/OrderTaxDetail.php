@@ -883,7 +883,8 @@ class OrderTaxDetailCore extends ObjectModel
             return false;
         }
 
-        $unitPriceTaxExcl = Tools::ps_round((float) $booking->total_price_tax_excl / $numNights, 6);
+        // getTaxesAmount() expects the price in the default currency and converts the amount to 'idCurrency' itself
+        $unitPriceTaxExcl = Tools::ps_round(Tools::convertPrice((float) $booking->total_price_tax_excl / $numNights, (int) $order->id_currency, false), 6);
 
         $childrenAges = array();
         if ($booking->child_ages) {
@@ -967,7 +968,7 @@ class OrderTaxDetailCore extends ObjectModel
         return array(
             'idTaxRulesGroup' => $idTaxRulesGroup,
             'address' => $address,
-            'unitPriceTaxExcl' => (float) $serviceLine->unit_price_tax_excl,
+            'unitPriceTaxExcl' => Tools::convertPrice((float) $serviceLine->unit_price_tax_excl, (int) $order->id_currency, false),
             'checkInDate' => $checkInDate,
             'numNights' => $numNights,
             'numAdults' => $numAdults,
