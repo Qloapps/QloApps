@@ -273,7 +273,7 @@
 								<div class="layer_cart_row">
 									<strong class="dark">
 										{l s='Total Rooms Cost in cart' mod='blockcart'}
-										{if $display_tax_label}
+										{if $use_taxes && $display_tax_label}
 											{if $priceDisplay == 1}
 												{l s='(tax excl.)' mod='blockcart'}
 											{else}
@@ -292,7 +292,7 @@
 								<div class="layer_cart_row">
 									<strong class="dark">
 										{l s='Total Product Cost in cart' mod='blockcart'}
-										{if $display_tax_label}
+										{if $use_taxes && $display_tax_label}
 											{if $priceDisplay == 1}
 												{l s='(tax excl.)' mod='blockcart'}
 											{else}
@@ -331,7 +331,7 @@
 							{/if} -->
 							<!-- <div class="layer_cart_row">
 								<strong class="dark{if $shipping_cost_float == 0 && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} unvisible{/if}">
-									{l s='Total shipping' mod='blockcart'}&nbsp;{if $display_tax_label}{if $priceDisplay == 1}{l s='(tax excl.)' mod='blockcart'}{else}{l s='(tax incl.)' mod='blockcart'}{/if}{/if}
+									{l s='Total shipping' mod='blockcart'}&nbsp;{if $use_taxes && $display_tax_label}{if $priceDisplay == 1}{l s='(tax excl.)' mod='blockcart'}{else}{l s='(tax incl.)' mod='blockcart'}{/if}{/if}
 								</strong>
 								<span class="ajax_cart_shipping_cost{if $shipping_cost_float == 0 && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} unvisible{/if}">
 									{if $shipping_cost_float == 0}
@@ -346,7 +346,7 @@
 									<div class="layer_cart_row">
 										<strong class="dark">
 											{l s='Convenience Fees' mod='blockcart'}
-											{if $display_tax_label}
+											{if $use_taxes && $display_tax_label}
 												{if $priceDisplay == 1}
 													{l s='(tax excl.)' mod='blockcart'}
 												{else}
@@ -386,7 +386,7 @@
 								<div class="layer_cart_row">
 									<strong class="dark">
 										{l s='Total' mod='blockcart'}
-										{if $display_tax_label}
+										{if $use_taxes && $display_tax_label}
 											{if $priceDisplay == 1}
 												{l s='(tax excl.)' mod='blockcart'}
 											{else}
