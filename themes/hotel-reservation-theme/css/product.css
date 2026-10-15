@@ -1603,6 +1603,7 @@ ul.service-product-nav > li:hover {
 
 .service-product-element .service-product-actions {
   display: flex;
+  margin-left: auto;
 }
 @media (max-width: 575px) {
   .service-product-element .service-product-actions {
