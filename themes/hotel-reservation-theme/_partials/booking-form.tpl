@@ -87,18 +87,11 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <label class="control-label">{l s='Extra Services'}</label>
-                                                <p class="extra_services_price_block">
+                                                <div class="extra_services_price_block">
                                                     {if isset($service_product_price)}{convertPrice price=$service_product_price}{else}{convertPrice price=0}{/if}
                                                     {if isset($selected_service_product) && $selected_service_product}
-                                                        <span class="services-info">
-                                                            <img src="{$img_dir}icon/icon-info.svg" />
-                                                        </span>
-                                                    {/if}
-                                                </p>
-                                                {if isset($selected_service_product) && $selected_service_product}
-                                                    <div class="services-info-container" style="display: none;">
-                                                        <div class="services-info-tooltip-cont">
-                                                            {if isset($selected_service_product) && $selected_service_product}
+                                                        {capture name='extra_services_tooltip'}
+                                                            <div class="services-info-tooltip-cont">
                                                                 <div class="extra-service-panel">
                                                                     <p class="panel_title">{l s='Selected services'} <span>{l s='(Per %s)' sprintf=$room_type_info['selling_object_name']}</span></p>
                                                                     <div class="services-list">
@@ -118,21 +111,22 @@
                                                                         {/foreach}
                                                                     </div>
                                                                 </div>
-                                                            {/if}
-                                                            <hr>
-                                                            <div class="extra-service-panel">
-                                                                <div class="summary-row">
-                                                                    <div>{l s='Total price per room'}</div>
-                                                                    <div><p class="service_price">{displayPrice price=$service_product_price_per_room}</p></div>
-                                                                </div>
-                                                                <div class="summary-row">
-                                                                    <div>{l s='Total price:'}</div>
-                                                                    <div><p class="service_price">{displayPrice price=$service_product_price}</p></div>
+                                                                <hr>
+                                                                <div class="extra-service-panel">
+                                                                    <div class="summary-row">
+                                                                        <div>{l s='Total price per room'}</div>
+                                                                        <div><p class="service_price">{displayPrice price=$service_product_price_per_room}</p></div>
+                                                                    </div>
+                                                                    <div class="summary-row">
+                                                                        <div>{l s='Total price:'}</div>
+                                                                        <div><p class="service_price">{displayPrice price=$service_product_price}</p></div>
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                {/if}
+                                                        {/capture}
+                                                        {include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.extra_services_tooltip allow_html=true}
+                                                    {/if}
+                                                </div>
                                             </div>
                                         </div>
                                         <hr class="separator-hr-mg-10 form-group">

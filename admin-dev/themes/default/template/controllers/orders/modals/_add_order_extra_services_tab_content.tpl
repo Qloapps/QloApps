@@ -65,17 +65,19 @@
                                                     {$product['name']|escape:'html':'UTF-8'}
                                                     {capture name='room_type_service_tooltip_content'}
                                                     {assign var="priceCalcMethod" value=$product['price_calculation_method']|default:0}
-                                                    <div class="tooltip-cont">
-                                                        <div class="tooltip-popup-row"><label>{l s='Applied on:'}</label></div>
-                                                        <ul class="tooltip-days">
-                                                            {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
-                                                                <li>{$pcmDayLabel}</li>
-                                                            {/foreach}
-                                                        </ul>
-                                                    </div>
+                                                        <div class="ui-tooltip-header">
+                                                            <div class="ui-tooltip-label">{l s='Applied on:'}</div>
+                                                        </div>
+                                                        <div class="ui-tooltip-body">
+                                                            <ul>
+                                                                {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                                                    <li>{$pcmDayLabel}</li>
+                                                                {/foreach}
+                                                            </ul>
+                                                        </div>
                                                     {/capture}
 
-                                                    {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_tooltip_content allow_html=true}
+                                                    {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_tooltip_content allow_html=true}
                                                 </div>
                                             </td>
                                             <td>

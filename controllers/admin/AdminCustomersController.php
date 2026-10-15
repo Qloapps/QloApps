@@ -365,7 +365,7 @@ class AdminCustomersControllerCore extends AdminController
         // Added this to check if the filter for the banned(deleted) is used, since $this->delete = true will not display the deleted customers.
         $prefix = $this->getCookieFilterPrefix();
         $filters = $this->context->cookie->getFamily($prefix.$this->table.'Filter_');
-        if (isset($filters[$prefix.$this->table.'Filter_deleted']) && $filters[$prefix.$this->table.'Filter_deleted'] == 1) {
+        if (isset($filters[$prefix.$this->table.'Filter_a!deleted']) && $filters[$prefix.$this->table.'Filter_a!deleted'] == 1) {
             $this->deleted = false;
         }
     }
@@ -970,7 +970,7 @@ class AdminCustomersControllerCore extends AdminController
         $helper->color = 'color2';
         $helper->title = $this->l('Banned Customers', null, null, false);
         $helper->subtitle = $this->l('All Time', null, null, false);
-        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_deleted=1';
+        $helper->href = $this->context->link->getAdminLink('AdminCustomers').'&submitResetcustomer&submitFiltercustomer=1&customerFilter_a!deleted=1';
         $helper->source = $this->context->link->getAdminLink('AdminStats').'&ajax=1&action=getKpi&kpi=total_banned_customers';
         $helper->tooltip = $this->l('The total number of banned customers.', null, null, false);
         $this->kpis[] = $helper;

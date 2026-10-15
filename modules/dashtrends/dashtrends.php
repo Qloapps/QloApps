@@ -146,15 +146,17 @@ class Dashtrends extends Module
             $refined_data['net_profits'][$date] = 0;
 
             // calculate actual values now for current date from available $gross_data to be used to display in line chart
-            $refined_data['sales'][$date] = isset($gross_data['total_paid_tax_excl'][$date]) ? $gross_data['total_paid_tax_excl'][$date] : 0;
+            // sales are net of refunded amount
+            $refunds = isset($gross_data['total_refunds'][$date]) ? $gross_data['total_refunds'][$date] : 0;
+            $refined_data['sales'][$date] = (isset($gross_data['total_paid_tax_excl'][$date]) ? $gross_data['total_paid_tax_excl'][$date] : 0) - $refunds;
             $refined_data['orders'][$date] = isset($gross_data['orders'][$date]) ? $gross_data['orders'][$date] : 0;
             $refined_data['average_cart_value'][$date] = $refined_data['orders'][$date] ? $refined_data['sales'][$date] / $refined_data['orders'][$date] : 0;
             $refined_data['visits'][$date] = isset($gross_data['visits'][$date]) ? $gross_data['visits'][$date] : 0;
             $refined_data['conversion_rate'][$date] = $refined_data['visits'][$date] ? ($refined_data['orders'][$date] / $refined_data['visits'][$date] * 100) : 0;
-            $refined_data['net_profits'][$date] += (isset($gross_data['total_paid_tax_excl'][$date]) ? $gross_data['total_paid_tax_excl'][$date] : 0);
+            // sales already have refunds deducted
+            $refined_data['net_profits'][$date] += $refined_data['sales'][$date];
             $refined_data['net_profits'][$date] -= (isset($gross_data['total_purchases'][$date]) ? $gross_data['total_purchases'][$date] : 0);
             $refined_data['net_profits'][$date] -= (isset($gross_data['total_expenses'][$date]) ? $gross_data['total_expenses'][$date] : 0);
-            $refined_data['net_profits'][$date] -= (isset($gross_data['total_refunds'][$date]) ? $gross_data['total_refunds'][$date] : 0);
         }
 
         return $refined_data;

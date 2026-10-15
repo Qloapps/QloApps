@@ -145,16 +145,15 @@ class QctmCronTask extends ObjectModel
 
     public function syncAllExistingModules()
     {
-        $allTasks = Hook::exec('registerCronTasks', array(), null, true);
+        foreach (Module::getModulesInstalled() as $installedModule) {
+            $module = Module::getInstanceByName($installedModule['name']);
+            if (!$module || !method_exists($module, 'hookRegisterCronTasks')) {
+                continue;
+            }
 
-        if (!empty($allTasks) && is_array($allTasks)) {
-            foreach ($allTasks as $moduleName => $tasks) {
-                if (!empty($tasks) && is_array($tasks)) {
-                    $module = Module::getInstanceByName($moduleName);
-                    if($module){
-                        $this->registerTasksForModule($module->id, $tasks);
-                    }
-                }
+            $tasks = $module->hookRegisterCronTasks();
+            if (!empty($tasks) && is_array($tasks)) {
+                $this->registerTasksForModule($module->id, $tasks);
             }
         }
     }
