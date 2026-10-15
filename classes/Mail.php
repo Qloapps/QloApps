@@ -264,6 +264,13 @@ class MailCore extends ObjectModel
                 $transport = new SendmailTransport();
             }
 
+            // Allow modules to supply a different mail transport (e.g. a third-party
+            // email API provider) instead of the SMTP/sendmail transport chosen above.
+            Hook::exec('actionMailAlterTransportBeforeSend', array(
+                'configuration' => $configuration,
+                'transport' => &$transport,
+            ));
+
             $mailer = new Mailer($transport);
             /* Get templates content */
             $iso = Language::getIsoById((int)$id_lang);
@@ -414,10 +421,11 @@ class MailCore extends ObjectModel
             $email->from(new Address($from, (string) $from_name));
 
             // Hook to alter Symfony Mailer before sending mail
-            Hook::exec('actionMailAlterMessageBeforeSend', [
-                'message' => &$message,
+            Hook::exec('actionMailAlterMessageBeforeSend', array(
+                'template' => &$template,
                 'message' => &$email,
-            ]);
+                'template_vars' => $template_vars,
+            ));
 
             $mailer->send($email);
 
@@ -517,6 +525,12 @@ class MailCore extends ObjectModel
             } else {
                 $transport = new SendmailTransport();
             }
+
+            // Same extension point as Send(), so the test email also uses the transport supplied by modules.
+            Hook::exec('actionMailAlterTransportBeforeSend', array(
+                'configuration' => array('PS_MAIL_METHOD' => Configuration::get('PS_MAIL_METHOD')),
+                'transport' => &$transport,
+            ));
 
             $mailer = new Mailer($transport);
             $email = (new Email())

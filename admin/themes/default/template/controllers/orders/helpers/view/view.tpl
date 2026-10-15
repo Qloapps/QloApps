@@ -152,6 +152,7 @@
                                                                     <i class="icon-pencil"></i> {l s='Edit'}
                                                                 </a>
                                                             {/if}
+                                                            {hook h="displayAdminRoomBookingStatusActionAfter" hotel_booking_details=$data}
                                                         </td>
                                                     </tr>
                                                 {/foreach}
@@ -599,6 +600,7 @@
                                         {if $customer->phone}
                                             <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{$customer->phone}">{$customer->phone}</a></b></dd>
                                         {/if}
+                                        {hook h="displayAdminOrderAfterPhone" customer=$customer order=$order}
                                     </dl>
                                     <dl class="list-detail col-sm-6">
                                         <label class="label-title">{l s='Customer Info'}</label>

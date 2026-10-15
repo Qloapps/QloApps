@@ -59,6 +59,7 @@
                                                                     <span class="quantity">{l s='(Quantity: %s)' sprintf=[$additionalService['quantity']|string_format:'%02d']}</span>
                                                                 {/if}
                                                             </div>
+                                                            {hook h='displayOrderedPartyServiceProduct' id_service_product_order_detail=$additionalService['id_service_product_order_detail']}
                                                         </div>
                                                         <div class="">
                                                             <span>

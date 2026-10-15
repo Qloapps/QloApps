@@ -95,6 +95,7 @@
 																				{$data_v['name']}
 																			</a>
 																		</p>
+																		{hook h='displayOrderConfirmationRoomTypeNameAfter' id_product=$data_v['id_product']}
 																	</div>
 																</div>
 
@@ -129,6 +130,7 @@
 																			</dd>
 																		</div>
 																	</div>
+																	{hook h='displayOrderConfirmationAfterOccupancy' data=$data_v room=$rm_v}
 																</div>
 																<div class="row">
 																	<div class="col-xs-12 col-md-6">

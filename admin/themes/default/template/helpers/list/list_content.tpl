@@ -169,6 +169,8 @@
 					{$compiled_actions[] = $tr.$action}
 				{/if}
 			{/foreach}
+			{capture assign='row_actions_before_delete'}{hook h='displayAdminListRowActionsBeforeDelete' table=$table identifier=$identifier id=$tr.$identifier token=$token}{/capture}
+			{if $row_actions_before_delete}{$compiled_actions[] = $row_actions_before_delete}{/if}
 			{if $compiled_actions|count > 0}
 				{if $compiled_actions|count > 1}<div class="btn-group-action">{/if}
 				<div class="btn-group pull-right">

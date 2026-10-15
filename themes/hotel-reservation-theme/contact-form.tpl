@@ -190,6 +190,7 @@
 							<input type="text" name="url" value="" class="hidden" />
 							<input type="hidden" name="contactKey" value="{$contactKey}" />
 							<button class="btn button button-medium contact_btn" type="submit" name="submitMessage" id="submitMessage" ><span>{l s='Send Message'}</span></button>
+							{hook h='displayAfterContactUsSubmitButton'}
 						</div>
 					</form>
 				{/block}

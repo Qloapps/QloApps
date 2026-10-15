@@ -200,6 +200,12 @@ class RoomTypeServiceProduct extends ObjectModel
             $subCategory
         )) {
             $serviceProducts = Product::getProductsProperties($idLang, $serviceProducts);
+
+            Hook::exec('actionRemoveNotAvailablePartyServices', array(
+                'serviceProducts' => &$serviceProducts,
+                'idProductRoomType' => $idProductRoomType
+            ));
+
             foreach($serviceProducts as &$serviceProduct) {
                 $serviceProduct['price_tax_exc'] = Product::getServiceProductPrice(
                     (int)$serviceProduct['id_product'],

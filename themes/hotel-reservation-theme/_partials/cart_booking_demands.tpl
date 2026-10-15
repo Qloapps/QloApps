@@ -135,6 +135,7 @@
 																	</div>
 																	<div class="col-xs-10">
 																		<div>{$product['name']|escape:'html':'UTF-8'}</div>
+																		{hook h='displayCartExtraDemandsOrderOpc' id_service_product=$product['id_product'] id_cart_booking=$cartRoom['id']}
 																		{if $product.price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY}
 										<div class="price-per-night">
 											{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}{/if}{l s='/night'}

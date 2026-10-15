@@ -66,6 +66,7 @@
 		{else}
 			{if $data['adults']}{$data['adults']}{/if} {if $data['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if {$data['children']}}, {$data['children']} {if $data['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
 		{/if}
+		{hook h='displayAdminOrderOccupancyColumn' data=$data}
 	</td>
 	<td>
 		<p>

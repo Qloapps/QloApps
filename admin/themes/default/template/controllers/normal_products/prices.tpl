@@ -219,6 +219,7 @@ $(document).ready(function () {
 			</select>
 		</div>
 	</div>
+	{hook h='displayAdminProductPriceCalculationMethodAfter' product=$product}
 	{* As no use in QloApps currently so commented *}
 	{* <div class="form-group">
 		<div class="col-lg-1"><span class="pull-right">{include file="controllers/products/multishop/checkbox.tpl" field="unit_price" type="unit_price"}</span></div>

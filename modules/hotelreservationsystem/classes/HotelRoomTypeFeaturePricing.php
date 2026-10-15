@@ -232,6 +232,12 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $res &= $objFeaturePriceRestriction->deleteFeaturePriceRestrictionsById($existingFeaturePrices);
         }
 
+        Hook::exec('actionCustomFeaturePrice', array(
+            'id_feature_price' => $idFeaturePrice,
+            'restrictions' => $restrictions,
+            'existing_feature_prices' => $existingFeaturePrices
+        ));
+
         return $res;
     }
 

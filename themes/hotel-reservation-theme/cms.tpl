@@ -41,6 +41,7 @@
 		<div class="rte{if $content_only} content_only{/if}">
 			{$cms->content}
 		</div>
+		{hook h='displayCMSPage' page=$cms}
 	{elseif isset($cms_category)}
 		<div class="block-cms">
 			<h1><a href="{if $cms_category->id eq 1}{if isset($force_ssl) && $force_ssl}{$base_dir_ssl}{else}{$base_dir}{/if}{else}{$link->getCMSCategoryLink($cms_category->id, $cms_category->link_rewrite)}{/if}">{$cms_category->name|escape:'html':'UTF-8'}</a></h1>

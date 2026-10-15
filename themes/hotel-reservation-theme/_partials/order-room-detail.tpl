@@ -94,6 +94,7 @@
                                             </dd>
                                         </div>
                                     </div>
+                                    {hook h='displayOrderDetailAfterOccupancy' data=$data_v room=$rm_v id_order=$order->id}
                                 </div>
 
                                 <div class="row">

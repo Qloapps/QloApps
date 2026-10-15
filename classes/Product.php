@@ -3294,6 +3294,14 @@ class ProductCore extends ObjectModel
                 $sql->select('product_option.id_product_option, product_option.price_impact as option_impact_price');
                 $sql->leftJoin('product_option', 'product_option', '(product_option.id_product = p.id_product AND product_option.id_product_option = '.(int)$id_product_option.')');
             }
+
+            Hook::exec('actionAdminProductPriceSqlModifier', array(
+                'id_product' => $id_product,
+                'id_product_option' => $id_product_option,
+                'id_shop' => $id_shop,
+                'sql' => &$sql,
+            ));
+
             $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
 
             if (is_array($res) && count($res)) {
@@ -3387,6 +3395,11 @@ class ProductCore extends ObjectModel
         } else {
             $id_tax_rule_group = Product::getIdTaxRulesGroupByIdProduct((int)$id_product, $context);
         }
+
+        Hook::exec('actionProductTaxRuleGroupModifier', array(
+            'id_product' => $id_product,
+            'id_tax_rule_group' => &$id_tax_rule_group
+        ));
 
         $tax_manager = TaxManagerFactory::getManager($address, $id_tax_rule_group);
         $product_tax_calculator = $tax_manager->getTaxCalculator();

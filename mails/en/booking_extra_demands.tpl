@@ -92,6 +92,7 @@
                                         <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
                                             {$service['name']}
                                         </span>
+                                        {hook h='displayPartyServiceProductDatesInvoiceAndEmail' id_service_product_order_detail=$service['id_service_product_order_detail']}
                                     </td>
                                     <td>
                                         <span style="font-size:12px; font-family:Open-sans, sans-serif; color:#555454;">
