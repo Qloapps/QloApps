@@ -223,7 +223,7 @@
 		<p class="checkbox">
 			<label>
 				<input type="checkbox" id="hotel_restriction" name="hotel_restriction" value="1" {if $hotels.unselected|@count}checked="checked"{/if} />
-				{l s='Hotel selection'}
+				{l s='Property selection'}
 			</label>
 		</p>
 		<div id="hotel_restriction_div">
