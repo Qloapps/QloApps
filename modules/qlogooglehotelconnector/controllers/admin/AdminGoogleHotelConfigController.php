@@ -74,6 +74,22 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
         }
     }
 
+    /** True when the current admin request came over HTTPS (directly or via a TLS-terminating proxy). */
+    protected function isSecureRequest()
+    {
+        if (Tools::usingSecureMode()) {
+            return true;
+        }
+
+        if (empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            return false;
+        }
+
+        $protos = explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO']);
+
+        return strtolower(trim($protos[0])) === 'https';
+    }
+
     /** Renders the configuration page into the admin layout. */
     public function initContent()
     {
@@ -129,6 +145,8 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
             'configs' => $configs,
             'ws_key' => $wsKey,
             'is_connected' => $isConnected,
+            'is_secure' => $this->isSecureRequest(),
+            'ssl_settings_url' => $this->context->link->getAdminLink('AdminPreferences'),
             'action_url' => $this->context->link->getAdminLink('AdminGoogleHotelConfig'),
             'cron_url' => $cronUrl,
             'hotel_list_url' => $hotelEditBase,
@@ -140,6 +158,11 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
     {
         if (!$this->tabAccess['edit']) {
             $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return;
+        }
+
+        if (!$this->isSecureRequest()) {
+            $this->errors[] = $this->l('Connection cannot be created from an unsecure (HTTP) server. Please use HTTPS.');
             return;
         }
 
@@ -216,6 +239,11 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
     {
         if (!$this->tabAccess['edit']) {
             $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return;
+        }
+
+        if (!$this->isSecureRequest()) {
+            $this->errors[] = $this->l('The webservice key cannot be regenerated from an unsecure (HTTP) server. Please use HTTPS.');
             return;
         }
 

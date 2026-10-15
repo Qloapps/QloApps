@@ -42,7 +42,7 @@ class QloGoogleHotelConnector extends Module
     {
         $this->name = 'qlogooglehotelconnector';
         $this->tab = 'administration';
-        $this->version = '1.0.0';
+        $this->version = '4.0.0';
         $this->author = 'Webkul';
         $this->need_instance = 0;
         $this->bootstrap = true;
@@ -387,10 +387,18 @@ class QloGoogleHotelConnector extends Module
     {
         $idLang = (int) $this->context->language->id;
 
+        $hotelEditBase = $this->context->link->getAdminLink('AdminAddHotel');
+        $hotels = array();
+        foreach (QghcPropertyService::getHotelsWithIssues($idLang) as $idHotel => $hotelName) {
+            $hotels[] = array(
+                'name' => $hotelName,
+                'url' => $hotelEditBase . '&id=' . (int) $idHotel . '&updatehtl_branch_info',
+            );
+        }
+
         $this->context->smarty->assign(array(
             'is_connected' => (int) Configuration::get(self::CONFIG_STATUS) === QghcProperty::GOOGLE_STATUS_CONNECTED,
-            'hotel_names' => array_values(QghcPropertyService::getHotelsWithIssues($idLang)),
-            'hotel_list_url' => $this->context->link->getAdminLink('AdminAddHotel'),
+            'hotels' => $hotels,
             'config_url' => $this->context->link->getAdminLink('AdminGoogleHotelConfig'),
         ));
 
@@ -402,16 +410,22 @@ class QloGoogleHotelConnector extends Module
     {
         $idLang = (int) $this->context->language->id;
         $isConnected = (int) Configuration::get(self::CONFIG_STATUS) === QghcProperty::GOOGLE_STATUS_CONNECTED;
-        $hotelNames = array_values(QghcPropertyService::getHotelsWithIssues($idLang));
+        $editBaseUrl = $this->context->link->getAdminLink('AdminAddHotel');
+        $hotels = array();
+        foreach (QghcPropertyService::getHotelsWithIssues($idLang) as $idHotel => $hotelName) {
+            $hotels[] = array(
+                'hotel_name' => $hotelName,
+                'edit_url' => $editBaseUrl . '&id=' . (int) $idHotel . '&updatehtl_branch_info',
+            );
+        }
 
-        if ($isConnected && !$hotelNames) {
+        if ($isConnected && !$hotels) {
             return '';
         }
 
         $this->context->smarty->assign(array(
             'is_connected' => $isConnected,
-            'hotel_names' => $hotelNames,
-            'hotel_list_url' => $this->context->link->getAdminLink('AdminAddHotel'),
+            'hotels_with_issues' => $hotels,
             'config_url' => $this->context->link->getAdminLink('AdminGoogleHotelConfig'),
         ));
 

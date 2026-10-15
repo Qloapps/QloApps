@@ -175,18 +175,26 @@ class QghcPropertyService
         if ($property) {
             if ((int) $property->google_status === QghcProperty::GOOGLE_STATUS_FAILED) {
                 return array($property->failure_reason
-                    ? self::l('Google Hotel: Google could not verify this hotel — ') . $property->failure_reason
-                    : self::l('Google Hotel: Google reported an issue connecting this hotel. Please contact support.'));
+                    ? self::l('Google could not verify this hotel — ') . $property->failure_reason
+                    : self::l('Google reported an issue connecting this hotel. Please contact support.'));
             }
             return array();
         }
 
         $errors = self::validateRequiredFields($idHotel, $idLang);
         if ($errors) {
+            // Shown as a list under a "Need to fix" heading, so the "Google Hotel: " prefix is redundant.
+            $prefix = self::l('Google Hotel: ');
+            foreach ($errors as $key => $error) {
+                if (strpos($error, $prefix) === 0) {
+                    $errors[$key] = Tools::substr($error, Tools::strlen($prefix));
+                }
+            }
+
             return $errors;
         }
 
-        return array(self::l('Google Hotel: This hotel is not yet enabled for Google Hotel.'));
+        return array(self::l('This hotel is not yet enabled for Google Hotel.'));
     }
 
     /**

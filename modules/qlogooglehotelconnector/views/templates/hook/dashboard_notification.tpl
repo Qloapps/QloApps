@@ -22,16 +22,16 @@
 <div class="col-sm-12">
     <section id="ghc-dashboard-notification" class="widget panel">
         <h3>
-            <i class="icon-{if $is_connected && empty($hotel_names)}check-circle text-success{else}warning-sign text-warning{/if}"></i>
+            <i class="icon-{if $is_connected && empty($hotels)}check-circle text-success{else}warning-sign text-warning{/if}"></i>
             {l s='Google Hotel Connector' mod='qlogooglehotelconnector'}
         </h3>
 
         {if !$is_connected}
             <p class="qlo-ghc-notif-desc">
-                {l s='Not connected to the Google Hotel Center.' mod='qlogooglehotelconnector'}
-                &nbsp;<a href="{$config_url|escape:'html':'UTF-8'}">{l s='Fix in Google Hotel Setup' mod='qlogooglehotelconnector'}</a>
+                {l s='Connect to Google Hotel to get more commission-free direct bookings.' mod='qlogooglehotelconnector'}
+                &nbsp;<a href="{$config_url|escape:'html':'UTF-8'}">{l s='Connect in Google Hotel Setup' mod='qlogooglehotelconnector'}</a>
             </p>
-        {elseif !empty($hotel_names)}
+        {elseif !empty($hotels)}
             <p class="qlo-ghc-notif-desc">
                 {l s='Connected to the Google Hotel Center, but some hotels are not listed.' mod='qlogooglehotelconnector'}
             </p>
@@ -41,22 +41,18 @@
             </p>
         {/if}
 
-        {if !empty($hotel_names)}
+        {if !empty($hotels)}
             <p class="qlo-ghc-notif-title">
                 <strong>{l s='Hotels with an issue:' mod='qlogooglehotelconnector'}</strong>
-                &nbsp;<span class="label label-danger qlo-ghc-badge-urgent">{l s='Urgent Action Needed' mod='qlogooglehotelconnector'}</span>
             </p>
             <ul class="list-unstyled qlo-ghc-notif-list">
-                {foreach from=$hotel_names item=hotelName}
+                {foreach from=$hotels item=hotel}
                 <li class="qlo-ghc-notif-item">
                     <i class="icon-circle text-danger qlo-ghc-notif-dot"></i>
-                    &nbsp;<strong>{$hotelName|escape:'html':'UTF-8'}</strong>
+                    &nbsp;<a href="{$hotel.url|escape:'html':'UTF-8'}"><strong>{$hotel.name|escape:'html':'UTF-8'}</strong></a>
                 </li>
                 {/foreach}
             </ul>
-            <p class="qlo-ghc-notif-desc">
-                <a href="{$hotel_list_url|escape:'html':'UTF-8'}">{l s='View Hotel List' mod='qlogooglehotelconnector'}</a>
-            </p>
         {/if}
 
         <a href="{$config_url|escape:'html':'UTF-8'}" class="btn btn-default btn-sm btn-block">

@@ -19,9 +19,9 @@ https://qloapps.com/addons/
 
 ### Module Versions and Compatibility:
 
-- **Current version:** `1.0.0`
+- **Current version:** `4.0.0`
 
-- Module version `1.0.0` compatible with QloApps version `1.8.x`
+- Module version `4.0.0` compatible with QloApps version `1.8.x`
 
 
 ### Refund Policy:

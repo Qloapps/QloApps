@@ -20,22 +20,19 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 <div id="ghc-hotel-top-warning">
-    {if !$is_connected}
-        <div class="alert alert-danger qlo-ghc-alert-mb">
-            <strong>{l s='Not connected to the Google Hotel Center.' mod='qlogooglehotelconnector'}</strong>
-            {l s='Hotels cannot sync with Google Hotel Ads until this is fixed.' mod='qlogooglehotelconnector'}
-            &nbsp;<a href="{$hotel_edit_config_url|escape:'html':'UTF-8'}" class="alert-link">{l s='Fix in Google Hotel Setup' mod='qlogooglehotelconnector'}</a>
-        </div>
-    {/if}
+    <div class="alert alert-warning">
+        {if !$is_connected}
+            <strong>{l s='Connect to Google Hotel to get more commission-free direct bookings.' mod='qlogooglehotelconnector'}</strong>
+            &nbsp;<a href="{$hotel_edit_config_url|escape:'html':'UTF-8'}" class="alert-link">{l s='Connect in Google Hotel Setup' mod='qlogooglehotelconnector'}</a>
+        {/if}
 
-    {if !empty($issue_reasons)}
-        <div class="alert alert-warning">
-            <strong>{l s='This hotel is not listed on Google Hotel:' mod='qlogooglehotelconnector'}</strong>
+        {if !empty($issue_reasons)}
+            <div class="qlo-ghc-warning-title">{l s='Need to fix the below mentioned issues:' mod='qlogooglehotelconnector'}</div>
             <ul class="qlo-ghc-missing-list">
                 {foreach from=$issue_reasons item=reason}
-                <li>{$reason|escape:'html':'UTF-8'} {l s='Use the Google Hotel tab below to enable it.' mod='qlogooglehotelconnector'}</li>
+                <li>{$reason|escape:'html':'UTF-8'}</li>
                 {/foreach}
             </ul>
-        </div>
-    {/if}
+        {/if}
+    </div>
 </div>

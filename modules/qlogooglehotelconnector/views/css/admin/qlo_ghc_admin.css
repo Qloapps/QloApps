@@ -110,6 +110,9 @@ table.qghc_api_log th.actions .pull-right {
 .qlo-ghc-col-padded    { padding-top: 6px; }
 .qlo-ghc-status-label  { font-size: 12px; padding: 5px 10px; }
 .qlo-ghc-missing-list  { margin: 8px 0 0 0; padding-left: 20px; }
+.qlo-ghc-warning-title { margin-top: 6px; }
+.qlo-ghc-warning-title:first-child { margin-top: 0; }
+.qlo-ghc-warning-title + .qlo-ghc-missing-list { margin-top: 2px; }
 .qlo-ghc-switch-disabled { opacity: 0.5; cursor: not-allowed; }
 /* Double class to out-specify core's ".bootstrap p { margin: ... }" without !important. */
 .qlo-ghc-helpblock-top.qlo-ghc-helpblock-top { margin-top: 10px; }

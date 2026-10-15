@@ -20,6 +20,14 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
+{if !$is_secure}
+  <div class="alert alert-danger">
+    <strong>{l s='Unsecure server detected.' mod='qlogooglehotelconnector'}</strong>
+    {l s='Your store is not running on a secure (HTTPS) server, so the connection with Google Hotel cannot be created or updated.' mod='qlogooglehotelconnector'}
+    <a href="{$ssl_settings_url|escape:'html':'UTF-8'}" class="alert-link">{l s='Please enable HTTPS to continue.' mod='qlogooglehotelconnector'}</a>
+  </div>
+{/if}
+
 {* ── Google Hotel Setup ───────────────────────────────────────────────── *}
 <div class="panel qlo-ghc-form-left-labels">
 
@@ -51,9 +59,10 @@
         <strong>{l s='Important:' mod='qlogooglehotelconnector'}</strong>
         {l s='This key was automatically generated for the Google Hotel connection. Please do not change the permissions of this webservice key.' mod='qlogooglehotelconnector'}
         {if !$is_connected}
-          <br><br>
-          {l s='To complete the setup, click' mod='qlogooglehotelconnector'}
-          <strong>{l s='Create Connection' mod='qlogooglehotelconnector'}</strong>.
+          <div class="qlo-ghc-warning-title">
+            {l s='To complete the setup, click' mod='qlogooglehotelconnector'}
+            <strong>{l s='Create Connection' mod='qlogooglehotelconnector'}</strong>.
+          </div>
         {/if}
       </div>
 
@@ -70,7 +79,7 @@
                  placeholder="{l s='Enter your webservice key' mod='qlogooglehotelconnector'}" />
           {if $ws_key}
           <p class="qlo-ghc-helpblock-top">
-            <button type="submit" form="ghc-regenerate-form" class="btn btn-default btn-sm">
+            <button type="submit" form="ghc-regenerate-form" class="btn btn-default btn-sm"{if !$is_secure} disabled="disabled"{/if}>
               <i class="icon-refresh"></i>
               {l s='Regenerate Key' mod='qlogooglehotelconnector'}
             </button>
@@ -112,7 +121,7 @@
     {else}
       <span></span>
     {/if}
-    <button type="submit" form="ghc-connection-form" class="btn btn-default">
+    <button type="submit" form="ghc-connection-form" class="btn btn-default"{if !$is_secure} disabled="disabled"{/if}>
       <i class="process-icon-save"></i>&nbsp;
       {if $is_connected}
         {l s='Update Connection' mod='qlogooglehotelconnector'}
@@ -123,6 +132,36 @@
   </div>
 
 </div>
+
+{if !$is_secure}
+<script type="text/javascript">
+  {literal}
+  (function () {
+    var form = document.getElementById('ghc-connection-form');
+    if (!form) { return; }
+    // Unsecure server: never let the connection form be submitted, even if the disabled attribute is removed.
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return false;
+    }, true);
+    form.removeAttribute('action');
+    form.onsubmit = function () { return false; };
+
+    var regenForm = document.getElementById('ghc-regenerate-form');
+    if (regenForm) {
+      regenForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return false;
+      }, true);
+      regenForm.removeAttribute('action');
+      regenForm.onsubmit = function () { return false; };
+    }
+  })();
+  {/literal}
+</script>
+{/if}
 
 {* ── Cron job setting ─────────────────────────────────────────────────── *}
 <div class="panel">
