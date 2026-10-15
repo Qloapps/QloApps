@@ -522,7 +522,13 @@ class ParentOrderControllerCore extends FrontController
                 0
             ))) {
                 $multi = (int)Tools::getValue('multi-shipping');
-                Tools::redirect('index.php?controller=address&back='.urlencode('order.php?step=1'.($multi ? '&multi-shipping='.$multi : '')));
+                $backUrl = $this->context->link->getPageLink(
+                    'order',
+                    true,
+                    null,
+                    'step=1'.($multi ? '&multi-shipping='.$multi : '')
+                );
+                Tools::redirect($this->context->link->getPageLink('address', true, null, array('back' => $backUrl)));
             }
         }
 
