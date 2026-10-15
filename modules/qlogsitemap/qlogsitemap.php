@@ -92,9 +92,14 @@ class Qlogsitemap extends Module
 
     public function install()
     {
-        return parent::install()
-            && $this->registerHook('displayAdminMetaOptions')
-            && $this->registerHook('registerCronTasks');
+        if (!parent::install()
+            || !$this->registerHook('displayAdminMetaOptions')
+            || !$this->registerHook('registerCronTasks')
+        ) {
+            return false;
+        }
+        $this->sitemapPageMeta();
+        return true;
     }
 
     public function uninstall()
@@ -385,7 +390,6 @@ class Qlogsitemap extends Module
         }
 
         QgsHelper::deleteSitemapFiles();
-        $this->sitemapPageMeta();
 
         $disabledPages = QgsHelper::getDisabledPages();
         foreach (Language::getLanguages(true, (int) $this->context->shop->id) as $lang) {
