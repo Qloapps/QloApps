@@ -111,9 +111,3 @@
   .header-rmsearch-wrapper {
     display: block !important;}
 }
-/* the sidebar is narrow on tablets, so keep the searched details compact */
-@media (min-width: 768px) and (max-width: 991px) {
-  .header-rmsearch-details-wrapper .search_result_info {
-    font-size: 13px;
-    line-height: 20px;}
-}

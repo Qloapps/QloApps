@@ -50,6 +50,12 @@
         float :right;
     }
 }
+@media (min-width: 768px) and (max-width: 991px) {
+    #hotelRoomsBlock .col-md-6 {
+        width: 50%;
+        float: left;
+    }
+}
 @media (max-width: 530px) {
     #hotelRoomsBlock .col-md-6 > a img.width-100 {
         width: 100%;

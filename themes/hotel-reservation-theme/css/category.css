@@ -407,6 +407,11 @@ p.capa_txt {
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
+    #category #left_column,
+    #category #center_column {
+        width: 100%;
+    }
+
     .catSortBlock .col-sm-3 {
         width: auto;
     }
@@ -417,5 +422,32 @@ p.capa_txt {
 
     .catSortBlock .filter_dw_cont .sort_btn_span {
         margin-right: 8px;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .visible-md .capa_txt {
+        padding-left: 0;
+    }
+}
+
+.rm_amen_more {
+    display: none;
+}
+@media (max-width: 1199px) {
+    .rm_amen_extra {
+        display: none;
+    }
+
+    .rm_amen_more {
+        display: inline-block;
+        margin-bottom: 5px;
+        padding: 0 6px;
+        border: 1px solid #379BF0;
+        border-radius: 10px;
+        font-size: 12px;
+        line-height: 18px;
+        color: #379BF0;
+        vertical-align: top;
     }
 }
