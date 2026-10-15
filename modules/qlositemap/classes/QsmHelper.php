@@ -24,34 +24,32 @@
 /**
  * Queries for the pages added to the sitemap, and helpers for the sitemap files.
  */
-class QgsHelper
+class QsmHelper
 {
-    const QGS_MAX_URLS_PER_FILE = 25000;
-
-    const QGS_INDEX_FILE_NAME = 'sitemap.xml';
-
-    const QGS_DEFAULT_FREQUENCY = 'weekly';
+    const QSM_MAX_URLS_PER_FILE = 25000;
+    const QSM_INDEX_FILE_NAME = 'sitemap.xml';
+    const QSM_DEFAULT_FREQUENCY = 'weekly';
     const TYPE_ROOM_TYPES = 'type-room-types';
     const TYPE_PROPERTIES = 'type-properties';
     const TYPE_STANDALONE = 'type-standalone';
     const TYPE_CMS = 'type-cms';
+
     public static function getFrequencies()
     {
         return array('always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never');
     }
     public static function getFrequency()
     {
-        $frequency = Configuration::get('QLOGSITEMAP_FREQUENCY');
+        $frequency = Configuration::get('QLOSITEMAP_FREQUENCY');
 
-        return in_array($frequency, self::getFrequencies(), true) ? $frequency : self::QGS_DEFAULT_FREQUENCY;
+        return in_array($frequency, self::getFrequencies(), true) ? $frequency : self::QSM_DEFAULT_FREQUENCY;
     }
     public static function getDisabledPages()
     {
-        $pages = Configuration::get('QLOGSITEMAP_DISABLED_PAGES');
+        $pages = Configuration::get('QLOSITEMAP_DISABLED_PAGES');
 
         return $pages ? explode(',', $pages) : array();
     }
-
     public static function getModulePages()
     {
         $pages = array();
@@ -74,7 +72,6 @@ class QgsHelper
 
         return $pages;
     }
-
     public static function getMetaIdByPage($page)
     {
         return (int) Db::getInstance()->getValue(
@@ -112,7 +109,6 @@ class QgsHelper
             Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
             Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
         );
-        // Types that are also sold with hotels need at least one hotel linked to the product
         $withHotelTypes = array(
             Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
             Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
@@ -183,7 +179,7 @@ class QgsHelper
         foreach (self::getSitemapFiles() as $row) {
             @unlink(_PS_ROOT_DIR_.'/'.$row['link']);
         }
-        @unlink(_PS_ROOT_DIR_.'/'.self::QGS_INDEX_FILE_NAME);
+        @unlink(_PS_ROOT_DIR_.'/'.self::QSM_INDEX_FILE_NAME);
     }
 
     public static function createIndexFile()
@@ -200,7 +196,7 @@ class QgsHelper
         }
         $xml .= '</sitemapindex>'.PHP_EOL;
 
-        return (bool) file_put_contents(_PS_ROOT_DIR_.'/'.self::QGS_INDEX_FILE_NAME, $xml);
+        return (bool) file_put_contents(_PS_ROOT_DIR_.'/'.self::QSM_INDEX_FILE_NAME, $xml);
     }
 
     public static function escapeXml($string)
