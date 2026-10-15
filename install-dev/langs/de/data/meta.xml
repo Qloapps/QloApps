@@ -125,10 +125,10 @@
     <url_rewrite>bestellungsverfolgung</url_rewrite>
   </meta>
   <meta id='our-properties' id_shop='1'>
-    <title>Unsere Immobilien</title>
+    <title>Immobilien</title>
     <description/>
     <keywords/>
-    <url_rewrite>our-properties</url_rewrite>
+    <url_rewrite>immobilien</url_rewrite>
   </meta>
   <meta id="order-slip" id_shop="1">
     <title>Bestellschein</title>
