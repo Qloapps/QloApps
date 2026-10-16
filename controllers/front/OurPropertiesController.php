@@ -129,7 +129,6 @@ class OurPropertiesControllerCore extends FrontController
                 'hotelsInfo' => $hotelsInfo,
                 'hotelLocationArray' => $hotelLocationArray,
                 'displayHotelMap' => $displayHotelMap,
-                'WK_HTL_SHORT_DESC' => Configuration::get('WK_HTL_SHORT_DESC', $this->context->language->id),
                 'currentIndex' => $this->context->link->getPageLink('our-properties')
             )
         );
