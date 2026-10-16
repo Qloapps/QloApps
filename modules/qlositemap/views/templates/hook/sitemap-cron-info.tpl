@@ -21,18 +21,26 @@
 *}
 
 	<div class="alert alert-info">
-		<p><strong>{l s='Sitemap generation' mod='qlositemap'}</strong></p>
-		<ul>
-			{if $qsm_cron_manager_enabled}
+		{if $qsm_cron_manager_enabled}
+			<p><strong>{l s='Automatic sitemap generation' mod='qlositemap'}</strong></p>
+			<ul>
 				{if $qsm_cron_task && !$qsm_cron_task.active}
-					<li><strong>{l s='Automatic:' mod='qlositemap'}</strong> {l s='automatic sitemap generation is turned off. To generate the sitemap automatically, choose Weekly, Monthly or Yearly in Sitemap generation schedule.' mod='qlositemap'}</li>
+					<li>{l s='Automatic sitemap generation is turned off.' mod='qlositemap'}</li>
+					<li>{l s='To turn it on, select Weekly, Monthly or Yearly from the Sitemap generation schedule.' mod='qlositemap'}</li>
 				{elseif $qsm_cron_task}
-					<li><strong>{l s='Automatic:' mod='qlositemap'}</strong> {l s='the sitemaps are regenerated automatically. Current schedule:' mod='qlositemap'} <strong>{$qsm_cron_task.readable|escape:'html':'UTF-8'}</strong>.</li>
+					<li>{l s='The sitemaps are regenerated automatically. Current schedule:' mod='qlositemap'} <strong>{$qsm_cron_task.readable|escape:'html':'UTF-8'}</strong>.</li>
+					<li>{l s='To change it, select another option from the Sitemap generation schedule.' mod='qlositemap'}</li>
 				{else}
-					<li><strong>{l s='Automatic:' mod='qlositemap'}</strong> {l s='the sitemaps are regenerated automatically. You can configure the schedule in the' mod='qlositemap'} <a href="{$qsm_cron_manager_link|escape:'html':'UTF-8'}">{l s='Cron Task Manager' mod='qlositemap'}</a>.</li>
+					<li>{l s='The sitemaps are regenerated automatically. You can configure the schedule in the' mod='qlositemap'} <a href="{$qsm_cron_manager_link|escape:'html':'UTF-8'}">{l s='Cron Task Manager' mod='qlositemap'}</a>.</li>
 				{/if}
-			{/if}
-			<li><strong>{l s='Manual:' mod='qlositemap'}</strong> {l s='to generate the sitemap manually, click on the "Generate sitemap" button. This erases the old sitemap files and creates new ones.' mod='qlositemap'}</li>
+				{if $qsm_cron_task}
+					<li>{l s='Save the configuration. The old sitemap files will then be erased and new ones created automatically, based on the schedule.' mod='qlositemap'}</li>
+				{/if}
+			</ul>
+		{/if}
+		<p><strong>{l s='Manual sitemap generation' mod='qlositemap'}</strong></p>
+		<ul>
+			<li>{l s='To update the sitemap at any time, click the "Generate sitemap" button. This erases the old sitemap files and creates new ones.' mod='qlositemap'}</li>
 		</ul>
 	</div>
 	{if !$qsm_cron_manager_enabled}

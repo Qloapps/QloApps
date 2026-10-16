@@ -26,7 +26,7 @@
 			<p>{l s='Please set up the following sitemap URL in your Google Search Console account:' mod='qlositemap'}<br><a href="{$qsm_index_url|escape:'html':'UTF-8'}" target="_blank">{$qsm_index_url|escape:'html':'UTF-8'}</a></p>
 			<p>{l s='A separate sitemap file is generated for each active language.' mod='qlositemap'}</p>
 			<p>{l s='The above URL is the master sitemap file. It refers to the following sub-sitemap files:' mod='qlositemap'}</p>
-			<ul class="list-unstyled">
+			<ul>
 				{foreach from=$qsm_sitemap_links item=sitemap_link}
 					<li><a href="{$qsm_store_url|escape:'html':'UTF-8'}{$sitemap_link.link|escape:'html':'UTF-8'}" target="_blank">{$sitemap_link.link|escape:'html':'UTF-8'}</a></li>
 				{/foreach}
@@ -41,8 +41,10 @@
 	<div class="panel">
 		<div class="panel-heading"><i class="icon-wrench"></i> {l s='Configure your sitemap' mod='qlositemap'}</div>
 		<div class="alert alert-info">
-			<strong>{l s='CMS pages:' mod='qlositemap'}</strong>
-			{l s='You can manage which CMS pages are included in the sitemap in two ways. If "CMS pages" is selected here, no CMS page is included in the sitemap. To leave out only specific CMS pages, set "Indexation by search engines" to No on the page itself (Preferences > CMS).' mod='qlositemap'}
+			<p><strong>{l s='CMS pages' mod='qlositemap'}</strong></p>
+			<p>{l s='You can manage which CMS pages are included in the sitemap in two ways.' mod='qlositemap'}</p>
+			<p>{l s='If "CMS pages" is selected here, no CMS page is included in the sitemap.' mod='qlositemap'}</p>
+			<p>{l s='To leave out only specific CMS pages, set "Indexation by search engines" to No on the page itself' mod='qlositemap'} (<a href="{$qsm_cms_link|escape:'html':'UTF-8'}" target="_blank">{l s='Preferences > CMS' mod='qlositemap'}</a>).</p>
 		</div>
 		<div class="form-group">
 			<label class="control-label col-lg-3" for="qsm_frequency"><span class="label-tooltip" data-toggle="tooltip" title="{l s='How often do you update your property website?' mod='qlositemap'}">{l s='Sitemap frequency' mod='qlositemap'}</span></label>

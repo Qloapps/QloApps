@@ -33,7 +33,6 @@ class Qlositemap extends Module
         'index' => 'home',
         'our-properties' => 'meta',
     );
-
     protected $pagesAfter = array(
         'contact' => 'contact',
         'authentication' => 'login',
@@ -85,7 +84,8 @@ class Qlositemap extends Module
     {
         return parent::install()
             && $this->registerHook('displayAdminMetaOptions')
-            && $this->registerHook('registerCronTasks');
+            && $this->registerHook('registerCronTasks')
+            && $this->ensureSitemapPageMeta();
     }
 
     public function uninstall()
@@ -191,6 +191,7 @@ class Qlositemap extends Module
             'qsm_frequencies' => $frequencies,
             'qsm_frequency' => QsmHelper::getFrequency(),
             'qsm_pages' => $pages,
+            'qsm_cms_link' => $this->context->link->getAdminLink('AdminCmsContent'),
         ));
 
         return $output.$this->display(__FILE__, 'views/templates/admin/config.tpl');
@@ -418,7 +419,6 @@ class Qlositemap extends Module
         }
 
         QsmHelper::deleteSitemapFiles();
-        $this->ensureSitemapPageMeta();
 
         $disabledPages = QsmHelper::getDisabledPages();
         foreach (Language::getLanguages(true, (int) $this->context->shop->id) as $lang) {
