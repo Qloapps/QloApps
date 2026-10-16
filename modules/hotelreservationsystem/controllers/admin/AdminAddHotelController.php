@@ -49,7 +49,7 @@ class AdminAddHotelController extends ModuleAdminController
         ON (cl.`id_country` = aa.`id_country` AND cl.`id_lang` = '.(int) $this->context->language->id.')';
         $this->_join .= 'LEFT JOIN `'._DB_PREFIX_.'htl_property_type_lang` hrtsl
         ON (hrtsl.`id_htl_property_type` = a.`id_property_type` AND hrtsl.`id_lang` = '.(int) $this->context->language->id.')';
-        $this->_select = ' hrtsl.`name` as `property_type` , hbl.`hotel_name`, aa.`city`, s.`name` as `state_name`, cl.`name` as `country_name`';
+        $this->_select = ' COALESCE(hrtsl.`name`, \''.pSQL($this->l('Hotel')).'\') as `property_type` , hbl.`hotel_name`, aa.`city`, s.`name` as `state_name`, cl.`name` as `country_name`';
 
         $this->fields_list = array(
             'id' => array(
