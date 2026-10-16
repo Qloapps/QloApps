@@ -202,11 +202,12 @@
 .order-detail-content span.room-type-feature {
 	white-space: nowrap;
 	line-height: 35px;
-	background-color: #eee;
-	border-radius: 10px;
-	margin-right: 10px;
-	padding: 3px 10px 6px 0px;
+	margin-right: 5px;
 	font-size: 14px;
+	color: #555555;
+}
+.room-type-feature i {
+	font-size: 16px;
 	color: #555555;
 }
 .order-detail-content .room_duration_block_head {

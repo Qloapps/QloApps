@@ -153,18 +153,23 @@ p.capa_txt {
 
 .rm_amen
 {
-    width: 20px;
+    width: 18px;
     display: inline-block;
     margin-right: 10px;
     margin-bottom: 5px;
-    font-size: 18px;
-    color: #737877d1;
+    font-size: 16px;
+    color: #555555;
 }
 
 .room_featured_feature
 {
     display: inline-block;
-    margin: 0 10px 5px 0;
+    margin: 0 10px 10px 0;
+}
+.room_featured_feature i{
+    
+    font-size: 16px;
+    color: #555555;
 }
 
 .room_featured_feature img

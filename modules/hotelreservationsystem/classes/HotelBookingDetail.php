@@ -1877,9 +1877,13 @@ class HotelBookingDetail extends ObjectModel
                         // featured room features (is_featured) for display below the short description
                         $featuredFeatures = array();
                         foreach (Product::getFrontFeaturesStatic($context->language->id, $value['id_product']) as $roomFeature) {
-                            // one entry per featured feature value, each shown with the feature icon
+                            // one entry per featured feature, its values are shown together after the feature icon
                             if ($roomFeature['is_featured']) {
-                                $featuredFeatures[] = $roomFeature;
+                                if (!isset($featuredFeatures[$roomFeature['id_feature']])) {
+                                    $featuredFeatures[$roomFeature['id_feature']] = $roomFeature;
+                                } else {
+                                    $featuredFeatures[$roomFeature['id_feature']]['value'] .= ', '.$roomFeature['value'];
+                                }
                             }
                         }
                         $featuredFeatures = array_values($featuredFeatures);

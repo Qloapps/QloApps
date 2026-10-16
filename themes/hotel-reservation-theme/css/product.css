@@ -1299,7 +1299,8 @@ Quick View Styles
   align-items: center;
   gap: 5px;
   margin-bottom: 3px;}
-
+.room_info_heading i {
+  font-size: 16px;}
 .product_wrapper .form-control {
   background-color: transparent!important;
   border: 1px solid #999999;

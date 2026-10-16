@@ -83,7 +83,12 @@
                                 <div class="room-type-features">
                                 {foreach $data_v['hotel_info']['room_features'] as $feature}
                                     <span class="room-type-feature">
-                                        <img src="{$THEME_DIR}img/icon/form-ok-circle.svg" /> {$feature['value']|escape:'html':'UTF-8'}
+                                        {if $feature['logo_type'] == 'icon' && $feature['logo']}
+                                            <i class="{$feature['logo']|escape:'html':'UTF-8'}"></i>
+                                        {else}
+                                            <img src="{$smarty.const._PS_IMG_}rf/{$feature['logo_image']|escape:'html':'UTF-8'}" alt="" onerror="this.style.display='none'" />
+                                        {/if}
+                                        {$feature['value']|escape:'html':'UTF-8'}{if !$feature@last} &nbsp;|{/if}
                                     </span>
                                 {/foreach}
                                 </div>

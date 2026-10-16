@@ -1268,13 +1268,14 @@ class HotelHelper
                 return false;
             }
 
+            $objFeature = new Feature($idFeature);
+            $objFeature->is_featured = in_array($featureName, $featuredFeatures);
+            // features without an icon keep their default image (img/rf/<id>.jpg)
             if (isset($featureIcons[$featureName])) {
-                $objFeature = new Feature($idFeature);
                 $objFeature->logo_type = 'icon';
                 $objFeature->logo = $featureIcons[$featureName];
-                $objFeature->is_featured = in_array($featureName, $featuredFeatures);
-                $objFeature->update();
             }
+            $objFeature->update();
 
             foreach ($featureValues as $featureValue) {
                 $idFeatureValue = (int) FeatureValue::addFeatureValueImport($idFeature, $featureValue, null, $idLang, false);
@@ -1304,7 +1305,6 @@ class HotelHelper
             'View' => 'icon-eye',
             'Balcony Type' => 'icon-home',
             'Bathroom Type' => 'icon-tint',
-            'AC Type' => 'icon-cloud',
             'Heating Type' => 'icon-fire',
             'TV Type' => 'icon-desktop',
             'Wi-Fi Speed' => 'icon-wifi',
