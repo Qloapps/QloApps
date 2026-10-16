@@ -62,9 +62,9 @@
 													{if $featured_feature.logo_type == 'icon' && $featured_feature.logo}
 														<i class="{$featured_feature.logo|escape:'htmlall':'UTF-8'}"></i>
 													{else}
-														<img src="{$smarty.const._PS_IMG_}rf/{$featured_feature.id_feature|intval}.jpg" alt="" onerror="this.style.display='none'" />
+														<img src="{$smarty.const._PS_IMG_}rf/{$featured_feature.logo_image|escape:'html':'UTF-8'}" alt="" onerror="this.style.display='none'" />
 													{/if}
-													{$featured_feature.name|escape:'htmlall':'UTF-8'}
+													{$featured_feature.value|escape:'htmlall':'UTF-8'}{if !$featured_feature@last} &nbsp;|{/if}
 												</span>
 											{/foreach}
 										</div>
@@ -82,7 +82,7 @@
 															<i class="{$feat_v.logo|escape:'htmlall':'UTF-8'} rm_amen" title="{$feat_v.name|escape:'htmlall':'UTF-8'}"></i>
 														{elseif $feat_v.logo_type == 'image' && $feat_v.logo}
 															<img title="{$feat_v.name|escape:'htmlall':'UTF-8'}"
-																 src="{$amenity_img_dir|escape:'htmlall':'UTF-8'}{$feat_v.id|intval}.jpg"
+																 src="{$amenity_img_dir|escape:'htmlall':'UTF-8'}{$feat_v.logo|escape:'htmlall':'UTF-8'}"
 																 class="rm_amen" />
 														{/if}
 													{/foreach}

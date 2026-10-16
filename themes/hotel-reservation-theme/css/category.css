@@ -83,9 +83,10 @@
     color: #555555;
     font-size: 14px;
     font-weight: 400;
-    margin-bottom: 15px;
 }
-
+.room_featured_features, .room_features_cont{
+    margin-top: 10px;
+}
 .rm_desc p
 {
     display: inline;
@@ -156,12 +157,14 @@ p.capa_txt {
     display: inline-block;
     margin-right: 10px;
     margin-bottom: 5px;
+    font-size: 18px;
+    color: #737877d1;
 }
 
 .room_featured_feature
 {
     display: inline-block;
-    margin: 0 15px 5px 0;
+    margin: 0 10px 5px 0;
 }
 
 .room_featured_feature img

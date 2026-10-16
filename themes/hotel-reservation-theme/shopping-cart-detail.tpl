@@ -79,7 +79,7 @@
                             {/block}
                         </div>
                         {block name='shopping_cart_room_type_features'}
-                            {if isset($data_v['hotel_info']['room_features'])}
+                            {if !empty($data_v['hotel_info']['room_features'])}
                                 <div class="room-type-features">
                                 {foreach $data_v['hotel_info']['room_features'] as $feature}
                                     <span class="room-type-feature">

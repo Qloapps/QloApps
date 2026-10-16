@@ -198,6 +198,15 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'class' => 'fixed-width-xl',
                         'default' => '0',
                     ),
+                    'WK_MAX_FEATURES_ROOM_SEARCH' => array(
+                        'title' => $this->l('Maximum features in room search'),
+                        'hint' => $this->l('Maximum number of featured features to display for each room type on the front office room search page.'),
+                        'desc' => $this->l('Set to 0 to display all featured features.'),
+                        'type' => 'text',
+                        'cast' => 'intval',
+                        'class' => 'fixed-width-xl',
+                        'default' => '0',
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
             ),
@@ -581,6 +590,9 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             }
             if (!Validate::isUnsignedInt(Tools::getValue('WK_MAX_AMENITIES_ROOM_SEARCH'))) {
                 $this->errors[] = $this->l('Maximum amenities in room search is invalid. Enter 0 or a positive number.');
+            }
+            if (!Validate::isUnsignedInt(Tools::getValue('WK_MAX_FEATURES_ROOM_SEARCH'))) {
+                $this->errors[] = $this->l('Maximum features in room search is invalid. Enter 0 or a positive number.');
             }
             if (Tools::getValue('WK_GOOGLE_ACTIVE_MAP')) {
                 if (!Tools::getValue('PS_API_KEY')) {

@@ -1844,7 +1844,7 @@ class HotelBookingDetail extends ObjectModel
                     }
                     if (!empty($amenities) && $amenities) {
                         $roomAmenityIds = array_column(HotelRoomTypeAmenities::getAmenities($value['id_product']), 'id');
-                        if (!array_intersect($amenities, $roomAmenityIds)) {
+                        if (array_diff($amenities, $roomAmenityIds)) {
                             unset($bookingData['rm_data'][$key]);
                             continue;
                         }
@@ -1877,11 +1877,16 @@ class HotelBookingDetail extends ObjectModel
                         // featured room features (is_featured) for display below the short description
                         $featuredFeatures = array();
                         foreach (Product::getFrontFeaturesStatic($context->language->id, $value['id_product']) as $roomFeature) {
-                            if ($roomFeature['is_featured'] && !isset($featuredFeatures[$roomFeature['id_feature']])) {
-                                $featuredFeatures[$roomFeature['id_feature']] = $roomFeature;
+                            // one entry per featured feature value, each shown with the feature icon
+                            if ($roomFeature['is_featured']) {
+                                $featuredFeatures[] = $roomFeature;
                             }
                         }
-                        $bookingData['rm_data'][$key]['featured_features'] = array_values($featuredFeatures);
+                        $featuredFeatures = array_values($featuredFeatures);
+                        if ($maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH')) {
+                            $featuredFeatures = array_slice($featuredFeatures, 0, $maxFeatures);
+                        }
+                        $bookingData['rm_data'][$key]['featured_features'] = $featuredFeatures;
                         $bookingData['rm_data'][$key]['price'] = $prod_price;
                         $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
                         $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;

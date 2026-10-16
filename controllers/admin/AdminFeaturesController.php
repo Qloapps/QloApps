@@ -52,11 +52,6 @@ class AdminFeaturesControllerCore extends AdminController
                 'align' => 'center',
                 'class' => 'fixed-width-xs'
             ),
-            'name' => array(
-                'title' => $this->l('Name'),
-                'width' => 'auto',
-                'filter_key' => 'b!name'
-            ),
             'logo' => array(
                 'title' => $this->l('Icon'),
                 'align' => 'text-center',
@@ -64,7 +59,13 @@ class AdminFeaturesControllerCore extends AdminController
                 'orderby' => false,
                 'search' => false,
                 'class' => 'fixed-width-xs'
-            ),/*by webkul to show feature image*/
+            ),
+            'name' => array(
+                'title' => $this->l('Name'),
+                'width' => 'auto',
+                'filter_key' => 'b!name'
+            ),
+            /*by webkul to show feature image*/
             /*'value' => array(
                 'title' => $this->l('Values'),
                 'orderby' => false,
@@ -74,10 +75,9 @@ class AdminFeaturesControllerCore extends AdminController
             ),*/
             'is_featured' => array(
                 'title' => $this->l('Is Featured'),
-                'type' => 'select',
-                'list' => array(1 => $this->l('Yes'), 0 => $this->l('No')),
+                'type' => 'bool',
+                'active' => 'is_featured',
                 'align' => 'center',
-                'callback' => 'displayIsFeatured',
                 'filter_key' => 'a!is_featured',
                 'filter_type' => 'int',
                 'class' => 'fixed-width-sm',
@@ -190,7 +190,7 @@ class AdminFeaturesControllerCore extends AdminController
         }
         // by webkul to get media link.
         // $ps_img_url = _PS_IMG_DIR_.'rf/'.$obj->id.'.jpg';
-        $img_url = $this->context->link->getMediaLink(_PS_IMG_.'rf/'.$obj->id.'.jpg');
+        $img_url = $this->context->link->getMediaLink(_PS_IMG_.'rf/'.Feature::getLogoImageName($obj->id, $obj->logo));
         if ($img_exist = Tools::file_get_contents($img_url)) {
             $image = "<img class='img-thumbnail img-responsive' src='".$img_url."'>";
         }
@@ -299,30 +299,31 @@ class AdminFeaturesControllerCore extends AdminController
             return $logo ? '<i class="'.Tools::safeOutput($logo).'"></i>' : '';
         }
 
-        $idFeature = (int) $row['id_feature'];
+        $imageName = Feature::getLogoImageName($row['id_feature'], $logo);
 
         return ImageManager::thumbnail(
-            _PS_IMG_DIR_.'rf/'.$idFeature.'.jpg',
-            'feature_mini_'.$idFeature.'_'.(int) $this->context->shop->id.'.jpg',
+            _PS_IMG_DIR_.'rf/'.$imageName,
+            'feature_mini_'.basename($imageName, '.jpg').'_'.(int) $this->context->shop->id.'.jpg',
             45,
             'jpg'
         );
     }
 
     /**
-     * List callback: render the Is Featured value as a status-like label.
-     *
-     * @param int   $isFeatured Is featured flag
-     * @param array $row        List row
-     * @return string
+     * Toggle the Is Featured value from the list (like the status toggle).
      */
-    public function displayIsFeatured($isFeatured, $row)
+    public function processToggleIsFeatured()
     {
-        if ((int) $isFeatured) {
-            return '<span class="label label-success">'.$this->l('Yes').'</span>';
+        if (!$this->loadObject()) {
+            return false;
         }
 
-        return '<span class="label label-default">'.$this->l('No').'</span>';
+        $this->object->is_featured = !$this->object->is_featured;
+        if ($this->object->save()) {
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
+        } else {
+            $this->errors[] = $this->l('An error occurred while updating "is featured".');
+        }
     }
 
     public function initPageHeaderToolbar()
@@ -616,6 +617,15 @@ class AdminFeaturesControllerCore extends AdminController
         }
 
         parent::initProcess();
+
+        // Toggle Is Featured from the list
+        if (Tools::getIsset('is_featured'.$this->table)) {
+            if ($this->tabAccess['edit'] === 1) {
+                $this->action = 'toggleIsFeatured';
+            } else {
+                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            }
+        }
     }
 
     public function postProcess()
@@ -712,6 +722,9 @@ class AdminFeaturesControllerCore extends AdminController
             }
             $logoType = Tools::getValue('logo_type');
             $featureImage = isset($_FILES['logo_image']) ? $_FILES['logo_image'] : null;
+            $objCurrentFeature = new Feature($idFeature);
+            $oldLogo = $objCurrentFeature->logo;
+            $oldLogoType = $objCurrentFeature->logo_type;
 
             if (!in_array($logoType, array('image', 'icon'))) {
                 $this->errors[] = $this->l('Logo type is invalid.');
@@ -737,13 +750,16 @@ class AdminFeaturesControllerCore extends AdminController
                 }
             } else {
                 $hasUpload = $featureImage && !empty($featureImage['tmp_name']);
-                $hasExisting = $idFeature && file_exists(_PS_IMG_DIR_.'rf/'.$idFeature.'.jpg');
+                $hasExisting = $idFeature && file_exists(_PS_IMG_DIR_.'rf/'.Feature::getLogoImageName($idFeature, $oldLogo));
                 if ($hasUpload) {
                     if ($error = ImageManager::validateUpload($featureImage, Tools::getMaxUploadSize())) {
                         $this->errors[] = $error;
                     }
                 } elseif (!$hasExisting) {
                     $this->errors[] = $this->l('Please select a logo for this feature.');
+                } elseif ($oldLogoType === 'image' && $oldLogo) {
+                    // no new image: keep the current image name
+                    $_POST['logo'] = $oldLogo;
                 }
             }
 
@@ -754,29 +770,15 @@ class AdminFeaturesControllerCore extends AdminController
 
             $objFeature = parent::processSave();
             if (!count($this->errors)) {
-                // icon type does not need the uploaded image
-                if ($logoType === 'icon' && file_exists(_PS_IMG_DIR_.'rf/'.$objFeature->id.'.jpg')) {
-                    unlink(_PS_IMG_DIR_.'rf/'.$objFeature->id.'.jpg');
-                }
-
-                // image type stores the image file name
-                if ($logoType === 'image' && $objFeature->logo !== $objFeature->id.'.jpg') {
-                    $objFeature->logo = $objFeature->id.'.jpg';
-                    $objFeature->update();
-                }
-
-                // save feature image
+                // save feature image: <id>.jpg is kept for the webservice, a random named copy is used for display
+                // so that browsers do not show a cached old image
                 if ($logoType === 'image' && isset($featureImage['tmp_name']) && $featureImage['tmp_name']) {
-                    // if already feature image then delete it once before uploading new image
-                    if ($idFeature) {
-                        $currentImg = _PS_TMP_IMG_DIR_.'feature_mini_'.$objFeature->id.'_'.$this->context->shop->id.'.jpg';
-                        if (file_exists($currentImg)) {
-                            unlink($currentImg);
-                        }
-                    }
-                    // upload feature image
                     $imgPath = _PS_IMG_DIR_.'rf/'.$objFeature->id.'.jpg';
-                    if (!ImageManager::resize($featureImage['tmp_name'], $imgPath)) {
+                    $imageName = $objFeature->id.'_'.substr(md5(uniqid(mt_rand(), true)), 0, 12).'.jpg';
+                    if (ImageManager::resize($featureImage['tmp_name'], $imgPath) && copy($imgPath, _PS_IMG_DIR_.'rf/'.$imageName)) {
+                        $objFeature->logo = $imageName;
+                        $objFeature->update();
+                    } else {
                         $this->errors[] = $this->l('Some error occurred while uploding room feature logo. Please try again.');
                     }
                 }

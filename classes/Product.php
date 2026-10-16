@@ -4868,6 +4868,10 @@ class ProductCore extends ObjectModel
 				WHERE pf.id_product = '.(int)$id_product.'
 				ORDER BY f.position ASC'
             );
+            foreach (self::$_frontFeaturesCache[$id_product.'-'.$id_lang] as &$frontFeature) {
+                $frontFeature['logo_image'] = Feature::getLogoImageName($frontFeature['id_feature'], $frontFeature['logo']);
+            }
+            unset($frontFeature);
         }
         return self::$_frontFeaturesCache[$id_product.'-'.$id_lang];
     }

@@ -1294,8 +1294,6 @@ Quick View Styles
 .room_info_content.row .col-sm-4 .amenity-name {
   white-space: nowrap;
   overflow: hidden;}
-.room_feature_group {
-  margin-bottom: 15px;}
 .room_feature_group .room_info_heading {
   display: flex;
   align-items: center;
@@ -1481,6 +1479,9 @@ Quick View Styles
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+.extra-service-panel .services-list .services-list-row {
+  align-items: center;
 }
 .extra-service-panel .services-list .services-list-row .service-price-action {
   display: flex;

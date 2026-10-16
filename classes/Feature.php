@@ -128,6 +128,11 @@ class FeatureCore extends ObjectModel
         return $return;
     }
 
+    public static function getLogoImageName($idFeature, $logo)
+    {
+        return preg_match('/^[A-Za-z0-9_]+\.jpg$/', (string) $logo) ? $logo : (int) $idFeature.'.jpg';
+    }
+
     public function delete()
     {
         /* Also delete related attributes */
