@@ -123,7 +123,7 @@ class FeatureCore extends ObjectModel
             $this->position = Feature::getHigherPosition() + 1;
         }
 
-        $return = parent::add($autodate, true);
+        $return = parent::add($autodate, $nullValues);
         Hook::exec('actionFeatureSave', array('id_feature' => $this->id));
         return $return;
     }
