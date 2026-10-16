@@ -75,7 +75,7 @@ class AdminMetaControllerCore extends AdminController
 
         parent::__construct();
 
-        $this->sm_file = _PS_ROOT_DIR_.DIRECTORY_SEPARATOR.$this->context->shop->id.'_index_sitemap.xml';
+        $this->sm_file = _PS_ROOT_DIR_.DIRECTORY_SEPARATOR.'sitemap.xml';
         // Options to generate friendly urls
         $mod_rewrite = Tools::modRewriteActive();
         $general_fields = array(
@@ -134,7 +134,11 @@ class AdminMetaControllerCore extends AdminController
         }
 
         // Options to generate robot.txt
-        $robots_description = $this->l('Your robots.txt file MUST be in your website\'s root directory and nowhere else (e.g. http://www.example.com/robots.txt).');
+        $robots_url = Tools::safeOutput($this->context->link->getBaseLink().'robots.txt');
+        $robots_description = sprintf(
+            $this->l('Your robots.txt file MUST be in your website\'s root directory and nowhere else (e.g. %s).'),
+            '<a href="'.$robots_url.'" target="_blank">'.$robots_url.'</a>'
+        );
         if ($this->checkConfiguration($this->rb_file)) {
             $robots_description .= $this->l('Generate your "robots.txt" file by clicking on the following button (this will erase the old robots.txt file)');
             $robots_submit = array('name' => 'submitRobots', 'title' => $this->l('Generate robots.txt file'));
