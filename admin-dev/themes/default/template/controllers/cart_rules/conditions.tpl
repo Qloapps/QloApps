@@ -231,7 +231,7 @@
 			<table class="table">
 				<tr>
 					<td>
-						<p>{l s='Unselected hotels'}</p>
+						<p>{l s='Unselected Properties'}</p>
 						<select id="hotel_select_1" class="input-large" multiple>
 							{foreach from=$hotels.unselected item='hotel'}
 								<option value="{$hotel.id_hotel|intval}">&nbsp;{$hotel.hotel_name|escape}</option>
@@ -240,7 +240,7 @@
 						<a id="hotel_select_add" class="btn btn-default btn-block clearfix" >{l s='Add'} <i class="icon-arrow-right"></i></a>
 					</td>
 					<td>
-						<p>{l s='Selected hotels'}</p>
+						<p>{l s='Selected Properties'}</p>
 						<select name="hotel_select[]" class="input-large" id="hotel_select_2" multiple>
 							{foreach from=$hotels.selected item='hotel'}
 								<option value="{$hotel.id_hotel|intval}">&nbsp;{$hotel.hotel_name|escape}</option>
