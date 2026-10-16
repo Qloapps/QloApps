@@ -977,6 +977,74 @@ class HotelHelper
         );
         // lang fields
         $languages = Language::getLanguages(false);
+        // FontAwesome icons (admin/front icon- classes) for default amenities, keyed by amenity position.
+        // Amenities without a suitable icon keep their default image.
+        $amenityIcons = array(
+            1 => 'icon-building',
+            2 => 'icon-video-camera',
+            3 => 'icon-users',
+            4 => 'icon-microphone',
+            5 => 'icon-pencil',
+            6 => 'icon-fax',
+            7 => 'icon-wifi',
+            8 => 'icon-wifi',
+            9 => 'icon-bus',
+            10 => 'icon-newspaper-o',
+            11 => 'icon-shopping-cart',
+            12 => 'icon-glass',
+            13 => 'icon-music',
+            14 => 'icon-diamond',
+            16 => 'icon-music',
+            17 => 'icon-microphone',
+            18 => 'icon-film',
+            19 => 'icon-moon-o',
+            21 => 'icon-plug',
+            22 => 'icon-credit-card',
+            23 => 'icon-money',
+            25 => 'icon-book',
+            26 => 'icon-medkit',
+            27 => 'icon-gift',
+            29 => 'icon-paw',
+            30 => 'icon-child',
+            32 => 'icon-fire',
+            33 => 'icon-bell',
+            34 => 'icon-cutlery',
+            35 => 'icon-car',
+            37 => 'icon-shopping-cart',
+            38 => 'icon-hospital-o',
+            39 => 'icon-envelope',
+            41 => 'icon-language',
+            42 => 'icon-car',
+            45 => 'icon-wifi',
+            46 => 'icon-fax',
+            47 => 'icon-tree',
+            48 => 'icon-car',
+            49 => 'icon-fire',
+            50 => 'icon-child',
+            53 => 'icon-car',
+            55 => 'icon-leaf',
+            56 => 'icon-car',
+            57 => 'icon-car',
+            58 => 'icon-key',
+            59 => 'icon-heartbeat',
+            60 => 'icon-bicycle',
+            64 => 'icon-ship',
+            69 => 'icon-life-ring',
+            70 => 'icon-gamepad',
+            72 => 'icon-anchor',
+            73 => 'icon-leaf',
+            87 => 'icon-glass',
+            88 => 'icon-cutlery',
+            89 => 'icon-cutlery',
+            90 => 'icon-coffee',
+            91 => 'icon-cutlery',
+            93 => 'icon-cutlery',
+            94 => 'icon-cutlery',
+            95 => 'icon-coffee',
+            96 => 'icon-beer',
+            97 => 'icon-cutlery',
+            98 => 'icon-leaf',
+        );
         $imgDir = dirname(__FILE__).'/../views/img/hotel_amenities/';
         $i = 1;
         $defaultImageIndex = 0;
@@ -1008,6 +1076,13 @@ class HotelHelper
                 $obj_amenity->active            = 1;
                 $obj_amenity->id_parent = $idParent;
                 $obj_amenity->save();
+
+                if (isset($amenityIcons[$defaultImageIndex])) {
+                    $obj_amenity->logo_type = 'icon';
+                    $obj_amenity->logo      = $amenityIcons[$defaultImageIndex];
+                    $obj_amenity->save();
+                    continue;
+                }
 
                 $srcImg = $imgDir.'_default/'.$defaultImageIndex.'.jpg';
                 if (file_exists($srcImg)) {
@@ -1114,6 +1189,7 @@ class HotelHelper
         Configuration::updateValue('PS_MIN_BOOKING_OFFSET', 0);
 
         Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', 'specific_date;special_day;date_range');
+        Configuration::updateValue('WK_MAX_AMENITIES_ROOM_SEARCH', 0);
         Configuration::updateValue('WK_GOOGLE_ACTIVE_MAP', 0);
         Configuration::updateValue('WK_MAP_HOTEL_ACTIVE_ONLY', 1);
 

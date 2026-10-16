@@ -108,9 +108,6 @@
 p.capa_txt {
     margin-bottom: 15px;
 }
-.visible-md .capa_txt {
-    padding-left: 15px;
-}
 
 .rm_review_cont
 {
@@ -159,6 +156,18 @@ p.capa_txt {
     display: inline-block;
     margin-right: 10px;
     margin-bottom: 5px;
+}
+
+.room_featured_feature
+{
+    display: inline-block;
+    margin: 0 15px 5px 0;
+}
+
+.room_featured_feature img
+{
+    max-height: 20px;
+    max-width: 20px;
 }
 
 .rm_price_val

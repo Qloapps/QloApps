@@ -53,13 +53,31 @@
 							{block name='room_type_list_room_description'}
 								<div class="rm_desc">{$room_v['description_short']|truncate:190:"":true}&nbsp;<a class="view_more" href="{$room_v['product_link']|escape:'htmlall':'UTF-8'}">{l s='View More'}....</a></div>
 							{/block}
+							{block name='room_type_list_room_featured_features'}
+								{if !empty($room_v['featured_features'])}
+									<div class="row">
+										<div class="col-sm-12 room_featured_features">
+											{foreach from=$room_v['featured_features'] item=featured_feature}
+												<span class="room_featured_feature">
+													{if $featured_feature.logo_type == 'icon' && $featured_feature.logo}
+														<i class="{$featured_feature.logo|escape:'htmlall':'UTF-8'}"></i>
+													{else}
+														<img src="{$smarty.const._PS_IMG_}rf/{$featured_feature.id_feature|intval}.jpg" alt="" onerror="this.style.display='none'" />
+													{/if}
+													{$featured_feature.name|escape:'htmlall':'UTF-8'}
+												</span>
+											{/foreach}
+										</div>
+									</div>
+								{/if}
+							{/block}
 							<div class="room_features_cont">
 								<div class="row">
 									{block name='room_type_list_room_features'}
 										<div class="col-sm-12 col-md-5 col-lg-6">
-											{if !empty($room_v['feature'])}
+											{if !empty($room_v['featured_amenities'])}
 												<p class="rm_amenities_cont">
-													{foreach from=$room_v['feature'] key=feat_k item=feat_v}
+													{foreach from=$room_v['featured_amenities'] key=feat_k item=feat_v}
 														{if $feat_v.logo_type == 'icon' && $feat_v.logo}
 															<i class="{$feat_v.logo|escape:'htmlall':'UTF-8'} rm_amen" title="{$feat_v.name|escape:'htmlall':'UTF-8'}"></i>
 														{elseif $feat_v.logo_type == 'image' && $feat_v.logo}

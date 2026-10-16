@@ -308,6 +308,9 @@ class HotelBookingDetail extends ObjectModel
         if (!isset($params['amenities'])) {
             $params['amenities'] = 0;
         }
+        if (!isset($params['feature_values'])) {
+            $params['feature_values'] = 0;
+        }
         if (!isset($params['price'])) {
             $params['price'] = 0;
         }
@@ -1831,14 +1834,24 @@ class HotelBookingDetail extends ObjectModel
             if (!empty($bookingData)) {
                 foreach ($bookingData['rm_data'] as $key => $value) {
                     // featured amenities for display in room type list
-                    $product_feature = HotelRoomTypeAmenities::getAmenities(
+                    $featured_amenities = HotelRoomTypeAmenities::getAmenities(
                         $value['id_product'],
                         $context->language->id,
                         true
                     );
+                    if ($maxAmenities = (int) Configuration::get('WK_MAX_AMENITIES_ROOM_SEARCH')) {
+                        $featured_amenities = array_slice($featured_amenities, 0, $maxAmenities);
+                    }
                     if (!empty($amenities) && $amenities) {
                         $roomAmenityIds = array_column(HotelRoomTypeAmenities::getAmenities($value['id_product']), 'id');
-                        if (array_diff($amenities, $roomAmenityIds)) {
+                        if (!array_intersect($amenities, $roomAmenityIds)) {
+                            unset($bookingData['rm_data'][$key]);
+                            continue;
+                        }
+                    }
+                    if (!empty($feature_values)) {
+                        $roomFeatureValueIds = array_map('intval', array_column(Product::getFeaturesStatic($value['id_product']), 'id_feature_value'));
+                        if (!array_intersect($feature_values, $roomFeatureValueIds)) {
                             unset($bookingData['rm_data'][$key]);
                             continue;
                         }
@@ -1859,7 +1872,16 @@ class HotelBookingDetail extends ObjectModel
                             $cover_img = $context->link->getImageLink($value['link_rewrite'], $context->language->iso_code.'-default', 'home_default');
                         }
                         $bookingData['rm_data'][$key]['image'] = $cover_img;
-                        $bookingData['rm_data'][$key]['feature'] = $product_feature;
+                        $bookingData['rm_data'][$key]['featured_amenities'] = $featured_amenities;
+
+                        // featured room features (is_featured) for display below the short description
+                        $featuredFeatures = array();
+                        foreach (Product::getFrontFeaturesStatic($context->language->id, $value['id_product']) as $roomFeature) {
+                            if ($roomFeature['is_featured'] && !isset($featuredFeatures[$roomFeature['id_feature']])) {
+                                $featuredFeatures[$roomFeature['id_feature']] = $roomFeature;
+                            }
+                        }
+                        $bookingData['rm_data'][$key]['featured_features'] = array_values($featuredFeatures);
                         $bookingData['rm_data'][$key]['price'] = $prod_price;
                         $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
                         $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;

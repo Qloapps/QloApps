@@ -29,6 +29,9 @@ class FeatureCore extends ObjectModel
     /** @var string Name */
     public $name;
     public $position;
+    public $logo_type;
+    public $logo;
+    public $is_featured;
 
     /**
      * @see ObjectModel::$definition
@@ -39,6 +42,9 @@ class FeatureCore extends ObjectModel
         'multilang' => true,
         'fields' => array(
             'position' =>    array('type' => self::TYPE_INT, 'validate' => 'isInt'),
+            'logo_type' =>   array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 10),
+            'logo' =>        array('type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'size' => 255),
+            'is_featured' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
 
             /* Lang fields */
             'name' =>        array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true, 'size' => 128),

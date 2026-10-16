@@ -189,6 +189,15 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         ),
                         'hint' => $this->l('Enable to display hotels list on the contact us page.'),
                     ),
+                    'WK_MAX_AMENITIES_ROOM_SEARCH' => array(
+                        'title' => $this->l('Maximum amenities in room search'),
+                        'hint' => $this->l('Maximum number of amenities to display for each room type on the front office room search page.'),
+                        'desc' => $this->l('Set to 0 to display all amenities.'),
+                        'type' => 'text',
+                        'cast' => 'intval',
+                        'class' => 'fixed-width-xl',
+                        'default' => '0',
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
             ),
@@ -569,6 +578,9 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 $this->errors[] = $this->l('Minimum partial payment percentage should be more than 0.');
             } elseif (Tools::getValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT') > 100) {
                 $this->errors[] = $this->l('Minimum partial payment percentage should not be more than 100.');
+            }
+            if (!Validate::isUnsignedInt(Tools::getValue('WK_MAX_AMENITIES_ROOM_SEARCH'))) {
+                $this->errors[] = $this->l('Maximum amenities in room search is invalid. Enter 0 or a positive number.');
             }
             if (Tools::getValue('WK_GOOGLE_ACTIVE_MAP')) {
                 if (!Tools::getValue('PS_API_KEY')) {

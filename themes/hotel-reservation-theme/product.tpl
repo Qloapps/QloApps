@@ -261,18 +261,45 @@
 															</div>
 														{/if}
 													{/block}
+													{block name='product_info_tab_featured_amenities'}
+														{if isset($featured_amenities) && $featured_amenities}
+															<div class="row info_margin_div featured_amenities">
+																<div class="col-sm-12">
+																	<div class="room_info_heading">
+																		<span>{l s='Featured Amenities'}</span>
+																	</div>
+																	<div class="room_info_content row">
+																		{foreach from=$featured_amenities item=amenity}
+																			<div class="col-sm-4 col-xs-6">
+																				<span class="featured_amenity" title="{$amenity.name|escape:'html':'UTF-8'}">
+																					{if $amenity.logo_type == 'icon' && $amenity.logo}
+																						<i class="{$amenity.logo|escape:'html':'UTF-8'}"></i>
+																					{elseif $amenity.logo_type == 'image' && $amenity.logo}
+																						<img src="{$amenity_img_dir|escape:'html':'UTF-8'}{$amenity.id|intval}.jpg" alt="{$amenity.name|escape:'html':'UTF-8'}" />
+																					{/if}
+																					<span class="amenity-name">{$amenity.name|escape:'html':'UTF-8'}</span>
+																				</span>
+																			</div>
+																		{/foreach}
+																	</div>
+																</div>
+															</div>
+														{/if}
+													{/block}
 													{block name='product_info_tab_room_features'}
 														{if isset($room_type_features) && $room_type_features}
 															<div class="info_margin_div">
 																{assign var="current_feature_name" value=""}
 																{assign var="current_feature_values" value=""}
 																{assign var="current_feature_id" value=0}
+																{assign var="current_feature_logo_type" value=""}
+																{assign var="current_feature_logo" value=""}
 																{foreach from=$room_type_features item=feature}
 																	{if $feature.name != $current_feature_name}
 																		{if $current_feature_name != ""}
 																			<div class="room_feature_group">
 																				<div class="room_info_heading">
-																					<img src="{$smarty.const._PS_IMG_}rf/{$current_feature_id|intval}.jpg" alt="{$current_feature_name|escape:'html':'UTF-8'}" title="{$current_feature_name|escape:'html':'UTF-8'}" style="max-height:20px;max-width:20px;" onerror="this.style.display='none'" />
+																					{if $current_feature_logo_type == 'icon' && $current_feature_logo}<i class="{$current_feature_logo|escape:'html':'UTF-8'}"></i>{else}<img src="{$smarty.const._PS_IMG_}rf/{$current_feature_id|intval}.jpg" alt="{$current_feature_name|escape:'html':'UTF-8'}" title="{$current_feature_name|escape:'html':'UTF-8'}" style="max-height:20px;max-width:20px;" onerror="this.style.display='none'" />{/if}
 																					<span>{$current_feature_name|escape:'html':'UTF-8'}</span>
 																				</div>
 																				<div class="room_info_content">{$current_feature_values|escape:'html':'UTF-8'}</div>
@@ -280,6 +307,8 @@
 																		{/if}
 																		{assign var="current_feature_name" value=$feature.name}
 																		{assign var="current_feature_id" value=$feature.id_feature}
+																		{assign var="current_feature_logo_type" value=$feature.logo_type}
+																		{assign var="current_feature_logo" value=$feature.logo}
 																		{assign var="current_feature_values" value=$feature.value}
 																	{else}
 																		{assign var="current_feature_values" value="`$current_feature_values`, `$feature.value`"}
@@ -287,7 +316,7 @@
 																	{if $feature@last}
 																		<div class="room_feature_group">
 																			<div class="room_info_heading">
-																				<img src="{$smarty.const._PS_IMG_}rf/{$current_feature_id|intval}.jpg" alt="{$current_feature_name|escape:'html':'UTF-8'}" title="{$current_feature_name|escape:'html':'UTF-8'}" style="max-height:20px;max-width:20px;" onerror="this.style.display='none'" />
+																				{if $current_feature_logo_type == 'icon' && $current_feature_logo}<i class="{$current_feature_logo|escape:'html':'UTF-8'}"></i>{else}<img src="{$smarty.const._PS_IMG_}rf/{$current_feature_id|intval}.jpg" alt="{$current_feature_name|escape:'html':'UTF-8'}" title="{$current_feature_name|escape:'html':'UTF-8'}" style="max-height:20px;max-width:20px;" onerror="this.style.display='none'" />{/if}
 																				<span>{$current_feature_name|escape:'html':'UTF-8'}</span>
 																			</div>
 																			<div class="room_info_content">{$current_feature_values|escape:'html':'UTF-8'}</div>
@@ -303,11 +332,11 @@
 															{if isset($room_dynamic_amenities) && $room_dynamic_amenities}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='%s Amenities' sprintf=$property_type}</span>
+																		<span>{l s='%s Amenities' sprintf=$room_type_info['selling_object_name']}</span>
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$room_dynamic_amenities item=amenity}
-																			<div class="col-sm-4 col-xs-12" title="{$amenity.name|escape:'html':'UTF-8'}">
+																			<div class="col-sm-4 col-xs-6" title="{$amenity.name|escape:'html':'UTF-8'}">
 																				{if $amenity.logo_type == 'icon' && $amenity.logo}
 																					<i class="{$amenity.logo|escape:'html':'UTF-8'}"></i>
 																				{elseif $amenity.logo_type == 'image' && $amenity.logo}
@@ -331,7 +360,7 @@
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$hotel_dynamic_amenities item=amenity}
-																			<div class="col-sm-4 col-xs-12" title="{$amenity.name|escape:'html':'UTF-8'}">
+																			<div class="col-sm-4 col-xs-6" title="{$amenity.name|escape:'html':'UTF-8'}">
 																				{if $amenity.logo_type == 'icon' && $amenity.logo}
 																					<i class="{$amenity.logo|escape:'html':'UTF-8'}"></i>
 																				{elseif $amenity.logo_type == 'image' && $amenity.logo}

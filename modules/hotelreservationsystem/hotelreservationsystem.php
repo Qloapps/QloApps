@@ -613,6 +613,7 @@ class HotelReservationSystem extends Module
             'WK_CUSTOMER_SUPPORT_PHONE_NUMBER',
             'WK_CUSTOMER_SUPPORT_EMAIL',
             'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST',
+            'WK_MAX_AMENITIES_ROOM_SEARCH',
             'QLO_HEADER_MEDIA_TYPE',
             'QLO_HEADER_CONTENT_ALIGN',
             'QLO_HEADER_VIDEO_SOURCE_TYPE',

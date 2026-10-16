@@ -1442,6 +1442,17 @@ Quick View Styles
   color: #505050;
 }
 
+/* featured amenities (room type + hotel) */
+.featured_amenities .featured_amenity {
+  display: inline-block;
+  margin: 0 20px 8px 0;
+}
+.featured_amenities .featured_amenity img {
+  max-height: 20px;
+  max-width: 20px;
+}
+/* end */
+
 /* service popup design */
 .services-info-tooltip-cont {
   min-width: 240px;
@@ -1470,6 +1481,15 @@ Quick View Styles
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+.extra-service-panel .services-list .services-list-row .service-price-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.extra-service-panel .services-list .services-list-row .service-price-action p {
+  margin: 0;
 }
 .extra-service-panel .summary-row .service_price {
   font-weight: 700;
