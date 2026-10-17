@@ -138,7 +138,7 @@ class AdminThemesControllerCore extends AdminController
                 'icon' => 'icon-html5',
                 'tabs' => array(
                     'logo' => $this->l('Logo'),
-                    'logo2' => $this->l('Invoice & Email Logos'),
+                    'logo2' => $this->l('Documents & Email Logos'),
                     'icons' => $this->l('Icons'),
                     'mobile' => $this->l('Mobile'),
                     ),
