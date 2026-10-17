@@ -86,6 +86,9 @@ class AdminControllerCore extends Controller
     /** @var array */
     public $tabAccess;
 
+    /** @var array|null Cached ids of the hotels the current employee profile can access */
+    protected $accessible_hotels = null;
+
     /** @var int Tab id */
     public $id = -1;
 
@@ -804,6 +807,75 @@ class AdminControllerCore extends Controller
                 return sprintf($this->l('Filter by %s'), implode(', ', $filters));
             }
         }
+    }
+
+    /**
+     * Check whether the current employee's profile can access all the given hotels.
+     * Super admin always has access. An unknown hotel id is treated as no access.
+     *
+     * @param array|int $idHotels Hotel id(s) to validate
+     *
+     * @return bool
+     */
+    public function hasHotelAccess($idHotels)
+    {
+        if (!is_array($idHotels)) {
+            $idHotels = array($idHotels);
+        }
+
+        $idHotels = array_unique(array_map('intval', $idHotels));
+        if (!$idHotels || in_array(0, $idHotels, true)) {
+            return false;
+        }
+
+        if ($this->context->employee->id_profile == _PS_ADMIN_PROFILE_) {
+            return true;
+        }
+
+        if ($this->accessible_hotels === null) {
+            $this->accessible_hotels = array_map(
+                'intval',
+                (array) HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1, 1)
+            );
+        }
+
+        return !array_diff($idHotels, $this->accessible_hotels);
+    }
+
+    /**
+     * Same as hasHotelAccess() but also registers the permission error on failure.
+     *
+     * @param array|int $idHotels Hotel id(s) to validate
+     *
+     * @return bool
+     */
+    public function checkHotelAccess($idHotels)
+    {
+        if ($this->hasHotelAccess($idHotels)) {
+            return true;
+        }
+
+        $this->errors[] = Tools::displayError('You do not have permission to perform this operation.');
+
+        return false;
+    }
+
+    /**
+     * Check that every given room exists and belongs to a hotel the current employee can access.
+     *
+     * @param array|int $idRooms Room id(s) to validate
+     *
+     * @return bool
+     */
+    public function checkRoomsAccess($idRooms)
+    {
+        if (!is_array($idRooms)) {
+            $idRooms = array($idRooms);
+        }
+
+        $idHotels = HotelRoomInformation::getHotelIdsByRoomIds($idRooms);
+
+        return $this->checkHotelAccess($idHotels ? $idHotels : 0);
     }
 
     /**

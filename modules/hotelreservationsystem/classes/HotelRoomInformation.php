@@ -242,6 +242,31 @@ class HotelRoomInformation extends ObjectModel
         }
     }
 
+    /**
+     * Get the distinct hotel ids the given rooms belong to.
+     *
+     * @param array $idRooms Room ids
+     *
+     * @return array|false Hotel ids, or false if any of the rooms does not exist
+     */
+    public static function getHotelIdsByRoomIds($idRooms)
+    {
+        $idRooms = array_unique(array_filter(array_map('intval', (array) $idRooms)));
+        if (!$idRooms) {
+            return false;
+        }
+
+        $rows = Db::getInstance()->executeS(
+            'SELECT `id`, `id_hotel` FROM `'._DB_PREFIX_.'htl_room_information`
+            WHERE `id` IN ('.implode(',', $idRooms).')'
+        );
+        if (!$rows || count($rows) != count($idRooms)) {
+            return false;
+        }
+
+        return array_values(array_unique(array_map('intval', array_column($rows, 'id_hotel'))));
+    }
+
     public static function getHotelRoomsInfo($idHotel = null, $idProduct = null, $idLang = null)
     {
         if (!$idLang) {

@@ -3739,7 +3739,10 @@ class AdminProductsControllerCore extends AdminController
     public function processBulkDeleteRooms()
     {
         if ($this->tabAccess['edit'] === 1) {
-            if ($idRooms = Tools::getValue('selected_room_ids')) {
+            if (($idRooms = Tools::getValue('selected_room_ids')) && is_array($idRooms)) {
+                if (!$this->checkRoomsAccess($idRooms)) {
+                    $idRooms = array();
+                }
                 foreach ($idRooms as $idRoom) {
                     $objRoomInfo = new HotelRoomInformation((int)$idRoom);
                     if ($objRoomInfo->getFutureBookings($idRoom)) {
@@ -3867,7 +3870,9 @@ class AdminProductsControllerCore extends AdminController
         if ($this->tabAccess['edit'] === 1) {
             $idRoom = Tools::getValue('id');
             $objRoomInfo = new HotelRoomInformation((int) $idRoom);
-            if ($objRoomInfo->getFutureBookings($idRoom)) {
+            if (!$this->checkRoomsAccess($idRoom)) {
+                // error already registered
+            } elseif ($objRoomInfo->getFutureBookings($idRoom)) {
                 $this->errors[] = $this->l('This room cannot be deleted as this room contains future booking.');
             }
             if (empty($this->errors)) {
@@ -5209,7 +5214,9 @@ class AdminProductsControllerCore extends AdminController
         $dateTo = Tools::getValue('date_to');
         $idProduct = Tools::getValue('id_product');
         if ($this->tabAccess['edit'] === 1) {
-            if (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo)) {
+            if (!$this->checkRoomsAccess($idRoom)) {
+                // error already registered
+            } elseif (!Validate::isDate($dateFrom) || !Validate::isDate($dateTo)) {
                 $this->errors[] = $this->l('Please select a valid date range to temporary disable this room');
             } else if ($idRoom && Validate::isLoadedObject($objHotelRoomInfo = new HotelRoomInformation((int) $idRoom))) {
                 $dateTo = date('Y-m-d', strtotime($dateTo));
@@ -5350,6 +5357,7 @@ class AdminProductsControllerCore extends AdminController
         $response['status'] = false;
         if (($idRoom = Tools::getValue('id_room'))
             && Validate::isLoadedObject(new HotelRoomInformation($idRoom))
+            && $this->checkRoomsAccess($idRoom)
         ) {
             $objRoomDisableDates = new HotelRoomDisableDates();
             $disableDates = $objRoomDisableDates->getRoomDisableDates($idRoom);
@@ -5371,7 +5379,9 @@ class AdminProductsControllerCore extends AdminController
                 && Validate::isLoadedObject($objRoomDisableDates = new HotelRoomDisableDates($idDisableDate))
             ) {
                 $idRoom = $objRoomDisableDates->id_room;
-                if (!$objRoomDisableDates->delete()) {
+                if (!$this->checkRoomsAccess($idRoom)) {
+                    // error already registered
+                } elseif (!$objRoomDisableDates->delete()) {
                     $this->errors[] = Tools::displayError('An error occurred while trying to perform this operation.');
                 } else if (!$objRoomDisableDates->getRoomDisableDates($idRoom)) {
                     $objRoomInfo = new HotelRoomInformation($idRoom);
@@ -5402,7 +5412,11 @@ class AdminProductsControllerCore extends AdminController
         $response = array('status' => false);
         $roomsInfo = array();
         if ($this->tabAccess['edit'] === 1) {
-            if ($idRooms = Tools::getValue('id_rooms')) {
+            $idRooms = Tools::getValue('id_rooms');
+            if (!$idRooms || !is_array($idRooms)) {
+                $this->errors[] = Tools::displayError('Please select at least one room for this operation.');
+            } elseif ($this->checkRoomsAccess($idRooms)) {
+                $idRooms = array_map('intval', $idRooms);
                 $rowsToHighlight = array();
                 $room = array();
                 $bookedRows = array();
@@ -5538,8 +5552,6 @@ class AdminProductsControllerCore extends AdminController
                     $rowsToHighlight = array_values(array_unique($rowsToHighlight));
                     $response['rows_to_highlight'] = $rowsToHighlight;
                 }
-            } else {
-                $this->errors[] = Tools::displayError('Please select at least on room for this operation.');
             }
         } else {
             $this->errors[] = Tools::displayError('You do not have permission to perform this operation.');
@@ -5715,6 +5727,9 @@ class AdminProductsControllerCore extends AdminController
     {
         $roomId = (int) Tools::getValue('room_id');
         $roomTypeId = (int) Tools::getValue('room_type_id');
+        if (!$this->checkRoomsAccess($roomId)) {
+            die(json_encode(['success' => false, 'message' => $this->errors[0]]));
+        }
         $allGroups = HotelConnectedRoom::getNotConnectedRooms($roomId, $this->context->language->id);
         $rooms = isset($allGroups[$roomTypeId]) ? $allGroups[$roomTypeId]['rooms'] : array();
         die(Tools::jsonEncode(['success' => true, 'rooms' => $rooms]));
@@ -5724,6 +5739,10 @@ class AdminProductsControllerCore extends AdminController
     {
         $response['hasError'] = 1;
         $roomId = (int) Tools::getValue('room_id');
+        if (!$this->checkRoomsAccess($roomId)) {
+            $response['errors'] = $this->errors;
+            die(json_encode($response));
+        }
         $objRoom = new HotelRoomInformation($roomId);
         $idProduct = (int) $objRoom->id_product;
         $idHotel = (int) $objRoom->id_hotel;
@@ -5760,6 +5779,13 @@ class AdminProductsControllerCore extends AdminController
         $roomId = (int) Tools::getValue('room_id');
         $connectedRoomId = (int) Tools::getValue('connected_room_id');
         $connectedId = (int) Tools::getValue('connected_id');
+        $idRoomsToCheck = array($roomId);
+        if ($connectedRoomId) {
+            $idRoomsToCheck[] = $connectedRoomId;
+        }
+        if (!$this->checkRoomsAccess($idRoomsToCheck)) {
+            die(json_encode(['success' => false, 'message' => $this->errors[0]]));
+        }
         $objRoom = new HotelRoomInformation($roomId);
         $idProduct = (int) $objRoom->id_product;
         $idHotel = (int) $objRoom->id_hotel;
