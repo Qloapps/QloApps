@@ -156,7 +156,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'class' => 'fixed-width-xxl',
                     ),
                      'WK_DISPLAY_PROPERTIES_LINK_IN_HEADER' => array(
-                        'title' => $this->l('Display Our Properties link in Header'),
+                        'title' => $this->l('Display Properties link in Header'),
                         'cast' => 'intval',
                         'type' => 'bool',
                         'default' => '0',
@@ -170,7 +170,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('Display Our Properties link in header in the front office'),
+                        'hint' => $this->l('Display Properties link in header in the front office'),
                     ),
                     'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST' => array(
                         'title' => $this->l('Display Contact Page Hotel List'),
@@ -423,7 +423,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('If yes, only active hotels will be displayed on map.'),
                     ),
                     'WK_DISPLAY_PROPERTIES_PAGE_GOOGLE_MAP' => array(
-                        'title' => $this->l('Display Our Properties page Google map'),
+                        'title' => $this->l('Display Properties page Google map'),
                         'cast' => 'intval',
                         'type' => 'bool',
                         'default' => '0',
@@ -437,7 +437,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('Enable to display map with hotels locations on the our properties page.'),
+                        'hint' => $this->l('Enable to display map with hotels locations on the properties page.'),
                     ),
                     'WK_DISPLAY_CONTACT_PAGE_GOOLGE_MAP' => array(
                         'title' => $this->l('Display Contact Us page Google map'),
