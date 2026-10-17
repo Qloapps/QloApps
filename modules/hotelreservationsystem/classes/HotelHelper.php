@@ -977,6 +977,74 @@ class HotelHelper
         );
         // lang fields
         $languages = Language::getLanguages(false);
+        // FontAwesome icons (admin/front icon- classes) for default amenities, keyed by amenity position.
+        // Amenities without a suitable icon keep their default image.
+        $amenityIcons = array(
+            1 => 'icon-building',
+            2 => 'icon-video-camera',
+            3 => 'icon-users',
+            4 => 'icon-microphone',
+            5 => 'icon-pencil',
+            6 => 'icon-fax',
+            7 => 'icon-wifi',
+            8 => 'icon-wifi',
+            9 => 'icon-bus',
+            10 => 'icon-newspaper-o',
+            11 => 'icon-shopping-cart',
+            12 => 'icon-glass',
+            13 => 'icon-music',
+            14 => 'icon-diamond',
+            16 => 'icon-music',
+            17 => 'icon-microphone',
+            18 => 'icon-film',
+            19 => 'icon-moon-o',
+            21 => 'icon-plug',
+            22 => 'icon-credit-card',
+            23 => 'icon-money',
+            25 => 'icon-book',
+            26 => 'icon-medkit',
+            27 => 'icon-gift',
+            29 => 'icon-paw',
+            30 => 'icon-child',
+            32 => 'icon-fire',
+            33 => 'icon-bell',
+            34 => 'icon-cutlery',
+            35 => 'icon-car',
+            37 => 'icon-shopping-cart',
+            38 => 'icon-hospital-o',
+            39 => 'icon-envelope',
+            41 => 'icon-language',
+            42 => 'icon-car',
+            45 => 'icon-wifi',
+            46 => 'icon-fax',
+            47 => 'icon-tree',
+            48 => 'icon-car',
+            49 => 'icon-fire',
+            50 => 'icon-child',
+            53 => 'icon-car',
+            55 => 'icon-leaf',
+            56 => 'icon-car',
+            57 => 'icon-car',
+            58 => 'icon-key',
+            59 => 'icon-heartbeat',
+            60 => 'icon-bicycle',
+            64 => 'icon-ship',
+            69 => 'icon-life-ring',
+            70 => 'icon-gamepad',
+            72 => 'icon-anchor',
+            73 => 'icon-leaf',
+            87 => 'icon-glass',
+            88 => 'icon-cutlery',
+            89 => 'icon-cutlery',
+            90 => 'icon-coffee',
+            91 => 'icon-cutlery',
+            93 => 'icon-cutlery',
+            94 => 'icon-cutlery',
+            95 => 'icon-coffee',
+            96 => 'icon-beer',
+            97 => 'icon-cutlery',
+            98 => 'icon-leaf',
+        );
         $imgDir = dirname(__FILE__).'/../views/img/hotel_amenities/';
         $i = 1;
         $defaultImageIndex = 0;
@@ -1008,6 +1076,13 @@ class HotelHelper
                 $obj_amenity->active            = 1;
                 $obj_amenity->id_parent = $idParent;
                 $obj_amenity->save();
+
+                if (isset($amenityIcons[$defaultImageIndex])) {
+                    $obj_amenity->logo_type = 'icon';
+                    $obj_amenity->logo      = $amenityIcons[$defaultImageIndex];
+                    $obj_amenity->save();
+                    continue;
+                }
 
                 $srcImg = $imgDir.'_default/'.$defaultImageIndex.'.jpg';
                 if (file_exists($srcImg)) {
@@ -1114,6 +1189,8 @@ class HotelHelper
         Configuration::updateValue('PS_MIN_BOOKING_OFFSET', 0);
 
         Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', 'specific_date;special_day;date_range');
+        Configuration::updateValue('WK_MAX_AMENITIES_ROOM_SEARCH', 0);
+        Configuration::updateValue('WK_MAX_FEATURES_ROOM_SEARCH', 0);
         Configuration::updateValue('WK_GOOGLE_ACTIVE_MAP', 0);
         Configuration::updateValue('WK_MAP_HOTEL_ACTIVE_ONLY', 1);
 
@@ -1165,12 +1242,24 @@ class HotelHelper
     {
         $idLang = (int) Configuration::get('PS_LANG_DEFAULT');
         $position = 0;
+        $featureIcons = $this->getDefaultRoomFeatureIcons();
+        // features marked as featured by default
+        $featuredFeatures = array('Bed Type', 'Room Size', 'Balcony Type', 'Wi-Fi Speed', 'AC Type', 'TV Type');
 
         foreach ($this->getDefaultRoomFeatures() as $featureName => $featureValues) {
             $idFeature = (int) Feature::addFeatureImport($featureName, $position);
             if (!$idFeature) {
                 return false;
             }
+
+            $objFeature = new Feature($idFeature);
+            $objFeature->is_featured = in_array($featureName, $featuredFeatures);
+            // features without an icon keep their default image (img/rf/<id>.jpg)
+            if (isset($featureIcons[$featureName])) {
+                $objFeature->logo_type = 'icon';
+                $objFeature->logo = $featureIcons[$featureName];
+            }
+            $objFeature->update();
 
             foreach ($featureValues as $featureValue) {
                 $idFeatureValue = (int) FeatureValue::addFeatureValueImport($idFeature, $featureValue, null, $idLang, false);
@@ -1183,6 +1272,29 @@ class HotelHelper
         }
 
         return true;
+    }
+
+    /**
+     * Return the icon class (admin/front icon- classes) of each default room feature.
+     *
+     * @return array
+     */
+    protected function getDefaultRoomFeatureIcons()
+    {
+        return array(
+            'Bed Type' => 'icon-bed',
+            'Extra Bed Available' => 'icon-plus-square',
+            'Crib/Cot Available' => 'icon-child',
+            'Room Size' => 'icon-arrows-alt',
+            'View' => 'icon-eye',
+            'Balcony Type' => 'icon-home',
+            'Bathroom Type' => 'icon-tint',
+            'Heating Type' => 'icon-fire',
+            'TV Type' => 'icon-desktop',
+            'Wi-Fi Speed' => 'icon-wifi',
+            'Smoke Detection' => 'icon-fire-extinguisher',
+            'Smoking Policy' => 'icon-ban',
+        );
     }
 
     /**
@@ -2192,6 +2304,73 @@ class HotelHelper
 
             // save advance payment information
             $this->saveAdvancedPaymentInfo($product_id);
+
+            // assign features to the room type as per the room type
+            $roomTypeFeatures = $this->getDefaultRoomTypeFeatures();
+            if (isset($roomTypeFeatures[$roomTypeDataDefult['name']])) {
+                $this->saveDummyRoomTypeFeatures($product, $roomTypeFeatures[$roomTypeDataDefult['name']]);
+            }
+        }
+    }
+
+    /**
+     * Return the features (and their values) of each demo room type, keyed by the room type name.
+     *
+     * @return array
+     */
+    protected function getDefaultRoomTypeFeatures()
+    {
+        return array(
+            'General Rooms' => array(
+                'Bed Type' => array('Double', 'Bunk Bed'),
+                'Room Size' => array('300 sq ft'),
+                'Balcony Type' => array('None'),
+                'AC Type' => array('Fan Only'),
+                'TV Type' => array('LED TV'),
+                'Wi-Fi Speed' => array('Basic'),
+            ),
+            'Delux Rooms' => array(
+                'Bed Type' => array('Queen'),
+                'Room Size' => array('400 sq ft'),
+                'Balcony Type' => array('Private Balcony'),
+                'AC Type' => array('Split AC'),
+                'TV Type' => array('Smart TV'),
+                'Wi-Fi Speed' => array('High Speed'),
+            ),
+            'Executive Rooms' => array(
+                'Bed Type' => array('King'),
+                'Room Size' => array('600 sq ft'),
+                'Balcony Type' => array('Juliet Balcony', 'Patio'),
+                'AC Type' => array('Central AC'),
+                'TV Type' => array('Smart TV'),
+                'Wi-Fi Speed' => array('High Speed'),
+            ),
+            'Luxury Rooms' => array(
+                'Bed Type' => array('Super King'),
+                'Room Size' => array('800 sq ft'),
+                'Balcony Type' => array('Rooftop Access', 'Veranda'),
+                'AC Type' => array('Central AC'),
+                'TV Type' => array('OLED TV'),
+                'Wi-Fi Speed' => array('Premium/Fiber'),
+            ),
+        );
+    }
+
+    /**
+     * Assign the given features to a demo room type.
+     *
+     * @param Product $objProduct
+     * @param array   $features   Feature name => array of feature values
+     */
+    public function saveDummyRoomTypeFeatures($objProduct, $features)
+    {
+        $idLang = (int) Configuration::get('PS_LANG_DEFAULT');
+        foreach ($features as $featureName => $featureValues) {
+            $idFeature = (int) Feature::addFeatureImport($featureName);
+            foreach ($featureValues as $featureValue) {
+                $idFeatureValue = (int) FeatureValue::addFeatureValueImport($idFeature, $featureValue, null, $idLang, false);
+                $objProduct->addFeaturesToDB($idFeature, $idFeatureValue);
+            }
         }
     }
 

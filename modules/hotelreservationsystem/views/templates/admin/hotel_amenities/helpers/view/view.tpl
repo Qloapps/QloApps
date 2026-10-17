@@ -70,7 +70,7 @@
 													{if $amenity.logo_type == 'icon' && $amenity.logo}
 														<i class="{$amenity.logo|escape:'htmlall':'UTF-8'}"></i>
 													{elseif $amenity.logo_type == 'image' && $amenity.logo}
-														<img src="{$img_base_url}{$amenity.id}.jpg"
+														<img src="{$img_base_url}{$amenity.logo|escape:'htmlall':'UTF-8'}"
 															 alt="{$amenity.name|escape:'htmlall':'UTF-8'}"
 															 class="htl-amenity-logo-img" />
 													{else}

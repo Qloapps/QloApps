@@ -26,7 +26,7 @@ $(document).ready(function()
 	{
 		var filter_wrapper = $(this).parents(".layered_filter_heading").siblings(".lf_sub_cont");
 		var make_diff = filter_wrapper.children("div"); //use to make difference between checkbox and price slider
-		if (make_diff.hasClass("layered_filt")) // for checkbox
+		if (make_diff.hasClass("layered_filt") || make_diff.hasClass("layered_filt_category")) // for checkbox (flat or tree)
 		{
 			var selected_filter = filter_wrapper.find("div.layered_filt input.filter:checked").prop("checked", false);
 			selected_filter.parent("span.checked").removeClass("checked");

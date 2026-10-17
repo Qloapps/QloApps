@@ -52,19 +52,20 @@ class AdminFeaturesControllerCore extends AdminController
                 'align' => 'center',
                 'class' => 'fixed-width-xs'
             ),
+            'logo' => array(
+                'title' => $this->l('Icon'),
+                'align' => 'text-center',
+                'callback' => 'displayLogo',
+                'orderby' => false,
+                'search' => false,
+                'class' => 'fixed-width-xs'
+            ),
             'name' => array(
                 'title' => $this->l('Name'),
                 'width' => 'auto',
                 'filter_key' => 'b!name'
             ),
-            'logo' => array(
-                'title' => $this->l('Icon'),
-                'align' => 'text-center',
-                'image' => 'rf',
-                'orderby' => false,
-                'search' => false,
-                'class' => 'fixed-width-xs'
-            ),/*by webkul to show feature image*/
+            /*by webkul to show feature image*/
             /*'value' => array(
                 'title' => $this->l('Values'),
                 'orderby' => false,
@@ -72,6 +73,16 @@ class AdminFeaturesControllerCore extends AdminController
                 'align' => 'center',
                 'class' => 'fixed-width-xs'
             ),*/
+            'is_featured' => array(
+                'title' => $this->l('Is Featured'),
+                'type' => 'bool',
+                'active' => 'is_featured',
+                'align' => 'center',
+                'filter_key' => 'a!is_featured',
+                'filter_type' => 'int',
+                'class' => 'fixed-width-sm',
+                'orderby' => false
+            ),
             'position' => array(
                 'title' => $this->l('Position'),
                 'filter_key' => 'a!position',
@@ -179,9 +190,9 @@ class AdminFeaturesControllerCore extends AdminController
         }
         // by webkul to get media link.
         // $ps_img_url = _PS_IMG_DIR_.'rf/'.$obj->id.'.jpg';
-        $img_url = $this->context->link->getMediaLink(_PS_IMG_.'rf/'.$obj->id.'.jpg');
+        $img_url = $this->context->link->getMediaLink(_PS_IMG_.'rf/'.Feature::getLogoImageName($obj->id, $obj->logo));
         if ($img_exist = Tools::file_get_contents($img_url)) {
-            $image = "<img class='img-thumbnail img-responsive' style='max-width:100px' src='".$img_url."'>";
+            $image = "<img class='img-thumbnail img-responsive' src='".$img_url."'>";
         }
 
         $this->toolbar_title = $this->l('Add a new room feature');
@@ -201,13 +212,49 @@ class AdminFeaturesControllerCore extends AdminController
                     'required' => true
                 ),
                 array(
+                    'type' => 'switch',
+                    'label' => $this->l('Is Featured'),
+                    'name' => 'is_featured',
+                    'is_bool' => true,
+                    'values' => array(
+                        array('id' => 'is_featured_on', 'value' => 1, 'label' => $this->l('Yes')),
+                        array('id' => 'is_featured_off', 'value' => 0, 'label' => $this->l('No')),
+                    ),
+                ),
+                array(
+                    'type' => 'select',
+                    'label' => $this->l('Logo Type'),
+                    'name' => 'logo_type',
+                    'required' => true,
+                    'options' => array(
+                        'query' => array(
+                            array('id' => 'image', 'name' => $this->l('Image (Upload)')),
+                            array('id' => 'icon', 'name' => $this->l('Icon (Font Awesome)')),
+                        ),
+                        'id' => 'id',
+                        'name' => 'name',
+                    ),
+                ),
+                array(
                     'type' => 'file',
                     'label' => $this->l('Room Feature Logo'),
-                    'name' => 'logo',
+                    'name' => 'logo_image',
                     'image' => $img_exist ? $image : false,
                     'display_image' => true,
                     'hint' => $this->l('Upload a room feature logo.'),
                     'required' => true
+                ),
+                array(
+                    'type' => 'text',
+                    'label' => $this->l('Icon Class'),
+                    'name' => 'logo_icon',
+                    'required' => true,
+                    'col' => 4,
+                    'hint' => $this->l('Font Awesome icon class. Replace fa- with icon- (e.g. fa-wifi becomes icon-wifi).'),
+                    'desc' => sprintf(
+                        $this->l('Refer to %s for available icons.'),
+                        '<a href="https://fontawesome.com/v4/cheatsheet" target="_blank">https://fontawesome.com/v4/cheatsheet</a>'
+                    ),
                 )
             )
         );
@@ -234,7 +281,49 @@ class AdminFeaturesControllerCore extends AdminController
             )
         );
 
+        $this->fields_value['logo_icon'] = ($obj->logo_type == 'icon') ? $obj->logo : '';
+
         return parent::renderForm();
+    }
+
+    /**
+     * List callback: render the feature logo as an icon or as the uploaded image thumbnail.
+     *
+     * @param string $logo Icon class (when logo type is icon)
+     * @param array  $row  List row
+     * @return string
+     */
+    public function displayLogo($logo, $row)
+    {
+        if (isset($row['logo_type']) && $row['logo_type'] == 'icon') {
+            return $logo ? '<i class="'.Tools::safeOutput($logo).'"></i>' : '';
+        }
+
+        $imageName = Feature::getLogoImageName($row['id_feature'], $logo);
+
+        return ImageManager::thumbnail(
+            _PS_IMG_DIR_.'rf/'.$imageName,
+            'feature_mini_'.basename($imageName, '.jpg').'_'.(int) $this->context->shop->id.'.jpg',
+            45,
+            'jpg'
+        );
+    }
+
+    /**
+     * Toggle the Is Featured value from the list (like the status toggle).
+     */
+    public function processToggleIsFeatured()
+    {
+        if (!$this->loadObject()) {
+            return false;
+        }
+
+        $this->object->is_featured = !$this->object->is_featured;
+        if ($this->object->save()) {
+            Tools::redirectAdmin(self::$currentIndex.'&token='.$this->token.'&conf=4');
+        } else {
+            $this->errors[] = $this->l('An error occurred while updating "is featured".');
+        }
     }
 
     public function initPageHeaderToolbar()
@@ -528,6 +617,15 @@ class AdminFeaturesControllerCore extends AdminController
         }
 
         parent::initProcess();
+
+        // Toggle Is Featured from the list
+        if (Tools::getIsset('is_featured'.$this->table)) {
+            if ($this->tabAccess['edit'] === 1) {
+                $this->action = 'toggleIsFeatured';
+            } else {
+                $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            }
+        }
     }
 
     public function postProcess()
@@ -622,31 +720,65 @@ class AdminFeaturesControllerCore extends AdminController
                     $_POST[$key] = str_replace('\n', '', str_replace('\r', '', $value));
                 }
             }
-            $featureImage = $_FILES['logo'];
-            if (!$idFeature || (isset($featureImage['tmp_name']) && $featureImage['tmp_name'])) {
-                if ($featureImage && $featureImage['tmp_name'] && $featureImage['name']) {
+            $logoType = Tools::getValue('logo_type');
+            $featureImage = isset($_FILES['logo_image']) ? $_FILES['logo_image'] : null;
+            $objCurrentFeature = new Feature($idFeature);
+            $oldLogo = $objCurrentFeature->logo;
+            $oldLogoType = $objCurrentFeature->logo_type;
+
+            if (!in_array($logoType, array('image', 'icon'))) {
+                $this->errors[] = $this->l('Logo type is invalid.');
+                $logoType = 'image';
+            }
+            if (!in_array(Tools::getValue('is_featured', 0), array('0', '1', 0, 1), true)) {
+                $this->errors[] = $this->l('Is Featured value is invalid.');
+            }
+            $_POST['logo_type'] = $logoType;
+            // Empty logo would be saved as NULL (Feature::add() uses null values), so image type keeps a placeholder until the image is saved.
+            $_POST['logo'] = 'image';
+
+            if ($logoType === 'icon') {
+                $logoIcon = trim(Tools::getValue('logo_icon'));
+                if (!$logoIcon) {
+                    $this->errors[] = $this->l('Icon class is required.');
+                } elseif (Tools::strlen($logoIcon) > 255) {
+                    $this->errors[] = $this->l('Icon class is too long.');
+                } elseif (!preg_match('/^icon-[a-z0-9]+(-[a-z0-9]+)*$/', $logoIcon)) {
+                    $this->errors[] = $this->l('Icon class is invalid. It must start with "icon-" and contain only lowercase letters, numbers and hyphens (e.g. icon-wifi).');
+                } else {
+                    $_POST['logo'] = $logoIcon;
+                }
+            } else {
+                $hasUpload = $featureImage && !empty($featureImage['tmp_name']);
+                $hasExisting = $idFeature && file_exists(_PS_IMG_DIR_.'rf/'.Feature::getLogoImageName($idFeature, $oldLogo));
+                if ($hasUpload) {
                     if ($error = ImageManager::validateUpload($featureImage, Tools::getMaxUploadSize())) {
                         $this->errors[] = $error;
                     }
-                } else {
+                } elseif (!$hasExisting) {
                     $this->errors[] = $this->l('Please select a logo for this feature.');
+                } elseif ($oldLogoType === 'image' && $oldLogo) {
+                    // no new image: keep the current image name
+                    $_POST['logo'] = $oldLogo;
                 }
+            }
+
+            if (count($this->errors)) {
+                $this->display = $idFeature ? 'edit' : 'add';
+                return false;
             }
 
             $objFeature = parent::processSave();
             if (!count($this->errors)) {
-                // save feature image
-                if (isset($featureImage['tmp_name']) && $featureImage['tmp_name']) {
-                    // if already feature image then delete it once before uploading new image
-                    if ($idFeature) {
-                        $currentImg = _PS_TMP_IMG_DIR_.'feature_mini_'.$objFeature->id.'_'.$this->context->shop->id.'.jpg';
-                        if (file_exists($currentImg)) {
-                            unlink($currentImg);
-                        }
-                    }
-                    // upload feature image
+                // save feature image: <id>.jpg is kept for the webservice, a random named copy is used for display
+                // so that browsers do not show a cached old image
+                if ($logoType === 'image' && isset($featureImage['tmp_name']) && $featureImage['tmp_name']) {
                     $imgPath = _PS_IMG_DIR_.'rf/'.$objFeature->id.'.jpg';
-                    if (!ImageManager::resize($featureImage['tmp_name'], $imgPath)) {
+                    $imageName = $objFeature->id.'_'.substr(md5(uniqid(mt_rand(), true)), 0, 12).'.jpg';
+                    if (ImageManager::resize($featureImage['tmp_name'], $imgPath) && copy($imgPath, _PS_IMG_DIR_.'rf/'.$imageName)) {
+                        $objFeature->logo = $imageName;
+                        $objFeature->update();
+                    } else {
                         $this->errors[] = $this->l('Some error occurred while uploding room feature logo. Please try again.');
                     }
                 }

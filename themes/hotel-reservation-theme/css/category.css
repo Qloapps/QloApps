@@ -83,9 +83,10 @@
     color: #555555;
     font-size: 14px;
     font-weight: 400;
-    margin-bottom: 15px;
 }
-
+.room_featured_features, .room_features_cont{
+    margin-top: 10px;
+}
 .rm_desc p
 {
     display: inline;
@@ -107,9 +108,6 @@
 }
 p.capa_txt {
     margin-bottom: 15px;
-}
-.visible-md .capa_txt {
-    padding-left: 15px;
 }
 
 .rm_review_cont
@@ -155,10 +153,29 @@ p.capa_txt {
 
 .rm_amen
 {
-    width: 20px;
+    width: 18px;
     display: inline-block;
     margin-right: 10px;
     margin-bottom: 5px;
+    font-size: 16px;
+    color: #555555;
+}
+
+.room_featured_feature
+{
+    display: inline-block;
+    margin: 0 10px 10px 0;
+}
+.room_featured_feature i{
+    
+    font-size: 16px;
+    color: #555555;
+}
+
+.room_featured_feature img
+{
+    max-height: 20px;
+    max-width: 20px;
 }
 
 .rm_price_val

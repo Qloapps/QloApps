@@ -1596,8 +1596,18 @@ class HotelCartBookingData extends ObjectModel
                                         $hotelInfo['htl_features'] = $hotelAmenities;
                                     }
                                 }
-                                // append roomtype features
-                                $hotelInfo['room_features'] = $objProduct->getFrontFeatures($idLang);
+                                // append featured roomtype features
+                                $hotelInfo['room_features'] = array();
+                                foreach ($objProduct->getFrontFeatures($idLang) as $roomFeature) {
+                                    if ($roomFeature['is_featured']) {
+                                        // the values of a feature are shown together
+                                        if (!isset($hotelInfo['room_features'][$roomFeature['id_feature']])) {
+                                            $hotelInfo['room_features'][$roomFeature['id_feature']] = $roomFeature;
+                                        } else {
+                                            $hotelInfo['room_features'][$roomFeature['id_feature']]['value'] .= ', '.$roomFeature['value'];
+                                        }
+                                    }
+                                }
 
                                 $cartHotelData[$prodKey]['hotel_info'] = $hotelInfo;
                             }

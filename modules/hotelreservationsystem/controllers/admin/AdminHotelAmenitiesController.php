@@ -127,12 +127,12 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 }
             }
 
-            $imgPath = $this->module->getLocalPath().self::IMG_DIR.$idAmenity.'.jpg';
+            $logoFile = (isset($amenity['logo_type']) && $amenity['logo_type'] == 'image') ? $amenity['logo'] : '';
             $this->context->smarty->assign(array(
                 'amenity'      => $amenity,
                 'id_category'  => $idCategory,
-                'existing_img' => ($idAmenity && file_exists($imgPath))
-                    ? $this->module->getPathUri().self::IMG_DIR.$idAmenity.'.jpg'
+                'existing_img' => ($logoFile && file_exists($this->module->getLocalPath().self::IMG_DIR.$logoFile))
+                    ? $this->module->getPathUri().self::IMG_DIR.$logoFile
                     : false,
             ));
         } else {
@@ -236,7 +236,9 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 }
             } else {
                 $hasUpload   = isset($_FILES['logo_image']) && !empty($_FILES['logo_image']['tmp_name']);
-                $hasExisting = $idAmenity && file_exists($this->module->getLocalPath().self::IMG_DIR.$idAmenity.'.jpg');
+                $objCurrent  = new HotelAmenities($idAmenity);
+                $hasExisting = $idAmenity && $objCurrent->logo_type == 'image' && $objCurrent->logo
+                    && file_exists($this->module->getLocalPath().self::IMG_DIR.$objCurrent->logo);
                 if (!$hasUpload && !$hasExisting) {
                     $this->errors[] = $this->l('Please upload an image for this amenity.');
                 }
@@ -248,6 +250,7 @@ class AdminHotelAmenitiesController extends ModuleAdminController
             }
 
             $objHotelAmenities = $idAmenity ? new HotelAmenities($idAmenity) : new HotelAmenities();
+            $oldImage = ($objHotelAmenities->logo_type == 'image') ? $objHotelAmenities->logo : '';
             foreach ($languages as $lang) {
                 $val = trim(Tools::getValue('amenity_name_'.$lang['id_lang']));
                 $objHotelAmenities->name[$lang['id_lang']] = $val ?: $nameDefault;
@@ -263,8 +266,8 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                 return;
             }
 
-            if ($logoType === 'icon') {
-                $imgFile = $this->module->getLocalPath().self::IMG_DIR.$objHotelAmenities->id.'.jpg';
+            if ($logoType === 'icon' && $oldImage) {
+                $imgFile = $this->module->getLocalPath().self::IMG_DIR.$oldImage;
                 if (file_exists($imgFile)) {
                     unlink($imgFile);
                 }
@@ -279,8 +282,13 @@ class AdminHotelAmenitiesController extends ModuleAdminController
                     if (!is_dir($imgDir)) {
                         mkdir($imgDir, 0755, true);
                     }
-                    if (ImageManager::resize($imgFile['tmp_name'], $imgDir.$objHotelAmenities->id.'.jpg')) {
-                        $objHotelAmenities->logo = $objHotelAmenities->id.'.jpg';
+                    // random file name so that browsers do not show a cached old image
+                    $imageName = $objHotelAmenities->id.'_'.substr(md5(uniqid(mt_rand(), true)), 0, 12).'.jpg';
+                    if (ImageManager::resize($imgFile['tmp_name'], $imgDir.$imageName)) {
+                        if ($oldImage && file_exists($imgDir.$oldImage)) {
+                            unlink($imgDir.$oldImage);
+                        }
+                        $objHotelAmenities->logo = $imageName;
                         $objHotelAmenities->save();
                     } else {
                         $this->errors[] = $this->l('Error uploading amenity image.');
