@@ -146,7 +146,7 @@
                                                         {/if}
                                                     </div>
                                                     <p class="total_price_detial">
-                                                        {l s='Total %s price' sprintf=$data_v['selling_object_plural_name']|escape:'html':'UTF-8'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                                        {l s='Total %s price' sprintf=$data_v['selling_object_plural_name']|escape:'html':'UTF-8'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                                     </p>
                                                 </div>
                                             </div>
@@ -178,7 +178,7 @@
                                                 </span>
                                             </p>
                                             <p class="total_price_detial">
-                                                {l s='Total price for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.'}{/if} {l s='all taxes.)'}{/if}
+                                                {l s='Total price for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.'}{/if} {l s='all taxes.)'}{/if}
                                             </p>
                                         </div>
                                     </div>
@@ -260,7 +260,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Unit price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Unit price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                             {if $product.allow_multiple_quantity}
@@ -292,7 +292,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Total price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Total price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                         </div>
@@ -351,7 +351,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Unit price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Unit price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                             {if $product.allow_multiple_quantity}
@@ -384,7 +384,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Total price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Total price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                         </div>

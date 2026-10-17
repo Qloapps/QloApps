@@ -26,12 +26,12 @@
         <p>
             <span>
                 {l s='Total rooms cost'}
-                {if $display_tax_label}
-                    {if $use_taxes && $priceDisplay == 0}
-                        {l s='(tax incl)'}
-                    {else}
-                        {l s='(tax excl)'}
-                    {/if}
+                {if $display_tax_label && $use_taxes}
+                        {if $priceDisplay == 0}
+                            {l s='(tax incl)'}
+                        {else}
+                            {l s='(tax excl)'}
+                        {/if}
                 {/if}
             </span>
             <span class="cart_total_values">
@@ -48,8 +48,8 @@
         <p>
             <span>
                 {l s='Total products'}
-                {if $display_tax_label}
-                    {if $use_taxes && $priceDisplay == 0}
+                {if $display_tax_label && $use_taxes}
+                    {if $priceDisplay == 0}
                         {l s='(tax incl)'}
                     {else}
                         {l s='(tax excl)'}
@@ -69,8 +69,8 @@
         <p>
             <span>
                 {l s='Convenience Fees'}
-                {if $display_tax_label}
-                    {if $use_taxes && $priceDisplay == 0}
+                {if $display_tax_label && $use_taxes}
+                    {if $priceDisplay == 0}
                         {l s='(tax incl)'}
                     {else}
                         {l s='(tax excl)'}
@@ -108,8 +108,8 @@
     {/if}
     <p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">
         <span>
-            {if $display_tax_label}
-                {if $use_taxes && $priceDisplay == 0}
+            {if $display_tax_label && $use_taxes}
+                {if $priceDisplay == 0}
                     {l s='Total Discount (tax incl)'}
                 {else}
                     {l s='Total Discount (tax excl)'}
