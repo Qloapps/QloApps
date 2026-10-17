@@ -307,7 +307,7 @@
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$room_dynamic_amenities item=amenity}
-																			<div class="col-sm-4 col-xs-12" title="{$amenity.name|escape:'html':'UTF-8'}">
+																			<div class="col-sm-4 col-xs-12{if !empty($amenity.is_featured)} featured_amenity{/if}" title="{$amenity.name|escape:'html':'UTF-8'}">
 																				{if $amenity.logo_type == 'icon' && $amenity.logo}
 																					<i class="{$amenity.logo|escape:'html':'UTF-8'}"></i>
 																				{elseif $amenity.logo_type == 'image' && $amenity.logo}
@@ -331,7 +331,7 @@
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$hotel_dynamic_amenities item=amenity}
-																			<div class="col-sm-4 col-xs-12" title="{$amenity.name|escape:'html':'UTF-8'}">
+																			<div class="col-sm-4 col-xs-12{if !empty($amenity.is_featured)} featured_amenity{/if}" title="{$amenity.name|escape:'html':'UTF-8'}">
 																				{if $amenity.logo_type == 'icon' && $amenity.logo}
 																					<i class="{$amenity.logo|escape:'html':'UTF-8'}"></i>
 																				{elseif $amenity.logo_type == 'image' && $amenity.logo}

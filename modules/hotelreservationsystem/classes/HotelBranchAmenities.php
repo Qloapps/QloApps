@@ -57,7 +57,7 @@ class HotelBranchAmenities extends ObjectModel
         $filter = $featuredOnly ? 'AND hba.`is_featured` = 1' : '';
 
         return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
-            'SELECT ha.`id_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`
+            'SELECT ha.`id_amenity` AS `id`, ha.`logo_type`, ha.`logo`, hal.`name`, hba.`is_featured`
             FROM `'._DB_PREFIX_.'htl_branch_amenity` hba
             INNER JOIN `'._DB_PREFIX_.'htl_amenity` ha
                 ON (ha.`id_amenity` = hba.`amenity_id`)
