@@ -27,7 +27,7 @@
 			<div class="title-container">
 				<h1 class="text-center our-properties-header">{l s='Properties'}</h1>
 				<div class="text-center our-properties-desc">
-					<p>{$WK_HTL_SHORT_DESC|escape:'html':'UTF-8'}</p>
+					<p>{l s='Enjoy a welcoming atmosphere, essential comforts, and a pleasant stay.'}</p>
 				</div>
 			</div>
 		{/block}
