@@ -86,7 +86,7 @@
 							<div class="col-sm-12 lf_sub_cont">
 								{foreach $feature.values as $featureValue}
 									<div class="layered_filt">
-										<input type="checkbox" class="filter" data-type="features" value="{$featureValue.id_feature_value|intval}">
+										<input type="checkbox" class="filter" data-type="features" data-feature-group="{$feature.id_feature|intval}" value="{$featureValue.id_feature_value|intval}">
 										<span class="filters_name">{$featureValue.value|escape:'html':'UTF-8'}</span>
 									</div>
 								{/foreach}

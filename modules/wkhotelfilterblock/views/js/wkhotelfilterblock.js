@@ -142,7 +142,15 @@ $(document).ready(function()
 			if ($(this).is(':checked'))
 			{
 				var temp_type = $(this).attr('data-type');
-				if (typeof filter[temp_type] != 'undefined')
+				var feature_group = $(this).attr('data-feature-group');
+				if (typeof feature_group != 'undefined')
+				{
+					// features: values of one feature are grouped (OR inside, AND between features)
+					filter[temp_type] = filter[temp_type] || {};
+					filter[temp_type][feature_group] = filter[temp_type][feature_group] || [];
+					filter[temp_type][feature_group].push($(this).val());
+				}
+				else if (typeof filter[temp_type] != 'undefined')
 				{
 					filter[temp_type].push($(this).val());
 				}

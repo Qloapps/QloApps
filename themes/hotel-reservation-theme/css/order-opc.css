@@ -200,15 +200,37 @@
 	margin-bottom: 5px;
 }
 .order-detail-content span.room-type-feature {
-	white-space: nowrap;
-	line-height: 35px;
-	margin-right: 5px;
-	font-size: 14px;
+	display: inline-block;
+	max-width: 100%;
+	line-height: 24px;
+	background-color: #eee;
+	border-radius: 10px 10px 10px 11px;
+	margin: 0 10px 10px 0;
+	padding: 0px 8px 0px 0px;
+	font-size: 12px;
 	color: #555555;
 }
+.room-type-feature i,
+.room-type-feature img {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	box-sizing: border-box;
+	border: 1px solid #000000;
+	border-radius: 50%;
+	background-color: #ffffff;
+	color: #000000;
+	vertical-align: middle;
+	margin-right: 5px;
+}
 .room-type-feature i {
-	font-size: 16px;
+	font-size: 12px;
 	color: #555555;
+}
+.room-type-feature img {
+	padding: 3px;
 }
 .order-detail-content .room_duration_block_head {
 	font-size: 12px;

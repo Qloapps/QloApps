@@ -192,8 +192,9 @@ class CategoryControllerCore extends FrontController
                             $amenities[] = $a_v;
                         }
                     } elseif ($key == 'features') {
-                        foreach ($value as $idFeatureValue) {
-                            $featureValues[] = (int) $idFeatureValue;
+                        // one group of feature value ids per feature
+                        foreach ($value as $idFeatureValues) {
+                            $featureValues[] = array_map('intval', (array) $idFeatureValues);
                         }
                     } elseif ($key == 'price') {
                         $price['from'] = $value[0];

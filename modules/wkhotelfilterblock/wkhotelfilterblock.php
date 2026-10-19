@@ -185,6 +185,11 @@ class wkhotelfilterblock extends Module
     public function postProcess()
     {
         if (Tools::isSubmit('btnConfigSubmit')) {
+            if (Tools::getValue('SHOW_FEATURES_FILTER') && !array_filter((array) Tools::getValue('FEATURES_FILTER_BOX', array()))) {
+                $this->html .= $this->displayError($this->l('Please select at least one feature to show in the Features filter.'));
+
+                return;
+            }
             Configuration::updateValue(
                 'SHOW_AMENITIES_FILTER',
                 Tools::getValue('SHOW_AMENITIES_FILTER')

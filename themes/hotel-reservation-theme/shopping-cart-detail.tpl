@@ -88,7 +88,7 @@
                                         {else}
                                             <img src="{$smarty.const._PS_IMG_}rf/{$feature['logo_image']|escape:'html':'UTF-8'}" alt="" onerror="this.style.display='none'" />
                                         {/if}
-                                        {$feature['value']|escape:'html':'UTF-8'}{if !$feature@last} &nbsp;|{/if}
+                                        {$feature['value']|escape:'html':'UTF-8'}
                                     </span>
                                 {/foreach}
                                 </div>

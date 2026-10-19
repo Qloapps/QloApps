@@ -1515,6 +1515,8 @@ class HotelCartBookingData extends ObjectModel
             $objCartBookingData = new HotelCartBookingData();
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
             $objServiceProductCartDetail = new ServiceProductCartDetail();
+            $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
+            $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
 
             foreach ($cartRoomTypes as $prodKey => $product) {
                 if (Validate::isLoadedObject(
@@ -1603,11 +1605,22 @@ class HotelCartBookingData extends ObjectModel
                                         // the values of a feature are shown together
                                         if (!isset($hotelInfo['room_features'][$roomFeature['id_feature']])) {
                                             $hotelInfo['room_features'][$roomFeature['id_feature']] = $roomFeature;
-                                        } else {
-                                            $hotelInfo['room_features'][$roomFeature['id_feature']]['value'] .= ', '.$roomFeature['value'];
+                                            $hotelInfo['room_features'][$roomFeature['id_feature']]['values'] = array();
                                         }
+                                        $hotelInfo['room_features'][$roomFeature['id_feature']]['values'][] = $roomFeature['value'];
                                     }
                                 }
+                                $hotelInfo['room_features'] = array_values($hotelInfo['room_features']);
+                                if ($maxFeatures) {
+                                    $hotelInfo['room_features'] = array_slice($hotelInfo['room_features'], 0, $maxFeatures);
+                                }
+                                foreach ($hotelInfo['room_features'] as &$roomFeature) {
+                                    if ($maxFeatureValues) {
+                                        $roomFeature['values'] = array_slice($roomFeature['values'], 0, $maxFeatureValues);
+                                    }
+                                    $roomFeature['value'] = implode(', ', $roomFeature['values']);
+                                }
+                                unset($roomFeature);
 
                                 $cartHotelData[$prodKey]['hotel_info'] = $hotelInfo;
                             }

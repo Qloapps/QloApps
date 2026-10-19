@@ -153,6 +153,7 @@ p.capa_txt {
 
 .rm_amen
 {
+    color: #555555;
     width: 18px;
     display: inline-block;
     margin-right: 10px;
@@ -165,6 +166,7 @@ p.capa_txt {
 {
     display: inline-block;
     margin: 0 10px 10px 0;
+    color: #555;
 }
 .room_featured_feature i{
     
@@ -275,7 +277,6 @@ p.capa_txt {
         left: unset;
     }
     .room_features_cont > div {
-        min-height: 47px;
         display: flex;
         flex-wrap: wrap;
         align-items: center;

@@ -992,12 +992,10 @@ class HotelHelper
             10 => 'icon-newspaper-o',
             11 => 'icon-shopping-cart',
             12 => 'icon-glass',
-            13 => 'icon-music',
             14 => 'icon-diamond',
             16 => 'icon-music',
             17 => 'icon-microphone',
             18 => 'icon-film',
-            19 => 'icon-moon-o',
             21 => 'icon-plug',
             22 => 'icon-credit-card',
             23 => 'icon-money',
@@ -1035,14 +1033,8 @@ class HotelHelper
             73 => 'icon-leaf',
             87 => 'icon-glass',
             88 => 'icon-cutlery',
-            89 => 'icon-cutlery',
             90 => 'icon-coffee',
             91 => 'icon-cutlery',
-            93 => 'icon-cutlery',
-            94 => 'icon-cutlery',
-            95 => 'icon-coffee',
-            96 => 'icon-beer',
-            97 => 'icon-cutlery',
             98 => 'icon-leaf',
         );
         $imgDir = dirname(__FILE__).'/../views/img/hotel_amenities/';
@@ -1191,6 +1183,7 @@ class HotelHelper
         Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', 'specific_date;special_day;date_range');
         Configuration::updateValue('WK_MAX_AMENITIES_ROOM_SEARCH', 0);
         Configuration::updateValue('WK_MAX_FEATURES_ROOM_SEARCH', 0);
+        Configuration::updateValue('WK_MAX_ROOM_TYPE_FEATURE_VALUES', 0);
         Configuration::updateValue('WK_GOOGLE_ACTIVE_MAP', 0);
         Configuration::updateValue('WK_MAP_HOTEL_ACTIVE_ONLY', 1);
 
@@ -1283,17 +1276,11 @@ class HotelHelper
     {
         return array(
             'Bed Type' => 'icon-bed',
-            'Extra Bed Available' => 'icon-plus-square',
-            'Crib/Cot Available' => 'icon-child',
             'Room Size' => 'icon-arrows-alt',
             'View' => 'icon-eye',
-            'Balcony Type' => 'icon-home',
-            'Bathroom Type' => 'icon-tint',
             'Heating Type' => 'icon-fire',
             'TV Type' => 'icon-desktop',
             'Wi-Fi Speed' => 'icon-wifi',
-            'Smoke Detection' => 'icon-fire-extinguisher',
-            'Smoking Policy' => 'icon-ban',
         );
     }
 

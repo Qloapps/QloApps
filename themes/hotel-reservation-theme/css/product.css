@@ -1450,6 +1450,13 @@ Quick View Styles
   max-height: 20px;
   max-width: 20px;
 }
+
+/* font icons use the same color as the amenity/feature jpg images */
+.featured_amenities .featured_amenity i,
+.info_margin_div .col-sm-4 > i,
+.room_info_heading i {
+  color: #555555;
+}
 /* end */
 
 /* service popup design */
