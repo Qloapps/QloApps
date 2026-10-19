@@ -30,41 +30,54 @@
 }
 
 /* ── KPI row container: strip panel chrome ──────────────────────────────── */
-.kpi-container {
+.bootstrap .kpi-container {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 0 0 15px !important;
+    padding: 0 0 8px !important;
+    margin-bottom: 0 !important;
 }
 
 .kpi-container .kpis-wrap {
     flex-wrap: nowrap !important;
-    overflow-x: auto;
-    gap: 8px;
-    margin: 0 !important;
+    overflow: auto;
+    margin: -5px !important;
+    padding-bottom: 10px !important;
 }
 
 .kpi-container .kpis-wrap .kpi-wrap {
     width: 14.28% !important;
     min-width: 110px;
-    padding: 0 !important;
+    padding: 5px !important;
     margin-bottom: 0 !important;
 }
 
 .kpi-container .box-stats {
+    position: relative;
     height: 80px !important;
     background: #fff !important;
     border-radius: 10px !important;
-    overflow: hidden;
     font-size: inherit !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+.kpi-container .box-stats::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 100%;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background: currentColor;
 }
 
 .kpi-container .box-stats .kpi-content {
     border: none !important;
-    border-left: 10px solid !important;
     border-radius: 0 !important;
     height: 100% !important;
-    padding: 8px 12px !important;
+    padding: 8px 12px 8px 20px !important;
     align-items: center !important;
     gap: 0 !important;
 }
@@ -110,23 +123,26 @@
     display: none !important;
 }
 
-.kpi-container .box-stats.color1 .kpi-content { border-left-color: #266FFE !important; }
-.kpi-container .box-stats.color1 .value        { color: #266FFE !important; }
+.kpi-container .box-stats.color1 { color: #266FFE !important; }
+.kpi-container .box-stats.color1 .value { color: #266FFE !important; }
 
-.kpi-container .box-stats.color2 .kpi-content { border-left-color: #72C3F0 !important; }
-.kpi-container .box-stats.color2 .value        { color: #72C3F0 !important; }
+.kpi-container .box-stats.color2 { color: #72C3F0 !important; }
+.kpi-container .box-stats.color2 .value { color: #72C3F0 !important; }
 
-.kpi-container .box-stats.color3 .kpi-content { border-left-color: #56CE56 !important; }
-.kpi-container .box-stats.color3 .value        { color: #56CE56 !important; }
+.kpi-container .box-stats.color3 { color: #56CE56 !important; }
+.kpi-container .box-stats.color3 .value { color: #56CE56 !important; }
 
-.kpi-container .box-stats.color4 .kpi-content { border-left-color: #FFC148 !important; }
-.kpi-container .box-stats.color4 .value        { color: #FFC148 !important; }
+.kpi-container .box-stats.color4 { color: #FFC148 !important; }
+.kpi-container .box-stats.color4 .value { color: #FFC148 !important; }
 
-.kpi-container .box-stats.color5 .kpi-content { border-left-color: #A569DF !important; }
-.kpi-container .box-stats.color5 .value        { color: #A569DF !important; }
+.kpi-container .box-stats.color5 { color: #A569DF !important; }
+.kpi-container .box-stats.color5 .value { color: #A569DF !important; }
 
-.kpi-container .box-stats.color6 .kpi-content { border-left-color: #FF4036 !important; }
-.kpi-container .box-stats.color6 .value        { color: #FF4036 !important; }
+.kpi-container .box-stats.color6 { color: #FF4036 !important; }
+.kpi-container .box-stats.color6 .value { color: #FF4036 !important; }
+
+.kpi-container .box-stats.color7 { color: #FF809E !important; }
+.kpi-container .box-stats.color7 .value { color: #FF809E !important; }
 
 .kpi-container .actions-wrap {
     display: none !important;

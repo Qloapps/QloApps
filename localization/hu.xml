@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <localizationPack name="Hungary" version="1.0">
   <currencies>
-    <currency name="Forint" iso_code="HUF" iso_code_num="348" sign="Ft‎" blank="1" conversion_rate="276.334" format="2" decimals="1"/>
+    <currency name="Forint" iso_code="HUF" iso_code_num="348" sign="Ft‎" blank="1" format="2" decimals="1"/>
   </currencies>
   <languages>
     <language iso_code="hu"/>
@@ -17,26 +17,27 @@
     <tax id="8" name="DPH CZ 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="9" name="MwSt. DE 19%" rate="19" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="10" name="moms DK 25%" rate="25" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="11" name="km EE 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="11" name="km EE 24%" rate="24" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="12" name="IVA ES 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="13" name="ALV FI 24%" rate="24" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="13" name="ALV FI 25.5%" rate="25.5" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="14" name="TVA FR 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="15" name="VAT UK 20%" rate="20.0" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="16" name="ΦΠΑ GR 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="16" name="ΦΠΑ GR 24%" rate="24" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="17" name="Croatia PDV 25%" rate="25.000" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="18" name="VAT IE 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="19" name="IVA IT 22%" rate="22" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="20" name="PVM LT 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="21" name="TVA LU 17%" rate="17" auto-generated="1" from-eu-tax-group="virtual"/>
     <tax id="22" name="PVN LV 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="23" name="VAT MT 18%" rate="18" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="24" name="BTW NL 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="25" name="PTU PL 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="26" name="IVA PT 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="27" name="TVA RO 24%" rate="24" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="28" name="Moms SE 25%" rate="25" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="29" name="DDV SI 22%" rate="22" auto-generated="1" from-eu-tax-group="virtual"/>
-    <tax id="30" name="DPH SK 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="23" name="TVA MC 20%" rate="20" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="24" name="VAT MT 18%" rate="18" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="25" name="BTW NL 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="26" name="PTU PL 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="27" name="IVA PT 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="28" name="TVA RO 21%" rate="21" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="29" name="Moms SE 25%" rate="25" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="30" name="DDV SI 22%" rate="22" auto-generated="1" from-eu-tax-group="virtual"/>
+    <tax id="31" name="DPH SK 23%" rate="23" auto-generated="1" from-eu-tax-group="virtual"/>
     <taxRulesGroup name="HU Standard Rate (27%)">
       <taxRule iso_code_country="be" id_tax="1"/>
       <taxRule iso_code_country="bg" id_tax="1"/>
@@ -45,8 +46,10 @@
       <taxRule iso_code_country="de" id_tax="1"/>
       <taxRule iso_code_country="ee" id_tax="1"/>
       <taxRule iso_code_country="gr" id_tax="1"/>
+      <taxRule iso_code_country="hr" id_tax="1"/>
       <taxRule iso_code_country="es" id_tax="1"/>
       <taxRule iso_code_country="fr" id_tax="1"/>
+      <taxRule iso_code_country="mc" id_tax="1"/>
       <taxRule iso_code_country="ie" id_tax="1"/>
       <taxRule iso_code_country="it" id_tax="1"/>
       <taxRule iso_code_country="cy" id_tax="1"/>
@@ -65,7 +68,6 @@
       <taxRule iso_code_country="fi" id_tax="1"/>
       <taxRule iso_code_country="se" id_tax="1"/>
       <taxRule iso_code_country="gb" id_tax="1"/>
-      <taxRule iso_code_country="hr" id_tax="1"/>
     </taxRulesGroup>
     <taxRulesGroup name="HU Reduced Rate (18%)">
       <taxRule iso_code_country="be" id_tax="2"/>
@@ -75,8 +77,10 @@
       <taxRule iso_code_country="de" id_tax="2"/>
       <taxRule iso_code_country="ee" id_tax="2"/>
       <taxRule iso_code_country="gr" id_tax="2"/>
+      <taxRule iso_code_country="hr" id_tax="2"/>
       <taxRule iso_code_country="es" id_tax="2"/>
       <taxRule iso_code_country="fr" id_tax="2"/>
+      <taxRule iso_code_country="mc" id_tax="2"/>
       <taxRule iso_code_country="ie" id_tax="2"/>
       <taxRule iso_code_country="it" id_tax="2"/>
       <taxRule iso_code_country="cy" id_tax="2"/>
@@ -95,7 +99,6 @@
       <taxRule iso_code_country="fi" id_tax="2"/>
       <taxRule iso_code_country="se" id_tax="2"/>
       <taxRule iso_code_country="gb" id_tax="2"/>
-      <taxRule iso_code_country="hr" id_tax="2"/>
     </taxRulesGroup>
     <taxRulesGroup name="HU Super Reduced Rate (5%)">
       <taxRule iso_code_country="be" id_tax="3"/>
@@ -105,8 +108,10 @@
       <taxRule iso_code_country="de" id_tax="3"/>
       <taxRule iso_code_country="ee" id_tax="3"/>
       <taxRule iso_code_country="gr" id_tax="3"/>
+      <taxRule iso_code_country="hr" id_tax="3"/>
       <taxRule iso_code_country="es" id_tax="3"/>
       <taxRule iso_code_country="fr" id_tax="3"/>
+      <taxRule iso_code_country="mc" id_tax="3"/>
       <taxRule iso_code_country="ie" id_tax="3"/>
       <taxRule iso_code_country="it" id_tax="3"/>
       <taxRule iso_code_country="cy" id_tax="3"/>
@@ -125,7 +130,6 @@
       <taxRule iso_code_country="fi" id_tax="3"/>
       <taxRule iso_code_country="se" id_tax="3"/>
       <taxRule iso_code_country="gb" id_tax="3"/>
-      <taxRule iso_code_country="hr" id_tax="3"/>
     </taxRulesGroup>
     <taxRulesGroup name="HU Foodstuff Rate (27%)">
       <taxRule iso_code_country="be" id_tax="1"/>
@@ -135,8 +139,10 @@
       <taxRule iso_code_country="de" id_tax="1"/>
       <taxRule iso_code_country="ee" id_tax="1"/>
       <taxRule iso_code_country="gr" id_tax="1"/>
+      <taxRule iso_code_country="hr" id_tax="1"/>
       <taxRule iso_code_country="es" id_tax="1"/>
       <taxRule iso_code_country="fr" id_tax="1"/>
+      <taxRule iso_code_country="mc" id_tax="1"/>
       <taxRule iso_code_country="ie" id_tax="1"/>
       <taxRule iso_code_country="it" id_tax="1"/>
       <taxRule iso_code_country="cy" id_tax="1"/>
@@ -155,7 +161,6 @@
       <taxRule iso_code_country="fi" id_tax="1"/>
       <taxRule iso_code_country="se" id_tax="1"/>
       <taxRule iso_code_country="gb" id_tax="1"/>
-      <taxRule iso_code_country="hr" id_tax="1"/>
     </taxRulesGroup>
     <taxRulesGroup name="HU Books Rate (5%)">
       <taxRule iso_code_country="be" id_tax="3"/>
@@ -165,8 +170,10 @@
       <taxRule iso_code_country="de" id_tax="3"/>
       <taxRule iso_code_country="ee" id_tax="3"/>
       <taxRule iso_code_country="gr" id_tax="3"/>
+      <taxRule iso_code_country="hr" id_tax="3"/>
       <taxRule iso_code_country="es" id_tax="3"/>
       <taxRule iso_code_country="fr" id_tax="3"/>
+      <taxRule iso_code_country="mc" id_tax="3"/>
       <taxRule iso_code_country="ie" id_tax="3"/>
       <taxRule iso_code_country="it" id_tax="3"/>
       <taxRule iso_code_country="cy" id_tax="3"/>
@@ -185,7 +192,6 @@
       <taxRule iso_code_country="fi" id_tax="3"/>
       <taxRule iso_code_country="se" id_tax="3"/>
       <taxRule iso_code_country="gb" id_tax="3"/>
-      <taxRule iso_code_country="hr" id_tax="3"/>
     </taxRulesGroup>
     <taxRulesGroup name="EU VAT For Virtual Products" auto-generated="1" eu-tax-group="virtual">
       <taxRule iso_code_country="hu" id_tax="1"/>
@@ -208,16 +214,62 @@
       <taxRule iso_code_country="lt" id_tax="20"/>
       <taxRule iso_code_country="lu" id_tax="21"/>
       <taxRule iso_code_country="lv" id_tax="22"/>
-      <taxRule iso_code_country="mt" id_tax="23"/>
-      <taxRule iso_code_country="nl" id_tax="24"/>
-      <taxRule iso_code_country="pl" id_tax="25"/>
-      <taxRule iso_code_country="pt" id_tax="26"/>
-      <taxRule iso_code_country="ro" id_tax="27"/>
-      <taxRule iso_code_country="se" id_tax="28"/>
-      <taxRule iso_code_country="si" id_tax="29"/>
-      <taxRule iso_code_country="sk" id_tax="30"/>
+      <taxRule iso_code_country="mc" id_tax="23"/>
+      <taxRule iso_code_country="mt" id_tax="24"/>
+      <taxRule iso_code_country="nl" id_tax="25"/>
+      <taxRule iso_code_country="pl" id_tax="26"/>
+      <taxRule iso_code_country="pt" id_tax="27"/>
+      <taxRule iso_code_country="ro" id_tax="28"/>
+      <taxRule iso_code_country="se" id_tax="29"/>
+      <taxRule iso_code_country="si" id_tax="30"/>
+      <taxRule iso_code_country="sk" id_tax="31"/>
     </taxRulesGroup>
   </taxes>
+  <states>
+    <state name="Bács-Kiskun" iso_code="BK" country="HU" zone="Europe" />
+    <state name="Baranya" iso_code="BA" country="HU" zone="Europe" />
+    <state name="Békés" iso_code="BE" country="HU" zone="Europe" />
+    <state name="Békéscsaba" iso_code="BC" country="HU" zone="Europe" />
+    <state name="Borsod-Abaúj-Zemplén" iso_code="BZ" country="HU" zone="Europe" />
+    <state name="Budapest" iso_code="BU" country="HU" zone="Europe" />
+    <state name="Csongrád-Csanád" iso_code="CS" country="HU" zone="Europe" />
+    <state name="Debrecen" iso_code="DE" country="HU" zone="Europe" />
+    <state name="Dunaújváros" iso_code="DU" country="HU" zone="Europe" />
+    <state name="Eger" iso_code="EG" country="HU" zone="Europe" />
+    <state name="Érd" iso_code="ER" country="HU" zone="Europe" />
+    <state name="Fejér" iso_code="FE" country="HU" zone="Europe" />
+    <state name="Győr" iso_code="GY" country="HU" zone="Europe" />
+    <state name="Győr-Moson-Sopron" iso_code="GS" country="HU" zone="Europe" />
+    <state name="Hajdú-Bihar" iso_code="HB" country="HU" zone="Europe" />
+    <state name="Heves" iso_code="HE" country="HU" zone="Europe" />
+    <state name="Hódmezővásárhely" iso_code="HV" country="HU" zone="Europe" />
+    <state name="Jász-Nagykun-Szolnok" iso_code="JN" country="HU" zone="Europe" />
+    <state name="Kaposvár" iso_code="KV" country="HU" zone="Europe" />
+    <state name="Kecskemét" iso_code="KM" country="HU" zone="Europe" />
+    <state name="Komárom-Esztergom" iso_code="KM" country="HU" zone="Europe" />
+    <state name="Miskolc" iso_code="MI" country="HU" zone="Europe" />
+    <state name="Nagykanizsa" iso_code="NK" country="HU" zone="Europe" />
+    <state name="Nógrád" iso_code="NO" country="HU" zone="Europe" />
+    <state name="Nyíregyháza" iso_code="NY" country="HU" zone="Europe" />
+    <state name="Pécs" iso_code="PS" country="HU" zone="Europe" />
+    <state name="Pest" iso_code="PE" country="HU" zone="Europe" />
+    <state name="Salgótarján" iso_code="ST" country="HU" zone="Europe" />
+    <state name="Somogy" iso_code="SO" country="HU" zone="Europe" />
+    <state name="Sopron" iso_code="SN" country="HU" zone="Europe" />
+    <state name="Szabolcs-Szatmár-Bereg" iso_code="SZ" country="HU" zone="Europe" />
+    <state name="Szeged" iso_code="SD" country="HU" zone="Europe" />
+    <state name="Székesfehérvár" iso_code="SF" country="HU" zone="Europe" />
+    <state name="Szekszárd" iso_code="SS" country="HU" zone="Europe" />
+    <state name="Szolnok" iso_code="SK" country="HU" zone="Europe" />
+    <state name="Szombathely" iso_code="SH" country="HU" zone="Europe" />
+    <state name="Tatabánya" iso_code="TB" country="HU" zone="Europe" />
+    <state name="Tolna" iso_code="TO" country="HU" zone="Europe" />
+    <state name="Vas" iso_code="VA" country="HU" zone="Europe" />
+    <state name="Veszprém" iso_code="VM" country="HU" zone="Europe" />
+    <state name="Veszprém city" iso_code="VE" country="HU" zone="Europe" />
+    <state name="Zala" iso_code="ZA" country="HU" zone="Europe" />
+    <state name="Zalaegerszeg" iso_code="ZE" country="HU" zone="Europe" />
+  </states>
   <units>
     <unit type="weight" value="kg"/>
     <unit type="volume" value="L"/>

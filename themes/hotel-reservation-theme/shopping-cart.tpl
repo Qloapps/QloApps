@@ -87,7 +87,7 @@
 	{/block}
 {/if}
 
-{* Fancybox for extra demands*}
+{* Fancybox for extra services *}
 {block name='shopping_cart_extra_services'}
 	<div style="display:none;" id="rooms_extra_services">
 	</div>

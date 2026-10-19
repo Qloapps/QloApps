@@ -83,7 +83,7 @@
                                 <div class="room-type-features">
                                 {foreach $data_v['hotel_info']['room_features'] as $feature}
                                     <span class="room-type-feature">
-                                        <img src="{$THEME_DIR}img/icon/form-ok-circle.svg" /> {$feature['name']}
+                                        <img src="{$THEME_DIR}img/icon/form-ok-circle.svg" /> {$feature['value']|escape:'html':'UTF-8'}
                                     </span>
                                 {/foreach}
                                 </div>
@@ -101,10 +101,23 @@
                                     <p class="room_duration_block_value">{$rm_v['data_to']|date_format:"%d %b, %a"}{if $is_full_date} {$rm_v['data_to']|date_format:"%H:%M"}{/if}</p>
                                 </div>
                                 <div class="col-sm-6 col-xs-6">
-                                    <p class="room_duration_block_head">{l s='OCCUPANCY'}</p>
-                                    <p class="room_duration_block_value">
-                                        {if {$rm_v['adults']} <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {l s='Rooms'}{else} {l s='Room'}{/if}
-                                    </p>
+                                    {if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}
+                                        <p class="room_duration_block_head">{l s='OCCUPANCY'}</p>
+                                        <p class="room_duration_block_value">
+                                            {if {$rm_v['adults']} <= 9}0{$rm_v['adults']}{else}{$rm_v['adults']}{/if} {if $rm_v['adults'] > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v['children']}, {if $rm_v['children'] <= 9}0{$rm_v['children']}{else}{$rm_v['children']}{/if} {if $rm_v['children'] > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}, {if {$rm_v['num_rm']} <= 9}0{/if}{$rm_v['num_rm']}{if $rm_v['num_rm'] > 1} {$data_v['selling_object_plural_name']|escape:'html':'UTF-8'}{else} {$data_v['selling_object_name']|escape:'html':'UTF-8'}{/if}
+                                        </p>
+                                    {else}
+                                        <p class="room_duration_block_head">{l s='QUANTITY'}</p>
+                                        <p class="room_duration_block_value">
+                                            {if $rm_v['num_rm'] <= 9}0{/if}{$rm_v['num_rm']}
+                                            {if $rm_v['num_rm'] > 1}
+                                                {$data_v['selling_object_plural_name']|escape:'html':'UTF-8'}
+                                            {else}
+                                                {$data_v['selling_object_name']|escape:'html':'UTF-8'}
+                                            {/if}                                        
+                                        </p>
+                                    {/if}
+
                                 </div>
                             </div>
                         {/block}
@@ -118,35 +131,31 @@
                                             </span>
                                         {/if}
                                         <div class="row">
-                                            <div class="{if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
+                                            <div class="{if (isset($data_v['service_products']) && $data_v['service_products'])}col-xs-6 plus-sign{else}col-xs-12{/if}">
                                                 <div class="price_block">
-                                                    <p class="total_price">
-                                                        <span>
-                                                            {displayPrice price=($rm_v['amount'])}
-                                                        </span>
+                                                    <div class="total_price">
+                                                        {displayPrice price=($rm_v['amount'])}
                                                         {if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && (in_array($data_v['id_product'], $discounted_products) || $PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN)}
-                                                            <span class="room-price-detail">
-                                                                <img src="{$img_dir}icon/icon-info.svg" />
-                                                            </span>
-                                                            <div class="room-price-detail-container" style="display: none;">
-                                                                <div class="room-price-detail-tooltip-cont">
-                                                                    <div><label>{l s='Room price'}</label> : {displayPrice price=($rm_v['amount_without_auto_add'])}</div>
-                                                                    <div><label>{l s='Additional charges'}</label> : {displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</div>
-                                                                </div>
+                                                            {capture name='htl_room_price_detail_tooltip'}
+                                                            <div class="ui-tooltip-body">
+                                                                <div class="ui-tooltip-label">{l s='Room price'}</div><span class="ui-tooltip-elem-txt">{displayPrice price=($rm_v['amount_without_auto_add'])}</span>
+                                                                <div class="ui-tooltip-label">{l s='Additional charges'}</div><span class="ui-tooltip-elem-txt">{displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</span>
                                                             </div>
+                                                            {/capture}
+                                                            {include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.htl_room_price_detail_tooltip allow_html=true tooltip_class='ui-htl-tooltip-room-price-detail'}
                                                         {/if}
-                                                    </p>
+                                                    </div>
                                                     <p class="total_price_detial">
-                                                        {l s='Total rooms price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                                        {l s='Total %s price' sprintf=$data_v['selling_object_plural_name']|escape:'html':'UTF-8'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                                     </p>
                                                 </div>
                                             </div>
-                                            {if (isset($data_v['extra_demands']) && $data_v['extra_demands']) || (isset($data_v['service_products']) && $data_v['service_products'])}
+                                            {if (isset($data_v['service_products']) && $data_v['service_products'])}
                                                 <div class="col-xs-6">
-                                                    <div class="demand_price_block">
-                                                        <p class="demand_total_price">
+                                                    <div class="extra_service_price_block">
+                                                        <p class="extra_service_total_price">
                                                             <span>
-                                                                {displayPrice price=$rm_v['demand_price']}
+                                                                {displayPrice price=$rm_v['additional_price']}
                                                             </span>
                                                         </p>
                                                         <p class="total_price_detial">
@@ -165,11 +174,11 @@
                                         <div class="total_price_block col-xs-12">
                                             <p class="total_price">
                                                 <span>
-                                                    {displayPrice price=($rm_v['amount']+$rm_v['demand_price'])}
+                                                    {displayPrice price=($rm_v['amount']+$rm_v['additional_price'])}
                                                 </span>
                                             </p>
                                             <p class="total_price_detial">
-                                                {l s='Total price for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.'}{/if} {l s='all taxes.)'}{/if}
+                                                {l s='Total price for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.'}{/if} {l s='all taxes.)'}{/if}
                                             </p>
                                         </div>
                                     </div>
@@ -251,7 +260,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Unit price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Unit price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                             {if $product.allow_multiple_quantity}
@@ -283,7 +292,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Total price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Total price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                         </div>
@@ -342,7 +351,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Unit price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Unit price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                             {if $product.allow_multiple_quantity}
@@ -375,7 +384,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Total price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Total price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                         </div>

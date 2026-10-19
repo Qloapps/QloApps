@@ -146,7 +146,7 @@ class CustomerMessageCore extends ObjectModel
                 ON (ct.`id_customer_thread` = cm.`id_customer_thread`)
             LEFT JOIN '._DB_PREFIX_.'customer c
                 ON (IFNULL(ct.`id_customer`, ct.`email`) = IFNULL(c.`id_customer`, c.`email`))
-            WHERE `message` LIKE \'%'.$query.'%\'
+            WHERE `message` LIKE \'%'.pSQL($query).'%\'
         ');
     }
 

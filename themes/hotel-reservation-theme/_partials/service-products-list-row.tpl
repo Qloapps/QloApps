@@ -38,6 +38,20 @@
                 {block name='service_product_name'}
                     <div class="col-sm-12 clearfix service-product-block">
                         <span class="service-product-name">{$service_product['name']}</span>
+                        {assign var='priceCalcMethod' value=$service_product.price_calculation_method|default:0}
+                        {capture name='htl_pcm_tooltip'}
+                        <div class="ui-tooltip-header">
+                            <div class="ui-tooltip-label">{l s='Applied on:'}</div>
+                        </div>
+                        <div class="ui-tooltip-body">
+                            <ul>
+                                {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
+                                    <li>{$pcmDayLabel}</li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                        {/capture}
+                        {include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}
                     </div>
                 {/block}
                 {block name='service_product_description'}
@@ -53,7 +67,7 @@
                         {if !$PS_CATALOG_MODE && !$order_date_restrict && ($service_product.show_price && !isset($restricted_country_mode))}
                             <div class="service-product-price">
                                 {block name='service_product_price'}
-                                    {if !$priceDisplay}{convertPrice price=$service_product.price_tax_incl}{else}{convertPrice price=$service_product.price_tax_exc}{/if}{if $service_product.price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY}<span class="price-label">{l s='/Night'}</span>{/if}
+                                    {if !$priceDisplay}{convertPrice price=$service_product.price_tax_incl}{else}{convertPrice price=$service_product.price_tax_exc}{/if}
                                 {/block}
                                 {if $service_product.allow_multiple_quantity && $service_product.available_for_order && $service_product.max_quantity > 0}
                                     <div class="service-max-quantity-info">

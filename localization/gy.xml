@@ -1,23 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Guyana" version="1.0">
 	<currencies>
-		<currency name="Dollar" iso_code="GYD" iso_code_num="328" sign="$" blank="0" conversion_rate="276.712" format="1" decimals="1" />
+		<currency name="Dollar" iso_code="GYD" iso_code_num="328" sign="$" blank="0" format="1" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="en" />
 	</languages>
 	<taxes>
-		<tax id="1" name="VAT GY 16%" rate="16" />
-		
-		<taxRulesGroup name="GY Standard Rate (16%)">
+		<tax id="1" name="VAT GY 14%" rate="14" />
+
+		<taxRulesGroup name="GY Standard Rate (14%)">
 			<taxRule iso_code_country="gy" id_tax="1" />
 		</taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Barima-Waini" iso_code="BA" country="GY" zone="South America" />
+		<state name="Cuyuni-Mazaruni" iso_code="CU" country="GY" zone="South America" />
+		<state name="Demerara-Mahaica" iso_code="DE" country="GY" zone="South America" />
+		<state name="East Berbice-Corentyne" iso_code="EB" country="GY" zone="South America" />
+		<state name="Essequibo Islands-West Demerara" iso_code="ES" country="GY" zone="South America" />
+		<state name="Mahaica-Berbice" iso_code="MA" country="GY" zone="South America" />
+		<state name="Pomeroon-Supenaam" iso_code="PM" country="GY" zone="South America" />
+		<state name="Potaro-Siparuni" iso_code="PT" country="GY" zone="South America" />
+		<state name="Upper Demerara-Berbice" iso_code="UD" country="GY" zone="South America" />
+		<state name="Upper Takutu-Upper Essequibo" iso_code="UT" country="GY" zone="South America" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />
-		<unit type="short_distance" value="in" />
-		<unit type="base_distance" value="ft" />
-		<unit type="long_distance" value="mi" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
 	</units>
 </localizationPack>

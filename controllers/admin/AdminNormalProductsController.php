@@ -200,8 +200,14 @@ class AdminNormalProductsControllerCore extends AdminController
             Product::PRICE_ADDITION_TYPE_INDEPENDENT => $this->l('Convenience Fee')
         );
         $priceCalculationMethod = array(
-            Product::PRICE_CALCULATION_METHOD_PER_BOOKING => $this->l('Add price once for the booking range'),
-            Product::PRICE_CALCULATION_METHOD_PER_DAY => $this->l('Add price for each day of booking')
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY => $this->l('Check-in day'),
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY => $this->l('Check-out day'),
+            Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY => $this->l('During-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY => $this->l('Check-in day | Check-out days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY => $this->l('Check-in day | During-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY => $this->l('Check-out day | During-stay days'),
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY => $this->l('Check-in day | During-stay days | Check-out day'),
+            Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING => $this->l('Once per booking'),
         );
 
         $this->_join .= '
@@ -218,13 +224,14 @@ class AdminNormalProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop ON (image_shop.`id_product` = a.`id_product` AND image_shop.`cover` = 1 AND image_shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
                 LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
+                LEFT JOIN `'._DB_PREFIX_.'tax_rules_group` ttrg ON (ttrg.`id_tax_rules_group` = sa.`id_tourism_tax_rules_group`)
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` rsp ON (rsp.`id_product` = a.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (rsp.`id_element` = hrt.`id_product` AND rsp.`element_type` = '.(int)RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.')
                 '.HotelBranchInformation::addHotelRestriction(false, 'hrt');
 
-        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, IF(a.`price_calculation_method` = '.(int)Product::PRICE_CALCULATION_METHOD_PER_DAY.', "'.$this->l('Per Day').'", "'.$this->l('Per Booking').'") as price_calculation_method_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
+        $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= ' COUNT(hrt.`id_product`) as products_associated, ';
-        $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
+        $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ttrg.`name` AS `tourism_tax_rules_group`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
 
         if ($join_category) {
@@ -299,13 +306,14 @@ class AdminNormalProductsControllerCore extends AdminController
             'callback' => 'getPriceDisplayPreference',
             'list' => $priceAdditionType,
         );
-        $this->fields_list['price_calculation_method_txt'] = array(
+        $this->fields_list['price_calculation_method'] = array(
             'title' => $this->l('Price calculation method'),
             'filter_key' => 'a!price_calculation_method',
             'type' => 'select',
             'list' => $priceCalculationMethod,
             'visible_default' => true,
             'optional' => true,
+            'callback' => 'getPriceCalculationMethod',
         );
         $this->servicesCategory = array();
         $idServiceCategory = Configuration::get('PS_SERVICE_CATEGORY');
@@ -327,9 +335,12 @@ class AdminNormalProductsControllerCore extends AdminController
         // Code For Standard product working
         // $sellingPreferenceTypes = array(
         //     Product::SELLING_PREFERENCE_WITH_ROOM_TYPE => $this->l('With room type'),
-        //     Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With hotel|room type'),
-        //     Product::SELLING_PREFERENCE_STANDALONE => $this->l('Standalone'),
-        //     Product::SELLING_PREFERENCE_HOTEL_STANDALONE => $this->l('With hotel'),
+        //     Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE => $this->l('With hotel | With room type'),
+        //     Product::SELLING_PREFERENCE_WITH_STANDALONE => $this->l('With Standalone'),
+        //     Product::SELLING_PREFERENCE_WITH_HOTEL => $this->l('With hotel'),
+        //     Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE => $this->l('With hotel | With standalone'),
+        //     Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE => $this->l('With room type | With standalone'),
+        //     Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE => $this->l('With hotel | With room type | With standalone'),
         // );
         // $this->fields_list['selling_preference_type'] = array(
         //     'type' => 'select',
@@ -345,6 +356,21 @@ class AdminNormalProductsControllerCore extends AdminController
                 'filter_key' => 'shop!name',
             );
         }
+
+        $tourismTaxRulesGroups = array();
+        foreach (TaxRulesGroup::getTaxRulesGroups(true, true) as $taxRulesGroup) {
+            $tourismTaxRulesGroups[$taxRulesGroup['id_tax_rules_group']] = $taxRulesGroup['name'];
+        }
+        $this->fields_list['tourism_tax_rules_group'] = array(
+            'title' => $this->l('Tourism tax rule'),
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
+            'filter_key' => 'sa!id_tourism_tax_rules_group',
+            'list' => $tourismTaxRulesGroups,
+            'optional' => true,
+            'class' => 'chosen',
+        );
 
         $this->fields_list['price'] = array(
             'title' => $this->l('Base price'),
@@ -426,17 +452,28 @@ class AdminNormalProductsControllerCore extends AdminController
 
     public function getBuyingOption($selling_preference_type, $row)
     {
-        if ($selling_preference_type == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE) {
-            return $this->l('With room type');
-        } else if ($selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE) {
-            return $this->l('With hotel|room type');
-        } else if ($selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE) {
-            return $this->l('Standalone');
-        } else if ($selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) {
-            return $this->l('With hotel');
+        $list = $this->fields_list['selling_preference_type']['list'];
+
+        if (empty($list[$selling_preference_type])) {
+            return '--';
         }
 
-        return '--';
+        $options = array_map('trim', explode('|', $list[$selling_preference_type]));
+
+        return implode(', ', $options);
+    }
+
+    public function getPriceCalculationMethod($price_calculation_method, $row)
+    {
+        $list = $this->fields_list['price_calculation_method']['list'];
+
+        if (empty($list[$price_calculation_method])) {
+            return '--';
+        }
+
+        $options = array_map('trim', explode('|', $list[$price_calculation_method]));
+
+        return implode(', ', $options);
     }
 
     public function getHotelName($hotelName, $row)
@@ -501,6 +538,11 @@ class AdminNormalProductsControllerCore extends AdminController
      */
     protected function copyFromPost(&$object, $table)
     {
+        if (Tools::getValue('price_calculation_type') == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING) {
+            $_POST['price_calculation_method'] = Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING;
+        } elseif (is_array(Tools::getValue('price_calculation_method'))) {
+            $_POST['price_calculation_method'] = array_sum(array_map('intval', Tools::getValue('price_calculation_method')));
+        }
         parent::copyFromPost($object, $table);
         if (get_class($object) != 'Product') {
             return;
@@ -589,6 +631,12 @@ class AdminNormalProductsControllerCore extends AdminController
         if ($this->_list) {
             $context = $this->context->cloneContext();
             $context->shop = clone($context->shop);
+            $useTourismTax = (bool) Configuration::get('QLO_USE_TOURISM_TAX');
+            $tourismTaxContext = $useTourismTax ? TaxConfiguration::resolveServiceLineTaxContext(
+                (int) Configuration::get('WK_PRIMARY_HOTEL'),
+                0,
+                new Address(0)
+            ) : null;
             /* update product final price */
             for ($i = 0; $i < $nb; $i++) {
                 if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP) {
@@ -600,6 +648,31 @@ class AdminNormalProductsControllerCore extends AdminController
                 $this->_list[$i]['price_tmp'] = Product::getPriceStatic($this->_list[$i]['id_product'], true, null,
                     (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION'), null, false, true, 1, true, null, null, null, $nothing, true, true,
                     $context);
+
+                if ($useTourismTax) {
+                    $unitPriceTaxExcl = Product::getPriceStatic($this->_list[$i]['id_product'], false, null,
+                        6, null, false, true, 1, true, null, null, null, $nothing, true, true,
+                        $context);
+                    $serviceTourismTaxAmount = 0.0;
+                    $idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $this->_list[$i]['id_product']);
+                    if ($idTourismTaxRulesGroup) {
+                        $taxCalculator = TaxManagerFactory::getManager(
+                            $tourismTaxContext['address'],
+                            $idTourismTaxRulesGroup
+                        )->getTaxCalculator();
+                        $serviceTourismTaxAmount = $taxCalculator->getTaxesTotalAmount(
+                            (float) $unitPriceTaxExcl,
+                            $tourismTaxContext['checkInDate'],
+                            $tourismTaxContext['numNights'],
+                            $tourismTaxContext['numAdults'],
+                            $tourismTaxContext['childrenAges'],
+                            $tourismTaxContext['collectionType'],
+                            1,
+                            $this->context->currency->id
+                        );
+                    }
+                    $this->_list[$i]['price_tmp'] += $serviceTourismTaxAmount;
+                }
             }
         }
 
@@ -2197,6 +2270,17 @@ class AdminNormalProductsControllerCore extends AdminController
      */
     public function checkProduct()
     {
+        if (Tools::getValue('price_calculation_type') == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING) {
+            $_POST['price_calculation_method'] = Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING;
+        } elseif (is_array(Tools::getValue('price_calculation_method'))) {
+            $_POST['price_calculation_method'] = array_sum(array_map('intval', Tools::getValue('price_calculation_method')));
+        }
+
+        // Code For Standard product working
+        // if (is_array(Tools::getValue('selling_preference_type'))) {
+        //     $_POST['selling_preference_type'] = array_sum(array_map('intval', Tools::getValue('selling_preference_type')));
+        // }
+
         $className = 'Product';
         // @todo : the call_user_func seems to contains only statics values (className = 'Product')
         $rules = call_user_func(array($this->className, 'getValidationRules'), $this->className);
@@ -2346,6 +2430,15 @@ class AdminNormalProductsControllerCore extends AdminController
 
         if ($this->isProductFieldUpdated('id_category_default') && (!is_array(Tools::getValue('categoryBox')) || !in_array(Tools::getValue('id_category_default'), Tools::getValue('categoryBox')))) {
             $this->errors[] = $this->l('This product must be in the default category.');
+        }
+
+        // code for standard product working
+        // if (!Tools::getValue('selling_preference_type')) {
+        //     $this->errors[] = $this->l('Please select at least one buying option.');
+        // }
+
+        if (Tools::getValue('id_product') && !Tools::getValue('price_calculation_method')) {
+            $this->errors[] = $this->l('Please select at least one day to apply the price calculation method on.');
         }
 
         // Tags
@@ -2983,7 +3076,8 @@ class AdminNormalProductsControllerCore extends AdminController
         if (Validate::isLoadedObject($product)) {
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
             $allAssociations = $objRoomTypeServiceProduct->getAssociatedHotelsAndRoomType($product->id);
-            if (Product::SELLING_PREFERENCE_WITH_ROOM_TYPE == $product->selling_preference_type) {
+
+            if (Product::isSellableWithRoomType($product->id)) {
                 $associatedRoomTypes = $allAssociations['room_type'];
                 $selectedRoomTypes = Tools::getValue('RT_tree_room_type_box', array());
 
@@ -3020,89 +3114,14 @@ class AdminNormalProductsControllerCore extends AdminController
                         RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
                     );
                 }
-                RoomTypeServiceProduct::deleteRoomProductLink(
-                    $product->id,
-                    RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL
-                );
-            } elseif (Product::SELLING_PREFERENCE_HOTEL_STANDALONE == $product->selling_preference_type) {
-                $associatedHotels = $allAssociations['hotel'];
-                $selectedHotel = Tools::getValue('hotel_box', array());
-                // Generate list of new associations
-                $newHotels = array();
-                foreach ($selectedHotel as $selectedRoomType) {
-                    if (!in_array($selectedRoomType, $associatedHotels)) {
-                        $newHotels[] = $selectedRoomType;
-                    }
-                }
-
-                // Generate list of associations to remove
-                $removedHotels = array();
-                foreach ($associatedHotels as $associatedRoomType) {
-                    if (!in_array($associatedRoomType, $selectedHotel)) {
-                        $removedHotels[] = $associatedRoomType;
-                    }
-                }
-
-                // Remove associations
-                foreach ($removedHotels as $removedHotel) {
-                    RoomTypeServiceProduct::deleteRoomProductLink(
-                        $product->id,
-                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL,
-                        $removedHotel
-                    );
-                }
-
-                // Save new associations
-                if ($newHotels) {
-                    $objRoomTypeServiceProduct->addRoomProductLink(
-                        $product->id,
-                        $newHotels,
-                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL
-                    );
-                }
+            } else {
                 RoomTypeServiceProduct::deleteRoomProductLink(
                     $product->id,
                     RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
                 );
-            } elseif (Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE == $product->selling_preference_type) {
-                // Add room types linking
-                $associatedRoomTypes = $allAssociations['room_type'];
-                $selectedRoomTypes = Tools::getValue('RT_tree_room_type_box', array());
-                // Generate list of new associations
-                $newRoomTypes = array();
-                foreach ($selectedRoomTypes as $selectedRoomType) {
-                    if (!in_array($selectedRoomType, $associatedRoomTypes)) {
-                        $newRoomTypes[] = $selectedRoomType;
-                    }
-                }
+            }
 
-                // Generate list of associations to remove
-                $removedRoomTypes = array();
-                foreach ($associatedRoomTypes as $associatedRoomType) {
-                    if (!in_array($associatedRoomType, $selectedRoomTypes)) {
-                        $removedRoomTypes[] = $associatedRoomType;
-                    }
-                }
-
-                // Remove old associations
-                foreach ($removedRoomTypes as $removedRoomType) {
-                    RoomTypeServiceProduct::deleteRoomProductLink(
-                        $product->id,
-                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE,
-                        $removedRoomType
-                    );
-                }
-
-                // Save new associations
-                if ($newRoomTypes) {
-                    $objRoomTypeServiceProduct->addRoomProductLink(
-                        $product->id,
-                        $newRoomTypes,
-                        RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
-                    );
-                }
-
-                // Add hotels linking
+            if (Product::isSellableWithHotel($product->id)) {
                 $associatedHotels = $allAssociations['hotel'];
                 $selectedHotel = Tools::getValue('hotel_box', array());
                 // Generate list of new associations
@@ -3121,7 +3140,7 @@ class AdminNormalProductsControllerCore extends AdminController
                     }
                 }
 
-                // Remove old associations
+                // Remove associations
                 foreach ($removedHotels as $removedHotel) {
                     RoomTypeServiceProduct::deleteRoomProductLink(
                         $product->id,
@@ -3139,10 +3158,16 @@ class AdminNormalProductsControllerCore extends AdminController
                     );
                 }
             } else {
-                // Remove associations
                 RoomTypeServiceProduct::deleteRoomProductLink(
-                    $product->id
+                    $product->id,
+                    RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL
                 );
+            }
+
+            if (!Product::isSellableWithRoomType($product->id)
+                && !Product::isSellableWithHotel($product->id)
+            ) {
+                RoomTypeServiceProduct::deleteRoomProductLink($product->id);
             }
         }
     }
@@ -3374,6 +3399,26 @@ class AdminNormalProductsControllerCore extends AdminController
         //     $productFeaturePrices = $htlFeaturePrices->getFeaturePricesbyIdProduct($product->id);
         //     $data->assign('productFeaturePrices', $productFeaturePrices);
         // }
+
+        if (Configuration::get('QLO_USE_TOURISM_TAX') && !Tax::excludeTaxeOption()) {
+            $tourismTaxRulesGroups = TaxRulesGroup::getTaxRulesGroupsForOptions(true, true);
+            $data->assign('tourismTaxRulesGroups', $tourismTaxRulesGroups);
+            $data->assign('id_tourism_tax_rules_group', isset($product->id_tourism_tax_rules_group) ? (int) $product->id_tourism_tax_rules_group : 0);
+
+            $tourismTaxRates = array();
+            foreach ($tourismTaxRulesGroups as $tourismTaxRulesGroup) {
+                $idTourismTaxRulesGroup = (int) $tourismTaxRulesGroup['id_tax_rules_group'];
+                if (!$idTourismTaxRulesGroup) {
+                    continue;
+                }
+                $tourismTaxRates[$idTourismTaxRulesGroup] = TaxConfiguration::getPreviewParams(
+                    $idTourismTaxRulesGroup,
+                    $address,
+                    (int) $this->context->language->id
+                );
+            }
+            $data->assign('tourismTaxRatesByGroup', $tourismTaxRates);
+        }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }

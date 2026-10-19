@@ -59,6 +59,7 @@ class CartRuleCore extends ObjectModel
     public $cart_rule_restriction;
     public $product_restriction;
     public $shop_restriction;
+    public $hotel_restriction;
     public $free_shipping;
     public $reduction_percent;
     public $reduction_amount;
@@ -102,6 +103,7 @@ class CartRuleCore extends ObjectModel
             'cart_rule_restriction' =>    array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'product_restriction' =>    array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'shop_restriction' =>        array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
+            'hotel_restriction' =>       array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'free_shipping' =>            array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'reduction_percent' =>        array('type' => self::TYPE_FLOAT, 'validate' => 'isPercentage'),
             'reduction_amount' =>        array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
@@ -163,6 +165,7 @@ class CartRuleCore extends ObjectModel
         $r &= Db::getInstance()->delete('cart_rule_carrier', '`id_cart_rule` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_shop', '`id_cart_rule` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_group', '`id_cart_rule` = '.(int)$this->id);
+        $r &= Db::getInstance()->delete('cart_rule_hotel', '`id_cart_rule` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_country', '`id_cart_rule` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_combination', '`id_cart_rule_1` = '.(int)$this->id.' OR `id_cart_rule_2` = '.(int)$this->id);
         $r &= Db::getInstance()->delete('cart_rule_product_rule_group', '`id_cart_rule` = '.(int)$this->id);
@@ -353,6 +356,29 @@ class CartRuleCore extends ObjectModel
                         continue;
                     }
                     unset($result[$key]);
+                }
+            }
+
+            // Remove cart rule if the cart contains a room from a hotel not covered by its hotel restriction.
+            foreach ($result as $key => $cart_rule) {
+                if (isset($cart_rule['hotel_restriction']) && $cart_rule['hotel_restriction']) {
+                    $total_cart_products = (int)Db::getInstance()->getValue('
+                        SELECT COUNT(cp.id_product)
+                        FROM '._DB_PREFIX_.'cart_product cp
+                        INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
+                        WHERE cp.id_cart = '.(int)$cart->id
+                    );
+                    $allowed_cart_products = (int)Db::getInstance()->getValue('
+                        SELECT COUNT(cp.id_product)
+                        FROM '._DB_PREFIX_.'cart_product cp
+                        INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
+                        INNER JOIN '._DB_PREFIX_.'cart_rule_hotel crh ON crh.id_hotel = hrt.id_hotel
+                        WHERE crh.id_cart_rule = '.(int)$cart_rule['id_cart_rule'].'
+                        AND cp.id_cart = '.(int)$cart->id
+                    );
+                    if (!$total_cart_products || $total_cart_products != $allowed_cart_products) {
+                        unset($result[$key]);
+                    }
                 }
             }
         }
@@ -634,6 +660,27 @@ class CartRuleCore extends ObjectModel
 			AND crs.id_shop = '.(int)$context->shop->id);
             if (!$id_cart_rule) {
                 return (!$display_error) ? false : Tools::displayError('You cannot use this voucher');
+            }
+        }
+
+        // Check if all the rooms in the cart belong to the restricted hotel(s). Only room-type cart
+        if ($this->hotel_restriction) {
+            $total_cart_products = (int)Db::getInstance()->getValue('
+                SELECT COUNT(cp.id_product)
+                FROM '._DB_PREFIX_.'cart_product cp
+                INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
+                WHERE cp.id_cart = '.(int)$context->cart->id
+            );
+            $allowed_cart_products = (int)Db::getInstance()->getValue('
+                SELECT COUNT(cp.id_product)
+                FROM '._DB_PREFIX_.'cart_product cp
+                INNER JOIN '._DB_PREFIX_.'htl_room_type hrt ON hrt.id_product = cp.id_product
+                INNER JOIN '._DB_PREFIX_.'cart_rule_hotel crh ON crh.id_hotel = hrt.id_hotel
+                WHERE crh.id_cart_rule = '.(int)$this->id.'
+                AND cp.id_cart = '.(int)$context->cart->id
+            );
+            if (!$total_cart_products || $total_cart_products != $allowed_cart_products) {
+                return (!$display_error) ? false : Tools::displayError('You cannot use this voucher with the selected hotels');
             }
         }
 
@@ -962,7 +1009,7 @@ class CartRuleCore extends ObjectModel
                     continue;
                 }
             }
-            $cache_id .= '_'.(int)$product['id_product'].'_'.(int)$product['id_product_attribute'].(isset($product['in_stock']) ? '_'.(int)$product['in_stock'] : '');
+            $cache_id .= '_'.(int)$product['id_product'].'_'.(int)$product['id_product_attribute'].'_'.(int)$product['cart_quantity'].(isset($product['in_stock']) ? '_'.(int)$product['in_stock'] : '');
         }
 
         $package_products = $package['products'];
@@ -973,8 +1020,8 @@ class CartRuleCore extends ObjectModel
 
         $all_cart_rules_ids = $context->cart->getOrderedCartRulesIds();
 
-        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
-        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+        $cart_amount_ti = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
+        $cart_amount_te = $context->cart->getOrderTotal(false, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
 
         // Free shipping on selected carriers
         if ($this->free_shipping && in_array($filter, array(CartRule::FILTER_ACTION_ALL, CartRule::FILTER_ACTION_ALL_NOCAP, CartRule::FILTER_ACTION_SHIPPING))) {
@@ -1000,7 +1047,7 @@ class CartRuleCore extends ObjectModel
             // Discount (%) on the whole order
             if ($this->reduction_percent && $this->reduction_product == 0) {
                 // Do not give a reduction on free products!
-                $order_total = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS, $package_products);
+                $order_total = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE, $package_products);
                 foreach ($context->cart->getCartRules(CartRule::FILTER_ACTION_GIFT) as $cart_rule) {
                     $order_total -= Tools::ps_round($cart_rule['obj']->getContextualValue($use_tax, $context, CartRule::FILTER_ACTION_GIFT, $package), _PS_PRICE_COMPUTE_PRECISION_);
                 }
@@ -1073,9 +1120,9 @@ class CartRuleCore extends ObjectModel
             if ((float)$this->reduction_amount > 0) {
                 $prorata = 1;
                 if (!is_null($package) && count($all_products)) {
-                    $total_products = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+                    $total_products = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
                     if ($total_products) {
-                        $prorata = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS, $package['products']) / $total_products;
+                        $prorata = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE, $package['products']) / $total_products;
                     }
                 }
 
@@ -1124,7 +1171,7 @@ class CartRuleCore extends ObjectModel
                 if ($this->reduction_tax == $use_tax) {
                     // The reduction cannot exceed the products total, except when we do not want it to be limited (for the partial use calculation)
                     if ($filter != CartRule::FILTER_ACTION_ALL_NOCAP) {
-                        $cart_amount = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_DEMANDS);
+                        $cart_amount = $context->cart->getOrderTotal($use_tax, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE);
                         $reduction_amount = min($reduction_amount, $cart_amount);
                     }
                     $reduction_value += $prorata * $reduction_amount;
@@ -1370,6 +1417,49 @@ class CartRuleCore extends ObjectModel
         return $array;
     }
 
+    public function getHotelRestrictions($id_profile = null)
+    {
+        $array = array('selected' => array(), 'unselected' => array());
+        $id_lang = (int)Context::getContext()->language->id;
+
+        $hotel_access_condition = '';
+        if ($id_profile) {
+            $accessible_hotels = HotelBranchInformation::getProfileAccessedHotels($id_profile, 1, 1);
+            if (!empty($accessible_hotels)) {
+                $hotel_access_condition = ' AND hbi.`id` IN ('.implode(',', array_map('intval', $accessible_hotels)).')';
+            }
+        }
+
+        if (!Validate::isLoadedObject($this) || $this->hotel_restriction == 0) {
+            $array['selected'] = Db::getInstance()->executeS('
+                SELECT hbi.`id` AS id_hotel, hbl.`hotel_name`, 1 AS selected
+                FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+                LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
+                    ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.$id_lang.')
+                WHERE hbi.`active` = 1'.$hotel_access_condition.'
+                ORDER BY hbl.`hotel_name` ASC
+            ');
+        } else {
+            $resource = Db::getInstance()->query('
+                SELECT hbi.`id` AS id_hotel, hbl.`hotel_name`,
+                    IF(crh.id_hotel IS NULL, 0, 1) AS selected
+                FROM `'._DB_PREFIX_.'htl_branch_info` hbi
+                LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
+                    ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.$id_lang.')
+                LEFT JOIN (
+                    SELECT id_hotel FROM `'._DB_PREFIX_.'cart_rule_hotel`
+                    WHERE id_cart_rule = '.(int)$this->id.'
+                ) crh ON hbi.`id` = crh.id_hotel
+                WHERE hbi.`active` = 1'.$hotel_access_condition.'
+                ORDER BY hbl.`hotel_name` ASC
+            ');
+            while ($row = Db::getInstance()->nextRow($resource)) {
+                $array[$row['selected'] ? 'selected' : 'unselected'][] = $row;
+            }
+        }
+        return $array;
+    }
+
     public static function autoRemoveFromCart($context = null)
     {
         if (!$context) {
@@ -1379,7 +1469,7 @@ class CartRuleCore extends ObjectModel
             return array();
         }
 
-        $order_total = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_DEMANDS, null, null, false);
+         $order_total = $context->cart->getOrderTotal(true, Cart::ONLY_PRODUCTS_WITH_ADDITIONAL_SERVICE, null, null, false);
         static $errors = array();
         foreach ($context->cart->getCartRules() as $cart_rule) {
             if ($error = $cart_rule['obj']->checkValidity($context, true)) {

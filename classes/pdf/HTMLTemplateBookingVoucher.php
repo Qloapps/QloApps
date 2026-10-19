@@ -159,17 +159,6 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
             // Services for this booking
             $bookingServices = array();
 
-            $objBookingDemand = new HotelBookingDemands();
-            $extraDemands = $objBookingDemand->getRoomTypeBookingExtraDemands(
-                (int)$this->order->id, 0, 0, 0, 0, 0, 0, 0,
-                (int)$booking['id'], (int)$booking['id_order_detail']
-            );
-            if (is_array($extraDemands)) {
-                foreach ($extraDemands as $demand) {
-                    $bookingServices[] = array('name' => $demand['name'], 'quantity' => 1);
-                }
-            }
-
             // Auto-added services bundled with room price (for cost calculation only)
             $objServiceProductOrderDetail = new ServiceProductOrderDetail();
             $autoAddedWithRoomPriceTaxExcl = (float)$objServiceProductOrderDetail->getRoomTypeServiceProducts(
@@ -181,7 +170,7 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
                 1, 0, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM
             );
 
-            // Additional services chosen by guest
+            // Extra services chosen by guest
             $additionalServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
                 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, null, 0, (int)$booking['id']
             );
@@ -274,13 +263,10 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
             }
         }
         // --- Totals ---
-        $objBookingDemand = new HotelBookingDemands();
-        $totalDemandsPriceTE = (float)$objBookingDemand->getRoomTypeBookingExtraDemands(
-            (int)$this->order->id, 0, 0, 0, 0, 1, 1, 0
-        );
-        $totalDemandsPriceTI = (float)$objBookingDemand->getRoomTypeBookingExtraDemands(
-            (int)$this->order->id, 0, 0, 0, 0, 1, 1, 1
-        );
+        // Extra demands feature was removed from the system; kept as 0 so the
+        // additive totals below stay correct without the deleted HotelBookingDemands class.
+        $totalDemandsPriceTE = 0;
+        $totalDemandsPriceTI = 0;
 
         $orderDetails = OrderDetail::getList((int)$this->order->id);
         $idsOrderDetail = is_array($orderDetails)
@@ -301,8 +287,8 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
         if (!empty($idsOrderDetail)) {
             $footer['room_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, true, null, null, null, $idsOrderDetail) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM, $idsOrderDetail);
             $roomsCostTaxIncl = $this->order->getTotalProductsWithTaxes(false, true, null, null, null, $idsOrderDetail) + $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_WITH_ROOM, $idsOrderDetail);
-            $footer['service_products_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE, false, false, $idsOrderDetail) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE, false, false, $idsOrderDetail);
-            $serviceProductsCostTaxIncl = $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_STANDALONE, false, false, $idsOrderDetail) + $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_HOTEL_STANDALONE, false, false, $idsOrderDetail);
+            $footer['service_products_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE, false, false, $idsOrderDetail) + $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL, false, false, $idsOrderDetail);
+            $serviceProductsCostTaxIncl = $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE, false, false, $idsOrderDetail) + $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL, false, false, $idsOrderDetail);
             $footer['additional_service_price_tax_excl'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 0, null, $idsOrderDetail) + $totalDemandsPriceTE;
             $additionalServicesCostTaxIncl = $this->order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 0, null, $idsOrderDetail) + $totalDemandsPriceTI;
             $footer['total_convenience_fee_te'] = $this->order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE, 1, Product::PRICE_ADDITION_TYPE_INDEPENDENT, $idsOrderDetail);
@@ -321,7 +307,10 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
 
         $footer['total_without_discount_te'] = $footer['room_price_tax_excl'] + $footer['total_convenience_fee_te'] + $footer['additional_service_price_tax_excl'] + $footer['service_products_price_tax_excl'];
         $totalWithoutDiscountTaxIncl = $roomsCostTaxIncl + $serviceProductsCostTaxIncl + $additionalServicesCostTaxIncl + $convenienceFeeTaxIncl;
-        $footer['total_tax_without_discount'] = max(0, $totalWithoutDiscountTaxIncl - $footer['total_without_discount_te']);
+        $totalTourismTax = OrderTaxDetail::getOrderTourismTaxTotal((int) $this->order->id);
+        $footer['total_tax_without_discount'] = max(0, $totalWithoutDiscountTaxIncl - $footer['total_without_discount_te'] - $totalTourismTax);
+        $footer['total_tourism_tax'] = $totalTourismTax;
+        $footer['show_tourism_tax_separately'] = (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE_DOCS');
         $grandTotal = max(0.0, $totalWithoutDiscountTaxIncl - $productDiscountsTaxIncl);
         $footer['product_discounts_tax_incl'] = $productDiscountsTaxIncl;
         $footer['total_paid_tax_incl'] = $grandTotal;

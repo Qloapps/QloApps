@@ -52,8 +52,6 @@
 			{assign var=HOOK_ORDERDETAILDISPLAYED value=$order->hook_orderdetaildisplayed}
 			{assign var=total_convenience_fee_ti value=$order->total_convenience_fee_ti}
 			{assign var=total_convenience_fee_te value=$order->total_convenience_fee_te}
-			{assign var=total_demands_price_ti value=$order->total_demands_price_ti}
-			{assign var=total_demands_price_te value=$order->total_demands_price_te}
 			{assign var=any_back_order value=$order->any_back_order}
 			{assign var=shw_bo_msg value=$order->shw_bo_msg}
 			{assign var=back_ord_msg value=$order->back_ord_msg}
@@ -65,6 +63,7 @@
 			{assign var=obj_hotel_branch_information value=$order->obj_hotel_branch_information}
 			{assign var=hotel_address_info value=$order->hotel_address_info}
 			{assign var=hotel_refund_rules value=$order->hotel_refund_rules}
+			{assign var=property_type value=$order->property_type}
 
 			{if isset($order->total_old)}
 				{assign var=total_old value=$order->total_old}

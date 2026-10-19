@@ -24,9 +24,3 @@ body.adminorderrefundrequests .ui-tooltip {
     padding: 10px;
     box-shadow: 0px 0px 15px 0px #00000026;
 }
-.ui-tooltip.price_info-tooltip span {
-    margin-left: 15px;
-}
-.ui-tooltip.price_info-tooltip label {
-    font-weight: 600;
-}

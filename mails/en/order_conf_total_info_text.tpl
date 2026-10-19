@@ -14,7 +14,11 @@
 {l s="Total Convenience Fees"}  {$list['total_convenience_fee_te']}
 {/if}
 
-{l s="Total Tax"}  {$list['total_order_tax']}
+{l s="Room and Service Tax"}  {$list['total_order_tax']}
+
+{if isset($list['has_tourism_tax']) && $list['has_tourism_tax']}
+{l s="Total Tourism Tax"}  {$list['total_tourism_tax']}
+{/if}
 
 {l s="Discounts"}  {$list['total_discounts']}
 

@@ -136,7 +136,8 @@ class HotelRoomTypeRestrictionDateRange extends ObjectModel
                 $errors[] = $objModule->l('Maximum length of stay is invalid.', 'HotelRoomTypeLosDateRanges').
                 ' [ '.$objModule->l('LOS for date range in row no.', 'HotelRoomTypeLosDateRanges').' : '.($dateFromKey+1).' ]';
             } elseif ($minDay && $maxDay > 0 && ($minDay > $maxDay)) {
-                $this->errors[] = Tools::displayError('Value of global maximum length of stay must be greater than global minimum length of stay.');
+                $errors[] = $objModule->l('Maximum length of stay must be greater than minimum length of stay.', 'HotelRoomTypeLosDateRanges').
+                ' [ '.$objModule->l('LOS for date range in row no.', 'HotelRoomTypeLosDateRanges').' : '.($dateFromKey+1).' ]';
             }
 
             if (!$dateFrom || $dateFrom == '') {

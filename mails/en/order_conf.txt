@@ -6,7 +6,7 @@ Order: {order_name} Placed on {date}
 
 {cart_booking_data_text}
 
-{extra_demands_details_text}
+{extra_services_details_text}
 
 {normal_products_data_txt}
 

@@ -56,6 +56,13 @@ class ProductCore extends ObjectModel
     /** @var string Manufacturer name */
     public $manufacturer_name;
 
+    /** @var string Room Type Selling Object  name */
+    public $selling_object_name;
+
+    /** @var string Room Type Selling Object  plural name */
+    public $selling_object_plural_name;
+
+
     /** @var string Supplier name */
     public $supplier_name;
 
@@ -226,6 +233,9 @@ class ProductCore extends ObjectModel
 
     public $id_tax_rules_group = 1;
 
+    /** @var int Tourism tax rules group id (0 = no tourism tax) */
+    public $id_tourism_tax_rules_group = 0;
+
     /**
      * We keep this variable for retrocompatibility for themes
      * @deprecated 1.5.0
@@ -247,6 +257,7 @@ class ProductCore extends ObjectModel
     public $is_virtual;
     public $booking_product;
     public $id_pack_product_attribute;
+    public $id_selling_object;
     public $cache_default_attribute;
 
     /**
@@ -313,8 +324,9 @@ class ProductCore extends ObjectModel
 
             /* Shop fields */
             'id_category_default' =>        array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
-            'id_tax_rules_group' =>        array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
-            'on_sale' =>                    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
+            'id_tax_rules_group' =>              array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
+            'id_tourism_tax_rules_group' =>      array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedId'),
+            'on_sale' =>                         array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'online_only' =>                array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'ecotax' =>                    array('type' => self::TYPE_FLOAT, 'shop' => true, 'validate' => 'isPrice'),
             'minimal_quantity' =>            array('type' => self::TYPE_INT, 'shop' => true, 'validate' => 'isUnsignedInt'),
@@ -341,6 +353,7 @@ class ProductCore extends ObjectModel
             'show_price' =>                array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'indexed' =>                    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'visibility' =>                array('type' => self::TYPE_STRING, 'shop' => true, 'validate' => 'isProductVisibility', 'values' => array('both', 'catalog', 'search', 'none'), 'default' => 'both'),
+            'id_selling_object' =>    array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => false),
             'cache_default_attribute' =>    array('type' => self::TYPE_INT, 'shop' => true),
             'advanced_stock_management' =>    array('type' => self::TYPE_BOOL, 'shop' => true, 'validate' => 'isBool'),
             'date_add' =>                    array('type' => self::TYPE_DATE, 'shop' => true, 'validate' => 'isDate'),
@@ -414,6 +427,7 @@ class ProductCore extends ObjectModel
             //     )
             // ),
             'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'id_tourism_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
             'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
             // 'manufacturer_name' => array(
             //     'getter' => 'getWsManufacturerName',
@@ -469,14 +483,6 @@ class ProductCore extends ObjectModel
                     'id' => array('required' => true),
                 )
             ),
-            'extra_demands' => array(
-                'resource' => 'extra_demand',
-                'fields' => array(
-                    'id' => array('required' => true),
-                    'id_option' => array(),
-                    'price' => array(),
-                )
-            ),
             'services' => array(
                 'resource' => 'service',
                 'fields' => array(
@@ -518,6 +524,7 @@ class ProductCore extends ObjectModel
                 )
             ),
             'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'id_tourism_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
             'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
             // 'manufacturer_name' => array(
             //     'getter' => 'getWsManufacturerName',
@@ -559,15 +566,24 @@ class ProductCore extends ObjectModel
 
     // Product selling preference types
     const SELLING_PREFERENCE_WITH_ROOM_TYPE = 1; // Product to be sold with Room types
-    const SELLING_PREFERENCE_HOTEL_STANDALONE = 2; // Product to be sold Standalone with Hotels
-    const SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE = 3; // Product to be sold Standalone with Hotels and with Room types also
-    const SELLING_PREFERENCE_STANDALONE = 4; // Product to be sold standalone
+    const SELLING_PREFERENCE_WITH_HOTEL = 2; // Product to be sold Standalone with Hotels
+    const SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE = 3; // Product to be sold Standalone with Hotels and with Room types also
+    const SELLING_PREFERENCE_WITH_STANDALONE = 4; // Product to be sold standalone
+    const SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE = 5; // Product to be sold standalone and with Room types also
+    const SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE = 6; // Product to be sold standalone with Hotels and with Room types also
+    const SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE = 7; // Product to be sold standalone with Hotels and with Room types also and standalone
 
     const PRICE_ADDITION_TYPE_WITH_ROOM = 1;
     const PRICE_ADDITION_TYPE_INDEPENDENT = 2;
 
-    const PRICE_CALCULATION_METHOD_PER_BOOKING = 1;
-    const PRICE_CALCULATION_METHOD_PER_DAY = 2;
+    const PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY = 1;
+    const PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY = 2;
+    const PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY = 3;
+    const PRICE_CALCULATION_METHOD_ON_DURING_STAY = 4;
+    const PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY = 5;
+    const PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY = 6;
+    const PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY = 7;
+    const PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING = 8;
 
     const STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOMER = 1;
     const STANDARD_PRODUCT_ADDRESS_PREFERENCE_HOTEL = 2;
@@ -585,6 +601,9 @@ class ProductCore extends ObjectModel
             $this->tax_name = 'deprecated'; // The applicable tax may be BOTH the product one AND the state one (moreover this variable is some deadcode)
             $this->manufacturer_name = Manufacturer::getNameById((int)$this->id_manufacturer);
             $this->supplier_name = Supplier::getNameById((int)$this->id_supplier);
+            $sellingObject = RoomTypeSellingObject::getRoomTypeSellingObjectBySellingObjectId((int)$this->id_selling_object, (int)$id_lang);
+            $this->selling_object_name = $sellingObject ? $sellingObject['name'] : null;
+            $this->selling_object_plural_name = $sellingObject ? $sellingObject['plural_name'] : null;
             $address = null;
             $id_address = Cart::getIdAddressForTaxCalculation($this->id);
             $this->tax_rate = $this->getTaxesRate(new Address($id_address));
@@ -1073,9 +1092,6 @@ class ProductCore extends ObjectModel
             if (!$this->deleteServiceInfo()) {
                 return false;
             }
-        } else {
-            $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-            $objHotelRoomTypeBedType->deleteRoomTypeBedTypes(false, $this->id);
         }
 
         Hook::exec('actionProductDelete', array('id_product' => (int)$this->id, 'product' => $this));
@@ -1083,6 +1099,7 @@ class ProductCore extends ObjectModel
             !GroupReduction::deleteProductReduction($this->id) ||
             !$this->deleteCategories(true) ||
             !$this->deleteProductFeatures() ||
+            !HotelRoomTypeAmenities::deleteByProduct((int)$this->id) ||
             !$this->deleteTags() ||
             !$this->deleteAttributesImpacts() ||
             !$this->deleteAttachments(false) ||
@@ -1447,7 +1464,10 @@ class ProductCore extends ObjectModel
                     ('.
                         '(`element_type` = '.RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$this->id.')
                     )
-                    AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE.')'. '
+                    AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. ' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE.')
                     AND product_shop.`id_shop` = '.(int)$context->shop->id
                 .($sub_category? ' AND product_shop.`id_category_default` = '.(int)$sub_category : '')
                 .($front ? ' AND product_shop.`show_at_front` = 1':'')
@@ -1491,7 +1511,10 @@ class ProductCore extends ObjectModel
                     ('.
                         '(`element_type` = '.RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$this->id.')
                     )
-                    AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. '|| p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE.')'. '
+                    AND (p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE. '
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.' 
+                    || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE.')'. '
                     AND product_shop.`id_shop` = '.(int)$context->shop->id
                     .($sub_category? ' AND product_shop.`id_category_default` = '.(int)$sub_category : '')
                     .($front ? ' AND product_shop.`show_at_front` = 1':'')
@@ -1540,7 +1563,9 @@ class ProductCore extends ObjectModel
                         '(`element_type` = '.RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.' AND `id_element` = '.(int)$this->id.')
                     )
                     AND p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_ROOM_TYPE.
-                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE.
+                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE.
+                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE.
+                    ' || p.`selling_preference_type` = '.(int)self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE.
                     ' AND product_shop.`id_shop` = '.(int)$context->shop->id;
 
             $sql .= ' GROUP BY cl.`id_category`';
@@ -3033,7 +3058,8 @@ class ProductCore extends ObjectModel
      * @param null     $specific_price_output If a specific price applies regarding the previous parameters,
      *                                        this variable is filled with the corresponding SpecificPrice object
      * @param bool     $with_ecotax           Insert ecotax in price output.
-     * @param bool     $use_group_reduction
+     * @param bool     $use_group_reduction   @deprecated no longer applied here; call
+     *                                        Product::applyGroupDiscount() explicitly on your final total.
      * @param Context  $context
      * @param bool     $use_customer_price
      * @return float                          Product price
@@ -3101,7 +3127,7 @@ class ProductCore extends ObjectModel
         }
 
         if (!Product::isBookingProduct($id_product)
-            && (Product::getSellingPreferenceType($id_product) == Product::SELLING_PREFERENCE_STANDALONE)
+            && (Product::getSellingPreferenceType($id_product) == Product::SELLING_PREFERENCE_WITH_STANDALONE)
             && !$id_address
         ) {
             $serviceAddressPrefrenceType = Configuration::get('PS_STANDARD_PRODUCT_ORDER_ADDRESS_PREFRENCE');
@@ -3202,7 +3228,8 @@ class ProductCore extends ObjectModel
      * @param bool   $with_ecotax insert ecotax in price output.
      * @param null   $specific_price If a specific price applies regarding the previous parameters,
      *                               this variable is filled with the corresponding SpecificPrice object
-     * @param bool   $use_group_reduction
+     * @param bool   $use_group_reduction @deprecated no longer applied here; call
+     *                                    Product::applyGroupDiscount() explicitly on your final total.
      * @param int    $id_customer
      * @param bool   $use_customer_price
      * @param int    $id_cart
@@ -3469,18 +3496,6 @@ class ProductCore extends ObjectModel
             $price -= $specific_price_reduction;
         }
 
-        // Group reduction
-        if ($use_group_reduction) {
-            $reduction_from_category = GroupReduction::getValueForProduct($id_product, $id_group);
-            if ($reduction_from_category !== false) {
-                $group_reduction = $price * (float)$reduction_from_category;
-            } else { // apply group reduction if there is no group reduction for this category
-                $group_reduction = (($reduc = Group::getReductionByIdGroup($id_group)) != 0) ? ($price * $reduc / 100) : 0;
-            }
-
-            $price -= $group_reduction;
-        }
-
         if ($only_reduc) {
             return Tools::ps_round($specific_price_reduction, $decimals);
         }
@@ -3493,6 +3508,32 @@ class ProductCore extends ObjectModel
 
         self::$_prices[$cache_id] = $price;
         return self::$_prices[$cache_id];
+    }
+
+    /**
+     * Applies the group discount to an already-computed price. 
+     * @param float $price The price to discount (tax-incl. or tax-excl., either works).
+     * @param int $id_product
+     * @param int $id_group
+     * @param bool $use_group_reduction
+     * @return float
+     */
+    public static function applyGroupDiscount($price, $id_product, $id_group, $use_group_reduction = true)
+    {
+        if (!$use_group_reduction) {
+            return $price;
+        }
+
+        $reduction_from_category = GroupReduction::getValueForProduct($id_product, $id_group);
+        if ($reduction_from_category !== false) {
+            $group_reduction = $price * (float)$reduction_from_category;
+        } else { // apply group reduction if there is no group reduction for this category
+            $group_reduction = (($reduc = Group::getReductionByIdGroup($id_group)) != 0) ? ($price * $reduc / 100) : 0;
+        }
+
+        $price -= $group_reduction;
+
+        return $price < 0 ? 0 : $price;
     }
 
     public static function convertAndFormatPrice($price, $currency = false, ?Context $context = null)
@@ -4015,7 +4056,7 @@ class ProductCore extends ObjectModel
             $id_value = Db::getInstance()->Insert_ID();
         }
         $row = array('id_feature' => (int)$id_feature, 'id_product' => (int)$this->id, 'id_feature_value' => (int)$id_value);
-        Db::getInstance()->insert('feature_product', $row);
+        Db::getInstance()->insert('feature_product', $row, false, true, Db::INSERT_IGNORE);
         SpecificPriceRule::applyAllRules(array((int)$this->id));
         if ($id_value) {
             return ($id_value);
@@ -5426,6 +5467,31 @@ class ProductCore extends ObjectModel
     }
 
     /**
+     * Returns the tourism tax rules group assigned to a product, mirroring
+     * getIdTaxRulesGroupByIdProduct() for tourism tax's own product_shop column.
+     *
+     * @param int $id_product
+     * @param Context|null $context
+     * @return int
+     */
+    public static function getIdTourismTaxRulesGroupByIdProduct($id_product, ?Context $context = null)
+    {
+        if (!$context) {
+            $context = Context::getContext();
+        }
+        $key = 'product_id_tourism_tax_rules_group_'.(int)$id_product.'_'.(int)$context->shop->id;
+        if (!Cache::isStored($key)) {
+            $result = Db::getInstance(_PS_USE_SQL_SLAVE_)->getValue('
+                        SELECT `id_tourism_tax_rules_group`
+                        FROM `'._DB_PREFIX_.'product_shop`
+                        WHERE `id_product` = '.(int)$id_product.' AND id_shop='.(int)$context->shop->id);
+            Cache::store($key, (int)$result);
+            return (int)$result;
+        }
+        return Cache::retrieve($key);
+    }
+
+    /**
      * Returns tax rate.
      *
      * @param Address|null $address
@@ -6626,35 +6692,6 @@ class ProductCore extends ObjectModel
         );
     }
 
-    public function getWsExtraDemands()
-    {
-        $objHotelRoomTypeDemand = new HotelRoomTypeDemand();
-        $selectedDemands = Db::getInstance()->executeS(
-            'SELECT `id_global_demand` as `id` FROM `'._DB_PREFIX_.'htl_room_type_demand`
-            WHERE `id_product` = '.(int)$this->id
-        );
-        $res = array();
-        $demands = $objHotelRoomTypeDemand->getRoomTypeDemands($this->id);
-        if ($selectedDemands) {
-            foreach ($selectedDemands as $id_demand => $demand) {
-                $option['id'] = $demand['id'];
-                if (isset($demands[$demand['id']]['adv_option']) && count($demands[$demand['id']]['adv_option'])) {
-                    foreach ($demands[$demand['id']]['adv_option'] as $id_option => $adv_option) {
-                        $option['id_option'] = $id_option;
-                        $option['price'] = $adv_option['price_tax_excl'];
-                        $res[] = $option;
-                    }
-                } else {
-                    $option['id_option'] = false;
-                    $option['price'] = $demand['price_tax_excl'];
-                    $res[] = $option;
-                }
-            }
-        }
-
-        return $res;
-    }
-
     public function getWsServices()
     {
         return Db::getInstance()->executeS(
@@ -6715,59 +6752,6 @@ class ProductCore extends ObjectModel
     public function deleteWs()
     {
         return $this->delete();
-    }
-
-    public function setWsExtraDemands($demands)
-    {
-        Db::getInstance()->execute('
-            DELETE FROM `'._DB_PREFIX_.'htl_room_type_demand`
-            WHERE `id_product` = '.(int)$this->id
-        );
-        Db::getInstance()->execute('
-            DELETE FROM `'._DB_PREFIX_.'htl_room_type_demand_price`
-            WHERE `id_product` = '.(int)$this->id
-        );
-        $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
-        $savedDemands = array();
-        foreach ($demands as $globalDemand) {
-            if (Validate::isLoadedObject($objGlobalDemand = new HotelRoomTypeGlobalDemand($globalDemand['id']))) {
-                if (!isset($savedDemands[$globalDemand['id']])) {
-                    $objRoomTypeDemand = new HotelRoomTypeDemand();
-                    $objRoomTypeDemand->id_product = $this->id;
-                    $objRoomTypeDemand->id_global_demand = $objGlobalDemand->id;
-                    $objRoomTypeDemand->save();
-                    $savedDemands[$globalDemand['id']] = $objRoomTypeDemand->id;
-                }
-
-                if (isset($globalDemand['price'])) {
-                    if ($objAdvOption->getGlobalDemandAdvanceOptions($objGlobalDemand->id)
-                        && isset($globalDemand['id_option'])
-                        && Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($globalDemand['id_option']))
-                    ) {
-                        if ($globalDemand['price'] != $objAdvOption->price) {
-                            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                            $objRoomTypeDemandPrice->id_product = $this->id;
-                            $objRoomTypeDemandPrice->id_global_demand = $objGlobalDemand->id;
-                            $objRoomTypeDemandPrice->id_option = $objAdvOption->id;
-                            $objRoomTypeDemandPrice->price = $globalDemand['price'];
-                            $objRoomTypeDemandPrice->save();
-                        }
-                    } else {
-                        // save selected demands prices for this room type
-                        if ($objGlobalDemand->price != $globalDemand['price']) {
-                            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                            $objRoomTypeDemandPrice->id_product = $this->id;
-                            $objRoomTypeDemandPrice->id_global_demand = $objGlobalDemand->id;
-                            $objRoomTypeDemandPrice->id_option = 0;
-                            $objRoomTypeDemandPrice->price = $globalDemand['price'];
-                            $objRoomTypeDemandPrice->save();
-                        }
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 
     public function setWsServices($services)
@@ -6832,21 +6816,24 @@ class ProductCore extends ObjectModel
         $idAddress = null,
         $useReduc = 1,
         $idGroup = null,
-        $idCartBooking = 0
+        $idCartBooking = 0,
+        $includeTourismTax = false,
+        $numAdults = null,
+        $childrenAges = null
     ) {
         if ($useTax === null) {
             $useTax = Product::$_taxCalculationMethod == PS_TAX_EXC ? false : true;
         }
 
         $price = Product::getPriceStatic(
-            (int)$idProduct,
+            $idProduct,
             $useTax,
             $idProductOption,
             6,
             null,
             false,
             $useReduc,
-            (int)$quantity,
+            $quantity,
             false,
             null,
             $idCart,
@@ -6856,8 +6843,8 @@ class ProductCore extends ObjectModel
             true,
             null,
             true,
-            (int)$idHotel,
-            (int)$idProductRoomType,
+            $idHotel,
+            $idProductRoomType,
             $idGroup,
             $idCartBooking
         );
@@ -6878,12 +6865,216 @@ class ProductCore extends ObjectModel
             )
         );
 
-        if (Product::getProductPriceCalculation($idProduct) == Product::PRICE_CALCULATION_METHOD_PER_DAY
-            && $dateFrom && $dateTo
-        ) {
-            $price = $price * HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+        $numdays = Product::getServicePriceBillableDays(
+            Product::getProductPriceCalculation($idProduct),
+            $dateFrom,
+            $dateTo
+        );
+        $price = $price * $numdays;
+
+        $price = $price * $quantity;
+
+        $tourismTaxHotelId = $idHotel;
+        if (!$tourismTaxHotelId && $idProductRoomType) {
+            $objRoomType = new HotelRoomType();
+            if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProductRoomType)) {
+                $tourismTaxHotelId = $roomTypeInfo['id_hotel'];
+            }
         }
 
-        return $price * (int)$quantity;
+        if ($includeTourismTax && ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct($idProduct))) {
+
+            $unitPriceExcl = ($useTax ? Product::getServiceProductPrice($idProduct, $idProductOption, $idHotel, $idProductRoomType, false, 1, $dateFrom, $dateTo, $idCart, $idAddress, $useReduc, $idGroup, $idCartBooking) : $price / (int) $quantity) / max(1, $numdays);
+
+            $fallbackAddress = new Address(Cart::getIdAddressForTaxCalculation($idProduct));
+            if ($numAdults === null) {
+                $taxContext = TaxConfiguration::resolveServiceLineTaxContext($tourismTaxHotelId, 0, $fallbackAddress, $idCartBooking);
+            } else {
+                // caller supplied its own occupancy (e.g. a live search form) — use it as-is, only resolve address/collection type
+                $hotelContext = TaxConfiguration::resolveHotelAddressAndCollectionType($tourismTaxHotelId, $fallbackAddress);
+                $taxContext = array(
+                    'address' => $hotelContext['address'],
+                    'collectionType' => $hotelContext['collectionType'],
+                    'checkInDate' => $dateFrom,
+                    'numNights' => max(1, HotelHelper::getNumberOfDays($dateFrom, $dateTo)),
+                    'numAdults' => $numAdults,
+                    'childrenAges' => $childrenAges ?: array(),
+                );
+            }
+
+            // no $idCurrency passed — TaxCalculator::getTaxesAmount() already resolves it from the current context when null
+            $taxCalculator = TaxManagerFactory::getManager($taxContext['address'], $idTourismTaxRulesGroup)->getTaxCalculator();
+            $price += $taxCalculator->getTaxesTotalAmount(
+                $unitPriceExcl,
+                $taxContext['checkInDate'],
+                $taxContext['numNights'],
+                $taxContext['numAdults'],
+                $taxContext['childrenAges'],
+                $taxContext['collectionType'],
+                $quantity
+            );
+        }
+
+        if (!$specificPrice || ($specificPrice['id_cart'] == 0 && $specificPrice['id_htl_cart_booking'] == 0)) {
+            if (!$idGroup || !Validate::isLoadedObject(new Group((int)$idGroup))) {
+                $idGroup = (int)Group::getCurrent()->id;
+            }
+            $price =  Product::applyGroupDiscount($price, $idProduct, $idGroup);
+        }
+        return $price;
+    }
+
+
+    public static function getServicePriceBillableDays(
+        $priceCalculationMethod,
+        $dateFrom,
+        $dateTo,
+    ) {
+
+        $numNights = (int) HotelHelper::getNumberOfDays($dateFrom, $dateTo);
+        if ($numNights < 1) {
+            return 1;
+        }
+
+        $checkinDay = 1;
+        $checkoutDay = 1;
+        $stayDay = $numNights - 1;
+
+        switch ((int) $priceCalculationMethod) {
+            case self::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING:
+                return 1;
+
+            case self::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY:
+                return $checkinDay;
+
+            case self::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY:
+                return $checkoutDay;
+
+            case self::PRICE_CALCULATION_METHOD_ON_DURING_STAY:
+                return $stayDay;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY:
+                return $checkinDay + $checkoutDay;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY:
+                return $checkinDay + $stayDay;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKOUT_AND_DURING_STAY:
+                return $checkoutDay + $stayDay;
+
+            case self::PRICE_CALCULATION_METHOD_CHECKIN_AND_CHECKOUT_AND_DURING_STAY:
+                return $checkinDay + $checkoutDay + $stayDay;
+
+            default:
+                return $numNights;
+        }
+    }
+
+    public static function getPriceCalculationMethodDaysLabel($priceCalculationMethod)
+    {
+        $priceCalculationMethod = (int) $priceCalculationMethod;
+        $labels = array();
+        static $module = null;
+        if (is_null($module)) {
+            $module = Module::getInstanceByName('hotelreservationsystem');
+        }   
+        if ($priceCalculationMethod == self::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING) {
+            $labels[] = $module->l('Once per booking');
+
+            return $labels;
+        }
+
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY) {
+            $labels[] = $module->l('Check-in day');
+        }
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_DURING_STAY) {
+            $labels[] = $module->l('During-stay days');
+        }
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY) {
+            $labels[] = $module->l('Check-out day');
+        }
+
+        return $labels;
+    }
+
+    public static function isSellableWithRoomType($idProduct)
+    {
+        return in_array((int) self::getSellingPreferenceType($idProduct), [
+            self::SELLING_PREFERENCE_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        ]);
+    }
+
+    public static function isSellableWithHotel($idProduct)
+    {
+        return in_array((int) self::getSellingPreferenceType($idProduct), [
+            self::SELLING_PREFERENCE_WITH_HOTEL,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        ]);
+    }
+
+    public static function isSellableAsStandalone($idProduct)
+    {
+        return in_array((int) self::getSellingPreferenceType($idProduct), [
+            self::SELLING_PREFERENCE_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+            self::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+            self::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        ]);
+    }
+    
+    /**
+     * Prepare grouped core features and values for a room type, with selection state.
+     *
+     * @param int $idProduct
+     * @param int $idLang defaults to current context language
+     * @return array
+     */
+    public static function getRoomTypeFeatureTreeData($idProduct, $idLang = 0)
+    {
+        if (!$idLang) {
+            $idLang = Context::getContext()->language->id;
+        }
+
+        $product = new self((int) $idProduct);
+        $features = Feature::getFeatures(
+            $idLang,
+            (Shop::isFeatureActive() && Shop::getContext() == Shop::CONTEXT_SHOP)
+        );
+        $selectedFeatureValues = array();
+        foreach ($product->getFeatures() as $productFeature) {
+            $selectedFeatureValues[(int) $productFeature['id_feature']][] = (int) $productFeature['id_feature_value'];
+        }
+
+        foreach ($features as &$feature) {
+            $featureValues = FeatureValue::getFeatureValuesWithLang(
+                $idLang,
+                (int) $feature['id_feature']
+            );
+            $feature['value'] = (int) $feature['id_feature'];
+            $feature['input_name'] = 'feature_value_parents';
+            $feature['children'] = array();
+            $selectedValues = isset($selectedFeatureValues[(int) $feature['id_feature']])
+                ? $selectedFeatureValues[(int) $feature['id_feature']]
+                : array();
+
+            foreach ($featureValues as $featureValue) {
+                $featureValue['name'] = $featureValue['value'];
+                $featureValue['value'] = (int) $featureValue['id_feature_value'];
+                $featureValue['input_name'] = 'feature_values['.(int) $feature['id_feature'].']';
+                $featureValue['selected'] = in_array((int) $featureValue['id_feature_value'], $selectedValues);
+                $feature['children'][] = $featureValue;
+            }
+
+            if ($feature['children'] && count($selectedValues) === count($feature['children'])) {
+                $feature['selected'] = true;
+            }
+        }
+
+        return $features;
     }
 }

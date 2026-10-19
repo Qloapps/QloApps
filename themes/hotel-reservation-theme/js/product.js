@@ -205,6 +205,13 @@ $(document).ready(function() {
     }
 
     if ($('.room_info_hotel_images_wrap').length) {
+        if (!!$.prototype.fancybox) {
+            $('.room_info_hotel_images_wrap .fancybox').fancybox({
+                'hideOnContentClick': true,
+                'openEffect': 'elastic',
+                'closeEffect': 'elastic',
+            });
+        }
         loadHotelImagesByPage(1);
     }
 });
@@ -1041,30 +1048,8 @@ $(document).ready(function() {
         BookingForm.refresh();
     });
 
-    $('.id_room_type_demand').on('click', function() {
-        BookingForm.refresh();
-    });
 
-    $(document).on('click', '.remove_roomtype_demand', function(e) {
-        e.preventDefault();
-        let idGlobalDemand = $(this).data('id_global_demand');
-        $('.id_room_type_demand[data-id_global_demand="' + idGlobalDemand + '"]:checked').prop('checked', false).uniform();
-        BookingForm.refresh();
-    });
-
-    $(document).on('change', '.room_demand_block .id_option', function(e) {
-        var optionSelected = $(this).find('option:selected');
-        var extraDemandPrice = optionSelected.attr("optionPrice")
-        extraDemandPrice = parseFloat(extraDemandPrice);
-        extraDemandPrice = formatCurrency(extraDemandPrice, currency_format, currency_sign, currency_blank);
-        $(this).closest('.room_demand_block').find('.extra_demand_option_price').text(extraDemandPrice);
-        if ($(this).closest('.room_demand_block').find('.id_room_type_demand:checked').val()) {
-            BookingForm.refresh();
-        }
-    });
-
-
-    // Accordian for extra demand
+    // Accordian for extra services
     function close_accordion_section() {
         $('.accordion .accordion-section-title').removeClass('active');
         $('.accordion .accordion-section-content').slideUp(300).removeClass('open');
@@ -1171,6 +1156,7 @@ $(document).ready(function() {
                                 triggerElement.hide();
                             }
                         }
+                        initUITooltip();
                     } else {
                         triggerElement.hide();
                     }
@@ -1269,7 +1255,7 @@ function addProductToRoomType(that) {
     } else {
         $('<input type="hidden">').attr({
             id: 'service_product_'+ id_product,
-            name: 'service_product['+ id_product +'][]',
+            name: 'service_product['+ id_product +'][quantity]',
             class: 'service_product',
             'data-id_product': id_product,
             value: qty
@@ -1310,11 +1296,14 @@ function updateRoomServiceQuantity(that) {
 
 
 function initMap() {
-    const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), {
+    const mapOptions = {
         zoom: 10,
         streetViewControl: false,
-        mapId: PS_MAP_ID
-    });
+    };
+    if (PS_MAP_ID) {
+        mapOptions.mapId = PS_MAP_ID;
+    }
+    const map = new google.maps.Map($('#room_type_map_tab .map-wrap').get(0), mapOptions);
 
     const hotelLatLng = {
         lat: Number(hotel_location.latitude),
@@ -1326,11 +1315,20 @@ function initMap() {
     icon.src = PS_STORES_ICON;
     icon.style.width = '24px';
     icon.style.height = '24px';
-    let marker = new google.maps.marker.AdvancedMarkerElement({
-        position: hotelLatLng,
-        map: map,
-        content: icon,
-    });
+    let marker;
+    if (PS_MAP_ID) {
+        marker = new google.maps.marker.AdvancedMarkerElement({
+            position: hotelLatLng,
+            map: map,
+            content: icon,
+        });
+    } else {
+        marker = new google.maps.Marker({
+            position: hotelLatLng,
+            map: map,
+            icon: PS_STORES_ICON,
+        });
+    }
 
     const uiContent = $('#room-info-map-ui-content .hotel-info-wrap').get(0);
     map.controls[google.maps.ControlPosition.LEFT_TOP].push(uiContent);
@@ -1348,52 +1346,11 @@ var BookingForm = {
         if (parseInt($('#product_page_booking_product').val())) {
             BookingForm.initDatepicker(max_order_date, min_booking_offset, $('#room_check_in').val(), $('#room_check_out').val());
         }
-        // initialize tootltip for extra service
-        if ($('.price_desc_block .services-info').length) {
-            $('.price_desc_block .services-info img').tooltip({
-                content: $('.price_desc_block .services-info-container').html(),
-                items: "div",
-                trigger : 'hover',
-                position: { my: "left-15 top", at: "left bottom" },
-                tooltipClass: "services-tootip",
-                open: function(event, ui)
-                    {
-                        if (typeof(event.originalEvent) === 'undefined')
-                        {
-                            return false;
-                        }
-
-                        var $id = $(ui.tooltip).attr('id');
-
-                        // close any lingering tooltips
-                        if ($('div.ui-tooltip').not('#' + $id).length) {
-                            return false;
-                        }
-
-                        // ajax function to pull in data and add it to the tooltip goes here
-                    },
-                    close: function(event, ui)
-                    {
-                        ui.tooltip.hover(function()
-                        {
-                            $(this).stop(true).fadeTo(400, 1);
-                        },
-                        function()
-                        {
-                            $(this).fadeOut('400', function()
-                            {
-                                $(this).remove();
-                            });
-                        });
-                    }
-
-            });
-        }
+        // initialize tooltip for extra service
+        initUITooltip();
         if (!$('.max_avail_type_qty').length || $('.max_avail_type_qty').val() < 1) {
-            disableRoomTypeDemands(1);
             disableRoomTypeServices(1);
         } else {
-            disableRoomTypeDemands(0);
             disableRoomTypeServices(0);
         }
         $(document).trigger("QloApps:afterBookingFormInit");
@@ -1453,7 +1410,6 @@ var BookingForm = {
     },
     getFormData: function () {
         let formData = new FormData($('form#booking-form').get(0));
-        formData.append('room_type_demands', JSON.stringify(getRoomsExtraDemands()));
         formData.append('room_service_products', JSON.stringify(getRoomsServiceProducts()));
         return formData;
     },
@@ -1524,7 +1480,6 @@ function loadHotelImagesByPage(page = 1) {
         success: function(response) {
             if (response.status == true && response.message == 'HTML_OK') {
                 $('.room_info_hotel_images_wrap .images-wrap').append(response.html);
-                $('.room_info_hotel_images_wrap .hotel-images-fancybox').fancybox();
                 $('.room_info_hotel_images_wrap .btn-show-more-images').removeClass('hide');
             }
 
@@ -1591,3 +1546,11 @@ function getBookingOccupancy()
 
     return occupancy;
 }
+
+$(document).on('change', 'input[name="buying_option"]', function() {
+    if ($(this).val() == '2') {
+        $('#hotel_selection_block').hide();
+    } else {
+        $('#hotel_selection_block').show();
+    }
+});

@@ -1,0 +1,201 @@
+{*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*}
+
+<div class="row">
+    <div class="col-lg-12">
+        <table class="table" id="customer_products_details">
+            <thead>
+                <tr>
+                    <th><span class="title_box">{l s='Image'}</span></th>
+                    <th><span class="title_box">{l s='Name'}</span></th>
+                    <th><span class="title_box">{l s='Quantity'}</span></th>
+                    <th><span class="title_box">{l s='Price (Tax excl.)'}</span></th>
+                    <th><span class="title_box">{l s='Total Tax'}</span></th>
+                    <th><span class="title_box">{l s='Total Price (Tax incl.)'}</span></th>
+                    {if isset($refundReqProducts) && $refundReqProducts}
+                        <th><span class="title_box"><div>{l s='Refund'}</div><div>{l s='Refund requests'}</div></span></th>
+                    {/if}
+                    {if ($can_edit)}
+                        <th class="fixed-width-md center"><span class="title_box">{l s='Actions'}</span></th>
+                    {/if}
+                </tr>
+            </thead>
+            <tbody>
+                {if $standalone_service_products}
+                    {foreach from=$standalone_service_products item=product}
+                        {* Include product line partial *}
+                        {if ($order->getTaxCalculationMethod() == $smarty.const.PS_TAX_EXC)}
+                            {assign var=product_price value=($product['unit_price_tax_excl'])}
+                        {else}
+                            {assign var=product_price value=$product['unit_price_tax_incl']}
+                        {/if}
+                        <tr class="product-line-row" data-id_product="{$product.id_product}" data-id_order_detail="{$product.id_order_detail}" data-id_service_product_order_detail="{$product.id_service_product_order_detail}">
+                            <td>
+                                {if isset($product.image_link) && $product.image_link}
+                                    <img class="img img-responsive" src="{$product.image_link|escape:'html':'UTF-8'}" />
+                                {/if}
+                            </td>
+                            <td>
+                                <a href="{$link->getAdminLink('AdminNormalProducts')|escape:'html':'UTF-8'}&amp;id_product={$product['id_product']|intval}&amp;updateproduct">
+                                    <span class="productName">{$product['name']}{if $product['option_name']} : {$product['option_name']}{/if}</span><br />
+                                </a>
+                            </td>
+                            <td>
+                                {if $product['allow_multiple_quantity']}<span class="">{(int)$product['quantity']}</span>{else}--{/if}
+                            </td>
+                            <td class="unit_price_tax_excl">
+                                <p>{displayPrice price=$product.total_price_tax_excl currency=$currency->id}</p>
+                                <p class="help-block">{l s='Unit price'} : {displayPrice price=$product.unit_price_tax_excl currency=$currency->id}</p>
+                            </td>
+                            <td>
+                                <span>{displayPrice price=($product.total_price_tax_incl - $product.total_price_tax_excl) currency=$currency->id}</span>
+                                {if isset($use_tourism_tax) && $use_tourism_tax && isset($product.tourism_tax_status)}
+                                    {capture name='service_tax_tooltip_content'}
+                                        <div class="ui-tooltip-body">
+                                            <div class="ui-tooltip-service-tax-row">
+                                                <label class="ui-tooltip-label">{l s='Service Tax:'}</label>
+                                                <span class="ui-tooltip-elem-txt">{displayPrice price=$product.total_service_tax_only currency=$currency->id}</span>
+                                            </div>
+                                            {if $product.tourism_tax_total > 0}
+                                            <div class="ui-tooltip-tourism-tax-row">
+                                                <label class="ui-tooltip-label">{l s='Tourism Tax:'}</label>
+                                                <span class="ui-tooltip-elem-txt">{displayPrice price=$product.tourism_tax_total currency=$currency->id}</span>
+                                            </div>
+                                            {/if}
+                                        </div>
+                                    {/capture}
+                                    {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.service_tax_tooltip_content}
+                                {/if}
+                            </td>
+                            <td>
+                                <span>{displayPrice price=$product.total_price_tax_incl currency=$currency->id}</span>
+                            </td>
+                            {if (isset($refundReqProducts) && $refundReqProducts)}
+                                <td>
+                                    {if $product.refund_count}
+                                        {if $product.refund_amount}
+                                            <p class="refunded_amount">
+                                                {convertPriceWithCurrency price=$product.refund_amount currency=$currency->id}
+                                            </p>
+                                        {/if}
+                                        <p>
+                                        <a href="{$link->getAdminLink('AdminOrderRefundRequests')|escape:'html':'UTF-8'}&id_order={$order->id|intval}&id_service_product_order_detail={$product.id_service_product_order_detail|intval}" target="_blank" class="badge badge-danger">{$product.refund_count}</a>
+                                    {else}
+                                        <p>--</p>
+                                    {/if}
+                                </td>
+                            {/if}
+                            {if ($can_edit)}
+                                <td class="room_invoice" style="display: none;">
+                                {if sizeof($invoices_collection)}
+                                <select name="product_invoice" class="edit_product_invoice">
+                                    {foreach from=$invoices_collection item=invoice}
+                                    <option value="{$invoice->id}" {*{if $invoice->id == $product['id_order_invoice']}selected="selected"{/if}*}>
+                                        #{Configuration::get('PS_INVOICE_PREFIX', $current_id_lang, null, $order->id_shop)}{'%06d'|sprintf:$invoice->number}
+                                    </option>
+                                    {/foreach}
+                                </select>
+                                {else}
+                                &nbsp;
+                                {/if}
+                                </td>
+                                <td class="product_action center">
+                                    {* edit/delete controls *}
+                                    {if isset($refundReqProducts) && $refundReqProducts && $product.id_service_product_order_detail|in_array:$refundReqProducts && $product.is_cancelled}
+                                        <button href="#" class="btn btn-default delete_product_line">
+                                            <i class="icon-trash"></i>
+                                            {l s='Delete'}
+                                        </button>
+                                    {else}
+                                        <div class="btn-group pull-right">
+                                            {* <button type="button" class="btn btn-default delete_product_line">
+                                                <i class="icon-trash"></i>
+                                                {l s='Delete'}
+                                            </button> *}
+                                            <button type="button" class="btn btn-default edit_product_change_link" data-product_line_data="{$product|json_encode|escape}">
+                                                <i class="icon-pencil"></i>
+                                                {l s='Edit'}
+                                            </button>
+                                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu">
+                                                <li>
+                                                    <a href="#" class="delete_product_line">
+                                                        <i class="icon-trash"></i>
+                                                        {l s='Delete'}
+                                                    </a>
+                                                </li>
+                                                {if isset($use_tourism_tax) && $use_tourism_tax && isset($product.tourism_tax_status) && $product.tourism_tax_status != $tourism_tax_status_not_applicable && !$product.is_cancelled && !$product.is_refunded}
+                                                    {if $product.tourism_tax_status == $tourism_tax_status_applied}
+                                                        <li>
+                                                            <a href="#" class="tt-exempt-service-line" data-id_service_product_order_detail="{$product.id_service_product_order_detail|intval}" data-label="{$product.name|escape:'html':'UTF-8'}">
+                                                                <i class="icon-ban"></i>
+                                                                {l s='Exempt Tourism Tax'}
+                                                            </a>
+                                                        </li>
+                                                    {else}
+                                                        <li>
+                                                            <a href="#" class="tt-apply-service-line" data-id_service_product_order_detail="{$product.id_service_product_order_detail|intval}">
+                                                                <i class="icon-check"></i>
+                                                                {l s='Apply Tourism Tax'}
+                                                            </a>
+                                                        </li>
+                                                    {/if}
+                                                {/if}
+                                            </ul>
+                                        </div>
+                                    {/if}
+                                    {* Update controls *}
+                                    {* <button type="button" class="btn btn-default submitProductChange" style="display: none;">
+                                        <i class="icon-ok"></i>
+                                        {l s='Update'}
+                                    </button>
+                                    <button type="button" class="btn btn-default cancel_product_change_link" style="display: none;">
+                                        <i class="icon-remove"></i>
+                                        {l s='Cancel'}
+                                    </button> *}
+                                </td>
+                            {/if}
+                        </tr>
+                    {/foreach}
+                {else}
+                    <tr>
+                        {assign var=colspan value=6}
+                        {if isset($refundReqProducts) && $refundReqProducts}
+                            {assign var=colspan value=($colspan+1)}
+                        {/if}
+                        {if ($can_edit)}
+                            {assign var=colspan value=($colspan+1)}
+                        {/if}
+                        <td class="list-empty hidden-print" colspan="{$colspan}">
+                            <div class="list-empty-msg">
+                                <i class="icon-warning-sign list-empty-icon"></i>
+                                {l s='No products added yet'}
+                            </div>
+                        </td>
+                    </tr>
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>

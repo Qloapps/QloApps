@@ -21,7 +21,7 @@
  *}
 
 <div class="panel htl_conf_panel">
-	<h3 class="tab"> <i class="icon-cogs"></i>&nbsp;&nbsp; {l s='Hotel Configuration' mod='hotelreservationsystem'}</h3>
+	<h3 class="tab"> <i class="icon-cogs"></i>&nbsp;&nbsp; {l s='Property Configuration' mod='hotelreservationsystem'}</h3>
 	<div class="panel-body">
 		{foreach from=$settings_links item=settings_link}
 			<div class="btn-group setting-link-div col-sm-3 col-xs-12">

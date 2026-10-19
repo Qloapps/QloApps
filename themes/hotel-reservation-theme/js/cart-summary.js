@@ -601,8 +601,8 @@ function deleteRoomFromSummary(el)
 			+ '&op=down'
 			+ '&qty='+qty
 			+ '&id_product='+id_product
-			+ '&dateFrom='+date_from
-			+ '&dateTo='+date_to
+			+ '&date_from='+date_from
+			+ '&date_to='+date_to
 			+ '&token=' + static_token
 			+ '&allow_refresh=1',
 		success: function(jsonData)
@@ -942,8 +942,8 @@ function updateCartSummary(json)
 		$('input[name=quantity_' + key_for_blockcart_nocustom + '_hidden]').val(product_list[i].id_customization? product_list[i].quantity_without_customization : product_list[i].cart_quantity);
 		if (typeof(product_list[i].customizationQuantityTotal) !== 'undefined' && product_list[i].customizationQuantityTotal > 0)
 			$('#cart_quantity_custom_' + key_for_blockcart).html(product_list[i].customizationQuantityTotal);
-		nbrProducts += parseInt(product_list[i].quantity);
 	}
+	nbrProducts += parseInt(json.total_products_in_cart);
 
 	// Update discounts
 	var discount_count = 0;

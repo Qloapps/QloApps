@@ -167,7 +167,7 @@ class StatsCheckUp extends Module
             <ul class="nav nav-tabs">
                 <li '.($activeTab == 'hotels' ? 'class="active"' : '').'>
                     <a href="#statscheckup_hotels" data-toggle="tab">
-                        <span>'.$this->l('Hotels').'</span>
+                        <span>'.$this->l('Properties').'</span>
                     </a>
                 </li>
                 <li '.($activeTab == 'services' ? 'class="active"' : '').'>
@@ -301,7 +301,7 @@ class StatsCheckUp extends Module
             <thead>
                 <tr>
                     <th><span class="title_box active">'.$this->l('ID').'</span></th>
-                    <th><span class="title_box active">'.(!$this->id_hotel ? $this->l('Hotel') : $this->l('Room type')).'</span></th>
+                    <th><span class="title_box active">'.(!$this->id_hotel ? $this->l('Property') : $this->l('Room type')).'</span></th>
                     <th class="center"><span class="title_box active">'.$this->l('Active').'</span></th>';
         foreach ($languages as $language) {
             $hotelsHtml .= '<th><span class="title_box active">'.$this->l('Desc.').' ('.Tools::strtoupper($language['iso_code']).')</span></th>';
@@ -343,10 +343,8 @@ class StatsCheckUp extends Module
             $totals['total_rooms'] += (int)$scores['total_rooms'];
             $descriptions = $this->getDescriptions($this->id_hotel ? 'room_type' : 'hotel', $row['id_object']);
             foreach ($descriptions as $description) {
-                if (isset($description['iso_code']) && isset($description['description'])) {
-                    $row['desclength_'.$description['iso_code']] = Tools::strlen(strip_tags($description['description']));
-                }
                 if (isset($description['iso_code'])) {
+                    $row['desclength_'.$description['iso_code']] = isset($description['description']) ? Tools::strlen(strip_tags($description['description'])) : 0;
                     $scores['description_'.$description['iso_code']] = ($row['desclength_'.$description['iso_code']] < $confCheckup['DESCRIPTIONS_LT'] ? 0 : ($row['desclength_'.$description['iso_code']] > $confCheckup['DESCRIPTIONS_GT'] ? 2 : 1));
                     $totals['description_'.$description['iso_code']] += $scores['description_'.$description['iso_code']];
                 }
@@ -584,10 +582,8 @@ class StatsCheckUp extends Module
             $totals['orders'] += (int)$scores['orders'];
             $descriptions = $this->getDescriptions('service', $row['id_object']);
             foreach ($descriptions as $description) {
-                if (isset($description['iso_code']) && isset($description['description_short'])) {
-                    $row['desclength_'.$description['iso_code']] = Tools::strlen(strip_tags($description['description_short']));
-                }
                 if (isset($description['iso_code'])) {
+                    $row['desclength_'.$description['iso_code']] = isset($description['description_short']) ? Tools::strlen(strip_tags($description['description_short'])) : 0;
                     $scores['description_'.$description['iso_code']] = ($row['desclength_'.$description['iso_code']] < $confCheckup['DESCRIPTIONS_SHORT_LT'] ? 0 : ($row['desclength_'.$description['iso_code']] > $confCheckup['DESCRIPTIONS_SHORT_GT'] ? 2 : 1));
                     $totals['description_'.$description['iso_code']] += $scores['description_'.$description['iso_code']];
                 }

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="United States" version="1.0">
-	
 	<languages>
 		<language iso_code="en" />
 	</languages>
-	
+
 	<currencies>
-		<currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" conversion_rate="1.31153" format="1" decimals="1" />
+		<currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" format="1" decimals="1" />
 	</currencies>
 	<taxes>
 		<tax id="1" name="Sales-taxes US-AL 4%" rate="4" />
@@ -229,6 +228,7 @@
 		<state name="Colorado" iso_code="CO" country="US" zone="North America" />
 		<state name="Connecticut" iso_code="CT" country="US" zone="North America" />
 		<state name="Delaware" iso_code="DE" country="US" zone="North America" />
+		<state name="District of Columbia" iso_code="DC" country="US" zone="North America" />
 		<state name="Florida" iso_code="FL" country="US" zone="North America" />
 		<state name="Georgia" iso_code="GA" country="US" zone="North America" />
 		<state name="Hawaii" iso_code="HI" country="US" zone="North America" />
@@ -252,6 +252,7 @@
 		<state name="New Hampshire" iso_code="NH" country="US" zone="North America" />
 		<state name="New Jersey" iso_code="NJ" country="US" zone="North America" />
 		<state name="New Mexico" iso_code="NM" country="US" zone="North America" />
+		<state name="New York" iso_code="NY" country="US" zone="North America" />
 		<state name="North Carolina" iso_code="NC" country="US" zone="North America" />
 		<state name="North Dakota" iso_code="ND" country="US" zone="North America" />
 		<state name="Ohio" iso_code="OH" country="US" zone="North America" />
@@ -270,9 +271,13 @@
 		<state name="West Virginia" iso_code="WV" country="US" zone="North America" />
 		<state name="Wisconsin" iso_code="WI" country="US" zone="North America" />
 		<state name="Wyoming" iso_code="WY" country="US" zone="North America" />
+		<!-- Outlying areas or islands -->
+		<state name="American Samoa" iso_code="AS" country="US" zone="North America" />
+		<state name="Guam" iso_code="GU" country="US" zone="North America" />
+		<state name="Northern Mariana Islands" iso_code="MP" country="US" zone="North America" />
 		<state name="Puerto Rico" iso_code="PR" country="US" zone="North America" />
+		<state name="US Minor Outlying Islands" iso_code="UM" country="US" zone="North America" />
 		<state name="US Virgin Islands" iso_code="VI" country="US" zone="North America" />
-		<state name="District of Columbia" iso_code="DC" country="US" zone="North America" />
 	</states>
 	<units>
 		<unit type="weight" value="lb" />
@@ -289,4 +294,3 @@
 	</configurations>
 	<group_default price_display_method="1" />
 </localizationPack>
-

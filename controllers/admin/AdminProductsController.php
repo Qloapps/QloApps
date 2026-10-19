@@ -107,11 +107,11 @@ class AdminProductsControllerCore extends AdminController
             'Images' => $this->l('Images'),
             'ServiceProduct' => $this->l('Service Products'),
             // 'Associations' => $this->l('Associations'),
+            'Amenities' => $this->l('Amenities'),
             'Features' => $this->l('Features'),
             'Configuration' => $this->l('Rooms'),
             'Occupancy' => $this->l('Occupancy'),
             'LengthOfStay' => $this->l('Length of Stay'),
-            'AdditionalFacilities' => $this->l('Additional Facilities'),
         );
 
         if ($this->context->shop->getContext() != Shop::CONTEXT_GROUP) {
@@ -121,12 +121,12 @@ class AdminProductsControllerCore extends AdminController
                 'Seo' => 2,
                 // 'Associations' => 3,
                 'Images' => 4,
-                'Features' => 5,
-                'Configuration' => 6,
-                'Occupancy' => 7,
+                'Amenities' => 5,
+                'Features' => 6,
+                'Configuration' => 7,
+                'Occupancy' => 8,
                 'ServiceProduct' => 9,
                 'LengthOfStay' => 10,
-                'AdditionalFacilities' => 11,
             ));
         }
 
@@ -243,8 +243,10 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
 				LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
 				LEFT JOIN `'._DB_PREFIX_.'address` aa ON (aa.`id_hotel` = hb.`id`)
+				LEFT JOIN `'._DB_PREFIX_.'htl_property_type_lang` hptl ON (hptl.`id_htl_property_type` = hb.`id_property_type` AND hptl.`id_lang` = '.(int) $this->context->language->id.')
+				LEFT JOIN `'._DB_PREFIX_.'room_type_selling_object_lang` rsol ON (rsol.`id_room_type_selling_object` = a.`id_selling_object` AND rsol.`id_lang` = '.(int) $this->context->language->id.')
+				LEFT JOIN `'._DB_PREFIX_.'tax_rules_group` ttrg ON (ttrg.`id_tax_rules_group` = a.`id_tourism_tax_rules_group`)
 				LEFT JOIN `'._DB_PREFIX_.'feature_product` fp ON (fp.`id_product` = a.`id_product`)
-				LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtd ON (hrtd.`id_product` = a.`id_product`)
 				LEFT JOIN (
                     SELECT rsp.*, GROUP_CONCAT(pl.`name`) AS service_products
                     FROM `'._DB_PREFIX_.'htl_room_type_service_product` rsp
@@ -255,9 +257,9 @@ class AdminProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'htl_advance_payment` hap ON (hap.`id_product` = a.`id_product`)';
 
         $this->_select .= ' a.`show_at_front`, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
-        $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, ';
+        $this->_select .= 'hrt.`adults`, hrt.`children`, hrt.`max_guests`, hb.`id` as id_hotel, aa.`city`, hbl.`hotel_name`, hptl.`name` AS `property_type`, rsol.`name` AS `selling_object`, ttrg.`name` AS `tourism_tax_rules_group`, ';
         $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
-        $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
+        $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`, a.`id_tourism_tax_rules_group`';
         $this->_select .= ', IFNULL(hap.`active`, 0) AS advance_payment';
         $this->_select .= ', IF(IFNULL(hap.`active`, 0), 1, 0) badge_success, IF(IFNULL(hap.`active`, 0), 0, 1) badge_danger ';
 
@@ -304,7 +306,7 @@ class AdminProductsControllerCore extends AdminController
             }
 
             $this->fields_list['hotel_name'] = array(
-                'title' => $this->l('Hotel'),
+                'title' => $this->l('Property'),
                 'type' => 'select',
                 'multiple' => true,
                 'operator' => 'or',
@@ -315,6 +317,48 @@ class AdminProductsControllerCore extends AdminController
                 'visible_default' => true,
             );
         }
+        $propertyTypes = array();
+        foreach (HotelPropertyType::getPropertyTypes($this->context->language->id) as $propertyType) {
+            $propertyTypes[$propertyType['id_property_type']] = $propertyType['name'];
+        }
+        $this->fields_list['property_type'] = array(
+            'title' => $this->l('Property type'),
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
+            'filter_key' => 'hb!id_property_type',
+            'list' => $propertyTypes,
+            'optional' => true,
+            'class' => 'chosen',
+        );
+        $sellingObjects = array();
+        foreach (RoomTypeSellingObject::getRoomTypeSellingObjects($this->context->language->id) as $sellingObject) {
+            $sellingObjects[$sellingObject['id_room_type_selling_object']] = $sellingObject['name'];
+        }
+        $this->fields_list['selling_object'] = array(
+            'title' => $this->l('Selling object'),
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
+            'filter_key' => 'a!id_selling_object',
+            'list' => $sellingObjects,
+            'optional' => true,
+            'class' => 'chosen',
+        );
+        $tourismTaxRulesGroups = array();
+        foreach (TaxRulesGroup::getTaxRulesGroups(true, true) as $taxRulesGroup) {
+            $tourismTaxRulesGroups[$taxRulesGroup['id_tax_rules_group']] = $taxRulesGroup['name'];
+        }
+        $this->fields_list['tourism_tax_rules_group'] = array(
+            'title' => $this->l('Tourism tax rule'),
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
+            'filter_key' => 'a!id_tourism_tax_rules_group',
+            'list' => $tourismTaxRulesGroups,
+            'optional' => true,
+            'class' => 'chosen',
+        );
         $this->fields_list['adults'] = array(
             'title' => $this->l('Adults'),
             'filter_key' => 'hrt!adults',
@@ -429,9 +473,12 @@ class AdminProductsControllerCore extends AdminController
         );
 
         $objProduct = new Product();
-        $hotelServiceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-        $roomTypeServiceProducts = $objProduct->getServiceProducts(null, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-        $allServiceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+        $allServiceProducts = array_values(array_filter(
+            $objProduct->getServiceProducts(null),
+            function ($serviceProduct) {
+                return Product::isSellableWithRoomType($serviceProduct['id_product']);
+            }
+        ));
         $serviceProducts = array();
         foreach ($allServiceProducts as $serviceProduct) {
             $serviceProducts[$serviceProduct['id_product']] = $serviceProduct['name'];
@@ -444,23 +491,6 @@ class AdminProductsControllerCore extends AdminController
             'operator' => 'and',
             'filter_key' => 'hrtsp!id_product',
             'list' => $serviceProducts,
-            'displayed' => false,
-        );
-
-        $additionalFacilities = array();
-        $objHotelRoomTypeGlobalDemand = new HotelRoomTypeGlobalDemand();
-        $demands = $objHotelRoomTypeGlobalDemand->getAllDemands();
-        foreach ($demands as $demand) {
-            $additionalFacilities[$demand['id_global_demand']] = $demand['name'];
-        }
-        $this->fields_list['id_global_demand'] = array(
-            'title' => $this->l('Additional Facilities'),
-            'align' => 'text-center',
-            'type' => 'select',
-            'multiple' => true,
-            'operator' => 'and',
-            'filter_key' => 'hrtd!id_global_demand',
-            'list' => $additionalFacilities,
             'displayed' => false,
         );
 
@@ -677,13 +707,13 @@ class AdminProductsControllerCore extends AdminController
     {
         $prefix = $this->getCookieFilterPrefix();
         $orderByPriceFinal = (empty($orderBy) ? ($this->context->cookie->__get($prefix.$this->table.'Orderby') ? $this->context->cookie->__get($prefix.$this->table.'Orderby') : 'id_'.$this->table) : $orderBy);
-        $orderWayPriceFinal = (empty($orderWay) ? ($this->context->cookie->__get($prefix.$this->table.'Orderway') ? $this->context->cookie->__get($prefix.$this->table.'Orderby') : 'ASC') : $orderWay);
+        $orderWayPriceFinal = (empty($orderWay) ? ($this->context->cookie->__get($prefix.$this->table.'Orderway') ? $this->context->cookie->__get($prefix.$this->table.'Orderway') : 'ASC') : $orderWay);
         if ($orderByPriceFinal == 'price_final') {
             $orderBy = 'id_'.$this->table;
             $orderWay = 'ASC';
         }
         if ($this->action == 'export' && empty($this->_listsql)) {
-            $this->_select .= ' , trg.`name` AS `id_tax_rules_group`, `features`, hrtdl.`global_demands`';
+            $this->_select .= ' , trg.`name` AS `id_tax_rules_group`, `features`';
             $this->_join .= ' LEFT JOIN `'._DB_PREFIX_.'tax_rules_group` trg
                 ON trg.`id_tax_rules_group` = a.`id_tax_rules_group`
                 LEFT JOIN (SELECT GROUP_CONCAT(fpl.`name`) AS features, fp.`id_product`
@@ -693,14 +723,6 @@ class AdminProductsControllerCore extends AdminController
                     WHERE fpl.`id_lang`='.(int) $this->context->language->id.'
                     GROUP BY fp.`id_product`
                 ) AS fpl ON (a.`id_product` = fpl.`id_product`)';
-
-            $this->_join .= ' LEFT JOIN (SELECT hrtgd.`id_product`, `id_lang`, GROUP_CONCAT(`name`) AS `global_demands`
-                    FROM `'._DB_PREFIX_.'htl_room_type_global_demand_lang` hrtgdl
-                    LEFT JOIN `'._DB_PREFIX_.'htl_room_type_demand` hrtgd
-                    ON hrtgd.`id_global_demand` = hrtgdl.`id_global_demand`
-                    WHERE `id_lang`='.(int) $this->context->language->id.'
-                    GROUP BY hrtgd.`id_product`
-                ) AS hrtdl ON (hrtdl.`id_product` = a.`id_product`)';
 
             $this->fields_list = array_merge($this->fields_list, array(
                    'id_tax_rules_group' => array(
@@ -713,35 +735,59 @@ class AdminProductsControllerCore extends AdminController
                     'service_products' => array(
                         'title' => $this->l('Services Products'),
                     ),
-                    'global_demands' => array(
-                        'title' => $this->l('Additional Facilities'),
-                    )
                 )
             );
 
             unset($this->fields_list['id_category_default']);
-            unset($this->fields_list['id_global_demand']);
             unset($this->fields_list['id_feature']);
             unset($this->fields_list['id_service_product']);
         }
-        parent::getList($id_lang, $orderBy, $orderWay, $start, $limit, $this->context->shop->id);
+        parent::getList($id_lang, $orderBy, $orderWay, $start, $limit, $id_lang_shop ?: $this->context->shop->id);
 
         /* update product quantity with attributes ...*/
         $nb = count($this->_list);
         if ($this->_list) {
             $context = $this->context->cloneContext();
             $context->shop = clone($context->shop);
+            $isAllShopsContext = (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP);
+            $priceDisplayPrecision = (int) Configuration::get('PS_PRICE_DISPLAY_PRECISION');
+            $useTourismTax = (bool) Configuration::get('QLO_USE_TOURISM_TAX');
+            $todayDate = date('Y-m-d');
+            $tomorrowDate = date('Y-m-d', strtotime('+1 day', strtotime($todayDate)));
+
             /* update product final price */
             for ($i = 0; $i < $nb; $i++) {
-                if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP) {
+                if ($isAllShopsContext) {
                     $context->shop = new Shop((int)$this->_list[$i]['id_shop_default']);
                 }
 
                 // convert price with the currency from context
                 $this->_list[$i]['price'] = Tools::convertPrice($this->_list[$i]['price'], $this->context->currency, true, $this->context);
                 $this->_list[$i]['price_tmp'] = Product::getPriceStatic($this->_list[$i]['id_product'], true, null,
-                    (int)Configuration::get('PS_PRICE_DISPLAY_PRECISION'), null, false, true, 1, true, null, null, null, $nothing, true, true,
+                    $priceDisplayPrecision, null, false, true, 1, true, null, null, null, $nothing, true, true,
                     $context);
+
+                $idTourismTaxRulesGroup = (int) $this->_list[$i]['id_tourism_tax_rules_group'];
+                $idHotel = (int) $this->_list[$i]['id_hotel'];
+                if ($useTourismTax && $idTourismTaxRulesGroup && $idHotel) {
+                    $idProduct = $this->_list[$i]['id_product'];
+                    $vatAddress = new Address(HotelRoomType::getHotelIdAddressByIdProduct($idProduct));
+                    $vatCalculator = TaxManagerFactory::getManager($vatAddress, Product::getIdTaxRulesGroupByIdProduct($idProduct))->getTaxCalculator();
+                    $unitPriceTaxExcl = $vatCalculator->removeTaxes($this->_list[$i]['price_tmp']);
+
+                    $hotelTaxContext = TaxConfiguration::resolveHotelAddressAndCollectionType($idHotel, $vatAddress);
+                    $taxCalculator = TaxManagerFactory::getManager($hotelTaxContext['address'], $idTourismTaxRulesGroup)->getTaxCalculator();
+                    $this->_list[$i]['price_tmp'] += $taxCalculator->getTaxesTotalAmount(
+                        $unitPriceTaxExcl,
+                        $todayDate,
+                        1,
+                        1,
+                        array(),
+                        $hotelTaxContext['collectionType'],
+                        1,
+                        $this->context->currency->id
+                    );
+                }
             }
         }
 
@@ -950,18 +996,13 @@ class AdminProductsControllerCore extends AdminController
                     && Product::duplicateCustomizationFields($id_product_old, $product->id)
                     && Product::duplicateTags($id_product_old, $product->id)
                     && Product::duplicateDownload($id_product_old, $product->id)
+                    && HotelAdvancedPayment::duplicateAdvancePayment($id_product_old, $product->id)
                 ) {
                     $obj_hotel_room_type = new HotelRoomType();
                     $room_type_info = $obj_hotel_room_type->getRoomTypeInfoByIdProduct($id_product_old);
                     $id_room_type_old = $room_type_info['id'];
                     if (!$id_hotel_new) {
                         $id_hotel_new = $room_type_info['id_hotel'];
-                    }
-
-                    $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-                    if ($roomTypeBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($id_product_old)) {
-                        $roomTypeBedTypes = array_column($roomTypeBedTypes, 'id_bed_type');
-                        $objHotelRoomTypeBedType->updateRoomTypeBedTypes($roomTypeBedTypes, $product->id);
                     }
 
                     if ($product->hasAttributes()) {
@@ -984,11 +1025,6 @@ class AdminProductsControllerCore extends AdminController
                             $id_hotel_new
                         )) {
                             $this->errors[] = Tools::displayError('An error occurred while duplicating rooms.');
-                        }
-                        if (!HotelRoomTypeDemand::duplicateRoomTypeDemands($id_product_old, $product->id)) {
-                            $this->errors[] = Tools::displayError(
-                                'An error occurred while duplicating additional facilities.'
-                            );
                         }
                     } else {
                         $this->errors[] = Tools::displayError('An error occurred while duplicating room type.');
@@ -1157,32 +1193,43 @@ class AdminProductsControllerCore extends AdminController
         }
 
         if (Validate::isLoadedObject($product = new Product((int)Tools::getValue('id_product')))) {
-            // delete all objects
-            $product->deleteFeatures();
-
-            // add new objects
-            $languages = Language::getLanguages(false);
-            foreach ($_POST as $key => $val) {
-                if (preg_match('/^feature_([0-9]+)_check/i', $key, $match)) {
-                    if ($val) {
-                        $product->addFeaturesToDB($match[1], $val);
-                    } else {
-                        if ($default_value = $this->checkFeatures($languages, $match[1])) {
-                            $id_value = $product->addFeaturesToDB($match[1], 0, 1);
-                            foreach ($languages as $language) {
-                                if ($cust = Tools::getValue('custom_'.$match[1].'_'.(int)$language['id_lang'])) {
-                                    $product->addFeaturesCustomToDB($id_value, (int)$language['id_lang'], $cust);
-                                } else {
-                                    $product->addFeaturesCustomToDB($id_value, (int)$language['id_lang'], $default_value);
-                                }
-                            }
-                        }
-                    }
-                }
+            if (!$this->saveRoomTypeFeatures($product)) {
+                $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
             }
         } else {
             $this->errors[] = Tools::displayError('A room type must be created before adding features.');
         }
+    }
+
+    /**
+     * Save assigned core feature values for a room type.
+     *
+     * @param Product $product
+     *
+     * @return bool
+     */
+    protected function saveRoomTypeFeatures(Product $product)
+    {
+        $product->deleteFeatures();
+
+        $featureValues = Tools::getValue('feature_values', array());
+        if (!is_array($featureValues) || empty($featureValues)) {
+            return true;
+        }
+
+        foreach ($featureValues as $idFeature => $selectedValues) {
+            $idFeature = (int)$idFeature;
+            if (!$idFeature) {
+                continue;
+            }
+            foreach (array_unique(array_map('intval', $selectedValues)) as $idFeatureValue) {
+                if ($idFeatureValue) {
+                    $product->addFeaturesToDB($idFeature, $idFeatureValue);
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -1262,6 +1309,10 @@ class AdminProductsControllerCore extends AdminController
 
                 if ($payment_type == 1) {
                     $adv_pay_value = Tools::getValue('adv_pay_percent');
+                    if ($adv_pay_value > 100) {
+                        $this->errors[] = Tools::displayError('Advance payment percentage cannot be more than 100.');
+                        return false;
+                    }
                 } elseif ($payment_type == 2) {
                     $adv_pay_value = Tools::getValue('adv_pay_amount');
                 }
@@ -1939,14 +1990,29 @@ class AdminProductsControllerCore extends AdminController
         $this->copyFromPost($this->object, $this->table);
         $this->object->booking_product = true;
         if ($this->object->add()) {
-            $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-            $objHotelRoomTypeBedType->updateRoomTypeBedTypes(Tools::getValue('id_bed_types'), $this->object->id);
             // associateroom type to hotel
             // if ($this->object->is_virtual) {
 
             // }
 
             $this->assignRoomType($this->object);
+            if ($this->isTabSubmitted('Amenities')) {
+                $categories = HotelAmenities::getCategories();
+                if ($categories && !HotelAmenities::getAmenities()) {
+                    $this->errors[] = Tools::displayError('No amenities have been created. Please add amenities to at least one category before assigning them.');
+                    return false;
+                }
+                $selectedAmenities = Tools::getValue('room_type_amenities', array());
+                $featuredAmenities = Tools::getValue('featured_amenities', array());
+                if (!(new HotelRoomTypeAmenities())->saveRoomTypeAmenities((int)$this->object->id, $selectedAmenities, $featuredAmenities)) {
+                    $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
+                    return false;
+                }
+            }
+            if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatures($this->object)) {
+                $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
+                return false;
+            }
 
             PrestaShopLogger::addLog(sprintf($this->l('%s addition', 'AdminTab', false, false), $this->className), 1, null, $this->className, (int)$this->object->id, true, (int)$this->context->employee->id);
 
@@ -2189,8 +2255,20 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if ($object->update()) {
-                    $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-                    $objHotelRoomTypeBedType->updateRoomTypeBedTypes(Tools::getValue('id_bed_types'), $object->id);
+                    if ($this->isTabSubmitted('Amenities')) {
+                        $selectedAmenities = Tools::getValue('room_type_amenities', array());
+                        $featuredAmenities = Tools::getValue('featured_amenities', array());
+                        if (!(new HotelRoomTypeAmenities())->saveRoomTypeAmenities((int)$object->id, $selectedAmenities, $featuredAmenities)) {
+                            $this->errors[] = Tools::displayError('An error occurred while saving room type amenities.');
+                            return false;
+                        }
+                    }
+                    if ($this->isTabSubmitted('Features') && !$this->saveRoomTypeFeatures($object)) {
+                        $this->errors[] = Tools::displayError('An error occurred while saving room type features.');
+                        return false;
+                    }
+
+                    $this->assignRoomType($object);
 
                     // update position in category
                     $object->setPositionInCategory(Tools::getValue('category_position'));
@@ -2213,9 +2291,6 @@ class AdminProductsControllerCore extends AdminController
                         }
                         if ($this->isTabSubmitted('Suppliers')) {
                             // $this->processSuppliers();
-                        }
-                        if ($this->isTabSubmitted('Features')) {
-                            $this->processFeatures();
                         }
                         if ($this->isTabSubmitted('Combinations')) {
                             $this->processProductAttribute();
@@ -2245,9 +2320,6 @@ class AdminProductsControllerCore extends AdminController
                         }
                         if ($this->isTabSubmitted('Configuration')) {
                             $this->processConfiguration();
-                        }
-                        if ($this->isTabSubmitted('AdditionalFacilities')) {
-                            $this->processAdditionalFacilities();
                         }
 
                         // $this->updatePackItems($object);
@@ -2362,6 +2434,7 @@ class AdminProductsControllerCore extends AdminController
             $saveShort = Tools::getValue('description_short');
             $_POST['description_short'] = strip_tags(Tools::getValue('description_short'));
         }
+        $_POST['id_selling_object'] = Tools::getValue('id_selling_object') ?? 0;
 
         // Check description short size without html
         $limit = (int)Configuration::get('PS_SHORT_DESC_LIMIT');
@@ -3128,8 +3201,12 @@ class AdminProductsControllerCore extends AdminController
         if (Validate::isLoadedObject($product)) {
             if ($id_hotel = Tools::getValue('id_hotel')) {
                 $objRoomType = new HotelRoomType();
+                if ($roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($product->id)) {
+                    $objRoomType = new HotelRoomType((int)$roomTypeInfo['id']);
+                }
                 $objRoomType->id_product = $product->id;
                 $objRoomType->id_hotel = $id_hotel;
+                $objRoomType->id_selling_object = (int)$product->id_selling_object;
                 $objRoomType->save();
             }
         }
@@ -3186,7 +3263,10 @@ class AdminProductsControllerCore extends AdminController
                             'product' => $obj,
                             'htl_info' => $hotelInfo,
                             'rm_status' => $roomStatus,
-                            'locale' => $this->context->language->iso_code
+                            'id_lang' => $this->context->language->id,
+                            'locale' => $this->context->language->iso_code,
+                            'room_type_acronym' => preg_replace(
+                                '/(?:(?<!^)(?<!\s)\p{L}|\P{L})+/u','',(string) $obj->name[$this->context->language->id]),
                         )
                     );
                 } else {
@@ -3237,9 +3317,12 @@ class AdminProductsControllerCore extends AdminController
 
             $objRoomType = new HotelRoomType();
             if ($hotelRoomType = $objRoomType->getRoomTypeInfoByIdProduct($obj->id)) {
-                $hotelServiceProducts = $obj->getServiceProducts(null, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-                $roomTypeServiceProducts = $obj->getServiceProducts(null, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $allServiceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                $allServiceProducts = array_values(array_filter(
+                    $obj->getServiceProducts(null),
+                    function ($serviceProduct) {
+                        return Product::isSellableWithRoomType($serviceProduct['id_product']);
+                    }
+                ));
 
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $objRoomTypeServiceProductPrice = new RoomTypeServiceProductPrice();
@@ -3285,7 +3368,7 @@ class AdminProductsControllerCore extends AdminController
                             if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
                                 $serviceProductPriceInfo['id_tax_rules_group'],
                                 $this->context->language->id
-                            ))) {
+                            )) && !$objTaxRuleGroup->is_tourism_tax_rule_group) {
                                 $associationInfo['tax_rules_group_name'] = $objTaxRuleGroup->name;
                             }
                             $associationInfo['id_room_type_service_product_price'] = $serviceProductPriceInfo['id_room_type_service_product_price'];
@@ -3295,7 +3378,7 @@ class AdminProductsControllerCore extends AdminController
                         if (Validate::isLoadedObject($objTaxRuleGroup = new TaxRulesGroup(
                             $objProduct->id_tax_rules_group,
                             $this->context->language->id
-                        ))) {
+                        )) && !$objTaxRuleGroup->is_tourism_tax_rule_group) {
                             $associationInfo['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
                         }
 
@@ -3309,7 +3392,7 @@ class AdminProductsControllerCore extends AdminController
                         if (Validate::isLoadedObject($objTaxRulesGroup = new TaxRulesGroup(
                             $serviceProduct['id_tax_rules_group'],
                             $this->context->language->id
-                        ))) {
+                        )) && !$objTaxRulesGroup->is_tourism_tax_rule_group) {
                             $serviceProduct['tax_rules_group_name'] = $objTaxRulesGroup->name;
                         }
 
@@ -3816,136 +3899,6 @@ class AdminProductsControllerCore extends AdminController
         die(json_encode($response));
     }
 
-    public function initFormAdditionalFacilities($obj)
-    {
-        $data = $this->createTemplate($this->tpl_form);
-
-        if ($obj->id) {
-            $objGlobalDemand = new HotelRoomTypeGlobalDemand();
-            $allDemands = $objGlobalDemand->getAllDemands();
-            foreach($allDemands as &$demand) {
-                if ($demand['id_tax_rules_group'] == 0) {
-                    $demand['default_tax_rules_group_name'] = 'No tax';
-                } else {
-                    $objTaxRuleGroup = new TaxRulesGroup(
-                        $demand['id_tax_rules_group'],
-                        $this->context->language->id
-                    );
-                    $demand['default_tax_rules_group_name'] = $objTaxRuleGroup->name;
-                }
-            }
-            $objCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-
-            // get room type additional facilities
-            $objRoomDemand = new HotelRoomTypeDemand();
-            $selectedDemands = $objRoomDemand->getRoomTypeDemands($obj->id, 0, 0);
-
-            $data->assign(array(
-                'product' => $obj,
-                'selectedDemands' => $selectedDemands,
-                'allDemands' => $allDemands,
-                'defaultcurrencySign' => $objCurrency->sign,
-                'idDefaultcurrency' => $objCurrency->id,
-            ));
-        } else {
-            $this->displayWarning($this->l('You must save this room type before managing additional facilities.'));
-        }
-
-        $this->tpl_form_vars['custom_form'] = $data->fetch();
-    }
-
-    public function processAdditionalFacilities()
-    {
-        if ($idProduct = Tools::getValue('id_product')) {
-            $errors = array();
-            $objRoomTypeDemand = new HotelRoomTypeDemand();
-            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-            // first delete all the previously saved prices and demands of this room type
-            $objRoomTypeDemand->deleteRoomTypeDemands($idProduct);
-            $objRoomTypeDemandPrice->deleteRoomTypeDemandPrices($idProduct);
-            if ($selectedDemands = Tools::getValue('selected_demand')) {
-                $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
-                foreach ($selectedDemands as $idGlobalDemand) {
-                    if (Validate::isLoadedObject($objGlobalDemand = new HotelRoomTypeGlobalDemand($idGlobalDemand))) {
-                        // save selected demands for this room type
-                        $objRoomTypeDemand = new HotelRoomTypeDemand();
-                        $objRoomTypeDemand->id_product = $idProduct;
-                        $objRoomTypeDemand->id_global_demand = $idGlobalDemand;
-                        $objRoomTypeDemand->save();
-
-                        // save selected demands prices for this room type
-                        $demandPrice = Tools::getValue('demand_price_'.$idGlobalDemand);
-                        if (Validate::isPrice($demandPrice)) {
-                            if ($objGlobalDemand->price != $demandPrice) {
-                                $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                                $objRoomTypeDemandPrice->id_product = $idProduct;
-                                $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
-                                $objRoomTypeDemandPrice->id_option = 0;
-                                $objRoomTypeDemandPrice->price = $demandPrice;
-                                $objRoomTypeDemandPrice->save();
-                            }
-                        } else {
-                            $errors[] = Tools::displayError('Invalid demand price of facility.').
-                            ' : '.$objGlobalDemand->name[$this->context->language->id];
-                        }
-                        if ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($idGlobalDemand)) {
-                            foreach ($advOptions as $option) {
-                                if (Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($option['id']))) {
-                                    $optionPrice = Tools::getValue('option_price_'.$option['id']);
-                                    if (Validate::isPrice($optionPrice)) {
-                                        if ($optionPrice != $objAdvOption->price) {
-                                            $objRoomTypeDemandPrice = new HotelRoomTypeDemandPrice();
-                                            $objRoomTypeDemandPrice->id_product = $idProduct;
-                                            $objRoomTypeDemandPrice->id_global_demand = $idGlobalDemand;
-                                            $objRoomTypeDemandPrice->id_option = $option['id'];
-                                            $objRoomTypeDemandPrice->price = $optionPrice;
-                                            $objRoomTypeDemandPrice->save();
-                                        }
-                                    } else {
-                                        $errors[] = Tools::displayError('Invalid price of advanced option: ').$objAdvOption->name[$this->context->language->id];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (count($errors)) {
-                    $this->warnings[] = Tools::displayError('Invalid price values for additional facilities were not saved. Please correct them and try again.');
-                    $this->errors = array_merge($this->errors, $errors);
-                }
-
-                $objCartBookingData = new HotelCartBookingData();
-                if ($cartExtraDemands = $objCartBookingData->getCartExtraDemands(0, $idProduct)) {
-                    // delete the demands from cart if not available in cart
-                    $objRoomDemand = new HotelRoomTypeDemand();
-                    $roomTypeDemandIds = array();
-                    if ($roomTypeDemands = $objRoomDemand->getRoomTypeDemands($idProduct)) {
-                        $roomTypeDemandIds = array_keys($roomTypeDemands);
-                    }
-                    foreach ($cartExtraDemands as &$demandInfo) {
-                        if (isset($demandInfo['extra_demands']) && $demandInfo['extra_demands']) {
-                            $cartChanged = 0;
-                            foreach ($demandInfo['extra_demands'] as $key => $demand) {
-                                if (!in_array($demand['id_global_demand'], $roomTypeDemandIds)) {
-                                    $cartChanged = 1;
-                                    unset($demandInfo['extra_demands'][$key]);
-                                }
-                            }
-                            if ($cartChanged) {
-                                if (Validate::isLoadedObject(
-                                    $objCartBooking = new HotelCartBookingData($demandInfo['id'])
-                                )) {
-                                    $objCartBooking->extra_demands = json_encode($demandInfo['extra_demands']);
-                                    $objCartBooking->save();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * @param Product $obj
      *
@@ -4172,6 +4125,25 @@ class AdminProductsControllerCore extends AdminController
             $htlFeaturePrices = new HotelRoomTypeFeaturePricing();
             $productFeaturePrices = $htlFeaturePrices->getFeaturePricesbyIdProduct($product->id);
             $data->assign('productFeaturePrices', $productFeaturePrices);
+        }
+
+        if (Configuration::get('QLO_USE_TOURISM_TAX') && !Tax::excludeTaxeOption()) {
+            $tourismTaxRulesGroups = TaxRulesGroup::getTaxRulesGroupsForOptions(true, true);
+            $data->assign('tourismTaxRulesGroups', $tourismTaxRulesGroups);
+            $data->assign('id_tourism_tax_rules_group', isset($product->id_tourism_tax_rules_group) ? (int) $product->id_tourism_tax_rules_group : 0);
+
+            $roomTypeInfo = (new HotelRoomType())->getRoomTypeInfoByIdProduct((int) $product->id);
+            $idHotel = $roomTypeInfo ? (int) $roomTypeInfo['id_hotel'] : 0;
+            $collectionType = TaxConfiguration::resolveHotelAddressAndCollectionType($idHotel, $address)['collectionType'];
+
+            $tourismTaxRates = array();
+            foreach ($tourismTaxRulesGroups as $tourismTaxRulesGroup) {
+                if (!$tourismTaxRulesGroup['id_tax_rules_group']) {
+                    continue;
+                }
+                $tourismTaxRates[$tourismTaxRulesGroup['id_tax_rules_group']] = TaxConfiguration::getPreviewParams($tourismTaxRulesGroup['id_tax_rules_group'], $address, $this->context->language->id, $collectionType);
+            }
+            $data->assign('tourismTaxRatesByGroup', $tourismTaxRates);
         }
 
         $this->tpl_form_vars['custom_form'] = $data->fetch();
@@ -4612,13 +4584,10 @@ class AdminProductsControllerCore extends AdminController
             $data->assign('htl_full_info', $hotelFullInfo);
         }
 
-        $objHotelBedType = new HotelBedType();
-        $bedTypes = $objHotelBedType->getAllBedTypes($this->context->language->id);
-        $data->assign('bed_types_info', $bedTypes);
-        $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
-        if ($selectedBedTypes = $objHotelRoomTypeBedType->getRoomTypeBedTypes($product->id)) {
-            $selectedBedTypes = array_column($selectedBedTypes, 'id_bed_type');
-            $data->assign('selected_bed_types', $selectedBedTypes);
+        $roomTypeSellingObjects = RoomTypeSellingObject::getRoomTypeSellingObjects($this->context->language->id);
+        $data->assign('selling_object_info', $roomTypeSellingObjects);
+        if (!empty($product->id_selling_object)) {
+            $data->assign('selected_room_type_selling_object', $product->id_selling_object);
         }
 
         $this->tpl_form_vars['product'] = $product;
@@ -4862,37 +4831,17 @@ class AdminProductsControllerCore extends AdminController
         } else {
             if ($obj->id) {
                 if ($this->product_exists_in_shop) {
-                    $features = Feature::getFeatures($this->context->language->id, (Shop::isFeatureActive() && Shop::getContext() == Shop::CONTEXT_SHOP));
-
-                    foreach ($features as $k => $tab_features) {
-                        $features[$k]['current_item'] = false;
-                        $features[$k]['val'] = array();
-
-                        $custom = true;
-                        foreach ($obj->getFeatures() as $tab_products) {
-                            if ($tab_products['id_feature'] == $tab_features['id_feature']) {
-                                $features[$k]['current_item'] = $tab_products['id_feature_value'];
-                            }
-                        }
-
-                        $features[$k]['featureValues'] = FeatureValue::getFeatureValuesWithLang($this->context->language->id, (int)$tab_features['id_feature']);
-                        if (count($features[$k]['featureValues'])) {
-                            foreach ($features[$k]['featureValues'] as $value) {
-                                if ($features[$k]['current_item'] == $value['id_feature_value']) {
-                                    $custom = false;
-                                }
-                            }
-                        }
-
-                        if ($custom) {
-                            $feature_values_lang = FeatureValue::getFeatureValueLang($features[$k]['current_item']);
-                            foreach ($feature_values_lang as $feature_value) {
-                                $features[$k]['val'][$feature_value['id_lang']] = $feature_value;
-                            }
-                        }
+                    $features = Product::getRoomTypeFeatureTreeData($obj->id);
+                    if ($features) {
+                        $tree = new HelperTree('room-type-features-tree', $features);
+                        $tree->setShowCollapseExpandButton(true)
+                            ->setUseCheckBox(true)
+                            ->setAutoSelectChildren(true)
+                            ->setUseBulkActions(true)
+                            ->setUseSearch(true)
+                            ->setHeaderTemplate('tree_header_room.tpl');
+                        $data->assign('room_type_features_tree', $tree->render());
                     }
-
-                    $data->assign('available_features', $features);
                     $data->assign('product', $obj);
                     $data->assign('link', $this->context->link);
                     $data->assign('default_form_language', $this->default_form_language);
@@ -4903,6 +4852,50 @@ class AdminProductsControllerCore extends AdminController
                 $this->displayWarning($this->l('You must save this room type before adding features.'));
             }
         }
+        $this->tpl_form_vars['custom_form'] = $data->fetch();
+    }
+
+    /**
+     * Prepare the amenities form tab for a room type.
+     *
+     * @param Product $obj
+     *
+     * @throws Exception
+     * @throws SmartyException
+     */
+    public function initFormAmenities($obj)
+    {
+        if (!$this->default_form_language) {
+            $this->getLanguages();
+        }
+
+        $data = $this->createTemplate($this->tpl_form);
+        $data->assign('default_form_language', $this->default_form_language);
+        $data->assign('languages', $this->_languages);
+        $data->assign('link', $this->context->link);
+        $data->assign('product', $obj);
+        
+        if ($obj->id) {
+            if ($this->product_exists_in_shop) {
+                $roomTypeAmenities = HotelRoomTypeAmenities::getRoomTypeAmenitiesTreeData((int) $obj->id);
+                if ($roomTypeAmenities) {
+                    $tree = new HelperTree('room-type-amenities-tree', $roomTypeAmenities);
+                    $tree->setShowCollapseExpandButton(true)
+                        ->setUseCheckBox(true)
+                        ->setAutoSelectChildren(true)
+                        ->setUseBulkActions(true)
+                        ->setUseSearch(true)
+                        ->setHeaderTemplate('tree_header_room.tpl');
+                    $data->assign('room_type_amenities_tree', $tree->render());
+                    $data->assign('featured_amenity_ids', array_column(HotelRoomTypeAmenities::getAmenities((int)$obj->id, 0, true), 'id'));
+                }
+            } else {
+                $this->displayWarning($this->l('You must save the room type in this shop before adding amenities.'));
+            }
+        } else {
+            $this->displayWarning($this->l('You must save this room type before adding amenities.'));
+        }
+
         $this->tpl_form_vars['custom_form'] = $data->fetch();
     }
 
@@ -5601,13 +5594,15 @@ class AdminProductsControllerCore extends AdminController
                 if (!empty($roomNumber = trim(Tools::getValue('num')))
                     && !Validate::isUnsignedInt($roomNumber)
                 ) {
-                    $this->errors[] = Tools::displayError('Invalid Starting Room No.');
+                    $this->errors[] = sprintf(Tools::displayError('Invalid Starting %s No.') , $roomTypeInfo['selling_object_name']);
                 }
 
                 if (!($roomQuantity = Tools::getValue('qty'))) {
-                    $this->errors[] = Tools::displayError('Number of rooms is required.');
+                    $this->errors[] = sprintf(Tools::displayError('Number of %s is required.') ,$roomTypeInfo['selling_object_name']);
                 } else if (!Validate::isUnsignedInt($roomQuantity) || $roomQuantity < 1) {
-                    $this->errors[] = Tools::displayError('Invalid value for number of rooms.');
+                    $this->errors[] = sprintf(Tools::displayError('Invalid value for number of %s.') ,$roomTypeInfo['selling_object_name']);
+                } else if ($roomQuantity > 50) {
+                    $this->errors[] = sprintf(Tools::displayError('You cannot create more than 50 %s at a time.'), $roomTypeInfo['selling_object_name']);
                 }
 
                 if (trim($comment = Tools::getValue('room_comment'))) {
@@ -5620,7 +5615,7 @@ class AdminProductsControllerCore extends AdminController
                     $disableDates = Tools::getValue('disable_dates');
                     $roomsInfo['disable_dates_json'] = json_encode($disableDates);
                     if (!$disableDates) {
-                        $this->errors[] = Tools::displayError('Please add at least one date range for updating the rooms status to temporary inactive.');
+                        $this->errors[] = sprintf(Tools::displayError('Please add at least one date range for updating the %s status to temporary inactive.') , $roomTypeInfo['selling_object_name']);
                     } else {
                         $hasMissingRowError = false;
                         foreach ($disableDates as $key => $dateRange) {
@@ -5637,16 +5632,19 @@ class AdminProductsControllerCore extends AdminController
                 }
 
                 if (empty($this->errors)) {
-                    if (!$prefix) {
-                        $roomsInfo['prefix'] = $objProduct->name[0].'R';
-                    } else {
+                    if ($prefix) {
                         $roomsInfo['prefix'] = $prefix;
+                    } elseif (!(int) $roomNumber) {
+                        $roomsInfo['prefix'] = preg_replace('/(?:(?<!^)(?<!\s)\p{L}|\P{L})+/u', '', (string) $objProduct->name);
+                    } else {
+                        $roomsInfo['prefix'] = '';
                     }
 
+                    $startingRoomNumber = (int) $roomNumber;
                     for ($i = 0; $i < $roomQuantity; $i++) {
                         $roomNum = $roomsInfo['prefix'];
-                        if ((int) $roomNumber) {
-                            $roomNum .= '-'.($roomNumber + $i);
+                        if ($startingRoomNumber) {
+                            $roomNum .= ($roomsInfo['prefix'] !== '' ? '-' : '').($startingRoomNumber + $i);
                         }
 
                         $objHotelRoomInfo = new HotelRoomInformation();
@@ -5781,6 +5779,19 @@ class AdminProductsControllerCore extends AdminController
         $idHotel = (int) $objRoom->id_hotel;
 
         if ($mode === 'add') {
+            if (!Validate::isLoadedObject($objRoom)) {
+                die(json_encode(['success' => false, 'message' => $this->l('Invalid room selected.')]));
+            }
+
+            $objConnectedRoom = new HotelRoomInformation($connectedRoomId);
+            if (
+                $connectedRoomId === $roomId
+                || !Validate::isLoadedObject($objConnectedRoom)
+                || (int) $objConnectedRoom->id_hotel !== $idHotel
+            ) {
+                die(json_encode(['success' => false, 'message' => $this->l('Invalid room selected for connection.')]));
+            }
+
             $connection = new HotelConnectedRoom();
             $connection->id_room = $roomId;
             $connection->id_room_connected = $connectedRoomId;

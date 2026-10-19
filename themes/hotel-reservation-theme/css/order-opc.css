@@ -241,7 +241,7 @@
 	color: #777;
 	content: '+';
 }
-.room_price_detail_block .demand_total_price, .room_price_detail_block .total_price {
+.room_price_detail_block .extra_service_total_price, .room_price_detail_block .total_price {
 	line-height: 28px;
 }
 
@@ -255,7 +255,7 @@
 		transform: translate(15px, 0px);
 	}
 }
-.room_price_detail_block .price_block .total_price, .room_price_detail_block .demand_price_block .demand_total_price{
+.room_price_detail_block .price_block .total_price, .room_price_detail_block .extra_service_price_block .extra_service_total_price{
 	word-break: break-word;
 }
 .order-detail-content .room_price_detail_block .plus-sign{
@@ -652,8 +652,8 @@
 		text-align: center;}
 
 
-/* Fancy-box for extra demands Css */
-.room_extra_demands .open_rooms_extra_services_panel {
+/* Fancy-box for extra services Css */
+.room_extra_services .open_rooms_extra_services_panel {
 	font-size:12px;
 	font-weight: 600;
 	color: #0000FF;}

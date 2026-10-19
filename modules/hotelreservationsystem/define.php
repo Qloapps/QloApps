@@ -26,9 +26,13 @@ require_once 'classes/HotelRoomType.php';
 require_once 'classes/HotelRoomInformation.php';
 require_once 'classes/HotelBranchInformation.php';
 require_once 'classes/HotelImage.php';
-require_once 'classes/HotelFeatures.php';
-require_once 'classes/HotelBranchFeatures.php';
+require_once 'classes/HotelImageCategory.php';
+require_once 'classes/HotelAmenities.php';
+require_once 'classes/HotelBranchAmenities.php';
+require_once 'classes/HotelRoomTypeAmenities.php';
 require_once 'classes/HotelBookingDetail.php';
+require_once 'classes/HotelBookingStatus.php';
+require_once 'classes/HotelBookingStatusHistory.php';
 require_once 'classes/HotelCartBookingData.php';
 require_once 'classes/HotelAdvancedPayment.php';
 require_once 'classes/HotelOrderRefundRules.php';
@@ -38,17 +42,11 @@ require_once 'classes/HotelRoomTypeFeaturePricing.php';
 require_once 'classes/HotelRoomTypeFeaturePricingRestriction.php';
 require_once 'classes/ChannelOrderPayment.php';
 
-require_once 'classes/HotelBookingDemands.php';
-require_once 'classes/HotelRoomTypeGlobalDemand.php';
-require_once 'classes/HotelRoomTypeGlobalDemandAdvanceOption.php';
-require_once 'classes/HotelRoomTypeDemandPrice.php';
-require_once 'classes/HotelRoomTypeDemand.php';
 require_once 'classes/HotelRoomTypeRestrictionDateRange.php';
 
 require_once 'classes/HotelRoomDisableDates.php';
 require_once 'classes/HotelBranchRefundRules.php';
-require_once 'classes/HotelBedType.php';
-require_once 'classes/HotelRoomTypeBedType.php';
+require_once 'classes/HotelPropertyType.php';
 require_once 'classes/HotelConnectedRoom.php';
 
 // linked products
@@ -61,6 +59,7 @@ require_once 'classes/ServiceProductOption.php';
 
 require_once 'classes/HotelSettingsLink.php';
 require_once 'classes/HotelBookingDocument.php';
+require_once 'classes/HotelHeaderImage.php';
 
 // Web services classes
 require_once 'classes/WebserviceSpecificManagementHotelAri.php';

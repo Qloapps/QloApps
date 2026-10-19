@@ -34,7 +34,11 @@ class AdminBookingDocumentController extends ModuleAdminController
             $contentLength = $objHotelBookingDocument->getContentLength();
             $filePath = $objHotelBookingDocument->getPhysicalPath();
             $downloadFileName = $objHotelBookingDocument->getDownloadFileName();
-            $contentDisposition = Tools::getValue('is_preview') ? 'inline' : 'attachment';
+            // Only images are safe to render inline; PDFs can carry embedded JavaScript
+            // that executes when opened inline, so they always force a download instead.
+            $contentDisposition = (Tools::getValue('is_preview')
+                && $objHotelBookingDocument->file_type == HotelBookingDocument::FILE_TYPE_IMAGE)
+                ? 'inline' : 'attachment';
 
             if (Tools::file_exists_cache($filePath)) {
                 if (ob_get_level() && ob_get_length() > 0) {

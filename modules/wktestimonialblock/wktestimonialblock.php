@@ -42,8 +42,8 @@ class WkTestimonialBlock extends Module
         $this->bootstrap = true;
         parent::__construct();
 
-        $this->displayName = $this->l('Hotel Testimonial');
-        $this->description = $this->l('Show Hotel testimonials on home page using this module.');
+        $this->displayName = $this->l('Property Testimonial');
+        $this->description = $this->l('Show Property testimonials on home page using this module.');
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
     }
 

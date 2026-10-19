@@ -205,14 +205,13 @@
 								{/block}
 							{/if}
 						</div>
-
 						<div class="product_info_containter">
 							<!-- tab hook is added here -->
 							<!--HOOK_PRODUCT_TAB -->
 							<section class="page-product-box">
 								{block name='product_tabs'}
 									<ul class="nav nav-tabs product_description_tabs">
-									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='Room Information'}{else}{l s='Product Information'}{/if}</a></li>
+									<li class="active"><a href="#product_info_tab" class="idTabHrefShort" data-toggle="tab">{if $product->booking_product}{l s='%s Information' sprintf=$room_type_info['selling_object_name']}{else}{l s='Product Information'}{/if}</a></li>
 										{* Block for booking products *}
 										{if isset($id_hotel) && $id_hotel}
 											<li><a href="#refund_policies_tab" class="idTabHrefShort" data-toggle="tab">{l s='Refund Policies'}</a></li>
@@ -262,51 +261,87 @@
 															</div>
 														{/if}
 													{/block}
-													{block name='product_info_tab_room_bed_type'}
-														{if isset($selected_bed_types) && $selected_bed_types && isset($bed_types_info) && $bed_types_info}
-															<div class="info_margin_div">
-																<div class="room_info_heading">
-																	<span>{l s='Bed Types'}</span>
-																</div>
-																<div class="room_info_content">
-																	{foreach $selected_bed_types as $selected_bed_type}
-																		{if isset($bed_types_info[$selected_bed_type])}
-																			<p>{$bed_types_info[$selected_bed_type]['name']}: {$bed_types_info[$selected_bed_type]['area']} {l s='sq.'}{$dimension_unit}</p>
-																		{/if}
-																	{/foreach}
-																</div>
-															</div>
-														{/if}
-													{/block}
 													{block name='product_info_tab_room_features'}
-														{if isset($features) && $features}
+														{if isset($room_type_features) && $room_type_features}
 															<div class="info_margin_div">
-																<div class="room_info_heading">
-																	<span>{l s='Room Features'}</span>
-																</div>
-																<div class="room_info_content row">
-																	{foreach from=$features key=ftr_k item=ftr_v}
-																		<div class="col-md-3 col-sm-4 col-xs-6">
-																			<div class="rm_ftr_wrapper" title="{$ftr_v.name|escape:'html':'UTF-8'}" alt="{$ftr_v.name|escape:'html':'UTF-8'}" >
-																				<img src="{$link->getMediaLink("`$ftr_img_src|escape:'html':'UTF-8'`{$ftr_v.value|escape:'html':'UTF-8'}")}">  {$ftr_v.name|escape:'html':'UTF-8'}
+																{assign var="current_feature_name" value=""}
+																{assign var="current_feature_values" value=""}
+																{assign var="current_feature_id" value=0}
+																{foreach from=$room_type_features item=feature}
+																	{if $feature.name != $current_feature_name}
+																		{if $current_feature_name != ""}
+																			<div class="room_feature_group">
+																				<div class="room_info_heading">
+																					<img src="{$smarty.const._PS_IMG_}rf/{$current_feature_id|intval}.jpg" alt="{$current_feature_name|escape:'html':'UTF-8'}" title="{$current_feature_name|escape:'html':'UTF-8'}" style="max-height:20px;max-width:20px;" onerror="this.style.display='none'" />
+																					<span>{$current_feature_name|escape:'html':'UTF-8'}</span>
+																				</div>
+																				<div class="room_info_content">{$current_feature_values|escape:'html':'UTF-8'}</div>
 																			</div>
+																		{/if}
+																		{assign var="current_feature_name" value=$feature.name}
+																		{assign var="current_feature_id" value=$feature.id_feature}
+																		{assign var="current_feature_values" value=$feature.value}
+																	{else}
+																		{assign var="current_feature_values" value="`$current_feature_values`, `$feature.value`"}
+																	{/if}
+																	{if $feature@last}
+																		<div class="room_feature_group">
+																			<div class="room_info_heading">
+																				<img src="{$smarty.const._PS_IMG_}rf/{$current_feature_id|intval}.jpg" alt="{$current_feature_name|escape:'html':'UTF-8'}" title="{$current_feature_name|escape:'html':'UTF-8'}" style="max-height:20px;max-width:20px;" onerror="this.style.display='none'" />
+																				<span>{$current_feature_name|escape:'html':'UTF-8'}</span>
+																			</div>
+																			<div class="room_info_content">{$current_feature_values|escape:'html':'UTF-8'}</div>
 																		</div>
-																	{/foreach}
-																</div>
+																	{/if}
+																{/foreach}
 															</div>
 														{/if}
 													{/block}
 													{* Block for booking products *}
 													{if isset($id_hotel) && $id_hotel}
-														{block name='product_info_tab_hotel_features'}
-															{if isset($hotel_features) && $hotel_features}
+														{block name='product_info_tab_room_amenities'}
+															{if isset($room_dynamic_amenities) && $room_dynamic_amenities}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Features'}</span>
+																		<span>{l s='%s Amenities' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content row">
-																		{foreach from=$hotel_features key=ftr_k item=ftr_v}
-																			<div class="col-sm-4 col-xs-12"><i class="circle-small">o</i> {$ftr_v|escape:'html':'UTF-8'}</div>
+																		{foreach from=$room_dynamic_amenities item=amenity}
+																			<div class="col-sm-4 col-xs-12" title="{$amenity.name|escape:'html':'UTF-8'}">
+																				{if $amenity.logo_type == 'icon' && $amenity.logo}
+																					<i class="{$amenity.logo|escape:'html':'UTF-8'}"></i>
+																				{elseif $amenity.logo_type == 'image' && $amenity.logo}
+																					<img src="{$amenity_img_dir|escape:'html':'UTF-8'}{$amenity.id|intval}.jpg"
+																						 alt="{$amenity.name|escape:'html':'UTF-8'}"
+																						 title="{$amenity.name|escape:'html':'UTF-8'}"
+																						 style="max-height:20px;max-width:20px;" />
+																				{/if}
+																				<span class="amenity-name">{$amenity.name|escape:'html':'UTF-8'}</span>
+																			</div>
+																		{/foreach}
+																	</div>
+																</div>
+															{/if}
+														{/block}
+														{block name='product_info_tab_hotel_features'}
+															{if isset($hotel_dynamic_amenities) && $hotel_dynamic_amenities}
+																<div class="info_margin_div">
+																	<div class="room_info_heading">
+																		<span>{l s='%s Amenities' sprintf=$property_type}</span>
+																	</div>
+																	<div class="room_info_content row">
+																		{foreach from=$hotel_dynamic_amenities item=amenity}
+																			<div class="col-sm-4 col-xs-12" title="{$amenity.name|escape:'html':'UTF-8'}">
+																				{if $amenity.logo_type == 'icon' && $amenity.logo}
+																					<i class="{$amenity.logo|escape:'html':'UTF-8'}"></i>
+																				{elseif $amenity.logo_type == 'image' && $amenity.logo}
+																					<img src="{$amenity_img_dir|escape:'html':'UTF-8'}{$amenity.id|intval}.jpg"
+																						 alt="{$amenity.name|escape:'html':'UTF-8'}"
+																						 title="{$amenity.name|escape:'html':'UTF-8'}"
+																						 style="max-height:20px;max-width:20px;" />
+																				{/if}
+																				<span class="amenity-name">{$amenity.name|escape:'html':'UTF-8'}</span>
+																			</div>
 																		{/foreach}
 																	</div>
 																</div>
@@ -316,7 +351,7 @@
 															{if isset($hotel_description) && $hotel_description}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Description'}</span>
+																		<span>{l s='%s Description' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content">
 																		{$hotel_description}
@@ -330,7 +365,7 @@
 															<div class="room_info_hotel_images_wrap">
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Images'}</span>
+																		<span>{l s='Property Images'}</span>
 																	</div>
 																	<div class="room_info_content" id="room_info_hotel_images">
 																		<div class="row images-wrap"></div>
@@ -365,7 +400,7 @@
 														{if isset($hotel_policies) && $hotel_policies}
 															<div class="info_margin_div">
 																<div class="room_info_heading">
-																	<span>{l s='Hotel Policies'}</span>
+																	<span>{l s='%s Policies' sprintf=$property_type}</span>
 																</div>
 																<div class="room_info_content">
 																	<p class="">{$hotel_policies}</p>
@@ -438,40 +473,6 @@
 
 							{block name='booking_form'}
 								{include file='./_partials/booking-form.tpl'}
-							{/block}
-
-							{block name='product_demands'}
-								{* extra room type demands *}
-								{if isset($room_type_demands) && $room_type_demands}
-									<div class="col-sm-12 card room_demands_container">
-										<label for="" class="control-label">{l s='Additional Facilities'}</label>
-										{foreach $room_type_demands as $idGlobalDemand => $demand}
-											<div class="row room_demand_block">
-												{if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
-													<div class="col-xs-1">
-														<p class="checkbox">
-															<input value="{$idGlobalDemand|escape:'html':'UTF-8'}" type="checkbox" class="id_room_type_demand" data-id_global_demand="{$idGlobalDemand|escape:'html':'UTF-8'}" />
-														</p>
-													</div>
-												{/if}
-												<div class="col-xs-11 demand_adv_option_block">
-													<p>{$demand['name']|escape:'html':'UTF-8'} {if $product->show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}<span class="pull-right"><span class="extra_demand_option_price">{convertPrice price = $demand['price']}</span>{if $demand['price_calc_method'] == $WK_PRICE_CALC_METHOD_EACH_DAY}{l s='/Night'}{/if}</span>{/if}</p>
-													{if isset($demand['adv_option']) && $demand['adv_option']}
-														<select class="id_option">
-															{foreach $demand['adv_option'] as $idOption => $option}
-																<option optionPrice="{$option['price']|escape:'html':'UTF-8'}" value="{$idOption|escape:'html':'UTF-8'}">{$option['name']|escape:'html':'UTF-8'}</option>
-															{/foreach}
-														</select>
-													{else}
-														<input type="hidden" class="id_option" value="0" />
-													{/if}
-												</div>
-											</div>
-										{/foreach}
-										<div class="room_demands_container_overlay">
-										</div>
-									</div>
-								{/if}
 							{/block}
 						{/if}
 						{block name='displayRightColumnProduct'}

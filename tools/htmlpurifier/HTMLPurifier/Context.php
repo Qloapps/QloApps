@@ -24,11 +24,7 @@ class HTMLPurifier_Context
     public function register($name, &$ref)
     {
         if (array_key_exists($name, $this->_storage)) {
-            trigger_error(
-                "Name $name produces collision, cannot re-register",
-                E_USER_ERROR
-            );
-            return;
+            throw new Exception("Name $name produces collision, cannot re-register");
         }
         $this->_storage[$name] =& $ref;
     }
@@ -43,10 +39,7 @@ class HTMLPurifier_Context
     {
         if (!array_key_exists($name, $this->_storage)) {
             if (!$ignore_error) {
-                trigger_error(
-                    "Attempted to retrieve non-existent variable $name",
-                    E_USER_ERROR
-                );
+                throw new Exception("Attempted to retrieve non-existent variable $name");
             }
             $var = null; // so we can return by reference
             return $var;
@@ -61,11 +54,7 @@ class HTMLPurifier_Context
     public function destroy($name)
     {
         if (!array_key_exists($name, $this->_storage)) {
-            trigger_error(
-                "Attempted to destroy non-existent variable $name",
-                E_USER_ERROR
-            );
-            return;
+            throw new Exception("Attempted to destroy non-existent variable $name");
         }
         unset($this->_storage[$name]);
     }

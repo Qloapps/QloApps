@@ -3,11 +3,11 @@
 // File name   : tcpdf_autoconfig.php
 // Version     : 1.1.1
 // Begin       : 2013-05-16
-// Last Update : 2014-12-18
+// Last Update : 2025-04-18
 // Authors     : Nicola Asuni - Tecnick.com LTD - www.tecnick.com - info@tecnick.com
-// License     : GNU-LGPL v3 (http://www.gnu.org/copyleft/lesser.html)
+// License     : GNU-LGPL v3 (https://www.gnu.org/copyleft/lesser.html)
 // -------------------------------------------------------------------
-// Copyright (C) 2011-2014 Nicola Asuni - Tecnick.com LTD
+// Copyright (C) 2011-2026 Nicola Asuni - Tecnick.com LTD
 //
 // This file is part of TCPDF software library.
 //
@@ -37,8 +37,13 @@
  * @file
  * Try to automatically configure some TCPDF constants if not defined.
  * @package com.tecnick.tcpdf
- * @version 1.1.1
+ * @version 1.2.1
  */
+
+// Disable phar stream wrapper globally.
+// if (in_array('phar', stream_get_wrappers(), true)) {
+//     stream_wrapper_unregister('phar');
+// }
 
 // DOCUMENT_ROOT fix for IIS Webserver
 if ((!isset($_SERVER['DOCUMENT_ROOT'])) OR (empty($_SERVER['DOCUMENT_ROOT']))) {
@@ -149,7 +154,7 @@ if (!defined('PDF_HEADER_TITLE')) {
 }
 
 if (!defined('PDF_HEADER_STRING')) {
-	define ('PDF_HEADER_STRING', "by Nicola Asuni - Tecnick.com\nwww.tcpdf.org");
+	define ('PDF_HEADER_STRING', "by2026 Nicola Asuni - Tecnick.com\nwww.tcpdf.org");
 }
 
 if (!defined('PDF_UNIT')) {
@@ -201,7 +206,7 @@ if (!defined('PDF_FONT_MONOSPACED')) {
 }
 
 if (!defined('PDF_IMAGE_SCALE_RATIO')) {
-	define ('PDF_IMAGE_SCALE_RATIO', 1.25);
+	define ('PDF_IMAGE_SCALE_RATIO', 96/72);
 }
 
 if (!defined('HEAD_MAGNIFICATION')) {
@@ -238,6 +243,11 @@ if (!defined('K_TCPDF_THROW_EXCEPTION_ERROR')) {
 
 if (!defined('K_TIMEZONE')) {
 	define('K_TIMEZONE', @date_default_timezone_get());
+}
+
+// Custom cURL options for curl_setopt_array.
+if (!defined('K_CURLOPTS')) {
+	define('K_CURLOPTS', array());
 }
 
 //============================================================+

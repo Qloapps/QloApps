@@ -1,83 +1,131 @@
 # TCPDF
-*PHP PDF Library*
 
-[![Donate via PayPal](https://img.shields.io/badge/donate-paypal-87ceeb.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&currency_code=GBP&business=paypal@tecnick.com&item_name=donation%20for%20TCPDF%20project)
-*Please consider supporting this project by making a donation via [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&currency_code=GBP&business=paypal@tecnick.com&item_name=donation%20for%20TCPDF%20project)*
+> Legacy PDF engine for PHP. **Deprecated** and maintained for existing integrations.
 
-* **category**    Library
-* **author**      Nicola Asuni <info@tecnick.com>
-* **copyright**   2002-2024 Nicola Asuni - Tecnick.com LTD
-* **license**     http://www.gnu.org/copyleft/lesser.html GNU-LGPL v3 (see LICENSE.TXT)
-* **link**        http://www.tcpdf.org
-* **source**      https://github.com/tecnickcom/TCPDF
+[![Latest Stable Version](https://poser.pugx.org/tecnickcom/tcpdf/version)](https://packagist.org/packages/tecnickcom/tcpdf)
+[![License](https://poser.pugx.org/tecnickcom/tcpdf/license)](https://packagist.org/packages/tecnickcom/tcpdf)
+[![Downloads](https://poser.pugx.org/tecnickcom/tcpdf/downloads)](https://packagist.org/packages/tecnickcom/tcpdf)
+[![Donate via PayPal](https://img.shields.io/badge/donate-paypal-87ceeb.svg)](https://www.paypal.com/donate/?hosted_button_id=NZUEC5XS8MFBJ)
 
+If TCPDF helps your business, please consider supporting development via [PayPal](https://www.paypal.com/donate/?hosted_button_id=NZUEC5XS8MFBJ).
 
-## NOTE
-A new version of this library is under development at https://github.com/tecnickcom/tc-lib-pdf and as a consequence this library is in support only mode.
+---
 
+## Deprecation Notice
 
+TCPDF is **deprecated** and in **maintenance-only mode**.
 
-## Description
+Active feature development has moved to [tc-lib-pdf](https://github.com/tecnickcom/tc-lib-pdf), the modern and modular successor.
 
-PHP library for generating PDF documents on-the-fly.
+For new projects, use `tecnickcom/tc-lib-pdf`. This repository remains available for legacy systems and critical compatibility fixes.
 
-### Main Features:
-* no external libraries are required for the basic functions;
-* all standard page formats, custom page formats, custom margins and units of measure;
-* UTF-8 Unicode and Right-To-Left languages;
-* TrueTypeUnicode, OpenTypeUnicode v1, TrueType, OpenType v1, Type1 and CID-0 fonts;
-* font subsetting;
-* methods to publish some XHTML + CSS code, Javascript and Forms;
-* images, graphic (geometric figures) and transformation methods;
-* supports JPEG, PNG and SVG images natively, all images supported by GD (GD, GD2, GD2PART, GIF, JPEG, PNG, BMP, XBM, XPM) and all images supported via ImagMagick (http://www.imagemagick.org/script/formats.php)
-* 1D and 2D barcodes: CODE 39, ANSI MH10.8M-1983, USD-3, 3 of 9, CODE 93, USS-93, Standard 2 of 5, Interleaved 2 of 5, CODE 128 A/B/C, 2 and 5 Digits UPC-Based Extension, EAN 8, EAN 13, UPC-A, UPC-E, MSI, POSTNET, PLANET, RMS4CC (Royal Mail 4-state Customer Code), CBC (Customer Bar Code), KIX (Klant index - Customer index), Intelligent Mail Barcode, Onecode, USPS-B-3200, CODABAR, CODE 11, PHARMACODE, PHARMACODE TWO-TRACKS, Datamatrix, QR-Code, PDF417;
-* JPEG and PNG ICC profiles, Grayscale, RGB, CMYK, Spot Colors and Transparencies;
-* automatic page header and footer management;
-* document encryption up to 256 bit and digital signature certifications;
-* transactions to UNDO commands;
-* PDF annotations, including links, text and file attachments;
-* text rendering modes (fill, stroke and clipping);
-* multiple columns mode;
-* no-write page regions;
-* bookmarks, named destinations and table of content;
-* text hyphenation;
-* text stretching and spacing (tracking);
-* automatic page break, line break and text alignments including justification;
-* automatic page numbering and page groups;
-* move and delete pages;
-* page compression (requires php-zlib extension);
-* XOBject Templates;
-* Layers and object visibility.
-* PDF/A-1b support.
+### Migration Path
 
-### Third party fonts:
+- New projects: install `tecnickcom/tc-lib-pdf`.
+- Existing TCPDF users: keep TCPDF for current production workloads and migrate in phases.
+- Teams seeking modern architecture, Composer-first design, and stronger type-safety should prioritize `tc-lib-pdf`.
 
-This library may include third party font files released with different licenses.
+### Why Migrate to tc-lib-pdf
 
-All the PHP files on the fonts directory are subject to the general TCPDF license (GNU-LGPLv3),
-they do not contain any binary data but just a description of the general properties of a particular font.
-These files can be also generated on the fly using the font utilities and TCPDF methods.
+- Modern architecture: modular libraries and cleaner component boundaries improve maintainability.
+- Better extensibility: new features are easier to add without patching a monolithic legacy core.
+- Stronger tooling fit: modern package structure works better with static analysis, CI, and automated tests.
+- Lower long-term risk: reduces technical debt tied to legacy APIs and supports ongoing PHP ecosystem evolution.
+- Improved delivery speed: teams can implement and ship new PDF capabilities with less friction.
 
-All the original binary TTF font files have been renamed for compatibility with TCPDF and compressed using the gzcompress PHP function that uses the ZLIB data format (.z files).
+Migration still requires planning and regression checks to preserve rendering parity for existing documents.
 
-The binary files (.z) that begins with the prefix "free" have been extracted from the GNU FreeFont collection (GNU-GPLv3).
-The binary files (.z) that begins with the prefix "pdfa" have been derived from the GNU FreeFont, so they are subject to the same license.
-For the details of Copyright, License and other information, please check the files inside the directory fonts/freefont-20120503
-Link : http://www.gnu.org/software/freefont/
+### Future Compatibility Possibility
 
-The binary files (.z) that begins with the prefix "dejavu" have been extracted from the DejaVu fonts 2.33 (Bitstream) collection.
-For the details of Copyright, License and other information, please check the files inside the directory fonts/dejavu-fonts-ttf-2.33
-Link : http://dejavu-fonts.org
+As a long-term possibility, TCPDF could be refactored to use `tc-lib-pdf` internally as a backend while preserving a practical level of backward compatibility for existing TCPDF integrations.
 
-The binary files (.z) that begins with the prefix "ae" have been extracted from the Arabeyes.org collection (GNU-GPLv2).
-Link : http://projects.arabeyes.org/
+This is not part of a committed roadmap and there is no guarantee it will happen. It is documented here only as a potential direction that may be evaluated in the future.
 
-### ICC profile:
+---
 
-TCPDF includes the sRGB.icc profile from the icc-profiles-free Debian package:
-https://packages.debian.org/source/stable/icc-profiles-free
+## Overview
 
+TCPDF is a pure-PHP library for generating PDF documents and barcodes directly in application code.
 
-## Developer(s) Contact
+It has been widely used across many PHP stacks and still provides a complete feature set for text rendering, page composition, graphics, signatures, forms, and standards-oriented output.
 
-* Nicola Asuni <info@tecnick.com>
+| | |
+|---|---|
+| **Package** | `tecnickcom/tcpdf` |
+| **Author** | Nicola Asuni <info@tecnick.com> |
+| **License** | [GNU LGPL v3](https://www.gnu.org/copyleft/lesser.html) (see [LICENSE.TXT](LICENSE.TXT)) |
+| **Website** | <http://www.tcpdf.org> |
+| **Source** | <https://github.com/tecnickcom/TCPDF> |
+
+---
+
+## Features
+
+### Text & Fonts
+- UTF-8 Unicode and right-to-left (RTL) language support
+- TrueTypeUnicode, OpenTypeUnicode v1, TrueType, OpenType v1, Type1, and CID-0 fonts
+- Font subsetting
+- Text hyphenation, stretching, spacing, and rendering modes (fill/stroke/clipping)
+- Automatic line breaks, page breaks, and justification
+
+### Layout & Content
+- Standard and custom page formats, margins, and measurement units
+- XHTML + CSS rendering, JavaScript, and forms
+- Automatic headers and footers
+- Multi-column mode and no-write page regions
+- Bookmarks, named destinations, and table of contents
+- Automatic page numbering, page groups, move/delete pages, and undo transactions
+
+### Images, Graphics & Color
+- Native JPEG, PNG, and SVG support
+- Geometric drawing primitives and transformations
+- Support for GD image formats (`GD`, `GD2`, `GD2PART`, `GIF`, `JPEG`, `PNG`, `BMP`, `XBM`, `XPM`)
+- Additional formats via ImageMagick (when available)
+- JPEG/PNG ICC profiles, grayscale/RGB/CMYK/spot colors, and transparencies
+
+### Security, Standards & Advanced Output
+- Encryption up to 256-bit and digital signature certifications
+- PDF annotations (links, text, and file attachments)
+- 1D and 2D barcode support (including CODE 128, EAN/UPC, Datamatrix, QR Code, PDF417)
+- XObject templates and layers with object visibility controls
+- PDF/A-1b support
+
+---
+
+## Requirements
+
+- PHP 7.1 or later
+- `ext-curl`
+
+Optional extensions for richer output in some workflows: `gd`, `zlib`, `imagick`.
+
+---
+
+## Third-Party Fonts
+
+This library may include third-party font files released under different licenses.
+
+PHP metadata files under [fonts](fonts) are covered by the TCPDF license (GNU LGPL v3). They contain font metadata and can also be generated using TCPDF font utilities.
+
+Original binary TTF files are renamed for compatibility and compressed with PHP `gzcompress` (the `.z` format).
+
+| Prefix | Source | License |
+|---|---|---|
+| `free*` | [GNU FreeFont](https://www.gnu.org/software/freefont/) | GNU GPL v3 |
+| `pdfa*` | Derived from GNU FreeFont | GNU GPL v3 |
+| `dejavu*` | [DejaVu Fonts](http://dejavu-fonts.org) | Bitstream/DejaVu terms |
+| `ae*` | [Arabeyes.org](http://projects.arabeyes.org/) | GNU GPL v2 |
+
+For full details, see the bundled notices in the corresponding subdirectories under [fonts](fonts).
+
+---
+
+## ICC Profile
+
+TCPDF includes `sRGB.icc` from the Debian [`icc-profiles-free`](https://packages.debian.org/source/stable/icc-profiles-free) package.
+
+---
+
+## Contact
+
+Nicola Asuni <info@tecnick.com>

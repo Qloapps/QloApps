@@ -660,11 +660,11 @@ class FrontControllerCore extends Controller
     }
 
     /**
-     * Renders and outputs maintenance page and ends controller process.
+     * Redirects a cursed request (e.g. an invalid/expired access token) to page not found and ends controller process.
      */
     public function initCursedPage()
     {
-        $this->displayMaintenancePage();
+        Tools::redirect($this->context->link->getPageLink('pagenotfound'));
     }
 
     /**
@@ -1183,6 +1183,7 @@ class FrontControllerCore extends Controller
             $this->addJS(_PS_JS_DIR_.'hookLiveEdit.js');
         }
         $this->addJqueryUI('ui.tooltip', 'base', true);
+        $this->addJS(_PS_JS_DIR_.'jquery-ui-tooltip-alias.js');
 
         if (Configuration::get('PS_QUICK_VIEW')) {
             $this->addjqueryPlugin('fancybox');

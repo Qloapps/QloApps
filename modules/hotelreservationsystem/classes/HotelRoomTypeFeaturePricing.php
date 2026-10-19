@@ -149,7 +149,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing` rtfp
             ON (rtfpr.`id_feature_price` = rtfp.`id_feature_price` AND rtfp.`id_product`='.(int) $idRoomType.')
             LEFT JOIN `'._DB_PREFIX_.'htl_room_type_feature_pricing_group` rtfpg
-            ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price` '.($groups ? ' AND rtfpg.`id_group` IN ('.pSQL(implode(', ',$groups)).')' : ' ' ).')
+            ON (rtfp.`id_feature_price` = rtfpg.`id_feature_price` '.($groups ? ' AND rtfpg.`id_group` IN ('.implode(', ', array_map('intval', $groups)).')' : ' ' ).')
             WHERE 1 '.( !is_null($active) ? ' AND rtfp.`active`= '.(int) $active: ' ').' ' .(!is_null($skipFeaturePriceId) ? ' AND rtfpr.`id_feature_price`!='.(int) $skipFeaturePriceId : ' ');
         $sqlWhere = '';
         if ($restrictions && is_array($restrictions)) {
@@ -281,13 +281,15 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         $id_guest = 0,
         $id_room = 0,
         $with_auto_room_services = 1,
-        $use_reduc = 1
+        $use_reduc = 1,
+        $includeTourismTax = false
     ) {
         $totalPrice = array();
         $totalPrice['total_price_tax_incl'] = 0;
         $totalPrice['total_price_tax_excl'] = 0;
         $featureImpactPriceTE = 0;
         $featureImpactPriceTI = 0;
+
         $productPriceTI = Product::getPriceStatic((int) $id_product, 1, 0, 6, null, 0, $use_reduc, 1, 0, null, null, null, $nothing, 1, 1, null, 1, 0, 0, $id_group);
         $productPriceTE = Product::getPriceStatic((int) $id_product, 0, 0, 6, null, 0, $use_reduc, 1, 0, null, null, null, $nothing, 1, 1, null, 1, 0, 0, $id_group);
         $id_address =  HotelRoomType::getHotelIdAddressByIdProduct($id_product);
@@ -323,6 +325,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 $id_guest,
                 $id_room
             ))) {
+
                 if ($featurePrice['impact_type'] == self::IMPACT_TYPE_PERCENTAGE) {
                     //percentage
                     $featureImpactPriceTE = $productPriceTE * ($featurePrice['impact_value'] / 100);
@@ -350,11 +353,17 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $priceWithFeatureTI = 0;
                     $priceWithFeatureTE = 0;
                 }
+                if ((int)$featurePrice['id_cart'] == 0) {
+                    $priceWithFeatureTI = Product::applyGroupDiscount($priceWithFeatureTI, $id_product, $id_group);
+                    $priceWithFeatureTE = Product::applyGroupDiscount($priceWithFeatureTE, $id_product, $id_group);
+                }
                 $totalPrice['total_price_tax_incl'] += $priceWithFeatureTI;
                 $totalPrice['total_price_tax_excl'] += $priceWithFeatureTE;
             } else {
-                $totalPrice['total_price_tax_incl'] += $productPriceTI;
-                $totalPrice['total_price_tax_excl'] += $productPriceTE;
+                $dayPriceTI = Product::applyGroupDiscount($productPriceTI, $id_product, $id_group);
+                $dayPriceTE = Product::applyGroupDiscount($productPriceTE, $id_product, $id_group);
+                $totalPrice['total_price_tax_incl'] += $dayPriceTI;
+                $totalPrice['total_price_tax_excl'] += $dayPriceTE;
             }
         }
         Hook::exec('actionRoomTypeTotalPriceModifier',
@@ -374,6 +383,31 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                 'occupancy' => $occupancy
             )
         );
+        
+        if ($includeTourismTax && Configuration::get('QLO_USE_TOURISM_TAX') && is_array($occupancy) && !empty($occupancy) && isset($occupancy[0]['adults'])) {
+            if ($idTourismTaxRulesGroup = Product::getIdTourismTaxRulesGroupByIdProduct((int) $id_product)) {
+                $hotelBranch = new HotelBranchInformation((int) $objAddress->id_hotel);
+                $collectionType = (int) $hotelBranch->tourism_tax_collection_type;
+                $numNights = max(1, (int) HotelHelper::getNumberOfDays($date_from, $date_to));
+                $unitPriceTe = (float) $totalPrice['total_price_tax_excl'] / $numNights;
+                $taxCalculator = TaxManagerFactory::getManager($objAddress, $idTourismTaxRulesGroup)->getTaxCalculator();
+                $roomsTourismTax = 0;
+                foreach ($occupancy as $roomOccupancy) {
+                    $roomsTourismTax += $taxCalculator->getTaxesTotalAmount(
+                        $unitPriceTe,
+                        $date_from,
+                        $numNights,
+                        isset($roomOccupancy['adults']) ? (int) $roomOccupancy['adults'] : 0,
+                        !empty($roomOccupancy['child_ages']) ? (array) $roomOccupancy['child_ages'] : array(),
+                        $collectionType,
+                        1,
+                        $id_currency
+                    );
+                }
+                $totalPrice['total_price_tax_incl'] += $roomsTourismTax / count($occupancy);
+            }
+        }
+
         if ($with_auto_room_services) {
             if ($id_cart && $id_room) {
                 $objHotelCartBookingData = new HotelCartBookingData();
@@ -401,6 +435,9 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                         foreach($roomServicesServices as $selectedService) {
                             $totalPrice['total_price_tax_incl'] += $selectedService['total_price_tax_incl'];
                             $totalPrice['total_price_tax_excl'] += $selectedService['total_price_tax_excl'];
+                            if ($includeTourismTax && isset($selectedService['tourism_tax'])) {
+                                $totalPrice['total_price_tax_incl'] += $selectedService['tourism_tax'];
+                            }
                         }
                     }
                 }
@@ -412,10 +449,11 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $date_to,
                     Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                     true,
-                    $use_reduc
+                    $use_reduc,
+                    $includeTourismTax
                 )) {
                     foreach($servicesWithTax as $service) {
-                        $totalPrice['total_price_tax_incl'] += Tools::processPriceRounding($service['price']);
+                        $totalPrice['total_price_tax_incl'] += $service['price'];
                     }
                 }
                 if ($servicesWithoutTax = RoomTypeServiceProduct::getAutoAddServices(
@@ -427,7 +465,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
                     $use_reduc
                 )) {
                     foreach($servicesWithoutTax as $service) {
-                        $totalPrice['total_price_tax_excl'] += Tools::processPriceRounding($service['price']);
+                        $totalPrice['total_price_tax_excl'] += $service['price'];
                     }
                 }
             }
@@ -436,8 +474,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
         if (!$quantity) {
             $quantity = 1;
         }
-        $totalPrice['total_price_tax_incl'] = Tools::processPriceRounding($totalPrice['total_price_tax_incl'], $quantity);
-        $totalPrice['total_price_tax_excl'] = Tools::processPriceRounding($totalPrice['total_price_tax_excl'], $quantity);
+        $totalPrice['total_price_tax_incl'] = $totalPrice['total_price_tax_incl'] * $quantity;
+        $totalPrice['total_price_tax_excl'] = $totalPrice['total_price_tax_excl'] * $quantity;
 
         return $totalPrice;
     }
@@ -464,6 +502,7 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
     ) {
         $dateFrom = date('Y-m-d H:i:s', strtotime($date_from));
         $dateTo = date('Y-m-d H:i:s', strtotime($date_to));
+        $includeTourismTax = $use_tax && Configuration::get('QLO_TOURISM_TAX_GROSSED_UP');
         $totalDurationPrice = HotelRoomTypeFeaturePricing::getRoomTypeTotalPrice(
             $id_product,
             $dateFrom,
@@ -474,7 +513,8 @@ class HotelRoomTypeFeaturePricing extends ObjectModel
             $id_guest,
             $id_room,
             $with_auto_room_services,
-            $use_reduc
+            $use_reduc,
+            $includeTourismTax
         );
 
         $totalDurationPriceTI = $totalDurationPrice['total_price_tax_incl'];

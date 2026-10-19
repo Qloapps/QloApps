@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<entity_business_source>
+  <business_source id="Direct">
+    <name>Директно</name>
+  </business_source>
+  <business_source id="OTA">
+    <name>OTA</name>
+  </business_source>
+  <business_source id="Corporate">
+    <name>Корпоративно</name>
+  </business_source>
+  <business_source id="Travel_Agent">
+    <name>Патничка Агенција</name>
+  </business_source>
+  <business_source id="Group">
+    <name>Група</name>
+  </business_source>
+  <business_source id="Api">
+    <name>API</name>
+  </business_source>
+</entity_business_source>

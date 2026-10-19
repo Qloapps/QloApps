@@ -56,7 +56,7 @@ class StatsBestCategories extends ModuleGrid
         $this->columns = array(
             array(
                 'id' => 'name',
-                'header' => $this->l('Hotel name'),
+                'header' => $this->l('Property Name'),
                 'dataIndex' => 'hotel_name',
                 'align' => 'center'
             ),
@@ -65,14 +65,14 @@ class StatsBestCategories extends ModuleGrid
                 'header' => $this->l('Room nights booked'),
                 'dataIndex' => 'totalRoomsBooked',
                 'align' => 'center',
-                'tooltip' => $this->l('The room nights booked for the hotel.'),
+                'tooltip' => $this->l('The room nights booked for the property.'),
             ),
             array(
                 'id' => 'availableRooms',
                 'header' => $this->l('Available room nights'),
                 'dataIndex' => 'availableRooms',
                 'align' => 'center',
-                'tooltip' => $this->l('The total room nights available for booking for the hotel.'),
+                'tooltip' => $this->l('The total room nights available for booking for the property.'),
             ),
             array(
                 'id' => 'totalOrders',
@@ -165,7 +165,7 @@ class StatsBestCategories extends ModuleGrid
             SELECT IFNULL(SUM(DATEDIFF(LEAST(hbd.`date_to`, "'.pSQL($date_to).'"), GREATEST(hbd.`date_from`, "'.pSQL($date_from).'"))), 0)
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
-            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1 AND is_refunded = 0
+            WHERE hbd.`id_hotel` = hbi.`id` AND o.`valid` = 1 AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
             AND hbd.`date_to` > "'.pSQL($date_from).'" AND hbd.`date_from` < "'.pSQL($date_to).'"
         ) AS totalRoomsBooked,
         (

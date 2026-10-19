@@ -61,7 +61,7 @@
 						<tr>
 							<th>{l s='Rooms'}</th>
 							<th>{l s='Room type'}</th>
-							<th>{l s='Hotel'}</th>
+							<th>{l s='Property Name'}</th>
 							<th>{l s='Duration'}</th>
 							<th>{l s='Total rooms price (tax incl.)'}</th>
 							<th>{l s='Extra services price (tax incl.)'}</th>
@@ -84,7 +84,7 @@
 										{displayPrice price=$booking['refunded_amount'] currency=$orderCurrency['id']}
 									</td>
 									<td>
-										{if $booking['is_cancelled']}
+										{if $booking['id_status'] == $room_status_cancelled}
 											<span class="badge badge-danger">{l s='Cancelled' mod='hotelreservationsystem'}</span>
 										{* used id_customization to check if in this request which bookings are refunded or not*}
 										{else if $booking['id_customization']}

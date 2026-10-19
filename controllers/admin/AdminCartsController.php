@@ -50,7 +50,8 @@ class AdminCartsControllerCore extends AdminController
 		IF(o.id_order, 1, 0) badge_success, IF(o.id_order, 0, 1) badge_danger, IF(co.id_guest, 1, 0) id_guest';
         $this->_join = 'LEFT JOIN '._DB_PREFIX_.'customer c ON (c.id_customer = a.id_customer)
 		LEFT JOIN '._DB_PREFIX_.'currency cu ON (cu.id_currency = a.id_currency)
-		LEFT JOIN '._DB_PREFIX_.'orders o ON (o.id_cart = a.id_cart)
+		LEFT JOIN '._DB_PREFIX_.'htl_booking_detail hbd ON (hbd.id_cart = a.id_cart)
+		LEFT JOIN '._DB_PREFIX_.'orders o ON (o.id_cart = a.id_cart OR o.id_order = hbd.id_order)
 		LEFT JOIN `'._DB_PREFIX_.'connections` co ON (a.id_guest = co.id_guest AND TIME_TO_SEC(TIMEDIFF(\''.pSQL(date('Y-m-d H:i:00', time())).'\', co.`date_add`)) < 1800)';
         $this->_group = ' GROUP BY a.`id_cart`';
 
@@ -270,12 +271,12 @@ class AdminCartsControllerCore extends AdminController
         if (!($cart = $this->loadObject(true))) {
             return;
         }
+        $this->context->cart = $cart;
         if ($this->tabAccess['kpi'] === 1) {
             $this->content .= $this->renderKpis();
         }
         $customer = new Customer($cart->id_customer);
         $currency = new Currency($cart->id_currency);
-        $this->context->cart = $cart;
         $this->context->currency = $currency;
         $this->context->customer = $customer;
         $this->toolbar_title = sprintf($this->l('Cart #%06d'), $this->context->cart->id);
@@ -363,7 +364,7 @@ class AdminCartsControllerCore extends AdminController
         $objServiceProductCartDetail = new ServiceProductCartDetail();
         $hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
             $cart->id,
-            [Product::SELLING_PREFERENCE_HOTEL_STANDALONE, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE],
+            [],
             $idHotel = null,
             0,
             null,
@@ -377,9 +378,15 @@ class AdminCartsControllerCore extends AdminController
             1
         );
 
+        $hotelProducts = array_filter($hotelProducts, function ($product) {
+            return $product['id_hotel'] > 0 && $product['id_hotel_cart_booking'] == 0;
+        });
+
         $standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
             $cart->id,
-            [Product::SELLING_PREFERENCE_STANDALONE]
+            [],
+            0,
+            0
         );
 
         if (count($standaloneProducts)) {
@@ -401,6 +408,7 @@ class AdminCartsControllerCore extends AdminController
             'total_discounts' => $total_discounts,
             'total_wrapping' => $total_wrapping,
             'total_price' => $total_price,
+            'total_tourism_tax' => isset($summary['total_tourism_tax']) ? $summary['total_tourism_tax'] : 0,
             'total_shipping' => $total_shipping,
             'customized_datas' => $customized_datas,
             'tax_calculation_method' => $tax_calculation_method
@@ -695,6 +703,7 @@ class AdminCartsControllerCore extends AdminController
                 'cart_detail_data' => $cart_detail_data,
                 'cart' => $objCart,
                 'currency' => new Currency((int)$this->context->cart->id_currency),
+                'can_edit_booking_carts' => ($this->tabAccess['edit'] === 1),
                 'occupancy_required_for_booking' => $occupancyRequiredForBooking,
                 'ajax' => true
             ));
@@ -1056,7 +1065,7 @@ class AdminCartsControllerCore extends AdminController
                 if ($bookingInfo['id'] == $id_booking_data) {
                     $amt_with_qty = $bookingInfo['amt_with_qty'];
                     $bookingInfo['amt_with_qty'] = Tools::displayPrice($amt_with_qty);
-                    $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['demand_price'] + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
+                     $bookingInfo['total_price'] = Tools::displayPrice($amt_with_qty + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
                     $response = array(
                         'curr_booking_info' => $bookingInfo,
                         'cart_info' => $this->ajaxReturnVars(),
@@ -1129,7 +1138,7 @@ class AdminCartsControllerCore extends AdminController
                 if ($bookingInfo['id'] == $idBookingData) {
                     $amtWithQty = $bookingInfo['amt_with_qty'];
                     $bookingInfo['amt_with_qty'] = Tools::displayPrice($amtWithQty);
-                    $bookingInfo['total_price'] = Tools::displayPrice($amtWithQty + $bookingInfo['demand_price'] + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
+                    $bookingInfo['total_price'] = Tools::displayPrice($amtWithQty + $bookingInfo['additional_service_price'] + $bookingInfo['additional_services_auto_add_price']);
                     $response = array(
                         'curr_booking_info' => $bookingInfo,
                         'cart_info' => $this->ajaxReturnVars(),
@@ -1153,8 +1162,8 @@ class AdminCartsControllerCore extends AdminController
         }
     }
 
-    // Process to get extra demands of any room while order creation process form.tpl
-    public function ajaxProcessGetRoomTypeCartDemands()
+    // Process to get extra services of any room while order creation process form.tpl
+    public function ajaxProcessGetRoomTypeCartServices()
     {
         $response['hasError'] = false;
         $response['errors'] = [];
@@ -1166,69 +1175,50 @@ class AdminCartsControllerCore extends AdminController
             && ($idHotelCartBooking = Tools::getValue('id_hotel_cart_booking'))
         ) {
             $objCartBookingData = new HotelCartBookingData();
-            if ($selectedRoomDemands = $objCartBookingData->getCartExtraDemands(
-                $idCart,
-                $idProduct,
-                $idRoom,
-                $dateFrom,
-                $dateTo
-            )) {
-                // get room type additional demands
-                $objRoomDemands = new HotelRoomTypeDemand();
-                if ($roomTypeDemands = $objRoomDemands->getRoomTypeDemands($idProduct)) {
-                    foreach ($roomTypeDemands as &$demand) {
-                        // if demand has advance options then set demand price as first advance option price.
-                        if (isset($demand['adv_option']) && $demand['adv_option']) {
-                            $demand['price'] = current($demand['adv_option'])['price'];
-                        }
-                    }
-                    foreach ($selectedRoomDemands as &$selectedDemand) {
-                        $objRoom = new HotelRoomInformation($selectedDemand['id_room']);
-                        $selectedDemand['room_num'] = $objRoom->room_num;
-                        if (isset($selectedDemand['extra_demands']) && $selectedDemand['extra_demands']) {
-                            $extraDmd = array();
-                            foreach ($selectedDemand['extra_demands'] as $sDemand) {
-                                $selectedDemand['selected_global_demands'][] = $sDemand['id_global_demand'];
-                                $extraDmd[$sDemand['id_global_demand'].'-'.$sDemand['id_option']] = $sDemand;
-                            }
-                            $selectedDemand['extra_demands'] = $extraDmd;
-                        }
-                    }
-                    $this->context->smarty->assign('roomTypeDemands', $roomTypeDemands);
-                    $this->context->smarty->assign('selectedRoomDemands', $selectedRoomDemands);
-                }
-            }
 
             $selectedRoomServiceProduct = array();
             if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                 // get all services
                 $objProduct = new Product();
-                $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-                $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                $serviceProducts = array_values(array_filter(
+                    $objProduct->getServiceProducts(true),
+                    function ($serviceProduct) {
+                        return Product::isSellableWithRoomType($serviceProduct['id_product']);
+                    }
+                ));
+                if ($serviceProducts) {
+                    foreach ($serviceProducts as $key => $servProduct) {
+
+                        if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$servProduct['id_product']))
+                            && Product::getQuantity((int)$servProduct['id_product']) <= 0
+                        ) {
+                            unset($serviceProducts[$key]);
+                            continue;
+                        }
+
+                        $numDays = Product::getServicePriceBillableDays(
+                            $servProduct['price_calculation_method'],
+                            $dateFrom,
+                            $dateTo
+                        );
+
+                        $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                            $servProduct['id_product'],
+                            0,
+                            0,
+                            $idProduct,
+                            false,
+                            1,
+                            $dateFrom,
+                            $dateTo,
+                            $idCart
+                        ) / max($numDays, 1);
+                    }
+                }
+
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($idProduct, 1, 0, false, 2, null);
-            }
-
-            if ($serviceProducts) {
-                foreach ($serviceProducts as $key => $servProduct) {
-                    $numDays = 1;
-                    if (Product::PRICE_CALCULATION_METHOD_PER_DAY == $servProduct['price_calculation_method']) {
-                        $numDays = HotelHelper::getNumberOfDays($dateFrom, $dateTo);
-                    }
-                    $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
-                        $servProduct['id_product'],
-                        0,
-                        0,
-                        $idProduct,
-                        false,
-                        1,
-                        $dateFrom,
-                        $dateTo,
-                        $idCart
-                    )/$numDays;
-                }
             }
 
             $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -1265,11 +1255,12 @@ class AdminCartsControllerCore extends AdminController
                 'serviceProducts' => $serviceProducts,
                 'selectedRoomServiceProduct' => $selectedRoomServiceProduct,
                 'customServiceAllowed' => Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING'),
-                'loaderImg' => $this->context->link->getMediaLink(_PS_IMG_.'admin/ajax-loader.gif')
+                'loaderImg' => $this->context->link->getMediaLink(_PS_IMG_.'admin/ajax-loader.gif'),
+                'can_edit' => $this->tabAccess['edit'],
             ));
 
-            $response['html_exta_demands'] = $this->context->smarty->fetch(
-                _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_demands.tpl'
+            $response['html_exta_services'] = $this->context->smarty->fetch(
+                _PS_ADMIN_DIR_.'/themes/default/template/controllers/orders/_cart_booking_services.tpl'
             );
         } else {
             $response['hasError'] = true;
@@ -1277,26 +1268,6 @@ class AdminCartsControllerCore extends AdminController
         }
 
         $this->ajaxDie(json_encode($response));
-    }
-
-    // Process when admin changes extra demands of any room while order creation process form.tpl
-    public function ajaxProcessChangeRoomDemands()
-    {
-        if ($this->tabAccess['edit'] === 1) {
-            $response = array('status' => false);
-            if ($idCartBooking = Tools::getValue('id_cart_booking')) {
-                if (Validate::isLoadedObject($objCartbookingCata = new HotelCartBookingData($idCartBooking))) {
-                    $roomDemands = Tools::getValue('room_demands');
-                    $roomDemands = json_decode($roomDemands, true);
-                    $roomDemands = json_encode($roomDemands);
-                    $objCartbookingCata->extra_demands = $roomDemands;
-                    if ($objCartbookingCata->save()) {
-                        $response['status'] = true;
-                    }
-                }
-            }
-            $this->ajaxDie(json_encode($response));
-        }
     }
 
     public static function getOrderTotalUsingTaxCalculationMethod($id_cart)
@@ -1374,9 +1345,14 @@ class AdminCartsControllerCore extends AdminController
                 $idHotelCartBooking = Tools::getValue('id_hotel_cart_booking');
                 // valiadate services being added
                 if (Validate::isLoadedObject($objHtlCartBooking = new HotelCartBookingData($idHotelCartBooking))) {
+                    $objCart = new Cart($objHtlCartBooking->id_cart);
                     $name = trim(Tools::getValue('new_service_name'));
                     $price = Tools::getValue('new_service_price');
-                    $priceCalcMethod = Tools::getValue('new_service_price_calc_method');
+                    if (Tools::getValue('price_calculation_type') == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING) {
+                        $priceCalcMethod = Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING;
+                    } elseif (is_array(Tools::getValue('new_service_price_calc_method'))) {
+                        $priceCalcMethod = array_sum(array_map('intval', Tools::getValue('new_service_price_calc_method')));
+                    }
                     $priceAdditionType = Tools::getValue('new_service_price_addition_type');
                     $productQty = Tools::getValue('new_service_qty');
                     $idTaxRuleGroup = Tools::getValue('new_service_price_tax_rule_group');
@@ -1408,6 +1384,15 @@ class AdminCartsControllerCore extends AdminController
                         $response['hasError'] = true;
                         $response['errors'][] = Tools::displayError('Invalid service name');
                     }
+                    
+                    if (empty($priceCalcMethod)) {
+                        $response['hasError'] = true;
+                        $response['errors'][] = Tools::displayError('Please select at least one day to apply the price calculation method.');
+                    } elseif (
+                        !Validate::isUnsignedInt($priceCalcMethod)) {
+                        $response['hasError'] = true;
+                        $response['errors'][] = Tools::displayError('Invalid price calculation method.');
+                    }
 
                     if (!isset($price)) {
                         $response['hasError'] = true;
@@ -1420,6 +1405,12 @@ class AdminCartsControllerCore extends AdminController
                     // if no validation errors then add service
                     if (!$response['hasError']) {
                         // ======= START: Create Service product  =========
+                        if ($objCart->id_currency != (int)Configuration::get('PS_CURRENCY_DEFAULT')) {
+                            $currency = Currency::getCurrencyInstance($objCart->id_currency);
+                            $price = Tools::ps_round($price/$currency->conversion_rate, 6);
+                            $this->context->currency = new Currency((int) $objCart->id_currency);
+                        }
+
                         $objServiceProduct = new Product();
                         $objServiceProduct->price_calculation_method = $priceCalcMethod;
                         $objServiceProduct->selling_preference_type = Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
@@ -1459,7 +1450,6 @@ class AdminCartsControllerCore extends AdminController
                                 RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
                             );
                             // If service product is create successfully the start adding the product in cart and order
-                            $objCart = new Cart($objHtlCartBooking->id_cart);
                             $objServiceProduct = new Product($objServiceProduct->id, false, $objCart->id_lang);
 
                             $objServiceProductCartDetail = new ServiceProductCartDetail();
@@ -1526,19 +1516,46 @@ class AdminCartsControllerCore extends AdminController
             if (Configuration::get('PS_ALLOW_ADD_ALL_SERVICES_IN_BOOKING')) {
                 // get all services
                 $objProduct = new Product();
-                $hotelServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE);
-                $roomTypeServiceProducts = $objProduct->getServiceProducts(true, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
-                $serviceProducts = array_merge($roomTypeServiceProducts, $hotelServiceProducts);
+                $serviceProducts = array_values(array_filter(
+                    $objProduct->getServiceProducts(true),
+                    function ($serviceProduct) {
+                        return Product::isSellableWithRoomType($serviceProduct['id_product']);
+                    }
+                ));
+                if ($serviceProducts) {
+                    foreach ($serviceProducts as $key => $servProduct) {
+
+                        if (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$servProduct['id_product']))
+                            && Product::getQuantity((int)$servProduct['id_product']) <= 0
+                        ) {
+                            unset($serviceProducts[$key]);
+                            continue;
+                        }
+
+                        $numDays = Product::getServicePriceBillableDays(
+                            $servProduct['price_calculation_method'],
+                            $objCartBookingData->date_from,
+                            $objCartBookingData->date_to
+                        );
+                        
+                        $serviceProducts[$key]['price_tax_exc'] = Product::getServiceProductPrice(
+                            $servProduct['id_product'],
+                            0,
+                            0,
+                            $objCartBookingData->id_product,
+                            false,
+                            1,
+                            $objCartBookingData->date_from,
+                            $objCartBookingData->date_to,
+                            $objCartBookingData->id_cart
+                        )/ max($numDays, 1);
+                    }
+                }
             } else {
                 $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                 $serviceProducts = $objRoomTypeServiceProduct->getServiceProductsData($objCartBookingData->id_product, 1, 0, false, 2, null);
             }
 
-            if ($serviceProducts) {
-                foreach ($serviceProducts as $key => $servProduct) {
-                    $serviceProducts[$key]['price_tax_exc'] = $servProduct['price'];
-                }
-            }
 
             $objServiceProductCartDetail = new ServiceProductCartDetail();
             if ($selectedRoomServiceProduct = $objCartBookingData->getRoomRowByIdProductIdRoomInDateRange(
@@ -1574,6 +1591,7 @@ class AdminCartsControllerCore extends AdminController
                 'serviceProducts' => $serviceProducts,
                 'selectedRoomServiceProduct' => $selectedRoomServiceProduct,
                 'customServiceAllowed' => Configuration::get('PS_ALLOW_CREATE_CUSTOM_SERVICES_IN_BOOKING'),
+                'can_edit' => $this->tabAccess['edit'],
             ));
 
             $servicesTpl = $this->context->smarty->fetch(
@@ -1589,7 +1607,9 @@ class AdminCartsControllerCore extends AdminController
     {
         $response = array('hasError' => false);
         // Check tab access is allowed to edit
-        if ($this->tabAccess['add'] === 1) {
+        $canAdd = ($this->tabAccess['add'] === 1);
+        $canEdit = ($this->tabAccess['edit'] === 1);
+        if ($canAdd || $canEdit) {
             $idCartBooking = Tools::getValue('id_hotel_cart_booking');
             if (Validate::isLoadedObject($objHotelCartBookingData = new HotelCartBookingData($idCartBooking))) {
                 $objCart = new Cart($objHotelCartBookingData->id_cart);
@@ -1621,6 +1641,39 @@ class AdminCartsControllerCore extends AdminController
                             ) {
                                 $response['hasError'] = true;
                                 $response['errors'][] = Tools::displayError('Invalid unit price for service').': '.$objProduct->name;
+                            }
+
+                            if ($selected && $objProduct->allow_multiple_quantity
+                                && isset($serviceQuantities[$idServiceProduct])
+                                && Validate::isUnsignedInt($serviceQuantities[$idServiceProduct])
+                            ) {
+                                $cartTotalQty = Cart::getProductQtyInCart($objCart->id, $idServiceProduct);
+
+                                $qty = (int)$serviceQuantities[$idServiceProduct];
+                                $numDays = Product::getServicePriceBillableDays(
+                                    $objProduct->price_calculation_method,
+                                    $objHotelCartBookingData->date_from,
+                                    $objHotelCartBookingData->date_to
+                                );
+
+                                $existingQty = 0;
+                                $objSpCartDetail = new ServiceProductCartDetail();
+                                if ($idExistingDetail = $objSpCartDetail->alreadyExists(
+                                    $objCart->id,
+                                    $idServiceProduct,
+                                    $idCartBooking
+                                )) {
+                                    $existingQty = (int)(new ServiceProductCartDetail($idExistingDetail))->quantity * $numDays;
+                                }
+
+                                $finalQty = (int)$cartTotalQty - $existingQty + ($qty * $numDays);
+                                if ($objProduct->max_quantity && $finalQty > $objProduct->max_quantity) {
+                                    $response['hasError'] = true;
+                                    $response['errors'][] = Tools::displayError(sprintf('Cannot add more than %d quantity.', $objProduct->max_quantity)).': '.$objProduct->name;
+                                } elseif (!Product::isAvailableWhenOutOfStock(StockAvailable::outOfStock((int)$idServiceProduct)) && !$objProduct->checkQty($finalQty)) {
+                                    $response['hasError'] = true;
+                                    $response['errors'][] = Tools::displayError('There isn\'t enough product in stock.').': '.$objProduct->name;
+                                }
                             }
                         } else {
                             $response['errors'][] = Tools::displayError('Some services not found. please try after refreshing the page');
@@ -1666,45 +1719,52 @@ class AdminCartsControllerCore extends AdminController
                                 $idCartBooking
                             ))) {
                                 $originalPrice = Product::getPriceStatic($idServiceProduct, false);
+                                $specificPriceInfo = SpecificPrice::getSpecificPrice(
+                                    (int)$idServiceProduct,
+                                    0,
+                                    $objCart->id_currency,
+                                    0,
+                                    0,
+                                    1,
+                                    0,
+                                    0,
+                                    $objCart->id,
+                                    0,
+                                    $objHotelCartBookingData->id
+                                );
                                 // if price is different than the original service price then update the price
-                                if ($operator == 'up' && $originalPrice != $unitPrice) {
-                                    if ($specificPriceInfo = SpecificPrice::getSpecificPrice(
-                                        (int)$idServiceProduct,
-                                        0,
-                                        $objCart->id_currency,
-                                        0,
-                                        0,
-                                        1,
-                                        0,
-                                        0,
-                                        $objCart->id,
-                                        0,
-                                        $objHotelCartBookingData->id
-                                    )) {
-                                        $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
-                                    } else {
-                                        $objSpecificPrice = new SpecificPrice();
-                                    }
-                                    $objSpecificPrice->id_shop = 0;
-                                    $objSpecificPrice->id_shop_group = 0;
-                                    $objSpecificPrice->id_cart = $objCart->id;
-                                    $objSpecificPrice->id_currency = $objCart->id_currency;
-                                    $objSpecificPrice->id_country = 0;
-                                    $objSpecificPrice->id_group = 0;
-                                    $objSpecificPrice->id_customer = 0;
-                                    $objSpecificPrice->id_product = $idServiceProduct;
-                                    $objSpecificPrice->id_product_attribute = 0;
-                                    $objSpecificPrice->price = $unitPrice;
-                                    $objSpecificPrice->from_quantity = 1;
-                                    $objSpecificPrice->reduction = 0;
-                                    $objSpecificPrice->id_htl_cart_booking = $objHotelCartBookingData->id;
-                                    $objSpecificPrice->reduction_type = 'amount';
-                                    $objSpecificPrice->reduction_tax = 0;
-                                    $objSpecificPrice->from = '0000-00-00 00:00:00';
-                                    $objSpecificPrice->to = '0000-00-00 00:00:00';
+                                if($canEdit && $operator == 'up'){
+                                    if ($originalPrice != $unitPrice) {
+                                        if ($specificPriceInfo) {
+                                            $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
+                                        } else {
+                                            $objSpecificPrice = new SpecificPrice();
+                                        }
+                                        $objSpecificPrice->id_shop = 0;
+                                        $objSpecificPrice->id_shop_group = 0;
+                                        $objSpecificPrice->id_cart = $objCart->id;
+                                        $objSpecificPrice->id_currency = $objCart->id_currency;
+                                        $objSpecificPrice->id_country = 0;
+                                        $objSpecificPrice->id_group = 0;
+                                        $objSpecificPrice->id_customer = 0;
+                                        $objSpecificPrice->id_product = $idServiceProduct;
+                                        $objSpecificPrice->id_product_attribute = 0;
+                                        $objSpecificPrice->price = $unitPrice;
+                                        $objSpecificPrice->from_quantity = 1;
+                                        $objSpecificPrice->reduction = 0;
+                                        $objSpecificPrice->id_htl_cart_booking = $objHotelCartBookingData->id;
+                                        $objSpecificPrice->reduction_type = 'amount';
+                                        $objSpecificPrice->reduction_tax = 0;
+                                        $objSpecificPrice->from = '0000-00-00 00:00:00';
+                                        $objSpecificPrice->to = '0000-00-00 00:00:00';
 
-                                    $result &= $objSpecificPrice->save();
+                                        $result &= $objSpecificPrice->save();
+                                    } elseif ($specificPriceInfo) {
+                                        $objSpecificPrice = new SpecificPrice($specificPriceInfo['id_specific_price']);
+                                        $result &= $objSpecificPrice->delete();
+                                    }
                                 }
+                                
                             }
                         }
 

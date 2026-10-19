@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Chile" version="1.0">
 	<currencies>
-		<currency name="Peso" iso_code="CLP" iso_code_num="152" sign="$" blank="1" conversion_rate="658.996" format="2" decimals="1" />
+		<currency name="Peso" iso_code="CLP" iso_code_num="152" sign="$" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="es" />
 	</languages>
 	<taxes>
 		<tax id="1" name="IVA CL 19%" rate="19" />
-		
+
 		<taxRulesGroup name="CL Standard Rate (19%)">
 			<taxRule iso_code_country="cl" id_tax="1" />
 		</taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Antofagasta" iso_code="AN" country="CL" zone="South America" />
+		<state name="Arica y Parinacota" iso_code="AP" country="CL" zone="South America" />
+		<state name="Atacama" iso_code="AT" country="CL" zone="South America" />
+		<state name="Aysén" iso_code="AI" country="CL" zone="South America" />
+		<state name="Biobío" iso_code="BI" country="CL" zone="South America" />
+		<state name="Coquimbo" iso_code="CO" country="CL" zone="South America" />
+		<state name="La Araucanía" iso_code="AR" country="CL" zone="South America" />
+		<state name="Los Lagos" iso_code="LL" country="CL" zone="South America" />
+		<state name="Los Ríos" iso_code="LR" country="CL" zone="South America" />
+		<state name="Magallanes" iso_code="MA" country="CL" zone="South America" />
+		<state name="Maule" iso_code="ML" country="CL" zone="South America" />
+		<state name="Ñuble" iso_code="NB" country="CL" zone="South America" />
+		<state name="Metrop. de Santiago" iso_code="RM" country="CL" zone="South America" />
+		<state name="O'Higgins" iso_code="LI" country="CL" zone="South America" />
+		<state name="Tarapacá" iso_code="TA" country="CL" zone="South America" />
+		<state name="Valparaíso" iso_code="VS" country="CL" zone="South America" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

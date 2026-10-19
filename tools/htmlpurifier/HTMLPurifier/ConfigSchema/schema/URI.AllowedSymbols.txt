@@ -1,0 +1,7 @@
+URI.AllowedSymbols
+TYPE: string/null
+DEFAULT: '!$&\'()*+,;='
+--DESCRIPTION--
+If a system permits templated URLs, then the URI encoder may need extra
+hints about which symbols to preserve.
+--# vim: et sw=4 sts=4

@@ -301,7 +301,7 @@ class AdminSupplyOrdersControllerCore extends AdminController
                         'required' => false,
                         'hint' => array(
                             $this->l('This will reset the order.'),
-                            $this->l('If a value specified, each of your current product (from the selected supplier and warehouse) with a quantity lower than or equal to this value will be loaded. This means that PrestaShop will pre-fill this order with the products that are low on quantity.'),
+                            $this->l('If a value specified, each of your current product (from the selected supplier and warehouse) with a quantity lower than or equal to this value will be loaded. This means that QloApps will pre-fill this order with the products that are low on quantity.'),
                         ),
                     ),
                 ),

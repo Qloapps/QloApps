@@ -63,14 +63,15 @@
 											<dl class="products">
 												{foreach from=$products key=data_k item='product' name='myLoop'}
 												{* only show products that are booking or global without room *}
-													{if $product.booking_product || ($product.selling_preference_type == Product::SELLING_PREFERENCE_STANDALONE)|| ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE) || ($product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE)}
-														{if $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE || $product.selling_preference_type == Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}
-                                                            {if isset($product.hotel_wise_data) && $product.hotel_wise_data}
-                                                                {foreach $product.hotel_wise_data as $hotel_wise_data}
-                                                                    {include file="./cartrow.tpl" hotel_wise_data=$hotel_wise_data}
-                                                                {/foreach}
-                                                            {/if}
-														{else}
+													{if $product.booking_product || Product::isSellableAsStandalone($product.id_product) || Product::isSellableWithHotel($product.id_product)}
+														{if Product::isSellableWithHotel($product.id_product) && isset($product.hotel_wise_data) && $product.hotel_wise_data}
+															{foreach $product.hotel_wise_data as $hotel_wise_data}
+																{include file="./cartrow.tpl" hotel_wise_data=$hotel_wise_data}
+															{/foreach}
+														{/if}
+														{if $product.booking_product
+															|| (!Product::isSellableWithHotel($product.id_product) && !Product::isSellableWithRoomType($product.id_product))
+															|| (Product::isSellableAsStandalone($product.id_product) && $product.standalone_total_qty > 0)}
 															{include file="./cartrow.tpl" hotel_wise_data=false}
 														{/if}
 													{/if}
@@ -136,14 +137,31 @@
 											{/if} --><!-- commented by webkul unnecessary data -->
 											{block name='blockcart_shopping_cart_total_tax'}
 												{if $show_tax && $use_tax}
-													<div class="cart-prices-line">
+													{* Always rendered — see blockcart_shopping_cart_total_tourism_tax below for why a value-gated {if} would break on later AJAX-only cart updates. *}
+													<div class="cart-prices-line ajax_cart_tax_line"{if !isset($show_tourism_tax_separately) || !$show_tourism_tax_separately || !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
 														<span class="price cart_block_tax_cost ajax_cart_tax_cost">{$tax_cost}</span>
-														<span>{l s='Tax' mod='blockcart'}</span>
+														<span>{l s='Room and Service Tax' mod='blockcart'}</span>
+													</div>
+												{/if}
+											{/block}
+											{block name='blockcart_shopping_cart_total_tourism_tax'}
+												{if $show_tax && $use_tax}
+													<div class="cart-prices-line ajax_cart_tourism_tax_line"{if !isset($show_tourism_tax_separately) || !$show_tourism_tax_separately || !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
+														<span class="price cart_block_tourism_tax_cost ajax_cart_tourism_tax_cost">{$tourism_tax_cost}</span>
+														<span>{l s='Total Tourism Tax' mod='blockcart'}</span>
+													</div>
+												{/if}
+											{/block}
+											{block name='blockcart_shopping_cart_total_taxes_combined'}
+												{if $show_tax && $use_tax}
+													<div class="cart-prices-line ajax_cart_total_taxes_line"{if isset($show_tourism_tax_separately) && $show_tourism_tax_separately && isset($tourism_tax) && $tourism_tax > 0} style="display:none"{/if}>
+														<span class="price cart_block_total_taxes_cost ajax_cart_total_taxes_cost">{$total_taxes_cost}</span>
+														<span>{l s='Total Taxes' mod='blockcart'}</span>
 													</div>
 												{/if}
 											{/block}
 											{block name='blockcart_shopping_cart_total_convenience_fee'}
-												{if isset($total_convenience_fee)}
+												{if isset($total_convenience_fee) && $total_convenience_fee}
 													<div class="cart-prices-line">
 														<span class="price cart_block_convenience_fee ajax_cart_convenience_fee">{convertPrice price=$total_convenience_fee}</span>
 														<span class="price">{l s='Convenience Fees' mod='blockcart'}</strong>
@@ -196,7 +214,7 @@
 							<span class="cross" title="{l s='Close window' mod='blockcart'}"></span>
 							{block name='blockcart_layer_cart_left_heading'}
 								<h2 class="layer_cart_room_txt">
-									<i class="icon-check"></i>{l s='Room successfully added to your cart' mod='blockcart'}
+									<i class="icon-check"></i><span class="layer_cart_room_success_msg">{l s='Room successfully added to your cart' mod='blockcart'}</span>
 								</h2>
 								<h2 class="layer_cart_product_txt">
 									<i class="icon-check"></i>{l s='Product successfully added to your cart' mod='blockcart'}
@@ -215,7 +233,7 @@
 										<span id="layer_cart_product_time_duration"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_product_txt">{l s='Hotel Name' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_product_txt">{l s='Property Name' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_hotel_name"></span>
 									</div>
 									<div>
@@ -223,12 +241,12 @@
 										<span id="layer_cart_product_unit_price"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_room_txt">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_room_txt"><span class="layer_cart_attribute_type">{if isset($occupancy_required_for_booking) && $occupancy_required_for_booking}{l s='Room occupancy' mod='blockcart'}{else}{l s='Rooms quantity added' mod='blockcart'}{/if}</span> &nbsp;-&nbsp;</strong>
 										<strong class="dark layer_cart_product_txt">{l s='Quantity' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_quantity"></span>
 									</div>
 									<div>
-										<strong class="dark layer_cart_room_txt">{l s='Room type cost' mod='blockcart'} &nbsp;-&nbsp;</strong>
+										<strong class="dark layer_cart_room_txt"><span class="layer_cart_room_type_cost_label">{l s='Room type cost' mod='blockcart'}</span> &nbsp;-&nbsp;</strong>
 										<strong class="dark layer_cart_product_txt">{l s='Total' mod='blockcart'} &nbsp;-&nbsp;</strong>
 										<span id="layer_cart_product_price"></span>
 									</div>
@@ -256,7 +274,7 @@
 								<div class="layer_cart_row">
 									<strong class="dark">
 										{l s='Total Rooms Cost in cart' mod='blockcart'}
-										{if $display_tax_label}
+										{if $use_taxes && $display_tax_label}
 											{if $priceDisplay == 1}
 												{l s='(tax excl.)' mod='blockcart'}
 											{else}
@@ -266,7 +284,7 @@
 									</strong>
 									<span class="ajax_block_room_total pull-right">
 										{if $cart_qties > 0}
-											{convertPrice price=$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS)}
+											{convertPrice price=$cart->getOrderTotal(($priceDisplay != 1), Cart::ONLY_ROOMS)}
 										{/if}
 									</span>
 								</div>
@@ -275,7 +293,7 @@
 								<div class="layer_cart_row">
 									<strong class="dark">
 										{l s='Total Product Cost in cart' mod='blockcart'}
-										{if $display_tax_label}
+										{if $use_taxes && $display_tax_label}
 											{if $priceDisplay == 1}
 												{l s='(tax excl.)' mod='blockcart'}
 											{else}
@@ -285,7 +303,7 @@
 									</strong>
 									<span class="ajax_block_product_total pull-right">
 										{if $cart_qties > 0}
-											{convertPrice price=$cart->getOrderTotal(false, Cart::ONLY_PRODUCTS)}
+											{convertPrice price=$normal_products_total}
 										{/if}
 									</span>
 								</div>
@@ -314,7 +332,7 @@
 							{/if} -->
 							<!-- <div class="layer_cart_row">
 								<strong class="dark{if $shipping_cost_float == 0 && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} unvisible{/if}">
-									{l s='Total shipping' mod='blockcart'}&nbsp;{if $display_tax_label}{if $priceDisplay == 1}{l s='(tax excl.)' mod='blockcart'}{else}{l s='(tax incl.)' mod='blockcart'}{/if}{/if}
+									{l s='Total shipping' mod='blockcart'}&nbsp;{if $use_taxes && $display_tax_label}{if $priceDisplay == 1}{l s='(tax excl.)' mod='blockcart'}{else}{l s='(tax incl.)' mod='blockcart'}{/if}{/if}
 								</strong>
 								<span class="ajax_cart_shipping_cost{if $shipping_cost_float == 0 && (!isset($cart->id_address_delivery) || !$cart->id_address_delivery)} unvisible{/if}">
 									{if $shipping_cost_float == 0}
@@ -325,11 +343,11 @@
 								</span>
 							</div> -->
 							{block name='blockcart_layer_cart_total_convenience_fee'}
-								{if isset($total_convenience_fee)}
+								{if isset($total_convenience_fee) && $total_convenience_fee}
 									<div class="layer_cart_row">
 										<strong class="dark">
 											{l s='Convenience Fees' mod='blockcart'}
-											{if $display_tax_label}
+											{if $use_taxes && $display_tax_label}
 												{if $priceDisplay == 1}
 													{l s='(tax excl.)' mod='blockcart'}
 												{else}
@@ -343,9 +361,29 @@
 							{/block}
 							{block name='blockcart_layer_cart_total_tax'}
 								{if $show_tax && $use_tax}
-									<div class="layer_cart_row">
-										<strong class="dark">{l s='Tax' mod='blockcart'}</strong>
+									{* Always rendered — see the matching dropdown block above for why a value-gated
+									   {if} would break on later AJAX-only cart updates. *}
+									<div class="layer_cart_row ajax_cart_tax_line"{if !isset($show_tourism_tax_separately) || !$show_tourism_tax_separately || !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
+										<strong class="dark">{l s='Room and Service Tax' mod='blockcart'}</strong>
 										<span class="price cart_block_tax_cost ajax_cart_tax_cost pull-right">{$tax_cost}</span>
+									</div>
+								{/if}
+							{/block}
+							{block name='blockcart_layer_cart_total_tourism_tax'}
+								{if $show_tax && $use_tax}
+									{* Always rendered — see the matching dropdown block above for why a value-gated
+									   {if} would break on later AJAX-only cart updates. *}
+									<div class="layer_cart_row ajax_cart_tourism_tax_line"{if !isset($show_tourism_tax_separately) || !$show_tourism_tax_separately || !isset($tourism_tax) || $tourism_tax <= 0} style="display:none"{/if}>
+										<strong class="dark">{l s='Total Tourism Tax' mod='blockcart'}</strong>
+										<span class="price cart_block_tourism_tax_cost ajax_cart_tourism_tax_cost pull-right">{$tourism_tax_cost}</span>
+									</div>
+								{/if}
+							{/block}
+							{block name='blockcart_layer_cart_total_taxes_combined'}
+								{if $show_tax && $use_tax}
+									<div class="layer_cart_row ajax_cart_total_taxes_line"{if isset($show_tourism_tax_separately) && $show_tourism_tax_separately && isset($tourism_tax) && $tourism_tax > 0} style="display:none"{/if}>
+										<strong class="dark">{l s='Total Taxes' mod='blockcart'}</strong>
+										<span class="price cart_block_total_taxes_cost ajax_cart_total_taxes_cost pull-right">{$total_taxes_cost}</span>
 									</div>
 								{/if}
 							{/block}
@@ -353,7 +391,7 @@
 								<div class="layer_cart_row">
 									<strong class="dark">
 										{l s='Total' mod='blockcart'}
-										{if $display_tax_label}
+										{if $use_taxes && $display_tax_label}
 											{if $priceDisplay == 1}
 												{l s='(tax excl.)' mod='blockcart'}
 											{else}
@@ -403,9 +441,12 @@
 		{addJsDef ajax_allowed=$ajax_allowed|boolval}
 		{addJsDef hasDeliveryAddress=(isset($cart->id_address_delivery) && $cart->id_address_delivery)}
 		{addJsDef SELLING_PREFERENCE_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_WITH_ROOM_TYPE}
-		{addJsDef SELLING_PREFERENCE_STANDALONE=Product::SELLING_PREFERENCE_STANDALONE}
-		{addJsDef SELLING_PREFERENCE_HOTEL_STANDALONE=Product::SELLING_PREFERENCE_HOTEL_STANDALONE}
-		{addJsDef SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE}
+		{addJsDef SELLING_PREFERENCE_WITH_STANDALONE=Product::SELLING_PREFERENCE_WITH_STANDALONE}
+		{addJsDef SELLING_PREFERENCE_WITH_HOTEL=Product::SELLING_PREFERENCE_WITH_HOTEL}
+		{addJsDef SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE}
+		{addJsDef SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE=Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE}
+		{addJsDef SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE=Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE}
+		{addJsDef SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE=Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE}
 
 		{addJsDefL name=customizationIdMessage}{l s='Customization #' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDefL name=removingLinkText}{l s='remove this product from my cart' mod='blockcart' js=1}{/addJsDefL}

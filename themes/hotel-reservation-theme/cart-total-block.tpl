@@ -22,23 +22,23 @@
 
 
 <div class="col-sm-12 card cart_total_detail_block">
-    {if $total_rooms_wt + $total_extra_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt}
+    {if $total_rooms_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt}
         <p>
             <span>
                 {l s='Total rooms cost'}
-                {if $display_tax_label}
-                    {if $use_taxes && $priceDisplay == 0}
-                        {l s='(tax incl)'}
-                    {else}
-                        {l s='(tax excl)'}
-                    {/if}
+                {if $display_tax_label && $use_taxes}
+                        {if $priceDisplay == 0}
+                            {l s='(tax incl)'}
+                        {else}
+                            {l s='(tax excl)'}
+                        {/if}
                 {/if}
             </span>
             <span class="cart_total_values">
                 {if $use_taxes && $priceDisplay == 0}
-                    {assign var='total_rooms_cost' value=($total_rooms_wt + $total_extra_demands_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt)}
+                    {assign var='total_rooms_cost' value=($total_rooms_wt + $total_additional_services_wt + $total_additional_services_auto_add_wt)}
                 {else}
-                    {assign var='total_rooms_cost' value=($total_rooms + $total_extra_demands + $total_additional_services + $total_additional_services_auto_add)}
+                    {assign var='total_rooms_cost' value=($total_rooms + $total_additional_services + $total_additional_services_auto_add)}
                 {/if}
                 {displayPrice price=$total_rooms_cost}
             </span>
@@ -48,8 +48,8 @@
         <p>
             <span>
                 {l s='Total products'}
-                {if $display_tax_label}
-                    {if $use_taxes && $priceDisplay == 0}
+                {if $display_tax_label && $use_taxes}
+                    {if $priceDisplay == 0}
                         {l s='(tax incl)'}
                     {else}
                         {l s='(tax excl)'}
@@ -69,8 +69,8 @@
         <p>
             <span>
                 {l s='Convenience Fees'}
-                {if $display_tax_label}
-                    {if $use_taxes && $priceDisplay == 0}
+                {if $display_tax_label && $use_taxes}
+                    {if $priceDisplay == 0}
                         {l s='(tax incl)'}
                     {else}
                         {l s='(tax excl)'}
@@ -90,15 +90,26 @@
         {hook h='displayBeforeCartTotalTax'}
     {/block}
     {if $show_taxes}
-        <p class="cart_total_tax">
-            <span>{l s='Total tax'}</span>
-            <span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
-        </p>
+        {if (!isset($show_tourism_tax_separately) || $show_tourism_tax_separately) && isset($total_tourism_tax) && $total_tourism_tax > 0}
+            <p class="cart_total_tax">
+                <span>{l s='Room and Service Tax'}</span>
+                <span class="cart_total_values">{displayPrice price=($total_tax_without_discount)}</span>
+            </p>
+            <p class="cart_total_tourism_tax">
+                <span>{l s='Total Tourism Tax'}</span>
+                <span class="cart_total_values">{displayPrice price=$total_tourism_tax}</span>
+            </p>
+        {else}
+            <p class="cart_total_tax">
+                <span>{l s='Total Taxes'}</span>
+                <span class="cart_total_values">{displayPrice price=($total_tax_without_discount + $total_tourism_tax)}</span>
+            </p>
+        {/if}
     {/if}
     <p class="total_discount_block {if $total_discounts == 0}unvisible{/if}">
         <span>
-            {if $display_tax_label}
-                {if $use_taxes && $priceDisplay == 0}
+            {if $display_tax_label && $use_taxes}
+                {if $priceDisplay == 0}
                     {l s='Total Discount (tax incl)'}
                 {else}
                     {l s='Total Discount (tax excl)'}

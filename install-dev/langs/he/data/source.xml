@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<entity_source>
+  <source id="Direct_Website">
+    <name>אתר אינטרנט ישיר</name>
+  </source>
+  <source id="Walk_in">
+    <name>הגעה ללא הזמנה</name>
+  </source>
+  <source id="Phone">
+    <name>טלפון</name>
+  </source>
+  <source id="Email">
+    <name>אימייל</name>
+  </source>
+  <source id="Social_Media">
+    <name>מדיה חברתית</name>
+  </source>
+  <source id="WhatsApp">
+    <name>WhatsApp</name>
+  </source>
+  <source id="Booking_com">
+    <name>Booking.com</name>
+  </source>
+  <source id="Expedia">
+    <name>Expedia</name>
+  </source>
+  <source id="GoMMT">
+    <name>GoMMT (GoIbibo/MakeMyTrip)</name>
+  </source>
+  <source id="Agoda">
+    <name>Agoda</name>
+  </source>
+  <source id="Airbnb">
+    <name>Airbnb</name>
+  </source>
+  <source id="Trip_com">
+    <name>Trip.com (Ctrip)</name>
+  </source>
+  <source id="Bakuun">
+    <name>Bakuun</name>
+  </source>
+  <source id="Despegar">
+    <name>Despegar</name>
+  </source>
+  <source id="Yatra">
+    <name>Yatra</name>
+  </source>
+  <source id="Hostelworld">
+    <name>Hostelworld</name>
+  </source>
+  <source id="HyperGuest">
+    <name>HyperGuest</name>
+  </source>
+  <source id="Api_Order">
+    <name>הזמנת API</name>
+  </source>
+</entity_source>

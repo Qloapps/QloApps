@@ -36,7 +36,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
 
         $this->fields_options = array(
             'global' => array(
-                'title' =>  $this->l('Hotel Interior Description'),
+                'title' =>  $this->l('Property Interior Description'),
                 'icon' =>   'icon-cogs',
                 'fields' => array(
                     'HOTEL_INTERIOR_HEADING' => array(
@@ -188,7 +188,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
 
         $this->fields_form = array(
             'legend' => array(
-                'title' => $this->l('Add New Hotel Interior Image'),
+                'title' => $this->l('Add New Property Interior Image'),
                 'icon' => 'icon-list-ul'
             ),
             'input' => array(
@@ -200,7 +200,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 ),
                 array(
                     'type' => 'file',
-                    'label' => $this->l('Hotel Interior Image'),
+                    'label' => $this->l('Property Interior Image'),
                     'name' => 'interior_img',
                     'required' => true,
                     'display_image' => true,
@@ -252,7 +252,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         }
         if (!(Tools::getValue("id_interior_image") && !$file['size'])) {
             if (!$file['size']) {
-                $this->errors[] = $this->l('Hotel Interior Image Required.');
+                $this->errors[] = $this->l('Property Interior Image Required.');
             } elseif ($error = ImageManager::validateUpload($file, Tools::getMaxUploadSize())) {
                 $this->errors[] = $error;
             }

@@ -43,9 +43,9 @@ class HotelHelper
         Media::addJsDef($jsVars);
     }
 
-    public function insertHotelCommonFeatures()
+    public function insertHotelCommonAmenities()
     {
-        $parent_features_arr = array(
+        $parent_amenities_arr = array(
             'Business Services' => array(
                 'name' => array(
                     'en' => 'Business Services',
@@ -55,7 +55,7 @@ class HotelHelper
                     'ru' => 'Бизнес-услуги',
                     'es' => 'Servicios empresariales',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Business Center',
                         'nl' => 'Businesscentrum',
@@ -123,7 +123,7 @@ class HotelHelper
                     'ru' => 'Дополнительные услуги',
                     'es' => 'Servicios complementarios',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Internet Access Free',
                         'nl' => 'Gratis internettoegang',
@@ -175,7 +175,7 @@ class HotelHelper
                     'ru' => 'Развлечения',
                     'es' => 'Entretenimiento',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'DiscoTheatre',
                         'nl' => 'Discotheek/theater',
@@ -243,7 +243,7 @@ class HotelHelper
                     'ru' => 'Удобства',
                     'es' => 'Instalaciones',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Laundry Service',
                         'nl' => 'Wasservice',
@@ -359,7 +359,7 @@ class HotelHelper
                     'ru' => 'Общие услуги',
                     'es' => 'Servicios generales',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Room Service',
                         'nl' => 'Roomservice',
@@ -443,7 +443,7 @@ class HotelHelper
                     'ru' => 'В помещении',
                     'es' => 'Interior',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Parking',
                         'nl' => 'Parkeren',
@@ -479,7 +479,7 @@ class HotelHelper
                     'ru' => 'Интернет',
                     'es' => 'Internet',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Internet Access-Surcharge',
                         'nl' => 'Internettoegang - toeslag',
@@ -507,7 +507,7 @@ class HotelHelper
                     'ru' => 'На открытом воздухе',
                     'es' => 'Al aire libre',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Gardens',
                         'nl' => 'Tuinen',
@@ -591,7 +591,7 @@ class HotelHelper
                     'ru' => 'Парковка',
                     'es' => 'Aparcamiento',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Parking (Surcharge)',
                         'nl' => 'Parkeren (toeslag)',
@@ -627,7 +627,7 @@ class HotelHelper
                     'ru' => 'Спорт и отдых',
                     'es' => 'Deportes y recreación',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Health Club / Gym Facility Available',
                         'nl' => 'Health Club / Sportschool beschikbaar',
@@ -823,7 +823,7 @@ class HotelHelper
                     'ru' => 'Водные удобства',
                     'es' => 'Instalaciones acuáticas',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Swimming Pool',
                         'nl' => 'Zwembad',
@@ -875,7 +875,7 @@ class HotelHelper
                     'ru' => 'Вино и ужин',
                     'es' => 'Vino y cena',
                 ),
-                'features' => array(
+                'amenities' => array(
                     array(
                         'en' => 'Bar / Lounge',
                         'nl' => 'Bar / Lounge',
@@ -977,34 +977,46 @@ class HotelHelper
         );
         // lang fields
         $languages = Language::getLanguages(false);
+        $imgDir = dirname(__FILE__).'/../views/img/hotel_amenities/';
         $i = 1;
-        foreach ($parent_features_arr as $key => $value) {
-            $obj_feature = new HotelFeatures();
+        $defaultImageIndex = 0;
+        foreach ($parent_amenities_arr as $key => $value) {
+            $obj_amenity = new HotelAmenities();
             foreach ($languages as $lang) {
                 if (isset($value['name'][$lang['iso_code']])) {
-                    $obj_feature->name[$lang['id_lang']] = $value['name'][$lang['iso_code']];
+                    $obj_amenity->name[$lang['id_lang']] = $value['name'][$lang['iso_code']];
                 } else {
-                    $obj_feature->name[$lang['id_lang']] = $value['name']['en'];
+                    $obj_amenity->name[$lang['id_lang']] = $value['name']['en'];
                 }
             }
 
-            $obj_feature->active = 1;
-            $obj_feature->position = $i;
-            $obj_feature->parent_feature_id = 0;
-            $obj_feature->save();
-            $parent_feature_id = $obj_feature->id;
-            foreach ($value['features'] as $val) {
-                $obj_feature = new HotelFeatures();
+            $obj_amenity->active = 1;
+            $obj_amenity->position = $i;
+            $obj_amenity->id_parent = 0;
+            $obj_amenity->save();
+            $idParent = $obj_amenity->id;
+            foreach ($value['amenities'] as $val) {
+                ++$defaultImageIndex;
+                $obj_amenity = new HotelAmenities();
                 foreach ($languages as $lang) {
                     if (isset($val[$lang['iso_code']])) {
-                        $obj_feature->name[$lang['id_lang']] = $val[$lang['iso_code']];
+                        $obj_amenity->name[$lang['id_lang']] = $val[$lang['iso_code']];
                     } else {
-                        $obj_feature->name[$lang['id_lang']] = $val['en'];
+                        $obj_amenity->name[$lang['id_lang']] = $val['en'];
                     }
                 }
-                $obj_feature->active = 1;
-                $obj_feature->parent_feature_id = $parent_feature_id;
-                $obj_feature->save();
+                $obj_amenity->active            = 1;
+                $obj_amenity->id_parent = $idParent;
+                $obj_amenity->save();
+
+                $srcImg = $imgDir.'_default/'.$defaultImageIndex.'.jpg';
+                if (file_exists($srcImg)) {
+                    if (ImageManager::resize($srcImg, $imgDir.$obj_amenity->id.'.jpg')) {
+                        $obj_amenity->logo_type = 'image';
+                        $obj_amenity->logo      = $obj_amenity->id.'.jpg';
+                        $obj_amenity->save();
+                    }
+                }
             }
             ++$i;
         }
@@ -1057,7 +1069,40 @@ class HotelHelper
 
         Configuration::updateValue('WK_TITLE_HEADER_BLOCK', $home_banner_default_title);
         Configuration::updateValue('WK_CONTENT_HEADER_BLOCK', $home_banner_default_content);
-        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', 'hotel_header_image.jpg');
+        Configuration::updateValue('QLO_HEADER_MEDIA_TYPE', HotelHeaderImage::MEDIA_TYPE_IMAGE);
+        Configuration::updateValue('QLO_HEADER_SLIDER_NAV_TYPE', HotelHeaderImage::NAV_TYPE_ARROWS);
+        Configuration::updateValue('QLO_HEADER_SLIDER_AUTO_PLAY', 1);
+        Configuration::updateValue('QLO_HEADER_SLIDER_INTERVAL', 5000);
+        Configuration::updateValue('QLO_HEADER_SLIDER_ANIM_TYPE', HotelHeaderImage::ANIMATION_TYPE_SLIDE);
+        Configuration::updateValue('QLO_HEADER_CONTENT_ALIGN', HotelHeaderImage::CONTENT_ALIGN_CENTER);
+        Configuration::updateValue('QLO_HEADER_VIDEO_SOURCE_TYPE', '');
+        Configuration::updateValue('QLO_HEADER_VIDEO_NAME', '');
+        HotelHeaderImage::createMediaDirectory();
+        $defaultImgSrc  = _PS_IMG_DIR_.'hotel_header_image.jpg';
+        $defaultImgDest = 'default_hotel_header_image.jpg';
+        $mediaDir       = _PS_IMG_DIR_.'hotel_header_media/';
+        if (file_exists($defaultImgSrc) && !file_exists($mediaDir.$defaultImgDest)) {
+            @copy($defaultImgSrc, $mediaDir.$defaultImgDest);
+        }
+        if (file_exists($mediaDir.$defaultImgDest)) {
+            Db::getInstance()->execute(
+                'INSERT INTO `'._DB_PREFIX_.'htl_header_image`
+                (`name`, `position`, `active`, `date_add`, `date_upd`)
+                VALUES (\''.pSQL($defaultImgDest).'\', 0, 1, NOW(), NOW())'
+            );
+            $newId = (int)Db::getInstance()->Insert_ID();
+            if ($newId) {
+                foreach (Language::getLanguages(false) as $lang) {
+                    $title = isset($homeBannerTitleLang[$lang['iso_code']]) ? $homeBannerTitleLang[$lang['iso_code']] : $homeBannerTitleLang['en'];
+                    $description = isset($homeBannerContentLang[$lang['iso_code']]) ? $homeBannerContentLang[$lang['iso_code']] : $homeBannerContentLang['en'];
+                    Db::getInstance()->execute(
+                        'INSERT INTO `'._DB_PREFIX_.'htl_header_image_lang`
+                        (`id_header_image`, `id_lang`, `title`, `description`)
+                        VALUES ('.$newId.', '.(int)$lang['id_lang'].', \''.pSQL($title).'\', \''.pSQL($description).'\')'
+                    );
+                }
+            }
+        }
         Configuration::updateValue('WK_ALLOW_ADVANCED_PAYMENT', 1);
         Configuration::updateValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT', 10);
         Configuration::updateValue('WK_ADVANCED_PAYMENT_INC_TAX', 1);
@@ -1080,23 +1125,7 @@ class HotelHelper
 
         // lang fields
         $languages = Language::getLanguages(false);
-        $htlTagLineLang = array(
-            'en' => 'A place where comfort and luxury are blended with nature!',
-            'nl' => 'Een plek waar comfort en luxe worden gecombineerd met de natuur!',
-            'fr' => 'Un endroit où le confort et le luxe se mêlent à la nature!',
-            'de' => 'Ein Ort, an dem Komfort und Luxus mit der Natur verschmelzen!',
-            'ru' => 'Место, где комфорт и роскошь сочетаются с природой!',
-            'es' => '¡Un lugar donde el confort y el lujo se mezclan con la naturaleza!',
-        );
 
-        $htlShortDescLang = array(
-            'en' => 'We offer elegant rooms, gourmet dining, and attentive service for a memorable stay.',
-            'nl' => 'Wij bieden elegante kamers, gastronomisch dineren en attente service voor een onvergetelijk verblijf.',
-            'fr' => 'Nous proposons des chambres élégantes, une cuisine gastronomique et un service attentionné pour un séjour mémorable.',
-            'de' => 'Wir bieten elegante Zimmer, Gourmet-Restaurants und aufmerksamen Service für einen unvergesslichen Aufenthalt.',
-            'ru' => 'Мы предлагаем элегантные номера, изысканную кухню и внимательное обслуживание для незабываемого отдыха.',
-            'es' => 'Ofrecemos habitaciones elegantes, comidas gourmet y un servicio atento para una estadía inolvidable.',
-        );
         $defaultDimensionUnitLang = array(
             'en' => 'ft',
             'nl' => 'ft',
@@ -1105,27 +1134,15 @@ class HotelHelper
             'ru' => 'фут',
             'es' => 'ft',
         );
-        $WK_HTL_CHAIN_NAME = array();
-        $WK_HTL_TAG_LINE = array();
-        $WK_HTL_SHORT_DESC = array();
         $defaultDimensionUnit = array();
         foreach ($languages as $lang) {
-            if (isset($htlTagLineLang[$lang['iso_code']])) {
-                $WK_HTL_TAG_LINE[$lang['id_lang']] = $htlTagLineLang[$lang['iso_code']];
-                $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang[$lang['iso_code']];
-                $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang[$lang['iso_code']];
+            if (isset($defaultDimensionUnitLang[$lang['iso_code']])) {
                 $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang[$lang['iso_code']];
             } else {
                 $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang['en'];
-                $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang['en'];
-                $WK_HTL_TAG_LINE[$lang['id_lang']] = $htlTagLineLang['en'];
-                $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang['en'];
             }
         }
 
-        Configuration::updateValue('WK_HTL_CHAIN_NAME', $WK_HTL_CHAIN_NAME);
-        Configuration::updateValue('WK_HTL_TAG_LINE', $WK_HTL_TAG_LINE);
-        Configuration::updateValue('WK_HTL_SHORT_DESC', $WK_HTL_SHORT_DESC);
         Configuration::updateValue('WK_DIMENSION_UNIT', $defaultDimensionUnit);
 
         // Search Fields
@@ -1139,229 +1156,327 @@ class HotelHelper
         return true;
     }
 
+    /**
+     * Seed default core room features and values used by room types.
+     *
+     * @return bool
+     */
     public function createHotelRoomDefaultFeatures()
     {
-        $htl_room_ftrs = array(
-            'Wi-Fi' => array(
-                'en' => 'Wi-Fi',
-                'nl' => 'Wi-Fi',
-                'fr' => 'Wi-Fi',
-                'de' => 'Wi-Fi',
-                'ru' => 'Wi-Fi',
-                'es' => 'Wi-Fi'
-            ),
-            'News Paper' => array(
-                'en' => 'News Paper',
-                'nl' => 'Krant',
-                'fr' => 'Journal',
-                'de' => 'Zeitung',
-                'ru' => 'Газета',
-                'es' => 'Periódico'
-            ),
-            'Power BackUp' => array(
-                'en' => 'Power BackUp',
-                'nl' => 'Stroomvoorziening',
-                'fr' => 'Alimentation de secours',
-                'de' => 'Notstromversorgung',
-                'ru' => 'Резервное электропитание',
-                'es' => 'Energía de respaldo'
-            ),
-            'Refrigerator' => array(
-                'en' => 'Refrigerator',
-                'nl' => 'Koelkast',
-                'fr' => 'Réfrigérateur',
-                'de' => 'Kühlschrank',
-                'ru' => 'Холодильник',
-                'es' => 'Refrigerador'
-            ),
-            'Restaurant' => array(
-                'en' => 'Restaurant',
-                'nl' => 'Restaurant',
-                'fr' => 'Restaurant',
-                'de' => 'Restaurant',
-                'ru' => 'Ресторан',
-                'es' => 'Restaurante'
-            ),
-            'Room Service' => array(
-                'en' => 'Room Service',
-                'nl' => 'Roomservice',
-                'fr' => 'Service de chambre',
-                'de' => 'Zimmerservice',
-                'ru' => 'Обслуживание номеров',
-                'es' => 'Servicio de habitaciones'
-            ),
-            'Gym' => array(
-                'en' => 'Gym',
-                'nl' => 'Fitnessruimte',
-                'fr' => 'Salle de sport',
-                'de' => 'Fitnessraum',
-                'ru' => 'Фитнес',
-                'es' => 'Gimnasio'
-            )
-        );
+        $idLang = (int) Configuration::get('PS_LANG_DEFAULT');
+        $position = 0;
 
-        // image value in rf/ folder
-        $pos = 1;
-        $languages = Language::getLanguages(true);
-        foreach ($htl_room_ftrs as $room_ftr_k => $room_ftr_v) {
-            $obj_feature = new Feature();
-            foreach ($languages as $lang) {
-                if (isset($room_ftr_v[$lang['iso_code']])) {
-                    $obj_feature->name[$lang['id_lang']] = $room_ftr_v[$lang['iso_code']];
-                } else {
-                    $obj_feature->name[$lang['id_lang']] = $room_ftr_v['en'];
-                }
+        foreach ($this->getDefaultRoomFeatures() as $featureName => $featureValues) {
+            $idFeature = (int) Feature::addFeatureImport($featureName, $position);
+            if (!$idFeature) {
+                return false;
             }
-            $obj_feature->position = $pos-1;
-            $obj_feature->save();
-            if ($obj_feature->id) {
-                $obj_feature_value = new FeatureValue();
-                $obj_feature_value->id_feature = $obj_feature->id;
 
-                foreach ($languages as $lang) {
-                    $obj_feature_value->value[$lang['id_lang']] = $obj_feature->id.'.jpg';
-                }
-
-                $obj_feature_value->save();
-                if ($obj_feature_value->id) {
-                    if (file_exists(_PS_IMG_DIR_.'rf/'.$pos.'.jpg')) {
-                        rename(_PS_IMG_DIR_.'rf/'.$pos.'.jpg', _PS_IMG_DIR_.'rf/'.$obj_feature->id.'.jpg');
-                    }
+            foreach ($featureValues as $featureValue) {
+                $idFeatureValue = (int) FeatureValue::addFeatureValueImport($idFeature, $featureValue, null, $idLang, false);
+                if (!$idFeatureValue) {
+                    return false;
                 }
             }
 
-            $pos++;
+            ++$position;
         }
 
         return true;
     }
 
-    public function createHotelDefaultBedTypes()
+    /**
+     * Return the default room feature/value seed set.
+     *
+     * @return array
+     */
+    protected function getDefaultRoomFeatures()
     {
-        $htlBedTypes = array(
+        return array(
+            'Bed Type' => array('Single', 'Double', 'Queen', 'King', 'Super King', 'Twin', 'Bunk Bed', 'Sofa Bed', 'Futon', 'Murphy Bed', 'Water Bed'),
+            'Extra Bed Available' => array('Yes', 'No', 'On Request', 'Chargeable'),
+            'Crib/Cot Available' => array('Yes', 'No', 'On Request'),
+            'Room Size' => array('150 sq ft', '200 sq ft', '300 sq ft', '400 sq ft', '500 sq ft', '600 sq ft', '800 sq ft', '1000+ sq ft'),
+            'View' => array('Sea/Ocean View', 'Garden View', 'City View', 'Pool View', 'Mountain View', 'Lake View', 'River View', 'Park View', 'Courtyard View', 'Desert View', 'No View/Interior'),
+            'Balcony Type' => array('Private Balcony', 'Shared Terrace', 'Juliet Balcony', 'Rooftop Access', 'Patio', 'Veranda', 'None'),
+            'Bathroom Type' => array('Private/Ensuite', 'Shared', 'Jack and Jill (shared between 2 rooms)', 'Half Bath'),
+            'AC Type' => array('Split AC', 'Central AC', 'Window AC', 'No AC', 'Fan Only'),
+            'Heating Type' => array('Central Heating', 'Room Heater', 'Underfloor Heating', 'Fireplace', 'No Heating'),
+            'TV Type' => array('No TV', 'LED TV', 'Smart TV', 'OLED TV'),
+            'Wi-Fi Speed' => array('No Wi-Fi', 'Basic', 'High Speed', 'Premium/Fiber'),
+            'Smoke Detection' => array('Smoke Detector', 'Sprinkler', 'None'),
+            'Smoking Policy' => array('Smoking Not Allowed', 'Smoking Allowed'),
+        );
+    }
+
+    public function createHotelDefaultPropertyTypes()
+    {
+        $propertyTypes = array(
+            'Hotel',
+            'Motel',
+            'Resort',
+            'Hostel',
+            'Guest House',
+            'Bed & Breakfast',
+            'Lodge',
+            'Apartment',
+            'Vacation Rental',
+            'Homestay',
+            'Co-Living',
+            'Camping',
+            'Glamping',
+            'Farm Stay',
+            'Houseboat',
+            'Boat Stay',
+        );
+
+        $languages = Language::getLanguages(true);
+        foreach ($propertyTypes as $typeName) {
+            $objType = new HotelPropertyType();
+            $objType->active = 1;
+            foreach ($languages as $lang) {
+                $objType->name[$lang['id_lang']] = $typeName;
+            }
+            $objType->save();
+        }
+
+        return true;
+    }
+
+    public function createDefaultRoomSellingObjects()
+    {
+       $roomTypeSellingObjects = array(
             array(
-                'length' => '6.25',
-                'width'  => '3.16',
+                'name' => 'Room',
+                'plural_name' => 'Rooms',
+            ),
+            array(
+                'name' => 'Bed',
+                'plural_name' => 'Beds',
+            ),
+            array(
+                'name' => 'Apartment',
+                'plural_name' => 'Apartments',
+            ),
+            array(
+                'name' => 'Villa',
+                'plural_name' => 'Villas',
+            ),
+            array(
+                'name' => 'Cottage',
+                'plural_name' => 'Cottages',
+            ),
+            array(
+                'name' => 'Bungalow',
+                'plural_name' => 'Bungalows',
+            ),
+            array(
+                'name' => 'House',
+                'plural_name' => 'Houses',
+            ),
+            array(
+                'name' => 'Chalet',
+                'plural_name' => 'Chalets',
+            ),
+            array(
+                'name' => 'Cabin',
+                'plural_name' => 'Cabins',
+            ),
+            array(
+                'name' => 'Studio',
+                'plural_name' => 'Studios',
+            ),
+            array(
+                'name' => 'Condo',
+                'plural_name' => 'Condos',
+            ),
+            array(
+                'name' => 'Penthouse',
+                'plural_name' => 'Penthouses',
+            ),
+            array(
+                'name' => 'Tent',
+                'plural_name' => 'Tents',
+            ),
+            array(
+                'name' => 'Camping Pitch',
+                'plural_name' => 'Camping Pitches',
+            ),
+            array(
+                'name' => 'Caravan Site',
+                'plural_name' => 'Caravan Sites',
+            ),
+            array(
+                'name' => 'RV Site',
+                'plural_name' => 'RV Sites',
+            ),
+            array(
+                'name' => 'Pod',
+                'plural_name' => 'Pods',
+            ),
+            array(
+                'name' => 'Capsule',
+                'plural_name' => 'Capsules',
+            ),
+            array(
+                'name' => 'Treehouse',
+                'plural_name' => 'Treehouses',
+            ),
+            array(
+                'name' => 'Hut',
+                'plural_name' => 'Huts',
+            ),
+            array(
+                'name' => 'Yurt',
+                'plural_name' => 'Yurts',
+            ),
+            array(
+                'name' => 'Igloo',
+                'plural_name' => 'Igloos',
+            ),
+            array(
+                'name' => 'Houseboat',
+                'plural_name' => 'Houseboats',
+            ),
+            array(
+                'name' => 'Boat Cabin',
+                'plural_name' => 'Boat Cabins',
+            ),
+            array(
+                'name' => 'Overwater Bungalow',
+                'plural_name' => 'Overwater Bungalows',
+            ),
+            array(
+                'name' => 'Heritage Room',
+                'plural_name' => 'Heritage Rooms',
+            ),
+            array(
+                'name' => 'Holiday Home',
+                'plural_name' => 'Holiday Homes',
+            ),
+            array(
+                'name' => 'Farm Stay Unit',
+                'plural_name' => 'Farm Stay Units',
+            ),
+            array(
+                'name' => 'Cave Room',
+                'plural_name' => 'Cave Rooms',
+            ),
+            array(
+                'name' => 'Container Stay',
+                'plural_name' => 'Container Stays',
+            ),
+            array(
+                'name' => 'Train Cabin',
+                'plural_name' => 'Train Cabins',
+            ),
+            array(
+                'name' => 'Motorhome',
+                'plural_name' => 'Motorhomes',
+            ),
+        );
+
+        $languages = Language::getLanguages(true);
+        foreach ($roomTypeSellingObjects as $typeName) {
+            $objType = new RoomTypeSellingObject();
+            $objType->active = 1;
+            foreach ($languages as $lang) {
+                $objType->name[$lang['id_lang']] = $typeName['name'];
+                $objType->plural_name[$lang['id_lang']] = $typeName['plural_name'];
+            }
+            $objType->save();
+        }
+    }
+
+    public function createDefaultBookingStatuses()
+    {
+        $htlBookingStatuses = array(
+            array(
+                'id' => HotelBookingDetail::STATUS_ASSIGNED,
+                'color' => '#4169E1',
+                'is_terminal' => 0,
                 'name' => array(
-                    'en' => 'Twin Bed',
-                    'nl' => 'Eenpersoonsbed',
-                    'fr' => 'Lit simple',
-                    'de' => 'Einzelbett',
-                    'ru' => 'Односпальная кровать',
-                    'es' => 'Cama individual',
+                    'en' => 'Assigned',
+                    'nl' => 'Toegewezen',
+                    'fr' => 'Assignée',
+                    'de' => 'Zugewiesen',
+                    'ru' => 'Назначено',
+                    'es' => 'Asignada',
                 ),
             ),
             array(
-                'length' => '6.66',
-                'width'  => '3.16',
+                'id' => HotelBookingDetail::STATUS_CHECKED_IN,
+                'color' => '#17A2B8',
+                'is_terminal' => 0,
                 'name' => array(
-                    'en' => 'Twin XL Bed',
-                    'nl' => 'Eenpersoonsbed XL',
-                    'fr' => 'Lit simple XL',
-                    'de' => 'Einzelbett XL',
-                    'ru' => 'Односпальная кровать XL',
-                    'es' => 'Cama individual XL',
+                    'en' => 'Checked-in',
+                    'nl' => 'Ingecheckt',
+                    'fr' => 'Enregistrée',
+                    'de' => 'Eingecheckt',
+                    'ru' => 'Заселено',
+                    'es' => 'Registrada',
                 ),
             ),
             array(
-                'length' => '6.25',
-                'width'  => '4.5',
+                'id' => HotelBookingDetail::STATUS_CHECKED_OUT,
+                'color' => '#108510',
+                'is_terminal' => 0,
                 'name' => array(
-                    'en' => 'Full Bed',
-                    'nl' => 'Tweepersoonsbed',
-                    'fr' => 'Lit double',
-                    'de' => 'Doppelbett',
-                    'ru' => 'Двуспальная кровать',
-                    'es' => 'Cama doble',
+                    'en' => 'Checked-out',
+                    'nl' => 'Uitgecheckt',
+                    'fr' => 'Départ effectué',
+                    'de' => 'Ausgecheckt',
+                    'ru' => 'Выселено',
+                    'es' => 'Salida realizada',
                 ),
             ),
             array(
-                'length' => '6.66',
-                'width'  => '5',
+                'id' => HotelBookingDetail::STATUS_NO_SHOW,
+                'color' => '#DC143C',
+                'is_terminal' => 1,
                 'name' => array(
-                    'en' => 'Queen Bed',
-                    'nl' => 'Queen size bed',
-                    'fr' => 'Lit Queen',
-                    'de' => 'Queen-Size-Bett',
-                    'ru' => 'Кровать Queen Size',
-                    'es' => 'Cama Queen',
+                    'en' => 'No-show',
+                    'nl' => 'Niet verschenen',
+                    'fr' => 'Non présentée',
+                    'de' => 'Nicht erschienen',
+                    'ru' => 'Неявка',
+                    'es' => 'No presentada',
                 ),
             ),
             array(
-                'length' => '6.66',
-                'width'  => '6.33',
+                'id' => HotelBookingDetail::STATUS_CANCELLED,
+                'color' => '#FF8C00',
+                'is_terminal' => 1,
                 'name' => array(
-                    'en' => 'King Bed',
-                    'nl' => 'King size bed',
-                    'fr' => 'Lit King',
-                    'de' => 'King-Size-Bett',
-                    'ru' => 'Кровать King Size',
-                    'es' => 'Cama King',
-                ),
-            ),
-            array(
-                'length' => '7',
-                'width'  => '6',
-                'name' => array(
-                    'en' => 'California King Bed',
-                    'nl' => 'California King bed',
-                    'fr' => 'Lit California King',
-                    'de' => 'California King-Bett',
-                    'ru' => 'Калифорнийская кровать King Size',
-                    'es' => 'Cama California King',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '3.16',
-                'name' => array(
-                    'en' => 'Bunk Bed',
-                    'nl' => 'Stapelbed',
-                    'fr' => 'Lit superposé',
-                    'de' => 'Etagenbett',
-                    'ru' => 'Двухъярусная кровать',
-                    'es' => 'Litera',
-                ),
-            ),
-            array(
-                'length' => '6.25',
-                'width'  => '4.5',
-                'name' => array(
-                    'en' => 'Sofa Bed',
-                    'nl' => 'Slaapbank',
-                    'fr' => 'Canapé-lit',
-                    'de' => 'Schlafsofa',
-                    'ru' => 'Диван-кровать',
-                    'es' => 'Sofá cama',
-                ),
-            ),
-            array(
-                'length' => '6.66',
-                'width'  => '5',
-                'name' => array(
-                    'en' => 'Murphy Bed',
-                    'nl' => 'Inklapbed',
-                    'fr' => 'Lit escamotable',
-                    'de' => 'Klappbett',
-                    'ru' => 'Откидная кровать',
-                    'es' => 'Cama abatible',
+                    'en' => 'Cancelled',
+                    'nl' => 'Geannuleerd',
+                    'fr' => 'Annulée',
+                    'de' => 'Storniert',
+                    'ru' => 'Отменено',
+                    'es' => 'Cancelada',
                 ),
             ),
         );
 
         $languages = Language::getLanguages(true);
-        foreach ($htlBedTypes as $htlBedType) {
-            $objBedType = new HotelBedType();
-            foreach ($languages as $lang) {
-                if (isset($htlBedType['name'][$lang['iso_code']])) {
-                    $objBedType->name[$lang['id_lang']] = $htlBedType['name'][$lang['iso_code']];
-                } else {
-                    $objBedType->name[$lang['id_lang']] = $htlBedType['name']['en'];
-                }
+        foreach ($htlBookingStatuses as $htlBookingStatus) {
+            $objBookingStatus = new HotelBookingStatus();
+            // fixed id: this catalog's rows are referenced by the HotelBookingDetail::STATUS_* constants
+            $objBookingStatus->id = $htlBookingStatus['id'];
+            $objBookingStatus->force_id = true;
+            $objBookingStatus->color = $htlBookingStatus['color'];
+            $objBookingStatus->is_terminal = $htlBookingStatus['is_terminal'];
 
-                $objBedType->width = $htlBedType['width'];
-                $objBedType->length = $htlBedType['length'];
-                $objBedType->save();
+            foreach ($languages as $lang) {
+                if (isset($htlBookingStatus['name'][$lang['iso_code']])) {
+                    $objBookingStatus->name[$lang['id_lang']] = $htlBookingStatus['name'][$lang['iso_code']];
+                } else {
+                    $objBookingStatus->name[$lang['id_lang']] = $htlBookingStatus['name']['en'];
+                }
+            }
+
+            if (!$objBookingStatus->add()) {
+                return false;
             }
         }
 
@@ -1386,6 +1501,7 @@ class HotelHelper
     {
         $obj_hotel_info = new HotelBranchInformation();
         $obj_hotel_info->active = 1;
+        $obj_hotel_info->id_property_type = 1;
         $obj_hotel_info->email = 'hotelprime@htl.com';
         $obj_hotel_info->check_in = '12:00';
         $obj_hotel_info->check_out = '11:00';
@@ -1804,14 +1920,14 @@ class HotelHelper
         return $htl_id;
     }
 
-    public function saveDummyHotelFeatures($id_hotel)
+    public function saveDummyHotelAmenities($id_hotel)
     {
-        $branch_ftr_ids = array(1, 2, 4, 7, 8, 9, 11, 12, 14, 16, 17, 18, 21);
-        foreach ($branch_ftr_ids as $value_ftr) {
-            $htl_ftr_obj = new HotelBranchFeatures();
-            $htl_ftr_obj->id_hotel = $id_hotel;
-            $htl_ftr_obj->feature_id = $value_ftr;
-            $htl_ftr_obj->save();
+        $branch_amenity_ids = array(2, 4, 7, 8, 11, 12, 14, 16, 17, 18, 21);
+        foreach ($branch_amenity_ids as $amenityId) {
+            $objHotelAmenities = new HotelBranchAmenities();
+            $objHotelAmenities->id_hotel   = $id_hotel;
+            $objHotelAmenities->amenity_id = $amenityId;
+            $objHotelAmenities->save();
         }
     }
 
@@ -1820,7 +1936,6 @@ class HotelHelper
         $roomTypeDemoDataLang = array(
             array(
                 'price' => 1000,
-                'id_bed_types' => array(4),
                 'en' => array(
                     'name' => 'General Rooms',
                     'description_short' => 'Our General Rooms offer space and comfort with multiple bedrooms and a cozy living area. Enjoy flat-screen TVs, complimentary Wi-Fi, and a kitchenette for a perfect family getaway.',
@@ -1854,7 +1969,6 @@ class HotelHelper
             ),
             array(
                 'price' => 1500,
-                'id_bed_types' => array(4, 5),
                 'en' => array(
                     'name' => 'Delux Rooms',
                     'description_short' => 'Enjoy lake views from our Deluxe Rooms with a king-sized bed, elegant furnishings, and a spacious sitting area. Perfect for guests seeking comfort, luxury, and modern amenities.',
@@ -1888,7 +2002,6 @@ class HotelHelper
             ),
             array(
                 'price' => 2000,
-                'id_bed_types' => array(5, 6),
                 'en' => array(
                     'name' => 'Executive Rooms',
                     'description_short' => 'Indulge in our Executive Rooms, featuring separate living and sleeping areas, a luxurious bathroom, and exclusive lounge access. Ideal for business travelers seeking privacy',
@@ -1922,7 +2035,6 @@ class HotelHelper
             ),
             array(
                 'price' => 2500,
-                'id_bed_types' => array(6, 8),
                 'en' => array(
                     'name' => 'Luxury Rooms',
                     'description_short' => 'Retreat to tranquility in our Luxury Rooms with expansive views. Featuring a queen-sized bed, workspace, and serene decor, perfect for business and leisure travelers alike.',
@@ -1956,7 +2068,6 @@ class HotelHelper
             ),
         );
 
-        $objHotelRoomTypeBedType = new HotelRoomTypeBedType();
         $languages = Language::getLanguages(true);
         foreach ($roomTypeDemoDataLang as $key => $roomTypeData) {
             // Add Product
@@ -1989,6 +2100,7 @@ class HotelHelper
             $product->show_at_front = 1;
             $product->is_virtual = 1;
             $product->indexed = 1;
+            $product->id_selling_object = 1;
             $product->save();
             $product_id = $product->id;
 
@@ -2069,6 +2181,7 @@ class HotelHelper
             $htl_rm_type = new HotelRoomType();
             $htl_rm_type->id_product = $product_id;
             $htl_rm_type->id_hotel = $id_hotel;
+            $htl_rm_type->id_selling_object = $product->id_selling_object;
             $htl_rm_type->adults = 2;
             $htl_rm_type->children = 2;
             $htl_rm_type->max_adults = 2;
@@ -2077,16 +2190,8 @@ class HotelHelper
 
             $htl_rm_type->save();
 
-            // Add features to the product
-            $ftr_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
-            $ftr_val_arr = array(0 => 1, 1 => 2, 2 => 3, 3 => 4);
-            foreach ($ftr_arr as $key_htl_ftr => $val_htl_ftr) {
-                $product->addFeaturesToDB($val_htl_ftr, $ftr_val_arr[$key_htl_ftr]);
-            }
-
             // save advance payment information
             $this->saveAdvancedPaymentInfo($product_id);
-            $objHotelRoomTypeBedType->updateRoomTypeBedTypes($roomTypeData['id_bed_types'], $product_id);
         }
     }
 
@@ -2155,7 +2260,7 @@ class HotelHelper
                 'price' => '250',
                 'auto_add_to_cart' => 1,
                 'show_at_front' => 0,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_DAY,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Room Maintenance Fees',
@@ -2187,7 +2292,7 @@ class HotelHelper
                 'price' => '250',
                 'auto_add_to_cart' => 1,
                 'show_at_front' => 0,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_BOOKING,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_INDEPENDENT,
                 'en' => array(
                     'name' => 'Internet Handling Charges',
@@ -2220,7 +2325,7 @@ class HotelHelper
                 'price' => '50',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_BOOKING,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Airport Shuttle',
@@ -2252,7 +2357,7 @@ class HotelHelper
                 'price' => '200',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_BOOKING,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Cab on Demand',
@@ -2284,7 +2389,7 @@ class HotelHelper
                 'price' => '350',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_DAY,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Breakfast',
@@ -2316,7 +2421,7 @@ class HotelHelper
                 'price' => '450',
                 'auto_add_to_cart' => 0,
                 'show_at_front' => 1,
-                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_PER_DAY,
+                'price_calculation_method' => Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY,
                 'price_addition_type' => Product::PRICE_ADDITION_TYPE_WITH_ROOM,
                 'en' => array(
                     'name' => 'Dinner',
@@ -2474,9 +2579,11 @@ class HotelHelper
     {
         $htl_id = $this->saveDummyHotelBranchInfo();
         $this->saveDummyHotelImages($htl_id);
-        $this->saveDummyHotelFeatures($htl_id);
+        $this->saveDummyHotelAmenities($htl_id);
         $this->saveDummyProductsAndRelatedInfo($htl_id);
         $this->saveDummyServiceProductsAndRelatedInfo();
+        $this->createHotelDefaultPropertyTypes();
+        $this->createDefaultRoomSellingObjects();
 
         return true;
     }

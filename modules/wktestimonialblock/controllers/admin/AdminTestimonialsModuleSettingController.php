@@ -37,7 +37,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
 
         $this->fields_options = array(
             'modulesetting' => array(
-                'title' =>    $this->l('Hotel Testimonials Setting'),
+                'title' =>    $this->l('Property Testimonials Setting'),
                 'fields' =>    array(
                     'HOTEL_TESIMONIAL_BLOCK_HEADING' => array(
                         'title' => $this->l('Testimonial block title'),
@@ -154,7 +154,7 @@ class AdminTestimonialsModuleSettingController extends ModuleAdminController
 
         $this->fields_form = array(
             'legend' => array(
-                'title' => $this->l('Hotel Testimonial Configuration'),
+                'title' => $this->l('Property Testimonial Configuration'),
                 'icon' => 'icon-globe'
             ),
             'input' => array(

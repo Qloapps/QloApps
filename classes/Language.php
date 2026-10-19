@@ -26,6 +26,9 @@
 
 class LanguageCore extends ObjectModel
 {
+    const EMAIL_TEMPLATE_TYPE_CORE = 1;
+    const EMAIL_TEMPLATE_TYPE_MODULE = 2;
+
     public $id;
 
     /** @var string Name */
@@ -686,7 +689,11 @@ class LanguageCore extends ObjectModel
         $key = 'Language::getIdByIso_'.$iso_code;
         if ($no_cache || !Cache::isStored($key)) {
             $id_lang = Db::getInstance()->getValue('SELECT `id_lang` FROM `'._DB_PREFIX_.'lang` WHERE `iso_code` = \''.pSQL(strtolower($iso_code)).'\'');
-
+            
+            if (empty($id_lang)) {
+                return null;
+            }
+            
             Cache::store($key, $id_lang);
             return $id_lang;
         }
@@ -793,7 +800,7 @@ class LanguageCore extends ObjectModel
 
     public static function checkAndAddLanguage($iso_code, $lang_pack = false, $only_add = false, $params_lang = null)
     {
-        if (Language::getIdByIso($iso_code)) {
+        if (Language::getIdByIso($iso_code, true)) {
             return true;
         }
 
@@ -919,9 +926,9 @@ class LanguageCore extends ObjectModel
         $file = _PS_TRANSLATIONS_DIR_.(string)$iso.'.gzip';
 
         if (!$lang_pack_link = Tools::file_get_contents(_QLO_API_URL_.'/lang_pack/get_lang_pack.php?version='.$version.'&iso_lang='.Tools::strtolower((string)$iso))) {
-            $errors[] = Tools::displayError('Archive cannot be downloaded from prestashop.com.');
+            $errors[] = Tools::displayError('Archive cannot be downloaded from QloApps Api.');
         } elseif (!$lang_pack = json_decode($lang_pack_link)) {
-            $errors[] = Tools::displayError('Error occurred when language was checked according to your Prestashop version.');
+            $errors[] = Tools::displayError('Error occurred when language was checked according to your QloApps version.');
         } elseif (empty($lang_pack->error) && ($content = Tools::file_get_contents($lang_pack->download_link))) {
             if (!@file_put_contents($file, $content)) {
                 if (is_writable(dirname($file))) {
@@ -1064,5 +1071,70 @@ class LanguageCore extends ObjectModel
                 $gz->extractList($files_listing, _PS_TRANSLATIONS_DIR_.'../', '');
             }
         }
+    }
+
+    public static function resetEmailTemplate($mail_template_name, $iso, $template_type, $module_name = false, $theme = '')
+    {
+        $is_module_template = ($template_type === self::EMAIL_TEMPLATE_TYPE_MODULE);
+
+        if ($theme) {
+            $dest_dir = $is_module_template
+                ? _PS_ROOT_DIR_.'/themes/'.$theme.'/modules/'.$module_name.'/mails/'.$iso.'/'
+                : _PS_ROOT_DIR_.'/themes/'.$theme.'/mails/'.$iso.'/';
+        } else {
+            $dest_dir = $is_module_template
+                ? rtrim(_PS_MODULE_DIR_, '/').'/'.$module_name.'/mails/'.$iso.'/'
+                : _PS_MAIL_DIR_.$iso.'/';
+        }
+
+        // Reuse the already-downloaded language pack if we have one, only hit the API when it's missing
+        $gzip_file = _PS_TRANSLATIONS_DIR_.$iso.'.gzip';
+        if (!file_exists($gzip_file)) {
+            Language::downloadAndInstallLanguagePack($iso, null, null, false);
+        }
+        if (!file_exists($gzip_file)) {
+            return array('hasError' => true, 'error' => Tools::displayError('Could not download the language pack from the QloApps API. Please check your internet connection and try again.'));
+        }
+
+        require_once(_PS_TOOL_DIR_.'tar/Tar.php');
+        $gz = new Archive_Tar($gzip_file, true);
+        if ($gz->error_object) {
+            return array('hasError' => true, 'error' => Tools::displayError('The downloaded language pack is corrupted. Please try again.'));
+        }
+        $archive_dir = $is_module_template
+            ? 'modules/'.$module_name.'/mails/'.$iso.'/'
+            : 'mails/'.$iso.'/';
+
+        $mail_dir = $is_module_template
+            ? rtrim(_PS_MODULE_DIR_, '/').'/'.$module_name.'/mails/'
+            : _PS_MAIL_DIR_;
+
+        $content = array('html' => null, 'txt' => null);
+        foreach (array_keys($content) as $ext) {
+            $file_content = $gz->extractInString($archive_dir.$mail_template_name.'.'.$ext);
+            if ($file_content === null) {
+                if (file_exists($mail_dir.$iso.'/'.$mail_template_name.'.'.$ext)) {
+                    $file_content = file_get_contents($mail_dir.$iso.'/'.$mail_template_name.'.'.$ext);
+                } elseif (file_exists($mail_dir.'en/'.$mail_template_name.'.'.$ext)) {
+                    $file_content = file_get_contents($mail_dir.'en/'.$mail_template_name.'.'.$ext);
+                }
+            }
+            if ($file_content !== null) {
+                if (file_put_contents($dest_dir.$mail_template_name.'.'.$ext, $file_content) === false) {
+                    return array('hasError' => true, 'error' => sprintf(Tools::displayError('Could not write file "%s".'), $dest_dir.$mail_template_name.'.'.$ext));
+                }
+                $content[$ext] = $file_content;
+            }
+        }
+
+        if ($content['html'] === null && $content['txt'] === null) {
+            return array('hasError' => true, 'error' => Tools::displayError('This template was not found in the downloaded language pack.'));
+        }
+
+        return array(
+            'hasError' => false,
+            'html' => $content['html'],
+            'txt' => $content['txt'],
+        );
     }
 }

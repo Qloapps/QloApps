@@ -29,7 +29,7 @@ class HTMLPurifier_URIParser
 
         // Regexp is as per Appendix B.
         // Note that ["<>] are an addition to the RFC's recommended
-        // characters, because they represent external delimeters.
+        // characters, because they represent external delimiters.
         $r_URI = '!'.
             '(([a-zA-Z0-9\.\+\-]+):)?'. // 2. Scheme
             '(//([^/?#"<>]*))?'. // 4. Authority
@@ -43,7 +43,7 @@ class HTMLPurifier_URIParser
 
         if (!$result) return false; // *really* invalid URI
 
-        // seperate out parts
+        // separate out parts
         $scheme     = !empty($matches[1]) ? $matches[2] : null;
         $authority  = !empty($matches[3]) ? $matches[4] : null;
         $path       = $matches[5]; // always present, can be empty

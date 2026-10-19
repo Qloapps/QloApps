@@ -147,6 +147,28 @@ class OrderInvoiceCore extends ObjectModel
 		'.($this->id && $this->number ? ' AND od.`id_order_invoice` = '.(int)$this->id : '').' ORDER BY od.`product_name`');
     }
 
+    /**
+     * Recompute this invoice's totals live from its own order_detail lines, instead of trusting
+     * accumulated deltas. Mirrors Order::getOrderTotal()'s formula, scoped to this invoice only.
+     *
+     * @return bool
+     */
+    public function recomputeTotalsFromLines()
+    {
+        $order = new Order((int) $this->id_order);
+        $invoiceProducts = $this->getProductsDetail();
+
+        $totalProductsTe = $order->getTotalProductsWithoutTaxes($invoiceProducts);
+        $totalProductsTi = $order->getTotalProductsWithTaxes($invoiceProducts);
+
+        $this->total_products = $totalProductsTe;
+        $this->total_products_wt = $totalProductsTi;
+        $this->total_paid_tax_excl = max(0, $totalProductsTe + $this->total_shipping_tax_excl + $this->total_wrapping_tax_excl - $this->total_discount_tax_excl);
+        $this->total_paid_tax_incl = max(0, $totalProductsTi + $this->total_shipping_tax_incl + $this->total_wrapping_tax_incl - $this->total_discount_tax_incl);
+
+        return $this->update();
+    }
+
     public static function getInvoiceByNumber($id_invoice)
     {
         if (is_numeric($id_invoice)) {
@@ -323,11 +345,12 @@ class OrderInvoiceCore extends ObjectModel
         // if one of the order details use the tax computation method the display will be different
         return Db::getInstance()->getValue('
     		SELECT od.`tax_computation_method`
-    		FROM `' . _DB_PREFIX_ . 'order_detail_tax` odt
+    		FROM `' . _DB_PREFIX_ . 'order_tax_detail` odt
     		LEFT JOIN `' . _DB_PREFIX_ . 'order_detail` od ON (od.`id_order_detail` = odt.`id_order_detail`)
     		WHERE od.`id_order` = ' . (int) $this->id_order . '
     		AND od.`id_order_invoice` = ' . (int) $this->id . '
-    		AND od.`tax_computation_method` = ' . (int) TaxCalculator::ONE_AFTER_ANOTHER_METHOD)
+    		AND od.`tax_computation_method` = ' . (int) TaxCalculator::ONE_AFTER_ANOTHER_METHOD . '
+    		AND NOT EXISTS (SELECT 1 FROM `' . _DB_PREFIX_ . 'tax` tc WHERE tc.`id_tax` = odt.`id_tax` AND tc.`is_tourism_tax` = 1)')
             || Configuration::get('PS_INVOICE_TAXES_BREAKDOWN');
     }
 
@@ -482,7 +505,8 @@ class OrderInvoiceCore extends ObjectModel
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product'] && !$v['product_auto_add'] && $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
         });
-        $details = $order->getProductTaxesDetails($order_detail, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
+
+        $details = $order->getProductTaxesDetails($order_detail, false,Product::SELLING_PREFERENCE_WITH_ROOM_TYPE);
 
         if ($sum_composite_taxes) {
             $grouped_details = array();
@@ -611,10 +635,11 @@ class OrderInvoiceCore extends ObjectModel
         $order_detail = $this->getProducts();
         $order_detail = array_filter($order_detail, function($v) {
             return (!$v['is_booking_product'] && (
-                $v['selling_preference_type'] == Product::SELLING_PREFERENCE_STANDALONE
-                || $v['selling_preference_type'] == Product::SELLING_PREFERENCE_HOTEL_STANDALONE
+                $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_STANDALONE
+                || $v['selling_preference_type'] == Product::SELLING_PREFERENCE_WITH_HOTEL
             ));
         });
+      
 
         $details = $order->getProductTaxesDetails($order_detail, false);
 
@@ -657,71 +682,6 @@ class OrderInvoiceCore extends ObjectModel
         foreach ($breakdown as $key => $data) {
             $breakdown[$key]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
             $breakdown[$key]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
-        }
-        
-        return $breakdown;
-    }
-
-    public function getExtraDemandTaxesBreakdown($order = null)
-    {
-        if (!$order) {
-            $order = $this->getOrder();
-        }
-        $breakdown = array();
-        $order_details = $this->getProducts();
-        $objBookingDemand = new HotelBookingDemands();
-        $order_details = array_column($order_details, 'id_order_detail');
-        $details = $objBookingDemand->getExtraDemandsTaxesDetails($order->id, $order_details);
-        if (!$this->useOneAfterAnotherTaxComputationMethod()) {
-            $grouped_details = array();
-            foreach ($details as $row) {
-                if (!isset($grouped_details[$row['id_htl_booking']][$row['id_booking_demand']])) {
-                    $grouped_details[$row['id_htl_booking']][$row['id_booking_demand']] = array(
-                        'tax_rate' => 0,
-                        'total_tax_base' => 0,
-                        'total_amount' => 0,
-                        'id_tax' => $row['id_tax'],
-                    );
-                    $grouped_details[$row['id_htl_booking']][$row['id_booking_demand']]['total_tax_base'] += $row['total_price_tax_excl'];
-                }
-                $grouped_details[$row['id_htl_booking']][$row['id_booking_demand']]['total_amount'] += $row['total_amount'];
-                $grouped_details[$row['id_htl_booking']][$row['id_booking_demand']]['tax_rate'] += $row['rate'];
-            }
-            $details = $grouped_details;
-            foreach ($details as $detail) {
-                foreach ($detail as $row) {
-                    $rate = sprintf('%.3f', $row['tax_rate']);
-                    if (!isset($breakdown[$rate])) {
-                        $breakdown[$rate] = array(
-                            'total_price_tax_excl' => 0,
-                            'total_amount' => 0,
-                            'id_tax' => $row['id_tax'],
-                            'rate' =>$rate,
-                        );
-                    }
-                    $breakdown[$rate]['total_price_tax_excl'] += $row['total_tax_base'];
-                    $breakdown[$rate]['total_amount'] += $row['total_amount'];
-                }
-            }
-        } else {
-            foreach ($details as $row) {
-                $key = $row['id_tax'];
-                $rate = sprintf('%.3f', $row['rate']);
-                if (!isset($breakdown[$key])) {
-                    $breakdown[$key] = array(
-                        'total_price_tax_excl' => 0,
-                        'total_amount' => 0,
-                        'id_tax' => $row['id_tax'],
-                        'rate' => $rate,
-                    );
-                }
-                $breakdown[$key]['total_price_tax_excl'] += $row['total_tax_base'];
-                $breakdown[$key]['total_amount'] += $row['total_amount'];
-            }
-        }
-        foreach ($breakdown as $rate => $data) {
-            $breakdown[$rate]['total_price_tax_excl'] = Tools::ps_round($data['total_price_tax_excl'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
-            $breakdown[$rate]['total_amount'] = Tools::ps_round($data['total_amount'], _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
         }
         
         return $breakdown;
@@ -858,6 +818,28 @@ class OrderInvoiceCore extends ObjectModel
         }
 
         return $wrapping_breakdown;
+    }
+
+    /**
+     * Return tourism tax breakdown grouped by id_tax for invoice display. Collapsed into a single
+     * combined row when the invoice's tax breakdown display is off — same rule every other tax
+     * category (rooms, services, ...) already applies via useOneAfterAnotherTaxComputationMethod().
+     *
+     * @return array  [['tax_name' => string, 'total_amount' => float], ...]
+     */
+    public function getTourismTaxBreakdown()
+    {
+        $breakdown = OrderTaxDetail::getBreakdownForInvoice((int) $this->id_order);
+        if (!$breakdown || $this->useOneAfterAnotherTaxComputationMethod()) {
+            return $breakdown;
+        }
+
+        $total = 0.0;
+        foreach ($breakdown as $row) {
+            $total += (float) $row['total_amount'];
+        }
+
+        return array(array('id_tax' => 0, 'tax_name' => '', 'total_amount' => $total));
     }
 
     /**

@@ -339,9 +339,10 @@ class LocalizationPackCore
                     continue;
                 }
 
-                $errors = Language::downloadAndInstallLanguagePack($attributes['iso_code'], $attributes['version'], $attributes);
-                if ($errors !== true && is_array($errors)) {
-                    $this->_errors = array_merge($this->_errors, $errors);
+                $version = isset($attributes['version']) ? (string)$attributes['version'] : null;
+                $lang_pack_response = Language::downloadAndInstallLanguagePack($attributes['iso_code'], $version, null);
+                if ($lang_pack_response !== true) {
+                    Language::checkAndAddLanguage($attributes['iso_code'], false, false);
                 }
             }
         }

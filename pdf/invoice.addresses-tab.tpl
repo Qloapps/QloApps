@@ -33,7 +33,7 @@
 		</td> -->
 		<td width="33%">
 			{if !empty($hotel_address)}
-				<span class="bold">{l s='Hotel Detail' pdf='true'}</span><br/><br/>
+				<span class="bold">{l s='%s Detail'  sprintf=$property_type pdf='true'}</span><br/><br/>
 				{$hotel_address}
 			{/if}
 		</td>

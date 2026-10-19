@@ -1,0 +1,160 @@
+/**
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*/
+
+/* Report page heading */
+.qlo-report-heading {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 16px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #25b9d7;
+}
+
+/* Gap above the filter form */
+form.form-horizontal.list_action_wrapper {
+    margin-top: 0;
+}
+
+/* Cancel Bootstrap's label margin-bottom inside filter bar */
+form.list_action_wrapper .list_filters label {
+    margin-bottom: 0;
+}
+
+/*
+ * Admin theme overrides <th> to font-weight:normal and only restores bold via
+ * span.title_box.active. We re-apply bold for all report table headers here.
+ * white-space:nowrap prevents column compression so the table overflows its
+ * table-responsive wrapper and horizontal scrolling kicks in.
+ */
+.table > thead > tr > th {
+    font-weight: bold !important;
+    white-space: nowrap;
+}
+
+/* Ensure table-responsive always enables horizontal scroll */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Totals footer */
+.qlo-report-totals td {
+    background: #f0f8f0;
+    border-top: 2px solid #ccc;
+}
+
+/* KPI summary cards (used in room-status sub-report) */
+.qlo-kpi-row {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.qlo-kpi-row > [class*="col-"] {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.qlo-kpi-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 14px 12px;
+    margin-bottom: 12px;
+    text-align: center;
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    min-height: 80px;
+}
+
+.qlo-kpi-card--success { border-color: #5cb85c; background: #f0fff0; }
+.qlo-kpi-card--danger  { border-color: #d9534f; background: #fff5f5; }
+.qlo-kpi-card--warning { border-color: #f0ad4e; background: #fffbf0; }
+
+.qlo-kpi-card .qlo-kpi-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.qlo-kpi-card .qlo-kpi-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1.2;
+}
+
+.qlo-kpi-card--success .qlo-kpi-value { color: #5cb85c; }
+.qlo-kpi-card--danger  .qlo-kpi-value { color: #d9534f; }
+.qlo-kpi-card--warning .qlo-kpi-value { color: #e67e22; }
+
+.qlo-section-heading {
+    margin: 20px 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 6px;
+}
+
+.qlo-text-danger {
+    color: #c0392b;
+    font-weight: 600;
+}
+
+.export-csv {
+    margin-top: 10px;
+}
+
+/* Housekeeping status badge */
+.qlo-hk-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+
+/* Pagination row below room-status table */
+.qlo-pagination-wrap {
+    margin-top: 10px;
+}
+
+.qlo-pagination-wrap .pagination {
+    margin-bottom: 5px;
+}

@@ -20,7 +20,7 @@
  * The second objective is to ensure that explicitly excluded elements of
  * an element do not appear in its children.  Code that accomplishes this
  * task is pervasive through the strategy, though the two are distinct tasks
- * and could, theoretically, be seperated (although it's not recommended).
+ * and could, theoretically, be separated (although it's not recommended).
  *
  * @note Whether or not unrecognized children are silently dropped or
  *       translated into text depends on the child definitions.

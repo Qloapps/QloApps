@@ -57,6 +57,30 @@
 		{foreach $tax_breakdowns as $label => $bd}
 			{assign var=label_printed value=false}
 
+			{* Tourism tax rows have no percentage rate — render them as a fixed-amount section *}
+			{if $label == 'tourism_tax'}
+				{foreach $bd as $line}
+					{assign var=has_line value=true}
+					<tr class="{if !$label_printed}tr-border-top{/if}">
+						{if !$label_printed}
+							<td class="white" rowspan="{$bd|count}">{l s='Tourism Tax' pdf='true'}</td>
+							{assign var=label_printed value=true}
+						{/if}
+						{if isset($showTaxName) && $showTaxName}
+							<td class="white">{$line.tax_name|escape:'html':'UTF-8'}</td>
+						{/if}
+						<td class="white">—</td>
+						{if $display_tax_bases_in_breakdowns}
+							<td class="white">—</td>
+						{/if}
+						<td class="white">
+							{displayPrice currency=$order->id_currency price=$line.total_amount}
+						</td>
+					</tr>
+				{/foreach}
+				{continue}
+			{/if}
+
 			{foreach $bd as $line}
 				{if $line.rate == 0}
 					{continue}
@@ -69,8 +93,6 @@
 								{l s='Services' pdf='true'}
 							{elseif $label == 'room_tax'}
 								{l s='Rooms' pdf='true'}
-							{elseif $label == 'extra_demands_tax'}
-								{l s='Facilities' pdf='true'}
 							{elseif $label == 'convenience_fee_tax'}
 								{l s='Convenience Fees' pdf='true'}
 							{elseif $label == 'service_products_tax'}

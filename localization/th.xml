@@ -1,21 +1,100 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Thailand" version="1.0">
-	<currencies>
-		<currency name="Baht" iso_code="THB" iso_code_num="978" sign="฿" blank="1" conversion_rate="41.4441" format="2" decimals="1" />
-	</currencies>
-	<languages>
-		<language iso_code="th" />
-	</languages>
-	<taxes>
-		<tax id="1" name="VAT TH 7%" rate="7" />
-		
-		<taxRulesGroup name="TH Standard Rate (7%)">
-			<taxRule iso_code_country="th" id_tax="1" />
-		</taxRulesGroup>
-	</taxes>
-	<units>
-		<unit type="weight" value="kg" />
-		<unit type="volume" value="L" />
-		<unit type="base_distance" value="wah" />
-	</units>
+  <currencies>
+  	<currency name="Baht" iso_code="THB" iso_code_num="978" sign="฿" blank="1" format="2" decimals="1" />
+  </currencies>
+  <languages>
+  	<language iso_code="th" />
+  </languages>
+  <taxes>
+  	<tax id="1" name="VAT TH 7%" rate="7" />
+
+  	<taxRulesGroup name="TH Standard Rate (7%)">
+  		<taxRule iso_code_country="th" id_tax="1" />
+  	</taxRulesGroup>
+  </taxes>
+  <states>
+    <state name="Bangkok" iso_code="TH-10" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Amnat Charoen" iso_code="TH-37" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Ang Thong" iso_code="TH-15" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Bueng Kan" iso_code="TH-38" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Buriram" iso_code="TH-31" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Chachoengsao" iso_code="TH-24" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Chai Nat" iso_code="TH-18" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Chaiyaphum" iso_code="TH-36" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Chanthaburi" iso_code="TH-22" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Chiang Mai" iso_code="TH-50" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Chiang Rai" iso_code="TH-57" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Chonburi" iso_code="TH-20" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Chumphon" iso_code="TH-86" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Kalasin" iso_code="TH-46" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Kamphaeng Phet" iso_code="TH-62" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Kanchanaburi" iso_code="TH-71" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Khon Kaen" iso_code="TH-40" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Krabi" iso_code="TH-81" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Lampang" iso_code="TH-52" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Lamphun" iso_code="TH-51" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Loei" iso_code="TH-42" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Lopburi" iso_code="TH-16" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Mae Hong Son" iso_code="TH-58" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Maha Sarakham" iso_code="TH-44" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Mukdahan" iso_code="TH-49" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nakhon Nayok" iso_code="TH-26" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nakhon Pathom" iso_code="TH-73" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nakhon Phanom" iso_code="TH-48" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nakhon Ratchasima" iso_code="TH-30" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nakhon Sawan" iso_code="TH-60" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nakhon Si Thammarat" iso_code="TH-80" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nan" iso_code="TH-55" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Narathiwat" iso_code="TH-96" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nong Bua Lam Phu" iso_code="TH-39" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nong Khai" iso_code="TH-43" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Nonthaburi" iso_code="TH-12" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Pathum Thani" iso_code="TH-13" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Pattani" iso_code="TH-94" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phang Nga" iso_code="TH-82" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phatthalung" iso_code="TH-93" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phayao" iso_code="TH-56" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phetchabun" iso_code="TH-67" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phetchaburi" iso_code="TH-76" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phichit" iso_code="TH-66" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phitsanulok" iso_code="TH-65" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phra Nakhon Si Ayutthaya" iso_code="TH-14" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phrae" iso_code="TH-54" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Phuket" iso_code="TH-83" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Prachinburi" iso_code="TH-25" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Prachuap Khiri Khan" iso_code="TH-77" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Ranong" iso_code="TH-85" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Ratchaburi" iso_code="TH-70" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Rayong" iso_code="TH-21" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Roi Et" iso_code="TH-45" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Sa Kaeo" iso_code="TH-27" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Sakon Nakhon" iso_code="TH-47" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Samut Prakan" iso_code="TH-11" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Samut Sakhon" iso_code="TH-74" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Samut Songkhram" iso_code="TH-75" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Saraburi" iso_code="TH-19" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Satun" iso_code="TH-91" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Sing Buri" iso_code="TH-17" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Sisaket" iso_code="TH-33" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Songkhla" iso_code="TH-90" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Sukhothai" iso_code="TH-64" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Suphan Buri" iso_code="TH-72" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Surat Thani" iso_code="TH-84" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Surin" iso_code="TH-32" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Tak" iso_code="TH-63" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Trang" iso_code="TH-92" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Trat" iso_code="TH-23" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Ubon Ratchathani" iso_code="TH-34" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Udon Thani" iso_code="TH-41" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Uthai Thani" iso_code="TH-61" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Uttaradit" iso_code="TH-53" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Yala" iso_code="TH-95" country="TH" zone="Asia" tax_behavior="0" />
+    <state name="Yasothon" iso_code="TH-35" country="TH" zone="Asia" tax_behavior="0" />
+  </states>
+  <units>
+  	<unit type="weight" value="kg" />
+  	<unit type="volume" value="L" />
+  	<unit type="base_distance" value="wah" />
+  </units>
 </localizationPack>

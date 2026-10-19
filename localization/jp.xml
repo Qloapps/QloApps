@@ -1,16 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Japan" version="1.0">
 	<currencies>
-		<currency name="Yen" iso_code="JPY" iso_code_num="392" sign="¥" blank="1" conversion_rate="113.786" format="1" decimals="0" />
+		<currency name="Yen" iso_code="JPY" iso_code_num="392" sign="¥" blank="1" format="1" decimals="0" />
 	</currencies>
 	<languages>
 		<language iso_code="ja" />
 	</languages>
 	<taxes>
-		<tax id="1" name="消費税 JP 5%" rate="5" />
-		
-		<taxRulesGroup name="JP Standard Rate (5%)">
+		<tax id="1" name="消費税 JP 10%" rate="10" />
+		<tax id="2" name="消費税 JP 8%" rate="8" />
+		<tax id="3" name="消費税 JP 0%" rate="0" />
+
+		<taxRulesGroup name="JP Standard Rate (10%)">
 			<taxRule iso_code_country="jp" id_tax="1" />
+		</taxRulesGroup>
+
+		<taxRulesGroup name="JP Reduced Rate (8%)">
+			<taxRule iso_code_country="jp" id_tax="2" />
+		</taxRulesGroup>
+
+		<taxRulesGroup name="JP Zero Rate (0%)">
+			<taxRule iso_code_country="jp" id_tax="3" />
 		</taxRulesGroup>
 	</taxes>
 	<units>

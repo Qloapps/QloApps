@@ -2,10 +2,10 @@
 /**
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
+* This source file is subject to the Academic Free License (AFL 3.0)
 * that is bundled with this package in the file LICENSE.md
 * It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
+* https://opensource.org/licenses/afl-3.0.php
 * If you did not receive a copy of the license and are unable to
 * obtain it through the world-wide-web, please send an email
 * to support@qloapps.com so we can send you a copy immediately.
@@ -18,21 +18,26 @@
 *
 * @author Webkul IN
 * @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
 */
 
 class WkPaypalCommerceWebhook
 {
+    const WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED = 'COMPLETED';
+    const WK_PAYPAL_COMMERCE_PAYMENT_STATUS_APPROVED = 'APPROVED';
+    const WK_PAYPAL_COMMERCE_PAYMENT_STATUS_PENDING = 'PENDING';
+    const WK_PAYPAL_COMMERCE_PAYMENT_STATUS_DENIED = 'DENIED';
+    const WK_PAYPAL_COMMERCE_EVENT_TYPE_ORDER_COMPLETED = 'CHECKOUT.ORDER.COMPLETED';
+
     public function capturePending($eventData)
     {
         $transaction_id = $eventData['resource']['id'];
 
-        $objPaypalOrder = new WKPayPalCommerceOrder();
-        if ($objPaypalOrder->getTransactionDetailsByPaypalTransaction(
+        if (WKPayPalCommerceOrder::getTransactionDetailsByPaypalTransaction(
             $transaction_id
         )) {
             $ppOrderStatus = $eventData['resource']['status'];
-            $this->updateOrderCapturePaypalOrderStatus($transaction_id, $ppOrderStatus);
+            WKPayPalCommerceOrder::updateOrderCapturePaypalOrderStatus($transaction_id, $ppOrderStatus);
         }
     }
 
@@ -40,10 +45,7 @@ class WkPaypalCommerceWebhook
     {
         $refundID = $eventData['resource']['id'];
 
-        $id = Db::getInstance()->getValue(
-            'SELECT `id_paypal_commerce_refund` FROM `'._DB_PREFIX_.'wk_paypal_commerce_refund`
-            WHERE `paypal_refund_id` =  "' . pSQL($refundID) .'"'
-        );
+        $id = WkPaypalCommerceRefund::getIdByPaypalRefundId($refundID);
 
         $refundObj = new WkPaypalCommerceRefund($id);
         $refundObj->paypal_refund_id = $refundID;
@@ -60,8 +62,7 @@ class WkPaypalCommerceWebhook
     public function captureDenied($eventData)
     {
         $transaction_id = $eventData['resource']['id'];
-        $objPaypalOrder = new WKPayPalCommerceOrder();
-        if ($transactionData = $objPaypalOrder->getTransactionDetailsByPaypalTransaction(
+        if ($transactionData = WKPayPalCommerceOrder::getTransactionDetailsByPaypalTransaction(
             $transaction_id
         )) {
             $cartID = $transactionData['id_cart'];
@@ -76,7 +77,7 @@ class WkPaypalCommerceWebhook
             }
 
             $ppOrderStatus = $eventData['resource']['status'];
-            $this->updateOrderCapturePaypalOrderStatus($transaction_id, $ppOrderStatus);
+            WKPayPalCommerceOrder::updateOrderCapturePaypalOrderStatus($transaction_id, $ppOrderStatus);
         }
     }
 
@@ -87,21 +88,33 @@ class WkPaypalCommerceWebhook
         foreach ($purchaseUnits as $purchase) {
             $transaction_id = $purchase['payments']['captures'][0]['id'];
 
-            $objPaypalOrder = new WKPayPalCommerceOrder();
-            if ($transactionData = $objPaypalOrder->getTransactionDetailsByPaypalTransaction(
+            if ($transactionData = WKPayPalCommerceOrder::getTransactionDetailsByPaypalTransaction(
                 $transaction_id
             )) {
                 // Check if PayPal order is already finished with status COMPLETED
-                if ($transactionData['pp_payment_status'] != 'COMPLETED') {
+                if ($transactionData['pp_payment_status'] != self::WK_PAYPAL_COMMERCE_PAYMENT_STATUS_COMPLETED) {
                     // if order completed then change the status of the order
-                    if ($eventData['event_type'] == 'CHECKOUT.ORDER.COMPLETED') {
+                    if ($eventData['event_type'] == self::WK_PAYPAL_COMMERCE_EVENT_TYPE_ORDER_COMPLETED) {
                         $cartID = $transactionData['id_cart'];
                         $objCart = new Cart($cartID);
-                        if ($objCart->is_advance_payment) {
-                            $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-                        } else {
-                            $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                        $capturedAmount = isset($purchase['payments']['captures'][0]['amount']['value'])
+                            ? (float)$purchase['payments']['captures'][0]['amount']['value']
+                            : 0;
+                        $capturedCurrency = isset($purchase['payments']['captures'][0]['amount']['currency_code'])
+                            ? $purchase['payments']['captures'][0]['amount']['currency_code']
+                            : '';
+                        $cartCurrency = Currency::getCurrency((int)$objCart->id_currency);
+                        if (Tools::strtoupper($capturedCurrency) !== Tools::strtoupper($cartCurrency['iso_code'])) {
+                            WkPaypalCommerceHelper::logMsg(
+                                'webhook',
+                                'PayPal currency mismatch for cart '.(int)$cartID.'. Captured currency: '.$capturedCurrency
+                            );
+                            continue;
                         }
+                        $fullTotal = (float)$objCart->getOrderTotal(true, Cart::BOTH);
+                        $orderStatus = $capturedAmount >= $fullTotal
+                            ? Configuration::get('PS_OS_PAYMENT_ACCEPTED')
+                            : Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                         if ($orders = WkPaypalCommerceHelper::getOrdersByCartId($cartID)) {
                             foreach ($orders as $order) {
                                 $this->updatePaymentStatus(
@@ -113,7 +126,7 @@ class WkPaypalCommerceWebhook
                     }
                 }
 
-                $this->updateOrderPaypalOrderStatus($transaction_id, $payment_status, $eventData['resource']);
+                WKPayPalCommerceOrder::updateOrderPaypalOrderStatus($transaction_id, $payment_status, $eventData['resource']);
             }
         }
     }
@@ -121,17 +134,29 @@ class WkPaypalCommerceWebhook
     public function captureCompleted($eventData)
     {
         $transaction_id = $eventData['resource']['id'];
-        $objPaypalOrder = new WKPayPalCommerceOrder();
-        if ($transactionData = $objPaypalOrder->getTransactionDetailsByPaypalTransaction(
+        if ($transactionData = WKPayPalCommerceOrder::getTransactionDetailsByPaypalTransaction(
             $transaction_id
         )) {
             $cartID = $transactionData['id_cart'];
             $objCart = new Cart($cartID);
-            if ($objCart->is_advance_payment) {
-                $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
-            } else {
-                $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+            $capturedAmount = isset($eventData['resource']['amount']['value'])
+                ? (float)$eventData['resource']['amount']['value']
+                : 0;
+            $capturedCurrency = isset($eventData['resource']['amount']['currency_code'])
+                ? $eventData['resource']['amount']['currency_code']
+                : '';
+            $cartCurrency = Currency::getCurrency((int)$objCart->id_currency);
+            if (Tools::strtoupper($capturedCurrency) !== Tools::strtoupper($cartCurrency['iso_code'])) {
+                WkPaypalCommerceHelper::logMsg(
+                    'webhook',
+                    'PayPal currency mismatch for cart '.(int)$cartID.'. Captured currency: '.$capturedCurrency
+                );
+                return;
             }
+            $fullTotal = (float)$objCart->getOrderTotal(true, Cart::BOTH);
+            $orderStatus = $capturedAmount >= $fullTotal
+                ? Configuration::get('PS_OS_PAYMENT_ACCEPTED')
+                : Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
             if ($orders = WkPaypalCommerceHelper::getOrdersByCartId($cartID)) {
                 foreach ($orders as $order) {
                     $this->updatePaymentStatus(
@@ -142,7 +167,7 @@ class WkPaypalCommerceWebhook
             }
 
             $ppOrderStatus = $eventData['resource']['status'];
-            $this->updateOrderCapturePaypalOrderStatus($transaction_id, $ppOrderStatus);
+            WKPayPalCommerceOrder::updateOrderCapturePaypalOrderStatus($transaction_id, $ppOrderStatus);
         }
     }
 
@@ -171,26 +196,5 @@ class WkPaypalCommerceWebhook
             );
             $orderHistory->addWithemail(true, null);
         }
-    }
-
-    public function updateOrderCapturePaypalOrderStatus($transaction_id, $payment_status)
-    {
-        return Db::getInstance()->execute(
-            'UPDATE `'._DB_PREFIX_.'wk_paypal_commerce_order`
-            SET `pp_payment_status` = "'.pSQL($payment_status).'"
-            WHERE `pp_transaction_id` = "'.pSQL($transaction_id).'"
-            '
-        );
-    }
-
-    public function updateOrderPaypalOrderStatus($transaction_id, $payment_status, $orderData)
-    {
-        return Db::getInstance()->execute(
-            'UPDATE `'._DB_PREFIX_.'wk_paypal_commerce_order`
-            SET `pp_payment_status` = "'.pSQL($payment_status).'",
-            `response` = "'.pSQL(json_encode($orderData)).'"
-            WHERE `pp_transaction_id` = "'.pSQL($transaction_id).'"
-            '
-        );
     }
 }

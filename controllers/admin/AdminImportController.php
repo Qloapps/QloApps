@@ -78,7 +78,7 @@ class AdminImportControllerCore extends AdminController
     {
         $this->bootstrap = true;
         $this->entities = array(
-            $this->l('Hotels'),
+            $this->l('Properties'),
             $this->l('Room Types'),
             $this->l('Rooms'),
             $this->l('Categories'),
@@ -108,7 +108,7 @@ class AdminImportControllerCore extends AdminController
                     'parent' => Configuration::get('PS_HOME_CATEGORY'),
                 );
             break;
-            case $this->entities[$this->l('Hotels')]:
+            case $this->entities[$this->l('Properties')]:
                 $this->required_fields = array(
                     'hotel_name',
                     'phone',
@@ -132,7 +132,7 @@ class AdminImportControllerCore extends AdminController
                     'no' => array('label' => $this->l('Ignore this column')),
                     'id' => array('label' => $this->l('ID')),
                     'active' => array('label' => $this->l('Active (0/1)')),
-                    'hotel_name' => array('label' => $this->l('Hotel Name *')),
+                    'hotel_name' => array('label' => $this->l('Property Name *')),
                     'short_description' => array('label' => $this->l('Short Description')),
                     'description' => array('label' => $this->l('Description')),
                     'phone' => array('label' => $this->l('Mobile phone *')),
@@ -146,7 +146,7 @@ class AdminImportControllerCore extends AdminController
                     'city' => array('label' => $this->l('City *')),
                     'postcode' => array('label' => $this->l('Zip Code *')),
                     'fax' => array('label' => $this->l('Fax')),
-                    'policies' => array('label' => $this->l('Hotel Policies')),
+                    'policies' => array('label' => $this->l('Property Policies')),
                     'active_refund' => array('label' => $this->l('Allow Refund (0 = No, 1 = Yes)')),
                     'refund_ids' => array('label' => $this->l('Refund IDs (x,y,z...)')),
                     'max_checkout_offset' => array('label' => $this->l('Maximum checkout offset')),
@@ -161,7 +161,6 @@ class AdminImportControllerCore extends AdminController
                 $this->required_fields = array('id_hotel', 'name');
 
                 self::$validators['image'] = array('AdminImportController', 'split');
-                self::$validators['id_additional_facilities'] = array('AdminImportController', 'split');
                 self::$validators['id_service_products'] = array('AdminImportController', 'split');
                 self::$validators['id_features'] = array('AdminImportController', 'split');
                 $this->available_fields = array(
@@ -169,7 +168,7 @@ class AdminImportControllerCore extends AdminController
                     'id' => array('label' => $this->l('ID')),
                     'active' => array('label' => $this->l('Active (0/1)')),
                     'name' => array('label' => $this->l('Name *')),
-                    'id_hotel' => array('label' => $this->l('Hotel ID *')),
+                    'id_hotel' => array('label' => $this->l('Property ID *')),
                     'price' => array('label' => $this->l('Pre-tax retail price')),
                     'wholesale_price' => array('label' => $this->l('Pre-tax operating cost')),
                     'id_tax_rules_group' => array('label' => $this->l('Tax rule ID')),
@@ -194,7 +193,6 @@ class AdminImportControllerCore extends AdminController
                     'max_children' => array('label' => $this->l('Maximum children')),
                     'max_room_occupancy' => array('label' => $this->l('Maximum room occupancy')),
                     'show_at_front' => array('label' => $this->l('Show at front (0/1)')),
-                    'id_additional_facilities' => array('label' => $this->l('Additional facilities IDs (x,y,z...)')),
                     'id_service_products' => array('label' => $this->l('Service products IDs (x, y, z...)')),
                     'id_features' => array('label' => $this->l('Feature IDs (x, y, z...)')),
                     'description_short' => array('label' => $this->l('Short description')),
@@ -285,7 +283,6 @@ class AdminImportControllerCore extends AdminController
             case $this->entities[$this->l('Bookings')]:
                 $this->required_fields = array('id_customer', 'duration_dates', 'num_rooms', 'id_product');
                 self::$validators['duration_dates'] = array('AdminImportController', 'split');
-                self::$validators['id_additional_facilities'] = array('AdminImportController', 'split');
                 self::$validators['id_service_products'] = array('AdminImportController', 'split');
 
                 $this->available_fields = array(
@@ -311,10 +308,6 @@ class AdminImportControllerCore extends AdminController
                     'id_service_products' => array(
                         'label' => $this->l('Service Product IDs (x:n, y:n, z:n,..)'),
                         'help' => $this->l('id_service_product:quantity')
-                    ),
-                    'id_additional_facilities' => array(
-                        'label' => $this->l('Additional Facilities IDs (x:a, y:b, z:c,...)'),
-                        'help' => $this->l('id_additional_facility:id_option')
                     ),
                 );
             break;
@@ -448,7 +441,7 @@ class AdminImportControllerCore extends AdminController
             case 'k': $bytes *= 1024;
         }
 
-        if (!isset($bytes) || $bytes == '') {
+        if (!isset($bytes) || $bytes == 0) {
             $bytes = 20971520;
         } // 20Mb
 
@@ -1479,8 +1472,8 @@ class AdminImportControllerCore extends AdminController
                         }
                     }
                 } else {
-                    $this->warnings[] = $this->l('Hotel creation for the ').$objCountry->name.
-                    $this->l(' is currently unavailable. Kindly activate the country for hotel creation.');
+                    $this->warnings[] = $this->l('Property creation for the ').$objCountry->name.
+                    $this->l(' is currently unavailable. Kindly activate the country for property creation.');
                 }
             }
         }
@@ -1746,18 +1739,6 @@ class AdminImportControllerCore extends AdminController
                         }
 
                         $objHotelAdvancePayment->save();
-                        if (isset($product->id_additional_facilities) && $product->id_additional_facilities) {
-                            $objRoomTypeDemand = new HotelRoomTypeDemand();
-                            $objRoomTypeDemand->deleteRoomTypeDemands($product->id);
-                            foreach ($product->id_additional_facilities as $idGlobalDemand) {
-                                if (Validate::isLoadedObject(new HotelRoomTypeGlobalDemand((int) $idGlobalDemand))) {
-                                    $objRoomTypeDemand = new HotelRoomTypeDemand();
-                                    $objRoomTypeDemand->id_product = $product->id;
-                                    $objRoomTypeDemand->id_global_demand = $idGlobalDemand;
-                                    $objRoomTypeDemand->save();
-                                }
-                            }
-                        }
 
                         //delete existing images if "delete_existing_images" is set to 1
                         if (isset($product->delete_existing_images)) {
@@ -1901,7 +1882,7 @@ class AdminImportControllerCore extends AdminController
                                 }
 
                                 $objServiceProduct = new Product($idServiceProduct);
-                                if (Product::SELLING_PREFERENCE_WITH_ROOM_TYPE == $objServiceProduct->selling_preference_type) {
+                                if (Product::isSellableWithRoomType($objServiceProduct->id)) {
                                     $objRoomTypeServiceProduct->addRoomProductLink(
                                         $objServiceProduct->id,
                                         $product->id,
@@ -2329,12 +2310,12 @@ class AdminImportControllerCore extends AdminController
                     $info['shop'] = explode($this->multiple_value_separator, $info['shop']);
 
                     RoomTypeServiceProduct::deleteRoomProductLink($product->id);
-                    if (Product::SELLING_PREFERENCE_WITH_ROOM_TYPE == $product->selling_preference_type) {
+                    if (Product::isSellableWithRoomType($product->id)) {
                         $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                         if (isset($info['id_room_types']) && $info['id_room_types']) {
                             $objRoomTypeServiceProduct->addRoomProductLink(
                                 $product->id,
-                                $product->id_room_types,
+                                $info['id_room_types'],
                                 RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE
                             );
                         }
@@ -2558,7 +2539,6 @@ class AdminImportControllerCore extends AdminController
                             }
 
                             $serviceProducts = array();
-                            $globalDemands = array();
                             if (isset($orderProduct['id_service_products']) && count($orderProduct['id_service_products'])) {
                                 foreach ($orderProduct['id_service_products'] as $serviceProdKey =>  $serviceProd) {
                                     $serviceProd = explode(':', $serviceProd);
@@ -2579,28 +2559,6 @@ class AdminImportControllerCore extends AdminController
                                 }
                             }
 
-                            if (isset($orderProduct['id_additional_facilities']) && count($orderProduct['id_additional_facilities'])) {
-                                foreach ($orderProduct['id_additional_facilities'] as $globalDemandKey =>  $globalDemand) {
-                                    $globalDemand = explode(':', $globalDemand);
-                                    $objGlobalDemand = new HotelRoomTypeGlobalDemand($globalDemand[0], $this->context->language->id);
-                                    if (Validate::isLoadedObject($objGlobalDemand)) {
-                                        $objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption();
-                                        // incase no option is provided or if the provided id is not valid or the id is not connected to the diffrent option, we will set the first option as default.
-                                        if ((!isset($globalDemand[1])
-                                            || !Validate::isLoadedObject($objAdvOption = new HotelRoomTypeGlobalDemandAdvanceOption($globalDemand[1])
-                                            || $objAdvOption->id_global_demand != $globalDemand[0]))
-                                            && ($advOptions = $objAdvOption->getGlobalDemandAdvanceOptions($objGlobalDemand->id))
-                                        ) {
-                                            $globalDemand[1] = $advOptions[0]['id'];
-                                        }
-
-                                        $globalDemands[$globalDemandKey]['id_global_demand'] = $globalDemand[0];
-                                        $globalDemands[$globalDemandKey]['id_option'] = isset($globalDemand[1]) ? $globalDemand[1] : 0;
-                                    }
-                                }
-                            }
-
-                            $globalDemands = json_encode($globalDemands);
                             $objCartBooking->updateCartBooking(
                                 $orderProduct['id_product'],
                                 $occupancy,
@@ -2609,7 +2567,6 @@ class AdminImportControllerCore extends AdminController
                                 0,
                                 date('Y-m-d', strtotime($dateFrom)),
                                 date('Y-m-d', strtotime($dateTo)),
-                                $globalDemands,
                                 $serviceProducts,
                                 $this->context->cart->id,
                                 $this->context->cart->id_guest
@@ -3316,7 +3273,7 @@ class AdminImportControllerCore extends AdminController
                     }
                 }
                 break;
-            case $this->entities[$this->l('Hotels')]:
+            case $this->entities[$this->l('Properties')]:
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_info_lang`');
                 Db::getInstance()->execute('DELETE c, cl FROM `'._DB_PREFIX_.'category` c
                     LEFT JOIN `'._DB_PREFIX_.'category_lang` cl ON c.id_category = cl.id_category
@@ -3326,7 +3283,7 @@ class AdminImportControllerCore extends AdminController
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_image`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_access`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_booking_detail`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_features`');
+                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_amenity`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_cart_booking_data`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_branch_refund_rules`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_order_restrict_date`');
@@ -3364,12 +3321,6 @@ class AdminImportControllerCore extends AdminController
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_feature_pricing`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_feature_pricing_lang`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_feature_pricing_group`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_global_demand`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_global_demand_lang`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_global_demand_advance_option_lang`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_demand_price`');
-                Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_demand`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_service_product_price`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'service_product_cart_detail`');
                 Db::getInstance()->execute('TRUNCATE TABLE `'._DB_PREFIX_.'htl_room_type_restriction_date_range`');
@@ -3472,8 +3423,6 @@ class AdminImportControllerCore extends AdminController
                     'referrer_cache',
                     'htl_cart_booking_data',
                     'htl_booking_detail',
-                    'htl_booking_demands',
-                    'htl_booking_demands_tax',
                     'service_product_order_detail',
                     'service_product_cart_detail',
                 );
@@ -3513,7 +3462,7 @@ class AdminImportControllerCore extends AdminController
                 $import_type = false;
                 Db::getInstance()->disableCache();
                 switch ((int)Tools::getValue('entity')) {
-                    case $this->entities[$import_type = $this->l('Hotels')]:
+                    case $this->entities[$import_type = $this->l('Properties')]:
                         $this->hotelImport();
                         $this->clearSmartyCache();
                         break;

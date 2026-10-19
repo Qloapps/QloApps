@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Iran" version="1.0">
 	<currencies>
-		<currency name="Rial" iso_code="IRR" iso_code_num="364" sign="ریال" blank="1" conversion_rate="1.00" format="4" decimals="0" />
+		<currency name="Rial" iso_code="IRR" iso_code_num="364" sign="ریال" blank="1" format="4" decimals="0" />
 	</currencies>
 	<states>
 		<state name="آذربایجان شرقی" iso_code="01" country="IR" zone="Asia" />
@@ -41,7 +41,7 @@
 	</languages>
 	<taxes>
 		<tax id="1" name="8% مالیات بر ارزش افزوده" rate="8" />
-		
+
 		<taxRulesGroup name="IR VAT(8%)">
 			<taxRule iso_code_country="ir" id_tax="1" />
 		</taxRulesGroup>

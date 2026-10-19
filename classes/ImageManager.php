@@ -285,7 +285,6 @@ class ImageManagerCore
             $temp = imagecreatetruecolor($dst_w * $quality + 1, $dst_h * $quality + 1);
             imagecopyresized($temp, $src_image, 0, 0, $src_x, $src_y, $dst_w * $quality + 1, $dst_h * $quality + 1, $src_w, $src_h);
             imagecopyresampled($dst_image, $temp, $dst_x, $dst_y, 0, 0, $dst_w, $dst_h, $dst_w * $quality, $dst_h * $quality);
-            imagedestroy($temp);
         } else {
             imagecopyresampled($dst_image, $src_image, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h);
         }
@@ -321,7 +320,6 @@ class ImageManagerCore
             $const = defined('FILEINFO_MIME_TYPE') ? FILEINFO_MIME_TYPE : FILEINFO_MIME;
             $finfo = finfo_open($const);
             $mime_type = finfo_file($finfo, $filename);
-            finfo_close($finfo);
         } elseif (function_exists('mime_content_type')) {
             $mime_type = mime_content_type($filename);
         } elseif (function_exists('exec')) {
@@ -542,7 +540,6 @@ class ImageManagerCore
                 $success = imagejpeg($resource, $filename, (int)$quality);
             break;
         }
-        imagedestroy($resource);
         @chmod($filename, 0664);
         return $success;
     }

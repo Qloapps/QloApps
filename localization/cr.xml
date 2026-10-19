@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <localizationPack name="Costa Rica" version="1.0">
   <currencies>
-    <currency name="Colón" iso_code="CRC" iso_code_num="188" sign="₡" blank="1" conversion_rate="560" format="1" decimals="1" />
+    <currency name="Colón" iso_code="CRC" iso_code_num="188" sign="₡" blank="1" format="1" decimals="1" />
   </currencies>
   <languages>
     <language iso_code="es" />
   </languages>
   <taxes>
     <tax id="1" name="I.V. 13%" rate="13" />
+    <tax id="2" name="I.V. 10%" rate="10" />
+    <tax id="3" name="I.V. 5%" rate="5" />
+
     <taxRulesGroup name="CR Standard Rate (13%)">
       <taxRule iso_code_country="cr" id_tax="1" />
     </taxRulesGroup>
+
+    <taxRulesGroup name="CR Reduced Rate (10%)">
+      <taxRule iso_code_country="cr" id_tax="2" />
+    </taxRulesGroup>
+
+    <taxRulesGroup name="CR Super Reduced Rate (5%)">
+      <taxRule iso_code_country="cr" id_tax="3" />
+    </taxRulesGroup>
   </taxes>
+  <states>
+    <state name="Alajuela" iso_code="A" country="CR" zone="Central America/Antilla" />
+    <state name="Cartago" iso_code="C" country="CR" zone="Central America/Antilla" />
+    <state name="Guanacaste" iso_code="G" country="CR" zone="Central America/Antilla" />
+    <state name="Heredia" iso_code="H" country="CR" zone="Central America/Antilla" />
+    <state name="Limón" iso_code="L" country="CR" zone="Central America/Antilla" />
+    <state name="Puntarenas" iso_code="P" country="CR" zone="Central America/Antilla" />
+    <state name="San José" iso_code="SJ" country="CR" zone="Central America/Antilla" />
+  </states>
   <units>
     <unit type="weight" value="kg" />
     <unit type="volume" value="L" />
@@ -19,13 +39,4 @@
     <unit type="base_distance" value="m" />
     <unit type="long_distance" value="km" />
   </units>
-  <states>
-    <state name="San Jose" iso_code="CR-SJ" zone="Central America/Antilla" country="CR"/>
-    <state name="Alajuela" iso_code="CR-A" zone="Central America/Antilla" country="CR"/>
-    <state name="Cartago" iso_code="CR-C" zone="Central America/Antilla" country="CR"/>
-    <state name="Heredia" iso_code="CR-H" zone="Central America/Antilla" country="CR"/>
-    <state name="Guanacaste" iso_code="CR-G" zone="Central America/Antilla" country="CR"/>
-    <state name="Puntarenas" iso_code="CR-P" zone="Central America/Antilla" country="CR"/>
-    <state name="Limon" iso_code="CR-L" zone="Central America/Antilla" country="CR"/>
-  </states>
 </localizationPack>

@@ -7,7 +7,7 @@
  * primary concern and you are using an opcode cache. PLEASE DO NOT EDIT THIS
  * FILE, changes will be overwritten the next time the script is run.
  *
- * @version 4.18.0
+ * @version 4.19.0
  *
  * @warning
  *      You must *not* include any other HTML Purifier files before this file,

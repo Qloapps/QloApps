@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Taiwan" version="1.0">
 	<currencies>
-		<currency name="Dollar" iso_code="TWD" iso_code_num="901" sign="NT$" blank="1" conversion_rate="42.6479" format="2" decimals="1" />
+		<currency name="Dollar" iso_code="TWD" iso_code_num="901" sign="NT$" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="tw" />
@@ -9,7 +9,7 @@
 	</languages>
 	<taxes>
 		<tax id="1" name="VAT TW 5%" rate="5" />
-		
+
 		<taxRulesGroup name="TW Standard Rate (5%)">
 			<taxRule iso_code_country="tw" id_tax="1" />
 		</taxRulesGroup>

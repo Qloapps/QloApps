@@ -543,14 +543,14 @@ class AddressCore extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'state` s
             ON s.`id_country` = cl.`id_country` AND s.`id_state` = a.`id_state`
             WHERE id_customer > 0 AND a.`deleted` = 0 AND
-                (a.`address1` LIKE \'%'.$query.'%\' OR
-                    a.`postcode` LIKE \'%'.$query.'%\' OR
-                    a.`city` LIKE \'%'.$query.'%\' OR
-                    a.`phone` LIKE \'%'.$query.'%\' OR
-                    a.`company` LIKE \'%'.$query.'%\' OR
-                    a.`alias` LIKE \'%'.$query.'%\' OR
-                    s.`name` LIKE \'%'.$query.'%\' OR
-                    cl.`name` LIKE \'%'.$query.'%\'
+                (a.`address1` LIKE \'%'.pSQL($query).'%\' OR
+                    a.`postcode` LIKE \'%'.pSQL($query).'%\' OR
+                    a.`city` LIKE \'%'.pSQL($query).'%\' OR
+                    a.`phone` LIKE \'%'.pSQL($query).'%\' OR
+                    a.`company` LIKE \'%'.pSQL($query).'%\' OR
+                    a.`alias` LIKE \'%'.pSQL($query).'%\' OR
+                    s.`name` LIKE \'%'.pSQL($query).'%\' OR
+                    cl.`name` LIKE \'%'.pSQL($query).'%\'
                 )
         ');
     }

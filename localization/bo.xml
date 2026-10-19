@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Bolivia" version="1.0">
 	<currencies>
-		<currency name="Boliviano" iso_code="BOB" iso_code_num="068" sign="$b" blank="1" conversion_rate="9.57620" format="2" decimals="1" />
+		<currency name="Boliviano" iso_code="BOB" iso_code_num="068" sign="$b" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="es" />
 	</languages>
 	<taxes>
 		<tax id="1" name="IVA BO 13%" rate="13" />
-		
+
 		<taxRulesGroup name="BO Standard rate (13%)">
 			<taxRule iso_code_country="bo" id_tax="1" />
 		</taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Chuquisaca" iso_code="H" country="BO" zone="South America" />
+		<state name="Cochabamba" iso_code="C" country="BO" zone="South America" />
+		<state name="El Beni" iso_code="B" country="BO" zone="South America" />
+		<state name="La Paz" iso_code="L" country="BO" zone="South America" />
+		<state name="Oruro" iso_code="O" country="BO" zone="South America" />
+		<state name="Pando" iso_code="N" country="BO" zone="South America" />
+		<state name="Potosí" iso_code="P" country="BO" zone="South America" />
+		<state name="Santa Cruz" iso_code="S" country="BO" zone="South America" />
+		<state name="Tarija" iso_code="T" country="BO" zone="South America" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

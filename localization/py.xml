@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Paraguay" version="1.0">
 	<currencies>
-		<currency name="Guaraní" iso_code="PYG" iso_code_num="600" sign="Gs" blank="1" conversion_rate="6547.98" format="2" decimals="1" />
+		<currency name="Guaraní" iso_code="PYG" iso_code_num="600" sign="Gs" blank="1" format="2" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="es" />
@@ -9,20 +9,40 @@
 	<taxes>
 		<tax id="1" name="IVA PY 10%" rate="10" />
 		<tax id="2" name="IVA PY 5%" rate="5" />
-		
+
 		<taxRulesGroup name="PY Standard Rate (10%)">
 			<taxRule iso_code_country="py" id_tax="1" />
 		</taxRulesGroup>
-		
+
 		<taxRulesGroup name="PY Reduced Rate (5%)">
 			<taxRule iso_code_country="py" id_tax="2" />
 		</taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Alto Paraguay" iso_code="16" country="PY" zone="South America" />
+		<state name="Alto Paraná" iso_code="10" country="PY" zone="South America" />
+		<state name="Amambay" iso_code="13" country="PY" zone="South America" />
+		<state name="Asunción" iso_code="ASU" country="PY" zone="South America" />
+		<state name="Boquerón" iso_code="19" country="PY" zone="South America" />
+		<state name="Caaguazú" iso_code="5" country="PY" zone="South America" />
+		<state name="Caazapá" iso_code="6" country="PY" zone="South America" />
+		<state name="Canindeyú" iso_code="14" country="PY" zone="South America" />
+		<state name="Central" iso_code="11" country="PY" zone="South America" />
+		<state name="Concepción" iso_code="1" country="PY" zone="South America" />
+		<state name="Cordillera" iso_code="3" country="PY" zone="South America" />
+		<state name="Guairá" iso_code="4" country="PY" zone="South America" />
+		<state name="Itapúa" iso_code="7" country="PY" zone="South America" />
+		<state name="Misiones" iso_code="8" country="PY" zone="South America" />
+		<state name="Ñeembucú" iso_code="12" country="PY" zone="South America" />
+		<state name="Paraguarí" iso_code="9" country="PY" zone="South America" />
+		<state name="Presidente Hayes" iso_code="15" country="PY" zone="South America" />
+		<state name="San Pedro" iso_code="2" country="PY" zone="South America" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />
-		<unit type="short_distance" value="in" />
-		<unit type="base_distance" value="ft" />
-		<unit type="long_distance" value="mi" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
 	</units>
 </localizationPack>

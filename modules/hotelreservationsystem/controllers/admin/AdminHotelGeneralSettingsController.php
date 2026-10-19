@@ -30,10 +30,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
         $this->bootstrap = true;
         parent::__construct();
 
-        $psImgUrl = $this->context->link->getMediaLink(_PS_IMG_.Configuration::get('WK_HOTEL_HEADER_IMAGE'));
-        if ($imgExist = (bool)Tools::file_get_contents($psImgUrl)) {
-            $image = '<img class="img-thumbnail img-responsive" style="max-width:200px" src="'.$psImgUrl.'">';
-        }
         $objHotelInfo = new HotelBranchInformation();
         if (!$hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1)) {
             $hotelsInfo = array();
@@ -112,11 +108,11 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('Enable if you want the next booking search field to be focused automatically after setting value for a field.'),
                     ),
                     'WK_HOTEL_NAME_SEARCH_THRESHOLD' => array(
-                        'title' => $this->l('Hotel name search threshold'),
+                        'title' => $this->l('Property name search threshold'),
                         'type' => 'text',
                         'required' => true,
                         'validation' => 'isUnsignedInt',
-                        'hint' => $this->l('Enter the number of hotels after which user can search hotel by name.'),
+                        'hint' => $this->l('Enter the number of properties after which user can search property by name.'),
                         'desc' => $this->l('Set to 0 to always show the search box.'),
                         'class' => 'fixed-width-xxl',
                     ),
@@ -128,55 +124,15 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             'generalsetting' => array(
                 'title' => $this->l('Website Configuration'),
                 'fields' => array(
-                    'WK_HTL_CHAIN_NAME' => array(
-                        'title' => $this->l('Hotel Name'),
-                        'type' => 'textLang',
-                        'lang' => true,
-                        'required' => true,
-                        'validation' => 'isGenericName',
-                        'hint' => $this->l('Enter Hotel name in case of single hotel or enter your hotels chain name in case of multiple hotels.'),
-                    ),
-                    'WK_HTL_TAG_LINE' => array(
-                        'title' => $this->l('Hotel Tag Line'),
-                        'type' => 'textareaLang',
-                        'lang' => true,
-                        'required' => true,
-                        'validation' => 'isGenericName',
-                        'hint' => $this->l('This will display hotel tag line in hotel page.'),
-                    ),
-                    'WK_HTL_SHORT_DESC' => array(
-                        'title' => $this->l('Hotel Short Description'),
-                        'type' => 'textareaLang',
-                        'lang' => true,
-                        'required' => true,
-                        'rows' => '4',
-                        'cols' => '2',
-                        'validation' => 'isGenericName',
-                        'hint' => $this->l('This will display hotel short description in footer. Note: number of letters must be less than 220.'),
-                    ),
                     'WK_PRIMARY_HOTEL' => array(
-                        'title' => $this->l('Primary hotel'),
-                        'hint' => $this->l('Primary hotel is used to default address for your business. The hotel address will be considered as your registered business address.'),
+                        'title' => $this->l('Primary property'),
+                        'hint' => $this->l('Primary property is used to default address for your business. The property address will be considered as your registered business address.'),
                         'type' => 'select',
                         'identifier' => 'id',
                         'list' => $hotelsInfo,
                     ),
-                    'WK_HTL_ESTABLISHMENT_YEAR' => array(
-                        'title' => $this->l('Website Launch Year'),
-                        'hint' => $this->l('The year when your hotel site was launched.'),
-                        'type' => 'text',
-                        'class' => 'fixed-width-xxl',
-                    ),
-                    'WK_HTL_HEADER_IMAGE' => array(
-                        'title' => $this->l('Header Background Image'),
-                        'type' => 'file',
-                        'image' => $imgExist ? $image : false,
-                        'hint' => $this->l('This image appears as header background image on home page.'),
-                        'name' => 'WK_HOTEL_HEADER_IMAGE',
-                        'url' => _PS_IMG_,
-                    ),
                      'WK_DISPLAY_PROPERTIES_LINK_IN_HEADER' => array(
-                        'title' => $this->l('Display Our Properties link in Header'),
+                        'title' => $this->l('Display Properties link in Header'),
                         'cast' => 'intval',
                         'type' => 'bool',
                         'default' => '0',
@@ -190,7 +146,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('Display Our Properties link in header in the front office'),
+                        'hint' => $this->l('Display Properties link in header in the front office'),
                     ),
                     'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST' => array(
                         'title' => $this->l('Display Contact Page Hotel List'),
@@ -251,6 +207,12 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'validation' => 'isEmail',
                         'required' => true,
                         'type' => 'text'
+                    ),
+                    'WK_HTL_ESTABLISHMENT_YEAR' => array(
+                        'title' => $this->l('Website Launch Year'),
+                        'hint' => $this->l('The year when your hotel site was launched.'),
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
                     ),
                     'PS_SHOP_PHONE' => array(
                         'title' => $this->l('Phone'),
@@ -398,13 +360,15 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                     'PS_API_KEY' => array(
                         'title' => $this->l('Google Maps API Key'),
                         'hint' => $this->l('Unique API key for Google Maps.'),
+                        'validation' => 'isGenericName',
                         'type' => 'text',
+                        'desc' => $this->l('Google Maps API Key is required to display Google Maps.')
                     ),
                     'PS_MAP_ID' => array(
                         'title' => $this->l('Google Map ID'),
-                        'hint' => $this->l('Map Id for Google Maps.'),
-                        'type' => 'text',
-                        'desc' => $this->l('Google Maps API Key and Google Map ID is required to display Google Maps.')
+                        'hint' => $this->l('Map Id for Google Maps (optional).'),
+                        'validation' => 'isGenericName',
+                        'type' => 'text'
                     ),
                     'WK_GOOGLE_ACTIVE_MAP' => array(
                         'title' => $this->l('Display Google Maps For Hotel Location'),
@@ -441,7 +405,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('If yes, only active hotels will be displayed on map.'),
                     ),
                     'WK_DISPLAY_PROPERTIES_PAGE_GOOGLE_MAP' => array(
-                        'title' => $this->l('Display Our Properties page Google map'),
+                        'title' => $this->l('Display Properties page Google map'),
                         'cast' => 'intval',
                         'type' => 'bool',
                         'default' => '0',
@@ -455,7 +419,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('Enable to display map with hotels locations on the our properties page.'),
+                        'hint' => $this->l('Enable to display map with hotels locations on the properties page.'),
                     ),
                     'WK_DISPLAY_CONTACT_PAGE_GOOLGE_MAP' => array(
                         'title' => $this->l('Display Contact Us page Google map'),
@@ -553,63 +517,11 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             // End occupancy fields validation
 
             if (!$hotelNameSearchThreshold && $hotelNameSearchThreshold !== '0') {
-                $this->errors[] = $this->l('Hotel name search threshold field is required.');
+                $this->errors[] = $this->l('Property name search threshold field is required.');
             } elseif (!Validate::isUnsignedInt($hotelNameSearchThreshold)) {
-                $this->errors[] = $this->l('Hotel name search threshold field is invalid.');
+                $this->errors[] = $this->l('Property name search threshold field is invalid.');
             }
 
-            if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Hotel chain name is required at least in ').$objDefaultLanguage['name'];
-            } else {
-                foreach ($languages as $lang) {
-                    if (trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
-                        if (!Validate::isGenericName(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid hotel chain name in ').$lang['name'];
-                        }
-                    }
-                }
-            }
-            if (!trim(Tools::getValue('WK_HTL_TAG_LINE_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Hotel tag line is required at least in ').$objDefaultLanguage['name'];
-            } else {
-                foreach ($languages as $lang) {
-                    if (trim(Tools::getValue('WK_HTL_TAG_LINE_'.$lang['id_lang']))) {
-                        if (!Validate::isGenericName(Tools::getValue('WK_HTL_TAG_LINE_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid Hotel tag line in ').$lang['name'];
-                        }
-                    }
-                }
-            }
-            if (!trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Hotel short description is required at least in ').
-                $objDefaultLanguage['name'];
-            } else {
-                foreach ($languages as $lang) {
-                    if (trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
-                        if (!Validate::isGenericName(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid hotel short description in ').$lang['name'];
-                        }
-                    }
-                }
-            }
-            if ($_FILES['WK_HOTEL_HEADER_IMAGE']['name']) {
-                if ($error = ImageManager::validateUpload($_FILES['WK_HOTEL_HEADER_IMAGE'], Tools::getMaxUploadSize())) {
-                    $this->errors[] = $error;
-                }
-
-                if (!count($this->errors)) {
-                    $file_name = 'hotel_header_image_'.time().'.jpg';
-                    $img_path = _PS_IMG_DIR_.$file_name;
-
-                    if (ImageManager::resize($_FILES['WK_HOTEL_HEADER_IMAGE']['tmp_name'], $img_path)) {
-                        $olderHeaderImg = _PS_IMG_DIR_.Configuration::get('WK_HOTEL_HEADER_IMAGE');
-                        Configuration::updateValue('WK_HOTEL_HEADER_IMAGE', $file_name);
-                        Tools::deleteFile($olderHeaderImg);
-                    } else {
-                        $this->errors[] = $this->l('Some error occured while uoploading image.Please try again.');
-                    }
-                }
-            }
             if (!Validate::isUnsignedInt(Tools::getValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT'))) {
                 $this->errors[] = $this->l('Invalid minimum partial payment percentage.');
             } elseif (Tools::getValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT') <= 0) {
@@ -620,9 +532,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             if (Tools::getValue('WK_GOOGLE_ACTIVE_MAP')) {
                 if (!Tools::getValue('PS_API_KEY')) {
                     $this->errors[] = $this->l('Please enter Google API key.');
-                }
-                if (!Tools::getValue('PS_MAP_ID')) {
-                    $this->errors[] = $this->l('Please enter Google Map Id.');
                 }
             }
             if (!trim(Tools::getValue('PS_SHOP_NAME'))) {
@@ -652,25 +561,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 if ($hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1)) {
                     if (count($hotelsInfo) > 1) {
                         $_POST['WK_HOTEL_NAME_ENABLE'] = 1;
-                    }
-                }
-                foreach ($languages as $lang) {
-                    // if lang fileds are at least in default language and not available in other languages then
-                    // set empty fields value to default language value
-                    if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
-                        $_POST['WK_HTL_CHAIN_NAME_'.$lang['id_lang']] = trim(
-                            Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId)
-                        );
-                    }
-                    if (!trim(Tools::getValue('WK_HTL_TAG_LINE_'.$lang['id_lang']))) {
-                        $_POST['WK_HTL_TAG_LINE_'.$lang['id_lang']] = trim(
-                            Tools::getValue('WK_HTL_TAG_LINE_'.$defaultLangId)
-                        );
-                    }
-                    if (!trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
-                        $_POST['WK_HTL_SHORT_DESC_'.$lang['id_lang']] = trim(
-                            Tools::getValue('WK_HTL_SHORT_DESC_'.$defaultLangId)
-                        );
                     }
                 }
                 parent::postProcess();

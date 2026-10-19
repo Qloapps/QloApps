@@ -44,7 +44,7 @@ class HelperKpiRowCore extends Helper
             if (isset($this->context->cookie->$cookieKey)) {
                 $kpi->visible = (bool) $this->context->cookie->$cookieKey;
             } else {
-                $kpi->visible = true;
+                $kpi->visible = isset($kpi->visible) ? (bool) $kpi->visible : true;
             }
 
             $countVisible = $kpi->visible ? ++$countVisible : $countVisible;

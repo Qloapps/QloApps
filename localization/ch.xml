@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Switzerland" version="1.0">
 	<currencies>
-		<currency name="Franc" iso_code="CHF" iso_code_num="756" sign="CHF" blank="1" conversion_rate="1.34183" format="5" decimals="1" />
+		<currency name="Franc" iso_code="CHF" iso_code_num="756" sign="CHF" blank="1" format="5" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="de" />
@@ -9,15 +9,15 @@
 		<language iso_code="it" />
 	</languages>
 	<taxes>
-		<tax id="1" name="TVA CH 8.0%" rate="8.0" />
-		<tax id="2" name="TVA CH 3.8%" rate="3.8" />
+		<tax id="1" name="TVA CH 7.7%" rate="7.7" />
+		<tax id="2" name="TVA CH 3.7%" rate="3.7" />
 		<tax id="3" name="TVA CH 2.5%" rate="2.5" />
 
-		<taxRulesGroup name="CH Standard Rate (8.0%)">
+		<taxRulesGroup name="CH Standard Rate (7.7%)">
 			<taxRule iso_code_country="ch" id_tax="1" />
 		</taxRulesGroup>
 
-		<taxRulesGroup name="CH Reduced Rate (3.8%)">
+		<taxRulesGroup name="CH Reduced Rate (3.7%)">
 			<taxRule iso_code_country="ch" id_tax="2" />
 		</taxRulesGroup>
 
@@ -25,6 +25,34 @@
 			<taxRule iso_code_country="ch" id_tax="3" />
 		</taxRulesGroup>
 	</taxes>
+	<states>
+    <state name="Aargau (de)" iso_code="CH-AG" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Appenzell Ausserrhoden (de)" iso_code="CH-AR" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Appenzell Innerrhoden (de)" iso_code="CH-AI" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Basel-Landschaft (de)" iso_code="CH-BL" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Basel-Stadt (de)" iso_code="CH-BS" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Bern (de), Berne (fr)" iso_code="CH-BE" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Fribourg (fr), Freiburg (de)" iso_code="CH-FR" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Genève (fr)" iso_code="CH-GE" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Glarus (de)" iso_code="CH-GL" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Graubünden (de)" iso_code="CH-GR" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Jura (fr)" iso_code="CH-JU" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Luzern (de)" iso_code="CH-LU" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Neuchâtel (fr)" iso_code="CH-NE" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Nidwalden (de)" iso_code="CH-NW" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Obwalden (de)" iso_code="CH-OW" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Sankt Gallen (de)" iso_code="CH-SG" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Schaffhausen (de)" iso_code="CH-SH" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Schwyz (de)" iso_code="CH-SZ" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Solothurn (de)" iso_code="CH-SO" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Thurgau (de)" iso_code="CH-TG" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Ticino (it)" iso_code="CH-TI" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Uri (de)" iso_code="CH-UR" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Valais (fr), Wallis (de)" iso_code="CH-VS" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Vaud (fr)" iso_code="CH-VD" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Zug (de)" iso_code="CH-ZG" country="CH" zone="Europe" tax_behavior="0" />
+    <state name="Zürich (de)" iso_code="CH-ZH" country="CH" zone="Europe" tax_behavior="0" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

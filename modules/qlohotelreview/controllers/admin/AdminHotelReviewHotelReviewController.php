@@ -72,8 +72,8 @@ class AdminHotelReviewHotelReviewController extends ModuleAdminController
                 'class' => 'fixed-width-xs',
             ),
             'hotel_name' => array(
-                'title' => $this->l('Hotel'),
-                'hint' => $this->l('Name of the hotel for which this review has been added.'),
+                'title' => $this->l('Property Name'),
+                'hint' => $this->l('Name of the property for which this review has been added.'),
                 'align' => 'left',
                 'callback' => 'getHotelLink',
             ),

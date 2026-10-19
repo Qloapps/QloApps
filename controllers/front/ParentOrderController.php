@@ -322,9 +322,15 @@ class ParentOrderControllerCore extends FrontController
                 $this->context->smarty->assign('cart_htl_data', $cartBookingInfo);
             }
             $objServiceProductCartDetail = new ServiceProductCartDetail();
+            $hotelSellingPreferences = [
+                Product::SELLING_PREFERENCE_WITH_HOTEL,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            ];
             if ($hotelProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                 $this->context->cart->id,
-                [Product::SELLING_PREFERENCE_HOTEL_STANDALONE, Product::SELLING_PREFERENCE_HOTEL_STANDALONE_AND_WITH_ROOM_TYPE],
+                $hotelSellingPreferences,
                 $idHotel = null,
                 0,
                 null,
@@ -337,13 +343,34 @@ class ParentOrderControllerCore extends FrontController
                 null,
                 1
             )) {
-                $this->context->smarty->assign('hotel_products', $hotelProducts);
+                $hotelProducts = array_values(array_filter($hotelProducts, function ($product) {
+                    return !empty($product['id_hotel']);
+                }));
+                if (!empty($hotelProducts)) {
+                    $this->context->smarty->assign('hotel_products', $hotelProducts);
+                }
             }
 
+            $standaloneSellingPreferences = [
+                Product::SELLING_PREFERENCE_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            ];
             $standaloneProducts = $objServiceProductCartDetail->getServiceProductsInCart(
                 $this->context->cart->id,
-                [Product::SELLING_PREFERENCE_STANDALONE]
+                $standaloneSellingPreferences,
+                0,
+                0
             );
+
+            foreach ($standaloneProducts as &$standaloneProduct) {
+                if (TaxConfiguration::isGrossedUp($standaloneProduct['tourism_tax_amount'])) {
+                    $standaloneProduct['unit_price_tax_incl'] += $standaloneProduct['tourism_tax_amount'] / max(1, (int) $standaloneProduct['quantity']);
+                    $standaloneProduct['total_price_tax_incl'] += $standaloneProduct['tourism_tax_amount'];
+                }
+            }
+            unset($standaloneProduct);
 
             if (count($standaloneProducts)) {
                 $this->context->smarty->assign('standalone_products', $standaloneProducts);
@@ -379,6 +406,7 @@ class ParentOrderControllerCore extends FrontController
             }
         }
         $this->context->smarty->assign($summary);
+        $this->context->smarty->assign('show_tourism_tax_separately', (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE'));
         $this->context->smarty->assign(array(
             'HOOK_SHOPPING_CART' => Hook::exec('displayShoppingCartFooter', $summary),
             'HOOK_SHOPPING_CART_EXTRA' => Hook::exec('displayShoppingCart', $summary)
@@ -449,6 +477,7 @@ class ParentOrderControllerCore extends FrontController
         }
 
         $this->context->smarty->assign($summary);
+        $this->context->smarty->assign('show_tourism_tax_separately', (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE'));
         $this->context->smarty->assign(array(
             'token_cart' => Tools::getToken(false),
             'isLogged' => $this->isLogged,
@@ -480,9 +509,17 @@ class ParentOrderControllerCore extends FrontController
             Tools::redirect('');
         } elseif (!Customer::getAddressesTotalById($this->context->customer->id)) {
             $objServiceProductCartDetail = new ServiceProductCartDetail();
+            $standaloneSellingPreferences = [
+                Product::SELLING_PREFERENCE_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+                Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+                Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+            ];
             if (count($objServiceProductCartDetail->getServiceProductsInCart(
                 $this->context->cart->id,
-                [Product::SELLING_PREFERENCE_STANDALONE]
+                $standaloneSellingPreferences,
+                0,
+                0
             ))) {
                 $multi = (int)Tools::getValue('multi-shipping');
                 Tools::redirect('index.php?controller=address&back='.urlencode('order.php?step=1'.($multi ? '&multi-shipping='.$multi : '')));

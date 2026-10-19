@@ -330,7 +330,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
                 ),
                 array(
                     'value' => Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_HOTEL,
-                    'name' => $this->l('Hotel Address')
+                    'name' => $this->l('Property Address')
                 ),
                 array(
                     'value' => Product::STANDARD_PRODUCT_ADDRESS_PREFERENCE_CUSTOM,
@@ -374,8 +374,8 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'identifier' => 'value',
                         'js' => "changeStandardProductAddressType()",
                         'hint' => $this->l('Select address for standard product tax calculation, this will be used to calculate the tax for the standard product price.'),
-                        'desc' => $this->l('The selected address will be used to calculate tax for standard products. To change the hotel address, update the "Primary Hotel" in the').
-                        '<a href="'.$this->context->link->getAdminLink('AdminHotelGeneralSettings').'"> '.$this->l('Hotel General Configuration.').'</a>'
+                        'desc' => $this->l('The selected address will be used to calculate tax for standard products. To change the property address, update the "Primary Property" in the').
+                        '<a href="'.$this->context->link->getAdminLink('AdminHotelGeneralSettings').'"> '.$this->l('Property General Configuration.').'</a>'
                     ),
                     'PS_STANDARD_PRODUCT_ORDER_ADDRESS' => array(
                         'title' => $this->l('Custom address for tax calculation'),

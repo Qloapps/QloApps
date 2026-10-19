@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Canada" version="1.0">
 	<currencies>
-		<currency name="Dollar (CAD)" iso_code="CAD" iso_code_num="124" sign="CAD$" blank="0" conversion_rate="1.40054" format="1" decimals="1" />
+		<currency name="Dollar (CAD)" iso_code="CAD" iso_code_num="124" sign="CAD$" blank="0" format="1" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="en" />

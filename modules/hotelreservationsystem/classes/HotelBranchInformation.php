@@ -23,9 +23,13 @@
 
 class HotelBranchInformation extends ObjectModel
 {
+    const TAX_COLLECTION_TYPE_ONLINE = 0;
+    const TAX_COLLECTION_TYPE_AT_HOTEL = 1;
+
     public $id_category;
     public $hotel_name;
     public $email;
+    public $id_property_type;
     public $check_in;
     public $check_out;
     public $description;
@@ -39,10 +43,12 @@ class HotelBranchInformation extends ObjectModel
     public $map_input_text;
     public $active_refund;
     public $fax;
+    public $tourism_tax_collection_type = 0;
     public $date_add;
     public $date_upd;
 
     public $moduleInstance;
+    public $propertyTypeName;
 
     public static $definition = array(
         'table' => 'htl_branch_info',
@@ -51,16 +57,18 @@ class HotelBranchInformation extends ObjectModel
         'fields' => array(
             'id_category' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'email' => array('type' => self::TYPE_STRING,'validate' => 'isEmail', 'size' => 255, 'required' => true),
+            'id_property_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'rating' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedId'),
             'check_in' => array('type' => self::TYPE_STRING, 'required' => true),
             'check_out' => array('type' => self::TYPE_STRING, 'required' => true),
             'active' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
-            'latitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
-            'longitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isFloat'),
+            'latitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isCoordinate'),
+            'longitude' => array('type' => self::TYPE_FLOAT, 'validate' => 'isCoordinate'),
             'map_formated_address' => array('type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'),
             'map_input_text' => array('type' => self::TYPE_STRING, 'validate' => 'isString'),
             'active_refund' => array('type' => self::TYPE_BOOL, 'validate' => 'isBool'),
             'fax' => array('type' => self::TYPE_STRING, 'validate' => 'isGenericName'),
+            'tourism_tax_collection_type' => array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
 
@@ -98,6 +106,10 @@ class HotelBranchInformation extends ObjectModel
                 'required' => true,
                 'xlink_resource'=> 'countries',
             ),
+            'id_property_type' => array(
+                'required' => true,
+                'xlink_resource'=> 'hotel_property_types',
+            ),
             'id_state' => array(
                 'xlink_resource'=> 'states',
             ),
@@ -128,8 +140,8 @@ class HotelBranchInformation extends ObjectModel
                 'resource' => 'image',
                 'fields' => array('id' => array())
             ),
-            'hotel_features' => array(
-                'resource' => 'hotel_feature',
+            'hotel_amenities' => array(
+                'resource' => 'hotel_amenity',
                 'fields' => array('id' => array('required' => true))
             ),
             'hotel_refund_rules' => array(
@@ -161,6 +173,7 @@ class HotelBranchInformation extends ObjectModel
                 $this->use_global_min_booking_offset = $hotelRestrictions['use_global_min_booking_offset'];
                 $this->min_booking_offset = $hotelRestrictions['min_booking_offset'];
             }
+            $this->propertyTypeName = self::getHotelPropertyTypeByPropertyId($this->id_property_type, $id_lang);
         }
     }
 
@@ -508,31 +521,25 @@ class HotelBranchInformation extends ObjectModel
         $sql = 'SELECT hbi.`id`, hbl.`hotel_name` FROM `'._DB_PREFIX_.'htl_branch_info` hbi
             LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
             ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')
-            WHERE hbi.`id` NOT IN (SELECT DISTINCT id_hotel FROM `'._DB_PREFIX_.'htl_branch_features`)';
+            WHERE hbi.`id` NOT IN (SELECT DISTINCT id_hotel FROM `'._DB_PREFIX_.'htl_branch_amenity`)';
 
         return Db::getInstance()->executeS($sql);
     }
 
     /**
-     * [getFeaturesOfHotelByHotelId : To get assigned Features of a hotel by its id].
-     *
-     * @param [type] $id_hotel [id of the hotel]
-     *
-     * @return [array | false] [If no feature found then returns false otherwise returns array of all features assigned to the hotel]
+     * @param int $id_hotel
+     * @return array|false
      */
-    public function getFeaturesOfHotelByHotelId($id_hotel)
+    public function getAmenitiesOfHotelByHotelId($id_hotel)
     {
         return Db::getInstance()->executeS(
-            'SELECT feature_id FROM `'._DB_PREFIX_.'htl_branch_features` WHERE id_hotel='.(int)$id_hotel
+            'SELECT amenity_id FROM `'._DB_PREFIX_.'htl_branch_amenity` WHERE id_hotel='.(int)$id_hotel
         );
     }
 
     /**
-     * [getFeaturesOfHotelByHotelId : To get Hotel's id by its category id].
-     *
-     * @param [int] $id_category [id_category of the hotel]
-     *
-     * @return [array | int] [If no hotel found then returns false otherwise returns id of the hotel]
+     * @param int $id_category
+     * @return int|false
      */
     public static function getHotelIdByIdCategory($id_category)
     {
@@ -550,11 +557,8 @@ class HotelBranchInformation extends ObjectModel
     }
 
     /**
-     * [getFeaturesOfHotelByHotelId : To get Category Information by its id_category].
-     *
-     * @param [int] $id_category [id of the category , Which innformation is wanted]
-     *
-     * @return [array | false] [If no Category found then returns false otherwise returns array of information of that category]
+     * @param int $id_category
+     * @return array|false
      */
     public function getCategoryDataByIdCategory($id_category)
     {
@@ -804,11 +808,11 @@ class HotelBranchInformation extends ObjectModel
                     }
                 }
             }
-            $objHotelfeatures = new HotelBranchFeatures();
+            $objHotelAmenities = new HotelBranchAmenities();
             $objHotelImage = new HotelImage();
-            if (!$objHotelfeatures->deleteBranchFeaturesByHotelId($idHotel)) {
+            if (!$objHotelAmenities->saveBranchAmenities($idHotel, array())) {
                 $contextController->errors[] = $this->moduleInstance->l(
-                    'Some error has occurred while deleting hotel feature data.',
+                    'Some error has occurred while deleting hotel amenity data.',
                     'HotelBranchInformation'
                 );
             }
@@ -932,33 +936,37 @@ class HotelBranchInformation extends ObjectModel
 
     public static function addHotelRestriction($idsHotel, $alias = null, $identifier = 'id_hotel', $idProfile = null)
     {
-        if (!$idProfile) {
-            $idProfile = Context::getContext()->employee->id_profile;
-        }
-
-        $accessedIds = self::getProfileAccessedHotels($idProfile, 1, 1);
-        if (!$idsHotel) {
-            $idsHotel = $accessedIds;
-        } else {
-            if (!is_array($idsHotel)) {
-                $idsHotel = array($idsHotel);
-            }
-            // check if passed hotel id's are available for current employee
-            $idsHotel = array_filter($idsHotel, function ($idHotel) use($accessedIds)  {
-                return in_array($idHotel, $accessedIds);
-            });
-        }
-
-        $restriction = ' AND ';
-        if (count($idsHotel)) {
-            if ($alias) {
-                $alias .= '.';
+        $restriction = '';
+        if (defined('_PS_ADMIN_DIR_')) {
+            if (!$idProfile) {
+                $idProfile = Context::getContext()->employee->id_profile;
             }
 
-            $identifier = "`$identifier`";
-            $restriction .= $alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
-        } else {
-            $restriction .= 0;
+            $accessedIds = self::getProfileAccessedHotels($idProfile, 1, 1);
+            if (!$idsHotel) {
+                $idsHotel = $accessedIds;
+            } else {
+                if (!is_array($idsHotel)) {
+                    $idsHotel = array($idsHotel);
+                }
+                // check if passed hotel id's are available for current employee
+                $idsHotel = array_filter($idsHotel, function ($idHotel) use($accessedIds) {
+                    return in_array($idHotel, $accessedIds);
+                });
+            }
+
+            $restriction .= ' AND ';
+            if (count($idsHotel)) {
+                if ($alias) {
+                    $alias .= '.';
+                }
+                $identifier = "`$identifier`";
+                $restriction .= $alias.$identifier.' IN ('.implode(', ', $idsHotel).') ';
+            } else {
+                $restriction .= 0;
+            }
+        } elseif ($ids = array_filter(array_map('intval', is_array($idsHotel) ? $idsHotel : array($idsHotel)))) {
+            $restriction .= ' AND `'.bqSQL($alias).'`.`id_hotel` IN ('.implode(',', $ids).')';
         }
 
         return $restriction;
@@ -1005,25 +1013,25 @@ class HotelBranchInformation extends ObjectModel
         return $ids;
     }
 
-    // Webservice:: function to prepare id parameter for hotel features in a hotel api
-    public function getWsHotelFeatures()
+    // Webservice:: function to prepare id parameter for hotel amenities in a hotel api
+    public function getWsHotelAmenities()
     {
         return Db::getInstance()->executeS(
-            'SELECT `feature_id` as `id` FROM `'._DB_PREFIX_.'htl_branch_features` WHERE `id_hotel` = '.(int)$this->id.
-            ' ORDER BY `feature_id` ASC'
+            'SELECT `amenity_id` as `id` FROM `'._DB_PREFIX_.'htl_branch_amenity` WHERE `id_hotel` = '.(int)$this->id.
+            ' ORDER BY `amenity_id` ASC'
         );
     }
 
-    // Webservice:: function to prepare id parameter for hotel features in a hotel api
-    public function setWsHotelFeatures($branchFeatures)
+    // Webservice:: function to set hotel amenities in a hotel api
+    public function setWsHotelAmenities($branchAmenities)
     {
         Db::getInstance()->execute('
-			DELETE FROM `'._DB_PREFIX_.'htl_branch_features`
+			DELETE FROM `'._DB_PREFIX_.'htl_branch_amenity`
 			WHERE `id_hotel` = '.(int)$this->id
         );
 
-        foreach ($branchFeatures as $feature) {
-            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_features` (`id_hotel`, `feature_id`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$feature['id'].', NOW(), NOW())');
+        foreach ($branchAmenities as $amenity) {
+            Db::getInstance()->execute('INSERT INTO `'._DB_PREFIX_.'htl_branch_amenity` (`id_hotel`, `amenity_id`, `date_add`, `date_upd`) VALUES ('.(int)$this->id.', '.(int)$amenity['id'].', NOW(), NOW())');
         }
 
         return true;
@@ -1406,6 +1414,25 @@ class HotelBranchInformation extends ObjectModel
             AND ha.`access`= 1 AND ha.`id_profile` = '.(int) $idEmployeeProfile;
 
         return Db::getInstance()->executeS($sql);
+    }
+
+    public static function getHotelPropertyTypeByPropertyId($idPropertyType, $idLang = null)
+    {
+        $idPropertyType = (int) $idPropertyType;
+        $idLang = $idLang ? (int) $idLang : (int) Context::getContext()->language->id;
+        $cacheKey = 'HotelPropertyType::getHotelPropertyTypeByPropertyId'.$idPropertyType.'_'.$idLang;
+
+        if (!Cache::isStored($cacheKey)) {
+            $sql = 'SELECT hptl.`name`
+                FROM `'._DB_PREFIX_.'htl_property_type_lang` hptl
+                WHERE hptl.`id_htl_property_type` = '.$idPropertyType.'
+                AND hptl.`id_lang` = '.$idLang;
+
+            Cache::store($cacheKey, Db::getInstance()->getValue($sql));
+        }
+
+        $propertyType = Cache::retrieve($cacheKey);
+        return $propertyType ? $propertyType : Module::getInstanceByName('hotelreservationsystem')->l('Hotel', 'HotelBranchInformation');
     }
 
 }

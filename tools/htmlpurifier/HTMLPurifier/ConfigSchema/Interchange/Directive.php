@@ -66,7 +66,7 @@ class HTMLPurifier_ConfigSchema_Interchange_Directive
     public $version;
 
     /**
-     * ID of directive that supercedes this old directive.
+     * ID of directive that supersedes this old directive.
      * Null if not deprecated.
      * @type HTMLPurifier_ConfigSchema_Interchange_Id
      */

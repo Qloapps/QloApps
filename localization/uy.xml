@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Uruguay" version="1.0">
 	<currencies>
-		<currency name="Peso" iso_code="UYU" iso_code_num="858" sign="$U" blank="1" conversion_rate="27.5471" format="1" decimals="1" />
+		<currency name="Peso" iso_code="UYU" iso_code_num="858" sign="$U" blank="1" format="1" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="es" />
@@ -9,20 +9,41 @@
 	<taxes>
 		<tax id="1" name="IVA UY 22%" rate="22" />
 		<tax id="2" name="IVA UY 10%" rate="10" />
-		
+
 		<taxRulesGroup name="UY Standard Rate (22%)">
 			<taxRule iso_code_country="uy" id_tax="1" />
 		</taxRulesGroup>
-		
+
 		<taxRulesGroup name="UY Reduced Rate (10%)">
 			<taxRule iso_code_country="uy" id_tax="2" />
 		</taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Artigas" iso_code="AR" country="UY" zone="South America" />
+		<state name="Canelones" iso_code="CA" country="UY" zone="South America" />
+		<state name="Cerro Largo" iso_code="CL" country="UY" zone="South America" />
+		<state name="Colonia" iso_code="CO" country="UY" zone="South America" />
+		<state name="Durazno" iso_code="DU" country="UY" zone="South America" />
+		<state name="Flores" iso_code="FS" country="UY" zone="South America" />
+		<state name="Florida" iso_code="FD" country="UY" zone="South America" />
+		<state name="Lavalleja" iso_code="LA" country="UY" zone="South America" />
+		<state name="Maldonado" iso_code="MA" country="UY" zone="South America" />
+		<state name="Montevideo" iso_code="MO" country="UY" zone="South America" />
+		<state name="Paysandú" iso_code="PA" country="UY" zone="South America" />
+		<state name="Río Negro" iso_code="RN" country="UY" zone="South America" />
+		<state name="Rivera" iso_code="RV" country="UY" zone="South America" />
+		<state name="Rocha" iso_code="RO" country="UY" zone="South America" />
+		<state name="Salto" iso_code="SA" country="UY" zone="South America" />
+		<state name="San José" iso_code="SJ" country="UY" zone="South America" />
+		<state name="Soriano" iso_code="SO" country="UY" zone="South America" />
+		<state name="Tacuarembó" iso_code="TA" country="UY" zone="South America" />
+		<state name="Treinta y Tres" iso_code="TT" country="UY" zone="South America" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />
-		<unit type="short_distance" value="in" />
-		<unit type="base_distance" value="ft" />
-		<unit type="long_distance" value="mi" />
+		<unit type="short_distance" value="cm" />
+		<unit type="base_distance" value="m" />
+		<unit type="long_distance" value="km" />
 	</units>
 </localizationPack>

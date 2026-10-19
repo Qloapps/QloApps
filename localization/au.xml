@@ -3,9 +3,9 @@
 	<languages>
 		<language iso_code="en"/>
 	</languages>
-	
+
 	<currencies>
-		<currency name="Dollar" iso_code="AUD" iso_code_num="036" sign="$" blank="0" conversion_rate="1.40554" format="1" decimals="1" />
+		<currency name="Dollar" iso_code="AUD" iso_code_num="036" sign="$" blank="0" format="1" decimals="1" />
 	</currencies>
 	<taxes>
 		<tax id="1" name="GST AU 10%" rate="10" />

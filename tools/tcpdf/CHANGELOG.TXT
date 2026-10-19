@@ -1,3 +1,73 @@
+6.11.3 (2026-04-21)
+	- Added deprecation notice.
+	- Improved composer.json.
+	- Added Makefile for common automation tasks.
+
+6.11.2 (2026-03-03)
+	- Refactor setCompression().
+
+6.11.1 (2026-03-03)
+	- Remove debug line preventing compression.
+
+6.11.0 (2026-03-01)
+	- Updated copyright year.
+	- Updated linked http urls to https.
+	- Fix PHP 8.5 deprecation on curl_close() - PR #838
+	- Fix PHP 8.5 deprecation on null array offset - PR #839
+	- Fixed: Font subsetting - incorrect placement of head checksum - PR #849
+	- Fix imagedestroy() deprecation in PHP 8.5 - PR #851
+	- Fix Rendering of SVG -> PDF issue - PR #855
+
+6.10.1 (2025-11-21)
+	- cI: Add 8.5 to CI matrix - PR #836
+	- Fix PHP 8.5 deprecation for xml_parser_free - PR #835
+	- Fix bad text-align from HTML source - PR #833
+	- Fix image on footer problems - PR #823
+	- Preserving percentage gradient decimals and correctly clamp coordinates - PR #815
+	- Enables compression for PDF/A - PR #820
+
+6.10.0 (2025-05-27)
+	- Embedded files support (Factur-X 1.07 / ZUGFeRD 2.3) #789
+
+6.9.5 (2025-05-27)
+	- Automatically add destinations from HTML code #804
+	- Wrong default value when $table_el['old_cell_padding'] is missing #807
+	- Fixed PHP warning when empty hash link for image exists in HTML #809
+	- Fix for application of alpha component to SVG RGBA fills #810
+
+6.9.4 (2025-05-13)
+	- Update donation link.
+
+6.9.3 (2025-04-20)
+	- New fix for "Deserialization of untrusted data" (check on valid protocols).
+	- Removed global phar configuration.
+
+6.9.2 (2025-04-18)
+	- Quick fix for "Deserialization of untrusted data" security vulnerability reported by Positive Technologies.
+	- Disable phar protocol globally.
+
+6.9.1 (2025-04-03)
+	- Fixed "Path Traversal" security vulnerability reported by Positive Technologies.
+
+6.9.0 (2025-03-30)
+	- Added PHP 8.4 testing.
+	- Removed tcpdf_import.php and tcpdf_parser.php files (for a parser check the tc-lib-pdf-parser project instead).
+	- Fix composer.json.
+
+6.8.2 (2025-01-26)
+	- Fix some annotation flags values.
+	- Remove examples from packaging.
+
+6.8.1 (2025-01-26) - UNTAGGED
+	- Check relative paths on SVG images.
+
+6.8.0 (2024-12-23)
+	- Requires PHP 7.1+ and curl extension.
+	- Escape error message.
+	- Use strict time-constant function to compare TCPDF-tag hashes.
+	- Add K_CURLOPTS config array to set custom cURL options (NOTE: some defaults have changed).
+	- Add some addTTFfont fixes from tc-lib-pdf-font.
+
 6.7.8 (2024-12-13)
 	- Improve SVG detection by checking for (mandatory) namespace.
 	- Use late state binding now that minimum PHP version is 5.5.
@@ -1780,7 +1850,7 @@
 		addTOCPage(), endTOCPage(), addHTMLTOC().
 
 5.0.000 (2010-05-05)
-	- Method ImageSVG() was added to embedd SVG images (see example n. 58). Note that not all SVG images are supported.
+	- Method ImageSVG() was added to embed SVG images (see example n. 58). Note that not all SVG images are supported.
 	- Method setRasterizeVectorImages() was added to enable/disable rasterization for vector images via ImageMagick library.
 	- Method RoundedRectXY() was added.
 	- Method PieSectorXY() was added.
@@ -2507,7 +2577,7 @@
 	- A bug relative to fill color on next page was fixed.
 
 4.2.007 (2008-11-12)
-	- The function setListIndentWidth() was added to set custom indentation widht for HTML lists.
+	- The function setListIndentWidth() was added to set custom indentation width for HTML lists.
 
 4.2.006 (2008-11-06)
 	- A bug relative to HTML justification was fixed.
@@ -2701,7 +2771,7 @@
 
 4.0.011 (2008-07-23)
 	- Font support was improved.
-	- The folder /fonts/utils contains new utilities and instructions for embedd font files.
+	- The folder /fonts/utils contains new utilities and instructions for embed font files.
 	- Documentation was updated.
 
 4.0.010 (2008-07-22)

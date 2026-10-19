@@ -91,6 +91,17 @@
                             <label for="lastname">{l s='Last name'} <sup>*</sup></label>
                             <input type="text" class="form-control validate" id="customer_lastname" name="customer_lastname" onblur="$('#lastname').val($(this).val());" data-validate="isName" value="{if isset($guestInformations) && isset($guestInformations.customer_lastname) && $guestInformations.customer_lastname}{$guestInformations.customer_lastname}{/if}" />
                         </div>
+                        {if isset($nationality) && $nationality}
+                            <div class="{if isset($nationality_mandatory) && $nationality_mandatory}required {/if}form-group">
+                                <label for="id_nationality">{l s='Nationality'}{if isset($nationality_mandatory) && $nationality_mandatory} <sup>*</sup>{/if}</label>
+                                <select name="id_nationality" id="id_nationality" class="form-control">
+                                    <option value="">-</option>
+                                    {foreach from=$nationality_countries item=c}
+                                        <option value="{$c.id_country}"{if isset($smarty.post.id_nationality) && $smarty.post.id_nationality == $c.id_country || (isset($guestInformations) && isset($guestInformations.id_nationality) && $guestInformations.id_nationality == $c.id_country)} selected="selected"{/if}>{$c.name|escape:'html':'UTF-8'}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        {/if}
                         <div class="select form-group date-select">
                             <label>{l s='Date of Birth'}</label>
                             <div class="row">

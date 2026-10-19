@@ -43,26 +43,26 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
 
         $this->fields_options = array(
             'global' => array(
-                'title' => $this->l('Hotel Room Display Setting'),
+                'title' => $this->l('Property Room Display Setting'),
                 'icon' => 'icon-cogs',
                 'fields' => array(
                     'HOTEL_ROOM_DISPLAY_HEADING' => array(
-                        'title' => $this->l('Hotel Room Block Title'),
+                        'title' => $this->l('Property Room Block Title'),
                         'type' => 'textLang',
                         'lang' => true,
                         'required' => true,
                         'validation' => 'isGenericName',
-                        'hint' => $this->l('Enter a title for the hotel rooms block.'),
+                        'hint' => $this->l('Enter a title for the property rooms block.'),
                     ),
                     'HOTEL_ROOM_DISPLAY_DESCRIPTION' => array(
-                        'title' => $this->l('Hotel room block description'),
+                        'title' => $this->l('Property room block description'),
                         'type' => 'textareaLang',
                         'lang' => true,
                         'required' => true,
                         'validation' => 'isGenericName',
                         'rows' => '4',
                         'cols' => '2',
-                        'hint' => $this->l('Enter a description for the hotel rooms block.'),
+                        'hint' => $this->l('Enter a description for the property rooms block.'),
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
@@ -91,7 +91,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                 'orderby' => false,
             ),
             'hotel_name' => array(
-                'title' => $this->l('Hotel'),
+                'title' => $this->l('Property'),
                 'align' => 'center',
                 'orderby' => false,
             ),
@@ -335,25 +335,25 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
             $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
             $languages = Language::getLanguages(false);
             if (!trim(Tools::getValue('HOTEL_ROOM_DISPLAY_HEADING_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Hotel rooms block title is required at least in ').
+                $this->errors[] = $this->l('Property rooms block title is required at least in ').
                 $objDefaultLanguage['name'];
             } else {
                 foreach ($languages as $lang) {
                     if (trim(Tools::getValue('HOTEL_ROOM_DISPLAY_HEADING_'.$lang['id_lang']))) {
                         if (!Validate::isGenericName(Tools::getValue('HOTEL_ROOM_DISPLAY_HEADING_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid hotel rooms block title in ').$lang['name'];
+                            $this->errors[] = $this->l('Invalid property rooms block title in ').$lang['name'];
                         }
                     }
                 }
             }
             if (!trim(Tools::getValue('HOTEL_ROOM_DISPLAY_DESCRIPTION_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Hotel rooms block description is required at least in ').
+                $this->errors[] = $this->l('Property rooms block description is required at least in ').
                 $objDefaultLanguage['name'];
             } else {
                 foreach ($languages as $lang) {
                     if (trim(Tools::getValue('HOTEL_ROOM_DISPLAY_DESCRIPTION_'.$lang['id_lang']))) {
                         if (!Validate::isGenericName(Tools::getValue('HOTEL_ROOM_DISPLAY_DESCRIPTION_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid hotel rooms block description in ').$lang['name'];
+                            $this->errors[] = $this->l('Invalid property rooms block description in ').$lang['name'];
                         }
                     }
                 }

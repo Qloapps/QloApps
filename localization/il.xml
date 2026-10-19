@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Israel" version="1.0">
 	<currencies>
-		<currency name="Shekel" iso_code="ILS" iso_code_num="376" sign="₪‎" blank="0" conversion_rate="4.97713" format="2" decimals="1" />
+		<currency name="Shekel" iso_code="ILS" iso_code_num="376" sign="₪‎" blank="0" format="2" decimals="1" />
 	</currencies>
 	<languages>
-		<language iso_code="ar" />
 		<language iso_code="he" />
 	</languages>
 	<taxes>
 		<tax id="1" name="Ma'am IL 17%" rate="17" />
+		<tax id="2" name="Ma'am IL 7.5%" rate="7.5" />
 
 		<taxRulesGroup name="IL Standard Rate (17%)">
 			<taxRule iso_code_country="il" id_tax="1" />
 		</taxRulesGroup>
-	</taxes>
+
+		<taxRulesGroup name="IL Reduced Rate (7.5%)">
+			<taxRule iso_code_country="il" id_tax="2" />
+		</taxRulesGroup>
+  </taxes>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

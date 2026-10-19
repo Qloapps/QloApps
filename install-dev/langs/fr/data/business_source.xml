@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<entity_business_source>
+  <business_source id="Direct">
+    <name>Direct</name>
+  </business_source>
+  <business_source id="OTA">
+    <name>OTA</name>
+  </business_source>
+  <business_source id="Corporate">
+    <name>Entreprise</name>
+  </business_source>
+  <business_source id="Travel_Agent">
+    <name>Agence de Voyage</name>
+  </business_source>
+  <business_source id="Group">
+    <name>Groupe</name>
+  </business_source>
+  <business_source id="Api">
+    <name>API</name>
+  </business_source>
+</entity_business_source>

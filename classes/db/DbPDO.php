@@ -60,8 +60,13 @@ class DbPDOCore extends Db
         } else {
             $dsn .= 'host='.$host;
         }
-
-        return new PDO($dsn, $user, $password, array(PDO::ATTR_TIMEOUT => $timeout, PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true));
+        if(class_exists('Pdo\\Mysql')){
+            $bufferedQueryAttr = \Pdo\Mysql::ATTR_USE_BUFFERED_QUERY;
+        }else{
+            $bufferedQueryAttr = PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;;
+        }
+        
+        return new PDO($dsn, $user, $password, array(PDO::ATTR_TIMEOUT => $timeout, $bufferedQueryAttr => true));
     }
 
     /**

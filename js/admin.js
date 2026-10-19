@@ -504,6 +504,14 @@ function changeCMSActivationAuthorization()
 		getE('PS_CONDITIONS_CMS_ID').disabled = 'disabled';
 }
 
+function toggleNationalityMandatoryField()
+{
+	if ($('#PS_CUSTOMER_NATIONALITY_on').prop('checked'))
+		$('#conf_id_PS_CUSTOMER_NATIONALITY_MANDATORY').closest('.form-group').show();
+	else
+		$('#conf_id_PS_CUSTOMER_NATIONALITY_MANDATORY').closest('.form-group').hide();
+}
+
 function changeOverbookingOrderAction()
 {
     if (getE('PS_OVERBOOKING_ORDER_ACTION').value == $("input[name='OVERBOOKING_ORDER_CANCEL_ACTION']").val())
@@ -998,6 +1006,10 @@ $(document).ready(function()
     if ($('.kpi-container').length) {
         refresh_kpis();
     }
+	if ($('#PS_CUSTOMER_NATIONALITY_on').length) {
+		toggleNationalityMandatoryField();
+		$('input[name="PS_CUSTOMER_NATIONALITY"]').on('change', toggleNationalityMandatoryField);
+	}
 });
 
 function bindSwapSave()

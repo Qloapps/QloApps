@@ -41,12 +41,22 @@
     {/if}
     <tr>
         <td>
-            <strong>{l s="Total Tax"}</strong>
+            <strong>{l s="Room and Service Tax"}</strong>
         </td>
         <td>
             {$list['total_order_tax']}
         </td>
     </tr>
+    {if isset($list['has_tourism_tax']) && $list['has_tourism_tax']}
+        <tr>
+            <td>
+                <strong>{l s="Total Tourism Tax"}</strong>
+            </td>
+            <td>
+                {$list['total_tourism_tax']}
+            </td>
+        </tr>
+    {/if}
     <tr>
         <td>
             <strong>{l s="Discounts"}</strong>

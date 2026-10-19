@@ -1051,7 +1051,6 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                 }
                 break;
         }
-        imagedestroy($dest_image);
         if (!$imaged) {
             throw new WebserviceException(sprintf('Unable to write the image "%s".', str_replace(_PS_ROOT_DIR_, '[SHOP_ROOT_DIR]', $new_path)), array(70, 500));
         }
@@ -1104,7 +1103,6 @@ class WebserviceSpecificManagementImagesCore implements WebserviceSpecificManage
                     $const = defined('FILEINFO_MIME_TYPE') ? FILEINFO_MIME_TYPE : FILEINFO_MIME;
                     $finfo = finfo_open($const);
                     $mime_type = finfo_file($finfo, $file['tmp_name']);
-                    finfo_close($finfo);
                 } elseif (Tools::isCallable('mime_content_type')) {
                     $mime_type = mime_content_type($file['tmp_name']);
                 } elseif (Tools::isCallable('exec')) {

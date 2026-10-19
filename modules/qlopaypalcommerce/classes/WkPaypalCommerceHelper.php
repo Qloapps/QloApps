@@ -2,10 +2,10 @@
 /**
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
+* This source file is subject to the Academic Free License (AFL 3.0)
 * that is bundled with this package in the file LICENSE.md
 * It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
+* https://opensource.org/licenses/afl-3.0.php
 * If you did not receive a copy of the license and are unable to
 * obtain it through the world-wide-web, please send an email
 * to support@qloapps.com so we can send you a copy immediately.
@@ -18,7 +18,7 @@
 *
 * @author Webkul IN
 * @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
 */
 
 class WkPaypalCommerceHelper
@@ -27,14 +27,24 @@ class WkPaypalCommerceHelper
     public static function getAccessToken()
     {
         $apiResp = array();
-        if (Tools::isSubmit('submit_paypal_commerce')) {
-            $wkClientID = trim(Tools::getValue('WK_PAYPAL_COMMERCE_CLIENT_ID'));
-            $wkClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_CLIENT_SECRET'));
+        if (Tools::isSubmit('btnConfigSubmit')) {
             $wkEnvironment = Tools::getValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
+            if ($wkEnvironment == QloPaypalCommerce::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) {
+                $wkClientID = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'));
+                $wkClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'));
+            } else {
+                $wkClientID = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'));
+                $wkClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'));
+            }
         } else {
-            $wkClientID = trim(Configuration::get('WK_PAYPAL_COMMERCE_CLIENT_ID'));
-            $wkClientSecret = trim(Configuration::get('WK_PAYPAL_COMMERCE_CLIENT_SECRET'));
             $wkEnvironment = Configuration::get('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
+            if ($wkEnvironment == QloPaypalCommerce::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) {
+                $wkClientID = Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID');
+                $wkClientSecret = Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET');
+            } else {
+                $wkClientID = Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID');
+                $wkClientSecret = Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET');
+            }
         }
 
         $base_url = ($wkEnvironment == 'sandbox') ? PayPalHelper::WK_PAYPAL_SANDBOX_URL : PayPalHelper::WK_PAYPAL_LIVE_URL;
@@ -60,8 +70,6 @@ class WkPaypalCommerceHelper
         $response = curl_exec($curl);
         $err = curl_error($curl);
 
-        curl_close($curl);
-
         if ($err) {
             throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
         } else {
@@ -84,9 +92,19 @@ class WkPaypalCommerceHelper
             "alg" => "none"
         );
         $returnData = base64_encode(json_encode($temp)) . '.';
+
+        $wkEnvironment = Configuration::get('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
+        if ($wkEnvironment == QloPaypalCommerce::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) {
+            $wkClientID = Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID');
+            $wkMerchantID = Configuration::get('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID');
+        } else {
+            $wkClientID = Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID');
+            $wkMerchantID = Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID');
+        }
+
         $temp = array(
-            "iss" => trim(Configuration::get('WK_PAYPAL_COMMERCE_CLIENT_ID')),
-            "payer_id" => Configuration::get('WK_PAYPAL_COMMERCE_MERCHANT_ID')
+            "iss" => $wkClientID,
+            "payer_id" => $wkMerchantID
         );
         $returnData .= base64_encode(json_encode($temp)) . '.';
         return $returnData;
@@ -156,7 +174,6 @@ class WkPaypalCommerceHelper
 
             $response = curl_exec($curl);
             $err = curl_error($curl);
-            curl_close($curl);
 
             if ($err) {
                 throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
@@ -215,8 +232,6 @@ class WkPaypalCommerceHelper
             curl_exec($curl);
             $err = curl_error($curl);
 
-            curl_close($curl);
-
             if ($err) {
                 throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
             }
@@ -254,8 +269,6 @@ class WkPaypalCommerceHelper
 
             $response = curl_exec($curl);
             $err = curl_error($curl);
-
-            curl_close($curl);
 
             if ($err) {
                 throw new PrestaShopException(sprintf('cURL Error #: %s', $err));
@@ -414,30 +427,6 @@ class WkPaypalCommerceHelper
                         }
                     }
                 }
-            }
-
-            $items = array_values($items);
-            $itemKey = count($items);
-
-            if ($totalFacilityCostTE = $objCartBookingData->getCartExtraDemands($objCart->id, 0, 0, 0, 0, 1, 0, 0)) {
-                $totalFacilityCostTI = $objCartBookingData->getCartExtraDemands($objCart->id, 0, 0, 0, 0, 1, 0, 1);
-                $items[$itemKey]['name'] = 'Extra facilities';
-                // $items[$itemKey]['sku'] = $product['reference'];
-                $items[$itemKey]['category'] = 'DIGITAL_GOODS';
-
-                $items[$itemKey]['description'] = 'Price of all Extra facilities added to the bookings';
-
-                // unit amount
-                $items[$itemKey]['unit_amount']['value'] = Tools::ps_round($totalFacilityCostTE, 2);
-                $items[$itemKey]['unit_amount']['currency_code'] = $currency['iso_code'];
-
-                // tax values
-                $tax = $totalFacilityCostTI - $totalFacilityCostTE;
-                $items[$itemKey]['tax']['value'] = Tools::ps_round($tax, 2);
-                $items[$itemKey]['tax']['currency_code'] = $currency['iso_code'];
-
-                // quantity
-                $items[$itemKey]['quantity'] = 1;
             }
         }
 

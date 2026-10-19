@@ -2,10 +2,10 @@
 /**
 * NOTICE OF LICENSE
 *
-* This source file is subject to the Open Software License version 3.0
+* This source file is subject to the Academic Free License (AFL 3.0)
 * that is bundled with this package in the file LICENSE.md
 * It is also available through the world-wide-web at this URL:
-* https://opensource.org/license/osl-3-0-php
+* https://opensource.org/licenses/afl-3.0.php
 * If you did not receive a copy of the license and are unable to
 * obtain it through the world-wide-web, please send an email
 * to support@qloapps.com so we can send you a copy immediately.
@@ -18,7 +18,7 @@
 *
 * @author Webkul IN
 * @copyright Since 2010 Webkul
-* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+* @license https://opensource.org/licenses/afl-3.0.php Academic Free License 3.0
 */
 
 if (!defined('_PS_VERSION_')) {
@@ -29,9 +29,22 @@ require_once dirname(__FILE__).'/classes/WkClassInclude.php';
 
 class QloPaypalCommerce extends PaymentModule
 {
+    const WK_PAYPAL_COMMERCE_PAYMENT_MODE_SANDBOX = 'sandbox';
+    const WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION = 'production';
+
     private $html = '';
     private $postErrors = array();
     private $token = '';
+
+    private $sandboxMerchantId = '';
+    private $sandboxEmail = '';
+    private $sandboxClientId = '';
+    private $sandboxClientSecret = '';
+
+    private $liveMerchantId = '';
+    private $liveEmail = '';
+    private $liveClientId = '';
+    private $liveClientSecret = '';
 
     public $ppMode;
     public $merchantId;
@@ -49,7 +62,8 @@ class QloPaypalCommerce extends PaymentModule
         $this->bootstrap = true;
         $this->secure_key = Tools::encrypt($this->name);
         $this->html = '';
-        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+        $this->qloapps_versions_compliancy = array('min' => '1.6', 'max' => _QLOAPPS_VERSION_);
 
         $this->displayName = $this->l('QloApps PayPal Checkout');
 
@@ -72,26 +86,47 @@ class QloPaypalCommerce extends PaymentModule
 
         $config = Configuration::getMultiple(array(
             'WK_PAYPAL_COMMERCE_PAYMENT_MODE',
-            'WK_PAYPAL_COMMERCE_MERCHANT_ID',
-            'WK_PAYPAL_COMMERCE_EMAIL',
-            'WK_PAYPAL_COMMERCE_CLIENT_ID',
-            'WK_PAYPAL_COMMERCE_CLIENT_SECRET'
+            'WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID',
+            'WK_PAYPAL_COMMERCE_SANDBOX_EMAIL',
+            'WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID',
+            'WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET',
+            'WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID',
+            'WK_PAYPAL_COMMERCE_LIVE_EMAIL',
+            'WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID',
+            'WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET',
         ));
 
         if (!empty($config['WK_PAYPAL_COMMERCE_PAYMENT_MODE'])) {
             $this->ppMode = $config['WK_PAYPAL_COMMERCE_PAYMENT_MODE'];
         }
-        if (!empty($config['WK_PAYPAL_COMMERCE_MERCHANT_ID'])) {
-            $this->merchantId = $config['WK_PAYPAL_COMMERCE_MERCHANT_ID'];
-        }
-        if (!empty($config['WK_PAYPAL_COMMERCE_EMAIL'])) {
-            $this->paypalEmail = $config['WK_PAYPAL_COMMERCE_EMAIL'];
-        }
-        if (!empty($config['WK_PAYPAL_COMMERCE_CLIENT_ID'])) {
-            $this->clientId = $config['WK_PAYPAL_COMMERCE_CLIENT_ID'];
-        }
-        if (!empty($config['WK_PAYPAL_COMMERCE_CLIENT_SECRET'])) {
-            $this->clientSecret = $config['WK_PAYPAL_COMMERCE_CLIENT_SECRET'];
+        $mode = $this->ppMode ? $this->ppMode : self::WK_PAYPAL_COMMERCE_PAYMENT_MODE_SANDBOX;
+
+        if ($mode == self::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) {
+            if (!empty($config['WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID'])) {
+                $this->merchantId = $config['WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID'];
+            }
+            if (!empty($config['WK_PAYPAL_COMMERCE_LIVE_EMAIL'])) {
+                $this->paypalEmail = $config['WK_PAYPAL_COMMERCE_LIVE_EMAIL'];
+            }
+            if (!empty($config['WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'])) {
+                $this->clientId = $config['WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'];
+            }
+            if (!empty($config['WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'])) {
+                $this->clientSecret = $config['WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'];
+            }
+        } else {
+            if (!empty($config['WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID'])) {
+                $this->merchantId = $config['WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID'];
+            }
+            if (!empty($config['WK_PAYPAL_COMMERCE_SANDBOX_EMAIL'])) {
+                $this->paypalEmail = $config['WK_PAYPAL_COMMERCE_SANDBOX_EMAIL'];
+            }
+            if (!empty($config['WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'])) {
+                $this->clientId = $config['WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'];
+            }
+            if (!empty($config['WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'])) {
+                $this->clientSecret = $config['WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'];
+            }
         }
 
         parent::__construct();
@@ -101,6 +136,8 @@ class QloPaypalCommerce extends PaymentModule
 
     public function getContent()
     {
+        $this->context->controller->addJS($this->_path.'views/js/admin/paypal_config.js');
+
         if (!$this->checkPaypalCommerceConfigured()) {
             $this->context->controller->warnings[] = $this->l('PayPal Merchant ID, Email, Client ID and Secret must be configured.');
         }
@@ -109,7 +146,7 @@ class QloPaypalCommerce extends PaymentModule
             $this->context->controller->warnings[] = $this->l('No currency has been set for this module.');
         }
 
-        if (Tools::isSubmit('submit_paypal_commerce')) {
+        if (Tools::isSubmit('btnConfigSubmit')) {
             $this->postValidation();
             if (!count($this->postErrors)) {
                 $this->postProcess();
@@ -163,42 +200,74 @@ class QloPaypalCommerce extends PaymentModule
                     'hint' => $this->l('Select PayPal payment environment either sandbox or production. You can get real transaction only on production, for testing, use sandbox.'),
                 ),
                 array(
-                    'label' => $this->l('Merchant ID'),
-                    'name' => 'WK_PAYPAL_COMMERCE_MERCHANT_ID',
+                    'label' => $this->l('Sandbox Merchant ID'),
+                    'name' => 'WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID',
                     'size' => 60,
                     'type' => 'text',
                     'required' => true,
-                    'hint' => $this->l('Enter the Merchant ID of your PayPal account.'),
+                    'hint' => $this->l('Enter the Merchant ID of your PayPal sandbox account.'),
                 ),
                 array(
-                    'label' => $this->l('Account Email'),
-                    'name' => 'WK_PAYPAL_COMMERCE_EMAIL',
+                    'label' => $this->l('Sandbox Account Email'),
+                    'name' => 'WK_PAYPAL_COMMERCE_SANDBOX_EMAIL',
                     'size' => 60,
                     'type' => 'text',
                     'required' => true,
-                    'hint' => $this->l('Enter the PayPal Account Email of your PayPal account.'),
+                    'hint' => $this->l('Enter the PayPal Account Email of your PayPal sandbox account.'),
                 ),
                 array(
-                    'label' => $this->l('Client ID'),
-                    'name' => 'WK_PAYPAL_COMMERCE_CLIENT_ID',
+                    'label' => $this->l('Sandbox Client ID'),
+                    'name' => 'WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID',
                     'size' => 100,
                     'type' => 'text',
                     'required' => true,
-                    'hint' => $this->l('Enter the Client ID from PayPal account app credentials.'),
+                    'hint' => $this->l('Enter the Client ID from PayPal sandbox account app credentials.'),
                 ),
                 array(
-                    'label' => $this->l('Client Secret'),
-                    'name' => 'WK_PAYPAL_COMMERCE_CLIENT_SECRET',
+                    'label' => $this->l('Sandbox Client Secret'),
+                    'name' => 'WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET',
                     'size' => 100,
                     'type' => 'text',
                     'required' => true,
-                    'hint' => $this->l('Enter the Client Secret from PayPal account app credentials.'),
+                    'hint' => $this->l('Enter the Client Secret from PayPal sandbox account app credentials.'),
+                ),
+                array(
+                    'label' => $this->l('Live Merchant ID'),
+                    'name' => 'WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID',
+                    'size' => 60,
+                    'type' => 'text',
+                    'required' => true,
+                    'hint' => $this->l('Enter the Merchant ID of your PayPal live account.'),
+                ),
+                array(
+                    'label' => $this->l('Live Account Email'),
+                    'name' => 'WK_PAYPAL_COMMERCE_LIVE_EMAIL',
+                    'size' => 60,
+                    'type' => 'text',
+                    'required' => true,
+                    'hint' => $this->l('Enter the PayPal Account Email of your PayPal live account.'),
+                ),
+                array(
+                    'label' => $this->l('Live Client ID'),
+                    'name' => 'WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID',
+                    'size' => 100,
+                    'type' => 'text',
+                    'required' => true,
+                    'hint' => $this->l('Enter the Client ID from PayPal live account app credentials.'),
+                ),
+                array(
+                    'label' => $this->l('Live Client Secret'),
+                    'name' => 'WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET',
+                    'size' => 100,
+                    'type' => 'text',
+                    'required' => true,
+                    'hint' => $this->l('Enter the Client Secret from PayPal live account app credentials.'),
                 ),
             ),
             'description' => $this->l('PayPal Seller Protection not applicable'),
             'submit' => array(
                     'title' => $this->l('Save'),
-                    'name' => 'submit_paypal_commerce',
+                    'name' => 'btnConfigSubmit',
                 ),
             );
 
@@ -225,49 +294,73 @@ class QloPaypalCommerce extends PaymentModule
 
     private function postValidation()
     {
-        if (Tools::isSubmit('submit_paypal_commerce')) {
-            $wkMerchantId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_MERCHANT_ID'));
+        if (Tools::isSubmit('btnConfigSubmit')) {
+            $mode = Tools::getValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
+
+            $this->sandboxMerchantId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID'));
+            $this->sandboxEmail = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_EMAIL'));
+            $this->sandboxClientId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID'));
+            $this->sandboxClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET'));
+
+            $this->liveMerchantId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID'));
+            $this->liveEmail = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_EMAIL'));
+            $this->liveClientId = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID'));
+            $this->liveClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET'));
+
+            if ($mode == self::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) {
+                $wkMerchantId = $this->liveMerchantId;
+                $wkEmail = $this->liveEmail;
+                $wkClientID = $this->liveClientId;
+                $wkClientSecret = $this->liveClientSecret;
+            } else {
+                $wkMerchantId = $this->sandboxMerchantId;
+                $wkEmail = $this->sandboxEmail;
+                $wkClientID = $this->sandboxClientId;
+                $wkClientSecret = $this->sandboxClientSecret;
+            }
+
             if (!$wkMerchantId) {
                 $this->postErrors[] = $this->l('Please enter Merchant ID');
-            } elseif (!preg_match(Tools::cleanNonUnicodeSupport('/[a-zA-Z0-9]+/'), $wkMerchantId)) {
+            } elseif (!preg_match('/^[a-zA-Z0-9]+$/', $wkMerchantId)) {
                 $this->postErrors[] = $this->l('Invalid Merchant ID provided.');
             }
-            $wkEmail = trim(Tools::getValue('WK_PAYPAL_COMMERCE_EMAIL'));
             if (!$wkEmail) {
                 $this->postErrors[] = $this->l('Please enter Account Email');
             } elseif (!Validate::isEmail($wkEmail)) {
                 $this->postErrors[] = $this->l('Please enter valid Account Email');
             }
-            $wkClientID = trim(Tools::getValue('WK_PAYPAL_COMMERCE_CLIENT_ID'));
             if (!$wkClientID) {
                 $this->postErrors[] = $this->l('Please enter Client ID');
+            } elseif (!preg_match('/^[A-Za-z0-9._-]+$/', $wkClientID)) {
+                $this->postErrors[] = $this->l('Invalid Client ID provided.');
             }
-            $wkClientSecret = trim(Tools::getValue('WK_PAYPAL_COMMERCE_CLIENT_SECRET'));
             if (!$wkClientSecret) {
                 $this->postErrors[] = $this->l('Please enter Client Secret');
+            } elseif (!preg_match('/^[A-Za-z0-9._-]+$/', $wkClientSecret)) {
+                $this->postErrors[] = $this->l('Invalid Client Secret provided.');
             }
 
             // Validate PayPal credentials
             $this->validatePaypalCredentials();
 
-            if (Tools::getValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE') == 'sandbox'
+            if ($mode == self::WK_PAYPAL_COMMERCE_PAYMENT_MODE_SANDBOX
                 && $this->token
             ) {
                 if (empty(Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_WEBHOOK_ID'))) {
                     // Create webhook URL first time
                     $this->createWebhookUrl('sandbox');
-                } elseif (Tools::getValue('WK_PAYPAL_COMMERCE_CLIENT_ID') != Configuration::get('WK_PAYPAL_COMMERCE_CLIENT_ID')) {
+                } elseif ($this->sandboxClientId != Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID')) {
                     // Delete existing webhook URL if PayPal credential changed
                     WkPaypalCommerceHelper::deleteWebhookUrl();
                     $this->createWebhookUrl('sandbox');
                 }
-            } elseif (Tools::getValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE') == 'production'
+            } elseif ($mode == self::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION
                 && $this->token
             ) {
                 if (empty(Configuration::get('WK_PAYPAL_COMMERCE_LIVE_WEBHOOK_ID'))) {
                     // Create webhook URL first time
                     $this->createWebhookUrl('production');
-                } elseif (Tools::getValue('WK_PAYPAL_COMMERCE_CLIENT_ID') != Configuration::get('WK_PAYPAL_COMMERCE_CLIENT_ID')) {
+                } elseif ($this->liveClientId != Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID')) {
                     // Delete existing webhook URL if PayPal credential changed
                     WkPaypalCommerceHelper::deleteWebhookUrl();
                     $this->createWebhookUrl('production');
@@ -309,21 +402,23 @@ class QloPaypalCommerce extends PaymentModule
     public function postProcess()
     {
         if (Tools::isSubmit('btnConfigSubmit')) {
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_MERCHANT_ID', trim(Tools::getValue('WK_PAYPAL_COMMERCE_MERCHANT_ID')));
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_EMAIL', trim(Tools::getValue('WK_PAYPAL_COMMERCE_EMAIL')));
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_CLIENT_ID', trim(Tools::getValue('WK_PAYPAL_COMMERCE_CLIENT_ID')));
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_CLIENT_SECRET', trim(Tools::getValue('WK_PAYPAL_COMMERCE_CLIENT_SECRET')));
-            Configuration::updateValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE', Tools::getValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE'));
+            $mode = Tools::getValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
+
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID', $this->sandboxMerchantId);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_EMAIL', $this->sandboxEmail);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID', $this->sandboxClientId);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET', $this->sandboxClientSecret);
+
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID', $this->liveMerchantId);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_EMAIL', $this->liveEmail);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID', $this->liveClientId);
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET', $this->liveClientSecret);
+
+            Configuration::updateValue('WK_PAYPAL_COMMERCE_PAYMENT_MODE', $mode);
 
             $moduleConfig = $this->context->link->getAdminLink('AdminModules');
             Tools::redirectAdmin(
                 $moduleConfig.'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name.'&conf=4'
-            );
-
-            // redirect after saving the configuration
-            Tools::redirectAdmin(
-                $this->context->link->getAdminLink('AdminModules').'&configure='.$this->name.'&tab_module='.$this->tab.
-                '&module_name='.$this->name.'&conf=4'
             );
         }
     }
@@ -383,7 +478,9 @@ class QloPaypalCommerce extends PaymentModule
                 $currency = Currency::getCurrency((int)$this->context->currency->id);
 
                 // // add PayPal script
-                $this->context->controller->addJS('https://www.paypal.com/sdk/js?client-id='.Configuration::get('WK_PAYPAL_COMMERCE_CLIENT_ID').'&commit=true&components=buttons&debug=false&currency='.$currency['iso_code'].'&intent=capture');
+                $mode = Configuration::get('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
+                $clientId = ($mode === self::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) ? Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID') : Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID');
+                $this->context->controller->addJS('https://www.paypal.com/sdk/js?client-id='.$clientId.'&commit=true&components=buttons&debug=false&currency='.$currency['iso_code'].'&intent=capture');
 
                 $this->context->controller->addCSS($this->_path.'views/css/front/wk_payment.css');
 
@@ -443,16 +540,17 @@ class QloPaypalCommerce extends PaymentModule
     // Check payment module is configured
     public function checkPaypalCommerceConfigured()
     {
-        if (!isset($this->ppMode)
-            || !isset($this->merchantId)
-            || !isset($this->paypalEmail)
-            || !isset($this->clientId)
-            || !isset($this->clientSecret)
-        ) {
-            return false;
+        $mode = Configuration::get('WK_PAYPAL_COMMERCE_PAYMENT_MODE');
+        if ($mode == self::WK_PAYPAL_COMMERCE_PAYMENT_MODE_PRODUCTION) {
+            return Configuration::get('WK_PAYPAL_COMMERCE_LIVE_MERCHANT_ID')
+                && Configuration::get('WK_PAYPAL_COMMERCE_LIVE_EMAIL')
+                && Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_ID')
+                && Configuration::get('WK_PAYPAL_COMMERCE_LIVE_CLIENT_SECRET');
         }
-
-        return true;
+        return Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_MERCHANT_ID')
+            && Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_EMAIL')
+            && Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_ID')
+            && Configuration::get('WK_PAYPAL_COMMERCE_SANDBOX_CLIENT_SECRET');
     }
 
     public function hookPaymentReturn($params)

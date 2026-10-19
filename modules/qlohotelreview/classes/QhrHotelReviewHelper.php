@@ -32,8 +32,8 @@ class QhrHotelReviewHelper
         return (bool) !Db::getInstance()->getValue(
             'SELECT COUNT(*) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.'
-            AND hbd.`is_refunded` != 1
-            AND hbd.`is_cancelled` != 1
+            AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
+            AND hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CANCELLED.'
             AND hbd.`id_order` = '.(int) $idOrder
         );
     }

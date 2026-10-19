@@ -1,18 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <localizationPack name="Ecuador" version="1.0">
 	<currencies>
-		<currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" conversion_rate="1.36550" format="1" decimals="1" />
+		<currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" format="1" decimals="1" />
 	</currencies>
 	<languages>
 		<language iso_code="es" />
 	</languages>
 	<taxes>
 		<tax id="1" name="IVA EC 12%" rate="12" />
-		
+		<tax id="2" name="IVA EC 0%" rate="0" />
+
 		<taxRulesGroup name="EC Standard Rate (12%)">
 			<taxRule iso_code_country="ec" id_tax="1" />
 		</taxRulesGroup>
+    <taxRulesGroup name="EC Zero Rate (0%)">
+			<taxRule iso_code_country="ec" id_tax="2" />
+		</taxRulesGroup>
 	</taxes>
+	<states>
+		<state name="Azuay" iso_code="A" country="EC" zone="South America" />
+		<state name="Bolívar" iso_code="B" country="EC" zone="South America" />
+		<state name="Cañar" iso_code="F" country="EC" zone="South America" />
+		<state name="Carchi" iso_code="C" country="EC" zone="South America" />
+		<state name="Chimborazo" iso_code="H" country="EC" zone="South America" />
+		<state name="Cotopaxi" iso_code="X" country="EC" zone="South America" />
+		<state name="El Oro" iso_code="O" country="EC" zone="South America" />
+		<state name="Esmeraldas" iso_code="E" country="EC" zone="South America" />
+		<state name="Galápagos" iso_code="W" country="EC" zone="South America" />
+		<state name="Guayas" iso_code="G" country="EC" zone="South America" />
+		<state name="Imbabura" iso_code="I" country="EC" zone="South America" />
+		<state name="Loja" iso_code="L" country="EC" zone="South America" />
+		<state name="Los Ríos" iso_code="R" country="EC" zone="South America" />
+		<state name="Manabí" iso_code="M" country="EC" zone="South America" />
+		<state name="Morona-Santiago" iso_code="S" country="EC" zone="South America" />
+		<state name="Napo" iso_code="N" country="EC" zone="South America" />
+		<state name="Orellana" iso_code="D" country="EC" zone="South America" />
+		<state name="Pastaza" iso_code="Y" country="EC" zone="South America" />
+		<state name="Pichincha" iso_code="P" country="EC" zone="South America" />
+		<state name="Santa Elena" iso_code="SE" country="EC" zone="South America" />
+		<state name="Santo Domingo de los Tsáchilas" iso_code="SD" country="EC" zone="South America" />
+		<state name="Sucumbíos" iso_code="U" country="EC" zone="South America" />
+		<state name="Tungurahua" iso_code="T" country="EC" zone="South America" />
+		<state name="Zamora Chinchipe" iso_code="Z" country="EC" zone="South America" />
+	</states>
 	<units>
 		<unit type="weight" value="kg" />
 		<unit type="volume" value="L" />

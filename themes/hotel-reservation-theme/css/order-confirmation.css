@@ -192,28 +192,28 @@
     padding-bottom: 15px;
 }
 
-#rooms_extra_services .tab-content .rooms_extra_demands_head {
+#rooms_extra_services .tab-content .rooms_extra_services_head {
     padding: 10px 18px;
     border-bottom: 1px solid #F0F0F0;
 }
 
-#rooms_extra_services .tab-content .rooms_extra_demands_text {
+#rooms_extra_services .tab-content .rooms_extra_services_text {
     font-size: 12px;
     margin-bottom: 0;
 }
 
-#rooms_extra_services .tab-content .room_demands {
+#rooms_extra_services .tab-content .room_additional_services {
     margin-top: 20px;
 }
 
-#rooms_extra_services .tab-content .demand_header {
+#rooms_extra_services .tab-content .additional_service_header {
     font-size: 16px;
     font-weight: bold;
     line-height: 24px;
     margin-bottom: 10px;
 }
 
-#rooms_extra_services .tab-content .room_demand_detail {
+#rooms_extra_services .tab-content .room_service_detail {
     font-size: 14px;
     font-weight: 500;
     margin-top: 0;
@@ -221,12 +221,12 @@
     border-top: unset;
 }
 
-#rooms_extra_services .tab-content .room_demand_block {
+#rooms_extra_services .tab-content .room_service_block {
     display: flex;
     justify-content: space-between;
 }
 
-#rooms_extra_services .tab-content .room_demand_block:not(:last-of-type) {
+#rooms_extra_services .tab-content .room_service_block:not(:last-of-type) {
     margin-bottom: 12px;
 }
 

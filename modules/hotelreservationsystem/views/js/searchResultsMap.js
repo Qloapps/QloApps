@@ -26,25 +26,38 @@ function initMap() {
         lng: Number(hotel_location.longitude),
     };
 
-    const map = new google.maps.Map($('#search-results-wrap .map-wrap').get(0), {
+    const mapOptions = {
         zoom: 10,
         center: hotelLocation,
         disableDefaultUI: true,
         fullscreenControl: true,
-        mapId: PS_MAP_ID
-    });
+    };
+    if (PS_MAP_ID) {
+        mapOptions.mapId = PS_MAP_ID;
+    }
+    const map = new google.maps.Map($('#search-results-wrap .map-wrap').get(0), mapOptions);
 
     let icon = document.createElement('img');
     icon.src = PS_STORES_ICON;
     icon.style.width = '24px';
     icon.style.height = '24px';
 
-    const marker = new google.maps.marker.AdvancedMarkerElement({
-        map: map,
-        position: hotelLocation,
-        title: location.hotel_name,
-        content: icon,
-    });
+    let marker;
+    if (PS_MAP_ID) {
+        marker = new google.maps.marker.AdvancedMarkerElement({
+            map: map,
+            position: hotelLocation,
+            title: location.hotel_name,
+            content: icon,
+        });
+    } else {
+        marker = new google.maps.Marker({
+            map: map,
+            position: hotelLocation,
+            title: location.hotel_name,
+            icon: PS_STORES_ICON,
+        });
+    }
 
     marker.query = location.query || null;
     marker.latitude = hotelLocation.lat;

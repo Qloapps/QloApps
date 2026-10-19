@@ -1,21 +1,45 @@
 <?xml version="1.0"?>
 <localizationPack name="Panama">
   <currencies>
-    <currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" conversion_rate="1.000000" format="1" decimals="1"/>
+    <currency name="Dollar" iso_code="USD" iso_code_num="840" sign="$" blank="0" format="1" decimals="1"/>
   </currencies>
   <languages>
     <language iso_code="es"/>
   </languages>
   <taxes>
-    <taxRulesGroup name="ITBMS 7%">
-      <taxRule iso_code_country="pa" behavior="0" id_tax="74"/>
+    <tax id="1" name="ITBMS 15%" rate="15.000"/>
+    <tax id="2" name="ITBMS 10%" rate="10.000"/>
+    <tax id="3" name="ITBMS 7%" rate="7.000"/>
+    <tax id="4" name="ITBMS 0%" rate="0.000"/>
+    <taxRulesGroup name="ITBMS Higher Rate 15%">
+      <taxRule iso_code_country="pa" behavior="0" id_tax="1"/>
     </taxRulesGroup>
-    <taxRulesGroup name="ITBMS 0%">
-      <taxRule iso_code_country="pa" behavior="0" id_tax="75"/>
+    <taxRulesGroup name="ITBMS Higher Rate 10%">
+      <taxRule iso_code_country="pa" behavior="0" id_tax="2"/>
     </taxRulesGroup>
-    <tax id="74" name="ITBMS 7%" rate="7.000"/>
-    <tax id="75" name="ITBMS 0%" rate="0.000"/>
+    <taxRulesGroup name="ITBMS Standard Rate 7%">
+      <taxRule iso_code_country="pa" behavior="0" id_tax="3"/>
+    </taxRulesGroup>
+    <taxRulesGroup name="ITBMS Zero Rate 0%">
+      <taxRule iso_code_country="pa" behavior="0" id_tax="4"/>
+    </taxRulesGroup>
   </taxes>
+	<states>
+		<state name="Bocas del Toro" iso_code="1" country="PA" zone="Central America/Antilla" />
+		<state name="Chiriquí" iso_code="4" country="PA" zone="Central America/Antilla" />
+		<state name="Coclé" iso_code="2" country="PA" zone="Central America/Antilla" />
+		<state name="Colón" iso_code="3" country="PA" zone="Central America/Antilla" />
+		<state name="Darién" iso_code="5" country="PA" zone="Central America/Antilla" />
+		<state name="Emberá" iso_code="EM" country="PA" zone="Central America/Antilla" />
+		<state name="Guna Yala" iso_code="KY" country="PA" zone="Central America/Antilla" />
+		<state name="Herrera" iso_code="6" country="PA" zone="Central America/Antilla" />
+		<state name="Los Santos" iso_code="7" country="PA" zone="Central America/Antilla" />
+		<state name="Naso Tjër Di" iso_code="NT" country="PA" zone="Central America/Antilla" />
+		<state name="Ngöbe-Buglé" iso_code="NB" country="PA" zone="Central America/Antilla" />
+		<state name="Panamá Oeste" iso_code="10" country="PA" zone="Central America/Antilla" />
+		<state name="Panamá" iso_code="8" country="PA" zone="Central America/Antilla" />
+		<state name="Veraguas" iso_code="9" country="PA" zone="Central America/Antilla" />
+	</states>
   <units>
     <unit type="weight" value="kg"/>
     <unit type="volume" value="L"/>

@@ -7,7 +7,7 @@
             <tr>
                 <th>{l s="Room Image"}</th>
                 <th>{l s="Room Description"}</th>
-                <th>{l s="Room Capcity"}</th>
+                <th>{l s="Room Capacity"}</th>
                 <th>{l s="Unit Price"}</th>
                 <th>{l s="Rooms Qty"}</th>
                 <th>{l s="Check-in Date"}</th>

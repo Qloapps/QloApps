@@ -1,0 +1,7 @@
+# v1.0.0 - 2026-03-24
+- Initial release
+- Centralized cron task management for QloApps modules
+- Single server cron entry dispatches all module tasks
+- Admin panel for viewing tasks, logs, and configuration
+- Automatic task discovery on module install/uninstall
+- Cron expression support via dragonmantank/cron-expression library

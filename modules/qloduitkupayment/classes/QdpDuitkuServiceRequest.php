@@ -58,7 +58,6 @@ class QdpDuitkuServiceRequest
         curl_setopt_array($curl, $options);
         $request = curl_exec($curl);
         $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
         self::logResponse($request);
         $response = array();
 

@@ -33,7 +33,7 @@
 				<div class="form-group">
 					{if isset($edit)}
 						<label class="control-label col-sm-5">
-							<span>{l s='Hotel Name' mod='hotelreservationsystem'} : </span>
+							<span>{l s='Property Name' mod='hotelreservationsystem'} : </span>
 						</label>
 						<select class="fixed-width-xl" name="id_hotel">
 							{foreach $hotels as $hotel}
@@ -44,11 +44,11 @@
 						</select>
 					{else}
 						<label class="control-label col-sm-5">
-							<span>{l s='Select Hotel' mod='hotelreservationsystem'} : </span>
+							<span>{l s='Select Property' mod='hotelreservationsystem'} : </span>
 						</label>
 						<div class="col-sm-4">
 							<select class="fixed-width-xl" name="id_hotel">
-							<option value='0'>{l s='Select Hotel' mod='hotelreservationsystem'}</option>>
+							<option value='0'>{l s='Select Property' mod='hotelreservationsystem'}</option>>
 								{foreach $hotels as $hotel}
 									<option value="{$hotel.id|escape:'html':'UTF-8'}" >{$hotel.hotel_name|escape:'html':'UTF-8'}</option>
 								{/foreach}
@@ -95,7 +95,7 @@
 			</div>
 		{else}
 			<div class="alert alert-warning">
-				{l s='No hotel found to assign features.' mod='hotelreservationsystem'}
+				{l s='No property found to assign features.' mod='hotelreservationsystem'}
 			</div>
 		{/if}
 	</div>

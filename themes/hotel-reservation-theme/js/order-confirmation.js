@@ -26,6 +26,7 @@ $(document).ready(function(){
         var idOrder = $(this).data('id_order');
         var dateFrom = $(this).data('date_from');
         var dateTo = $(this).data('date_to');
+        var secureKey = $(this).data('secure_key');
         var action = $(this).data('action');
         $.ajax({
             type: 'POST',
@@ -40,15 +41,17 @@ $(document).ready(function(){
                 date_to: dateTo,
                 id_product: idProduct,
                 id_order: idOrder,
-                action: 'getRoomTypeBookingDemands',
-                method: 'getRoomTypeBookingDemands',
+                action: 'getRoomTypeBookingServices',
+                method: 'getRoomTypeBookingServices',
+                secure_key: secureKey,
                 ajax: true,
                 token: static_token
             },
             success: function(result) {
-                if (result.extra_demands) {
+                if (result.extra_services) {
                     $('#rooms_extra_services').html('');
-                    $('#rooms_extra_services').append(result.extra_demands);
+                    $('#rooms_extra_services').append(result.extra_services);
+                    initUITooltip();
                 }
                 $.fancybox({
                     href: "#rooms_extra_services",
@@ -73,41 +76,4 @@ $(document).ready(function(){
             },
         });
     });
-
-    initPriceTooltip();
 });
-
-function initPriceTooltip() {
-    if ($('.order-price-info').length) {
-        $('.order-price-info').each(function () {
-            $(this).tooltip({
-                content: $(this).closest('dd').find('.price-info-container').html(),
-                items: 'span',
-                trigger: 'hover',
-                tooltipClass: 'price-tootip',
-                open: function (event, ui) {
-                    if (typeof (event.originalEvent) === 'undefined') {
-                        return false;
-                    }
-
-                    var $id = $(ui.tooltip).attr('id');
-
-                    // close any lingering tooltips
-                    if ($('div.ui-tooltip').not('#' + $id).length) {
-                        return false;
-                    }
-                },
-                close: function (event, ui) {
-                    ui.tooltip.hover(function () {
-                        $(this).stop(true).fadeTo(400, 1);
-                    },
-                    function () {
-                        $(this).fadeOut('400', function () {
-                            $(this).remove();
-                        });
-                    });
-                }
-            });
-        });
-    }
-}

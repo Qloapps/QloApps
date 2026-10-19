@@ -309,7 +309,7 @@ class AdminPerformanceControllerCore extends AdminController
                 'title' => $this->l('CCC (Combine, Compress and Cache)'),
                 'icon' => 'icon-fullscreen'
             ),
-            'description' => $this->l('CCC allows you to reduce the loading time of your page. With these settings you will gain performance without even touching the code of your theme. Make sure, however, that your theme is compatible with PrestaShop 1.4+. Otherwise, CCC will cause problems.'),
+            'description' => $this->l('CCC allows you to reduce the loading time of your page. With these settings you will gain performance without even touching the code of your theme.'),
             'input' => array(
                 array(
                     'type' => 'hidden',
@@ -638,7 +638,7 @@ class AdminPerformanceControllerCore extends AdminController
 
     public function postProcess()
     {
-        /* PrestaShop demo mode */
+        /* QloApps demo mode */
         if (_PS_MODE_DEMO_) {
             $this->errors[] = Tools::displayError('This functionality has been disabled.');
             return;
@@ -941,11 +941,11 @@ class AdminPerformanceControllerCore extends AdminController
 
     public function displayAjaxTestServer()
     {
-        /* PrestaShop demo mode */
+        /* QloApps demo mode */
         if (_PS_MODE_DEMO_) {
             die(Tools::displayError('This functionality has been disabled.'));
         }
-        /* PrestaShop demo mode*/
+        /* QloApps demo mode*/
         if (Tools::isSubmit('action') && Tools::getValue('action') == 'test_server') {
             $host = pSQL(Tools::getValue('sHost', ''));
             $port = (int)Tools::getValue('sPort', 0);
