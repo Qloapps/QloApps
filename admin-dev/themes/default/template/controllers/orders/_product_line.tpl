@@ -62,6 +62,7 @@
 				</div>
 			</div>
 		{/if}
+		{hook h='displayAdminOrderOccupancyColumn' data=$data}
 	</td>
 	<td class="center">
 		<p>

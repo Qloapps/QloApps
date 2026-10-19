@@ -495,7 +495,6 @@
                                             {if $customer->phone}
                                                 <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{$customer->phone}">{$customer->phone}</a></b></dd>
                                             {/if}
-                                            {hook h='displayAdminOrderAfterPhone'}
                                         </dl>
                                         <form method="post" action="index.php?tab=AdminCustomers&amp;id_customer={$customer->id}&amp;id_order={$order->id|intval}&amp;token={getAdminToken tab='AdminCustomers'}">
                                             <input type="hidden" name="id_lang" value="{$order->id_lang}" />
@@ -519,6 +518,7 @@
                                         {if $customer->phone}
                                             <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{$customer->phone}">{$customer->phone}</a></b></dd>
                                         {/if}
+                                        {hook h='displayAdminOrderAfterPhone'}
                                     </dl>
                                     <dl class="list-detail col-sm-6">
                                         <label class="label-title">{l s='Customer Info'}</label>

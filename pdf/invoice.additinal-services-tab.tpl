@@ -52,7 +52,7 @@
                             {/if}
                             <td>
                                 {$service['name']}
-                                {hook h='displayPartyServiceProductDatesInvoiceAndEmail' id_service_product_order_detail=$service['id_service_product_order_detail']}
+                                {hook h='displayServiceProductDatesInvoiceAndEmail' id_service_product_order_detail=$service['id_service_product_order_detail']}
                             </td>
                             <td class="center">
                                 {if isset($service['product_tax_label']) && $service['product_tax_label']}{$service['product_tax_label']}{else}{l s='No tax' pdf='true'}{/if}
