@@ -178,4 +178,10 @@
     <url_rewrite>product-vergelijking</url_rewrite>
   </meta>
 -->
+  <meta id='our-properties' id_shop='1'>
+    <title>Eigendommen</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>eigendommen</url_rewrite>
+  </meta>
 </entity_meta>

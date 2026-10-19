@@ -180,7 +180,7 @@
 											{/block}
 											{if isset($WK_DISPLAY_PROPERTIES_LINK_IN_HEADER) && $WK_DISPLAY_PROPERTIES_LINK_IN_HEADER}
 												<div>
-													<a href="{$link->getPageLink('our-properties')}" class="our_properties_link">{l s='Our Properties'}</a>
+													<a href="{$link->getPageLink('our-properties')}" class="our_properties_link">{l s='Properties'}</a>
 												</div>
 											{/if}
 										</div>

@@ -3672,7 +3672,9 @@ class AdminOrdersControllerCore extends AdminController
         $orderTourismTaxHasUnapplied = false;
         if ($useTourismTax && $order_detail_data) {
             foreach ($order_detail_data as $bookingRow) {
-                if (!empty($bookingRow['is_cancelled']) || !empty($bookingRow['is_refunded'])) {
+                if (!empty($bookingRow['is_cancelled']) || !empty($bookingRow['is_refunded'])
+                    || $bookingRow['id_status'] == HotelBookingDetail::STATUS_CANCELLED
+                ) {
                     continue;
                 }
                 if (isset($bookingRow['tourism_tax_status'])) {
@@ -9252,15 +9254,22 @@ class AdminOrdersControllerCore extends AdminController
     }
 
     /**
-     * Apply tourism tax to a booking (id_htl_booking), a standalone service line
-     * (id_service_product_order_detail), or every booking of a whole order (id_order) —
-     * see OrderTaxDetail::applyBooking()/applyServiceLine().
+     * Apply tourism tax to the rooms (id_htl_booking[]) and/or standalone service lines
+     * (id_service_product_order_detail[]) selected in the apply modal of an order (id_order) —
+     * see OrderTaxDetail::applyForOrder().
      */
     public function ajaxProcessApplyTourismTax()
     {
-        $idHtlBooking = (int) Tools::getValue('id_htl_booking', 0);
-        $idServiceProductOrderDetail = (int) Tools::getValue('id_service_product_order_detail', 0);
+        if ($this->tabAccess['edit'] !== 1) {
+            die(Tools::jsonEncode(array(
+                'hasError' => true,
+                'errors' => array(Tools::displayError('You do not have permission to edit this order.')),
+            )));
+        }
+
         $idOrder = (int) Tools::getValue('id_order', 0);
+        $idsHtlBooking = array_filter(array_map('intval', (array) Tools::getValue('id_htl_booking', array())));
+        $idsServiceProductOrderDetail = array_filter(array_map('intval', (array) Tools::getValue('id_service_product_order_detail', array())));
         $idEmployee = (int) Context::getContext()->employee->id;
         $autoMsgLabel = $this->l('Tourism Tax Applied');
         $errors = array();
@@ -9269,20 +9278,15 @@ class AdminOrdersControllerCore extends AdminController
             OrderTaxDetail::APPLY_ERROR_NOT_APPLICABLE => $this->l('Tourism tax is not applicable for this booking.'),
         );
 
-        if ($idHtlBooking) {
-            $result = OrderTaxDetail::applyBooking($idHtlBooking, $idEmployee, $autoMsgLabel);
-            if (isset($messagesByResult[$result])) {
-                $errors[] = $messagesByResult[$result];
-            }
-        } elseif ($idServiceProductOrderDetail) {
-            $result = OrderTaxDetail::applyServiceLine($idServiceProductOrderDetail, $idEmployee, $autoMsgLabel);
-            if (isset($messagesByResult[$result])) {
-                $errors[] = $messagesByResult[$result];
-            }
-        } elseif ($idOrder) {
-            $errors = self::tourismTaxErrorsFromResults(OrderTaxDetail::applyForOrder($idOrder, $idEmployee, $autoMsgLabel), $messagesByResult);
-        } else {
+        if (!Validate::isLoadedObject(new Order($idOrder))) {
             $errors[] = $this->l('Invalid request parameters.');
+        } elseif (!$idsHtlBooking && !$idsServiceProductOrderDetail) {
+            $errors[] = Tools::displayError('No booking/products has been selected.');
+        } else {
+            $errors = self::tourismTaxErrorsFromResults(
+                OrderTaxDetail::applyForOrder($idOrder, $idEmployee, $autoMsgLabel, $idsHtlBooking, $idsServiceProductOrderDetail),
+                $messagesByResult
+            );
         }
 
         die(Tools::jsonEncode(array(
@@ -9292,15 +9296,22 @@ class AdminOrdersControllerCore extends AdminController
     }
 
     /**
-     * Exempt tourism tax for a booking (id_htl_booking), a standalone service line
-     * (id_service_product_order_detail), or every booking of a whole order (id_order) —
-     * see OrderTaxDetail::exemptBooking()/exemptServiceLine().
+     * Exempt tourism tax for the rooms (id_htl_booking[]) and/or standalone service lines
+     * (id_service_product_order_detail[]) selected in the exemption modal of an order (id_order) —
+     * see OrderTaxDetail::exemptForOrder().
      */
     public function ajaxProcessExemptTourismTax()
     {
-        $idHtlBooking = (int) Tools::getValue('id_htl_booking', 0);
-        $idServiceProductOrderDetail = (int) Tools::getValue('id_service_product_order_detail', 0);
+        if ($this->tabAccess['edit'] !== 1) {
+            die(Tools::jsonEncode(array(
+                'hasError' => true,
+                'errors' => array(Tools::displayError('You do not have permission to edit this order.')),
+            )));
+        }
+
         $idOrder = (int) Tools::getValue('id_order', 0);
+        $idsHtlBooking = array_filter(array_map('intval', (array) Tools::getValue('id_htl_booking', array())));
+        $idsServiceProductOrderDetail = array_filter(array_map('intval', (array) Tools::getValue('id_service_product_order_detail', array())));
         $idEmployee = (int) Context::getContext()->employee->id;
         $note = trim((string) Tools::getValue('note', ''));
         $note = ($note !== '') ? $note : null;
@@ -9312,20 +9323,15 @@ class AdminOrdersControllerCore extends AdminController
             OrderTaxDetail::EXEMPT_ERROR_SAVE => $this->l('Could not exempt tourism tax.'),
         );
 
-        if ($idHtlBooking) {
-            $result = OrderTaxDetail::exemptBooking($idHtlBooking, $idEmployee, $note, $autoMsgLabel, $remarkLabel);
-            if (isset($messagesByResult[$result])) {
-                $errors[] = $messagesByResult[$result];
-            }
-        } elseif ($idServiceProductOrderDetail) {
-            $result = OrderTaxDetail::exemptServiceLine($idServiceProductOrderDetail, $idEmployee, $note, $autoMsgLabel, $remarkLabel);
-            if (isset($messagesByResult[$result])) {
-                $errors[] = $messagesByResult[$result];
-            }
-        } elseif ($idOrder) {
-            $errors = self::tourismTaxErrorsFromResults(OrderTaxDetail::exemptForOrder($idOrder, $idEmployee, $note, $autoMsgLabel, $remarkLabel), $messagesByResult);
-        } else {
+        if (!Validate::isLoadedObject(new Order($idOrder))) {
             $errors[] = $this->l('Invalid request parameters.');
+        } elseif (!$idsHtlBooking && !$idsServiceProductOrderDetail) {
+            $errors[] = Tools::displayError('No booking/products has been selected.');
+        } else {
+            $errors = self::tourismTaxErrorsFromResults(
+                OrderTaxDetail::exemptForOrder($idOrder, $idEmployee, $note, $autoMsgLabel, $remarkLabel, $idsHtlBooking, $idsServiceProductOrderDetail),
+                $messagesByResult
+            );
         }
 
         die(Tools::jsonEncode(array(

@@ -1258,21 +1258,25 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
-     * Exempt tourism tax for every booking (room + attached services) and every standalone service line
-     * of an order; returns only the failing entries.
+     * Exempt tourism tax for the bookings (room + attached services) and standalone service lines
+     * of an order — every one of them by default, or only the given ids; returns only the failing entries.
      *
      * @param int         $idOrder
      * @param int         $idEmployee
      * @param string|null $note  Reason for exemption, applied to every booking/line in the order
      * @param string|null $autoMsgLabel  Pre-translated "Tourism Tax Exempted" label — null skips the Order Notes entry entirely, for every booking/line in the order
      * @param string      $remarkLabel   Pre-translated "Remark" label
+     * @param int[]|null  $idsHtlBooking  Only these bookings are exempted (ids that don't belong to the order are ignored); null = every booking
+     * @param int[]|null  $idsServiceLines  Only these standalone service lines are exempted (ids that don't belong to the order are ignored); null = every line
      * @return array  [{'id_htl_booking' => int, 'result' => int}, ...] plus
      *                [{'id_service_product_order_detail' => int, 'result' => int}, ...] — failures only
      */
-    public static function exemptForOrder($idOrder, $idEmployee = 0, $note = null, $autoMsgLabel = null, $remarkLabel = 'Remark')
+    public static function exemptForOrder($idOrder, $idEmployee = 0, $note = null, $autoMsgLabel = null, $remarkLabel = 'Remark', $idsHtlBooking = null, $idsServiceLines = null)
     {
         $idOrder = (int) $idOrder;
         $failures = array();
+        $selectedBookingIds = ($idsHtlBooking !== null) ? array_flip(array_map('intval', $idsHtlBooking)) : null;
+        $selectedServiceLineIds = ($idsServiceLines !== null) ? array_flip(array_map('intval', $idsServiceLines)) : null;
         $objBookingDetail = new HotelBookingDetail();
         $bookings = $objBookingDetail->getBookingDataByOrderId($idOrder);
         if ($bookings) {
@@ -1282,6 +1286,9 @@ class OrderTaxDetailCore extends ObjectModel
             ));
             foreach ($bookings as $booking) {
                 if (isset($refundedIds[$booking['id']]) || $booking['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
+                    continue;
+                }
+                if ($selectedBookingIds !== null && !isset($selectedBookingIds[(int) $booking['id']])) {
                     continue;
                 }
                 $result = self::exemptBooking($booking['id'], $idEmployee, $note, $autoMsgLabel, $remarkLabel);
@@ -1291,6 +1298,9 @@ class OrderTaxDetailCore extends ObjectModel
             }
         }
         foreach (ServiceProductOrderDetail::getActiveStandaloneIdsByOrder($idOrder) as $idServiceLine) {
+            if ($selectedServiceLineIds !== null && !isset($selectedServiceLineIds[$idServiceLine])) {
+                continue;
+            }
             $result = self::exemptServiceLine($idServiceLine, $idEmployee, $note, $autoMsgLabel, $remarkLabel);
             if ($result !== self::EXEMPT_OK) {
                 $failures[] = array('id_service_product_order_detail' => $idServiceLine, 'result' => $result);
@@ -1300,21 +1310,25 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
-     * Apply tourism tax for every booking and every standalone service line of an order; returns only
-     * the failing entries. A booking/line with nothing applicable (neither the room nor any attached
+     * Apply tourism tax for the bookings and standalone service lines of an order — every one of them by
+     * default, or only the given ids; returns only the failing entries. A booking/line with nothing applicable (neither the room nor any attached
      * service, or the standalone line itself, has a tourism tax rule) is not a failure — it's silently
      * skipped, same as if it had simply been left alone.
      *
      * @param int         $idOrder
      * @param int         $idEmployee    PS employee id (0 = resolved from Context)
      * @param string|null $autoMsgLabel  Pre-translated "Tourism Tax Applied" label — null skips the Order Notes entry entirely, for every booking/line in the order
+     * @param int[]|null  $idsHtlBooking  Only these bookings are applied (ids that don't belong to the order are ignored); null = every booking
+     * @param int[]|null  $idsServiceLines  Only these standalone service lines are applied (ids that don't belong to the order are ignored); null = every line
      * @return array  [{'id_htl_booking' => int, 'result' => int}, ...] plus
      *                [{'id_service_product_order_detail' => int, 'result' => int}, ...] — failures only
      */
-    public static function applyForOrder($idOrder, $idEmployee = 0, $autoMsgLabel = null)
+    public static function applyForOrder($idOrder, $idEmployee = 0, $autoMsgLabel = null, $idsHtlBooking = null, $idsServiceLines = null)
     {
         $idOrder = (int) $idOrder;
         $failures = array();
+        $selectedBookingIds = ($idsHtlBooking !== null) ? array_flip(array_map('intval', $idsHtlBooking)) : null;
+        $selectedServiceLineIds = ($idsServiceLines !== null) ? array_flip(array_map('intval', $idsServiceLines)) : null;
         $objBookingDetail = new HotelBookingDetail();
         $bookings = $objBookingDetail->getBookingDataByOrderId($idOrder);
         if ($bookings) {
@@ -1326,6 +1340,9 @@ class OrderTaxDetailCore extends ObjectModel
                 if (isset($refundedIds[$booking['id']]) || $booking['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
                     continue;
                 }
+                if ($selectedBookingIds !== null && !isset($selectedBookingIds[(int) $booking['id']])) {
+                    continue;
+                }
                 $result = self::applyBooking($booking['id'], $idEmployee, $autoMsgLabel);
                 if ($result !== self::APPLY_OK && $result !== self::APPLY_ERROR_NOT_APPLICABLE) {
                     $failures[] = array('id_htl_booking' => (int) $booking['id'], 'result' => $result);
@@ -1333,6 +1350,9 @@ class OrderTaxDetailCore extends ObjectModel
             }
         }
         foreach (ServiceProductOrderDetail::getActiveStandaloneIdsByOrder($idOrder) as $idServiceLine) {
+            if ($selectedServiceLineIds !== null && !isset($selectedServiceLineIds[$idServiceLine])) {
+                continue;
+            }
             $result = self::applyServiceLine($idServiceLine, $idEmployee, $autoMsgLabel);
             if ($result !== self::APPLY_OK && $result !== self::APPLY_ERROR_NOT_APPLICABLE) {
                 $failures[] = array('id_service_product_order_detail' => $idServiceLine, 'result' => $result);
