@@ -59,7 +59,7 @@ class HotelAmenities extends ObjectModel
     public function delete()
     {
         if ($id = $this->id) {
-            $imgFile = dirname(__FILE__).'/../views/img/hotel_amenities/'.(int)$id.'.jpg';
+            $imgFile = dirname(__FILE__).'/../views/img/hotel_amenities/'.($this->logo_type == 'image' && $this->logo ? basename($this->logo) : (int)$id.'.jpg');
             if (file_exists($imgFile)) {
                 unlink($imgFile);
             }

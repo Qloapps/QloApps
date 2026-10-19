@@ -61,6 +61,22 @@
 	margin-bottom: 5px;
 }
 
+.layered_filt_category
+{
+	margin-bottom: 10px;
+}
+
+.layered_filt_category_name
+{
+	margin-bottom: 5px;
+}
+
+.layered_filt_category_children
+{
+	padding-left: 15px;
+	border-left: 1px solid #d6d4d4;
+}
+
 .filters_name, .price_filter_subcont span
 {
 	font-size: 16px;

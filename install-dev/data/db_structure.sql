@@ -824,6 +824,9 @@ CREATE TABLE `PREFIX_employee_shop` (
 CREATE TABLE `PREFIX_feature` (
   `id_feature` int(10) unsigned NOT NULL auto_increment,
   `position` int(10) unsigned NOT NULL DEFAULT '0',
+  `logo_type` varchar(10) NOT NULL DEFAULT 'image',
+  `logo` varchar(255) NOT NULL DEFAULT '',
+  `is_featured` tinyint(1) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_feature`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8 COLLATION;
 

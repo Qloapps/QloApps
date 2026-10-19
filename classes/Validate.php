@@ -397,6 +397,8 @@ class ValidateCore
      */
     public static function isCleanHtml($html, $allow_iframe = false)
     {
+        $html = (string) $html;
+
         $eventAttributeRegex = '/<\s*\w+[^>]*\s(on\w+)=["\'][^"\']*["\']/ims';
 
         $events = 'onabort|onactivate|onactive|onaddsourcebuffer|onaddstream|onaddtrack|onafterprint|onafterscriptexecute|onafterupdate|onalerting|onanimationcancel|onanimationend|onanimationiteration|onanimationstart'
