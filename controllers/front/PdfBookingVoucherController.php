@@ -59,6 +59,10 @@ class PdfBookingVoucherControllerCore extends FrontController
             die(Tools::displayError('The booking voucher was not found.'));
         }
 
+        if (!HotelBookingDetail::getIdHotelByIdOrder((int) $order->id, false)) {
+            die(Tools::displayError('The booking voucher was not found.'));
+        }
+
         $this->order = $order;
     }
 
