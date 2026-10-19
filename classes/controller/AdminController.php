@@ -1187,6 +1187,11 @@ class AdminControllerCore extends Controller
      */
     public function processDeleteImage()
     {
+        if ($this->tabAccess['delete'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to delete this.');
+            return false;
+        }
+
         if (Validate::isLoadedObject($object = $this->loadObject())) {
             if (($object->deleteImage())) {
                 $redirect = self::$currentIndex.'&update'.$this->table.'&'.$this->identifier.'='.Tools::getValue($this->identifier).'&conf=7&token='.$this->token;
@@ -1270,6 +1275,9 @@ class AdminControllerCore extends Controller
                     $callback_obj = (isset($params['callback_object'])) ? $params['callback_object'] : $this->context->controller;
                     if (!preg_match('/<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)/ism', call_user_func_array(array($callback_obj, $params['callback']), array($field_value, $row)))) {
                         $field_value = call_user_func_array(array($callback_obj, $params['callback']), array($field_value, $row));
+                    } elseif (is_string($field_value)) {
+                        // raw value is used for HTML output; ", " makes fputcsv quote it so comma separated values stay in one column
+                        $field_value = preg_replace('/\s*,\s*/', ', ', $field_value);
                     }
                 }
                 $content[] = $field_value;
@@ -1289,6 +1297,11 @@ class AdminControllerCore extends Controller
      */
     public function processDelete()
     {
+        if ($this->tabAccess['delete'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to delete this.');
+            return false;
+        }
+
         if (Validate::isLoadedObject($object = $this->loadObject())) {
             $res = true;
             // check if request at least one object with noZeroObject
@@ -1351,6 +1364,11 @@ class AdminControllerCore extends Controller
      */
     public function processAdd()
     {
+        if ($this->tabAccess['add'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to add this.');
+            return false;
+        }
+
         if (!isset($this->className) || empty($this->className)) {
             return false;
         }
@@ -1402,6 +1420,11 @@ class AdminControllerCore extends Controller
      */
     public function processUpdate()
     {
+        if ($this->tabAccess['edit'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return false;
+        }
+
         /* Checking fields validity */
         $this->validateRules();
         if (empty($this->errors)) {
@@ -1495,6 +1518,11 @@ class AdminControllerCore extends Controller
      */
     public function processUpdateFields()
     {
+        if ($this->tabAccess['edit'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return false;
+        }
+
         if (!is_array($fields = Tools::getValue('fieldsBox'))) {
             $fields = array();
         }
@@ -1519,6 +1547,11 @@ class AdminControllerCore extends Controller
      */
     public function processStatus()
     {
+        if ($this->tabAccess['edit'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return false;
+        }
+
         if (Validate::isLoadedObject($object = $this->loadObject())) {
             if ($object->toggleStatus()) {
                 PrestaShopLogger::addLog(
@@ -1562,6 +1595,11 @@ class AdminControllerCore extends Controller
      */
     public function processPosition()
     {
+        if ($this->tabAccess['edit'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return false;
+        }
+
         if (!Validate::isLoadedObject($object = $this->loadObject())) {
             $this->errors[] = Tools::displayError('An error occurred while updating the status for an object.').
                 ' <b>'.$this->table.'</b> '.Tools::displayError('(cannot load object)');
@@ -1619,6 +1657,11 @@ class AdminControllerCore extends Controller
      */
     protected function processUpdateOptions()
     {
+        if ($this->tabAccess['edit'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return false;
+        }
+
         $this->beforeUpdateOptions();
 
         $languages = Language::getLanguages(false);
@@ -2407,7 +2450,7 @@ class AdminControllerCore extends Controller
                 }
             } else {
                 foreach (libxml_get_errors() as $error) {
-                    $this->errors[] = Tools::displayError(sprintf('Error found : %1$s in country_module_list.xml file.', $error->message));
+                    $this->errors[] = Tools::displayError(sprintf('Error found : %1$s in %2$s file.', $error->message, basename(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST)));
                 }
             }
         }
@@ -2893,7 +2936,7 @@ class AdminControllerCore extends Controller
     public function setDeprecatedMedia()
     {
     }
-
+    
     public function setMedia()
     {
         //Bootstrap
@@ -2914,7 +2957,10 @@ class AdminControllerCore extends Controller
         ));
 
         //loads specific javascripts for the admin theme
+        $this->addJqueryUI('ui.tooltip', 'base', true);
+        $this->addJS(_PS_JS_DIR_.'jquery-ui-tooltip-alias.js');
         $this->addJS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/js/vendor/bootstrap.min.js');
+
         $this->addJS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/js/vendor/modernizr.min.js');
         $this->addJS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/js/modernizr-loads.js');
         $this->addJS(__PS_BASE_URI__.$this->admin_webpath.'/themes/'.$this->bo_theme.'/js/vendor/moment-with-langs.min.js');
@@ -3991,11 +4037,25 @@ class AdminControllerCore extends Controller
     protected function postImage($id)
     {
         if (isset($this->fieldImageSettings['name']) && isset($this->fieldImageSettings['dir'])) {
-            return $this->uploadImage($id, $this->fieldImageSettings['name'], $this->fieldImageSettings['dir'].'/');
+            return $this->uploadImage(
+                $id,
+                $this->fieldImageSettings['name'],
+                $this->fieldImageSettings['dir'].'/',
+                false,
+                isset($this->fieldImageSettings['width']) ? $this->fieldImageSettings['width'] : null,
+                isset($this->fieldImageSettings['height']) ? $this->fieldImageSettings['height'] : null
+            );
         } elseif (!empty($this->fieldImageSettings)) {
             foreach ($this->fieldImageSettings as $image) {
                 if (isset($image['name']) && isset($image['dir'])) {
-                    $this->uploadImage($id, $image['name'], $image['dir'].'/');
+                    $this->uploadImage(
+                        $id,
+                        $image['name'],
+                        $image['dir'].'/',
+                        false,
+                        isset($image['width']) ? $image['width'] : null,
+                        isset($image['height']) ? $image['height'] : null
+                    );
                 }
             }
         }
@@ -4065,6 +4125,11 @@ class AdminControllerCore extends Controller
      */
     protected function processBulkDelete()
     {
+        if ($this->tabAccess['delete'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to delete this.');
+            return false;
+        }
+
         if (is_array($this->boxes) && !empty($this->boxes)) {
             $object = new $this->className();
 
@@ -4266,6 +4331,11 @@ class AdminControllerCore extends Controller
      */
     protected function processBulkStatusSelection($status)
     {
+        if ($this->tabAccess['edit'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return false;
+        }
+
         $result = true;
         if (is_array($this->boxes) && !empty($this->boxes)) {
             foreach ($this->boxes as $id) {
@@ -4298,6 +4368,11 @@ class AdminControllerCore extends Controller
      */
     protected function processBulkAffectZone()
     {
+        if ($this->tabAccess['edit'] !== 1) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return false;
+        }
+
         $result = false;
         if (is_array($this->boxes) && !empty($this->boxes)) {
             /** @var Country|State $object */

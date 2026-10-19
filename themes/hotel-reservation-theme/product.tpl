@@ -327,7 +327,7 @@
 															{if isset($hotel_dynamic_amenities) && $hotel_dynamic_amenities}
 																<div class="info_margin_div">
 																	<div class="room_info_heading">
-																		<span>{l s='Hotel Amenities'}</span>
+																		<span>{l s='%s Amenities' sprintf=$property_type}</span>
 																	</div>
 																	<div class="room_info_content row">
 																		{foreach from=$hotel_dynamic_amenities item=amenity}

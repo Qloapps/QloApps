@@ -37,6 +37,9 @@ class QloDuitkuPaymentValidateModuleFrontController extends ModuleFrontControlle
 
                 if (isset($response['status']) && $response['status'] === true) {
                     $response['status'] = true;
+                } elseif (isset($response['message'])) {
+                    $response['status'] = false;
+                    $response['message'] = $response['message'];
                 } else if (isset($response['response']['statusMessage'])) {
                     $response['message'] = $response['response']['statusMessage'];
                 } elseif (isset($response['response']['title'])) {

@@ -357,7 +357,7 @@ class HotelReservationSystem extends Module
         $this->context->smarty->assign(
             array(
                 'WK_HTL_ESTABLISHMENT_YEAR' => Configuration::get('WK_HTL_ESTABLISHMENT_YEAR'),
-                'WK_HTL_CHAIN_NAME' => Configuration::get('WK_HTL_CHAIN_NAME', $this->context->language->id),
+                'WK_HTL_CHAIN_NAME' => Configuration::get('PS_SHOP_NAME'),
             )
         );
         return $this->display(__FILE__, 'copyRight.tpl');
@@ -451,12 +451,6 @@ class HotelReservationSystem extends Module
             //If Admin update new language when we do entry in module all lang tables.
             HotelHelper::updateLangTables($newIdLang, $langTables);
 
-            // update configuration keys
-            $configKeys = array(
-                'WK_HTL_CHAIN_NAME',
-                'WK_HTL_SHORT_DESC',
-            );
-            HotelHelper::updateConfigurationLangKeys($newIdLang, $configKeys);
         }
     }
 
@@ -599,6 +593,7 @@ class HotelReservationSystem extends Module
             'WK_ROOM_LEFT_WARNING_NUMBER',
             'WK_HTL_ESTABLISHMENT_YEAR',
             'WK_HTL_CHAIN_NAME',
+            'WK_HTL_SHORT_DESC',
             'WK_HTL_TAG_LINE',
             'WK_TITLE_HEADER_BLOCK',
             'WK_CONTENT_HEADER_BLOCK',

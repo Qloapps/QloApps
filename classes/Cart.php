@@ -2732,7 +2732,6 @@ class CartCore extends ObjectModel
         }
 
         $final_package_list = $hotelWisePackageList;
-     ///   ddd($final_package_list);
         // END $package_list hotel wise
         $cache[$cache_key] = $final_package_list;
         return $final_package_list;

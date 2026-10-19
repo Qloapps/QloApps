@@ -193,7 +193,7 @@ class WkCustomNavigationLink extends ObjectModel
                 'link' => 'index',
             ),
             array(
-                'name' => 'Our Properties',
+                'name' => 'Properties',
                 'id_cms' => 0,
                 'show_at_navigation' => 1,
                 'show_at_footer' => 0,

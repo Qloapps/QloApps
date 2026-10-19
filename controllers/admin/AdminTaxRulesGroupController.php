@@ -52,6 +52,19 @@ class AdminTaxRulesGroupControllerCore extends AdminController
             'name' => array(
                 'title' => $this->l('Name')
             ),
+            'is_tourism_tax_rule_group' => array(
+                'title' => $this->l('Tourism tax'),
+                'callback' => 'tourismTaxAsLabel',
+                'badge_success' => true,
+                'badge_danger' => true,
+                'type' => 'bool',
+                'align' => 'center',
+                'class' => 'fixed-width-sm',
+                'optional' => true,
+                'visible_default' => true,
+                'filter_key' => 'a!is_tourism_tax_rule_group',
+                'orderby' => false,
+            ),
             'active' => array(
                 'title' => $this->l('Enabled'),
                 'active' => 'status',
@@ -70,9 +83,14 @@ class AdminTaxRulesGroupControllerCore extends AdminController
             )
         );
 
+        $this->_select = 'a.`is_tourism_tax_rule_group` AS `badge_success`, IF(a.`is_tourism_tax_rule_group`, 0, 1) AS `badge_danger`';
         $this->_where .= ' AND a.deleted = 0';
 
         parent::__construct();
+    }
+    public function tourismTaxAsLabel($value, $row)
+    {
+        return $value ? $this->l('Yes') : $this->l('No');
     }
 
     public function initPageHeaderToolbar()

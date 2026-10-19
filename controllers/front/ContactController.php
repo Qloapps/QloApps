@@ -62,7 +62,7 @@ class ContactControllerCore extends FrontController
             } elseif (!$id_customer_thread && !$subject) {
                 $this->errors[] = Tools::displayError('The title cannot be blank.');
             } elseif (!$id_customer_thread && !Validate::isCleanHtml($subject)) {
-                $this->errors[] = Tools::displayError('Invalid subject$subject');
+                $this->errors[] = Tools::displayError('Invalid subject.');
             } else if (!$id_customer_thread && $nameRequired && !trim($userName)) {
                 $this->errors[] = Tools::displayError('Name is required.');
             } else if (!$id_customer_thread && trim($nameRequired) && !Validate::isGenericName($userName)) {
@@ -101,6 +101,9 @@ class ContactControllerCore extends FrontController
                         $id_order,
                         $id_contact,
                         ' AND a.`status` !='. CustomerThread::QLO_CUSTOMER_THREAD_STATUS_CLOSED
+                        .' AND a.`user_name` = \''.pSQL($userName).'\''
+                        .' AND a.`phone` = \''.pSQL($phone).'\''
+                        .' AND a.`subject` = \''.pSQL($subject).'\''
                     );
                 }
 

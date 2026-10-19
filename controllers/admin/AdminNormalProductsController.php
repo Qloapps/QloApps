@@ -224,13 +224,14 @@ class AdminNormalProductsControllerCore extends AdminController
 				LEFT JOIN `'._DB_PREFIX_.'image_shop` image_shop ON (image_shop.`id_product` = a.`id_product` AND image_shop.`cover` = 1 AND image_shop.id_shop = '.$id_shop.')
 				LEFT JOIN `'._DB_PREFIX_.'image` i ON (i.`id_image` = image_shop.`id_image`)
                 LEFT JOIN `'._DB_PREFIX_.'product_download` pd ON (pd.`id_product` = a.`id_product` AND pd.`active` = 1)
+                LEFT JOIN `'._DB_PREFIX_.'tax_rules_group` ttrg ON (ttrg.`id_tax_rules_group` = sa.`id_tourism_tax_rules_group`)
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type_service_product` rsp ON (rsp.`id_product` = a.`id_product`)
                 LEFT JOIN `'._DB_PREFIX_.'htl_room_type` hrt ON (rsp.`id_element` = hrt.`id_product` AND rsp.`element_type` = '.(int)RoomTypeServiceProduct::WK_ELEMENT_TYPE_ROOM_TYPE.')
                 '.HotelBranchInformation::addHotelRestriction(false, 'hrt');
 
         $this->_select .= ' IF(a.`auto_add_to_cart`, "'.$this->l('Yes').'", "'.$this->l('No').'") as auto_added, IF(a.`auto_add_to_cart`, 1, 0) as badge_success, IF(a.`show_at_front`, "'.$this->l('Yes').'", "'.$this->l('No').'") as show_at_front_txt, (SELECT COUNT(hri.`id`) FROM `'._DB_PREFIX_.'htl_room_information` hri WHERE hri.`id_product` = a.`id_product`) as num_rooms, ';
         $this->_select .= ' COUNT(hrt.`id_product`) as products_associated, ';
-        $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ';
+        $this->_select .= 'shop.`name` AS `shopname`, a.`id_shop_default`, ttrg.`name` AS `tourism_tax_rules_group`, ';
         $this->_select .= $alias_image.'.`id_image` AS `id_image`, cl.`name` AS `name_category`, '.$alias.'.`price`, 0 AS `price_final`, a.`is_virtual`, pd.`nb_downloadable`, sav.`quantity` AS `sav_quantity`, '.$alias.'.`active`, IF(sav.`quantity`<=0, 1, 0) AS `badge_danger`';
 
         if ($join_category) {
@@ -353,6 +354,21 @@ class AdminNormalProductsControllerCore extends AdminController
                 'filter_key' => 'shop!name',
             );
         }
+
+        $tourismTaxRulesGroups = array();
+        foreach (TaxRulesGroup::getTaxRulesGroups(true, true) as $taxRulesGroup) {
+            $tourismTaxRulesGroups[$taxRulesGroup['id_tax_rules_group']] = $taxRulesGroup['name'];
+        }
+        $this->fields_list['tourism_tax_rules_group'] = array(
+            'title' => $this->l('Tourism tax rule'),
+            'type' => 'select',
+            'multiple' => true,
+            'operator' => 'or',
+            'filter_key' => 'sa!id_tourism_tax_rules_group',
+            'list' => $tourismTaxRulesGroups,
+            'optional' => true,
+            'class' => 'chosen',
+        );
 
         $this->fields_list['price'] = array(
             'title' => $this->l('Base price'),
@@ -1578,8 +1594,6 @@ class AdminNormalProductsControllerCore extends AdminController
                 _PS_JS_DIR_.'jquery/plugins/timepicker/jquery-ui-timepicker-addon.css',
                 _PS_CSS_DIR_.'ps-hotel-reservation.css',
             ));
-        }else {
-            $this->addJqueryUI('ui.tooltip', 'base', true);
         }
     }
 

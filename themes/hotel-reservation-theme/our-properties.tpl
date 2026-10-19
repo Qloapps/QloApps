@@ -21,13 +21,13 @@
 *}
 
 {block name='our_properties'}
-{capture name=path}{l s='Our Properties'}{/capture}
+{capture name=path}{l s='Properties'}{/capture}
 	{if isset($hotelsInfo) && $hotelsInfo}
 		{block name='our_properties_list_title'}
 			<div class="title-container">
-				<h1 class="text-center our-properties-header">{l s='Our Properties'}</h1>
+				<h1 class="text-center our-properties-header">{l s='Properties'}</h1>
 				<div class="text-center our-properties-desc">
-					<p>{$WK_HTL_SHORT_DESC|escape:'html':'UTF-8'}</p>
+					<p>{l s='Enjoy a welcoming atmosphere, essential comforts, and a pleasant stay.'}</p>
 				</div>
 			</div>
 		{/block}
