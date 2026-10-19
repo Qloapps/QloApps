@@ -561,8 +561,8 @@ class QloHotelReports extends Module
                 )),
                 'room_statuses'         => array(
                     HotelRoomInformation::STATUS_INACTIVE           => array('label' => $this->l('Out of Order'),      'class' => 'label-default'),
-                    HotelRoomInformation::STATUS_TEMPORARY_INACTIVE => array('label' => $this->l('Under Maintenance'), 'class' => 'label-warning'),
                 ),
+                'maintenance_status' => array('label' => $this->l('Under Maintenance'), 'class' => 'label-warning'),
                 'filter_base_url'       => $filterBaseUrl,
                 'export_url'            => $filterBaseUrl
                     . '&id_product=' . $idProduct
@@ -657,10 +657,7 @@ class QloHotelReports extends Module
                 foreach ($allRooms as $room) {
                     if ($room['id_order']) {
                         $kpiOccupied++;
-                    } elseif (in_array((int) $room['id_status'], array(
-                        HotelRoomInformation::STATUS_INACTIVE,
-                        HotelRoomInformation::STATUS_TEMPORARY_INACTIVE,
-                    ))) {
+                    } elseif ((int) $room['id_status'] === HotelRoomInformation::STATUS_INACTIVE || !empty($room['is_disabled'])) {
                         $kpiOutOfOrder++;
                     }
                 }
@@ -849,8 +846,8 @@ class QloHotelReports extends Module
                 )),
                 'room_statuses'        => array(
                     HotelRoomInformation::STATUS_INACTIVE           => array('label' => $this->l('Out of Order'),      'class' => 'label-default'),
-                    HotelRoomInformation::STATUS_TEMPORARY_INACTIVE => array('label' => $this->l('Under Maintenance'), 'class' => 'label-warning'),
                 ),
+                'maintenance_status' => array('label' => $this->l('Under Maintenance'), 'class' => 'label-warning'),
                 'export_url'           => $filterBaseUrl
                     . ($floor ? '&floor=' . urlencode($floor) : '')
                     . '&export=1',
@@ -1420,8 +1417,7 @@ class QloHotelReports extends Module
             foreach ($rows as $row) {
                 if ($row['id_order']) {
                     $statusLabel = $this->l('Occupied');
-                } elseif ((int) $row['id_status'] === HotelRoomInformation::STATUS_INACTIVE
-                    || (int) $row['id_status'] === HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
+                } elseif ((int) $row['id_status'] === HotelRoomInformation::STATUS_INACTIVE || !empty($row['is_disabled'])) {
                     $statusLabel = $this->l('Under Maintenance');
                 } else {
                     $statusLabel = $this->l('Vacant');
