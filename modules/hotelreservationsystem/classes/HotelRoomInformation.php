@@ -158,6 +158,9 @@ class HotelRoomInformation extends ObjectModel
                 'status' => self::getRoomStatusTitle(HotelRoomInformation::STATUS_TEMPORARY_INACTIVE)
             ),
         );
+
+        Hook::exec('actionAdminRoomStatusModifier', array('status' => &$status));
+
         return $status;
     }
 
@@ -171,6 +174,8 @@ class HotelRoomInformation extends ObjectModel
             HotelRoomInformation::STATUS_SEARCH_LOS_UNSATISFIED => $moduleInstance->l('Length of stay restriction not satisfied', 'hotelreservationsystem'),
             HotelRoomInformation::STATUS_SEARCH_OCCUPANCY_UNSATISFIED => $moduleInstance->l('Occupancy exceeds room capacity', 'hotelreservationsystem'),
         );
+
+        Hook::exec('actionAdminRoomStatusTitle', array('status' => &$status, 'id_status' => $idStatus));
 
         return isset($status[$idStatus]) ? $status[$idStatus] : '';
     }

@@ -151,6 +151,20 @@ class AdminProductsControllerCore extends AdminController
             }
         }
 
+        // Allow modules to override the labels of the product tabs
+        $tabNameOverrides = Hook::exec('displayUpdateProductTabName', array('id_product' => (int) Tools::getValue('id_product')), null, true);
+        if (is_array($tabNameOverrides)) {
+            foreach ($tabNameOverrides as $moduleOverrides) {
+                if (is_array($moduleOverrides)) {
+                    foreach ($moduleOverrides as $key => $newLabel) {
+                        if (isset($this->available_tabs_lang[$key])) {
+                            $this->available_tabs_lang[$key] = $newLabel;
+                        }
+                    }
+                }
+            }
+        }
+
         if (Tools::getValue('productFilter_a!id_category_default') === '') {
             $this->context->cookie->id_category_room_types_filter = false;
         }

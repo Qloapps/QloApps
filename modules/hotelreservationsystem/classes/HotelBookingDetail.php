@@ -835,6 +835,19 @@ class HotelBookingDetail extends ObjectModel
         $unavailableRoomTypes = array();
 
         $avai_rooms = Db::getInstance()->executeS($sql);
+
+        Hook::exec('actionAvailableRoomData', array(
+            'avai_rooms' => &$avai_rooms,
+            'unavailableRoomTypes' => &$unavailableRoomTypes,
+            'params' => array(
+                'id_hotel' => $idHotel,
+                'id_product' => $idRoomType,
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+                'all_params' => $allParams
+            )
+        ));
+
         if ($avai_rooms) {
             $availableRoomTypes = array(
                 'roomTypes' => array(),
@@ -1376,6 +1389,19 @@ class HotelBookingDetail extends ObjectModel
                 }
                 // free space
                 unset($roomTypeDetail);
+
+                Hook::exec('actionPartiallyAvailableRoomData', array(
+                    'dateWiseRoomTypes' => &$dateWiseRoomTypes,
+                    'dateWiseCartRooms' => &$dateWiseCartRooms,
+                    'unavailableRoomTypes' => &$unavailableRoomTypes,
+                    'params' => array(
+                        'id_hotel' => $idHotel,
+                        'id_product' => $idRoomType,
+                        'date_from' => $dateFrom,
+                        'date_to' => $dateTo,
+                        'all_params' => $allParams
+                    )
+                ));
 
                 // Return room type wise instead of date wise
                 foreach ($dateWiseRoomTypes as $timeStamp => $dateWiseDetail) {

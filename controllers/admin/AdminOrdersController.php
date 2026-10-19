@@ -632,6 +632,12 @@ class AdminOrdersControllerCore extends AdminController
         if (Context::getContext()->shop->getContext() != Shop::CONTEXT_SHOP && isset($this->toolbar_btn['new']) && Shop::isFeatureActive()) {
             unset($this->toolbar_btn['new']);
         }
+
+        Hook::exec('actionOrderDetailToolbarModifier', array(
+            'toolbar_btn' => &$this->toolbar_btn,
+            'id_order' => (int) Tools::getValue('id_order')
+        ));
+
         return $res;
     }
 
@@ -2213,6 +2219,11 @@ class AdminOrdersControllerCore extends AdminController
                         }
                     }
 
+                    Hook::exec('actionAdminOrderValidateBefore', array(
+                        'cart' => $objCart,
+                        'errors' => &$this->errors
+                    ));
+
                     if (!count($this->errors)) {
 
                         // Set payment module details
@@ -2294,6 +2305,11 @@ class AdminOrdersControllerCore extends AdminController
                         }
 
                         if ($objPaymentModule->currentOrder) {
+                            Hook::exec('actionAdminOrderAddAfter', array(
+                                'cart' => $objCart,
+                                'order' => new Order((int) $objPaymentModule->currentOrder)
+                            ));
+
                             Tools::redirectAdmin(self::$currentIndex.'&id_order='.$objPaymentModule->currentOrder.'&vieworder'.'&token='.$this->token.'&conf=3');
                         }
                     }
@@ -6726,6 +6742,14 @@ class AdminOrdersControllerCore extends AdminController
         }
 
         $this->sendChangedNotification($order);
+
+        Hook::exec('actionHotelRoomBookingUpdateAfter', array(
+            'id_order' => $id_order,
+            'id_room' => $id_room,
+            'date_from' => $new_date_from,
+            'date_to' => $new_date_to
+        ));
+
         die(json_encode(array(
             'result' => $res,
             'view' => $view,
@@ -8971,6 +8995,11 @@ class AdminOrdersControllerCore extends AdminController
     {
         $idHotelBookingDetail = (int) Tools::getValue('id_hotel_booking_detail');
         if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail($idHotelBookingDetail))) {
+            Hook::exec('actionAdminOnChangeRoomStatus', array(
+                'post_data' => Tools::getAllValues(),
+                'errors' => &$this->errors
+            ));
+
             $newStatus = (int) Tools::getValue('booking_order_status');
             $statusRemark = Tools::getValue('status_remark');
             // date choosen for the status change
@@ -9027,6 +9056,15 @@ class AdminOrdersControllerCore extends AdminController
                     );
                 }
             }
+
+            Hook::exec('actionRoomBookingStatusUpdateBefore', array(
+                'id_hotel_booking_detail' => $objHotelBookingDetail->id,
+                'id_order' => $objHotelBookingDetail->id_order,
+                'id_room' => $objHotelBookingDetail->id_room,
+                'new_status' => $newStatus,
+                'status_date' => $statusDate,
+                'errors' => &$this->errors
+            ));
 
             if (empty($this->errors)) {
 

@@ -204,6 +204,7 @@
 			<input maxlength="12" type="text" id="upc" name="upc" value="{$product->upc|escape:'html':'UTF-8'}" />
 		</div>
 	</div>
+	{hook h='displayAddExtraProductInformation' item=$product}
 
 	<!-- <hr/> -->
 

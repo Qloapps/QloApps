@@ -26,6 +26,7 @@
 	<div class="panel-heading">
 		<i class="icon-shopping-cart"></i>
 		{l s='Cart Details'}
+		{hook h='displayAdminCartDetailsHeader'}
 	</div>
 	<div class="row">
 		<div class="col-lg-12 table-responsive">
@@ -120,6 +121,7 @@
 												</div>
 											</div>
 										</div>
+										{hook h='displayAdminOrderCartRoomCellAfterOccupancy' data=$data}
 									</td>
 								{/if}
 								<td id="cart_detail_data_unit_price_{$data.id|escape:'html':'UTF-8'}">
@@ -152,6 +154,7 @@
 									<button class="delete_hotel_cart_data btn btn-danger" data-id_room="{$data.id_room|escape:'html':'UTF-8'}" data-id_product="{$data.id_product|escape:'html':'UTF-8'}" data-id="{$data.id|escape:'html':'UTF-8'}" data-id_cart="{$data.id_cart|escape:'html':'UTF-8'}" data-date_to="{$data.date_to|escape:'html':'UTF-8'}" data-date_from="{$data.date_from|escape:'html':'UTF-8'}">
 										<i class="icon-trash"></i>&nbsp;{l s='Delete'}
 									</button>
+									{hook h='displayAfterAdminCartDetailsDeleteAction' data=$data}
                                     <br />
                                     <a href="#" id_hotel_cart_booking="{$data.id|escape:'html':'UTF-8'}" id_room="{$data.id_room|escape:'html':'UTF-8'}" date_from="{$data.date_from|escape:'html':'UTF-8'}" date_to="{$data.date_to|escape:'html':'UTF-8'}" id_product="{$data.id_product|escape:'html':'UTF-8'}" id_cart="{$data.id_cart|escape:'html':'UTF-8'}" class="open_rooms_extra_services btn btn-success" title="{l s='Click here to add or remove the extra services of this room type.'}">
                                         <i class="icon-pencil"></i>&nbsp;{l s='Services'}
