@@ -178,4 +178,10 @@
     <url_rewrite>comparaison-produits</url_rewrite>
   </meta>
 -->
+  <meta id='our-properties' id_shop='1'>
+    <title>Propriétés</title>
+    <description/>
+    <keywords/>
+    <url_rewrite>proprietes</url_rewrite>
+  </meta>
 </entity_meta>

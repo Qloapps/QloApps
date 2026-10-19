@@ -43,7 +43,9 @@ class AdminLanguagesControllerCore extends AdminController
         $this->fieldImageSettings = array(
             array(
                 'name' => 'flag',
-                'dir' => 'l'
+                'dir' => 'l',
+                'width' => 16,
+                'height' => 11
             ),
             array(
                 'name' => 'no_picture',

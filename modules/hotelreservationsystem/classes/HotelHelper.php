@@ -1126,14 +1126,6 @@ class HotelHelper
         // lang fields
         $languages = Language::getLanguages(false);
 
-        $htlShortDescLang = array(
-            'en' => 'We offer elegant rooms, gourmet dining, and attentive service for a memorable stay.',
-            'nl' => 'Wij bieden elegante kamers, gastronomisch dineren en attente service voor een onvergetelijk verblijf.',
-            'fr' => 'Nous proposons des chambres élégantes, une cuisine gastronomique et un service attentionné pour un séjour mémorable.',
-            'de' => 'Wir bieten elegante Zimmer, Gourmet-Restaurants und aufmerksamen Service für einen unvergesslichen Aufenthalt.',
-            'ru' => 'Мы предлагаем элегантные номера, изысканную кухню и внимательное обслуживание для незабываемого отдыха.',
-            'es' => 'Ofrecemos habitaciones elegantes, comidas gourmet y un servicio atento para una estadía inolvidable.',
-        );
         $defaultDimensionUnitLang = array(
             'en' => 'ft',
             'nl' => 'ft',
@@ -1142,23 +1134,15 @@ class HotelHelper
             'ru' => 'фут',
             'es' => 'ft',
         );
-        $WK_HTL_CHAIN_NAME = array();
-        $WK_HTL_SHORT_DESC = array();
         $defaultDimensionUnit = array();
         foreach ($languages as $lang) {
-            if (isset($htlShortDescLang[$lang['iso_code']])) {
-                $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang[$lang['iso_code']];
-                $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang[$lang['iso_code']];
+            if (isset($defaultDimensionUnitLang[$lang['iso_code']])) {
                 $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang[$lang['iso_code']];
             } else {
                 $defaultDimensionUnit[$lang['id_lang']] = $defaultDimensionUnitLang['en'];
-                $WK_HTL_CHAIN_NAME[$lang['id_lang']] = $homeBannerTitleLang['en'];
-                $WK_HTL_SHORT_DESC[$lang['id_lang']] = $htlShortDescLang['en'];
             }
         }
 
-        Configuration::updateValue('WK_HTL_CHAIN_NAME', $WK_HTL_CHAIN_NAME);
-        Configuration::updateValue('WK_HTL_SHORT_DESC', $WK_HTL_SHORT_DESC);
         Configuration::updateValue('WK_DIMENSION_UNIT', $defaultDimensionUnit);
 
         // Search Fields

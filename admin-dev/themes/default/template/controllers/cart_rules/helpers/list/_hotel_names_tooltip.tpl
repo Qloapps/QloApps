@@ -24,17 +24,17 @@
     <span>{$hotel_names_first|escape:'html':'UTF-8'}</span>
     {if $hotel_names_remaining}
         {capture name='hotel_names_tooltip'}
-            <div class="tooltip_cont">
-                <div class="tip_header"><div class="tip_date">{l s='Selected Hotels'}</div></div>
+            <div class="ui-tooltip-wrapper">
+                <div class="ui-tooltip-header"><div class="ui-tooltip-label">{l s='Selected Hotels'}</div></div>
                 <ul>
                     {foreach from=$selected_hotels item='hotel'}
-                        <li class="tip_element_value">{$hotel|escape:'html':'UTF-8'}</li>
+                        <li class="ui-tooltip-elem-txt">{$hotel|escape:'html':'UTF-8'}</li>
                     {/foreach}
                 </ul>
             </div>
         {/capture}
-        {capture name='hotel_names_tooltip_title'}<span class="badge tooltip-trigger">+{$hotel_names_remaining|@count}</span>{/capture}
-        {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.hotel_names_tooltip tooltip_title=$smarty.capture.hotel_names_tooltip_title}
+        {capture name='hotel_names_tooltip_title'}<span class="badge ui-tooltip-trigger">+{$hotel_names_remaining|@count}</span>{/capture}
+        {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.hotel_names_tooltip tooltip_title=$smarty.capture.hotel_names_tooltip_title}
     {/if}
 {else}
     --

@@ -590,7 +590,6 @@ class GuestTrackingControllerCore extends FrontController
             ));
 
             $this->addJqueryPlugin(array('fancybox', 'scrollTo', 'footable', 'footable-sort'));
-            $this->addJqueryUI(array('ui.tooltip'), 'base', true);
 
             // load Google Maps library if configured
             if (!count($this->errors)) {

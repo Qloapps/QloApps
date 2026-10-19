@@ -385,8 +385,13 @@ class QloDuitkuPayment extends PaymentModule
     public function getDuitkuTransactionTokenResponse()
     {
         $cart = new Cart((int) $this->context->cart->id);
-        // Validate and remove non-selected services from the cart
-        ServiceProductCartDetail::validateServiceProductsInCart();
+        // Validate cart and remove invalid services from the cart
+        if ($errors = HotelCartBookingData::validateCartBookings()) {
+            return array(
+                'status' => false,
+                'message' => implode('<br>', array_unique($errors)),
+            );
+        }
 
         $cartTotalAmount = $cart->is_advance_payment
             ? $cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT)

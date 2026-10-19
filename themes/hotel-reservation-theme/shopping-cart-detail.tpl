@@ -137,16 +137,16 @@
                                                         {displayPrice price=($rm_v['amount'])}
                                                         {if (($rm_v['amount'] - $rm_v['amount_without_auto_add']) > 0) && (in_array($data_v['id_product'], $discounted_products) || $PS_ROOM_PRICE_AUTO_ADD_BREAKDOWN)}
                                                             {capture name='htl_room_price_detail_tooltip'}
-                                                            <div class="htl-tooltip-cont">
-                                                                <div class="htl-tooltip-row"><label>{l s='Room price'}</label><span>{displayPrice price=($rm_v['amount_without_auto_add'])}</span></div>
-                                                                <div class="htl-tooltip-row"><label>{l s='Additional charges'}</label><span>{displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</span></div>
+                                                            <div class="ui-tooltip-body">
+                                                                <div class="ui-tooltip-label">{l s='Room price'}</div><span class="ui-tooltip-elem-txt">{displayPrice price=($rm_v['amount_without_auto_add'])}</span>
+                                                                <div class="ui-tooltip-label">{l s='Additional charges'}</div><span class="ui-tooltip-elem-txt">{displayPrice price=($rm_v['amount'] - $rm_v['amount_without_auto_add'])}</span>
                                                             </div>
                                                             {/capture}
-                                                            {include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_room_price_detail_tooltip allow_html=true tooltip_class='htl-tooltip-room-price-detail'}
+                                                            {include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.htl_room_price_detail_tooltip allow_html=true tooltip_class='ui-htl-tooltip-room-price-detail'}
                                                         {/if}
                                                     </div>
                                                     <p class="total_price_detial">
-                                                        {l s='Total %s price' sprintf=$data_v['selling_object_plural_name']|escape:'html':'UTF-8'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                                        {l s='Total %s price' sprintf=$data_v['selling_object_plural_name']|escape:'html':'UTF-8'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                                     </p>
                                                 </div>
                                             </div>
@@ -178,7 +178,7 @@
                                                 </span>
                                             </p>
                                             <p class="total_price_detial">
-                                                {l s='Total price for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.'}{/if} {l s='all taxes.)'}{/if}
+                                                {l s='Total price for'} {$rm_v['num_days']} {l s='Night(s) stay'}{if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.'}{/if} {l s='all taxes.)'}{/if}
                                             </p>
                                         </div>
                                     </div>
@@ -260,7 +260,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Unit price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Unit price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                             {if $product.allow_multiple_quantity}
@@ -292,7 +292,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Total price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Total price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                         </div>
@@ -351,7 +351,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Unit price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Unit price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                             {if $product.allow_multiple_quantity}
@@ -384,7 +384,7 @@
                                     </span>
                                 </p>
                                 <p class="total_price_detial">
-                                    {l s='Total price'} {if $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
+                                    {l s='Total price'} {if $use_taxes && $display_tax_label}{if $priceDisplay} {l s='(Excl.'} {else}{l s='(Incl.)'}{/if} {l s='all taxes.)'}{/if}
                                 </p>
                             </div>
                         </div>
