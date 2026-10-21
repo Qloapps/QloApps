@@ -31,33 +31,15 @@
 <div id="sitemap_content" class="row">
 	<div class="col-xs-12 col-sm-6">
 		<div class="sitemap_block box">
-    		<h3 class="page-subheading">{l s='Our offers'}</h3>
+    		<h3 class="page-subheading">{l s='Our properties'}</h3>
     		<ul>
     			<li>
-                    <a 
-                    href="{$link->getPageLink('new-products')|escape:'html':'UTF-8'}" 
-                    title="{l s='View a new product'}">
-                        {l s='New products'}
+                    <a
+                    href="{$link->getPageLink('our-properties')|escape:'html':'UTF-8'}"
+                    title="{l s='View our properties'}">
+                        {l s='Our properties'}
                     </a>
                 </li>
-    			{if !$PS_CATALOG_MODE}
-    			{if $PS_DISPLAY_BEST_SELLERS}
-        			<li>
-                        <a 
-                        href="{$link->getPageLink('best-sales')|escape:'html':'UTF-8'}" 
-                        title="{l s='View top-selling products'}">
-                            {l s='Best sellers'}
-                        </a>
-                    </li>
-                {/if}
-        			<li>
-                        <a 
-                        href="{$link->getPageLink('prices-drop')|escape:'html':'UTF-8'}" 
-                        title="{l s='View products with a price drop'}">
-                            {l s='Price drop'}
-                        </a>
-                    </li>
-    			{/if}
     		</ul>
 	   </div>
     </div>
@@ -166,11 +148,6 @@
 		<div class="sitemap_block box">
             <h3 class="page-subheading">{l s='Pages'}</h3>
             <ul>
-            	<li>
-                    <a href="{$categoriescmsTree.link|escape:'html':'UTF-8'}" title="{$categoriescmsTree.name|escape:'html':'UTF-8'}">
-                        {$categoriescmsTree.name|escape:'html':'UTF-8'}
-                    </a>
-                </li>
                 {if isset($categoriescmsTree.children)}
                     {foreach $categoriescmsTree.children as $child}
                         {if (isset($child.children) && $child.children|@count > 0) || $child.cms|@count > 0}

@@ -121,7 +121,7 @@ class HotelRoomDisableDates extends ObjectModel
         }
 
         if (!count($disableDates)) {
-            $wkDateErrors[] = $hotelResModInstance->l('Please enter disable dates for status temporary disable.', 'HotelRoomDisableDates');
+            $wkDateErrors[] = $hotelResModInstance->l('Please enter disable dates.', 'HotelRoomDisableDates');
         }
 
         return $wkDateErrors;
@@ -140,7 +140,7 @@ class HotelRoomDisableDates extends ObjectModel
 
     /**
      * Disabled/maintenance room rows for the out-of-order report.
-     * Returns both scheduled disable-date entries AND permanently inactive rooms (STATUS_INACTIVE).
+     * Returns scheduled disable-date entries of active rooms AND permanently inactive rooms (STATUS_INACTIVE).
      *
      * @param array $params date_from, date_to, id_hotel, id_product, floor, id_lang
      * @return array
@@ -179,7 +179,8 @@ class HotelRoomDisableDates extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
             INNER JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hrdd.`id_room`)
             '.$sharedJoins.'
-            WHERE hrdd.`date_from` < "'.$dateTo.' 23:59:59"
+            WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_ACTIVE.'
+            AND hrdd.`date_from` < "'.$dateTo.' 23:59:59"
             AND hrdd.`date_to` > "'.$dateFrom.' 00:00:00"'
             .$floorFilter.$productFilter.$hotelRestriction.'
 

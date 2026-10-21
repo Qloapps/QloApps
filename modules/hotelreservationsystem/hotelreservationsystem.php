@@ -386,7 +386,7 @@ class HotelReservationSystem extends Module
             // delete the feature prices of the room type
             HotelRoomTypeFeaturePricing::deleteFeaturePrices(false, $idProduct);
 
-            // delete the disable dates (temporary inactive status) of the room type
+            // delete the disable dates of the room type
             $objRoomDisableDates = new HotelRoomDisableDates();
             $objRoomDisableDates->deleteRoomDisableDatesByIdRoomType($idProduct);
         }
@@ -607,6 +607,9 @@ class HotelReservationSystem extends Module
             'WK_CUSTOMER_SUPPORT_PHONE_NUMBER',
             'WK_CUSTOMER_SUPPORT_EMAIL',
             'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST',
+            'WK_MAX_AMENITIES_ROOM_SEARCH',
+            'WK_MAX_FEATURES_ROOM_SEARCH',
+            'WK_MAX_ROOM_TYPE_FEATURE_VALUES',
             'QLO_HEADER_MEDIA_TYPE',
             'QLO_HEADER_CONTENT_ALIGN',
             'QLO_HEADER_VIDEO_SOURCE_TYPE',

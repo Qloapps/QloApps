@@ -265,7 +265,7 @@
                                         <tr>
                                             <th><span class="title_box">{l s='%s No.' sprintf=$book_v['selling_object_name'] mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Status' mod='hotelreservationsystem'}</span></th>
-                                            <th><span class="title_box">{l s='Duration' mod='hotelreservationsystem'}</span></th>
+                                            <th><span class="title_box">{l s='Disable date duration' mod='hotelreservationsystem'}</span></th>
                                             <th><span class="title_box">{l s='Message' mod='hotelreservationsystem'}</span></th>
                                         </tr>
                                     </thead>

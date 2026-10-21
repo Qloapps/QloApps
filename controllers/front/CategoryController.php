@@ -183,12 +183,18 @@ class CategoryControllerCore extends FrontController
             $sort_value = Tools::getValue('sort_value');
             $filter_data = Tools::getValue('filter_data');
             $amenities = [];
+            $featureValues = [];
             $price = [];
             if (!empty($filter_data)) {
                 foreach ($filter_data as $key => $value) {
                     if ($key == 'amenities') {
                         foreach ($value as $a_k => $a_v) {
                             $amenities[] = $a_v;
+                        }
+                    } elseif ($key == 'features') {
+                        // one group of feature value ids per feature
+                        foreach ($value as $idFeatureValues) {
+                            $featureValues[] = array_map('intval', (array) $idFeatureValues);
                         }
                     } elseif ($key == 'price') {
                         $price['from'] = $value[0];
@@ -207,6 +213,7 @@ class CategoryControllerCore extends FrontController
                 'id_cart' => $this->context->cart->id,
                 'id_guest' => $this->context->cookie->id_guest,
                 'amenities' => $amenities,
+                'feature_values' => $featureValues,
                 'price' => $price,
             );
 

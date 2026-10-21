@@ -25,15 +25,22 @@
 
 <li {if isset($last) && $last == 'true'}class="last"{/if}>
 	<a href="{$node.link|escape:'html':'UTF-8'}" {if isset($currentCategoryId) && $node.id == $currentCategoryId}class="selected"{/if} title="{$node.desc|escape:'html':'UTF-8'}">{$node.name|escape:'html':'UTF-8'}</a>
-	{if $node.children|@count > 0}
+	{if $node.children|@count > 0 || (isset($node.room_types) && $node.room_types|@count > 0)}
 		<ul>
 		{foreach from=$node.children item=child name=categoryTreeBranch}
-			{if $smarty.foreach.categoryTreeBranch.last}
+			{if $smarty.foreach.categoryTreeBranch.last && !(isset($node.room_types) && $node.room_types|@count > 0)}
 				{include file="$tpl_dir./category-tree-branch.tpl" node=$child last='true'}
 			{else}
 				{include file="$tpl_dir./category-tree-branch.tpl" node=$child last='false'}
 			{/if}
 		{/foreach}
+		{if isset($node.room_types)}
+			{foreach from=$node.room_types item=roomType name=roomTypeBranch}
+				<li {if $smarty.foreach.roomTypeBranch.last}class="last"{/if}>
+					<a href="{$roomType.link|escape:'html':'UTF-8'}" title="{$roomType.name|escape:'html':'UTF-8'}">{$roomType.name|escape:'html':'UTF-8'}</a>
+				</li>
+			{/foreach}
+		{/if}
 		</ul>
 	{/if}
 </li>

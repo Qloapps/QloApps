@@ -1294,14 +1294,13 @@ Quick View Styles
 .room_info_content.row .col-sm-4 .amenity-name {
   white-space: nowrap;
   overflow: hidden;}
-.room_feature_group {
-  margin-bottom: 15px;}
 .room_feature_group .room_info_heading {
   display: flex;
   align-items: center;
   gap: 5px;
   margin-bottom: 3px;}
-
+.room_info_heading i {
+  font-size: 16px;}
 .product_wrapper .form-control {
   background-color: transparent!important;
   border: 1px solid #999999;
@@ -1442,6 +1441,24 @@ Quick View Styles
   color: #505050;
 }
 
+/* featured amenities (room type + hotel) */
+.featured_amenities .featured_amenity {
+  display: inline-block;
+  margin: 0 20px 8px 0;
+}
+.featured_amenities .featured_amenity img {
+  max-height: 20px;
+  max-width: 20px;
+}
+
+/* font icons use the same color as the amenity/feature jpg images */
+.featured_amenities .featured_amenity i,
+.info_margin_div .col-sm-4 > i,
+.room_info_heading i {
+  color: #555555;
+}
+/* end */
+
 /* service popup design */
 .services-info-tooltip-cont {
   min-width: 240px;
@@ -1470,6 +1487,18 @@ Quick View Styles
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+.extra-service-panel .services-list .services-list-row {
+  align-items: center;
+}
+.extra-service-panel .services-list .services-list-row .service-price-action {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.extra-service-panel .services-list .services-list-row .service-price-action p {
+  margin: 0;
 }
 .extra-service-panel .summary-row .service_price {
   font-weight: 700;
