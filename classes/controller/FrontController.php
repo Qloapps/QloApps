@@ -1183,6 +1183,7 @@ class FrontControllerCore extends Controller
             $this->addJS(_PS_JS_DIR_.'hookLiveEdit.js');
         }
         $this->addJqueryUI('ui.tooltip', 'base', true);
+        $this->addJS(_PS_JS_DIR_.'jquery-ui-tooltip-alias.js');
 
         if (Configuration::get('PS_QUICK_VIEW')) {
             $this->addjqueryPlugin('fancybox');
@@ -1767,7 +1768,6 @@ class FrontControllerCore extends Controller
             'categoriescmsTree'         => CMSCategory::getRecurseCategory($this->context->language->id, 1, 1, 1),
             'voucherAllowed'            => (int)CartRule::isFeatureActive(),
             'PS_DISPLAY_BEST_SELLERS'   => Configuration::get('PS_DISPLAY_BEST_SELLERS'),
-            'display_store'             => Configuration::get('PS_STORES_DISPLAY_SITEMAP'),
             'conditions'                => Configuration::get('PS_CONDITIONS'),
             'id_cgv'                    => Configuration::get('PS_CONDITIONS_CMS_ID'),
             'PS_SHOP_NAME'              => Configuration::get('PS_SHOP_NAME'),

@@ -357,7 +357,7 @@ class HotelReservationSystem extends Module
         $this->context->smarty->assign(
             array(
                 'WK_HTL_ESTABLISHMENT_YEAR' => Configuration::get('WK_HTL_ESTABLISHMENT_YEAR'),
-                'WK_HTL_CHAIN_NAME' => Configuration::get('WK_HTL_CHAIN_NAME', $this->context->language->id),
+                'WK_HTL_CHAIN_NAME' => Configuration::get('PS_SHOP_NAME'),
             )
         );
         return $this->display(__FILE__, 'copyRight.tpl');
@@ -386,7 +386,7 @@ class HotelReservationSystem extends Module
             // delete the feature prices of the room type
             HotelRoomTypeFeaturePricing::deleteFeaturePrices(false, $idProduct);
 
-            // delete the disable dates (temporary inactive status) of the room type
+            // delete the disable dates of the room type
             $objRoomDisableDates = new HotelRoomDisableDates();
             $objRoomDisableDates->deleteRoomDisableDatesByIdRoomType($idProduct);
         }
@@ -451,12 +451,6 @@ class HotelReservationSystem extends Module
             //If Admin update new language when we do entry in module all lang tables.
             HotelHelper::updateLangTables($newIdLang, $langTables);
 
-            // update configuration keys
-            $configKeys = array(
-                'WK_HTL_CHAIN_NAME',
-                'WK_HTL_SHORT_DESC',
-            );
-            HotelHelper::updateConfigurationLangKeys($newIdLang, $configKeys);
         }
     }
 
@@ -599,6 +593,7 @@ class HotelReservationSystem extends Module
             'WK_ROOM_LEFT_WARNING_NUMBER',
             'WK_HTL_ESTABLISHMENT_YEAR',
             'WK_HTL_CHAIN_NAME',
+            'WK_HTL_SHORT_DESC',
             'WK_HTL_TAG_LINE',
             'WK_TITLE_HEADER_BLOCK',
             'WK_CONTENT_HEADER_BLOCK',
@@ -612,6 +607,9 @@ class HotelReservationSystem extends Module
             'WK_CUSTOMER_SUPPORT_PHONE_NUMBER',
             'WK_CUSTOMER_SUPPORT_EMAIL',
             'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST',
+            'WK_MAX_AMENITIES_ROOM_SEARCH',
+            'WK_MAX_FEATURES_ROOM_SEARCH',
+            'WK_MAX_ROOM_TYPE_FEATURE_VALUES',
             'QLO_HEADER_MEDIA_TYPE',
             'QLO_HEADER_CONTENT_ALIGN',
             'QLO_HEADER_VIDEO_SOURCE_TYPE',

@@ -644,11 +644,11 @@ class AdminStatsControllerCore extends AdminStatsTabController
             if ($result = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
 			SELECT
 				LEFT(`invoice_date`, 10) as date,
-				SUM(orr.`refunded_amount`) as total_refund_amount
+				SUM(orr.`refunded_amount` * (o.`total_paid_tax_excl` / o.`total_paid_tax_incl`) / o.`conversion_rate`) as total_refund_amount
 			FROM `'._DB_PREFIX_.'orders` o
 			LEFT JOIN `'._DB_PREFIX_.'order_return` orr ON (o.id_order = orr.id_order)
             LEFT JOIN `'._DB_PREFIX_.'order_state` os ON (o.current_state = os.id_order_state)
-			WHERE orr.`payment_mode` != "" AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00"
+			WHERE os.`logable` = 1 AND o.`total_paid_tax_incl` > 0 AND orr.`payment_mode` != "" AND `invoice_date` BETWEEN "'.pSQL($date_from).' 00:00:00"
             AND "'.pSQL($date_to).' 23:59:59"
             AND (
                 EXISTS (
@@ -1439,7 +1439,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
         // Unavailable are:
         // - inactive rooms (unavailable for all nights in the range)
-        // - temporarily inactive rooms for overlapping disabled date ranges (night-wise)
+        // - active rooms for overlapping disabled date ranges (night-wise)
         $countInactiveRooms = (int)Db::getInstance()->getValue(
             'SELECT IFNULL(COUNT(hri.`id`), 0)
             FROM `'._DB_PREFIX_.'htl_room_information` hri
@@ -1500,7 +1500,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 ON (hrdd.`id_room` = hri.`id`)
             LEFT JOIN `'._DB_PREFIX_.'product` p
                 ON (p.`id_product` = hri.`id_product`)
-            WHERE hri.`id_status` = '.(int)HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+            WHERE hri.`id_status` = '.(int)HotelRoomInformation::STATUS_ACTIVE.'
             AND hrdd.`date_from` < "'.pSQL($dateTo).'"
             AND hrdd.`date_to` > "'.pSQL($dateFrom).'"
             AND p.`active` = 1
@@ -1508,7 +1508,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             (!is_null($idsHotel) ? HotelBranchInformation::addHotelRestriction($idsHotel, 'hri') : '')
         );
 
-        // Booked nights overlapping temporary disable ranges should not be counted as unavailable.
+        // Booked nights overlapping disable ranges should not be counted as unavailable.
         $countOccupiedTemporaryInactiveNights = (int)Db::getInstance()->getValue(
             'SELECT IFNULL(SUM(
                 GREATEST(
@@ -1537,7 +1537,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 ON (hri.`id` = hbd.`id_room`)
             LEFT JOIN `'._DB_PREFIX_.'product` p
                 ON (p.`id_product` = hri.`id_product`)
-            WHERE hri.`id_status` = '.(int)HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+            WHERE hri.`id_status` = '.(int)HotelRoomInformation::STATUS_ACTIVE.'
             AND p.`active` = 1
             AND p.`booking_product` = 1
             AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
@@ -1646,9 +1646,9 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
     public static function getRevenue($dateFrom, $dateTo, $idHotel = false, $orderSource = '')
     {
-        $sql = 'SELECT SUM(total_paid_tax_excl - refunded_amount)
+        $sql = 'SELECT SUM(GREATEST(total_paid_tax_excl - refunded_amount, 0))
         FROM (SELECT o.`total_paid_tax_excl` / o.`conversion_rate` AS total_paid_tax_excl,
-        (SELECT IFNULL(SUM(orr.`refunded_amount`), 0) FROM`'._DB_PREFIX_.'order_return` orr WHERE orr.`id_order` = o.`id_order`) AS refunded_amount,
+        (SELECT IFNULL(SUM(orr.`refunded_amount`), 0) FROM`'._DB_PREFIX_.'order_return` orr WHERE orr.`id_order` = o.`id_order`) * IF(o.`total_paid_tax_incl` > 0, o.`total_paid_tax_excl` / o.`total_paid_tax_incl`, 1) / o.`conversion_rate` AS refunded_amount,
         (SELECT hbd.`id_hotel` FROM`'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = o.`id_order` LIMIT 1) AS id_hotel
         FROM `'._DB_PREFIX_.'orders` o
 
@@ -2023,13 +2023,13 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
                     ) AS num_inactive,
                     (
-                        SELECT IFNULL(COUNT(hri.`id`), 0)
+                        SELECT IFNULL(COUNT(DISTINCT hri.`id`), 0)
                         FROM `'._DB_PREFIX_.'htl_room_information` hri
                         LEFT JOIN `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
                         ON (hrdd.`id_room` = hri.`id`)
                         LEFT JOIN `'._DB_PREFIX_.'product` p
                         ON (p.`id_product` = hri.`id_product`)
-                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_ACTIVE.'
                         AND ("'.pSQL($discreteDate['date_from']).'" >= hrdd.`date_from` AND "'.pSQL($discreteDate['date_from']).'" < hrdd.`date_to`)
                         AND p.`active` = 1'.
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
@@ -2104,13 +2104,13 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
                     ) AS num_inactive,
                     (
-                        SELECT IFNULL(COUNT(hri.`id`), 0)
+                        SELECT IFNULL(COUNT(DISTINCT hri.`id`), 0)
                         FROM `'._DB_PREFIX_.'htl_room_information` hri
                         LEFT JOIN `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
                         ON (hrdd.`id_room` = hri.`id`)
                         LEFT JOIN `'._DB_PREFIX_.'product` p
                         ON (p.`id_product` = hri.`id_product`)
-                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_ACTIVE.'
                         AND ("'.pSQL($discreteDate['date_from']).'" >= hrdd.`date_from` AND "'.pSQL($discreteDate['date_from']).'" < hrdd.`date_to`)
                         AND p.`active` = 1'.
                         (!is_null($showAtFront) ? ' AND p.`show_at_front` = '.(int) $showAtFront : '').
@@ -2168,13 +2168,13 @@ class AdminStatsControllerCore extends AdminStatsTabController
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'
                     ) AS num_inactive,
                     (
-                        SELECT IFNULL(COUNT(hri.`id`), 0)
+                        SELECT IFNULL(COUNT(DISTINCT hri.`id`), 0)
                         FROM `'._DB_PREFIX_.'htl_room_information` hri
                         LEFT JOIN `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
                         ON (hrdd.`id_room` = hri.`id`)
                         LEFT JOIN `'._DB_PREFIX_.'product` p
                         ON (p.`id_product` = hri.`id_product`)
-                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_TEMPORARY_INACTIVE.'
+                        WHERE hri.`id_status` = '.(int) HotelRoomInformation::STATUS_ACTIVE.'
                         AND ("'.pSQL($discreteDate['date_from']).'" >= hrdd.`date_from` AND "'.pSQL($discreteDate['date_from']).'" < hrdd.`date_to`)
                         AND p.`active` = 1'.
                         (!is_null($idHotel) ? HotelBranchInformation::addHotelRestriction($idHotel, 'hri') : '').'

@@ -215,3 +215,17 @@
 .js-header-media-next {
     right: 15px;
 }
+/* ===== copyRight.tpl (footer copyright) ===== */
+.copyRightWrapper {
+    background-color: #242424;
+    padding: 30px;
+    width: 100%;
+}
+.copyRightWrapper .copyRight {
+    color: #868686;
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0;
+    text-align: center;
+    line-height: 23px;
+}

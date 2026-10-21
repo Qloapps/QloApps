@@ -1,0 +1,16 @@
+[/{shop_url}]
+
+Action needed
+
+Google Hotel Center could not verify your hotel
+
+Hi,
+
+Google was unable to verify your hotel {hotel_name} for Google Hotel Center.
+
+Reason: {failure_reason}
+
+Please review and correct the issue above. The Google Hotel Connector will automatically resubmit this hotel the next time it syncs with Google.
+
+{shop_name} [/{shop_url}] powered by Webkul(tm)
+[https://webkul.com]

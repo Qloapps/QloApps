@@ -95,7 +95,7 @@
 			<p class="help-block">{convertPriceWithCurrency price=$data['paid_unit_price_tax_excl'] currency=$currency->id}/{l s='day'}</p>
 
 	</td>
-	<td class="center">
+	<td class="center text-nowrap">
 		{convertPriceWithCurrency price=($data['additional_services_price_te'] + $data['convenience_fee_te'] + $data['additional_services_price_auto_add_te']) currency=$currency->id}
 		{if $data['additional_services']|count}
 			<a class="open_room_extra_services" href="#" date_from="{$data['date_from']}" date_to="{$data['date_to']}" id_product="{$data['id_product']}" id_room="{$data['id_room']}" id_order="{$order->id}" id_htl_booking="{$data['id']}">
@@ -103,23 +103,23 @@
 			</a>
 		{/if}
 	</td>
-	<td class="center">
+	<td class="center text-nowrap">
 		{convertPriceWithCurrency price=($data['total_room_tax']) currency=$currency->id}
-			<span class="price_info">
-				&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" />
-			</span>
-			<div class="price_info_container" style="display: none;">
-				<div>
-					<label>{l s='Room & Service Tax:'}</label>
-					<span class="pull-right">{convertPriceWithCurrency price=$data.total_room_service_tax_only currency=$currency->id}</span>
+		{capture name='room_tax_tooltip_content'}
+			<div class="ui-tooltip-body">
+				<div class="ui-tooltip-service-tax-row">
+					<label class="ui-tooltip-label">{l s='Room & Service Tax:'}</label>
+					<span class="ui-tooltip-elem-txt">{convertPriceWithCurrency price=$data.total_room_service_tax_only currency=$currency->id}</span>
 				</div>
 				{if isset($data.tourism_tax_total) && $data.tourism_tax_total > 0}
-				<div>
-					<label>{l s='Tourism Tax:'}</label>
-					<span class="pull-right">{convertPriceWithCurrency price=$data.tourism_tax_total currency=$currency->id}</span>
+				<div class="ui-tooltip-tourism-tax-row">
+					<label class="ui-tooltip-label">{l s='Tourism Tax:'}</label>
+					<span class="ui-tooltip-elem-txt">{convertPriceWithCurrency price=$data.tourism_tax_total currency=$currency->id}</span>
 				</div>
 				{/if}
 			</div>
+		{/capture}
+		{include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.room_tax_tooltip_content}
 	</td>
 	<td class="center">
 		{convertPriceWithCurrency price=($data['total_room_price_ti']) currency=$currency->id}

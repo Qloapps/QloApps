@@ -72,6 +72,11 @@ class HotelRoomType extends ObjectModel
                     'resourceName' => 'hotels',
                 )
             ),
+            'id_selling_object' => array(
+                'xlink_resource' => array(
+                    'resourceName' => 'room_type_selling_objects',
+                )
+            ),
         ),
         'associations' => array(
             'hotel_rooms' => array(
@@ -172,23 +177,21 @@ class HotelRoomType extends ObjectModel
             $objHRInformation->comment = $room['comment'];
             if ($objHRInformation->save()) {
                 $idRoom = $objHRInformation->id;
-                if ((int)$room['id_status'] === (int)HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) {
-                    $disableDates = Db::getInstance()->executeS(
-                        'SELECT * FROM `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
-                        WHERE hrdd.`id_room` = '.(int)$room['id']
-                    );
+                $disableDates = Db::getInstance()->executeS(
+                    'SELECT * FROM `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
+                    WHERE hrdd.`id_room` = '.(int)$room['id']
+                );
 
-                    if (is_array($disableDates) && count($disableDates)) {
-                        foreach ($disableDates as $disableDate) {
-                            $objHRDisableDates = new HotelRoomDisableDates();
-                            $objHRDisableDates->id_room_type = $idHotelRoomTypeNew;
-                            $objHRDisableDates->id_room = $idRoom;
-                            $objHRDisableDates->date_from = $disableDate['date_from'];
-                            $objHRDisableDates->date_to = $disableDate['date_to'];
-                            $objHRDisableDates->reason = $disableDate['reason'];
-                            if (!$objHRDisableDates->save()) {
-                                return false;
-                            }
+                if (is_array($disableDates) && count($disableDates)) {
+                    foreach ($disableDates as $disableDate) {
+                        $objHRDisableDates = new HotelRoomDisableDates();
+                        $objHRDisableDates->id_room_type = $idHotelRoomTypeNew;
+                        $objHRDisableDates->id_room = $idRoom;
+                        $objHRDisableDates->date_from = $disableDate['date_from'];
+                        $objHRDisableDates->date_to = $disableDate['date_to'];
+                        $objHRDisableDates->reason = $disableDate['reason'];
+                        if (!$objHRDisableDates->save()) {
+                            return false;
                         }
                     }
                 }
@@ -558,11 +561,11 @@ class HotelRoomType extends ObjectModel
                 FROM `'._DB_PREFIX_.'htl_room_information` r
                 WHERE r.`id_product` = hrt.`id_product` AND r.`id_hotel` = hrt.`id_hotel`
             ) AS total_rooms,
-            COUNT(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN hbd.`id` END) AS bookings,
-            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END), 0) AS room_nights,
-            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN hbd.`total_price_tax_excl` / o.`conversion_rate` ELSE 0 END), 0) AS room_revenue,
-            IFNULL(SUM(CASE WHEN hbd.`is_cancelled` = 0 AND hbd.`is_refunded` = 0 THEN (hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate` ELSE 0 END), 0) AS tax_amount,
-            COUNT(CASE WHEN hbd.`is_refunded` = 1 THEN hbd.`id` END) AS cancel_count
+            COUNT(CASE WHEN hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND hbd.`id_status` != '.HotelBookingDetail::STATUS_CANCELLED.' THEN hbd.`id` END) AS bookings,
+            IFNULL(SUM(CASE WHEN hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND hbd.`id_status` != '.HotelBookingDetail::STATUS_CANCELLED.' THEN DATEDIFF(hbd.`date_to`, hbd.`date_from`) ELSE 0 END), 0) AS room_nights,
+            IFNULL(SUM(CASE WHEN hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND hbd.`id_status` != '.HotelBookingDetail::STATUS_CANCELLED.' THEN hbd.`total_price_tax_excl` / o.`conversion_rate` ELSE 0 END), 0) AS room_revenue,
+            IFNULL(SUM(CASE WHEN hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND hbd.`id_status` != '.HotelBookingDetail::STATUS_CANCELLED.' THEN (hbd.`total_price_tax_incl` - hbd.`total_price_tax_excl`) / o.`conversion_rate` ELSE 0 END), 0) AS tax_amount,
+            COUNT(CASE WHEN hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CANCELLED.' THEN hbd.`id` END) AS cancel_count
             FROM `'._DB_PREFIX_.'htl_room_type` hrt
             INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hrt.`id_product`)
             INNER JOIN `'._DB_PREFIX_.'product_lang` pl

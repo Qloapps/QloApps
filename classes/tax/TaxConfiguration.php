@@ -40,6 +40,9 @@ class TaxConfigurationCore extends ObjectModel
     public $has_multiple_valid_ranges;
     public $special_days;
 
+    /** @var string Tax name, webservice only (stored in tax_lang) */
+    public $name;
+
     public static $definition = array(
         'table' => 'tax_configuration',
         'primary' => 'id_tax',
@@ -56,6 +59,145 @@ class TaxConfigurationCore extends ObjectModel
             'special_days' => array('type' => self::TYPE_STRING),
         ),
     );
+
+    protected $webserviceParameters = array(
+        'objectsNodeName' => 'tourism_taxes',
+        'objectNodeName' => 'tourism_tax',
+        'objectMethods' => array(
+            'add' => 'addWs',
+            'update' => 'updateWs',
+            'delete' => 'deleteWs',
+        ),
+        'fields' => array(
+            'name' => array('i18n' => false, 'getter' => 'getWsName'),
+        ),
+        'associations' => array(
+            'price_tiers' => array(
+                'resource' => 'price_tier',
+                'fields' => array('min_amount' => array(), 'max_amount' => array(), 'tax_value' => array()),
+            ),
+            'child_ranges' => array(
+                'resource' => 'child_range',
+                'fields' => array('min_age' => array(), 'max_age' => array(), 'tax_value' => array()),
+            ),
+            'validity_ranges' => array(
+                'resource' => 'validity_range',
+                'fields' => array('valid_from' => array(), 'valid_to' => array()),
+            ),
+        ),
+    );
+
+    /**
+     * Webservice: add a tourism tax. The tax row is created first, the configuration reuses its id.
+     *
+     * @return bool
+     * @throws WebserviceException
+     */
+    public function addWs()
+    {
+        $tax = new Tax();
+        $tax->is_tourism_tax = 1;
+        $tax->rate = 0;
+        $tax->active = 1;
+        foreach (Language::getIDs(false) as $idLang) {
+            $tax->name[$idLang] = (string) $this->name;
+        }
+        if (($error = $tax->validateFieldsLang(false, true)) !== true) {
+            throw new WebserviceException(sprintf(Tools::displayError('Validation error: "%s"'), $error), array(400, 400));
+        }
+        if (!$tax->add()) {
+            return false;
+        }
+        $this->id = (int) $tax->id;
+
+        return $this->add();
+    }
+
+    /**
+     * Webservice: update the configuration. Like in the admin, Tax::update() historizes a tax already used in
+     * orders; the tax then gets a new id, so the configuration and its ranges move to it.
+     *
+     * @param bool $nullValues
+     * @return bool
+     */
+    public function updateWs($nullValues = false)
+    {
+        $idOldTax = (int) $this->id;
+        $tax = new Tax($idOldTax);
+        if (!$tax->update()) {
+            return false;
+        }
+        if ((int) $tax->id === $idOldTax) {
+            return $this->update($nullValues);
+        }
+
+        $this->id = (int) $tax->id;
+        $tiers = TaxPriceTier::getByTaxId($idOldTax);
+        TaxPriceTier::saveAll($this->id, array_column($tiers, 'min_amount'), array_column($tiers, 'max_amount'), array_column($tiers, 'tax_value'));
+        $childRanges = TaxChildRange::getByTaxId($idOldTax);
+        TaxChildRange::saveAll($this->id, array_column($childRanges, 'min_age'), array_column($childRanges, 'max_age'), array_column($childRanges, 'tax_value'));
+        $validityRanges = TaxValidityRange::getByTaxId($idOldTax);
+        TaxValidityRange::saveAll($this->id, array_column($validityRanges, 'valid_from'), array_column($validityRanges, 'valid_to'));
+
+        return $this->add();
+    }
+
+    /**
+     * Webservice: delete the tax. Tax::delete() only historizes a tax used in orders, so keep its configuration then.
+     *
+     * @return bool
+     */
+    public function deleteWs()
+    {
+        $tax = new Tax((int) $this->id);
+        $isUsed = $tax->isUsed();
+
+        return $tax->delete() && ($isUsed || $this->delete());
+    }
+
+    /**
+     * @return string tax name in the default language
+     */
+    public function getWsName()
+    {
+        return (new Tax((int) $this->id, (int) Configuration::get('PS_LANG_DEFAULT')))->name;
+    }
+
+    public function getWsPriceTiers()
+    {
+        return TaxPriceTier::getByTaxId((int) $this->id);
+    }
+
+    public function setWsPriceTiers($rows)
+    {
+        TaxPriceTier::saveAll((int) $this->id, array_column($rows, 'min_amount'), array_column($rows, 'max_amount'), array_column($rows, 'tax_value'));
+
+        return true;
+    }
+
+    public function getWsChildRanges()
+    {
+        return TaxChildRange::getByTaxId((int) $this->id);
+    }
+
+    public function setWsChildRanges($rows)
+    {
+        TaxChildRange::saveAll((int) $this->id, array_column($rows, 'min_age'), array_column($rows, 'max_age'), array_column($rows, 'tax_value'));
+
+        return true;
+    }
+
+    public function getWsValidityRanges()
+    {
+        return TaxValidityRange::getByTaxId((int) $this->id);
+    }
+
+    public function setWsValidityRanges($rows)
+    {
+        TaxValidityRange::saveAll((int) $this->id, array_column($rows, 'valid_from'), array_column($rows, 'valid_to'));
+
+        return true;
+    }
 
     /**
      * Override add() because id_tax is a FK-as-PK — the base ObjectModel::add() never writes the primary key column, which would default to 0 and create phantom rows.

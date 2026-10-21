@@ -178,7 +178,9 @@ class Dashgoals extends Module
 	{
 		$year = ((isset($params['extra']) && $params['extra'] > 1970 && $params['extra'] < 2999) ? $params['extra'] : Configuration::get('PS_DASHGOALS_CURRENT_YEAR'));
 
-		return array('data_chart' => array('dash_goals_chart1' => $this->getChartData($year)));
+		$idHotel = isset($params['id_hotel']) ? (int) $params['id_hotel'] : 0;
+
+		return array('data_chart' => array('dash_goals_chart1' => $this->getChartData($year, $idHotel)));
 	}
 
 	protected function fakeConfigurationKPI_get($key)
@@ -198,7 +200,7 @@ class Dashgoals extends Module
 		}
 	}
 
-	public function getChartData($year)
+	public function getChartData($year, $idHotel = 0)
 	{
 		// There are stream types (different charts) and for each types there are 3 available zones (one color for the goal, one if you over perform and one if you under perfom)
 		$stream_types = array(
@@ -370,8 +372,8 @@ class Dashgoals extends Module
 		} else {
 			// Retrieve gross data from AdminStatsController
 			$visits = AdminStatsController::getVisits(false, $year.date('-01-01'), $year.date('-12-31'), 'month');
-			$orders = AdminStatsController::getOrders($year.date('-01-01'), $year.date('-12-31'), 'month');
-			$sales = AdminStatsController::getTotalSales($year.date('-01-01'), $year.date('-12-31'), 'month');
+			$orders = AdminStatsController::getOrders($year.date('-01-01'), $year.date('-12-31'), 'month', $idHotel);
+			$sales = AdminStatsController::getTotalSales($year.date('-01-01'), $year.date('-12-31'), 'month', $idHotel);
 
 			// Now we can calculate the value for every months
 			for ($i = '01'; $i <= 12; $i = sprintf('%02d', $i + 1)) {

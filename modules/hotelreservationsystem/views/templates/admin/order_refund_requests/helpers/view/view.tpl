@@ -183,42 +183,46 @@
 												<td>
 													{displayPrice price=($booking['total_price_tax_incl'] + $booking['extra_service_total_price_tax_incl']) currency=$orderCurrency['id']}
 													{capture name='refund_total_tooltip'}
-														<div>
-															<label>{l s='%s cost:' sprintf=$booking.selling_object_name mod='hotelreservationsystem'}</label>
-															<span class="pull-right">{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</span>
-														</div>
-														<div>
-															<label>{l s='Services cost:' mod='hotelreservationsystem'}</label>
-															<span class="pull-right">{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</span>
-														</div>
-														{if $tourismTaxAppliedAmount > 0}
-															<div>
-																<label>{l s='Tourism Tax:' mod='hotelreservationsystem'}</label>
-																<span class="pull-right">{displayPrice price=$tourismTaxAppliedAmount currency=$orderCurrency['id']}</span>
+														<div class="ui-tooltip-body">
+															<div class="ui-tooltip-room-row">
+																<label class="ui-tooltip-label">{l s='%s cost:' sprintf=$booking.selling_object_name mod='hotelreservationsystem'}</label>
+																<span class="ui-tooltip-elem-txt">{displayPrice price=$booking['total_price_tax_incl'] currency=$orderCurrency['id']}</span>
 															</div>
-														{/if}
+															<div class="ui-tooltip-service-tax-row">
+																<label class="ui-tooltip-label">{l s='Services cost:' mod='hotelreservationsystem'}</label>
+																<span class="ui-tooltip-elem-txt">{displayPrice price=$booking['extra_service_total_price_tax_incl'] currency=$orderCurrency['id']}</span>
+															</div>
+															{if $tourismTaxAppliedAmount > 0}
+															<div class="ui-tooltip-tourism-tax-row">
+																<label class="ui-tooltip-label">{l s='Tourism Tax:' mod='hotelreservationsystem'}</label>
+																<span class="ui-tooltip-elem-txt">{displayPrice price=$tourismTaxAppliedAmount currency=$orderCurrency['id']}</span>
+															</div>
+															{/if}
+														</div>
 													{/capture}
-													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_total_tooltip}
+													{include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.refund_total_tooltip}
 												</td>
 												<td>
 													{displayPrice price=($booking['room_paid_amount'] + $booking['extra_service_total_paid_amount']) currency=$orderCurrency['id']}
 													{capture name='refund_paid_tooltip'}
-														<div>
-															<label>{l s='%s paid amount:' sprintf=$booking.selling_object_name mod='hotelreservationsystem'}</label>
-															<span class="pull-right">{displayPrice price=$booking['room_paid_amount'] currency=$orderCurrency['id']}</span>
-														</div>
-														<div>
-															<label>{l s='Services paid amount:' mod='hotelreservationsystem'}</label>
-															<span class="pull-right">{displayPrice price=$booking['extra_service_total_paid_amount'] currency=$orderCurrency['id']}</span>
-														</div>
-														{if $tourismTaxPaidAmount > 0}
-															<div>
-																<label>{l s='Tourism Tax paid:' mod='hotelreservationsystem'}</label>
-																<span class="pull-right">{displayPrice price=$tourismTaxPaidAmount currency=$orderCurrency['id']}</span>
+														<div class="ui-tooltip-body">
+															<div class="ui-tooltip-room-row">
+																<label class="ui-tooltip-label">{l s='%s paid amount:' sprintf=$booking.selling_object_name mod='hotelreservationsystem'}</label>
+																<span class="ui-tooltip-elem-txt">{displayPrice price=$booking['room_paid_amount'] currency=$orderCurrency['id']}</span>
 															</div>
-														{/if}
+															<div class="ui-tooltip-service-tax-row">
+																<label class="ui-tooltip-label">{l s='Services paid amount:' mod='hotelreservationsystem'}</label>
+																<span class="ui-tooltip-elem-txt">{displayPrice price=$booking['extra_service_total_paid_amount'] currency=$orderCurrency['id']}</span>
+															</div>
+															{if $tourismTaxPaidAmount > 0}
+															<div class="ui-tooltip-tourism-tax-row">
+																<label class="ui-tooltip-label">{l s='Tourism Tax paid:' mod='hotelreservationsystem'}</label>
+																<span class="ui-tooltip-elem-txt">{displayPrice price=$tourismTaxPaidAmount currency=$orderCurrency['id']}</span>
+															</div>
+															{/if}
+														</div>
 													{/capture}
-													{include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.refund_paid_tooltip }
+													{include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.refund_paid_tooltip }
 												</td>
 												{if !$isRefundCompleted}
 													<td>

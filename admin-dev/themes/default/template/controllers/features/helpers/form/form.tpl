@@ -25,8 +25,34 @@
 {extends file="helpers/form/form.tpl"}
 
 {block name="input_row"}
+	<style>
+		#logo_image-images-thumbnails img {
+			max-width: 80px;
+			max-height: 80px;
+			padding: 5px;
+		}
+	</style>
 	{$smarty.block.parent}
 	{if $input.name == 'name'}
 		{hook h="displayFeatureForm" id_feature=$form_id}
+	{/if}
+	{if $input.name == 'logo_icon'}
+		<script type="text/javascript">
+			$(document).ready(function() {
+				// the uploader renders its own nested .form-group, so pick the field row that holds the label
+				function getFieldRow(selector) {
+					return $(selector).parents('.form-group').filter(function() {
+						return $(this).children('label.control-label').length > 0;
+					}).first();
+				}
+				function toggleFeatureLogoType() {
+					var isIcon = $('#logo_type').val() === 'icon';
+					getFieldRow('#logo_image').toggle(!isIcon);
+					getFieldRow('#logo_icon').toggle(isIcon);
+				}
+				$('#logo_type').on('change', toggleFeatureLogoType);
+				toggleFeatureLogoType();
+			});
+		</script>
 	{/if}
 {/block}
