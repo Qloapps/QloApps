@@ -233,15 +233,17 @@ abstract class PaymentModuleCore extends Module
             $full_cart_total = (float)Tools::ps_round((float)$this->context->cart->getOrderTotal(true, Cart::BOTH), _PS_PRICE_COMPUTE_PRECISION_);
             $amount_paid = !$dont_touch_amount ? Tools::ps_round((float)$amount_paid, _PS_PRICE_COMPUTE_PRECISION_) : $amount_paid;
 
+            $is_advance_payment = false;
             if ($amount_paid >= $full_cart_total) {
-                $is_advance_payment = false;
                 $cart_total_paid = $full_cart_total;
             } else {
-                $is_advance_payment = true;
                 $cart_total_paid = (float)Tools::ps_round(
                     (float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
                     _PS_PRICE_COMPUTE_PRECISION_
                 );
+                if ($this->context->cart->is_advance_payment) {
+                    $is_advance_payment = true;
+                }
             }
 
             foreach ($cart_delivery_option as $id_address => $key_carriers) {
