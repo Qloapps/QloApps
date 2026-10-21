@@ -997,6 +997,9 @@ class HotelCartBookingData extends ObjectModel
                                 // Without hotel/booking context, service must be sellable standalone.
                                 if (!$isSellableAsStandalone) {
                                     $toRemoveService = 1;
+                                }else if($context->customer->id && !Customer::getAddressesTotalById((int) $context->customer->id)) {
+                                    //  customer has no address, so we cannot sell standalone service product to them
+                                    $errors[] = $objModule->l('Please add an address to your account before proceeding with the order.', 'HotelOrderRestrictDate');
                                 }
                             }
                         }
@@ -1512,6 +1515,8 @@ class HotelCartBookingData extends ObjectModel
             $objCartBookingData = new HotelCartBookingData();
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
             $objServiceProductCartDetail = new ServiceProductCartDetail();
+            $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
+            $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
 
             foreach ($cartRoomTypes as $prodKey => $product) {
                 if (Validate::isLoadedObject(
@@ -1593,8 +1598,29 @@ class HotelCartBookingData extends ObjectModel
                                         $hotelInfo['htl_features'] = $hotelAmenities;
                                     }
                                 }
-                                // append roomtype features
-                                $hotelInfo['room_features'] = $objProduct->getFrontFeatures($idLang);
+                                // append featured roomtype features
+                                $hotelInfo['room_features'] = array();
+                                foreach ($objProduct->getFrontFeatures($idLang) as $roomFeature) {
+                                    if ($roomFeature['is_featured']) {
+                                        // the values of a feature are shown together
+                                        if (!isset($hotelInfo['room_features'][$roomFeature['id_feature']])) {
+                                            $hotelInfo['room_features'][$roomFeature['id_feature']] = $roomFeature;
+                                            $hotelInfo['room_features'][$roomFeature['id_feature']]['values'] = array();
+                                        }
+                                        $hotelInfo['room_features'][$roomFeature['id_feature']]['values'][] = $roomFeature['value'];
+                                    }
+                                }
+                                $hotelInfo['room_features'] = array_values($hotelInfo['room_features']);
+                                if ($maxFeatures) {
+                                    $hotelInfo['room_features'] = array_slice($hotelInfo['room_features'], 0, $maxFeatures);
+                                }
+                                foreach ($hotelInfo['room_features'] as &$roomFeature) {
+                                    if ($maxFeatureValues) {
+                                        $roomFeature['values'] = array_slice($roomFeature['values'], 0, $maxFeatureValues);
+                                    }
+                                    $roomFeature['value'] = implode(', ', $roomFeature['values']);
+                                }
+                                unset($roomFeature);
 
                                 $cartHotelData[$prodKey]['hotel_info'] = $hotelInfo;
                             }

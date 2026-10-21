@@ -234,6 +234,8 @@
                         <td class="text-center">
                             {if isset($room_statuses[$outOfOrderRow.id_status])}
                                 <span class="label {$room_statuses[$outOfOrderRow.id_status].class|escape:'html':'UTF-8'}">{$room_statuses[$outOfOrderRow.id_status].label|escape:'html':'UTF-8'}</span>
+                            {elseif $outOfOrderRow.disabled_from}
+                                <span class="label {$maintenance_status.class|escape:'html':'UTF-8'}">{$maintenance_status.label|escape:'html':'UTF-8'}</span>
                             {/if}
                         </td>
                         <td>{if $outOfOrderRow.reason}{$outOfOrderRow.reason|escape:'html':'UTF-8'}{else}&mdash;{/if}</td>

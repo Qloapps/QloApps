@@ -9391,13 +9391,13 @@ div a.our_properties_link{
   font-size: 17px;
   font-weight: 400;}
 
-.htl-tooltip {
+.ui-tooltip-trigger {
     cursor: pointer;
     display: inline-block;
     vertical-align: text-bottom;
 }
 
-.ui-tooltip.htl-tooltip-popup {
+.ui-tooltip.ui-tooltip-popup {
     box-shadow: 0 2px 6px 0 rgb(0 0 0 / 20%);
     background: #FFFFFF;
     border: unset;
@@ -9405,36 +9405,40 @@ div a.our_properties_link{
     padding: 9px 15px;
 }
 
-.htl-tooltip-cont {
-    min-width: 160px;
+.ui-tooltip-content {
+    min-width: 140px;
 }
 
-.htl-tooltip-cont .htl-tooltip-title {
+.ui-tooltip-header {
     margin: 0 0 6px;
+}
+
+.ui-tooltip-label {
     font-weight: 600;
     font-size: 13px;
+    margin: 0;
 }
 
-.htl-tooltip-cont ul {
+.ui-tooltip-body ul {
     margin: 0;
     padding-left: 16px;
     font-size: 13px;
     list-style: disc;
 }
 
-.htl-tooltip-cont ul li {
+.ui-tooltip-body ul li {
     padding: 2px 0;
 }
 
-.htl-tooltip-cont .htl-tooltip-row {
-    display: flex;
-    justify-content: space-between;
-    margin: 5px 0;
-    white-space: nowrap;
+.ui-tooltip-body {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 5px 15px;
 }
 
-.htl-tooltip-cont .htl-tooltip-row p,
-.htl-tooltip-cont .htl-tooltip-row label {
-    margin: 0;
+.ui-tooltip-elem-txt {
     font-size: 13px;
+    margin: 0;
+    text-align: right;
+    white-space: nowrap;
 }

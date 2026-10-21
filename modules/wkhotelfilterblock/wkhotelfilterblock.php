@@ -61,6 +61,15 @@ class wkhotelfilterblock extends Module
 
     public function renderForm()
     {
+
+
+        $features = array();
+        $featuresList = Feature::getFeatures($this->context->language->id);
+        foreach ($featuresList as $feature) {
+            $features[] = array('id_group' => (int) $feature['id_feature'], 'name' => $feature['name']);
+        }
+
+
         $fields_form = array();
         $fields_form['form'] = array(
             'legend' => array(
@@ -102,6 +111,33 @@ class wkhotelfilterblock extends Module
                     ),
                     'hint' => $this->l('Enable to display Price filter.'),
                 ),
+                array(
+                    'type' => 'switch',
+                    'label' => $this->l('Show Features filter'),
+                    'name' => 'SHOW_FEATURES_FILTER',
+                    'is_bool' => true,
+                    'values' => array(
+                        array(
+                            'id' => 'features_on',
+                            'value' => 1,
+                        ),
+                        array(
+                            'id' => 'features_off',
+                            'value' => 0,
+                        ),
+                    ),
+                    'hint' => $this->l('Enable to display Room Features filter.'),
+                ),
+                array(
+                    'type' => 'group',
+                    'label' => $this->l('Features'),
+                    'name' => 'FEATURES_FILTER_BOX',
+                    'form_group_class' => 'features_filter_group',
+                    'groups_id_title' => $this->l('ID'),
+                    'groups_title' => $this->l('Feature name'),
+                    'values' => $features,
+                    'hint' => $this->l('Mark the features that will be displayed in the Features filter.'),
+                ),
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
@@ -120,24 +156,54 @@ class wkhotelfilterblock extends Module
         '&configure='.$this->name.'&module_name='.$this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
 
+        $fieldsValue = $this->getConfigFieldsValues();
+        $selectedFeatures = $this->getSelectedFeatureIds();
+        foreach ($features as $feature) {
+            $fieldsValue['FEATURES_FILTER_BOX_'.$feature['id_group']] = in_array($feature['id_group'], $selectedFeatures);
+        }
+
         $helper->tpl_vars = array(
-            'fields_value' => $this->getConfigFieldsValues(),
+            'fields_value' => $fieldsValue,
             'languages' => $this->context->controller->getLanguages(),
             'id_language' => $this->context->language->id,
         );
 
-        return $helper->generateForm(array($fields_form));
+        // show the features list only when the Features filter is enabled
+        $script = '<script type="text/javascript">
+            $(document).ready(function() {
+                function toggleFeaturesGroup() {
+                    $(".features_filter_group").toggle($("input[name=\'SHOW_FEATURES_FILTER\']:checked").val() == 1);
+                }
+                $("input[name=\'SHOW_FEATURES_FILTER\']").on("change", toggleFeaturesGroup);
+                toggleFeaturesGroup();
+            });
+        </script>';
+
+        return $helper->generateForm(array($fields_form)).$script;
     }
 
     public function postProcess()
     {
         if (Tools::isSubmit('btnConfigSubmit')) {
+            if (Tools::getValue('SHOW_FEATURES_FILTER') && !array_filter((array) Tools::getValue('FEATURES_FILTER_BOX', array()))) {
+                $this->html .= $this->displayError($this->l('Please select at least one feature to show in the Features filter.'));
+
+                return;
+            }
             Configuration::updateValue(
                 'SHOW_AMENITIES_FILTER',
                 Tools::getValue('SHOW_AMENITIES_FILTER')
             );
             Configuration::updateValue('SHOW_PRICE_FILTER', Tools::getValue('SHOW_PRICE_FILTER'));
-
+            Configuration::updateValue('SHOW_FEATURES_FILTER', (int) Tools::getValue('SHOW_FEATURES_FILTER'));
+            if(Tools::getValue('SHOW_FEATURES_FILTER')){
+                Configuration::updateValue(
+                    'FEATURES_FILTER_IDS',
+                    implode(',', array_map('intval', (array) Tools::getValue('FEATURES_FILTER_BOX', array())))
+                );
+            }else{
+                Configuration::updateValue('FEATURES_FILTER_IDS', '');
+            }
             // redirect after saving the configuration
             Tools::redirectAdmin(
                 $this->context->link->getAdminLink('AdminModules').'&configure='.$this->name.'&tab_module='.$this->tab.
@@ -154,6 +220,8 @@ class wkhotelfilterblock extends Module
             || !$this->registerHook('displayLeftColumn')
             || !Configuration::updateValue('SHOW_AMENITIES_FILTER', 1)
             || !Configuration::updateValue('SHOW_PRICE_FILTER', 1)
+            || !Configuration::updateValue('SHOW_FEATURES_FILTER', 0)
+            || !Configuration::updateValue('FEATURES_FILTER_IDS', '')
         ) {
             return false;
         }
@@ -229,6 +297,20 @@ class wkhotelfilterblock extends Module
                     $currency = $this->context->currency;
 
                     $config = $this->getConfigFieldsValues();
+                    // features with their values for the features tree filter
+                    $room_type_features = array();
+                    if ($config['SHOW_FEATURES_FILTER'] && Feature::isFeatureActive()) {
+                        $selectedFeatures = $this->getSelectedFeatureIds();
+                        foreach (Feature::getFeatures($id_lang) as $feature) {
+                            if (!in_array((int) $feature['id_feature'], $selectedFeatures)) {
+                                continue;
+                            }
+                            if ($values = FeatureValue::getFeatureValuesWithLang($id_lang, (int) $feature['id_feature'])) {
+                                $feature['values'] = $values;
+                                $room_type_features[] = $feature;
+                            }
+                        }
+                    }
 
                     $num_days = HotelHelper::getNumberOfDays($date_from, $date_to);
 
@@ -236,6 +318,7 @@ class wkhotelfilterblock extends Module
                     $this->context->smarty->assign(array(
                         'warning_num' => $warning_num,
                         'all_amenities' => $all_amenities,
+                        'room_type_features' => $room_type_features,
                         'max_adult' => $max_adult,
                         'max_child' => $max_child,
                         'cat_link' => $categoryUrl,
@@ -259,7 +342,20 @@ class wkhotelfilterblock extends Module
         return array(
             'SHOW_AMENITIES_FILTER' => Configuration::get('SHOW_AMENITIES_FILTER'),
             'SHOW_PRICE_FILTER' => Configuration::get('SHOW_PRICE_FILTER'),
+            'SHOW_FEATURES_FILTER' => Configuration::get('SHOW_FEATURES_FILTER'),
         );
+    }
+
+    /**
+     * Get the ids of the features selected in the configuration for the Features filter.
+     *
+     * @return int[]
+     */
+    public function getSelectedFeatureIds()
+    {
+        $ids = (string) Configuration::get('FEATURES_FILTER_IDS');
+
+        return $ids === '' ? array() : array_map('intval', explode(',', $ids));
     }
 
     public function uninstall()
@@ -267,6 +363,8 @@ class wkhotelfilterblock extends Module
         if (!parent::uninstall()
             || !Configuration::deleteByName('SHOW_AMENITIES_FILTER')
             || !Configuration::deleteByName('SHOW_PRICE_FILTER')
+            || !Configuration::deleteByName('SHOW_FEATURES_FILTER')
+            || !Configuration::deleteByName('FEATURES_FILTER_IDS')
         ) {
             return false;
         }

@@ -23,6 +23,29 @@
 {block name='room_types_filters_block'}
 	<div id="filter_results" class="row block">
 		<div class="col-sm-12">
+			{block name='room_types_price_filter'}
+				{if isset($config) && $config['SHOW_PRICE_FILTER']}
+					<div class="row margin-lr-0 layered_filter_cont">
+						<div class="col-sm-12 layered_filter_heading">
+							<div class="row margin-lr-0">
+								<div class="pull-left lf_headingmain_wrapper">
+									<span>{l s='Price' mod='wkhotelfilterblock'}</span>
+									<hr class="theme-text-underline">
+								</div>
+								<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
+							</div>
+						</div>
+						<div class="col-sm-12 lf_sub_cont">
+							<div class="row margin-lr-0 price_filter_subcont">
+								<span class="pull-left"><span id="filter_price_from">{displayPrice price=$min_price}</span></span>
+								<span class="pull-right"><span id="filter_price_to">{displayPrice price=$max_price}</span></span>
+							</div>
+							<div id="filter_price_silder"></div>
+						</div>
+					</div>
+				{/if}
+			{/block}
+
 			{block name='room_types_amenities_filter'}
 				{if isset($config) && $config['SHOW_AMENITIES_FILTER'] && $all_amenities}
 					<div class="row margin-lr-0 layered_filter_cont">
@@ -47,26 +70,29 @@
 				{/if}
 			{/block}
 
-			{block name='room_types_price_filter'}
-				{if isset($config) && $config['SHOW_PRICE_FILTER']}
-					<div class="row margin-lr-0 layered_filter_cont">
-						<div class="col-sm-12 layered_filter_heading">
-							<div class="row margin-lr-0">
-								<div class="pull-left lf_headingmain_wrapper">
-									<span>{l s='Price' mod='wkhotelfilterblock'}</span>
-									<hr class="theme-text-underline">
+			{block name='room_types_features_filter'}
+				{if isset($config) && $config['SHOW_FEATURES_FILTER'] && isset($room_type_features) && $room_type_features}
+					{foreach $room_type_features as $feature}
+						<div class="row margin-lr-0 layered_filter_cont">
+							<div class="col-sm-12 layered_filter_heading">
+								<div class="row margin-lr-0">
+									<div class="pull-left lf_headingmain_wrapper">
+										<span>{$feature.name|escape:'html':'UTF-8'}</span>
+										<hr class="theme-text-underline">
+									</div>
+									<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
 								</div>
-								<span class="pull-right clear_filter">{l s='Clear Filter' mod='wkhotelfilterblock'}</span>
+							</div>
+							<div class="col-sm-12 lf_sub_cont">
+								{foreach $feature.values as $featureValue}
+									<div class="layered_filt">
+										<input type="checkbox" class="filter" data-type="features" data-feature-group="{$feature.id_feature|intval}" value="{$featureValue.id_feature_value|intval}">
+										<span class="filters_name">{$featureValue.value|escape:'html':'UTF-8'}</span>
+									</div>
+								{/foreach}
 							</div>
 						</div>
-						<div class="col-sm-12 lf_sub_cont">
-							<div class="row margin-lr-0 price_filter_subcont">
-								<span class="pull-left"><span id="filter_price_from">{displayPrice price=$min_price}</span></span>
-								<span class="pull-right"><span id="filter_price_to">{displayPrice price=$max_price}</span></span>
-							</div>
-							<div id="filter_price_silder"></div>
-						</div>
-					</div>
+					{/foreach}
 				{/if}
 			{/block}
 		</div>

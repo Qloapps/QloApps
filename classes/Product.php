@@ -427,6 +427,7 @@ class ProductCore extends ObjectModel
             //     )
             // ),
             'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'id_tourism_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
             'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
             // 'manufacturer_name' => array(
             //     'getter' => 'getWsManufacturerName',
@@ -523,6 +524,7 @@ class ProductCore extends ObjectModel
                 )
             ),
             'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'id_tourism_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
             'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
             // 'manufacturer_name' => array(
             //     'getter' => 'getWsManufacturerName',
@@ -4857,7 +4859,7 @@ class ProductCore extends ObjectModel
         }
         if (!array_key_exists($id_product.'-'.$id_lang, self::$_frontFeaturesCache)) {
             self::$_frontFeaturesCache[$id_product.'-'.$id_lang] = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-				SELECT name, value, pf.id_feature
+				SELECT name, value, pf.id_feature, f.logo_type, f.logo, f.is_featured
 				FROM '._DB_PREFIX_.'feature_product pf
 				LEFT JOIN '._DB_PREFIX_.'feature_lang fl ON (fl.id_feature = pf.id_feature AND fl.id_lang = '.(int)$id_lang.')
 				LEFT JOIN '._DB_PREFIX_.'feature_value_lang fvl ON (fvl.id_feature_value = pf.id_feature_value AND fvl.id_lang = '.(int)$id_lang.')
@@ -4866,6 +4868,10 @@ class ProductCore extends ObjectModel
 				WHERE pf.id_product = '.(int)$id_product.'
 				ORDER BY f.position ASC'
             );
+            foreach (self::$_frontFeaturesCache[$id_product.'-'.$id_lang] as &$frontFeature) {
+                $frontFeature['logo_image'] = Feature::getLogoImageName($frontFeature['id_feature'], $frontFeature['logo']);
+            }
+            unset($frontFeature);
         }
         return self::$_frontFeaturesCache[$id_product.'-'.$id_lang];
     }
@@ -7043,6 +7049,12 @@ class ProductCore extends ObjectModel
             $feature['value'] = (int) $feature['id_feature'];
             $feature['input_name'] = 'feature_value_parents';
             $feature['children'] = array();
+            if (!empty($feature['is_featured'])) {
+                $feature['badge'] = array(
+                    'class' => 'badge-success',
+                    'title' => Translate::getAdminTranslation('Featured', 'AdminProducts'),
+                );
+            }
             $selectedValues = isset($selectedFeatureValues[(int) $feature['id_feature']])
                 ? $selectedFeatureValues[(int) $feature['id_feature']]
                 : array();

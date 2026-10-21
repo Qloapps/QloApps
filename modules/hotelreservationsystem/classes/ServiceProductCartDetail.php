@@ -662,27 +662,4 @@ class ServiceProductCartDetail extends ObjectModel
         return parent::delete();
     }
 
-    public static function validateServiceProductsInCart()
-    {
-        $context = Context::getContext();
-        if ($cartProducts = $context->cart->getProducts()) {
-            $objServiceProductCartDetail = new ServiceProductCartDetail();
-            foreach ($cartProducts as $product) {
-                if (!$product['active'] && !$product['booking_product']) {
-                    if ($serviceProducts = $objServiceProductCartDetail->getServiceProductsInCart(
-                        $context->cart->id,
-                        [],
-                        null,
-                        null,
-                        null,
-                        $product['id_product']
-                    )) {
-                        foreach ($serviceProducts as $serviceProduct) {
-                            $objServiceProductCartDetail->removeServiceProductByIdHtlCartBooking($serviceProduct['htl_cart_booking_id']);
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

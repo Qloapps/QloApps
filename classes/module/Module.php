@@ -1663,15 +1663,16 @@ abstract class ModuleCore
 
                     if (!in_array($modaddons->name, $modulesOnDisk)) {
                         if (isset($modaddons->img)) {
-                            if (!file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
-                                if (!file_put_contents(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg', Tools::file_get_contents($modaddons->img))) {
-                                    copy(_PS_IMG_DIR_.'404.gif', _PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg');
+                            $imgFile = md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg';
+                            if (!file_exists(_PS_TMP_IMG_DIR_.$imgFile)) {
+                                $imgContent = Tools::file_get_contents($modaddons->img);
+                                if ($imgContent) {
+                                    file_put_contents(_PS_TMP_IMG_DIR_.$imgFile, $imgContent);
                                 }
                             }
 
-                            if (file_exists(_PS_TMP_IMG_DIR_.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg')) {
-                                $item->image = '../img/tmp/'.md5((int)$modaddons->id.'-'.$modaddons->name).'.jpg';
-                            }
+                            // Show 404 image without caching it, so the download is retried next time
+                            $item->image = file_exists(_PS_TMP_IMG_DIR_.$imgFile) ? '../img/tmp/'.$imgFile : '../img/404.gif';
                         }
                     }
 
@@ -1773,6 +1774,23 @@ abstract class ModuleCore
         return Db::getInstance()->executeS($sql);
     }
 
+    /**
+     * Writes downloaded XML to a cache file only when it parses, so a truncated
+     * response never replaces a good cache file.
+     *
+     * @param string $cacheFile Cache file path relative to _PS_ROOT_DIR_
+     * @param string|bool $xmlContent Downloaded content, false when the request failed
+     * @return bool True if the content was valid and written
+     */
+    protected static function saveValidXmlCache($cacheFile, $xmlContent)
+    {
+        if (!$xmlContent || !@simplexml_load_string($xmlContent)) {
+            return false;
+        }
+
+        return (bool) file_put_contents(_PS_ROOT_DIR_.$cacheFile, $xmlContent);
+    }
+
     public static function refreshModuleList($force_reload_cache = false)
     {
         $status = false;
@@ -1792,7 +1810,7 @@ abstract class ModuleCore
 
         if ($status != 'error') {
             if (!Tools::isFresh(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
-                if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'))) {
+                if (Module::saveValidXmlCache(Module::CACHE_FILE_DEFAULT_COUNTRY_MODULES_LIST, Tools::addonsRequest('native'))) {
                     $status = 'refresh';
                 } else {
                     $status = 'error';
@@ -1804,7 +1822,7 @@ abstract class ModuleCore
 
         if ($status != 'error') {
             if (!Tools::isFresh(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
-                if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
+                if (Module::saveValidXmlCache(Module::CACHE_FILE_MUST_HAVE_MODULES_LIST, Tools::addonsRequest('must-have'))) {
                     $status = 'refresh';
                 } else {
                     $status = 'error';
@@ -1816,7 +1834,7 @@ abstract class ModuleCore
 
         if ($status != 'error') {
             if (!Tools::isFresh(Module::CACHE_FILE_ADDONS_MODULES_LIST, _TIME_1_DAY_) || $force_reload_cache) {
-                if (file_put_contents(_PS_ROOT_DIR_.Module::CACHE_FILE_ADDONS_MODULES_LIST, Tools::addonsRequest('addons-modules'))) {
+                if (Module::saveValidXmlCache(Module::CACHE_FILE_ADDONS_MODULES_LIST, Tools::addonsRequest('addons-modules'))) {
                     $status = 'refresh';
                 } else {
                     $status = 'error';
