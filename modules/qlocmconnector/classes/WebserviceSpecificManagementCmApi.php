@@ -164,32 +164,84 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             $this->id_hotel = $inputData['id_property'];
                             $this->handleRoomTypePriceWithService($inputData);
                             $this->processCustomerDetails($inputData);
-                            if ($inputData['booking_status'] == self::API_BOOKING_STATUS_NEW
-                                || !Validate::isLoadedObject(new Order($inputData['id_booking']))
+
+                            // De-dup by cmid: the CM sends one request per room type with the same cmid,
+                            // so a repeated "new" or an unresolved id_booking modifies the existing order.
+                            $cancelledOrderStates = array(
+                                (int) Configuration::get('PS_OS_CANCELED'),
+                                (int) Configuration::get('PS_OS_REFUND'),
+                            );
+                            $isReversalRequest = isset($inputData['booking_status'])
+                                && in_array($inputData['booking_status'], array(self::API_BOOKING_STATUS_CANCELLED, self::API_BOOKING_STATUS_REFUNDED));
+                            $objRequestedOrder = !empty($inputData['id_booking']) ? new Order((int) $inputData['id_booking']) : null;
+                            $isRequestedOrderCancelled = $objRequestedOrder
+                                && Validate::isLoadedObject($objRequestedOrder)
+                                && in_array((int) $objRequestedOrder->current_state, $cancelledOrderStates);
+
+                            $idExistingOrderByCmid = 0;
+                            if (!empty($inputData['id_channel_manager_booking'])) {
+                                // Same property only (cmid is unique per hotel); non-cancellations match live orders only.
+                                $idExistingOrderByCmid = (int) Db::getInstance()->getValue(
+                                    'SELECT o.`id_order` FROM `'._DB_PREFIX_.'orders` o
+                                     WHERE o.`id_channel_manager_booking` = "'.pSQL($inputData['id_channel_manager_booking']).'"'
+                                     .($isReversalRequest ? '' : ' AND o.`current_state` NOT IN ('.implode(',', $cancelledOrderStates).')')
+                                     .(!empty($inputData['id_property'])
+                                        ? ' AND EXISTS (SELECT 1 FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                                            WHERE hbd.`id_order` = o.`id_order` AND hbd.`id_hotel` = '.(int) $inputData['id_property'].')'
+                                        : '').'
+                                     ORDER BY o.`id_order` DESC'
+                                );
+                            }
+                            if ($idExistingOrderByCmid
+                                && (empty($inputData['id_booking'])
+                                    || !Validate::isLoadedObject($objRequestedOrder)
+                                    || (!$isReversalRequest && $isRequestedOrderCancelled)
+                                )
+                            ) {
+                                $inputData['id_booking'] = $idExistingOrderByCmid;
+                            } elseif (!$isReversalRequest && $isRequestedOrderCancelled) {
+                                // Re-sent booking whose order is already cancelled here: create it again as a new order.
+                                $inputData['id_booking'] = 0;
+                            }
+
+                            $idBookingResolves = !empty($inputData['id_booking'])
+                                && Validate::isLoadedObject(new Order($inputData['id_booking']));
+                            if (!$idExistingOrderByCmid
+                                && !$idBookingResolves
+                                && $inputData['booking_status'] != self::API_BOOKING_STATUS_NEW
+                                && (!empty($inputData['id_booking'])
+                                    || in_array($inputData['booking_status'], array(self::API_BOOKING_STATUS_CANCELLED, self::API_BOOKING_STATUS_REFUNDED))
+                                )
+                            ) {
+                                // Non-new request with an unknown id_booking, or a cancel/refund with nothing to cancel: reject.
+                                $errorResponse = ["success" => false, "error" => $objQloCMConnector->l('Referenced booking not found.')];
+                                echo json_encode($errorResponse, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                                $this->deleteWsTempObjects();
+                                exit;
+                            }
+
+                            if (!$idExistingOrderByCmid
+                                && ($inputData['booking_status'] == self::API_BOOKING_STATUS_NEW || !$idBookingResolves)
                             ) {
                                 $inputData['booking_status'] = self::API_BOOKING_STATUS_NEW;
                                 $this->booking_type = self::API_BOOKING_STATUS_NEW;
                                 if ($this->validatePostRequest($inputData)) {
                                     $this->handlePostRequest($inputData);
-                                    $this->deleteWsServices();
-                                    $this->deleteWsFeaturePrices();
-                                    $this->deleteWsCartRules();
                                     $this->getResponseJson();
                                 } else {
                                     $errorResponse = ["success" => false, "error" => $objQloCMConnector->l($this->error_msg)];
                                     echo json_encode($errorResponse, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                                    $this->deleteWsTempObjects();
                                     exit;
                                 }
                             } else {
                                 if ($this->validatePutRequest($inputData)) {
                                     $this->handlePutRequest($inputData);
-                                    $this->deleteWsServices();
-                                    $this->deleteWsFeaturePrices();
-                                    $this->deleteWsCartRules();
                                     $this->getResponseJson();
                                 } else {
                                     $errorResponse = ["success" => false, "error" => $objQloCMConnector->l($this->error_msg)];
                                     echo json_encode($errorResponse, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                                    $this->deleteWsTempObjects();
                                     exit;
                                 }
                             }
@@ -209,8 +261,12 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             } else {
                                 $errorResponse = ["success" => false, "error" => $objQloCMConnector->l($e->getMessage())];
                                 echo json_encode($errorResponse, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                                $this->deleteWsTempObjects();
                                 exit;
                             }
+                        } finally {
+                            // exit skips finally, so each exit path above cleans up itself first.
+                            $this->deleteWsTempObjects();
                         }
                         break;
                     default:
@@ -305,7 +361,8 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
 
         $params['name'] = 'Api-Booking-Price';
         $params['impact_type'] = HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE;
-        $params['impact_value'] = $params['price']/$numDays;
+        // Stored precision (6 dp), so the nights add back up to the sent total.
+        $params['impact_value'] = Tools::ps_round($params['price']/$numDays, 6);
         $params['is_special_days_exists'] = 0;
         $params['special_days'] = json_encode(false);
         $params['restrictions'] = array(
@@ -487,6 +544,43 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
 
 
     /**
+     * Requested occupancy for the partial availability search: max guests when booked by
+     * quantity, else adults/children/child ages per room (missing ages default to 17).
+     *
+     * @param array $roomType requested room type
+     * @param bool $quantityWise
+     * @param array|false $hotelRoomData result of HotelBookingDetail::dataForFrontSearch()
+     *
+     * @return int|array
+     */
+    protected function buildRequestedOccupancy($roomType, $quantityWise, $hotelRoomData)
+    {
+        if ($quantityWise) {
+            return isset($hotelRoomData['rm_data'][$roomType['id_room_type']]['max_guests'])
+                ? $hotelRoomData['rm_data'][$roomType['id_room_type']]['max_guests']
+                : 0;
+        }
+
+        $occupancy = array();
+        if (isset($roomType['rooms']) && count($roomType['rooms'])) {
+            foreach ($roomType['rooms'] as $room) {
+                $child_ages = isset($room['occupancy']['children_ages']) ? $room['occupancy']['children_ages'] : (isset($room['occupancy']['child_ages']) ? $room['occupancy']['child_ages'] : array());
+
+                // default age for missing ones
+                $child_ages = array_pad($child_ages, isset($room['occupancy']['children']) ? $room['occupancy']['children'] : 0, 17);
+
+                $occupancy[] = array(
+                    'adults' => isset($room['occupancy']['adults']) ? $room['occupancy']['adults'] : 0,
+                    'children' => isset($room['occupancy']['children']) ? $room['occupancy']['children'] : 0,
+                    'child_ages' => $child_ages
+                );
+            }
+        }
+
+        return $occupancy;
+    }
+
+    /**
      * Checking room type information validity.
      */
     public function validateRequestedRoomTypes($roomTypes = array(), $idHotel = false, $idOrder = false)
@@ -544,7 +638,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             'hotel_id' => $idHotel,
                             'id_room_type' => $roomType['id_room_type'],
                             'number_of_rooms' => $roomType['number_of_rooms'],
-                            'occupancy' => $occupancy
+                            'occupancy' => $this->buildRequestedOccupancy($roomType, $quantityWise, $hotelRoomData)
                         ), $this->context->cart->id, $idOrder)) {
                             return false;
                         }
@@ -564,25 +658,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         }
                     }
                 } else {
-                    if ($quantityWise) {
-                        $occupancy = $hotelRoomData['rm_data'][$roomType['id_room_type']]['max_guests'];
-                    } else {
-                        $occupancy = array();
-                        if (isset($roomType['rooms']) && count($roomType['rooms'])) {
-                                foreach ($roomType['rooms'] as $room) {
-                                    $child_ages = isset($room['occupancy']['children_ages']) ? $room['occupancy']['children_ages'] : (isset($room['occupancy']['child_ages']) ? $room['occupancy']['child_ages'] : array());
-
-                                    // default age for missing ones
-                                    $child_ages = array_pad($child_ages, isset($room['occupancy']['children']) ? $room['occupancy']['children'] : 0, 17);
-
-                                    $occupancy[] = array(
-                                        'adults' => isset($room['occupancy']['adults']) ? $room['occupancy']['adults'] : 0,
-                                        'children' => isset($room['occupancy']['children']) ? $room['occupancy']['children'] : 0,
-                                        'child_ages' => $child_ages
-                                    );
-                            }
-                        }
-                    }
+                    $occupancy = $this->buildRequestedOccupancy($roomType, $quantityWise, $hotelRoomData);
 
                     if(!($partiallyAvailableRooms = $this->checkForPariallyAvailableRooms(array(
                         'date_from' => $dateFrom,
@@ -656,9 +732,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         $this->processCustomer($params['guest_detail']);
         if (!$this->addRoomsInCart($params['room_bookings'])) {
             QloCMConnector::$idBookingCm = null;
-            $this->deleteWsServices();
-            $this->deleteWsFeaturePrices();
-            $this->deleteWsCartRules();
+            $this->deleteWsTempObjects();
             throw new WebserviceException(
                 ($this->error_msg ?: Tools::displayError('Requested room(s) not available.')),
                 array(404, 400)
@@ -684,6 +758,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         }
 
         $cartTotal = $this->context->cart->getOrderTotal(false, Cart::BOTH);
+
         switch ($bookingStatus) {
             case self::API_BOOKING_STATUS_NEW:
                 $paymentStatus = false;
@@ -693,14 +768,15 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
 
                 switch ($paymentStatus) {
                     case self::API_BOOKING_PAYMENT_STATUS_COMPLETED:
-                        if (($totalAmount-$totalTax) >= $cartTotal) {
+                        $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+                        break;
+                    case self::API_BOOKING_PAYMENT_STATUS_PARTIAL:
+                        $sentPaidAmount = $this->getSentPaidAmount($params);
+                        if ($sentPaidAmount !== null && $totalAmount > 0 && $sentPaidAmount >= $totalAmount) {
                             $orderStatus = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
                         } else {
                             $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                         }
-                        break;
-                    case self::API_BOOKING_PAYMENT_STATUS_PARTIAL:
-                        $orderStatus = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
                         break;
                     case self::API_BOOKING_PAYMENT_STATUS_AWATING:
                         $orderStatus = Configuration::get('PS_OS_AWAITING_PAYMENT');
@@ -728,6 +804,9 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             default:
                 break;
         }
+
+        // Kept before the paid/unpaid collapse below, to record a partial payment later.
+        $originalOrderStatus = $orderStatus;
 
         if (isset($params['source']) && $params['source']) {
             $objPaymentModule->orderSource = $params['source'];
@@ -804,12 +883,46 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                 $objOrder->id_channel_manager_booking = $params['id_channel_manager_booking'];
             }
 
-            if(QcmcSourceHelper::coreClassesExist()) {
+            if (QcmcSourceHelper::coreClassesExist()
+                && isset($params['source'])
+                && $params['source']
+            ) {
+                // The CM never sends business_source; default to OTA.
+                $businessSource = (isset($params['business_source']) && $params['business_source'])
+                    ? $params['business_source']
+                    : 'OTA';
                 $objSourceHelper = new QcmcSourceHelper();
-                $objOrder->id_source = $objSourceHelper->getBookingSourceId($params['source'], $params['business_source']);
+                $objOrder->id_source = $objSourceHelper->getBookingSourceId($params['source'], $businessSource);
             }
 
+            // Partial payment: record the received amount if the CM sent one (see getSentPaidAmount()).
+            if (isset($paymentStatus)
+                && $paymentStatus == self::API_BOOKING_PAYMENT_STATUS_PARTIAL
+                && $originalOrderStatus == Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED')
+                && ($receivedAmount = $this->getSentPaidAmount($params))
+            ) {
+                // Linked to the order invoice, like core payments.
+                $objOrder->addOrderPayment(
+                    $receivedAmount,
+                    null,
+                    isset($extraVars['transaction_id']) ? $extraVars['transaction_id'] : null,
+                    null,
+                    null,
+                    $objOrder->getInvoicesCollection()->getFirst() ?: null,
+                    $objPaymentModule->payment_type == OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL
+                        ? OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL
+                        : OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT
+                );
+
+            }
+
+            if ( $originalOrderStatus == Configuration::get('PS_OS_PAYMENT_ACCEPTED')
+                || $originalOrderStatus == Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED')
+            ) {
+                $objOrder->advance_paid_amount = $totalAmount;
+            }
             $objOrder->save();
+
             $this->getBookingDetails($objPaymentModule->currentOrder);
             QloCMConnector::$idBookingCm = null;
 
@@ -950,11 +1063,11 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
 
                                 $objProduct = new Product($service['id_product']);
                                 $services['per_night'] = 0;
-                                if ($objProduct->price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
+                                if (self::isPerNightPriceCalculationMethod($objProduct->price_calculation_method)) {
                                     $services['per_night'] = 1;
                                 }
 
-                                $services['price_mode'] = (int) $objProduct->price_calculation_method;
+                                $services['price_mode'] = $services['per_night'] ? self::API_SERVICE_PRICE_MODE_PER_NIGHT : self::API_SERVICE_PRICE_MODE_PER_BOOKING;
                                 $roomInfo['services'][] = $services;
                             }
                         }
@@ -967,6 +1080,22 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             $params['associations']['room_types'] = array_values($roomTypeInfo);
             $this->output['data'] = $params;
         }
+    }
+
+    /**
+     * Deletes the request's temporary service products, feature prices and cart rules.
+     * Safe to call more than once: the lists are emptied after deletion.
+     *
+     * @return void
+     */
+    protected function deleteWsTempObjects()
+    {
+        $this->deleteWsServices();
+        $this->deleteWsFeaturePrices();
+        $this->deleteWsCartRules();
+        $this->wsIdServices = array();
+        $this->wsFeaturePrices = array();
+        $this->wsCartRules = array();
     }
 
     /**
@@ -1007,10 +1136,23 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
     {
         if (isset($this->wsCartRules) && $this->wsCartRules) {
             foreach ($this->wsCartRules as $idCartRule) {
+                // Keep cart rules applied to the order (order_cart_rule references them).
                 $objCartRule = new CartRule((int) $idCartRule);
-                if (Validate::isLoadedobject($objCartRule)) {
-                    $objCartRule->delete();
+                if (!Validate::isLoadedobject($objCartRule)) {
+                    continue;
                 }
+
+                if (Db::getInstance()->getValue(
+                    'SELECT id_order_cart_rule FROM `'._DB_PREFIX_.'order_cart_rule` WHERE id_cart_rule='.(int) $idCartRule
+                )) {
+                    // Applied directly to the order, so core never used it up: disable it to block reuse.
+                    $objCartRule->quantity = 0;
+                    $objCartRule->highlight = 0;
+                    $objCartRule->save();
+                    continue;
+                }
+
+                $objCartRule->delete();
             }
         }
     }
@@ -1031,20 +1173,26 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
 
                     if (isset($this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group'])) {
                         // Getting new Tax
-                        $objTaxManager = TaxManagerFactory::getManager($objAddress, $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group']);
-                        $objTaxCalculator = $objTaxManager->getTaxCalculator();
                         $objOrderDetail->id_tax_rules_group = $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group'];
-                        $priceWithTax = $objTaxCalculator->addTaxes($objHotelBookingDetail->total_price_tax_excl);
+                        if (isset($this->wsRequestedRooms[$dateRoomJoinKey]['total_tax'])) {
+                            // Use the sent total_tax, not a recomputed rate; the group is kept for tax rows.
+                            $priceWithTax = $objHotelBookingDetail->total_price_tax_excl + $this->wsRequestedRooms[$dateRoomJoinKey]['total_tax'];
+                        } else {
+                            $objTaxManager = TaxManagerFactory::getManager($objAddress, $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group']);
+                            $objTaxCalculator = $objTaxManager->getTaxCalculator();
+                            $priceWithTax = $objTaxCalculator->addTaxes($objHotelBookingDetail->total_price_tax_excl);
+                        }
                     } else if (isset($this->wsRequestedRooms[$dateRoomJoinKey]['total_tax'])) {
                         $priceWithTax = $objHotelBookingDetail->total_price_tax_excl + $this->wsRequestedRooms[$dateRoomJoinKey]['total_tax'];
                         $objOrderDetail->id_tax_rules_group = 0;
-                        Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'order_tax_detail` WHERE id_order_detail='.(int)$objOrderDetail->id.' AND id_htl_booking='.(int)$objHotelBookingDetail->id);
+                        Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.'order_tax_detail` WHERE id_order_detail='.(int)$objOrderDetail->id.' AND id_htl_booking IN (0, '.(int)$objHotelBookingDetail->id.')');
                     }
 
                     $taxDiff = $priceWithTax - $objHotelBookingDetail->total_price_tax_incl;
 
                     // Updating the price
                     $objHotelBookingDetail->total_price_tax_incl += $taxDiff;
+                    $objHotelBookingDetail->total_paid_amount = $objHotelBookingDetail->total_price_tax_incl;
                     $objHotelBookingDetail->save();
 
                     $objOrderDetail->total_price_tax_incl += $taxDiff;
@@ -1061,7 +1209,8 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                     if (isset($this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group']) && $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group']) {
                         $objOrderDetail->id_tax_rules_group = $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group'];
                         $objOrderDetail->save();
-                        $this->saveTaxCalculator($objOrderDetail->id, $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group']);
+                        // Rows scoped to this room; replaces its old rows and core's unscoped ones.
+                        $this->saveTaxCalculator($objOrderDetail->id, $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group'], $objHotelBookingDetail->id);
                     } else {
                         $objOrderDetail->save();
                     }
@@ -1080,19 +1229,32 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         }
     }
 
-    // order_detail_tax was replaced by order_tax_detail (scoped per room/service via id_htl_booking /
-    // id_service_product_order_detail); pass exactly one of $idHtlBooking/$idServiceProductOrderDetail.
+    /**
+     * Writes order_tax_detail rows for one of the module's hidden tax rules groups.
+     *
+     * Scoped to a room or service line like OrderTaxDetail::updateVatScoping(), with the line's
+     * stored tax (incl - excl) split across the group's taxes by rate. Unscoped rows use the
+     * order_detail totals.
+     *
+     * @param int $idOrderDetail
+     * @param int $idTaxRulesGroup
+     * @param int $idHtlBooking pass at most one of $idHtlBooking/$idServiceProductOrderDetail
+     * @param int $idServiceProductOrderDetail
+     *
+     * @return bool
+     */
     public function saveTaxCalculator($idOrderDetail, $idTaxRulesGroup, $idHtlBooking = 0, $idServiceProductOrderDetail = 0)
     {
         $idOrderDetail = (int) $idOrderDetail;
         $idHtlBooking = (int) $idHtlBooking;
         $idServiceProductOrderDetail = (int) $idServiceProductOrderDetail;
 
+        // A scoped write also drops core's unscoped (0/0) default-tax rows.
         Db::getInstance()->execute(
             'DELETE FROM `' . _DB_PREFIX_ . 'order_tax_detail`
              WHERE id_order_detail = ' . $idOrderDetail . '
-               AND id_htl_booking = ' . $idHtlBooking . '
-               AND id_service_product_order_detail = ' . $idServiceProductOrderDetail
+               AND ((id_htl_booking = ' . $idHtlBooking . ' AND id_service_product_order_detail = ' . $idServiceProductOrderDetail . ')'
+               . (($idHtlBooking || $idServiceProductOrderDetail) ? ' OR (id_htl_booking = 0 AND id_service_product_order_detail = 0)' : '') . ')'
         );
 
         if (empty($this->wsTaxRulesGroup[$idTaxRulesGroup])) {
@@ -1100,13 +1262,33 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         }
 
         $objOrderDetail = new OrderDetail($idOrderDetail);
+        $scopeTaxAmount = null;
+        if ($idHtlBooking) {
+            $objHotelBookingDetail = new HotelBookingDetail($idHtlBooking);
+            $scopeTaxAmount = $objHotelBookingDetail->total_price_tax_incl - $objHotelBookingDetail->total_price_tax_excl;
+        } elseif ($idServiceProductOrderDetail) {
+            $objServiceProductOrderDetail = new ServiceProductOrderDetail($idServiceProductOrderDetail);
+            $scopeTaxAmount = $objServiceProductOrderDetail->total_price_tax_incl - $objServiceProductOrderDetail->total_price_tax_excl;
+        }
+
+        $totalRate = 0;
+        foreach ($this->wsTaxRulesGroup[$idTaxRulesGroup] as $taxRuleGroup) {
+            $totalRate += (float) $taxRuleGroup['tax_rate'];
+        }
+
         $values = array();
         foreach ($this->wsTaxRulesGroup[$idTaxRulesGroup] as $taxRuleGroup) {
             $idTax = (int) $taxRuleGroup['tax'];
-            $unitAmount = Tools::ps_round(($objOrderDetail->unit_price_tax_excl * $taxRuleGroup['tax_rate']) / 100, _PS_PRICE_COMPUTE_PRECISION_);
-            $totalAmount = Tools::ps_round(($objOrderDetail->total_price_tax_excl * $taxRuleGroup['tax_rate']) / 100, _PS_PRICE_COMPUTE_PRECISION_);
+            if (!is_null($scopeTaxAmount)) {
+                // Like core's scoped rows: unit_amount = total_amount.
+                $totalAmount = Tools::ps_round($totalRate > 0 ? ($scopeTaxAmount * $taxRuleGroup['tax_rate'] / $totalRate) : 0, _PS_PRICE_COMPUTE_PRECISION_);
+                $unitAmount = $totalAmount;
+            } else {
+                $unitAmount = Tools::ps_round(($objOrderDetail->unit_price_tax_excl * $taxRuleGroup['tax_rate']) / 100, _PS_PRICE_COMPUTE_PRECISION_);
+                $totalAmount = Tools::ps_round(($objOrderDetail->total_price_tax_excl * $taxRuleGroup['tax_rate']) / 100, _PS_PRICE_COMPUTE_PRECISION_);
+            }
             $values[] = '(' . (int) $objOrderDetail->id_order . ', ' . $idOrderDetail . ', ' . $idHtlBooking . ', '
-                . $idServiceProductOrderDetail . ', ' . $idTax . ', ' . $unitAmount . ', ' . $totalAmount . ', NOW())';
+                . $idServiceProductOrderDetail . ', ' . $idTax . ', ' . (float) $unitAmount . ', ' . (float) $totalAmount . ', NOW())';
         }
 
         $sql = 'INSERT INTO `' . _DB_PREFIX_ . 'order_tax_detail`
@@ -1238,13 +1420,11 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         foreach ($orderedService['additional_services'] as $service) {
                             $objOrderDetail = new OrderDetail($service['id_order_detail']);
                             $objServiceProductOrderDetail = new ServiceProductOrderDetail($service['id_service_product_order_detail']);
-                            $quantity = $objServiceProductOrderDetail->quantity;
-                            if ($objOrderDetail->product_price_calculation_method == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                $quantity = $quantity * HotelHelper::getNumberOfDays(
-                                    $objHotelBookingDetail->date_from,
-                                    $objHotelBookingDetail->date_to
-                                );
-                            }
+                            $quantity = $objServiceProductOrderDetail->quantity * self::getServiceBillableDays(
+                                $objOrderDetail->product_price_calculation_method,
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to
+                            );
 
                             if (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']])) {
                                 $oldPriceTaxExcl = $objServiceProductOrderDetail->total_price_tax_excl;
@@ -1280,8 +1460,8 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                                 } elseif (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_price_without_tax'])) {
                                     $totalPriceTaxExcl = $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_price_without_tax'];
                                     $totalPriceTaxIncl = $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_price_without_tax'] * $oldTaxMultiplier;
-                                    $unitPriceTaxExcl = $totalPriceTaxExcl / $quantity;
-                                    $unitPriceTaxIncl = $totalPriceTaxIncl / $quantity;
+                                    $unitPriceTaxExcl = $quantity > 0 ? $totalPriceTaxExcl / $quantity : 0;
+                                    $unitPriceTaxIncl = $quantity > 0 ? $totalPriceTaxIncl / $quantity : 0;
 
                                     $objServiceProductOrderDetail->unit_price_tax_excl = Tools::ps_round($unitPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
                                     $objServiceProductOrderDetail->unit_price_tax_incl = Tools::ps_round($unitPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
@@ -1304,11 +1484,19 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             }
 
                             if (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group'])) {
-                                $objAddress = new Address((int) $objOrder->id_address_tax);
-                                $objTaxManager = TaxManagerFactory::getManager($objAddress, $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']);
-                                $objTaxCalculator = $objTaxManager->getTaxCalculator();
-                                $unitPriceTaxIncl = $objTaxCalculator->addTaxes($objServiceProductOrderDetail->unit_price_tax_excl);
                                 $oldPriceTaxIncl = Tools::ps_round($objServiceProductOrderDetail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_) ;
+                                if (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_tax'])
+                                    && $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_tax']
+                                ) {
+                                    // Use the sent total_tax, not a recomputed rate; the group is kept for tax rows.
+                                    $unitPriceTaxIncl = $objServiceProductOrderDetail->unit_price_tax_excl
+                                        + ($quantity > 0 ? ($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_tax'] / $quantity) : 0);
+                                } else {
+                                    $objAddress = new Address((int) $objOrder->id_address_tax);
+                                    $objTaxManager = TaxManagerFactory::getManager($objAddress, $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']);
+                                    $objTaxCalculator = $objTaxManager->getTaxCalculator();
+                                    $unitPriceTaxIncl = $objTaxCalculator->addTaxes($objServiceProductOrderDetail->unit_price_tax_excl);
+                                }
 
                                 $objServiceProductOrderDetail->unit_price_tax_incl = Tools::ps_round($unitPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
                                 $objServiceProductOrderDetail->total_price_tax_incl = Tools::ps_round(($unitPriceTaxIncl * $quantity), _PS_PRICE_COMPUTE_PRECISION_);
@@ -1326,7 +1514,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                                 $oldPriceTaxIncl = $objServiceProductOrderDetail->total_price_tax_incl;
                                 $objServiceProductOrderDetail->total_price_tax_incl = $objServiceProductOrderDetail->total_price_tax_excl + $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_tax'];
 
-                                $objServiceProductOrderDetail->unit_price_tax_incl = Tools::ps_round($objServiceProductOrderDetail->total_price_tax_incl / $quantity, _PS_PRICE_COMPUTE_PRECISION_);
+                                $objServiceProductOrderDetail->unit_price_tax_incl = Tools::ps_round($quantity > 0 ? ($objServiceProductOrderDetail->total_price_tax_incl / $quantity) : 0, _PS_PRICE_COMPUTE_PRECISION_);
                                 $objServiceProductOrderDetail->total_price_tax_incl = Tools::ps_round(($objServiceProductOrderDetail->total_price_tax_incl), _PS_PRICE_COMPUTE_PRECISION_);
 
                                 $priceDiffTaxIncl = $objServiceProductOrderDetail->total_price_tax_incl - $oldPriceTaxIncl;
@@ -1349,7 +1537,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                                 && isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group'])
                                 && $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']
                             ) {
-                                $this->saveTaxCalculator($objOrderDetail->id, $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']);
+                                $this->saveTaxCalculator($objOrderDetail->id, $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group'], 0, $objServiceProductOrderDetail->id);
                             }
                         }
                     }
@@ -1399,8 +1587,26 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         $activeBookingIds = array();
         $activeBookingKeys = array();
         if ($bookings = $objHotelBookingDetail->getBookingDataByOrderId($idOrder)) {
+            // Refunds come from completed order returns, cancellations from id_status. The old
+            // is_refunded/is_cancelled columns (shops upgraded from 1.7) are no longer written,
+            // so they only add rooms flagged before the upgrade.
+            $refundedBookingKeys = array();
+            if (method_exists('OrderReturn', 'getRefundedBookingIdsSubquery')) {
+                if ($refundedBookings = Db::getInstance()->executeS(
+                    OrderReturn::getRefundedBookingIdsSubquery().' AND orr.`id_order` = '.(int) $idOrder
+                )) {
+                    foreach ($refundedBookings as $refundedBooking) {
+                        $refundedBookingKeys[$refundedBooking['id_htl_booking']] = true;
+                    }
+                }
+            }
+
             foreach ($bookings as $booking) {
-                if (!$booking['is_refunded'] && !$booking['is_cancelled']) {
+                $isRefunded = isset($refundedBookingKeys[$booking['id']]) || !empty($booking['is_refunded']);
+                $isCancelled = (defined('HotelBookingDetail::STATUS_CANCELLED')
+                        && $booking['id_status'] == HotelBookingDetail::STATUS_CANCELLED)
+                    || !empty($booking['is_cancelled']);
+                if (!$isRefunded && !$isCancelled) {
                     $roomsTotalTaxIncl += (float) $booking['total_price_tax_incl'];
                     $roomsTotalTaxExcl += (float) $booking['total_price_tax_excl'];
                     $activeBookingIds[] = $booking['id'];
@@ -1446,6 +1652,15 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         }
 
         $objOrder->update();
+
+        // Sync invoice totals (the module uses one invoice per order).
+        if ($orderInvoice = $objOrder->getInvoicesCollection()->getFirst()) {
+            $orderInvoice->total_products = $totalProductsTaxExcl;
+            $orderInvoice->total_products_wt = $totalProductsTaxIncl;
+            $orderInvoice->total_paid_tax_excl = $totalPaidTaxExcl;
+            $orderInvoice->total_paid_tax_incl = $totalPaidTaxIncl;
+            $orderInvoice->update();
+        }
 
         return $totalPaidTaxIncl;
     }
@@ -1496,8 +1711,18 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             }
         }
 
-        if($params['payment_status'] == self::API_BOOKING_PAYMENT_STATUS_COMPLETED) {
+        $paymentStatus = isset($params['payment_status']) ? $params['payment_status'] : '';
+        if ($paymentStatus == self::API_BOOKING_PAYMENT_STATUS_COMPLETED) {
             $this->managePaymentHistory($objOrder->reference, $params['price_details']['total_price_with_tax']);
+        } elseif ($paymentStatus == self::API_BOOKING_PAYMENT_STATUS_PARTIAL
+            && ($sentPaidAmount = $this->getSentPaidAmount($params)) !== null
+            && isset($params['price_details']['total_price_with_tax'])
+        ) {
+            // Trim payments above the amount actually paid.
+            $this->managePaymentHistory(
+                $objOrder->reference,
+                min($sentPaidAmount, (float) $params['price_details']['total_price_with_tax'])
+            );
         }
     }
 
@@ -1697,19 +1922,95 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         $roomsToAdd = array();
         $roomsToUpdate = array();
         $roomTypes = $this->formatRoomTypesInRequestData($params['room_bookings']);
-        if($params['booking_status'] != self::API_BOOKING_STATUS_CANCELLED
-            && $params['booking_status'] != self::API_BOOKING_STATUS_REFUNDED
+        $isReversal = in_array($params['booking_status'], array(self::API_BOOKING_STATUS_CANCELLED, self::API_BOOKING_STATUS_REFUNDED));
+
+        // The CM sends one request per room type (same cmid): only change the requested room types.
+        $requestedRoomTypeIds = array();
+        if (!empty($params['room_bookings']) && is_array($params['room_bookings'])) {
+            foreach ($params['room_bookings'] as $roomBooking) {
+                if (isset($roomBooking['id_room_type'])) {
+                    $requestedRoomTypeIds[(int) $roomBooking['id_room_type']] = true;
+                }
+            }
+        }
+        $requestedRoomTypeRooms = array();
+        $otherRoomTypeRooms = array();
+        if ($orderRooms = $objHotelBookingDetail->getOrderCurrentDataByOrderId($objOrder->id)) {
+            foreach ($orderRooms as $orderRoom) {
+                if (!$requestedRoomTypeIds || isset($requestedRoomTypeIds[(int) $orderRoom['id_product']])) {
+                    $requestedRoomTypeRooms[] = $orderRoom;
+                } else {
+                    $otherRoomTypeRooms[] = $orderRoom;
+                }
+            }
+        }
+
+        if ($isReversal && $otherRoomTypeRooms) {
+            // Partial cancel: drop the requested room types' lines, keep the order active.
+            if ($requestedRoomTypeRooms) {
+                $this->removeRoomLineFromOrder($params, $requestedRoomTypeRooms);
+                $this->recalculateOrderFromComponents($objOrder->id);
+                $objOrder = new Order($objOrder->id);
+                $this->managePaymentHistory($objOrder->reference, $objOrder->total_paid_tax_incl);
+            }
+            $this->deleteWsFeaturePrices();
+            QloCMConnector::$idBookingCm = null;
+            $this->getBookingDetails($objOrder->id);
+
+            return;
+        }
+
+        if (!$isReversal
+            && $otherRoomTypeRooms
+            && isset($params['price_details']['total_price_with_tax'])
         ) {
-            if ($roomsInOrder = $objHotelBookingDetail->getOrderCurrentDataByOrderId($objOrder->id)) {
-                // Detect split rooms: group order rooms by room type to identify splits
-                $orderRoomsByType = array();
-                foreach ($roomsInOrder as $orderRoomKey => $orderRoom) {
-                    $orderRoomsByType[$orderRoom['id_product']][$orderRoomKey] = $orderRoom;
+            // price_details covers only the requested room types; add the other room types' current share.
+            $requestedTotalTaxIncl = 0;
+            $requestedTotalTaxExcl = 0;
+            $requestedBookingIds = array();
+            foreach ($requestedRoomTypeRooms as $orderRoom) {
+                $requestedTotalTaxIncl += (float) $orderRoom['total_price_tax_incl'];
+                $requestedTotalTaxExcl += (float) $orderRoom['total_price_tax_excl'];
+                $requestedBookingIds[] = (int) $orderRoom['id'];
+            }
+            if ($requestedBookingIds) {
+                $requestedServicesTotal = Db::getInstance()->getRow(
+                    'SELECT IFNULL(SUM(`total_price_tax_incl`), 0) AS total_incl, IFNULL(SUM(`total_price_tax_excl`), 0) AS total_excl
+                    FROM `'._DB_PREFIX_.'service_product_order_detail`
+                    WHERE `id_htl_booking_detail` IN ('.implode(',', $requestedBookingIds).')'
+                );
+                $requestedTotalTaxIncl += (float) $requestedServicesTotal['total_incl'];
+                $requestedTotalTaxExcl += (float) $requestedServicesTotal['total_excl'];
+            }
+            $otherTotalTaxIncl = (float) $objOrder->total_paid_tax_incl - $requestedTotalTaxIncl;
+            $otherTotalTaxExcl = (float) $objOrder->total_paid_tax_excl - $requestedTotalTaxExcl;
+            $params['price_details']['total_price_with_tax'] = Tools::ps_round(
+                (float) $params['price_details']['total_price_with_tax'] + $otherTotalTaxIncl,
+                _PS_PRICE_COMPUTE_PRECISION_
+            );
+            $params['price_details']['total_tax'] = Tools::ps_round(
+                (isset($params['price_details']['total_tax']) ? (float) $params['price_details']['total_tax'] : 0)
+                    + ($otherTotalTaxIncl - $otherTotalTaxExcl),
+                _PS_PRICE_COMPUTE_PRECISION_
+            );
+        }
+
+        if (!$isReversal) {
+            if ($roomsInOrder = $requestedRoomTypeRooms) {
+                // Split room: one OTA stay stored as consecutive segments on different rooms.
+                $splitSegments = $this->getSplitRoomSegments($roomsInOrder, $roomTypes);
+                $splitChainRooms = array();
+                $splitChainSegmentsLeft = array();
+                foreach ($splitSegments as $splitSegment) {
+                    $splitChainSegmentsLeft[$splitSegment['chain']] = $splitSegment['chain_segments'];
                 }
 
                 foreach ($roomsInOrder as $orderRoomKey => $orderRoom) {
-                    $requestedRoomTypeKey = $orderRoom['id_product'].'_'.strtotime($orderRoom['date_from']).strtotime($orderRoom['date_to']);
-                    if (!isset($roomTypes[$requestedRoomTypeKey])
+                    $isSplitRoom = isset($splitSegments[$orderRoomKey]);
+                    $requestedRoomTypeKey = $isSplitRoom
+                        ? $splitSegments[$orderRoomKey]['room_type_key']
+                        : $orderRoom['id_product'].'_'.strtotime($orderRoom['date_from']).strtotime($orderRoom['date_to']);
+                    if (!$isSplitRoom && !isset($roomTypes[$requestedRoomTypeKey])
                         || !isset($roomTypes[$requestedRoomTypeKey]['number_of_rooms'])
                         || $roomTypes[$requestedRoomTypeKey]['number_of_rooms'] <= 0
                     ) {
@@ -1742,30 +2043,24 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         continue;
                     }
 
-                    // Detect if this is a split room: multiple order rooms with same room type but different dates
-                    $isSplitRoom = false;
-                    if (isset($orderRoomsByType[$orderRoom['id_product']])) {
-                        $sameTypeRooms = $orderRoomsByType[$orderRoom['id_product']];
-                        if (count($sameTypeRooms) > 1) {
-                            $firstRoom = reset($sameTypeRooms);
-                            if ($firstRoom['date_from'] !== $orderRoom['date_from']
-                                || $firstRoom['date_to'] !== $orderRoom['date_to']
-                            ) {
-                                $isSplitRoom = true;
-                            }
-                        }
-                    }
-
                     $requestedCheckIn = date('Y-m-d', strtotime($roomTypes[$requestedRoomTypeKey]['check_in_date']));
                     $requestedCheckOut = date('Y-m-d', strtotime($roomTypes[$requestedRoomTypeKey]['check_out_date']));
                     $room = array();
                     // if there are multiple rooms then there can be a room at index 1 so we are adding a prifix for the below condition.
                     $room_key = 'r_'.$orderRoom['id_room'];
-                    if (isset($roomTypes[$requestedRoomTypeKey]['rooms'][$room_key])) {
-                        $room = $roomTypes[$requestedRoomTypeKey]['rooms'][$room_key];
-                        unset($roomTypes[$requestedRoomTypeKey]['rooms'][$room_key]);
-                    } elseif (isset($roomTypes[$requestedRoomTypeKey]['rooms'][0])) {
-                        $room = array_shift($roomTypes[$requestedRoomTypeKey]['rooms']);
+                    if ($isSplitRoom && isset($splitChainRooms[$splitSegments[$orderRoomKey]['chain']])) {
+                        // every segment of a split stay shares the one requested room
+                        $room = $splitChainRooms[$splitSegments[$orderRoomKey]['chain']];
+                    } else {
+                        if (isset($roomTypes[$requestedRoomTypeKey]['rooms'][$room_key])) {
+                            $room = $roomTypes[$requestedRoomTypeKey]['rooms'][$room_key];
+                            unset($roomTypes[$requestedRoomTypeKey]['rooms'][$room_key]);
+                        } elseif (isset($roomTypes[$requestedRoomTypeKey]['rooms'][0])) {
+                            $room = array_shift($roomTypes[$requestedRoomTypeKey]['rooms']);
+                        }
+                        if ($isSplitRoom) {
+                            $splitChainRooms[$splitSegments[$orderRoomKey]['chain']] = $room;
+                        }
                     }
 
                     if ($room) {
@@ -1783,15 +2078,12 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             if (isset($room['unit_price_without_tax'])) {
                                 $requestedTotalPriceTaxExcl = $room['unit_price_without_tax'];
                             } else if (isset($room['total_price_with_tax']) && isset($room['total_tax'])) {
-                                $requestedTotalPriceTaxExcl = abs($room['total_price_with_tax'] - $room['total_tax']);
+                                $requestedTotalPriceTaxExcl = $room['total_price_with_tax'] - $room['total_tax'];
                             }
                             $requestedTotalTax = isset($room['total_tax']) ? floatval($room['total_tax']) : 0;
 
-                            // Calculate total nights across all split segments for this room type
-                            $totalSplitNights = 0;
-                            foreach ($sameTypeRooms as $splitSegment) {
-                                $totalSplitNights += HotelHelper::getNumberOfDays($splitSegment['date_from'], $splitSegment['date_to']);
-                            }
+                            // Total nights of the split stay this segment belongs to
+                            $totalSplitNights = $splitSegments[$orderRoomKey]['chain_nights'];
                             if (!$totalSplitNights) {
                                 $totalSplitNights = 1;
                             }
@@ -1831,9 +2123,12 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         $roomsToUpdate[$requestedRoomTypeKey]['order'][$orderRoom['id_room']] = $roomsInOrder[$orderRoomKey];
                     }
 
-                    // For split rooms, don't decrement number_of_rooms since multiple segments
-                    // share the same requested room slot
-                    if (!$isSplitRoom) {
+                    // A split stay uses one requested room slot: release it with its last segment.
+                    if ($isSplitRoom) {
+                        $splitChainSegmentsLeft[$splitSegments[$orderRoomKey]['chain']]--;
+                    }
+
+                    if (!$isSplitRoom || $splitChainSegmentsLeft[$splitSegments[$orderRoomKey]['chain']] <= 0) {
                         $roomTypes[$requestedRoomTypeKey]['number_of_rooms']--;
                         if ($roomTypes[$requestedRoomTypeKey]['number_of_rooms'] <= 0) {
                             unset($roomTypes[$requestedRoomTypeKey]);
@@ -1887,10 +2182,11 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
 
                         if(Validate::isLoadedObject($objAddress)){
                             $totalPriceTaxExcl = $room['total_price_with_tax'] - $room['total_tax'];
+                            $roomTaxRate = $totalPriceTaxExcl > 0 ? ($room['total_tax']/$totalPriceTaxExcl)*100 : 0;
                             if(isset($room['taxes']) && $room['taxes']) {
-                                $room['id_tax_rules_group'] = $this->createTaxRulesGroup(($room['total_tax']/$totalPriceTaxExcl)*100, $room['taxes'], $objAddress);
+                                $room['id_tax_rules_group'] = $this->createTaxRulesGroup($roomTaxRate, $room['taxes'], $objAddress);
                             } else {
-                                $room['id_tax_rules_group'] = $this->createTaxRulesGroup(($room['total_tax']/$totalPriceTaxExcl)*100, false, $objAddress);
+                                $room['id_tax_rules_group'] = $this->createTaxRulesGroup($roomTaxRate, false, $objAddress);
                             }
                         }
 
@@ -1898,7 +2194,8 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group'] = $room['id_tax_rules_group'];
                         } else if (!empty($room['total_tax'])) {
                             $totalPriceTaxExcl = $room['total_price_with_tax'] - $room['total_tax'];
-                            $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group'] = $this->createTaxRulesGroup(($room['total_tax']/$totalPriceTaxExcl)*100, $room['taxes'], $objAddress);
+                            $roomTaxRate = $totalPriceTaxExcl > 0 ? ($room['total_tax']/$totalPriceTaxExcl)*100 : 0;
+                            $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group'] = $this->createTaxRulesGroup($roomTaxRate, $room['taxes'], $objAddress);
                         }
 
                         $requestedCheckInDate = isset($room['check_in_date'])
@@ -1918,6 +2215,20 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         if ($isPriceChanged || $isDateChanged) {
                             $this->updateRoomPriceInOrder($room, $roomsByDate['order'][$roomsKey]);
                             $this->wsRequestedRoomTypes[$dateRoomJoinKey]['room'] = $room;
+                        }
+
+                        if ($isDateChanged) {
+                            // Later steps (tax pass, services) look rooms up by their current dates.
+                            $newDateRoomJoinKey = strtotime($requestedCheckInDate).strtotime($requestedCheckOutDate).$idProduct.$idRoom;
+                            if (isset($this->wsRequestedRooms[$dateRoomJoinKey])) {
+                                $this->wsRequestedRooms[$newDateRoomJoinKey] = $this->wsRequestedRooms[$dateRoomJoinKey];
+                                unset($this->wsRequestedRooms[$dateRoomJoinKey]);
+                            }
+                            if (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey])) {
+                                $this->wsRequestedRoomTypes[$newDateRoomJoinKey] = $this->wsRequestedRoomTypes[$dateRoomJoinKey];
+                                unset($this->wsRequestedRoomTypes[$dateRoomJoinKey]);
+                            }
+                            $dateRoomJoinKey = $newDateRoomJoinKey;
                         }
 
                         $idHotelBookingDetail = $roomsByDate['order'][$roomsKey]['id'];
@@ -1946,6 +2257,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'] = $room['services'];
                         }
                         $this->addServicesInOrderedRoom($room['services'], $idHotelBookingDetail);
+                        $this->updateRoomOccupancyInOrder($idHotelBookingDetail, $room);
                     }
                 } else if (isset($roomsByDate['order'])
                     && $roomsByDate['order']
@@ -1980,132 +2292,153 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             $this->removeRoomLineFromOrder($params, $roomsToRemove);
         }
 
-        $cartRules = $objOrder->getCartRules();
-        //Removing the stored cached object
-        $this->removeOrderCartRules($objOrder->id, $cartRules);
-        if (isset($params['cart_rules']) && $params['cart_rules']) {
-            $this->addCartRulesToOrder($params['cart_rules'], $objOrder->id);
+        // Cancel/refund without price_details re-prices nothing: keep the discounts.
+        if (!in_array($params['booking_status'], array(self::API_BOOKING_STATUS_CANCELLED, self::API_BOOKING_STATUS_REFUNDED))
+            || isset($params['price_details']['total_price_with_tax'])
+        ) {
+            $cartRules = $objOrder->getCartRules();
+            //Removing the stored cached object
+            $this->removeOrderCartRules($objOrder->id, $cartRules);
+            if (isset($params['cart_rules']) && $params['cart_rules']) {
+                $this->addCartRulesToOrder($params['cart_rules'], $objOrder->id);
+            }
         }
 
         $this->updateRoomTaxRulesGroupsInOrder($objOrder->id);
-        // Calling this after the older cart rules are removed from the order.
-        if ($params['booking_status'] != self::API_BOOKING_STATUS_CANCELLED && $params['booking_status'] != self::API_BOOKING_STATUS_REFUNDED) {
-            $this->manageOrderPrice($objOrder->id, $params);
-            $this->recalculateOrderFromComponents($objOrder->id);
-        } else {
-            $this->adjustPriceForOrderReversal($objOrder->id, $params);
-        }
 
-        if (isset($params['booking_status'])) {
-            $objOrderState = false;
-            if ($params['booking_status'] == self::API_BOOKING_STATUS_CANCELLED) {
-                $objOrderState = new OrderState(Configuration::get('PS_OS_CANCELED'));
-            } elseif ($params['booking_status'] == self::API_BOOKING_STATUS_REFUNDED) {
-                $objOrderState = new OrderState(Configuration::get('PS_OS_REFUND'));
-            } elseif ($params['booking_status'] == self::API_BOOKING_STATUS_COMPLETED) {
-                $objOrderState = new OrderState(Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
-            } elseif ($params['booking_status'] == self::API_BOOKING_STATUS_NEW) {
-                $objOrderState =  new OrderState(Configuration::get('PS_OS_AWAITING_PAYMENT'));
-                $paymentStatus = false;
-                if (isset($params['payment_status'])) {
-                    $paymentStatus = $params['payment_status'];
-                }
-
-                switch ($paymentStatus) {
-                    case self::API_BOOKING_PAYMENT_STATUS_COMPLETED:
-                        $objOrderState = new OrderState(Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
-                        break;
-                    case self::API_BOOKING_PAYMENT_STATUS_PARTIAL:
-                        $objOrderState = new OrderState(Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED'));
-                        break;
-                    case self::API_BOOKING_PAYMENT_STATUS_AWATING:
-                        $objOrderState = new OrderState(Configuration::get('PS_OS_AWAITING_PAYMENT'));
-                        break;
-                    default:
-                        $objOrderState = new OrderState(Configuration::get('PS_OS_AWAITING_PAYMENT'));
-                        break;
-                }
+        // Log failures here: the order state may not have changed.
+        try {
+            // Calling this after the older cart rules are removed from the order.
+            if ($params['booking_status'] != self::API_BOOKING_STATUS_CANCELLED && $params['booking_status'] != self::API_BOOKING_STATUS_REFUNDED) {
+                $this->manageOrderPrice($objOrder->id, $params);
+                $this->recalculateOrderFromComponents($objOrder->id);
+            } else {
+                $this->adjustPriceForOrderReversal($objOrder->id, $params);
             }
 
-            if ($objOrderState) {
-                $statuses = array(Configuration::get('PS_OS_CANCELED'), Configuration::get('PS_OS_REFUND'));
-                if (!in_array($objOrder->current_state, $statuses) && in_array($objOrderState->id, $statuses)) {
-                    if ($bookings = $objHotelBookingDetail->getOrderCurrentDataByOrderId($objOrder->id)) {
-                        $objOrderReturn = new OrderReturn();
-                        $objOrderReturn->id_customer = $objOrder->id_customer;
-                        $objOrderReturn->id_order = $objOrder->id;
-                        $objOrderReturn->state = 0;
-                        $objOrderReturn->by_admin = 1;
-                        $objOrderReturn->refunded_amount = 0;
-                        $objOrderReturn->save();
-                        if ($objOrderReturn->id) {
-                            foreach ($bookings as $booking) {
-                                $objHtlBooking = new HotelBookingDetail($booking['id']);
-                                if(Configuration::get('PS_OS_REFUND') == $objOrderState->id){
-                                    if(Configuration::get('PS_OS_AWAITING_REMOTE_PAYMENT') == $objOrder->current_state) {
-                                        $htlBookingStatusField = 'is_cancelled';
-                                    } else {
-                                        if ($objOrder->is_advance_payment
-                                            || Configuration::get('PS_OS_PAYMENT_ACCEPTED') == $objOrder->current_state
-                                            || Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED') == $objOrder->current_state
-                                        ) {
-                                            $htlBookingStatusField = 'is_refunded';
-                                        } else {
-                                            $htlBookingStatusField = 'is_cancelled';
-                                        }
+            if (isset($params['booking_status'])) {
+                $objOrderState = false;
+                if ($params['booking_status'] == self::API_BOOKING_STATUS_CANCELLED) {
+                    $objOrderState = new OrderState(Configuration::get('PS_OS_CANCELED'));
+                } elseif ($params['booking_status'] == self::API_BOOKING_STATUS_REFUNDED) {
+                    $objOrderState = new OrderState(Configuration::get('PS_OS_REFUND'));
+                } elseif ($params['booking_status'] == self::API_BOOKING_STATUS_COMPLETED) {
+                    $objOrderState = new OrderState(Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
+                } elseif ($params['booking_status'] == self::API_BOOKING_STATUS_MODIFIED
+                    && isset($params['payment_status'])
+                    && $params['payment_status'] == self::API_BOOKING_PAYMENT_STATUS_COMPLETED
+                ) {
+                    // The guest paid the OTA after booking (e.g. hotel collect turned prepaid).
+                    $objOrderState = new OrderState(Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
+                } elseif ($params['booking_status'] == self::API_BOOKING_STATUS_MODIFIED
+                    && isset($params['payment_status'])
+                    && $params['payment_status'] == self::API_BOOKING_PAYMENT_STATUS_PARTIAL
+                ) {
+                    $sentPaidAmount = $this->getSentPaidAmount($params);
+                    $objOrderState = new OrderState(Configuration::get(
+                        ($sentPaidAmount !== null && isset($params['price_details']['total_price_with_tax'])
+                            && $sentPaidAmount >= (float) $params['price_details']['total_price_with_tax'])
+                            ? 'PS_OS_PAYMENT_ACCEPTED'
+                            : 'PS_OS_PARTIAL_PAYMENT_ACCEPTED'
+                    ));
+                } elseif ($params['booking_status'] == self::API_BOOKING_STATUS_NEW) {
+                    $objOrderState =  new OrderState(Configuration::get('PS_OS_AWAITING_PAYMENT'));
+                    $paymentStatus = false;
+                    if (isset($params['payment_status'])) {
+                        $paymentStatus = $params['payment_status'];
+                    }
+
+                    switch ($paymentStatus) {
+                        case self::API_BOOKING_PAYMENT_STATUS_COMPLETED:
+                            $objOrderState = new OrderState(Configuration::get('PS_OS_PAYMENT_ACCEPTED'));
+                            break;
+                        case self::API_BOOKING_PAYMENT_STATUS_PARTIAL:
+                            $objOrderState = new OrderState(Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED'));
+                            break;
+                        case self::API_BOOKING_PAYMENT_STATUS_AWATING:
+                            $objOrderState = new OrderState(Configuration::get('PS_OS_AWAITING_PAYMENT'));
+                            break;
+                        default:
+                            $objOrderState = new OrderState(Configuration::get('PS_OS_AWAITING_PAYMENT'));
+                            break;
+                    }
+                }
+
+                if ($objOrderState) {
+                    $statuses = array(Configuration::get('PS_OS_CANCELED'), Configuration::get('PS_OS_REFUND'));
+                    if (!in_array($objOrder->current_state, $statuses) && in_array($objOrderState->id, $statuses)) {
+                        if ($bookings = $objHotelBookingDetail->getOrderCurrentDataByOrderId($objOrder->id)) {
+                            $objOrderReturn = new OrderReturn();
+                            $objOrderReturn->id_customer = $objOrder->id_customer;
+                            $objOrderReturn->id_order = $objOrder->id;
+                            $objOrderReturn->state = 0;
+                            $objOrderReturn->by_admin = 1;
+                            $objOrderReturn->refunded_amount = 0;
+                            $objOrderReturn->save();
+                            if ($objOrderReturn->id) {
+                                foreach ($bookings as $booking) {
+                                    $objHtlBooking = new HotelBookingDetail($booking['id']);
+                                    // No is_cancelled/is_refunded write (columns missing on fresh 1.8);
+                                    // the order return tracks the refunded rooms.
+
+                                    $numDays = HotelHelper::getNumberOfDays($objHtlBooking->date_from, $objHtlBooking->date_to);
+                                    $objOrderReturnDetail = new OrderReturnDetail();
+                                    $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
+                                    $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
+                                    $objOrderReturnDetail->product_quantity = $numDays;
+                                    $objOrderReturnDetail->id_htl_booking = $objHtlBooking->id;
+                                    $objOrderReturnDetail->refunded_amount = 0;
+                                    if (!$objOrder->getCartRules() && $objOrder->getTotalPaid() <= 0) {
+                                        $objOrderReturnDetail->id_customization = 1;
                                     }
-                                } else {
-                                    $htlBookingStatusField = 'is_cancelled';
+                                    $objOrderReturnDetail->save();
                                 }
-                                $objHtlBooking->save();
-                                // Not in HotelBookingDetail's definition, so save() drops it.
-                                Db::getInstance()->update(
-                                    'htl_booking_detail',
-                                    array($htlBookingStatusField => 1),
-                                    '`id` = '.(int) $objHtlBooking->id
-                                );
-
-                                $numDays = HotelHelper::getNumberOfDays($objHtlBooking->date_from, $objHtlBooking->date_to);
-                                $objOrderReturnDetail = new OrderReturnDetail();
-                                $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
-                                $objOrderReturnDetail->id_order_detail = $objHtlBooking->id_order_detail;
-                                $objOrderReturnDetail->product_quantity = $numDays;
-                                $objOrderReturnDetail->id_htl_booking = $objHtlBooking->id;
-                                $objOrderReturnDetail->refunded_amount = 0;
-                                if (!$objOrder->getCartRules() && $objOrder->getTotalPaid() <= 0) {
-                                    $objOrderReturnDetail->id_customization = 1;
-                                }
-                                $objOrderReturnDetail->save();
                             }
-                        }
 
-                        $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_REFUNDED'));
+                            try {
+                                // A failed order_return state change must not block the order state change.
+                                $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_REFUNDED'));
+                            } catch (\Throwable $eReturnState) {
+                                PrestaShopLogger::addLog(
+                                    'qlocmconnector: could not update order_return state for order '
+                                        .(int) $objOrder->id.' (order state flip continues): '.$eReturnState->getMessage(),
+                                    2
+                                );
+                            }
 
-                        // Queue inventory ARI for all room types in the cancel request.
-                        // The hook covers current (post-reallocation) DB room types;
-                        // this covers original CM-side room types that may differ after reallocation.
-                        if (!empty($params['room_bookings']) && is_array($params['room_bookings'])) {
-                            $objAriUpdates = new QcmcAriUpdates();
-                            $objHotelRoomType = new HotelRoomType();
-                            foreach ($params['room_bookings'] as $roomBooking) {
-                                if (!isset($roomBooking['id_room_type'])) {
-                                    continue;
+                            // Queue inventory ARI for all room types in the cancel request.
+                            // The hook covers current (post-reallocation) DB room types;
+                            // this covers original CM-side room types that may differ after reallocation.
+                            if (!empty($params['room_bookings']) && is_array($params['room_bookings'])) {
+                                $objAriUpdates = new QcmcAriUpdates();
+                                $objHotelRoomType = new HotelRoomType();
+                                foreach ($params['room_bookings'] as $roomBooking) {
+                                    if (!isset($roomBooking['id_room_type'])) {
+                                        continue;
+                                    }
+                                    $idRoomType = (int)$roomBooking['id_room_type'];
+                                    $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idRoomType);
+                                    if (!$roomTypeInfo) {
+                                        continue;
+                                    }
+                                    $idHotel = (int)$roomTypeInfo['id_hotel'];
+                                    $dateFrom = date('Y-m-d', strtotime($roomBooking['check_in_date']));
+                                    $dateTo = date('Y-m-d', strtotime($roomBooking['check_out_date']));
+                                    $objAriUpdates->saveAriUpdateRow($idHotel, $idRoomType, $dateFrom, $dateTo);
                                 }
-                                $idRoomType = (int)$roomBooking['id_room_type'];
-                                $roomTypeInfo = $objHotelRoomType->getRoomTypeInfoByIdProduct($idRoomType);
-                                if (!$roomTypeInfo) {
-                                    continue;
-                                }
-                                $idHotel = (int)$roomTypeInfo['id_hotel'];
-                                $dateFrom = date('Y-m-d', strtotime($roomBooking['check_in_date']));
-                                $dateTo = date('Y-m-d', strtotime($roomBooking['check_out_date']));
-                                $objAriUpdates->saveAriUpdateRow($idHotel, $idRoomType, $dateFrom, $dateTo);
                             }
                         }
                     }
+                    $this->addOrderHistory($params['id_booking'], $objOrderState);
                 }
-                $this->addOrderHistory($params['id_booking'], $objOrderState);
             }
+        } catch (\Throwable $e) {
+            PrestaShopLogger::addLog(
+                'qlocmconnector: cancel/refund price adjustment or state change failed for order '
+                    .(int) $objOrder->id.' - order state may not have been updated: '.$e->getMessage(),
+                3
+            );
+            throw $e;
         }
 
         if ( isset($params['price_details']['total_price_with_tax'])
@@ -2119,6 +2452,126 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         $this->deleteWsFeaturePrices();
         QloCMConnector::$idBookingCm = null;
         $this->getBookingDetails($objOrder->id);
+    }
+
+    /**
+     * Finds order rooms that are segments of a split stay: consecutive bookings of one room
+     * type on different rooms that together cover one requested room's stay.
+     *
+     * @param array $orderRooms order rooms (htl_booking_detail rows) keyed by any key
+     * @param array $roomTypes requested room types from formatRoomTypesInRequestData()
+     *
+     * @return array order room key => ['room_type_key', 'chain', 'chain_nights', 'chain_segments']
+     */
+    protected function getSplitRoomSegments($orderRooms, $roomTypes)
+    {
+        $splitSegments = array();
+        $chainIndex = 0;
+        foreach ($roomTypes as $roomTypeKey => $roomType) {
+            if (!isset($roomType['id_room_type'], $roomType['check_in_date'], $roomType['check_out_date'])) {
+                continue;
+            }
+            $requestedFrom = strtotime(date('Y-m-d', strtotime($roomType['check_in_date'])));
+            $requestedTo = strtotime(date('Y-m-d', strtotime($roomType['check_out_date'])));
+
+            $segments = array();
+            foreach ($orderRooms as $orderRoomKey => $orderRoom) {
+                if ((int) $orderRoom['id_product'] == (int) $roomType['id_room_type'] && !isset($splitSegments[$orderRoomKey])) {
+                    $segments[$orderRoomKey] = array(
+                        'from' => strtotime(date('Y-m-d', strtotime($orderRoom['date_from']))),
+                        'to' => strtotime(date('Y-m-d', strtotime($orderRoom['date_to']))),
+                    );
+                }
+            }
+
+            $used = array();
+            foreach ($segments as $startKey => $startSegment) {
+                if ($startSegment['from'] != $requestedFrom || $startSegment['to'] >= $requestedTo || isset($used[$startKey])) {
+                    continue;
+                }
+                $chain = array($startKey);
+                $chainEnd = $startSegment['to'];
+                while ($chainEnd < $requestedTo) {
+                    $nextKey = false;
+                    foreach ($segments as $segmentKey => $segment) {
+                        if (!isset($used[$segmentKey]) && !in_array($segmentKey, $chain, true) && $segment['from'] == $chainEnd) {
+                            $nextKey = $segmentKey;
+                            break;
+                        }
+                    }
+                    if ($nextKey === false) {
+                        break;
+                    }
+                    $chain[] = $nextKey;
+                    $chainEnd = $segments[$nextKey]['to'];
+                }
+
+                if ($chainEnd == $requestedTo && count($chain) > 1) {
+                    $chainIndex++;
+                    foreach ($chain as $segmentKey) {
+                        $used[$segmentKey] = true;
+                        $splitSegments[$segmentKey] = array(
+                            'room_type_key' => $roomTypeKey,
+                            'chain' => $chainIndex,
+                            'chain_nights' => (int) round(($requestedTo - $requestedFrom) / 86400),
+                            'chain_segments' => count($chain),
+                        );
+                    }
+                }
+            }
+        }
+
+        return $splitSegments;
+    }
+
+    /**
+     * Applies the sent occupancy (adults, children, ages) to the booking row and its cart row.
+     *
+     * @param int $idHotelBookingDetail
+     * @param array $room requested room data with an 'occupancy' entry
+     *
+     * @return bool
+     */
+    public function updateRoomOccupancyInOrder($idHotelBookingDetail, $room)
+    {
+        if (!isset($room['occupancy']['adults'])) {
+            return false;
+        }
+
+        $objHotelBookingDetail = new HotelBookingDetail((int) $idHotelBookingDetail);
+        if (!Validate::isLoadedObject($objHotelBookingDetail)) {
+            return false;
+        }
+
+        $children = isset($room['occupancy']['children']) ? (int) $room['occupancy']['children'] : 0;
+        $childAges = array();
+        if (isset($room['occupancy']['children_ages']) && is_array($room['occupancy']['children_ages'])) {
+            $childAges = $room['occupancy']['children_ages'];
+        } elseif (isset($room['occupancy']['child_ages']) && is_array($room['occupancy']['child_ages'])) {
+            $childAges = $room['occupancy']['child_ages'];
+        }
+        $childAges = array_slice(array_pad(array_map('intval', array_values($childAges)), $children, 17), 0, $children);
+
+        $objHotelBookingDetail->adults = (int) $room['occupancy']['adults'];
+        $objHotelBookingDetail->children = $children;
+        $objHotelBookingDetail->child_ages = json_encode($childAges);
+        $result = $objHotelBookingDetail->save();
+
+        if ($idHotelCartBookingData = (int) Db::getInstance()->getValue(
+            'SELECT `id` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+            WHERE `id_order` = '.(int) $objHotelBookingDetail->id_order.'
+            AND `id_room` = '.(int) $objHotelBookingDetail->id_room.'
+            AND `date_from` = "'.pSQL($objHotelBookingDetail->date_from).'"
+            AND `date_to` = "'.pSQL($objHotelBookingDetail->date_to).'"'
+        )) {
+            $objHotelCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
+            $objHotelCartBookingData->adults = $objHotelBookingDetail->adults;
+            $objHotelCartBookingData->children = $objHotelBookingDetail->children;
+            $objHotelCartBookingData->child_ages = $objHotelBookingDetail->child_ages;
+            $result = $objHotelCartBookingData->save() && $result;
+        }
+
+        return $result;
     }
 
     /**
@@ -2145,7 +2598,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             if (isset($room['unit_price_without_tax'])) {
                 $roomPriceTaxExcl = $room['unit_price_without_tax'];
             } else if (isset($room['total_price_with_tax']) && isset($room['total_tax'])) {
-                $roomPriceTaxExcl = abs($room['total_price_with_tax'] - $room['total_tax']);
+                $roomPriceTaxExcl = $room['total_price_with_tax'] - $room['total_tax'];
             }
 
             if ($roomPriceTaxExcl) {
@@ -2190,17 +2643,46 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                 0
             );
 
+            $oldDateFrom = $objHotelBookingDetail->date_from;
+            $oldDateTo = $objHotelBookingDetail->date_to;
+            $oldNights = max((int) HotelHelper::getNumberOfDays($oldDateFrom, $oldDateTo), 1);
+
             $objHotelBookingDetail->date_from = $room['check_in_date'];
             $objHotelBookingDetail->date_to = $room['check_out_date'];
 
             $objHotelBookingDetail->total_price_tax_incl = $roomTotalPrice['total_price_tax_excl'] + (isset($room['total_tax']) ? $room['total_tax'] : 0);
             $objHotelBookingDetail->total_price_tax_excl = $roomTotalPrice['total_price_tax_excl'];
-            $objHotelBookingDetail->total_paid_amount = $roomTotalPrice['total_price_tax_excl'];
+            $objHotelBookingDetail->total_paid_amount = $objHotelBookingDetail->total_price_tax_incl;
             $objHotelBookingDetail->save();
+
+            // Keep the cart booking row the room was ordered from on the same dates.
+            if (strtotime($oldDateFrom) != strtotime($objHotelBookingDetail->date_from)
+                || strtotime($oldDateTo) != strtotime($objHotelBookingDetail->date_to)
+            ) {
+                Db::getInstance()->update(
+                    'htl_cart_booking_data',
+                    array(
+                        'date_from' => pSQL(date('Y-m-d H:i:s', strtotime($objHotelBookingDetail->date_from))),
+                        'date_to' => pSQL(date('Y-m-d H:i:s', strtotime($objHotelBookingDetail->date_to))),
+                    ),
+                    '`id_order` = '.(int) $objHotelBookingDetail->id_order.'
+                    AND `id_room` = '.(int) $objHotelBookingDetail->id_room.'
+                    AND `date_from` = "'.pSQL($oldDateFrom).'"
+                    AND `date_to` = "'.pSQL($oldDateTo).'"'
+                );
+            }
 
             // Updating the price
             $objOrderDetail->total_price_tax_incl += $objHotelBookingDetail->total_price_tax_incl;
             $objOrderDetail->total_price_tax_excl += $objHotelBookingDetail->total_price_tax_excl;
+
+            // Sync quantity/unit price with the new night count (only this room's nights change).
+            $newNights = max((int) HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to), 1);
+            $newQuantity = max((int) $objOrderDetail->product_quantity - $oldNights + $newNights, 1);
+            $objOrderDetail->product_quantity = $newQuantity;
+            $objOrderDetail->unit_price_tax_incl = Tools::ps_round($objOrderDetail->total_price_tax_incl / $newQuantity, _PS_PRICE_COMPUTE_PRECISION_);
+            $objOrderDetail->unit_price_tax_excl = Tools::ps_round($objOrderDetail->total_price_tax_excl / $newQuantity, _PS_PRICE_COMPUTE_PRECISION_);
+
             $objOrderDetail->save();
 
             $objOrder->total_paid += $objHotelBookingDetail->total_price_tax_incl;
@@ -2256,18 +2738,32 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             }
 
             $objCart = $this->context->cart;
+            $invoiceDeltaProductsExcl = 0;
+            $invoiceDeltaProductsIncl = 0;
+            $invoiceDeltaPaidExcl = 0;
+            $invoiceDeltaPaidIncl = 0;
             $formattedServices = array();
             foreach ($services as $serviceKey => &$service) {
                 if (!isset($service['id_product'])) {
                     $idServiceTaxRulesGroup = 0;
                     $servicePriceTaxExculded = floatval($service['total_price_with_tax']) - floatval($service['total_tax']);
-                    $serviceTaxRate = (floatval($service['total_tax'])/floatval($servicePriceTaxExculded))*100;
+                    $serviceTaxRate = $servicePriceTaxExculded > 0 ? (floatval($service['total_tax'])/floatval($servicePriceTaxExculded))*100 : 0;
                     if(isset($service['taxes']) && $service['taxes']) {
                         $idServiceTaxRulesGroup = $this->createTaxRulesGroup($serviceTaxRate, $service['taxes'], $objAddress);
                     } else {
                         $idServiceTaxRulesGroup = $this->createTaxRulesGroup($serviceTaxRate, false, $objAddress);
                     }
                     $service['id_tax_rules_group'] = $idServiceTaxRulesGroup;
+
+                    if (!isset($service['quantity'])) {
+                        $service['quantity'] = 1;
+                    }
+                    if (isset($service['price_mode']) && $service['price_mode'] == self::SERVICE_PRICE_MODE_PER_PERSON_PER_NIGHT) {
+                        // Fold per-person into quantity; nights come from the per-night calculation method.
+                        $numOccupants = max((int) $objHotelBookingDetail->adults + (int) $objHotelBookingDetail->children, 1);
+                        $service['quantity'] = $service['quantity'] * $numOccupants;
+                    }
+
                     $serviceKey = $this->createWsService($service, $objHotelBookingDetail->id_product, $idServiceTaxRulesGroup);
                     $service['id_product'] = $serviceKey;
                 }
@@ -2304,13 +2800,14 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                 )
                 ) {
                     $objServiceProductCartDetail = new ServiceProductCartDetail((int) $idServiceProductCartDetail);
-                    $insertedServiceProductIdOrderDetail = $objHotelBookingDetail->getLastInsertedServiceIdOrderDetail($objOrder->id, $service['id_product']);
+                    $insertedServiceProductIdOrderDetail = $objHotelBookingDetail->getLastInsertedServiceIdOrderDetail($objOrder->id, $product['id_product']);
                     $objOrderDetail = new OrderDetail($insertedServiceProductIdOrderDetail);
 
-                    $numDays = 1;
-                    if (Product::getProductPriceCalculation($product['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                        $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
-                    }
+                    $numDays = self::getServiceBillableDays(
+                        Product::getProductPriceCalculation($product['id_product']),
+                        $objHotelBookingDetail->date_from,
+                        $objHotelBookingDetail->date_to
+                    );
 
                     $quantity = $objServiceProductCartDetail->quantity * $numDays;
 
@@ -2363,22 +2860,29 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         $totalPriceTaxExcl = $services[$product['id_product']]['total_price_without_tax'];
                         $totalPriceTaxIncl = $totalPriceTaxExcl * $oldTaxMultiplier;
 
-                        $unitPriceTaxExcl = $totalPriceTaxExcl / $quantity;
-                        $unitPriceTaxIncl =  $totalPriceTaxIncl / $quantity;
+                        $unitPriceTaxExcl = $quantity > 0 ? $totalPriceTaxExcl / $quantity : 0;
+                        $unitPriceTaxIncl = $quantity > 0 ? $totalPriceTaxIncl / $quantity : 0;
                     }
 
                     if (isset($services[$product['id_product']]['id_tax_rules_group'])) {
-                        $objAddress = new Address((int) $objOrder->id_address_tax);
-                        $objTaxManager = TaxManagerFactory::getManager($objAddress, $services[$product['id_product']]['id_tax_rules_group']);
-                        $objTaxCalculator = $objTaxManager->getTaxCalculator();
-                        $unitPriceTaxIncl = $objTaxCalculator->addTaxes($unitPriceTaxExcl);
+                        if (isset($services[$product['id_product']]['total_tax'])) {
+                            // Use the sent total_tax, not a recomputed rate; the group is kept for tax rows.
+                            $totalPriceTaxIncl = $totalPriceTaxExcl + $services[$product['id_product']]['total_tax'];
+                            $totalPriceTaxIncl = Tools::ps_round(($totalPriceTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
+                            $unitPriceTaxIncl = Tools::ps_round($quantity > 0 ? ($totalPriceTaxIncl / $quantity) : 0, _PS_PRICE_COMPUTE_PRECISION_);
+                        } else {
+                            $objAddress = new Address((int) $objOrder->id_address_tax);
+                            $objTaxManager = TaxManagerFactory::getManager($objAddress, $services[$product['id_product']]['id_tax_rules_group']);
+                            $objTaxCalculator = $objTaxManager->getTaxCalculator();
+                            $unitPriceTaxIncl = $objTaxCalculator->addTaxes($unitPriceTaxExcl);
 
-                        $unitPriceTaxIncl = Tools::ps_round($unitPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
-                        $totalPriceTaxIncl = Tools::ps_round(($unitPriceTaxIncl * $quantity), _PS_PRICE_COMPUTE_PRECISION_);
+                            $unitPriceTaxIncl = Tools::ps_round($unitPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
+                            $totalPriceTaxIncl = Tools::ps_round(($unitPriceTaxIncl * $quantity), _PS_PRICE_COMPUTE_PRECISION_);
+                        }
                     } elseif (isset($services[$product['id_product']]['total_tax'])) {
                         $totalPriceTaxIncl = $totalPriceTaxExcl + $services[$product['id_product']]['total_tax'];
                         $totalPriceTaxIncl = Tools::ps_round(($totalPriceTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
-                        $unitPriceTaxIncl = Tools::ps_round($totalPriceTaxIncl / $quantity, _PS_PRICE_COMPUTE_PRECISION_);
+                        $unitPriceTaxIncl = Tools::ps_round($quantity > 0 ? ($totalPriceTaxIncl / $quantity) : 0, _PS_PRICE_COMPUTE_PRECISION_);
                     }
 
                     $objServiceProductOrderDetail = new ServiceProductOrderDetail();
@@ -2403,6 +2907,11 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                     $objOrder->total_paid_tax_excl += Tools::ps_round($objServiceProductOrderDetail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
                     $objOrder->total_paid_tax_incl += Tools::ps_round($objServiceProductOrderDetail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
 
+                    $invoiceDeltaProductsExcl += $objServiceProductOrderDetail->total_price_tax_excl;
+                    $invoiceDeltaProductsIncl += $objServiceProductOrderDetail->total_price_tax_incl;
+                    $invoiceDeltaPaidExcl += Tools::ps_round($objServiceProductOrderDetail->total_price_tax_excl, _PS_PRICE_COMPUTE_PRECISION_);
+                    $invoiceDeltaPaidIncl += Tools::ps_round($objServiceProductOrderDetail->total_price_tax_incl, _PS_PRICE_COMPUTE_PRECISION_);
+
                     $objOrderDetail->unit_price_tax_excl += $unitPriceTaxExcl;
                     $objOrderDetail->unit_price_tax_incl += $unitPriceTaxIncl;
                     $objOrderDetail->total_price_tax_excl += $unitPriceTaxExcl * $objServiceProductOrderDetail->quantity;
@@ -2416,6 +2925,16 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             $objOrder->total_discounts_tax_excl += (float)abs($objCart->getOrderTotal(false, Cart::ONLY_DISCOUNTS));
             $objOrder->total_discounts_tax_incl += (float)abs($objCart->getOrderTotal(true, Cart::ONLY_DISCOUNTS));
             $objOrder->update();
+
+            // Sync invoice totals with the added service lines.
+            if ($idOrderInvoice) {
+                $objOrderInvoice = new OrderInvoice((int) $idOrderInvoice);
+                $objOrderInvoice->total_products += $invoiceDeltaProductsExcl;
+                $objOrderInvoice->total_products_wt += $invoiceDeltaProductsIncl;
+                $objOrderInvoice->total_paid_tax_excl += $invoiceDeltaPaidExcl;
+                $objOrderInvoice->total_paid_tax_incl += $invoiceDeltaPaidIncl;
+                $objOrderInvoice->update();
+            }
         }
     }
 
@@ -2518,9 +3037,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                     foreach ($selectedAdditonalServices[$idHotelBooking]['additional_services'] as $service) {
                         $serviceOrderDetail = new OrderDetail($service['id_order_detail']);
                         $cart_quantity = $service['quantity'];
-                        if ($service['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                            $cart_quantity = $cart_quantity * $quantity;
-                        }
+                        $cart_quantity = $cart_quantity * self::getServiceBillableDays($service['price_calculation_method'], $dateFrom, $dateTo);
 
                         if ($cart_quantity >= $serviceOrderDetail->product_quantity) {
                             $serviceOrderDetail->delete();
@@ -2614,21 +3131,26 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             $cartRulesFormatted[$key]['currency'] = isset($cartRule['currency']) ? $cartRule['currency'] : '';
         }
 
+        // Tax rate from the order's corrected totals; getTaxesAverageUsed() uses the catalog rate.
+        $taxRate = $objOrder->total_paid_tax_excl > 0
+            ? (($objOrder->total_paid_tax_incl - $objOrder->total_paid_tax_excl) / $objOrder->total_paid_tax_excl)
+            : 0;
+
         if ($idCartRules = $this->createCartRules($cartRulesFormatted)) {
             foreach ($idCartRules as $idCartRule) {
                 $objCartRule = new CartRule($idCartRule);
                 $invoiceCartRules = array();
-                if ($invoiceCollection = $objOrder->getInvoicesCollection()) {
+                if (($invoiceCollection = $objOrder->getInvoicesCollection()) && count($invoiceCollection)) {
                     foreach ($invoiceCollection as $orderInvoice) {
                         if ((int) $objCartRule->reduction_amount) {
                             if (!($objCartRule->reduction_amount > $orderInvoice->total_paid_tax_incl)) {
                                 $this->error_msg = Tools::displayError('The discount value is greater than the order invoice total.').$orderInvoice->getInvoiceNumberFormatted(Context::getContext()->language->id, (int)$objOrder->id_shop).')';
                                 $invoiceCartRules[$orderInvoice->id]['value_tax_incl'] = Tools::ps_round($objCartRule->reduction_amount, _PS_PRICE_COMPUTE_PRECISION_);
-                                $invoiceCartRules[$orderInvoice->id]['value_tax_excl'] = Tools::ps_round($objCartRule->reduction_amount / (1 + ($objOrder->getTaxesAverageUsed() / 100)), _PS_PRICE_COMPUTE_PRECISION_);
+                                $invoiceCartRules[$orderInvoice->id]['value_tax_excl'] = Tools::ps_round($objCartRule->reduction_amount / (1 + $taxRate), _PS_PRICE_COMPUTE_PRECISION_);
 
                                 $this->applyDiscountOnInvoice($orderInvoice, $invoiceCartRules[$orderInvoice->id]['value_tax_incl'], $invoiceCartRules[$orderInvoice->id]['value_tax_excl']);
                             }
-                        } elseif ($objCartRule->reduction_percent) {
+                        } elseif ((float) $objCartRule->reduction_percent) {
                             $invoiceCartRules[$orderInvoice->id]['value_tax_incl'] = Tools::ps_round($objOrder->total_paid_tax_incl * $objCartRule->reduction_percent / 100, _PS_PRICE_COMPUTE_PRECISION_);
                             $invoiceCartRules[$orderInvoice->id]['value_tax_excl'] = Tools::ps_round($objOrder->total_paid_tax_excl * $objCartRule->reduction_percent / 100, _PS_PRICE_COMPUTE_PRECISION_);
 
@@ -2636,12 +3158,13 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         }
                     }
                 } else {
-                    if ($objCartRule->reduction_percent) {
+                    // Cast: DB values like "0.00" are truthy strings.
+                    if ((float) $objCartRule->reduction_percent) {
                         $invoiceCartRules[0]['value_tax_incl'] = Tools::ps_round($objOrder->total_paid_tax_incl * $objCartRule->reduction_percent / 100, _PS_PRICE_COMPUTE_PRECISION_);
                         $invoiceCartRules[0]['value_tax_excl'] = Tools::ps_round($objOrder->total_paid_tax_excl * $objCartRule->reduction_percent / 100, _PS_PRICE_COMPUTE_PRECISION_);
-                    } elseif ($objCartRule->reduction_amount) {
+                    } elseif ((float) $objCartRule->reduction_amount) {
                         $invoiceCartRules[0]['value_tax_incl'] = Tools::ps_round($objCartRule->reduction_amount, _PS_PRICE_COMPUTE_PRECISION_);
-                        $invoiceCartRules[0]['value_tax_excl'] = Tools::ps_round($objCartRule->reduction_amount / (1 + ($objOrder->getTaxesAverageUsed() / 100)), _PS_PRICE_COMPUTE_PRECISION_);
+                        $invoiceCartRules[0]['value_tax_excl'] = Tools::ps_round($objCartRule->reduction_amount / (1 + $taxRate), _PS_PRICE_COMPUTE_PRECISION_);
                     }
                 }
 
@@ -2747,23 +3270,38 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                 foreach ($roomType['rooms'] as &$room) {
                     $roomServices = array();
                     $totalPriceTaxExcl = $room['total_price_with_tax'] - $room['total_tax'];
+                    $roomTaxRate = $totalPriceTaxExcl > 0 ? ($room['total_tax']/$totalPriceTaxExcl)*100 : 0;
                     if(isset($room['taxes']) && $room['taxes']) {
-                        $room['id_tax_rules_group'] = $this->createTaxRulesGroup(($room['total_tax']/$totalPriceTaxExcl)*100, $room['taxes'], $objAddress);
+                        $room['id_tax_rules_group'] = $this->createTaxRulesGroup($roomTaxRate, $room['taxes'], $objAddress);
                     } else {
-                        $room['id_tax_rules_group'] = $this->createTaxRulesGroup(($room['total_tax']/$totalPriceTaxExcl)*100, false, $objAddress);
+                        $room['id_tax_rules_group'] = $this->createTaxRulesGroup($roomTaxRate, false, $objAddress);
                     }
 
                     if (isset($room['services']) && $room['services']) {
                         $idServiceTaxRulesGroup = 0;
                         foreach ($room['services'] as $serviceKey => &$service) {
                             $servicePriceTaxExculded = floatval($service['total_price_with_tax']) - floatval($service['total_tax']);
-                            $serviceTaxRate = (floatval($service['total_tax'])/floatval($servicePriceTaxExculded))*100;
+                            $serviceTaxRate = $servicePriceTaxExculded > 0 ? (floatval($service['total_tax'])/floatval($servicePriceTaxExculded))*100 : 0;
                             if(isset($service['taxes']) && $service['taxes']) {
                                 $idServiceTaxRulesGroup = $this->createTaxRulesGroup($serviceTaxRate, $service['taxes'], $objAddress);
                             } else {
                                 $idServiceTaxRulesGroup = $this->createTaxRulesGroup($serviceTaxRate, false, $objAddress);
                             }
                             $service['id_tax_rules_group'] = $idServiceTaxRulesGroup;
+
+                            if (isset($service['price_mode']) && $service['price_mode'] == self::SERVICE_PRICE_MODE_PER_PERSON_PER_NIGHT) {
+                                // Fold per-person into quantity; nights come from the per-night calculation method.
+                                if (!isset($service['quantity'])) {
+                                    $service['quantity'] = 1;
+                                }
+                                $numOccupants = max(
+                                    (int) (isset($room['occupancy']['adults']) ? $room['occupancy']['adults'] : 0)
+                                    + (int) (isset($room['occupancy']['children']) ? $room['occupancy']['children'] : 0),
+                                    1
+                                );
+                                $service['quantity'] = $service['quantity'] * $numOccupants;
+                            }
+
                             $service['id_product'] = $this->createWsService($service, $roomType['id_room_type'], $idServiceTaxRulesGroup);
 
                             $serviceKey = $service['id_product'];
@@ -2815,7 +3353,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         && isset($hotelRoomData['rm_data'][$roomType['id_room_type']]['data']['available'])
                         && $hotelRoomData['rm_data'][$roomType['id_room_type']]['data']['available']
                     ) {
-                        if ($idHtlCartBookingData = $objHotelCartBookingData->updateCartBooking(
+                        if (!($idHtlCartBookingData = $objHotelCartBookingData->updateCartBooking(
                             $roomType['id_room_type'],
                             $occupancy,
                             'up',
@@ -2826,7 +3364,11 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             $roomServices,
                             $this->context->cart->id,
                             $this->context->cart->id_guest
-                        )) {
+                        ))) {
+                            // Don't silently book fewer rooms than the OTA sold.
+                            $this->error_msg = Tools::displayError('Requested room(s) not available');
+                            return false;
+                        } else {
                             $objCartBookingData = new HotelCartBookingData((int) $idHtlCartBookingData);
                             $dateRoomJoinKey = strtotime($dateFrom).strtotime($dateTo).$objCartBookingData->id_product.$objCartBookingData->id_room;
                             // To update the price after valiate order is called.
@@ -2834,8 +3376,10 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             $this->wsRequestedRoomTypes[$dateRoomJoinKey]['room'] = $room;
 
                             if (isset($room['id_tax_rules_group']) && Validate::isLoadedObject(new TaxRulesGroup((int) $room['id_tax_rules_group']))) {
+                                // Keep both: the group for tax rows, the sent total_tax for the price.
                                 $this->wsRequestedRooms[$dateRoomJoinKey]['id_tax_rules_group'] = $room['id_tax_rules_group'];
-                            } else if (isset($room['total_tax'])) {
+                            }
+                            if (isset($room['total_tax'])) {
                                 $this->wsRequestedRooms[$dateRoomJoinKey]['total_tax'] = $room['total_tax'];
                             }
 
@@ -2844,7 +3388,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             if (isset($room['unit_price_without_tax'])) {
                                 $roomPriceTaxExcl = $room['unit_price_without_tax'];
                             } else if (isset($room['total_price_with_tax']) && isset($room['total_tax'])) {
-                                $roomPriceTaxExcl = abs($room['total_price_with_tax'] - $room['total_tax']);
+                                $roomPriceTaxExcl = $room['total_price_with_tax'] - $room['total_tax'];
                             }
 
                             $room['unit_price_without_tax'] = Tools::ps_round($roomPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
@@ -2885,11 +3429,13 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             foreach ($availableRooms['data'] as $key => $availableRoom) {
                                 if($key == 'partially_available') {
                                     foreach ($availableRoom as $avlRoom) {
-                                        $avl_room = reset($avlRoom['rooms']);
-                                        $roomDayFragments[$avl_room['id_room']][] = array(
-                                            'date_from' => $avlRoom['date_from'],
-                                            'date_to' => $avlRoom['date_to'],
-                                        );
+                                        // all rooms free on this day, so several requested rooms fit side by side
+                                        foreach ($avlRoom['rooms'] as $avl_room) {
+                                            $roomDayFragments[$avl_room['id_room']][] = array(
+                                                'date_from' => $avlRoom['date_from'],
+                                                'date_to' => $avlRoom['date_to'],
+                                            );
+                                        }
                                     }
                                 }
                             }
@@ -2928,13 +3474,25 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             }
                         }
 
+                        // Cover each night once with the fewest room changes. Rooms this request already
+                        // carted aren't seen as taken by the search, so pass them in.
+                        $takenSegments = Db::getInstance()->executeS(
+                            'SELECT `id_room`, `date_from`, `date_to` FROM `'._DB_PREFIX_.'htl_cart_booking_data`
+                            WHERE `id_cart` = '.(int) $this->context->cart->id.' AND `id_product` = '.(int) $roomType['id_room_type']
+                        );
+                        $partialRooms = $this->getPartialStayCoverage($partialRooms, $dateFrom, $dateTo, $takenSegments ?: array());
+                        if ($partialRooms === false) {
+                            $this->error_msg = Tools::displayError('Requested room(s) not available');
+                            return false;
+                        }
+
                         if($partialRooms) {
                             // Calculate the requested total price and tax for proportional distribution
                             $requestedTotalPriceTaxExcl = 0;
                             if (isset($room['unit_price_without_tax'])) {
                                 $requestedTotalPriceTaxExcl = $room['unit_price_without_tax'];
                             } else if (isset($room['total_price_with_tax']) && isset($room['total_tax'])) {
-                                $requestedTotalPriceTaxExcl = abs($room['total_price_with_tax'] - $room['total_tax']);
+                                $requestedTotalPriceTaxExcl = $room['total_price_with_tax'] - $room['total_tax'];
                             }
                             $requestedTotalTax = isset($room['total_tax']) ? floatval($room['total_tax']) : 0;
                             $totalSplitNights = 0;
@@ -2950,7 +3508,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                             $totalSplitRooms = count($partialRooms);
 
                             foreach ($partialRooms as $avlRoom) {
-                                if ($idHtlCartBookingData = $objHotelCartBookingData->updateCartBooking(
+                                if (!($idHtlCartBookingData = $objHotelCartBookingData->updateCartBooking(
                                     $roomType['id_room_type'],
                                     $occupancy,
                                     'up',
@@ -2961,7 +3519,11 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                                     $roomServices,
                                     $this->context->cart->id,
                                     $this->context->cart->id_guest
-                                )) {
+                                ))) {
+                                    // A missing segment would leave nights of the stay unbooked.
+                                    $this->error_msg = Tools::displayError('Requested room(s) not available');
+                                    return false;
+                                } else {
                                     $objCartBookingData = new HotelCartBookingData((int) $idHtlCartBookingData);
 
                                     /* Partial Booking indicator */
@@ -3073,6 +3635,137 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         return true;
     }
 
+    /**
+     * Picks free fragments that cover each night of the stay once, staying on the same room
+     * while it is free, else taking the longest free fragment.
+     *
+     * @param array $fragments free ranges, each ['id_room', 'date_from', 'date_to']
+     * @param string $dateFrom stay check-in (Y-m-d)
+     * @param string $dateTo stay check-out (Y-m-d)
+     * @param array $takenSegments ranges already taken in the cart, each ['id_room', 'date_from', 'date_to']
+     *
+     * @return array|false segments to book, each ['id_room', 'date_from', 'date_to'], or false
+     *                     when some night has no free room
+     */
+    protected function getPartialStayCoverage($fragments, $dateFrom, $dateTo, $takenSegments = array())
+    {
+        $stayEnd = strtotime(date('Y-m-d', strtotime($dateTo)));
+        $current = strtotime(date('Y-m-d', strtotime($dateFrom)));
+        $segments = array();
+        $previousRoom = 0;
+        while ($current < $stayEnd) {
+            $best = false;
+            foreach ($fragments as $fragment) {
+                $fragmentFrom = strtotime(date('Y-m-d', strtotime($fragment['date_from'])));
+                $fragmentTo = min(strtotime(date('Y-m-d', strtotime($fragment['date_to']))), $stayEnd);
+                if ($fragmentFrom > $current || $fragmentTo <= $current) {
+                    continue;
+                }
+                // Cut the fragment where the same room is already taken in the cart.
+                $isTaken = false;
+                foreach ($takenSegments as $taken) {
+                    if ((int) $taken['id_room'] != (int) $fragment['id_room']) {
+                        continue;
+                    }
+                    $takenFrom = strtotime(date('Y-m-d', strtotime($taken['date_from'])));
+                    $takenTo = strtotime(date('Y-m-d', strtotime($taken['date_to'])));
+                    if ($takenFrom <= $current && $takenTo > $current) {
+                        $isTaken = true;
+                        break;
+                    }
+                    if ($takenFrom > $current && $takenFrom < $fragmentTo) {
+                        $fragmentTo = $takenFrom;
+                    }
+                }
+                if ($isTaken) {
+                    continue;
+                }
+                if ($best === false
+                    || ((int) $fragment['id_room'] == $previousRoom && (int) $best['id_room'] != $previousRoom)
+                    || ($fragmentTo > $best['to'] && !((int) $best['id_room'] == $previousRoom && (int) $fragment['id_room'] != $previousRoom))
+                ) {
+                    $best = array('id_room' => (int) $fragment['id_room'], 'to' => $fragmentTo);
+                }
+            }
+            if ($best === false) {
+                return false;
+            }
+
+            $segments[] = array(
+                'id_room' => $best['id_room'],
+                'date_from' => date('Y-m-d', $current),
+                'date_to' => date('Y-m-d', $best['to']),
+            );
+            $previousRoom = $best['id_room'];
+            $current = $best['to'];
+        }
+
+        return $segments;
+    }
+
+    /**
+     * Core price calculation method for a per-booking or per-night service: PER_BOOKING/PER_DAY
+     * when this core defines them, else ONCE_FOR_BOOKING/CHECKIN_AND_DURING_STAY.
+     *
+     * @param bool $perNight
+     *
+     * @return int
+     */
+    public static function getServicePriceCalculationMethod($perNight)
+    {
+        if ($perNight) {
+            return defined('Product::PRICE_CALCULATION_METHOD_PER_DAY')
+                ? Product::PRICE_CALCULATION_METHOD_PER_DAY
+                : Product::PRICE_CALCULATION_METHOD_CHECKIN_AND_DURING_STAY;
+        }
+
+        return defined('Product::PRICE_CALCULATION_METHOD_PER_BOOKING')
+            ? Product::PRICE_CALCULATION_METHOD_PER_BOOKING
+            : Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING;
+    }
+
+    /**
+     * Whether the price calculation method bills the service for each night of the stay.
+     *
+     * @param int $priceCalculationMethod
+     *
+     * @return bool
+     */
+    public static function isPerNightPriceCalculationMethod($priceCalculationMethod)
+    {
+        if (defined('Product::PRICE_CALCULATION_METHOD_PER_DAY')) {
+            return $priceCalculationMethod == Product::PRICE_CALCULATION_METHOD_PER_DAY;
+        }
+
+        return !in_array((int) $priceCalculationMethod, array(
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY,
+            Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY,
+            Product::PRICE_CALCULATION_METHOD_CHECKIN_DAY_AND_CHECKOUT_DAY,
+            Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING,
+        ));
+    }
+
+    /**
+     * Days a service's unit price is billed for over a stay, as core computes it.
+     *
+     * @param int $priceCalculationMethod
+     * @param string $dateFrom
+     * @param string $dateTo
+     *
+     * @return int
+     */
+    public static function getServiceBillableDays($priceCalculationMethod, $dateFrom, $dateTo)
+    {
+        if (method_exists('Product', 'getServicePriceBillableDays')) {
+            return (int) Product::getServicePriceBillableDays($priceCalculationMethod, $dateFrom, $dateTo);
+        }
+
+        if (self::isPerNightPriceCalculationMethod($priceCalculationMethod)) {
+            return max((int) HotelHelper::getNumberOfDays($dateFrom, $dateTo), 1);
+        }
+
+        return 1;
+    }
 
     /**
      * Creating new service product for the request.
@@ -3102,7 +3795,8 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             } else if($service['price_mode'] == self::SERVICE_PRICE_MODE_PER_NIGHT) {
                 $service['price_mode'] = self::API_SERVICE_PRICE_MODE_PER_NIGHT;
             } else if ($service['price_mode'] == self::SERVICE_PRICE_MODE_PER_PERSON_PER_NIGHT) {
-                $service['price_mode'] = self::API_SERVICE_PRICE_MODE_PER_PERSON_PER_NIGHT;
+                // The caller already folded the per-person factor into quantity; bill per night.
+                $service['price_mode'] = self::API_SERVICE_PRICE_MODE_PER_NIGHT;
             } else {
                 $service['price_mode'] = self::API_SERVICE_PRICE_MODE_PER_BOOKING;
             }
@@ -3133,7 +3827,9 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         $objProduct->show_price = true;
         $objProduct->auto_add_to_cart = false;
         $objProduct->show_at_front = false;
-        $objProduct->price_calculation_method = $service['price_mode'];
+        $objProduct->price_calculation_method = self::getServicePriceCalculationMethod(
+            $service['price_mode'] == self::API_SERVICE_PRICE_MODE_PER_NIGHT
+        );
         $objProduct->redirect_type = '404';
         $objProduct->visibility = 'none';
         $objProduct->minimal_quantity = 1;
@@ -3179,7 +3875,8 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                 1
             )) {
                 foreach ($serviceProducts as $serviceProduct) {
-                    $dateRoomJoinKey = strtotime($serviceProduct['date_from']).strtotime($serviceProduct['date_to']).$serviceProduct['id_product'].$serviceProduct['id_room'];
+                    // Keyed by room type id ('id_room_type'), like wsRequestedRoomTypes.
+                    $dateRoomJoinKey = strtotime($serviceProduct['date_from']).strtotime($serviceProduct['date_to']).$serviceProduct['id_room_type'].$serviceProduct['id_room'];
                     // Checking if the auto add service was sent in the request
                     if (!isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$serviceProduct['id_product']])
                         && ($idServiceProductCartDetail = $objServiceProductCartDetail->alreadyExists(
@@ -3188,7 +3885,18 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         $serviceProduct['id_hotel_cart_booking'])
                     )) {
                         $objServiceProductCartDetail = new ServiceProductCartDetail((int) $idServiceProductCartDetail);
-                        $this->context->cart->updateQty($objServiceProductCartDetail->quantity, $objServiceProductCartDetail->id_product, null, false, 'down');
+                        // Remove quantity x billable days, else a 0-priced line stays in the cart.
+                        $this->context->cart->updateQty(
+                            $objServiceProductCartDetail->quantity * self::getServiceBillableDays(
+                                $serviceProduct['price_calculation_method'],
+                                $serviceProduct['date_from'],
+                                $serviceProduct['date_to']
+                            ),
+                            $objServiceProductCartDetail->id_product,
+                            null,
+                            false,
+                            'down'
+                        );
                         $objServiceProductCartDetail->delete();
                     }
                 }
@@ -3401,6 +4109,11 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         $objBookingDetail->child_ages = $objCartBookingData->child_ages;
                     }
 
+                    $rateDateRoomJoinKey = strtotime($objCartBookingData->date_from).strtotime($objCartBookingData->date_to).$objCartBookingData->id_product.$objCartBookingData->id_room;
+                    $objBookingDetail->rate_plan_name = isset($this->wsRequestedRoomTypes[$rateDateRoomJoinKey]['room']['rate_plan_name'])
+                        ? $this->wsRequestedRoomTypes[$rateDateRoomJoinKey]['room']['rate_plan_name']
+                        : 'Not Available';
+
                     if ($objBookingDetail->save()) {
                         $objServiceProductCartDetail = new ServiceProductCartDetail();
                         $dateRoomJoinKey = strtotime($objCartBookingData->date_from).strtotime($objCartBookingData->date_to).$objCartBookingData->id_product.$objCartBookingData->id_room;
@@ -3413,10 +4126,11 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         ) {
                             foreach ($services as $service) {
                                 $insertedServiceProductIdOrderDetail = $objBookingDetail->getLastInsertedServiceIdOrderDetail($objOrder->id, $service['id_product']);
-                                $numDays = 1;
-                                if (Product::getProductPriceCalculation($service['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                                    $numDays = HotelHelper::getNumberOfDays($objBookingDetail->date_from, $objBookingDetail->date_to);
-                                }
+                                $numDays = self::getServiceBillableDays(
+                                    Product::getProductPriceCalculation($service['id_product']),
+                                    $objBookingDetail->date_from,
+                                    $objBookingDetail->date_to
+                                );
                                 $totalPriceTaxExcl = Product::getServiceProductPrice(
                                     $service['id_product'],
                                     0,
@@ -3437,8 +4151,9 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                                     $objBookingDetail->date_from,
                                     $objBookingDetail->date_to
                                 );
-                                $unitPriceTaxExcl = $totalPriceTaxExcl / ($numDays * $service['quantity']);
-                                $unitPriceTaxIncl = $totalPriceTaxIncl / ($numDays * $service['quantity']);
+                                $serviceQuantityDivisor = $numDays * $service['quantity'];
+                                $unitPriceTaxExcl = $serviceQuantityDivisor > 0 ? $totalPriceTaxExcl / $serviceQuantityDivisor : 0;
+                                $unitPriceTaxIncl = $serviceQuantityDivisor > 0 ? $totalPriceTaxIncl / $serviceQuantityDivisor : 0;
                                 if ($unitPriceTaxExcl > 0) {
                                     $taxMultiplier = $unitPriceTaxIncl / $unitPriceTaxExcl;
                                 } else {
@@ -3459,7 +4174,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                                         $totalPriceTaxIncl = $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['unit_price_without_tax'] * $taxMultiplier;
                                     }
 
-                                    if ($totalPriceTaxExcl > 0) {
+                                    if ($totalPriceTaxExcl > 0 && $quantity > 0) {
                                         $unitPriceTaxExcl = $totalPriceTaxExcl / $quantity;
                                         $unitPriceTaxIncl = $totalPriceTaxIncl / $quantity;
                                     }
@@ -3467,16 +4182,19 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                                     $totalPriceTaxExcl = $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_price_without_tax'];
                                     $totalPriceTaxIncl = $totalPriceTaxExcl * $taxMultiplier;
 
-                                    $unitPriceTaxExcl = $totalPriceTaxExcl / $quantity;
-                                    $unitPriceTaxIncl =  $totalPriceTaxIncl / $quantity;
+                                    $unitPriceTaxExcl = $quantity > 0 ? $totalPriceTaxExcl / $quantity : 0;
+                                    $unitPriceTaxIncl = $quantity > 0 ? $totalPriceTaxIncl / $quantity : 0;
                                 }
 
                                 $objAddress = new Address((int) $objOrder->id_address_tax);
                                 if (!empty($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_tax'])) {
-                                    $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group'] = $this->createTaxRulesGroup(($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_tax']/$totalPriceTaxExcl)*100, false, $objAddress);
-                                }
-
-                                if (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']) && $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']) {
+                                    if (!isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group'])) {
+                                        $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group'] = $this->createTaxRulesGroup($totalPriceTaxExcl > 0 ? ($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_tax']/$totalPriceTaxExcl)*100 : 0, false, $objAddress);
+                                    }
+                                    // Use the sent total_tax, not a recomputed rate; the group is kept for tax rows.
+                                    $totalPriceTaxIncl = Tools::ps_round($totalPriceTaxExcl + $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_tax'], _PS_PRICE_COMPUTE_PRECISION_);
+                                    $unitPriceTaxIncl = Tools::ps_round($quantity > 0 ? ($totalPriceTaxIncl / $quantity) : 0, _PS_PRICE_COMPUTE_PRECISION_);
+                                } elseif (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']) && $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']) {
                                     $objTaxManager = TaxManagerFactory::getManager($objAddress, $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']);
                                     $objTaxCalculator = $objTaxManager->getTaxCalculator();
                                     $unitPriceTaxIncl = $objTaxCalculator->addTaxes($unitPriceTaxExcl);
@@ -3533,7 +4251,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                                     && isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group'])
                                     && $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']
                                 ) {
-                                    $this->saveTaxCalculator($objOrderDetail->id, $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group']);
+                                    $this->saveTaxCalculator($objOrderDetail->id, $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['id_tax_rules_group'], 0, $objServiceProductOrderDetail->id);
                                 }
                             }
 
@@ -3598,6 +4316,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                     $objHotelBookingDetail->total_price_tax_excl = 0;
                     $objHotelBookingDetail->unit_price_tax_incl = 0;
                     $objHotelBookingDetail->unit_price_tax_excl = 0;
+                    $objHotelBookingDetail->total_paid_amount = 0;
                     $objHotelBookingDetail->save();
 
                     // Updating the price
@@ -3615,6 +4334,8 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                         $objOrderInvoice = new OrderInvoice($objOrderDetail->id_order_invoice);
                         $objOrderInvoice->total_paid_tax_excl = 0;
                         $objOrderInvoice->total_paid_tax_incl = 0;
+                        $objOrderInvoice->total_products = 0;
+                        $objOrderInvoice->total_products_wt = 0;
                         $objOrderInvoice->update();
                     }
                 }
@@ -3655,7 +4376,8 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                 }
 
                 if($orderDetailsList) {
-                    Db::getInstance()->execute('DELETE FROM `' . _DB_PREFIX_ . 'order_detail_tax` WHERE id_order_detail IN ('.implode(',', $orderDetailsList).')');
+                    // Module tax rows live in order_tax_detail (order_detail_tax is gone).
+                    Db::getInstance()->execute('DELETE FROM `' . _DB_PREFIX_ . 'order_tax_detail` WHERE id_order_detail IN ('.implode(',', array_map('intval', $orderDetailsList)).')');
                 }
 
             }
@@ -3676,18 +4398,23 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                     $priceTaxExcl = $objServiceProductOrderDetail->total_price_tax_excl;
                     $priceTaxIncl = $objServiceProductOrderDetail->total_price_tax_incl;
                     $objHotelBookingDetail = new HotelBookingDetail($objServiceProductOrderDetail->id_htl_booking_detail);
-                    $numDays = 1;
-                    if (Product::getProductPriceCalculation($service['id_product']) == Product::PRICE_CALCULATION_METHOD_PER_DAY) {
-                        $numDays = HotelHelper::getNumberOfDays($objHotelBookingDetail->date_from, $objHotelBookingDetail->date_to);
-                    }
+                    $numDays = self::getServiceBillableDays(
+                        Product::getProductPriceCalculation($service['id_product']),
+                        $objHotelBookingDetail->date_from,
+                        $objHotelBookingDetail->date_to
+                    );
 
                     $quantity = $objOrderDetail->product_quantity * $numDays;
                     if ($objServiceProductOrderDetail->delete()) {
                         $objOrder = new Order($objServiceProductOrderDetail->id_order);
-                        if ($quantity >= $objOrderDetail->product_quantity) {
+                        // Delete the shared order_detail only when no service still uses it.
+                        $remainingServices = (int) Db::getInstance()->getValue(
+                            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'service_product_order_detail` WHERE id_order_detail = '.(int) $objOrderDetail->id
+                        );
+                        if ($quantity >= $objOrderDetail->product_quantity && $remainingServices === 0) {
                             $objOrderDetail->delete();
                         } else {
-                            $objOrderDetail->product_quantity -= $quantity;
+                            $objOrderDetail->product_quantity = max($objOrderDetail->product_quantity - $quantity, 0);
 
                             $objOrderDetail->total_price_tax_excl -= $priceTaxExcl;
                             $objOrderDetail->total_price_tax_incl -= $priceTaxIncl;
@@ -3790,11 +4517,37 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             $objAddress->id_state = isset($customerDetails['id_state']) ? $customerDetails['id_state'] : 0;
 
             $objAddress->save();
+
+            // Clear the cached "no address" so the cart uses the new guest address.
+            Cache::clean($cache_id);
+            if (Validate::isLoadedObject($objAddress) && Validate::isLoadedObject($this->context->cart)) {
+                $this->context->cart->id_address_invoice = (int) $objAddress->id;
+                $this->context->cart->id_address_delivery = (int) $objAddress->id;
+                $this->context->cart->save();
+            }
         }
 
         // to remove the older non ordered cart for this customer.
-        $this->context->cookie->id_cart = $this->context->cart->id;
+        $objRequestCart = $this->context->cart;
+        $idFreshCart = $objRequestCart->id;
+        $this->context->cookie->id_cart = $idFreshCart;
         $this->context->updateCustomer($this->bookingCustomer, 1);
+
+        // updateCustomer() may swap in an abandoned cart (PS_CART_FOLLOWING): restore ours and bind
+        // it to the customer, else validateOrder() fails on secure key. Unsaved (modify) carts are only restored.
+        if (!$idFreshCart) {
+            $this->context->cart = $objRequestCart;
+        } elseif ($this->context->cart->id != $idFreshCart) {
+            $objFreshCart = new Cart($idFreshCart);
+            $objFreshCart->secure_key = $this->bookingCustomer->secure_key;
+            $objFreshCart->id_customer = (int) $this->bookingCustomer->id;
+            $objFreshCart->id_guest = (int) $this->context->cookie->id_guest;
+            $objFreshCart->id_address_invoice = (int) Address::getFirstCustomerAddressId((int) $this->bookingCustomer->id);
+            $objFreshCart->save();
+            $objFreshCart->autosetProductAddress();
+            $this->context->cart = $objFreshCart;
+            $this->context->cookie->id_cart = $idFreshCart;
+        }
     }
 
 
@@ -3939,10 +4692,14 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                 if(Validate::isLoadedObject($objCustomer = new Customer((int)$objOrder->id_customer))) {
                     $inputData['guest_detail']['email'] = $objCustomer->email;
                 }
-            } else {
+            } elseif (empty($guestEmail) || mb_strlen($guestEmail) > 128 || !Validate::isEmail($guestEmail)) {
+                // Unknown id_booking and unusable email: generate a placeholder.
                 $inputData['guest_detail']['email'] = Tools::strtolower(trim($inputData['guest_detail']['firstname']));
                 $inputData['guest_detail']['email'] .= Tools::strtolower(trim($inputData['guest_detail']['lastname']));
                 $inputData['guest_detail']['email'] .= Tools::passwdGen(3, 'NUMERIC').'@qloapps.com';
+            } else {
+                // Unknown id_booking but valid email: keep it; manage() decides create or modify.
+                $inputData['guest_detail']['email'] = $guestEmail;
             }
         } else if (empty($guestEmail) || mb_strlen($guestEmail) > 128 || !Validate::isEmail($guestEmail)) {
             $inputData['guest_detail']['email'] = Tools::strtolower(trim($inputData['guest_detail']['firstname']));
@@ -4029,24 +4786,35 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
     {
         if (isset($params['price_details']['total_price_with_tax']) && $params['price_details']['total_price_with_tax'] ) {
             $objOrder = new Order($params['id_booking']);
-            $amount = $params['price_details']['total_price_with_tax'] - $objOrder->getTotalPaid();
+            // Target paid: the full total, or for partial only the received amount sent (none: skip).
+            $targetPaidAmount = (float) $params['price_details']['total_price_with_tax'];
+            if (isset($params['payment_status']) && $params['payment_status'] == self::API_BOOKING_PAYMENT_STATUS_PARTIAL) {
+                $targetPaidAmount = $this->getSentPaidAmount($params);
+                if ($targetPaidAmount === null) {
+                    return;
+                }
+                $targetPaidAmount = min($targetPaidAmount, (float) $params['price_details']['total_price_with_tax']);
+            }
+            $amount = $targetPaidAmount - $objOrder->getTotalPaid();
             $paymentMethod = null;
-            if (isset($params['payment_details']['payment_method']) && $params['payment_details']['payment_method']) {
-                $paymentMethod = $params['payment_details']['payment_method'];
+            if (isset($params['payment_detail']['payment_method']) && $params['payment_detail']['payment_method']) {
+                $paymentMethod = $params['payment_detail']['payment_method'];
             }
 
             $transactionId = null;
-            if (isset($params['payment_details']['transaction_id']) && $params['payment_details']['transaction_id']) {
-                $transactionId = $params['payment_details']['transaction_id'];
+            if (isset($params['payment_detail']['transaction_id']) && $params['payment_detail']['transaction_id']) {
+                $transactionId = $params['payment_detail']['transaction_id'];
             }
 
+            // Same payment type mapping as on create.
             $paymentType = OrderPayment::PAYMENT_TYPE_REMOTE_PAYMENT;
-            if (isset($params['payment_details']['payment_type']) && $params['payment_details']['payment_type']) {
-                $paymentType = $params['payment_details']['payment_type'];
+            if (isset($params['payment_detail']['payment_type'])
+                && $params['payment_detail']['payment_type'] == 'pay at hotel'
+            ) {
+                $paymentType = OrderPayment::PAYMENT_TYPE_PAY_AT_HOTEL;
             }
 
             $idCurrency = $objOrder->id_currency;
-            $paymentCurrency = null;
             if (isset($params['currency'])
                 && ($selectedCurrency = Currency::getIdByIsoCode($params['currency']))
             ) {
@@ -4062,23 +4830,25 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
             }
 
             $orderInvoice = null;
-            if ($invoice = $objOrder->hasInvoice()) {
-                $orderInvoice = new OrderInvoice((int) $invoice);
+            $idOrderInvoice = ($firstInvoice = $objOrder->getInvoicesCollection()->getFirst()) ? $firstInvoice->id : 0;
+            if ($idOrderInvoice) {
+                $orderInvoice = new OrderInvoice((int) $idOrderInvoice);
 
                 $totalPaidTaxIncl = $params['price_details']['total_price_with_tax'];
-                $totalPaidTaxExcl = $params['price_details']['total_tax'];
+                $totalPaidTaxExcl = $totalPaidTaxIncl - $params['price_details']['total_tax'];
 
                 $orderInvoice->total_paid_tax_excl = $totalPaidTaxExcl;
                 $orderInvoice->total_paid_tax_incl = $totalPaidTaxIncl;
-                $orderInvoice->total_products = $totalPaidTaxExcl;
-                $orderInvoice->total_products_wt = $totalPaidTaxIncl;
+                // Products are pre-discount: take them from the order.
+                $orderInvoice->total_products = $objOrder->total_products;
+                $orderInvoice->total_products_wt = $objOrder->total_products_wt;
                 $orderInvoice->save();
             }
 
             if ($amount > 0) {
                 $objOrder->addOrderPayment(
                     $amount,
-                    null,
+                    $paymentMethod,
                     $transactionId,
                     $newCurrency,
                     null,
@@ -4086,7 +4856,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                     $paymentType
                 );
             }
-            $objOrder->total_paid_real = $params['price_details']['total_price_with_tax'];
+            $objOrder->total_paid_real = $targetPaidAmount;
             if (isset($params['id_channel_manager_booking']) && $params['id_channel_manager_booking']) {
                 $objOrder->id_channel_manager_booking = $params['id_channel_manager_booking'];
             }
@@ -4096,21 +4866,85 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
         }
     }
 
+    /**
+     * Amount the request says was actually paid: price_details.total_paid, or
+     * payment_detail.amount_paid. Both are optional; the channel manager sends neither today.
+     *
+     * @param array $params booking_notification request
+     *
+     * @return float|null null when no usable amount was sent
+     */
+    public function getSentPaidAmount($params)
+    {
+        foreach (array(
+            isset($params['price_details']['total_paid']) ? $params['price_details']['total_paid'] : null,
+            isset($params['payment_detail']['amount_paid']) ? $params['payment_detail']['amount_paid'] : null,
+        ) as $amount) {
+            if ($amount !== null && $amount !== '' && Validate::isPrice($amount)) {
+                return Tools::ps_round((float) $amount, _PS_PRICE_COMPUTE_PRECISION_);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Trims the payments recorded for an order reference down to the paid amount sent by the CM.
+     *
+     * Compares the sum of payments and removes the excess, newest first (e.g. core's "rest paid"
+     * payment from validateOrder()). A shortfall is left to addOrderPayment().
+     *
+     * @param string $orderReference
+     * @param float $totalPaidAmount
+     *
+     * @return void
+     */
     public function managePaymentHistory($orderReference, $totalPaidAmount)
     {
         if ($orderReference && $totalPaidAmount) {
-           $getSql = 'SELECT `id_order_payment`, `amount`
-           FROM `' . _DB_PREFIX_ . 'order_payment`
-           WHERE `order_reference` = "' . pSQL($orderReference) . '"';
+            $getSql = 'SELECT `id_order_payment`, `amount`
+            FROM `' . _DB_PREFIX_ . 'order_payment`
+            WHERE `order_reference` = "' . pSQL($orderReference) . '"
+            ORDER BY `id_order_payment` DESC';
 
+            if ($results = Db::getInstance()->executeS($getSql)) {
+                $recordedAmount = 0;
+                foreach ($results as $result) {
+                    $recordedAmount += (float) $result['amount'];
+                }
 
-            if($results = Db::getInstance()->executeS($getSql)){
-                foreach ($results as $key => $result) {
-                    if(($idPaymentHistory = $result['id_order_payment']) && ((int)round($result['amount']) !== (int)round($totalPaidAmount))) {
-                        if(Validate::isLoadedObject($objPaymentHistory = new OrderPayment((int) $idPaymentHistory))) {
-                            $objPaymentHistory->delete();
+                $excessAmount = Tools::ps_round($recordedAmount - (float) $totalPaidAmount, _PS_PRICE_COMPUTE_PRECISION_);
+                foreach ($results as $result) {
+                    if ($excessAmount <= 0) {
+                        break;
+                    }
+
+                    $objPaymentHistory = new OrderPayment((int) $result['id_order_payment']);
+                    if (!Validate::isLoadedObject($objPaymentHistory)) {
+                        continue;
+                    }
+
+                    if ((float) $objPaymentHistory->amount <= $excessAmount) {
+                        // Whole payment is excess: delete it with its detail and invoice links.
+                        $excessAmount = Tools::ps_round($excessAmount - (float) $objPaymentHistory->amount, _PS_PRICE_COMPUTE_PRECISION_);
+                        Db::getInstance()->delete('order_invoice_payment', '`id_order_payment` = '.(int) $objPaymentHistory->id);
+                        Db::getInstance()->delete('order_payment_detail', '`id_order_payment` = '.(int) $objPaymentHistory->id);
+                        $objPaymentHistory->delete();
+                    } else {
+                        $objPaymentHistory->amount = Tools::ps_round((float) $objPaymentHistory->amount - $excessAmount, _PS_PRICE_COMPUTE_PRECISION_);
+                        $objPaymentHistory->save();
+                        if ($idPaymentDetail = (int) Db::getInstance()->getValue(
+                            'SELECT `id_order_payment_detail` FROM `'._DB_PREFIX_.'order_payment_detail`
+                            WHERE `id_order_payment` = '.(int) $objPaymentHistory->id.'
+                            ORDER BY `id_order_payment_detail` DESC'
+                        )) {
+                            $objPaymentDetail = new OrderPaymentDetail($idPaymentDetail);
+                            if (Validate::isLoadedObject($objPaymentDetail)) {
+                                $objPaymentDetail->amount = max(0, Tools::ps_round((float) $objPaymentDetail->amount - $excessAmount, _PS_PRICE_COMPUTE_PRECISION_));
+                                $objPaymentDetail->save();
+                            }
                         }
-
+                        $excessAmount = 0;
                     }
                 }
             }
@@ -4119,24 +4953,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
 
     public function handleRoomTypePriceWithService(array &$inputData)
     {
-        foreach ($inputData['room_bookings'] as &$roomBookings) {
-            foreach ($roomBookings['rooms'] as &$room) {
-                if(isset($room['services']) && !empty($room['services'])){
-                    $totalServicePrice = 0;
-                    $totalServiceTax = 0;
-                    foreach ($room['services'] as $service) {
-                        $totalServicePrice += floatval($service['total_price_with_tax']);
-                        if(isset($service['total_tax'])){
-                            $totalServiceTax += floatval($service['total_tax']);
-                        }
-                    }
-                    $room['total_price_with_tax'] -= $totalServicePrice;
-                    $room['total_tax'] -= $totalServiceTax;
-                    $roomBookings['total_price_with_tax'] -= $totalServicePrice;
-                    $roomBookings['total_tax'] -= $totalServiceTax;
-                }
-            }
-        }
+        // No-op: the CM sends room prices net of services, which are their own lines.
         return;
     }
 
@@ -4297,7 +5114,7 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
                 $requestedPriceTaxExcl = isset($room['unit_price_without_tax'])
                     ? $room['unit_price_without_tax']
                     : (isset($room['total_price_with_tax'], $room['total_tax'])
-                        ? abs($room['total_price_with_tax'] - $room['total_tax']) : 0);
+                        ? $room['total_price_with_tax'] - $room['total_tax'] : 0);
                 $requestedTax    = isset($room['total_tax']) ? floatval($room['total_tax']) : 0;
                 $requestedNights = HotelHelper::getNumberOfDays($newFrom, $newTo) ?: 1;
 

@@ -149,7 +149,7 @@ class QcmcBooking extends QmkWebService
                                     $serviceItem['total_price_with_tax'] = $service['total_price_tax_incl'];
                                     $serviceItem['total_tax'] = ($service['total_price_tax_incl'] - $service['total_price_tax_excl']);
 
-                                    if (WebserviceSpecificManagementBookings::API_SERVICE_PRICE_MODE_PER_DAY == $service['price_calculation_method']) {
+                                    if (WebserviceSpecificManagementCmApi::isPerNightPriceCalculationMethod($service['price_calculation_method'])) {
                                         $serviceItem['price_mode'] = 'per_night';
                                     } else {
                                         $serviceItem['price_mode'] = 'per_stay';
@@ -171,7 +171,12 @@ class QcmcBooking extends QmkWebService
 
                             // if a room is refunded or cancelled then the count will not be sent to the api response
                             // as we can not change the status room type booking wise for the API response
-                            if (!$value['is_refunded']
+                            // Refunds come from completed order returns; the old is_refunded column
+                            // (shops upgraded from 1.7) is no longer written, so it only adds older rooms.
+                            $isRefunded = !empty($value['is_refunded'])
+                                || (method_exists('OrderReturn', 'hasCompletelyRefundedBooking')
+                                    && (new OrderReturn())->hasCompletelyRefundedBooking($value['id']));
+                            if (!$isRefunded
                                 && isset($roomTypes[$key]['number_of_rooms'])
                             ) {
                                 $roomTypes[$key]['number_of_rooms'] += 1;

@@ -124,7 +124,7 @@ class QcmcSourceHelper
     {
         $name = array();
         foreach (Language::getLanguages(false) as $lang) {
-            $name[(int)$lang['id_lang']] = $this->formatSourceCode($sourceName);
+            $name[(int)$lang['id_lang']] = ucwords($sourceName);
         }
 
         $objBusinessSource = new BusinessSource();
@@ -143,7 +143,7 @@ class QcmcSourceHelper
     {
         $name = array();
         foreach (Language::getLanguages(false) as $lang) {
-            $name[(int)$lang['id_lang']] = $this->formatSourceCode($sourceName);
+            $name[(int)$lang['id_lang']] = ucwords($sourceName);
         }
 
         $objSource = new Source();

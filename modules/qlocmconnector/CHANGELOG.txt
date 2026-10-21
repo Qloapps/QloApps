@@ -1,12 +1,8 @@
 ---------------------------------------------------------------
-# V5.0.6 | COMPATIBLE:: QloApps V1.7.x
+# V7.0.0 | COMPATIBLE:: QloApps V1.8.x
 ---------------------------------------------------------------
 + [BO]: Addition of booking source and business source
 - [BO]: Removed all remaining references to the "extra demands" feature
-
----------------------------------------------------------------
-# V5.0.5 | COMPATIBLE:: QloApps V1.7.x
----------------------------------------------------------------
 + [BO]: Absorbed the Channel Manager Bookings admin list (previously provided by the separate `qlochannelmanagerconnector` module) — new `AdminQloappsChannelManagerConnector` tab lists orders detected via `orders.id_channel_manager_booking` (with `source` fallback), no separate DB table
 + [BO]: `qlochannelmanagerconnector` module (if present) is now automatically uninstalled and deleted from disk on install/upgrade of this module
 + [BO]: Channel Manager API booking creation no longer produces raw PHP fatal errors for any kind of unexpected failure — all errors now return as structured JSON

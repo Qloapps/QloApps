@@ -36,7 +36,7 @@ class QloCMConnector extends Module
     {
         $this->name = 'qlocmconnector';
         $this->tab = 'analytics_stats';
-        $this->version = '5.0.6';
+        $this->version = '7.0.0';
         $this->author = 'Webkul';
         $this->bootstrap = true;
         $this->secure_key = Tools::encrypt($this->name);
@@ -921,8 +921,10 @@ class QloCMConnector extends Module
 
     public function hookActionAvailRoomSearchSqlModifier(&$params)
     {
-        // Check if request is from trusted partners
-        if (!QcmcChannelManagerApiService::isAllowedRemoteAddr($_SERVER['REMOTE_ADDR'])) {
+        // CM only: trusted IP, or a cm_api booking request in progress.
+        if (!QcmcChannelManagerApiService::isAllowedRemoteAddr($_SERVER['REMOTE_ADDR'])
+            && self::$idBookingCm === null
+        ) {
             return;
         }
 
@@ -932,17 +934,13 @@ class QloCMConnector extends Module
 
             // Modify the checked_out subquery to exclude rooms based on order ID
             if (isset($params['exclude_room_id']['checked_out'])) {
-                // Add id_order condition to exclude only bookings NOT matching current order
-                $originalQuery = $params['exclude_room_id']['checked_out'];
-
-                // Insert id_order != {idOrder} condition after is_refunded = 0
-                $modifiedQuery = preg_replace(
-                    '/`is_refunded` = 0 AND IF\(/',
-                    '`is_refunded` = 0 AND `id_order` != ' . $idOrder . ' AND IF(',
-                    $originalQuery
+                // The modified order's own rooms must not block its search (anchored on the leading WHERE).
+                $params['exclude_room_id']['checked_out'] = preg_replace(
+                    '/WHERE\s+`id_hotel`\s*=/',
+                    'WHERE `id_order` != ' . $idOrder . ' AND `id_hotel` =',
+                    $params['exclude_room_id']['checked_out'],
+                    1
                 );
-
-                $params['exclude_room_id']['checked_out'] = $modifiedQuery;
             }
         }
 
@@ -1051,8 +1049,10 @@ class QloCMConnector extends Module
 
     public function hookActionPartiallyAvailRoomSearchSqlModifier(&$params)
     {
-        // Check if request is from trusted partners
-        if (!QcmcChannelManagerApiService::isAllowedRemoteAddr($_SERVER['REMOTE_ADDR'])) {
+        // CM only: trusted IP, or a cm_api booking request in progress.
+        if (!QcmcChannelManagerApiService::isAllowedRemoteAddr($_SERVER['REMOTE_ADDR'])
+            && self::$idBookingCm === null
+        ) {
             return;
         }
 
@@ -1063,17 +1063,17 @@ class QloCMConnector extends Module
             // Modify the SQL queries to exclude rooms based on order ID
             if (isset($params['sql']) && is_array($params['sql'])) {
                 foreach ($params['sql'] as &$sqlQuery) {
-                    // Check if this is the booking detail query
-                    if (strpos($sqlQuery, 'qlo_htl_booking_detail') !== false) {
-                        // Add id_order exclusion to exclude only bookings NOT matching current order
-                        // Insert after is_refunded = 0 condition
+                    // Booking detail query only: the modified order's own rooms must not block its search.
+                    if (strpos($sqlQuery, '`'._DB_PREFIX_.'htl_booking_detail` AS bd') !== false) {
                         $sqlQuery = preg_replace(
-                            '/`is_refunded` = 0 AND IF\(/',
-                            '`is_refunded` = 0 AND `id_order` != ' . $idOrder . ' AND IF(',
-                            $sqlQuery
+                            '/WHERE\s+bd\.`id_hotel`\s*=/',
+                            'WHERE bd.`id_order` != ' . $idOrder . ' AND bd.`id_hotel`=',
+                            $sqlQuery,
+                            1
                         );
                     }
                 }
+                unset($sqlQuery);
             }
         }
     }

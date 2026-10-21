@@ -19,7 +19,9 @@ https://qloapps.com/addons/
 
 ### Module Versions and Compatibility:
 
-- **Current version:** `5.0.6`
+- **Current version:** `7.0.0`
+
+- Module version `7.0.0` compatible with QloApps version `1.8.x`
 
 - Module version `5.0.6` compatible with QloApps version `1.8.x`
 
