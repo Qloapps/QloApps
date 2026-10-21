@@ -89,3 +89,15 @@
 .date-picker-wrapper .first-date-selected, .date-picker-wrapper .last-date-selected {
     background-color: #1292ff !important;
 }
+@media (max-width: 400px) {
+    .date-picker-wrapper {
+        max-width: calc(100vw - 20px);
+    }
+    .date-picker-wrapper .month-wrapper table tr td .day {
+        width: 28px;
+        padding: 8px 6px;
+    }
+    .date-picker-wrapper .month-wrapper table .week-name {
+        height: 32px;
+    }
+}

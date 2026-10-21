@@ -68,6 +68,57 @@
     margin-bottom: 15px;
 }
 
+@media (max-width: 767px) {
+    .cat_cont > .col-sm-12 {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .room_features_cont > .row {
+        flex-wrap: wrap;
+    }
+
+    .room_features_cont > .row > [class*="col-"] {
+        width: 100%;
+    }
+
+    .room-type-image {
+        width: 100%;
+    }
+
+    .room_info_cont > .row:first-child {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+    }
+
+    .room_info_cont > .row:first-child:before,
+    .room_info_cont > .row:first-child:after {
+        display: none;
+    }
+
+    .room_info_cont > .row:first-child {
+        justify-content: space-between;
+    }
+
+    .room_info_cont .rm_heading {
+        font-size: 22px;
+        line-height: 28px;
+    }
+
+    .room_info_cont .rm_left {
+        font-size: 14px;
+    }
+
+    .room_info_cont .rm_price_val {
+        font-size: 26px;
+    }
+
+    .room_info_cont .rm_price_txt {
+        font-size: 14px;
+    }
+}
+
 .rm_heading
 {
     color: #333333;
@@ -298,6 +349,23 @@ p.capa_txt {
         margin-bottom: 0;
     }
 }
+@media (max-width: 991px) {
+    .room_features_cont > div {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 0;
+        margin-bottom: 10px;
+    }
+    .booking_room_fields {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .booking_room_fields .form-group:not(.occupancy_count_block) {
+        width: 100%;
+    }
+}
 @media (min-width: 1200px) {
     .booking_guest_occupancy_conatiner .form-group {
         margin-bottom: 0;
@@ -349,4 +417,55 @@ p.capa_txt {
 
 .rm_desc .view_more {
     display: inline-block;
+}
+
+.layered_filter_cont:has(#filter_price_silder) {
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    #category #left_column,
+    #category #center_column {
+        width: 100%;
+    }
+
+    .catSortBlock .col-sm-3 {
+        width: auto;
+    }
+
+    .catSortBlock .filter_dw_cont .btn {
+        white-space: nowrap;
+    }
+
+    .catSortBlock .filter_dw_cont .sort_btn_span {
+        margin-right: 8px;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .visible-md .capa_txt {
+        padding-left: 0;
+    }
+}
+
+.rm_amen_more {
+    display: none;
+}
+@media (max-width: 1199px) {
+    .rm_amen_extra {
+        display: none;
+    }
+
+    .rm_amen_more {
+        display: inline-block;
+        margin-bottom: 5px;
+        padding: 0 6px;
+        border: 1px solid #379BF0;
+        border-radius: 10px;
+        font-size: 12px;
+        line-height: 18px;
+        color: #379BF0;
+        vertical-align: top;
+    }
 }

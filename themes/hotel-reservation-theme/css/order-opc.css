@@ -575,6 +575,52 @@
 		width: 50%;
 	}
 }
+@media (max-width: 991px) {
+	#order-opc .cart_voucher_detail_block span.cart_discount_name {
+		width: 50%;
+	}
+}
+/* Mobile & tablet: show cart total + voucher blocks before the payment block */
+@media (max-width: 991px) {
+	#order-opc #content > .row {
+		display: flex;
+		flex-direction: column;
+	}
+	#order-opc #content > .row:before,
+	#order-opc #content > .row:after {
+		display: none;
+	}
+	#order-opc #content > .row > .col-md-8,
+	#order-opc #content > .row > .col-md-8 > #oprder-opc-accordion {
+		display: contents;
+	}
+	#order-opc #content > .row > .col-md-8 > #oprder-opc-accordion > .card {
+		order: 0;
+		margin-left: 15px;
+		margin-right: 15px;
+	}
+	#order-opc #content > .row > .col-md-4 {
+		order: 1;
+		width: 100%;
+	}
+	#order-opc #content > .row > .col-md-8 > #oprder-opc-accordion > #order-payment-block {
+		order: 2;
+	}
+}
+@media (max-width: 480px) {
+	#order-opc .proceed_btn_block .button-medium,
+	#order-opc .proceed_btn_block .btn-edit-guest-info,
+	#order-opc #login_form_content #SubmitLogin {
+		float: none !important;
+		display: block;
+		width: 100%;
+		padding: 0 20px;
+		margin-right: 0;
+		margin-bottom: 10px;
+		text-align: center;
+		box-sizing: border-box;
+	}
+}
 @media (max-width: 480px) {
 	#order-opc .cart_voucher_detail_block span.cart_discount_name {
 		width: 50%;

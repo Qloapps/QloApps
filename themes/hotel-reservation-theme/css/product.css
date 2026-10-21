@@ -1621,6 +1621,28 @@ ul.service-product-nav > li:hover {
 
 .service-product-element .service-product-actions {
   display: flex;
+  margin-left: auto;
+}
+@media (max-width: 575px) {
+  .service-product-element .service-product-actions {
+    width: 100%;
+    margin-top: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    row-gap: 8px;
+  }
+  .service-product-element .service-product-actions .qty_container {
+    flex: 0 0 auto;
+  }
+}
+@media (max-width: 370px) {
+  .service-product-element .service-product-actions .qty_container {
+    margin-right: 4px;
+  }
+  .service-product-element .service-product-actions .qty_container .qty_count {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }
 
 .service-product-element .qty_container > * {
