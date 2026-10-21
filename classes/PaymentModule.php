@@ -236,14 +236,14 @@ abstract class PaymentModuleCore extends Module
             $is_advance_payment = false;
             if ($amount_paid >= $full_cart_total) {
                 $cart_total_paid = $full_cart_total;
-            } else {
+            } elseif ($this->context->cart->is_advance_payment) {
+                $is_advance_payment = true;
                 $cart_total_paid = (float)Tools::ps_round(
                     (float)$this->context->cart->getOrderTotal(true, Cart::ADVANCE_PAYMENT),
                     _PS_PRICE_COMPUTE_PRECISION_
                 );
-                if ($this->context->cart->is_advance_payment) {
-                    $is_advance_payment = true;
-                }
+            } else {
+                $cart_total_paid = $full_cart_total;
             }
 
             foreach ($cart_delivery_option as $id_address => $key_carriers) {
