@@ -9446,6 +9446,12 @@ div a.our_properties_link{
   font-size: 17px;
   font-weight: 400;}
 
+/* the menu panel already has a link to the properties page on mobile */
+@media (max-width: 767px) {
+  div a.our_properties_link {
+    display: none; }
+}
+
 .htl-tooltip {
     cursor: pointer;
     display: inline-block;
