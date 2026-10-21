@@ -1834,7 +1834,7 @@ class HotelBookingDetail extends ObjectModel
             if (!empty($bookingData)) {
                 $maxAmenities = (int) Configuration::get('WK_MAX_AMENITIES_ROOM_SEARCH');
                 $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
-                $maxFeatureValues = (int) Configuration::get('WK_MAX_FEATURE_VALUES_ROOM_SEARCH');
+                $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
                 foreach ($bookingData['rm_data'] as $key => $value) {
                     // featured amenities for display in room type list
                     $featured_amenities = HotelRoomTypeAmenities::getAmenities(
