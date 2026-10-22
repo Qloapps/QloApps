@@ -51,6 +51,18 @@ class QcmcChannelManagerOrder
         return Db::getInstance()->getValue($sql);
     }
 
+    /**
+     * Connected if a booking has come from the channel manager, or the channel manager
+     * API credentials (client id and client secret) are saved.
+     *
+     * @return bool
+     */
+    public static function isChannelManagerConnected()
+    {
+        return self::hasChannelManagerBookings()
+            || (Configuration::get('QCMC_CM_CLIENT_ID') && Configuration::get('QCMC_CM_CLIENT_SECRET'));
+    }
+
     protected static function getWhere()
     {
         return sprintf(self::CM_WHERE, pSQL(Configuration::get('PS_SHOP_DOMAIN')));

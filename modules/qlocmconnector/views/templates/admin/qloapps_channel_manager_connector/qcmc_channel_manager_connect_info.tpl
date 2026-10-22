@@ -26,14 +26,14 @@
             <div class="qcm_info_block">
                 <div class="row">
                     <div class="col-sm-6 margin-bottom-10">
-                        <span class="connect_status_heading">{l s='Connection status' mod='qlocmconnector'} :</span> <span class="not_connect_txt">{l s='Not Connected' mod='qlocmconnector'}</span>
+                        <span class="connect_status_heading">{l s='Connection status' mod='qlocmconnector'} :</span> {if $is_cm_connected}<span class="connect_txt">{l s='Connected' mod='qlocmconnector'}</span>{else}<span class="not_connect_txt">{l s='Not Connected' mod='qlocmconnector'}</span>{/if}
                     </div>
                     <div class="col-sm-6 channel_connection_info margin-bottom-10">
                         <span class="channel_info_type">{l s='Last updated' mod='qlocmconnector'} :</span> <span>{$current_datetime|escape:'htmlall':'UTF-8'}</span>
                     </div>
 
                     <div class="connect_info_txt col-sm-12 margin-bottom-10">
-                        **{l s='Connection status with channel manager is showing according to the bookings fetched from QloApps Channel Manager.' mod='qlocmconnector'}
+                        {l s='Connection status is shown as connected when channel manager API credentials are saved or a booking has been received from QloApps Channel Manager.' mod='qlocmconnector'}
                     </div>
                 </div>
             </div>

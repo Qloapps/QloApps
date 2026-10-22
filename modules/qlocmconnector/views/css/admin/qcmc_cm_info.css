@@ -92,6 +92,12 @@
     line-height: 22px;
     color: #ff404b;
 }
+.qcm_content_wrapper .connect_txt {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    color: #2FA368;
+}
 .qcm_content_wrapper .connect_status_heading {
     font-weight: 600;
     font-size: 16px;

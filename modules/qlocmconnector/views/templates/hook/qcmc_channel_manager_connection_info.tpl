@@ -21,14 +21,9 @@
  *}
 
 <div class="row">
-    <div class="col-sm-5">
-            <label class="qcm_booking_title">
-            <i class="icon icon-users"></i> {l s='Channel Manager Bookings' mod='qlocmconnector'}
-        </label>
-    </div>
-    <div class="col-sm-7 channel_connection_info">
-        <span class="channel_info_type">{l s='Connection status' mod='qlocmconnector'} :</span> <span class="channel_connection_status">{l s='Connected' mod='qlocmconnector'}</span>
-        <span class="channel_info_type">{l s='Last updated' mod='qlocmconnector'} :</span> <span>{$last_booking_datetime|escape:'htmlall':'UTF-8'}</span>
-        <span class="channel_info_type connection_criteria"><i id="connection_details" class="icon-info-circle" data-toggle="popover" data-content="{l s='Connection status with channel manager is showing according to the bookings fetched from QloApps Channel Manager.' mod='qlocmconnector'}"></i></span>
+    <div class="col-sm-12 channel_connection_info">
+        <span class="channel_info_type">{l s='Connection status' mod='qlocmconnector'} :</span> {if $is_cm_connected}<span class="channel_connection_status">{l s='Connected' mod='qlocmconnector'}</span>{else}<span class="channel_connection_status not_connected">{l s='Not Connected' mod='qlocmconnector'}</span>{/if}
+        <span class="channel_info_type">{l s='Last updated' mod='qlocmconnector'} :</span> <span>{if $last_booking_datetime}{$last_booking_datetime|escape:'htmlall':'UTF-8'}{else}--{/if}</span>
+        <span class="channel_info_type connection_criteria"><i id="connection_details" class="icon-info-circle" data-toggle="popover" data-content="{l s='Connection status is shown as connected when channel manager API credentials are saved or a booking has been received from QloApps Channel Manager.' mod='qlocmconnector'}"></i></span>
     </div>
 </div>

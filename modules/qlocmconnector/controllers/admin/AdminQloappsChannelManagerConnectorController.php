@@ -48,27 +48,37 @@ class AdminQloappsChannelManagerConnectorController extends ModuleAdminControlle
         $this->fields_list = array(
             'id_order' => array(
                 'title' => $this->l('Id order'),
-                'align' => 'center',
-                'havingFilter' => true,
+                'align' => 'text-center',
+                'class' => 'fixed-width-xs',
+                'filter_key' => 'a!id_order',
                 'callback' => 'getOrderLink',
             ),
             'source' => array(
                 'title' => $this->l('Channel'),
-                'align' => 'center',
+                'align' => 'text-center',
+                'filter_key' => 'a!source',
             ),
             'total_paid' => array(
                 'title' => $this->l('Order total'),
-                'align' => 'center',
+                'align' => 'text-center',
+                'type' => 'range',
+                'validation' => 'isFloat',
+                'filter_key' => 'a!total_paid',
                 'callback' => 'setPriceCurrency',
             ),
             'total_paid_real' => array(
                 'title' => $this->l('Recieved amount'),
-                'align' => 'center',
+                'align' => 'text-center',
+                'type' => 'range',
+                'validation' => 'isFloat',
+                'filter_key' => 'a!total_paid_real',
                 'callback' => 'setPriceCurrencyWithBadge',
             ),
             'date_add' => array(
                 'title' => $this->l('Created on'),
-                'align' => 'center',
+                'align' => 'text-center',
+                'type' => 'datetime',
+                'filter_key' => 'a!date_add',
             ),
         );
 
@@ -107,18 +117,19 @@ class AdminQloappsChannelManagerConnectorController extends ModuleAdminControlle
 
     public function renderList()
     {
-        if (QcmcChannelManagerOrder::hasChannelManagerBookings()) {
+        if (QcmcChannelManagerOrder::isChannelManagerConnected()) {
             $this->context->smarty->assign(
                 array (
                     'icon' => 'icon-list',
                     'toolbar_title' => 'icon-list',
                     'last_booking_datetime' => Tools::displayDate(QcmcChannelManagerOrder::getLastChannelManagerBookingDate(), null, true),
+                    'is_cm_connected' => QcmcChannelManagerOrder::isChannelManagerConnected(),
                 )
             );
 
             // because in helper list tpl_vars is given priority and we need different List title than list title
             // In HelperList.php assigned: 'title' => array_key_exists('title', $this->tpl_vars) ? $this->tpl_vars['title'] : $this->title
-            $this->tpl_list_vars['title'] = $this->l('Below is the list of all the bookings created by channel manager.');
+            $this->tpl_list_vars['title'] = $this->l('Channel Manager Bookings');
 
             unset($this->toolbar_btn['new']);
 
@@ -130,6 +141,7 @@ class AdminQloappsChannelManagerConnectorController extends ModuleAdminControlle
                 array (
                     'module_dir' => _MODULE_DIR_,
                     'current_datetime' => Tools::displayDate(date('Y-m-d H:i:s'), null, true),
+                    'is_cm_connected' => QcmcChannelManagerOrder::isChannelManagerConnected(),
                 )
             );
             $this->content .= $this->context->smarty->fetch(
@@ -143,7 +155,7 @@ class AdminQloappsChannelManagerConnectorController extends ModuleAdminControlle
     {
         parent::setMedia();
 
-        if (QcmcChannelManagerOrder::hasChannelManagerBookings()) {
+        if (QcmcChannelManagerOrder::isChannelManagerConnected()) {
             $this->addCSS(_MODULE_DIR_.'qlocmconnector/views/css/admin/qcmc_cm_booking_list.css');
             $this->addJS(_MODULE_DIR_.'qlocmconnector/views/js/admin/qcmc_cm_booking_list.js');
         } else {

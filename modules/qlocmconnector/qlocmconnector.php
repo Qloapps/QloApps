@@ -1147,9 +1147,9 @@ class QloCMConnector extends Module
 
     public function hookDisplayAdminListBefore()
     {
-        // This tpl will only display when at least one booking has come from channel manager
+        // This tpl will only display when connected with channel manager (CM booking exists or API credentials saved)
         if (self::CM_BOOKING_LIST_TAB_CLASS == $this->context->controller->controller_name
-            && QcmcChannelManagerOrder::hasChannelManagerBookings()
+            && QcmcChannelManagerOrder::isChannelManagerConnected()
         ) {
             return $this->display(__FILE__, 'qcmc_channel_manager_connection_info.tpl');
         }
@@ -1157,9 +1157,9 @@ class QloCMConnector extends Module
 
     public function hookActionAdminControllerSetMedia()
     {
-        // This CSS will only apply when at least one booking has come from channel manager
+        // This CSS will only apply when connected with channel manager (CM booking exists or API credentials saved)
         if (self::CM_BOOKING_LIST_TAB_CLASS == $this->context->controller->controller_name
-            && QcmcChannelManagerOrder::hasChannelManagerBookings()
+            && QcmcChannelManagerOrder::isChannelManagerConnected()
         ) {
             $this->context->controller->addCSS(_MODULE_DIR_.$this->name.'/views/css/hook/qcmc_cm_connection_info.css');
         }

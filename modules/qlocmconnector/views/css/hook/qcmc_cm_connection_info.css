@@ -26,10 +26,6 @@
     color: #333;
     text-align: right;
 }
-.adminqloappschannelmanagerconnector .qcm_booking_title {
-    font-size: 14px;
-    margin-bottom: 10px;
-}
 .adminqloappschannelmanagerconnector .channel_info_type {
     margin-left: 10px;
     font-weight: bold;
@@ -40,6 +36,9 @@
 .adminqloappschannelmanagerconnector .channel_connection_status {
     color: #2FA368;
     font-weight: bold;
+}
+.adminqloappschannelmanagerconnector .channel_connection_status.not_connected {
+    color: #ff404b;
 }
 .adminqloappschannelmanagerconnector .channel_info_type .icon-info-circle {
     font-size: 16px;
