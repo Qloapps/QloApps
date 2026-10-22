@@ -35,6 +35,8 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
     const CONF_DISCONNECTED = 102;
     /** _conf[] code: webservice key regenerated successfully. */
     const CONF_KEY_REGENERATED = 103;
+    /** _conf[] code: log cleanup cron schedule updated successfully. */
+    const CONF_CRON_UPDATED = 104;
 
     public function __construct()
     {
@@ -50,6 +52,7 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
         $this->_conf[self::CONF_CONNECTED]    = $this->l('Connection created successfully.');
         $this->_conf[self::CONF_DISCONNECTED] = $this->l('Connection disconnected successfully.');
         $this->_conf[self::CONF_KEY_REGENERATED] = $this->l('Webservice key regenerated successfully.');
+        $this->_conf[self::CONF_CRON_UPDATED] = $this->l('Cron schedule updated successfully.');
     }
 
     /**
@@ -72,6 +75,28 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
             $this->processRegenerateKey();
             return;
         }
+
+        if (Tools::isSubmit('submitGhcCron')) {
+            $this->processSaveCron();
+            return;
+        }
+    }
+
+    /** Saves the API log cleanup schedule in the Cron Task Manager. Redirects with a success code. */
+    public function processSaveCron()
+    {
+        if (!$this->tabAccess['edit']) {
+            $this->errors[] = Tools::displayError('You do not have permission to edit this.');
+            return;
+        }
+
+        $result = $this->module->updateCronSchedule(Tools::getValue('QGHC_CRON'));
+        if ($result !== true) {
+            $this->errors[] = $result;
+            return;
+        }
+
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminGoogleHotelConfig') . '&conf=' . self::CONF_CRON_UPDATED);
     }
 
     /** True when the current admin request came over HTTPS (directly or via a TLS-terminating proxy). */
@@ -122,7 +147,7 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
         $rows = QghcProperty::getEnrolledProperties($idLang);
         $configs = array();
         $hotelEditBase = $this->context->link->getAdminLink('AdminAddHotel');
-        
+
         if ($rows) {
             foreach ($rows as $row) {
                 $badge = isset($statusBadges[(int)$row['google_status']]) ? $statusBadges[(int)$row['google_status']] : $pendingBadge;
@@ -138,9 +163,6 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
             }
         }
 
-        // Token must match the check in ghclogcron.php
-        $cronUrl = Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/qlogooglehotelconnector/ghclogcron.php?token=' . Tools::encrypt('qlogooglehotelconnector');
-
         $this->context->smarty->assign(array(
             'configs' => $configs,
             'ws_key' => $wsKey,
@@ -148,7 +170,11 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
             'is_secure' => $this->isSecureRequest(),
             'ssl_settings_url' => $this->context->link->getAdminLink('AdminPreferences'),
             'action_url' => $this->context->link->getAdminLink('AdminGoogleHotelConfig'),
-            'cron_url' => $cronUrl,
+            'cron_options' => $this->module->getCronOptionLabels(),
+            'cron_task' => $this->module->getCronTaskSchedule(),
+            'cron_manager_enabled' => Module::isEnabled('qlocrontaskmanager'),
+            'cron_manager_installed' => Module::isInstalled('qlocrontaskmanager'),
+            'cron_manager_link' => $this->module->getCronManagerLink(),
             'hotel_list_url' => $hotelEditBase,
         ));
     }

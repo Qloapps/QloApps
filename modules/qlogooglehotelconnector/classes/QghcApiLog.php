@@ -95,4 +95,12 @@ class QghcApiLog extends ObjectModel
             return false;
         }
     }
+    public static function deleteOlderThan($dateTime)
+    {
+        if (!Db::getInstance()->delete('qghc_api_log', '`date_add` < \'' . pSQL($dateTime) . '\'')) {
+            return false;
+        }
+
+        return (int) Db::getInstance()->Affected_Rows();
+    }
 }
