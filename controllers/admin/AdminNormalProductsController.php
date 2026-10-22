@@ -2175,6 +2175,23 @@ class AdminNormalProductsControllerCore extends AdminController
                 }
 
                 if ($object->update()) {
+					// Synchronize product name updates across all shops in multi-shop mode
+                    $id_product = (int)$object->id;
+                    $languages = Language::getLanguages(false);
+                    
+                    foreach ($languages as $lang) {
+                        $name_val = Tools::getValue('name_' . $lang['id_lang']);
+                        if (!empty($name_val)) {
+                            Db::getInstance()->execute('
+                                UPDATE `'._DB_PREFIX_.'product_lang`
+                                SET `name` = "'.pSQL($name_val).'", 
+                                    `link_rewrite` = "'.pSQL(Tools::link_rewrite($name_val)).'"
+                                WHERE `id_product` = '.(int)$id_product.' 
+                                  AND `id_lang` = '.(int)$lang['id_lang'].'
+                            ');
+                        }
+                    }
+
                     // If the product doesn't exist in the current shop but exists in another shop
                     if (Shop::getContext() == Shop::CONTEXT_SHOP && !$existing_product->isAssociatedToShop($this->context->shop->id)) {
                         $out_of_stock = StockAvailable::outOfStock($existing_product->id, $existing_product->id_shop_default);
