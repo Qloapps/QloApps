@@ -718,6 +718,10 @@
 				updateCartLine(response.curr_booking_info, cart_row);
 				updateCartSummaryData(response.cart_info);
 				updateCartVouchers(response.cart_info.summary.discounts);
+				var $totalTaxesTrigger = $('#total_taxes').closest('.data-focus').find('.ui-tooltip-trigger');
+				initUITooltip($totalTaxesTrigger, function() {
+					return $totalTaxesTrigger.next('.tooltip-content').html();
+				});
 			}
 		});
 	}
