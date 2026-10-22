@@ -33,9 +33,17 @@ class QloGoogleHotelConnector extends Module
     const CONFIG_WS_KEY = 'QGHC_WS_KEY';
     /** PS Configuration key that stores the module connection status (0 = off, 1 = connected). */
     const CONFIG_STATUS = 'QGHC_STATUS';
+    const CRON_TASK_CLEANUP_LOGS = 'cleanup_api_logs';
 
     public $debugging = false;
     public $logger;
+
+    /** Schedules offered for the API log cleanup, as cron expressions. */
+    protected $cronOptions = array(
+        'daily' => '0 0 * * *',
+        'weekly' => '0 0 * * 0',
+        'monthly' => '0 0 1 * *',
+    );
 
     /** Sets up module properties (name, version, author) and initialises the file logger. */
     public function __construct()
@@ -192,7 +200,166 @@ class QloGoogleHotelConnector extends Module
             'actionObjectHotelOrderRestrictDateUpdateBefore',
             // Front-end structured data markup
             'displayFooterBefore',
+            // Cron Task Manager
+            'registerCronTasks',
         ));
+    }
+
+    /** Tells the Cron Task Manager module which tasks this module provides. */
+    public function hookRegisterCronTasks()
+    {
+        return array(
+            array(
+                'name' => self::CRON_TASK_CLEANUP_LOGS,
+                'description' => $this->l('Delete Google Hotel API logs older than 2 months'),
+                'cron' => $this->cronOptions['daily'],
+                'callback' => 'cronCleanupApiLogs',
+            ),
+        );
+    }
+
+    public function cronCleanupApiLogs()
+    {
+        if ($this->cleanupApiLogs() === false) {
+            throw new Exception('Unable to delete the old API logs.');
+        }
+    }
+
+    public function cleanupApiLogs()
+    {
+        $cutoff = date('Y-m-d H:i:s', strtotime('-2 months'));
+        $count = QghcApiLog::deleteOlderThan($cutoff);
+
+        // Daily file logs follow the same retention window as the DB rows.
+        $logDir = _PS_MODULE_DIR_ . $this->name . '/logs/';
+        if (is_dir($logDir)) {
+            foreach (glob($logDir . '*.log') as $file) {
+                $fileDate = basename($file, '.log');
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fileDate) && strtotime($fileDate) < strtotime($cutoff)) {
+                    @unlink($file);
+                }
+            }
+        }
+
+        return $count === false ? false : array('count' => $count, 'cutoff' => $cutoff);
+    }
+
+    public function getCronOptionLabels()
+    {
+        return array(
+            'daily' => $this->l('Daily'),
+            'weekly' => $this->l('Weekly'),
+            'monthly' => $this->l('Monthly'),
+            'never' => $this->l('Never'),
+        );
+    }
+
+    public function updateCronSchedule($option)
+    {
+        if ($option !== 'never' && !isset($this->cronOptions[$option])) {
+            return $this->l('Invalid cron schedule.');
+        }
+
+        if (!Module::isEnabled('qlocrontaskmanager')) {
+            return $this->l('The Cron Task Manager module is not enabled.');
+        }
+
+        $cronTask = $this->getCronTask();
+        if ($option === 'never') {
+            if ($cronTask && !$cronTask->delete()) {
+                return $this->l('Unable to update the cron task.');
+            }
+
+            return true;
+        }
+
+        if (!$cronTask) {
+            (new QctmCronTask())->registerTasksForModule((int) $this->id, $this->hookRegisterCronTasks());
+            $cronTask = $this->getCronTask();
+        }
+        if (!$cronTask) {
+            return $this->l('Unable to create the cleanup cron task in the Cron Task Manager.');
+        }
+
+        $cronTask->cron_expression = $this->cronOptions[$option];
+        $cronTask->active = 1;
+        if (!$cronTask->save()) {
+            return $this->l('Unable to update the cron task.');
+        }
+
+        return true;
+    }
+
+    /** Returns the log cleanup task of the Cron Task Manager, false when it does not exist. */
+    protected function getCronTask()
+    {
+        if (!Module::isEnabled('qlocrontaskmanager')) {
+            return false;
+        }
+
+        require_once _PS_MODULE_DIR_ . 'qlocrontaskmanager/classes/QctmRequiredClasses.php';
+
+        $idTask = QctmCronTask::getByModuleAndName((int) $this->id, self::CRON_TASK_CLEANUP_LOGS);
+        if (!$idTask) {
+            return false;
+        }
+
+        $cronTask = new QctmCronTask((int) $idTask);
+
+        return Validate::isLoadedObject($cronTask) ? $cronTask : false;
+    }
+
+    /** Returns the current cleanup schedule for display, false when the Cron Task Manager is not enabled. */
+    public function getCronTaskSchedule()
+    {
+        if (!Module::isEnabled('qlocrontaskmanager')) {
+            return false;
+        }
+
+        $cronTask = $this->getCronTask();
+        if (!$cronTask) {
+            return array(
+                'active' => false,
+                'expression' => '',
+                'readable' => '',
+                'option' => 'never',
+            );
+        }
+
+        $readable = $cronTask->cron_expression;
+        if (\Cron\CronExpression::isValidExpression($cronTask->cron_expression)) {
+            $readable = (new QctmCronExpressionTranslator())->getCronExpressionTranslation($cronTask->cron_expression);
+        }
+
+        $option = '';
+        if (!$cronTask->active) {
+            $option = 'never';
+        } elseif (($found = array_search($cronTask->cron_expression, $this->cronOptions, true)) !== false) {
+            $option = $found;
+        }
+
+        return array(
+            'active' => (bool) $cronTask->active,
+            'expression' => $cronTask->cron_expression,
+            'readable' => $readable,
+            'option' => $option,
+        );
+    }
+
+    /** Returns the admin link to the Cron Task Manager, or to its module page when it is not enabled. */
+    public function getCronManagerLink()
+    {
+        $link = $this->context->link;
+        if (Module::isEnabled('qlocrontaskmanager')) {
+            return $link->getAdminLink('AdminCronTaskManager');
+        }
+
+        $module = Module::getInstanceByName('qlocrontaskmanager');
+        if (!$module) {
+            return '';
+        }
+
+        return $link->getAdminLink('AdminModules') . '&module_name=' . $module->name . '&tab_module=' . $module->tab;
     }
 
     /** Adds the Google Hotel Connector menu group with Configuration and API Logs sub-tabs to the admin sidebar. */
