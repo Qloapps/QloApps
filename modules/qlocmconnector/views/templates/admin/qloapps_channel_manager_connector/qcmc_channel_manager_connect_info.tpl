@@ -33,7 +33,7 @@
                     </div>
 
                     <div class="connect_info_txt col-sm-12 margin-bottom-10">
-                        {l s='Connection status is shown as connected when channel manager API credentials are saved or a booking has been received from QloApps Channel Manager.' mod='qlocmconnector'}
+                        **{l s='Connection status with channel manager is showing according to the bookings fetched from QloApps Channel Manager.' mod='qlocmconnector'}
                     </div>
                 </div>
             </div>

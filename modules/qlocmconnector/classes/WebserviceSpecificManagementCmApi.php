@@ -916,10 +916,13 @@ class WebserviceSpecificManagementCmApi implements WebserviceSpecificManagementI
 
             }
 
-            if ( $originalOrderStatus == Configuration::get('PS_OS_PAYMENT_ACCEPTED')
-                || $originalOrderStatus == Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED')
+            $objOrder->advance_paid_amount = $totalAmount;
+            if ($params['payment_status'] == self::API_BOOKING_PAYMENT_STATUS_COMPLETED
+                || $params['payment_status'] == self::API_BOOKING_PAYMENT_STATUS_AWATING
             ) {
-                $objOrder->advance_paid_amount = $totalAmount;
+                $objOrder->is_advance_payment = 0;
+            } else {
+                $objOrder->advance_paid_amount = $objOrder->total_paid_real;
             }
             $objOrder->save();
 

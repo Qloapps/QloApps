@@ -27,5 +27,7 @@
         {if is_array($title)}{$title|end}{else}{$title}{/if}
         <span class="badge">{$list_total|intval}</span>
     </div>
-    <p>{l s='Below is the list of all the bookings created by channel manager.' mod='qlocmconnector'}</p>
+    <div class="alert alert-info">
+        {l s='Below is the list of all the bookings created by QloApps Channel Manager.' mod='qlocmconnector'}
+    </div>
 {/block}
