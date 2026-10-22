@@ -179,6 +179,14 @@
 									</a>
 									<input type="hidden" class="form-control disable_dates_json" name="{$var_name_room_info|cat:'[disable_dates_json]'}" value="">
 								</td>
+                                <td class="col-sm-1 center">
+                                    <a href="#" class="btn btn-default disabled">
+                                        <span class="connected-room-icon-wrapper">
+                                            <i class="icon-random"></i>
+                                            <span class="connected-room-count">0</span>
+                                        </span>
+                                    </a>
+                                </td>
                                 {hook h='displayHotelRoomListTableRowColumn' index=$k}
 								<td class="center col-sm-1">
 								    {if $k == 1}
