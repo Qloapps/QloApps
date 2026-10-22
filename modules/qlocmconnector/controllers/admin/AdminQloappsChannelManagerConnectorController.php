@@ -120,7 +120,6 @@ class AdminQloappsChannelManagerConnectorController extends ModuleAdminControlle
         if (QcmcChannelManagerOrder::isChannelManagerConnected()) {
             $this->context->smarty->assign(
                 array (
-                    'icon' => 'icon-list',
                     'toolbar_title' => 'icon-list',
                     'last_booking_datetime' => Tools::displayDate(QcmcChannelManagerOrder::getLastChannelManagerBookingDate(), null, true),
                     'is_cm_connected' => QcmcChannelManagerOrder::isChannelManagerConnected(),
@@ -156,7 +155,6 @@ class AdminQloappsChannelManagerConnectorController extends ModuleAdminControlle
         parent::setMedia();
 
         if (QcmcChannelManagerOrder::isChannelManagerConnected()) {
-            $this->addCSS(_MODULE_DIR_.'qlocmconnector/views/css/admin/qcmc_cm_booking_list.css');
             $this->addJS(_MODULE_DIR_.'qlocmconnector/views/js/admin/qcmc_cm_booking_list.js');
         } else {
             $this->addCSS(_MODULE_DIR_.'qlocmconnector/views/css/admin/qcmc_cm_info.css');

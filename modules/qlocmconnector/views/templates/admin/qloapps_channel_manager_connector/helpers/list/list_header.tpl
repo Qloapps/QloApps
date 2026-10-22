@@ -24,10 +24,8 @@
 
 {block name="panel_heading"}
     <div class="panel-heading">
-        {if isset($icon)}<i class="{$icon|escape:'htmlall':'UTF-8'}"></i> {/if}{if is_array($title)}{$title|end}{else}{$title}{/if}
+        {if is_array($title)}{$title|end}{else}{$title}{/if}
         <span class="badge">{$list_total|intval}</span>
     </div>
-    <div class="alert alert-info">
-        {l s='Below is the list of all the bookings created by channel manager.' mod='qlocmconnector'}
-    </div>
+    <p>{l s='Below is the list of all the bookings created by channel manager.' mod='qlocmconnector'}</p>
 {/block}
