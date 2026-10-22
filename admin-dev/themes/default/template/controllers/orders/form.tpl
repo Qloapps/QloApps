@@ -47,6 +47,7 @@
 	var currency_sign = '';
 	var currency_blank = false;
 	var priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval};
+	var current_order_total = {$order_total|floatval};
 
 	$(document).ready(function() {
 		$(document).on('change', '#add_new_room_services_form select[name="price_calculation_type"]', function() {
@@ -782,9 +783,8 @@
 		$('#total_taxes_tourism').html(formatCurrency(totalTaxesTourismAmt, currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
-		if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-			$('#payment_amount').val(jsonSummary.summary.total_price);
-		}
+		current_order_total = parseFloat(jsonSummary.summary.total_price);
+		$('#payment_amount').val(jsonSummary.summary.total_price);
 		$('#full_payment_amount_value').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
 		if (jsonSummary.summary.is_advance_payment_active) {
@@ -1322,9 +1322,8 @@
 		}
 		$('#order_message').val(jsonSummary.order_message);
 		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
-		if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-			$('#payment_amount').val(jsonSummary.summary.total_price);
-		}
+		current_order_total = parseFloat(jsonSummary.summary.total_price);
+		$('#payment_amount').val(jsonSummary.summary.total_price);
 		$('#full_payment_amount_value').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
 		if (jsonSummary.summary.is_advance_payment_active) {
@@ -1671,12 +1670,12 @@
 
 		$(document).on('change', 'input[name="is_full_payment"]', function() {
 			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-				$('#payment_amount').val({$order_total|floatval}).attr('disabled', true);
+				$('#payment_amount').val(current_order_total).attr('disabled', true);
 				$('#payment_amount').closest('.form-group').hide(200);
 
 				$('#payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
 			} else {
-				$('#payment_amount').val({$order_total|floatval}).attr('disabled', false);
+				$('#payment_amount').val(current_order_total).attr('disabled', false);
 				$('#payment_amount').closest('.form-group').show(200);
 
 				managePaymentOptions();
