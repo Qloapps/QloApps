@@ -3084,6 +3084,8 @@ class AdminOrdersControllerCore extends AdminController
                 $initialPaymentStatus = $this->l('Full Payment');
             } elseif (isset($orderHistory[0]['id_order_state']) && ($orderHistory[0]['id_order_state'] == Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED'))) {
                 $initialPaymentStatus = $this->l('Partial Payment');
+            } elseif (isset($orderHistory[0]['id_order_state']) && ($orderHistory[0]['id_order_state'] == Configuration::get('PS_OS_ERROR'))) {
+                $initialPaymentStatus = $this->l('Payment Error');
             } else {
                 $initialPaymentStatus = $this->l('No Payment Received');
             }
@@ -3091,7 +3093,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->icon = 'icon-home';
             $helper->color = 'color3';
             $helper->title = $this->l('Initial Payment Status');
-            $helper->tooltip = $this->l('Initial Payment Status defines whether the order was fully paid, partially paid, or had no payment received at the time the order was placed.');
+            $helper->tooltip = $this->l('Initial Payment Status defines whether the order was fully paid, partially paid, had a payment error, or had no payment received at the time the order was placed.');
             $helper->value = $initialPaymentStatus;
             $this->kpis[] = $helper;
 
