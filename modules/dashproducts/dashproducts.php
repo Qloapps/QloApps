@@ -433,7 +433,7 @@ class DashProducts extends Module
 			}
 		} else {
 			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
-			$body = '<div class="alert alert-info text-left">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the QloApps Google Analytics module.').'</div>';
+			$body = '<div class="alert alert-info text-left">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the QloApps Google Analytics module.').'</div>';
 		}
 		return array('header' => $header, 'body' => $body);
 	}
@@ -507,7 +507,7 @@ class DashProducts extends Module
 				}
 		} else {
 			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
-			$body = '<div class="alert alert-info text-left">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the QloApps Google Analytics module.').'</div>';
+			$body = '<div class="alert alert-info text-left">'.$this->l('You must enable the "Save global page views" option from ').'<u><a href="'.$link.'">Data mining for statistics</a></u>'.$this->l(' module in order to display the most viewed room types, or use the QloApps Google Analytics module.').'</div>';
 		}
 
 		return array('header' => $header, 'body' => $body);
