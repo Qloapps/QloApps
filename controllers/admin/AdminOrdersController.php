@@ -5810,6 +5810,11 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
 
+        // VAT scoping and tourism tax rows of the new room(s) exist only now, so refresh invoice totals again
+        if (isset($order_invoice) && Validate::isLoadedObject($order_invoice)) {
+            $order_invoice->recomputeTotalsFromLines();
+        }
+
         $order->total_paid = $order->getOrderTotal();
         $order->total_paid_tax_incl = $order->total_paid;
         $order->total_paid_tax_excl = $order->getOrderTotal(false);
