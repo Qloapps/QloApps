@@ -156,7 +156,7 @@ class StatsLive extends Module
 		</script>';
         if (!Configuration::get('PS_STATSDATA_CUSTOMER_PAGESVIEWS')) {
 			$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
-			$this->html .= '<div class="alert alert-info text-left">'.$this->l('You must enable the "Save page views for each customer" option from ').'<u><a href="'.$link.'" target="_blank">Data mining for statistics</a></u>'.$this->l(' module in order to see the pages that your visitors are currently viewing.').'</div>';
+			$this->html .= '<div class="alert alert-info text-left">'.$this->l('You must enable the "Save page views for each customer" option from ').'<u><a href="'.$link.'">Data mining for statistics</a></u>'.$this->l(' module in order to see the pages that your visitors are currently viewing.').'</div>';
         }
         $this->html .= '
 			<h4> '.$this->l('Current online customers').'</h4>';

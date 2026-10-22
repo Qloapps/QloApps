@@ -296,7 +296,7 @@ class StatsCatalog extends Module
 		$link = $this->context->link->getAdminLink('AdminModules').'&configure=statsdata';
 		$html .='
 				<p>
-					<strong>'.$this->l('Note: ').'</strong>'.$this->l('You must enable the "Save global page views" option from ').'<a href="'.$link.'" target="_blank">Data mining for statistics</a>'.$this->l(' module for accurate data, or use the QloApps Google Analytics module.').'
+					<strong>'.$this->l('Note: ').'</strong>'.$this->l('You must enable the "Save global page views" option from ').'<a href="'.$link.'">Data mining for statistics</a>'.$this->l(' module for accurate data, or use the QloApps Google Analytics module.').'
 				</p>
 			</div>';
 
