@@ -29,6 +29,16 @@ class QhrHotelReviewHelper
             return false;
         }
 
+        // At least one room must be actually checked out, otherwise an order with all rooms cancelled would count as checked out
+        if (!Db::getInstance()->getValue(
+            'SELECT COUNT(*) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            WHERE hbd.`id_status` = '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.'
+            AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
+            AND hbd.`id_order` = '.(int) $idOrder
+        )) {
+            return false;
+        }
+
         return (bool) !Db::getInstance()->getValue(
             'SELECT COUNT(*) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
             WHERE hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CHECKED_OUT.'
@@ -73,9 +83,11 @@ class QhrHotelReviewHelper
 
         $maxDate = Db::getInstance()->getValue(
             'SELECT MAX(DATE(hbd.`date_to`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
-            WHERE hbd.`id_order` = '.(int) $idOrder
+            WHERE hbd.`id_status` != '.(int) HotelBookingDetail::STATUS_CANCELLED.'
+            AND hbd.`id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().')
+            AND hbd.`id_order` = '.(int) $idOrder
         );
-        return date('Y-m-d') >= $maxDate;
+        return $maxDate && date('Y-m-d') >= $maxDate;
     }
 
     public static function sendReviewRequestMail($idOrder)
