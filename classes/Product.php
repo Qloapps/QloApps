@@ -6865,6 +6865,13 @@ class ProductCore extends ObjectModel
 
         $price = $price * $quantity;
 
+        if (!$specificPrice || ($specificPrice['id_cart'] == 0 && $specificPrice['id_htl_cart_booking'] == 0)) {
+            if (!$idGroup || !Validate::isLoadedObject(new Group((int)$idGroup))) {
+                $idGroup = (int)Group::getCurrent()->id;
+            }
+            $price = Product::applyGroupDiscount($price, $idProduct, $idGroup);
+        }
+
         $tourismTaxHotelId = $idHotel;
         if (!$tourismTaxHotelId && $idProductRoomType) {
             $objRoomType = new HotelRoomType();
@@ -6906,12 +6913,6 @@ class ProductCore extends ObjectModel
             );
         }
 
-        if (!$specificPrice || ($specificPrice['id_cart'] == 0 && $specificPrice['id_htl_cart_booking'] == 0)) {
-            if (!$idGroup || !Validate::isLoadedObject(new Group((int)$idGroup))) {
-                $idGroup = (int)Group::getCurrent()->id;
-            }
-            $price =  Product::applyGroupDiscount($price, $idProduct, $idGroup);
-        }
         return $price;
     }
 
