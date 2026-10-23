@@ -643,15 +643,6 @@ class AdminTaxesControllerCore extends AdminController
                         . ' - ' . $this->l('Invalid characters') . ' <>;=#{}',
                 ),
                 array(
-                    'type' => 'html',
-                    'label' => $this->l('Rate'),
-                    'name' => 'rate_wrap',
-                    'html_content' => $rateInputHtml,
-                    'hint' => $this->l('Format: XX.XX or XX.XXX (e.g. 19.60 or 13.925)')
-                        . ' - ' . $this->l('Invalid characters') . ' <>;=#{}',
-                    'form_group_class' => 'tourism-tax-non-tourism',
-                ),
-                array(
                     'type' => 'switch',
                     'label' => $this->l('Is tourism tax'),
                     'name' => 'is_tourism_tax',
@@ -661,6 +652,15 @@ class AdminTaxesControllerCore extends AdminController
                         array('id' => 'is_tourism_tax_on', 'value' => 1, 'label' => $this->l('Yes')),
                         array('id' => 'is_tourism_tax_off', 'value' => 0, 'label' => $this->l('No')),
                     ),
+                ),
+                array(
+                    'type' => 'html',
+                    'label' => $this->l('Rate'),
+                    'name' => 'rate_wrap',
+                    'html_content' => $rateInputHtml,
+                    'hint' => $this->l('Format: XX.XX or XX.XXX (e.g. 19.60 or 13.925)')
+                        . ' - ' . $this->l('Invalid characters') . ' <>;=#{}',
+                    'form_group_class' => 'tourism-tax-non-tourism',
                 ),
                 array(
                     'type' => 'select',
