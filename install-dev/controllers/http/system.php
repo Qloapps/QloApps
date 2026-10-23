@@ -87,7 +87,7 @@ class InstallControllerHttpSystem extends InstallControllerHttp
                     'title' => $this->l('Required PHP parameters'),
                     'success' => 1,
                     'checks' => array(
-                        'phpversion' => $this->l('The required PHP version is between 8.1 to 8.4'),
+                        'phpversion' => $this->l('The required PHP version is between 8.2 to 8.4'),
                         'upload' => $this->l('Cannot upload files'),
                         'system' => $this->l('Cannot create new files and folders'),
                         'gd' => $this->l('GD library is not installed'),
