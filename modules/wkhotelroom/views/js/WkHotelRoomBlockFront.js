@@ -21,6 +21,19 @@
 */
 
 $(document).ready(function() {
+    $('.htlRoom-owlCarousel .owl-carousel').owlCarousel({
+        loop: true,
+        nav: true,
+        navText: ['<i class="icon-angle-left"></i>', '<i class="icon-angle-right"></i>'],
+        dots: false,
+        margin: 24,
+        items: 1,
+        rtl: typeof language_is_rtl != 'undefined' && language_is_rtl,
+        responsive: {
+            768: { items: 2 },
+            992: { items: 3 }
+        }
+    });
     applyChangesToDescription();
     $(window).on('resize', function() {
         resetDescriptionChanges();

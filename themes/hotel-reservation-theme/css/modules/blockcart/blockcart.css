@@ -419,6 +419,9 @@
       text-align: center; }
     #layer_cart .layer_cart_cart .button-container span.exclusive-medium {
       margin-right: 0; } }
+  @media (min-width: 576px) and (max-width: 991px) {
+    #layer_cart .layer_cart_cart .button-container {
+      text-align: center; } }
   #layer_cart .cross {
     position: absolute;
     right: 7px;

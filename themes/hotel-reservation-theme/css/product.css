@@ -1336,12 +1336,12 @@ Quick View Styles
 @media (min-width: 768px) and (max-width: 1199px) {
   .num_avail_rooms_alert {
     float: left!important;}
-  .booking_room_fields .form-group {
+  .booking_room_fields .form-group:not(.occupancy_count_block) {
     width: 100%;}}
 @media (max-width: 450px) {
   .num_avail_rooms_alert {
     float: left!important;}
-  .booking_room_fields .form-group {
+  .booking_room_fields .form-group:not(.occupancy_count_block) {
     width: 100%;}}
 
 /* booking form loading */
@@ -1825,5 +1825,42 @@ ul.service-product-nav > li:hover {
 @media (max-width:768px) {
   #hotel_rating {
     display: block;
+  }
+}
+
+/* mobile and tablet: show the booking form right after the images, before the service products */
+@media (max-width: 991px) {
+  .primary_block {
+    display: flex;
+    flex-direction: column;
+  }
+  .primary_block:before,
+  .primary_block:after {
+    display: none;
+  }
+  .primary_block .pb-left-column,
+  .primary_block .pb-right-column {
+    display: contents;
+  }
+  .primary_block .room_type_img_containter {
+    order: 1;
+  }
+  .primary_block .booking-form {
+    order: 2;
+    margin-bottom: 20px;
+  }
+  /* the column wrappers are gone, so give the sections their side gutter back */
+  .primary_block .room_type_img_containter,
+  .primary_block .booking-form,
+  .primary_block #service_products_cont,
+  .primary_block .product_info_containter {
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+  .primary_block #service_products_cont {
+    order: 3;
+  }
+  .primary_block .product_info_containter {
+    order: 4;
   }
 }

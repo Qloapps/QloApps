@@ -133,9 +133,11 @@
       width: 100%;}
     .booking_occupancy_wrapper .occupancy_info_block .occupancy_count {
         width: 80%;}
-    /* room list: keep adults and children side by side, same as desktop */
-    .booking_guest_occupancy_conatiner .booking_occupancy_wrapper .occupancy_info_block .occupancy_count_block {
+    /* room list and product page booking form: keep adults and children side by side, same as desktop */
+    .booking_guest_occupancy_conatiner .booking_occupancy_wrapper .occupancy_info_block .occupancy_count_block,
+    .booking-form .booking_occupancy_wrapper .occupancy_info_block .occupancy_count_block {
       width: 50%;}
-    .booking_guest_occupancy_conatiner .booking_occupancy_wrapper .occupancy_info_block .occupancy_count {
+    .booking_guest_occupancy_conatiner .booking_occupancy_wrapper .occupancy_info_block .occupancy_count,
+    .booking-form .booking_occupancy_wrapper .occupancy_info_block .occupancy_count {
         width: auto;}
   }

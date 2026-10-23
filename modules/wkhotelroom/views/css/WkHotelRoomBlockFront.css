@@ -98,12 +98,206 @@ a.htlRoomTypeBookNow {
     text-transform: capitalize;
 }
 
-.btn.htlRoomTypeBookNow:hover{
-	border: 1px solid #333333;
-}
 
 .room_type_old_price {
    text-decoration: line-through;
    color:#555555;
    font-size:14px;
+}
+
+/* room type cards slider */
+.htlRoom-owlCarousel .owl-carousel {
+    padding: 0 0 6px;
+}
+.htlRoomCard {
+    background: #fff;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+}
+.htlRoomCardImg {
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+}
+.htlRoomCardImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.htlRoomCardBody {
+    padding: 16px;
+}
+.htlRoomCardBody .htlRoomTypeNameText {
+    float: none;
+    margin: 0 0 12px;
+    font-size: 22px;
+}
+.htlRoomCardFeatured {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    padding: 0 0 12px;
+    color: #555;
+    font-size: 15px;
+}
+.htlRoomCardFeatured img.htlRoomFeatureImg {
+    width: 16px;
+    height: 16px;
+    max-width: 16px;
+    flex: 0 0 16px;
+    margin-right: 0;
+    object-fit: contain;
+}
+.htlRoomCardAmen > span img.htlRoomAmenityImg {
+    width: 18px;
+    height: 18px;
+    max-width: 18px;
+    object-fit: contain;
+}
+.htlRoomCardFeatured > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+.htlRoomCardFeatured i {
+    margin-right: 0;
+    color: #777;
+}
+.htlRoomCardMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 0;
+    border-top: 1px solid #E5E5E5;
+    border-bottom: 1px solid #E5E5E5;
+    color: #555;
+    font-size: 15px;
+}
+.htlRoomCardGuests i {
+    margin-right: 4px;
+    color: #777;
+}
+.htlRoomCardAmen {
+    display: flex;
+    gap: 6px;
+}
+.htlRoomCardAmen > span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #D6D6D6;
+    border-radius: 50%;
+    font-size: 14px;
+    color: #666;
+}
+.htlRoomCardFoot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 14px;
+}
+.htlRoomCardFoot .htlRoomTypePriceText {
+    float: none;
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.htlRoomCardFoot .wk_roomType_price_type {
+    font-size: 14px;
+    font-weight: 400;
+    color: #777;
+}
+.htlRoomCardFoot .room_type_old_price {
+    display: block;
+    width: auto;
+    font-size: 14px;
+    font-weight: 400;
+}
+a.htlRoomTypeBookNow {
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 3px;
+    background: #379BF0;
+    color: #fff;
+    font-weight: 700;
+    white-space: nowrap;
+}
+a.htlRoomTypeBookNow:hover {
+    background: #2d86d3;
+    color: #fff;
+}
+.htlRoom-owlCarousel .owl-nav .owl-prev,
+.htlRoom-owlCarousel .owl-nav .owl-next {
+    position: absolute;
+    top: 38%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+    font-size: 22px;
+    line-height: 1;
+}
+.htlRoom-owlCarousel .owl-nav .owl-prev {
+    left: -12px;
+}
+.htlRoom-owlCarousel .owl-nav .owl-next {
+    right: -12px;
+}
+.htlRoom-owlCarousel .owl-nav .disabled {
+    display: none;
+}
+@media (max-width: 767px) {
+    .htlRoom-owlCarousel .owl-nav .owl-prev {
+        left: 4px;
+    }
+    .htlRoom-owlCarousel .owl-nav .owl-next {
+        right: 4px;
+    }
+    .htlRoomCardBody .htlRoomTypeNameText {
+        font-size: 20px;
+    }
+}
+
+/* equal height cards: price row sits at the bottom, occupancy row keeps the same height with or without amenities */
+.htlRoom-owlCarousel .owl-stage {
+    display: flex;
+}
+.htlRoom-owlCarousel .owl-item {
+    display: flex;
+}
+.htlRoomCard {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.htlRoomCardBody {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+.htlRoomCardFoot {
+    margin-top: auto;
+}
+.htlRoomCardGuests {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+}
+
+.htlRoomCard {
+    width: calc(100% - 4px);
+    margin: 2px;
 }
