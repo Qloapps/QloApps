@@ -160,6 +160,10 @@
     pointer-events: none;
 }
 
+#index #page {
+    overflow-x: clip;
+}
+
 .header-media-layer .owl-carousel,
 .header-media-layer .owl-stage-outer,
 .header-media-layer .owl-stage,
