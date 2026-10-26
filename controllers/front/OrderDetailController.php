@@ -475,6 +475,7 @@ class OrderDetailControllerCore extends FrontController
                         'ROOM_STATUS_ASSIGNED' => HotelBookingDetail::STATUS_ASSIGNED,
                         'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
                         'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
+                        'ROOM_STATUS_NO_SHOW' => HotelBookingDetail::STATUS_NO_SHOW,
                     )
                 );
 
@@ -588,7 +589,7 @@ class OrderDetailControllerCore extends FrontController
 
                         // the room has already been checked in/checked out, room will not be able to be cancelled by the customer
                         if ($objHotelBookingDetail->id_status != HotelBookingDetail::STATUS_ASSIGNED) {
-                            $this->errors[] = Tools::displayError('Some selected rooms have already been checked-in/checked-out.');
+                            $this->errors[] = Tools::displayError('Some selected rooms have already been checked-in/checked-out or marked as no-show.');
                             break;
                         }
 
