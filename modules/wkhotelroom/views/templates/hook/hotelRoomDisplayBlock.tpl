@@ -54,27 +54,36 @@
                                         <div class="htlRoomCardBody">
                                             {block name='hotel_room_block_room_type_description'}
                                                 <p class="htlRoomTypeNameText">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
-                                                <div class="htlRoomCardMeta">
-                                                    {if $roomDisplay.amenities}
-                                                        <span class="htlRoomCardAmen">
-                                                            {foreach from=$roomDisplay.amenities item=amenity}
-                                                                {if $amenity.logo}
-                                                                    <span title="{$amenity.name|escape:'htmlall':'UTF-8'}">
-                                                                        {if $amenity.logo_type == 'icon'}<i class="{$amenity.logo|escape:'htmlall':'UTF-8'}"></i>{else}<img class="htlRoomAmenityImg" src="{$amenity_img_dir|escape:'htmlall':'UTF-8'}{$amenity.logo|escape:'htmlall':'UTF-8'}" alt="{$amenity.name|escape:'htmlall':'UTF-8'}">{/if}
-                                                                    </span>
-                                                                {/if}
-                                                            {/foreach}
-                                                        </span>
-                                                    {/if}
-                                                </div>
                                                 {if $roomDisplay.feature}
                                                     <div class="htlRoomCardFeatured">
+                                                        {* the card shows one line, so features are added until the character budget is used and the last one is shortened *}
+                                                        {assign var='maxFeatureChars' value=40}
+                                                        {assign var='featChars' value=0}
                                                         {foreach from=$roomDisplay.feature item=feat}
-                                                            <span title="{$feat.name|escape:'htmlall':'UTF-8'}">
+                                                            {if $featChars < $maxFeatureChars}
+                                                                {assign var='featLeft' value=$maxFeatureChars-$featChars}
+                                                                {assign var='featText' value=$feat.value|truncate:$featLeft:'…':true}
+                                                                {if $featChars}<span class="htlRoomFeatureSep">|</span>{/if}
+                                                                <span title="{$feat.name|escape:'htmlall':'UTF-8'}">
                                                                     {if $feat.logo_type == 'icon'}<i class="{$feat.logo|escape:'htmlall':'UTF-8'}"></i>{else}<img class="htlRoomFeatureImg" src="{$smarty.const._PS_IMG_}rf/{$feat.logo_image|escape:'htmlall':'UTF-8'}" alt="{$feat.name|escape:'htmlall':'UTF-8'}" onerror="this.style.display='none'">{/if}
-                                                                    {$feat.value|escape:'htmlall':'UTF-8'}
+                                                                    {$featText|escape:'htmlall':'UTF-8'}
                                                                 </span>
+                                                                {assign var='featChars' value=$featChars+$feat.value|count_characters:true+4}
+                                                            {/if}
                                                         {/foreach}
+                                                    </div>
+                                                {/if}
+                                                {if $roomDisplay.amenities}
+                                                    <div class="htlRoomCardMeta">
+                                                            <span class="htlRoomCardAmen">
+                                                                {foreach from=$roomDisplay.amenities item=amenity}
+                                                                    {if $amenity.logo}
+                                                                        <span title="{$amenity.name|escape:'htmlall':'UTF-8'}">
+                                                                            {if $amenity.logo_type == 'icon'}<i class="{$amenity.logo|escape:'htmlall':'UTF-8'}"></i>{else}<img class="htlRoomAmenityImg" src="{$amenity_img_dir|escape:'htmlall':'UTF-8'}{$amenity.logo|escape:'htmlall':'UTF-8'}" alt="{$amenity.name|escape:'htmlall':'UTF-8'}">{/if}
+                                                                        </span>
+                                                                    {/if}
+                                                                {/foreach}
+                                                            </span>
                                                     </div>
                                                 {/if}
                                             {/block}
@@ -102,7 +111,7 @@
                     </div>
                 {/block}
             </div>
-           
+           <hr class="home_block_seperator"/>
         </div>
     {/if}
 {/block}

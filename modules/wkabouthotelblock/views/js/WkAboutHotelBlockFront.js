@@ -26,6 +26,9 @@ $(document).ready(function(){
 	    nav:false,
 	    dots:true,
 	    items: 1,
+	    margin: 8,
+	    slideBy: 'page',
+	    responsive: {576: {items: 2}},
 	    autoHeight:true,
 	    autoplay:true,
 	    autoplaySpeed:1000,
@@ -76,66 +79,89 @@ $(document).ready(function(){
         }
     }
 
-    // photos are listed once, the slider also holds cloned copies when it loops
-    $(document).on('click', '.htlInterior-owlCarousel .interiorbox[href]', function(e) {
-        e.preventDefault();
-        var items = [];
-        var index = 0;
-        var clicked = $(e.currentTarget).attr('href');
-        $('.htlInterior-owlCarousel .owl-item:not(.cloned) .interiorbox[href]').each(function(i) {
-            items.push({href: $(this).attr('href'), title: $(this).attr('title') || ''});
-            if ($(this).attr('href') === clicked) {
-                index = i;
+    // options of the dark gallery with a thumbnail strip
+    var thumbsGalleryOptions = {
+        padding: 0,
+        margin: [48, 48, 190, 48],
+        wrapCSS: 'htl-gallery-fancybox',
+        arrows: false,
+        helpers: {overlay: {locked: false, css: {background: 'rgba(43, 43, 43, 0.9)'}}},
+        beforeLoad: function() {
+            var compact = window.innerWidth < 768 || window.innerHeight < 500;
+            this.margin = window.innerHeight < 500 ? [36, 12, 84, 12] : (compact ? [48, 12, 110, 12] : [48, 48, 190, 48]);
+        },
+        afterLoad: function() {
+            // photos are shown as large as the screen allows (up to 589px), not at their natural size
+            var smallW = window.innerWidth < 768;
+            var shortH = window.innerHeight < 500;
+            var maxH = Math.min(window.innerHeight - (shortH ? 120 : (smallW ? 158 : 238)), 589);
+            var maxW = window.innerWidth - (shortH || smallW ? 24 : 96);
+            var ratio = this.width / this.height;
+            var height = maxH;
+            var width = height * ratio;
+            if (width > maxW) {
+                width = maxW;
+                height = width / ratio;
             }
-        });
-        $.fancybox.open(items, {
-            index: index,
-            type: 'image',
-            padding: 0,
-            margin: [48, 48, 190, 48],
-            wrapCSS: 'htl-gallery-fancybox',
-            arrows: false,
-            openEffect: 'fade',
-            closeEffect: 'fade',
-            helpers: {
-                overlay: {
-                    locked: false,
-                    css: {background: 'rgba(43, 43, 43, 0.9)'}
-                }
-            },
-            beforeLoad: function() {
-                var compact = window.innerWidth < 768 || window.innerHeight < 500;
-                this.margin = window.innerHeight < 500 ? [36, 12, 84, 12] : (compact ? [48, 12, 110, 12] : [48, 48, 190, 48]);
-            },
-            afterLoad: function() {
-                // photos are shown as large as the screen allows (up to 589px), not at their natural size
-                var smallW = window.innerWidth < 768;
-                var shortH = window.innerHeight < 500;
-                var maxH = Math.min(window.innerHeight - (shortH ? 120 : (smallW ? 158 : 238)), 589);
-                var maxW = window.innerWidth - (shortH || smallW ? 24 : 96);
-                var ratio = this.width / this.height;
-                var height = maxH;
-                var width = height * ratio;
-                if (width > maxW) {
-                    width = maxW;
-                    height = width / ratio;
-                }
-                this.width = Math.round(width);
-                this.height = Math.round(height);
-            },
-            beforeShow: function() {
-                $('.fancybox-overlay').addClass('htl-gallery-overlay');
-                if (!$thumbs) {
-                    buildThumbs();
-                }
-            },
-            afterShow: markActiveThumb,
-            afterClose: function() {
-                if ($thumbs) {
-                    $thumbs.remove();
-                    $thumbs = null;
-                }
+            this.width = Math.round(width);
+            this.height = Math.round(height);
+        },
+        beforeShow: function() {
+            $('.fancybox-overlay').addClass('htl-gallery-overlay');
+            if (!$thumbs) {
+                buildThumbs();
             }
+        },
+        afterShow: markActiveThumb,
+        afterClose: function() {
+            if ($thumbs) {
+                $thumbs.remove();
+                $thumbs = null;
+            }
+        }
+    };
+
+    // options of the light gallery with the next and previous arrows on the photo
+    var lightGalleryOptions = {
+        wrapCSS: 'htl-light-fancybox',
+        maxWidth: 700,
+        nextEffect: 'fade',
+        prevEffect: 'fade',
+        helpers: {overlay: {locked: false}}
+    };
+
+    /**
+     * Opens the photos of a slider in a lightbox when one is clicked.
+     * Usage: $('.owl-carousel').interiorBoxGallery({thumbs: true});
+     * thumbs true: dark gallery with a thumbnail strip, false: light gallery with arrows.
+     */
+    $.fn.interiorBoxGallery = function(options) {
+        var settings = $.extend({thumbs: true, itemSelector: '.interiorbox[href]'}, options);
+
+        return this.each(function() {
+            var $slider = $(this);
+            // photos are listed once, the slider also holds cloned copies when it loops
+            $slider.on('click', settings.itemSelector, function(e) {
+                e.preventDefault();
+                var items = [];
+                var index = 0;
+                var clicked = $(e.currentTarget).attr('href');
+                $slider.find('.owl-item:not(.cloned) ' + settings.itemSelector).each(function(i) {
+                    items.push({href: $(this).attr('href'), title: $(this).attr('title') || ''});
+                    if ($(this).attr('href') === clicked) {
+                        index = i;
+                    }
+                });
+                $.fancybox.open(items, $.extend(true, {
+                    index: index,
+                    type: 'image',
+                    openEffect: 'fade',
+                    closeEffect: 'fade',
+                    helpers: {title: {type: 'outside'}}
+                }, settings.thumbs ? thumbsGalleryOptions : lightGalleryOptions));
+            });
         });
-    });
+    };
+
+    $('.htlInterior-owlCarousel .owl-carousel').interiorBoxGallery({thumbs: true});
 });

@@ -136,7 +136,7 @@
     font-weight: 400;
 }
 .room_featured_features, .room_features_cont{
-    margin-top: 10px;
+    margin-top: 13px;
 }
 .rm_desc p
 {
@@ -226,7 +226,7 @@ img.rm_amen
 .room_featured_features {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px 18px;
+    gap: 6px 8px;
 }
 .room_featured_feature
 {

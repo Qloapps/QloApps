@@ -1842,11 +1842,8 @@ ul.service-product-nav > li:hover {
   .primary_block .pb-right-column {
     display: contents;
   }
-  .primary_block .room_type_img_containter {
-    order: 1;
-  }
+
   .primary_block .booking-form {
-    order: 2;
     margin-bottom: 20px;
   }
   /* the column wrappers are gone, so give the sections their side gutter back */
@@ -1857,10 +1854,5 @@ ul.service-product-nav > li:hover {
     margin-left: 15px;
     margin-right: 15px;
   }
-  .primary_block #service_products_cont {
-    order: 3;
-  }
-  .primary_block .product_info_containter {
-    order: 4;
-  }
+
 }

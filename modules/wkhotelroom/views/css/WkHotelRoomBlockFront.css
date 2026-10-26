@@ -112,7 +112,7 @@ a.htlRoomTypeBookNow {
 .htlRoomCard {
     background: #fff;
     border: 1px solid #E5E5E5;
-    border-radius: 8px;
+    border-radius: 4px;
     overflow: hidden;
     box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
 }
@@ -135,21 +135,21 @@ a.htlRoomTypeBookNow {
     font-size: 22px;
 }
 .htlRoomCardFeatured {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 16px;
     padding: 16px 0;
-    border-bottom: 1px solid #E5E5E5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: #555;
     font-size: 15px;
 }
 .htlRoomCardFeatured img.htlRoomFeatureImg {
+    display: inline-block;
     width: 16px;
     height: 16px;
     max-width: 16px;
-    flex: 0 0 16px;
-    margin-right: 0;
+    margin-right: 4px;
     object-fit: contain;
+    vertical-align: -3px;
 }
 .htlRoomCardAmen > span img.htlRoomAmenityImg {
     width: 18px;
@@ -157,14 +157,12 @@ a.htlRoomTypeBookNow {
     max-width: 18px;
     object-fit: contain;
 }
-.htlRoomCardFeatured > span {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
+.htlRoomCardFeatured .htlRoomFeatureSep {
+    margin: 0 5px;
+    color: #BBB;
 }
 .htlRoomCardFeatured i {
-    margin-right: 0;
+    margin-right: 4px;
     color: #777;
 }
 .htlRoomCardMeta {
@@ -173,7 +171,7 @@ a.htlRoomTypeBookNow {
     justify-content: space-between;
     gap: 10px;
     padding: 12px 0;
-    border-bottom: 1px solid #E5E5E5;
+    border-top: 1px solid #E5E5E5;
     color: #555;
     font-size: 15px;
 }
@@ -200,6 +198,7 @@ a.htlRoomTypeBookNow {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-top: 1px solid #E5E5E5;
     gap: 10px;
     padding-top: 14px;
 }
@@ -251,7 +250,7 @@ a.htlRoomTypeBookNow:hover {
     line-height: 1;
 }
 .htlRoom-owlCarousel .owl-nav .owl-prev {
-    left: -12px;
+    left: -15px;
 }
 .htlRoom-owlCarousel .owl-nav .owl-next {
     right: -12px;
@@ -260,12 +259,6 @@ a.htlRoomTypeBookNow:hover {
     display: none;
 }
 @media (max-width: 767px) {
-    .htlRoom-owlCarousel .owl-nav .owl-prev {
-        left: 4px;
-    }
-    .htlRoom-owlCarousel .owl-nav .owl-next {
-        right: 4px;
-    }
     .htlRoomCardBody .htlRoomTypeNameText {
         font-size: 20px;
     }
@@ -300,4 +293,8 @@ a.htlRoomTypeBookNow:hover {
 .htlRoomCard {
     width: calc(100% - 4px);
     margin: 2px;
+}
+.htlRoom-owlCarousel .owl-nav > div i {
+    position: relative;
+    left: 1px;
 }

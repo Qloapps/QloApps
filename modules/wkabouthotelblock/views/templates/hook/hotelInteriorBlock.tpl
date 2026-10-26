@@ -45,7 +45,7 @@
                         <div class="col-sm-12 col-xs-12">
                             <div class="owl-carousel owl-theme">
                                 {foreach from=$InteriorImg item=img_name name=intImg}
-                                    {if $smarty.foreach.intImg.iteration%8 == 1}
+                                    {if $smarty.foreach.intImg.iteration%4 == 1}
                                     <div class="interiorImgWrapper">
                                     {/if}
                                         <div class="interiorbox" data-fancybox-group="interiorGallery" rel="interiorGallery" href="{$link->getMediaLink("`$module_dir|escape:'htmlall':'UTF-8'`views/img/hotel_interior/`$img_name['name']|escape:'htmlall':'UTF-8'`.jpg")}" title="{$img_name['display_name']|escape:'htmlall':'UTF-8'}">
@@ -60,7 +60,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    {if $smarty.foreach.intImg.iteration%8 == 0 || $smarty.foreach.intImg.last}
+                                    {if $smarty.foreach.intImg.iteration%4 == 0 || $smarty.foreach.intImg.last}
                                     </div>
                                     {/if}
                                 {/foreach}
@@ -69,6 +69,7 @@
                     </div>
                 {/block}
             </div>
+            <hr class="home_block_seperator"/>
         </div>
     {/if}
 {/block}

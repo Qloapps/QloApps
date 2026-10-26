@@ -156,6 +156,7 @@
                     </div>
                 {/block}
             </div>
+            <hr class="home_block_seperator"/>
         </div>
     {/if}
 {/block}

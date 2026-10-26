@@ -1182,8 +1182,8 @@ class HotelHelper
 
         Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', 'specific_date;special_day;date_range');
         Configuration::updateValue('WK_MAX_AMENITIES_ROOM_SEARCH', 6);
-        Configuration::updateValue('WK_MAX_FEATURES_ROOM_SEARCH', 4);
-        Configuration::updateValue('WK_MAX_ROOM_TYPE_FEATURE_VALUES', 4);
+        Configuration::updateValue('WK_MAX_FEATURES_ROOM_SEARCH', 3);
+        Configuration::updateValue('WK_MAX_ROOM_TYPE_FEATURE_VALUES', 2);
         Configuration::updateValue('WK_GOOGLE_ACTIVE_MAP', 0);
         Configuration::updateValue('WK_MAP_HOTEL_ACTIVE_ONLY', 1);
 
