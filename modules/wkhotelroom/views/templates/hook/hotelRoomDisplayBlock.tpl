@@ -54,18 +54,7 @@
                                         <div class="htlRoomCardBody">
                                             {block name='hotel_room_block_room_type_description'}
                                                 <p class="htlRoomTypeNameText">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
-                                                {if $roomDisplay.feature}
-                                                    <div class="htlRoomCardFeatured">
-                                                        {foreach from=$roomDisplay.feature item=feat}
-                                                            <span title="{$feat.name|escape:'htmlall':'UTF-8'}">
-                                                                    {if $feat.logo_type == 'icon'}<i class="{$feat.logo|escape:'htmlall':'UTF-8'}"></i>{else}<img class="htlRoomFeatureImg" src="{$smarty.const._PS_IMG_}rf/{$feat.logo_image|escape:'htmlall':'UTF-8'}" alt="{$feat.name|escape:'htmlall':'UTF-8'}" onerror="this.style.display='none'">{/if}
-                                                                    {$feat.value|escape:'htmlall':'UTF-8'}
-                                                                </span>
-                                                        {/foreach}
-                                                    </div>
-                                                {/if}
                                                 <div class="htlRoomCardMeta">
-                                                    <span class="htlRoomCardGuests"><i class="icon-group"></i> {$roomDisplay.max_adults|intval} {l s='Adults' mod='wkhotelroom'}{if $roomDisplay.max_children}, {$roomDisplay.max_children|intval} {if $roomDisplay.max_children > 1}{l s='Children' mod='wkhotelroom'}{else}{l s='Child' mod='wkhotelroom'}{/if}{/if}</span>
                                                     {if $roomDisplay.amenities}
                                                         <span class="htlRoomCardAmen">
                                                             {foreach from=$roomDisplay.amenities item=amenity}
@@ -78,6 +67,16 @@
                                                         </span>
                                                     {/if}
                                                 </div>
+                                                {if $roomDisplay.feature}
+                                                    <div class="htlRoomCardFeatured">
+                                                        {foreach from=$roomDisplay.feature item=feat}
+                                                            <span title="{$feat.name|escape:'htmlall':'UTF-8'}">
+                                                                    {if $feat.logo_type == 'icon'}<i class="{$feat.logo|escape:'htmlall':'UTF-8'}"></i>{else}<img class="htlRoomFeatureImg" src="{$smarty.const._PS_IMG_}rf/{$feat.logo_image|escape:'htmlall':'UTF-8'}" alt="{$feat.name|escape:'htmlall':'UTF-8'}" onerror="this.style.display='none'">{/if}
+                                                                    {$feat.value|escape:'htmlall':'UTF-8'}
+                                                                </span>
+                                                        {/foreach}
+                                                    </div>
+                                                {/if}
                                             {/block}
                                             <div class="htlRoomCardFoot">
                                                 {if $roomDisplay.show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}

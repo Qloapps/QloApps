@@ -204,13 +204,23 @@ p.capa_txt {
 
 .rm_amen
 {
-    color: #555555;
-    width: 18px;
-    display: inline-block;
-    margin-right: 10px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
     margin-bottom: 5px;
-    font-size: 16px;
+    border: 1px solid #D6D6D6;
+    border-radius: 50%;
+    font-size: 14px;
     color: #555555;
+}
+img.rm_amen
+{
+    padding: 7px;
+    object-fit: contain;
 }
 
 .room_featured_features {
@@ -468,11 +478,11 @@ p.capa_txt {
     .rm_amen_more {
         display: inline-block;
         margin-bottom: 5px;
-        padding: 0 6px;
+        padding: 0 8px;
         border: 1px solid #379BF0;
-        border-radius: 10px;
+        border-radius: 16px;
         font-size: 12px;
-        line-height: 18px;
+        line-height: 30px;
         color: #379BF0;
         vertical-align: top;
     }
@@ -502,5 +512,222 @@ p.capa_txt {
 @media (max-width: 767px) {
     .booking_room_fields .btn_book_now_with_occupancy {
         text-align: center;
+    }
+}
+
+/* mobile filters: bottom Sort / Filter bar, sort sheet and full screen filters panel */
+.mf_header, .mf_footer, .mf_nav, .mf_bar, .mf_sheet {
+    display: none;
+}
+@media (max-width: 993px) {
+    body.category {
+        padding-bottom: 64px;
+    }
+    .catSortBlock {
+        display: none;
+    }
+    .mf_bar {
+        display: flex;
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 90;
+        background: #fff;
+        border-top: 1px solid #E5E5E5;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, .08);
+    }
+    .mf_bar button {
+        flex: 1;
+        padding: 16px 8px;
+        border: 0;
+        background: none;
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
+    }
+    .mf_bar button i {
+        margin-right: 4px;
+        color: #379BF0;
+    }
+    .mf_bar button b {
+        display: inline-block;
+        min-width: 20px;
+        padding: 0 5px;
+        border-radius: 10px;
+        background: #379BF0;
+        font-size: 12px;
+        line-height: 20px;
+        color: #fff;
+    }
+    .mf_bar button b:empty {
+        display: none;
+    }
+    .mf_bar button + button {
+        border-left: 1px solid #E5E5E5;
+    }
+    .mf_sheet {
+        position: fixed;
+        inset: 0;
+        z-index: 9000;
+        background: rgba(0, 0, 0, .45);
+        align-items: flex-end;
+    }
+    .mf_sheet.mf_open {
+        display: flex;
+    }
+    .mf_sheet_box {
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        background: #fff;
+        border-radius: 16px 16px 0 0;
+    }
+    .mf_sheet_head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        border-bottom: 1px solid #E5E5E5;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: .5px;
+        text-transform: uppercase;
+        color: #777;
+    }
+    .mf_sheet_head button {
+        border: 0;
+        background: none;
+        font-size: 28px;
+        line-height: 1;
+        color: #333;
+    }
+    .mf_sheet ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .mf_sheet li:after {
+        content: "";
+        float: right;
+        width: 22px;
+        height: 22px;
+        border: 2px solid #777;
+        border-radius: 50%;
+    }
+    .mf_sheet li.mf_selected:after {
+        border-color: #379BF0;
+        box-shadow: inset 0 0 0 4px #fff, inset 0 0 0 12px #379BF0;
+    }
+    .mf_sheet li {
+        padding: 16px;
+        font-size: 16px;
+        color: #333;
+    }
+    #filter_results {
+        display: none;
+        margin: 0;
+    }
+    body.mf_filter_open {
+        overflow: hidden;
+    }
+    body.mf_filter_open #filter_results {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        inset: 0;
+        z-index: 9000;
+        background: #fff;
+    }
+    #filter_results .mf_header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-bottom: 1px solid #E5E5E5;
+    }
+    #filter_results .mf_header .mf_back {
+        padding: 0 4px;
+        border: 0;
+        background: none;
+        font-size: 24px;
+        line-height: 1;
+        transform: translateY(-5px);
+    }
+    #filter_results .mf_title {
+        flex: 1;
+        font-size: 18px;
+    }
+    #filter_results .mf_clear_all {
+        border: 0;
+        background: none;
+        font-size: 14px;
+        color: #999;
+        text-decoration: underline;
+    }
+    #filter_results > .col-sm-12 {
+        flex: 1;
+        display: flex;
+        padding: 0;
+        min-height: 0;
+    }
+    #filter_results .mf_nav {
+        display: block;
+        flex: 0 0 38%;
+        overflow-y: auto;
+        background: #F5F5F5;
+    }
+    #filter_results .mf_tab {
+        display: block;
+        width: 100%;
+        padding: 16px;
+        border: 0;
+        border-left: 3px solid transparent;
+        background: none;
+        text-align: left;
+        font-size: 15px;
+        color: #333;
+    }
+    #filter_results .mf_tab b {
+        float: right;
+        font-size: 13px;
+        color: #379BF0;
+    }
+    #filter_results .mf_tab.mf_active {
+        background: #fff;
+        border-left-color: #379BF0;
+    }
+    #filter_results .layered_filter_cont {
+        display: none;
+        flex: 1;
+        margin: 0;
+        border: 0;
+        overflow-y: auto;
+        padding: 8px 4px;
+    }
+    #filter_results .layered_filter_cont.mf_active {
+        display: block;
+    }
+    #filter_results .layered_filter_cont .clear_filter {
+        display: none;
+    }
+    #filter_results .lf_sub_cont {
+        max-height: none;
+        overflow: visible;
+        padding: 0 16px 10px 12px;
+    }
+    #filter_results .mf_footer {
+        display: block;
+        padding: 12px 16px;
+        border-top: 1px solid #E5E5E5;
+        background: #fff;
+    }
+    #filter_results .mf_footer .mf_apply {
+        width: 100%;
+        height: 48px;
+        font-size: 17px;
+        background: #379BF0;
+        color: #fff;
+        font-weight: 700;
     }
 }

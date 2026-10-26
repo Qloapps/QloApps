@@ -138,7 +138,8 @@ a.htlRoomTypeBookNow {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 16px;
-    padding: 0 0 12px;
+    padding: 16px 0;
+    border-bottom: 1px solid #E5E5E5;
     color: #555;
     font-size: 15px;
 }
@@ -172,7 +173,6 @@ a.htlRoomTypeBookNow {
     justify-content: space-between;
     gap: 10px;
     padding: 12px 0;
-    border-top: 1px solid #E5E5E5;
     border-bottom: 1px solid #E5E5E5;
     color: #555;
     font-size: 15px;

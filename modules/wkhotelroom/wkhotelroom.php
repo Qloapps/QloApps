@@ -51,8 +51,9 @@ class WkHotelRoom extends Module
             $dateFrom = date('Y-m-d');
             $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
             $useTax = HotelBookingDetail::useTax();
-            $maxAmenities = $this->getRoomCardLimit('WK_MAX_AMENITIES_ROOM_SEARCH');
-            $maxFeatures = $this->getRoomCardLimit('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
+            $maxAmenities = (int) Configuration::get('WK_MAX_AMENITIES_ROOM_SEARCH');
+            $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
+            $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
             foreach ($hotelRoomDisplay as &$htlRoom) {
                 $idProduct = $htlRoom['id_product'];
                 $product = new Product($idProduct, false, $idLang);
@@ -115,23 +116,22 @@ class WkHotelRoom extends Module
                 $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
                 $htlRoom['max_adults'] = $roomTypeInfo ? (int) $roomTypeInfo['max_adults'] : 0;
                 $htlRoom['max_children'] = $roomTypeInfo ? (int) $roomTypeInfo['max_children'] : 0;
-                $htlRoom['feature'] = array();
+                $features = array();
                 foreach (Product::getFrontFeaturesStatic($idLang, $idProduct) as $feature) {
                     if ($feature['is_featured'] && $feature['logo']) {
-                        if (isset($htlRoom['feature'][$feature['id_feature']])) {
-                            $htlRoom['feature'][$feature['id_feature']]['values'][] = $feature['value'];
-                        } else {
-                            $feature['values'] = array($feature['value']);
-                            $htlRoom['feature'][$feature['id_feature']] = $feature;
-                        }
+                        $features[$feature['id_feature']] = $features[$feature['id_feature']] ?? $feature;
+                        $features[$feature['id_feature']]['values'][] = $feature['value'];
                     }
                 }
-                $htlRoom['feature'] = array_values($htlRoom['feature']);
-                $htlRoom['feature'] = array_slice($htlRoom['feature'], 0, $maxFeatures);
+                $htlRoom['feature'] = array_slice($features, 0, $maxFeatures ?: null);
+                foreach ($htlRoom['feature'] as &$roomFeature) {
+                    $roomFeature['value'] = implode(', ', array_slice($roomFeature['values'], 0, $maxFeatureValues ?: null));
+                }
+                unset($roomFeature);
                 $htlRoom['amenities'] = array_slice(
                     HotelRoomTypeAmenities::getAmenities($idProduct, $idLang, true),
                     0,
-                    $maxAmenities
+                    $maxAmenities ?: null
                 );
                 $htlRoom['feature_price'] = $featurePrice;
                 $htlRoom['feature_price_diff'] = (float)($priceWithoutReduction - $featurePrice);
@@ -159,13 +159,6 @@ class WkHotelRoom extends Module
         $this->context->controller->addCSS($this->_path.'/views/css/WkHotelRoomBlockFront.css');
 
         return $this->display(__FILE__, 'hotelRoomDisplayBlock.tpl');
-    }
-
-    public function getRoomCardLimit($configKey)
-    {
-        $limit = (int) Configuration::get($configKey);
-
-        return ($limit < 1 || $limit > 5) ? 3 : $limit;
     }
 
     public function hookActionProductSave($params)

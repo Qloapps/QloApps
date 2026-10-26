@@ -47,6 +47,7 @@ class WkAboutHotelBlock extends Module
 
     public function hookDisplayHome()
     {
+        $this->context->controller->addJqueryPlugin('fancybox');
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.carousel.min.css');
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.theme.default.min.css');
         $this->context->controller->addJS(_PS_JS_DIR_.'owl-carousel/owl.carousel.min.js');
