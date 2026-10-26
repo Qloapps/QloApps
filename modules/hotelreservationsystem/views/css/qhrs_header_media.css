@@ -104,7 +104,6 @@
     display: none;
 }
 
-/* Owl carousel slide animation classes */
 .wkFadeOut  { animation: wkFadeOut  0.7s forwards; }
 .wkFadeIn   { animation: wkFadeIn   0.7s forwards; }
 .wkZoomOut  { animation: wkZoomOut  0.7s forwards; }
@@ -115,11 +114,11 @@
 .wkSlideIn  { animation: wkSlideIn  0.7s forwards; }
 
 @keyframes wkFadeOut  { from { opacity:1; } to { opacity:0; } }
-@keyframes wkFadeIn   { from { opacity:0; } to { opacity:1; } }
+@keyframes wkFadeIn   { from { opacity:1; } to { opacity:1; } }
 @keyframes wkZoomOut  { from { opacity:1; transform:scale(1);   } to { opacity:0; transform:scale(1.15); } }
-@keyframes wkZoomIn   { from { opacity:0; transform:scale(0.88); } to { opacity:1; transform:scale(1);   } }
+@keyframes wkZoomIn   { from { opacity:1; transform:scale(0.88); } to { opacity:1; transform:scale(1);   } }
 @keyframes wkBlurOut  { from { opacity:1; filter:blur(0);   } to { opacity:0; filter:blur(10px); } }
-@keyframes wkBlurIn   { from { opacity:0; filter:blur(10px); } to { opacity:1; filter:blur(0);   } }
+@keyframes wkBlurIn   { from { opacity:1; filter:blur(10px); } to { opacity:1; filter:blur(0);   } }
 @keyframes wkSlideOut { from { transform:translateX(0);     } to { transform:translateX(-100%); } }
 @keyframes wkSlideIn  { from { transform:translateX(100%);  } to { transform:translateX(0);     } }
 
@@ -144,6 +143,7 @@
     height: 100%;
     z-index: -11;
     overflow: hidden;
+    background-color: #252525;
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
@@ -160,6 +160,10 @@
     pointer-events: none;
 }
 
+#index #page {
+    overflow-x: clip;
+}
+
 .header-media-layer .owl-carousel,
 .header-media-layer .owl-stage-outer,
 .header-media-layer .owl-stage,
@@ -168,7 +172,7 @@
 }
 
 .header-slide-img {
-    width: 100%;
+    width: calc(100% + 1px);
     height: 100%;
     background-size: cover;
     background-position: center center;

@@ -47,6 +47,7 @@ $(document).ready(function () {
     var animLabel = animNames[animType] || 'Slide';
 
     var showDots = (navType === 1 || navType === 3);
+    var isSlide = (animType === 1);
     $imgCarousel.owlCarousel({
         loop:               true,
         items:              1,
@@ -56,9 +57,12 @@ $(document).ready(function () {
         autoplay:           autoPlay,
         autoplayTimeout:    interval,
         autoplaySpeed:      800,
+        smartSpeed:         800,
         autoplayHoverPause: false,
-        animateOut:         'wk' + animLabel + 'Out',
-        animateIn:          'wk' + animLabel + 'In',
+        mouseDrag:          isSlide,
+        touchDrag:          isSlide,
+        animateOut:         isSlide ? false : 'wk' + animLabel + 'Out',
+        animateIn:          isSlide ? false : 'wk' + animLabel + 'In',
         responsiveClass:    true,
         rtl:                (typeof language_is_rtl !== 'undefined' ? language_is_rtl : false)
     });
