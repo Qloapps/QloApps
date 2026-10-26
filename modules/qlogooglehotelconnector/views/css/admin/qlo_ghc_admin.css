@@ -37,6 +37,12 @@
     text-align: left;
 }
 
+#ghc-dashboard-notification h3 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 /* ── Prevent scrollbar jitter on GHC admin pages ─────────────────
    Scoped to exactly the controllers this stylesheet is loaded on
    (see hookActionAdminControllerSetMedia) via QloApps admin's own
