@@ -373,6 +373,10 @@ class CountryCore extends ObjectModel
      */
     public function checkZipCode($zip_code)
     {
+        if (empty($this->zip_code_format)) {
+            return true;
+        }
+
         $zip_regexp = '/^'.$this->zip_code_format.'$/ui';
         $zip_regexp = str_replace(' ', '( |)', $zip_regexp);
         $zip_regexp = str_replace('-', '(-|)', $zip_regexp);
@@ -380,7 +384,7 @@ class CountryCore extends ObjectModel
         $zip_regexp = str_replace('L', '[a-zA-Z]', $zip_regexp);
         $zip_regexp = str_replace('C', $this->iso_code, $zip_regexp);
 
-        return (bool)preg_match($zip_regexp, (string) $zip_code);
+        return (bool)preg_match($zip_regexp, $zip_code);
     }
 
     public static function addModuleRestrictions(array $shops = array(), array $countries = array(), array $modules = array())
