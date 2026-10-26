@@ -575,6 +575,8 @@ class OrderDetailControllerCore extends FrontController
             $objOrderReturn = new OrderReturn();
             if (!(Validate::isLoadedObject($objOrder) && $objOrder->id_customer == $this->context->customer->id)) {
                 $this->errors[] = Tools::displayError('Something went wrong. Please try later.');
+            } elseif (!$objOrder->isReturnable()) {
+                $this->errors[] = Tools::displayError('Refund is not allowed for this hotel.');
             } else {
                 if ($idsHtlBooking) {
                     foreach ($idsHtlBooking as $idHtlBooking) {
