@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Cài đặt mô-đun Addons',
 		'Install theme' => 'Cài đặt chủ đề',
 		'Required PHP parameters' => 'Các tham số PHP bắt buộc',
-		'The required PHP version is between 8.2 to 8.4' => 'Phiên bản PHP yêu cầu là từ 8.2 đến 8.4',
+		'The required PHP version is between 8.2 to 8.5' => 'Phiên bản PHP yêu cầu là từ 8.2 đến 8.5',
 		'Cannot upload files' => 'Không thể tải tập tin lên',
 		'Cannot create new files and folders' => 'Không thể tạo tập tin và thư mục mới',
 		'GD library is not installed' => 'Thư viện GD chưa được cài đặt',

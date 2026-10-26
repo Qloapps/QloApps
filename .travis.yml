@@ -15,6 +15,7 @@ php:
   - 8.2
   - 8.3
   - 8.4
+  - 8.5
 
 before_script:
   - sudo cp -f tests/travis-ci-apache-vhost /etc/apache2/sites-available/default

@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'התקן מודולי תוספות',
 		'Install theme' => 'התקן ערכת נושא',
 		'Required PHP parameters' => 'פרמטרי PHP נדרשים',
-		'The required PHP version is between 8.2 to 8.4' => 'גרסת ה-PHP הנדרשת היא בין 8.2 ל-8.4',
+		'The required PHP version is between 8.2 to 8.5' => 'גרסת ה-PHP הנדרשת היא בין 8.2 ל-8.5',
 		'Cannot upload files' => 'לא ניתן להעלות קבצים',
 		'Cannot create new files and folders' => 'לא ניתן ליצור קבצים ותיקיות חדשים',
 		'GD library is not installed' => 'ספריית GD אינה מותקנת',

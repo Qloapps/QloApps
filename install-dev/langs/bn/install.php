@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Addons মডিউল ইনস্টল করুন',
 		'Install theme' => 'থিম ইনস্টল করুন',
 		'Required PHP parameters' => 'প্রয়োজনীয় পিএইচপি পরামিতি',
-		'The required PHP version is between 8.2 to 8.4' => 'প্রয়োজনীয় পিএইচপি সংস্করণটি 8.2 থেকে 8.4 এর মধ্যে',
+		'The required PHP version is between 8.2 to 8.5' => 'প্রয়োজনীয় পিএইচপি সংস্করণটি 8.2 থেকে 8.5 এর মধ্যে',
 		'Cannot upload files' => 'ফাইল আপলোড করা যাবে না',
 		'Cannot create new files and folders' => 'নতুন ফাইল এবং ফোল্ডার তৈরি করা যাবে না',
 		'GD library is not installed' => 'জিডি লাইব্রেরি ইনস্টল করা নেই',

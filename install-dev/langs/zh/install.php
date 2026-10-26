@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => '安装附加模块',
 		'Install theme' => '安装主题',
 		'Required PHP parameters' => '必需的 PHP 参数',
-		'The required PHP version is between 8.2 to 8.4' => '所需 PHP 版本介于 8.2 至 8.4 之间',
+		'The required PHP version is between 8.2 to 8.5' => '所需 PHP 版本介于 8.2 至 8.5 之间',
 		'Cannot upload files' => '无法上传文件',
 		'Cannot create new files and folders' => '无法创建新文件和文件夹',
 		'GD library is not installed' => '未安装 GD 库',

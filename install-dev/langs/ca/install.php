@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Instal·leu mòduls de complements',
 		'Install theme' => 'Instal·leu el tema',
 		'Required PHP parameters' => 'Paràmetres PHP necessaris',
-		'The required PHP version is between 8.2 to 8.4' => 'La versió de PHP necessària és entre la 8.2 i la 8.4',
+		'The required PHP version is between 8.2 to 8.5' => 'La versió de PHP necessària és entre la 8.2 i la 8.5',
 		'Cannot upload files' => 'No es poden carregar fitxers',
 		'Cannot create new files and folders' => 'No es poden crear fitxers i carpetes nous',
 		'GD library is not installed' => 'La biblioteca GD no està instal·lada',

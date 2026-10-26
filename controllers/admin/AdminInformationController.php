@@ -108,7 +108,7 @@ class AdminInformationControllerCore extends AdminController
     public function getTestResult()
     {
         $tests_errors = array(
-            'phpversion' => $this->l('The required PHP version is between 8.2 to 8.4.'),
+            'phpversion' => $this->l('The required PHP version is between 8.2 to 8.5.'),
             'upload' => $this->l('Configure your server to allow file uploads.'),
             'system' => $this->l('Configure your server to allow the creation of directories and files with write permissions.'),
             'gd' => $this->l('Enable the GD library on your server.'),

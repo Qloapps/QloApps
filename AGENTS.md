@@ -10,7 +10,7 @@ This document provides guidance for AI coding agents contributing to the QloApps
 
 ## Technology Stack
 
-- **Language:** PHP 8.2–8.4 (backend), Smarty 3.x (templates), JavaScript/jQuery (frontend)
+- **Language:** PHP 8.2–8.5 (backend), Smarty 3.x (templates), JavaScript/jQuery (frontend)
 - **Database:** MySQL 5.7, 8.0+; MariaDB 10.5, 10.6, 10.11, 11.0, 11.2, 11.4
 - **Architecture:** MVC with hook-based module system
 - **License:** OSL-3.0 (core), AFL-3.0 (modules)

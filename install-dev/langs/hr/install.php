@@ -65,7 +65,7 @@ return array(
 		'Install Addons modules' => 'Instalirajte Addons module',
 		'Install theme' => 'Instalirajte temu',
 		'Required PHP parameters' => 'Potrebni PHP parametri',
-		'The required PHP version is between 8.2 to 8.4' => 'Potrebna verzija PHP-a je između 8.2 i 8.4',
+		'The required PHP version is between 8.2 to 8.5' => 'Potrebna verzija PHP-a je između 8.2 i 8.5',
 		'Cannot upload files' => 'Ne mogu učitati datoteke',
 		'Cannot create new files and folders' => 'Nije moguće stvoriti nove datoteke i mape',
 		'GD library is not installed' => 'GD biblioteka nije instalirana',
