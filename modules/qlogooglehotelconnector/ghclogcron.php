@@ -36,28 +36,11 @@ if ($token !== Tools::encrypt('qlogooglehotelconnector')) {
     die('Invalid token.');
 }
 
-// Delete qghc_api_log rows older than 2 months
-$cutoff  = date('Y-m-d H:i:s', strtotime('-2 months'));
-$deleted = Db::getInstance()->execute(
-    'DELETE FROM `' . _DB_PREFIX_ . 'qghc_api_log`
-     WHERE `date_add` < \'' . pSQL($cutoff) . '\''
-);
-
-if ($deleted) {
-    $count = Db::getInstance()->Affected_Rows();
-    echo 'OK — ' . (int)$count . ' log(s) deleted (older than ' . $cutoff . ').';
+// Delete qghc_api_log rows and daily file logs older than 2 months
+Module::getInstanceByName('qlogooglehotelconnector'); // loads the module classes
+if (QghcApiLog::cleanupApiLogs()) {
+    echo 'OK — logs older than 2 months deleted.';
 } else {
     header('HTTP/1.1 500 Internal Server Error');
     echo 'ERROR — failed to delete old logs.';
-}
-
-// Delete daily file logs older than the same retention window used for the DB rows above.
-$logDir = _PS_MODULE_DIR_ . 'qlogooglehotelconnector/logs/';
-if (is_dir($logDir)) {
-    foreach (glob($logDir . '*.log') as $file) {
-        $fileDate = basename($file, '.log');
-        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fileDate) && strtotime($fileDate) < strtotime($cutoff)) {
-            @unlink($file);
-        }
-    }
 }

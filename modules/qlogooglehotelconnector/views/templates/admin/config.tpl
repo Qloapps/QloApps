@@ -164,26 +164,60 @@
 {/if}
 
 {* ── Cron job setting ─────────────────────────────────────────────────── *}
-<div class="panel">
+<form method="post" action="{$action_url|escape:'html':'UTF-8'}" class="form-horizontal">
+  <div class="panel">
 
-  <div class="panel-heading">
-    <i class="icon-clock-o"></i>
-    {l s='Cron job setting' mod='qlogooglehotelconnector'}
-  </div>
-
-  <div class="panel-body">
-    <div class="alert alert-info qlo-ghc-no-margin">
-      <strong>
-        {l s='For automatic cleanup of API logs older than 2 months, set the following cron job to run once every 24 hours:' mod='qlogooglehotelconnector'}
-      </strong>
-      <br><br>
-      <strong>
-        <code>0 0 * * * curl {$cron_url|escape:'html':'UTF-8'}</code>
-      </strong>
+    <div class="panel-heading">
+      <i class="icon-clock-o"></i>
+      {l s='Cron job setting' mod='qlogooglehotelconnector'}
     </div>
-  </div>
 
-</div>
+    {if $cron_manager_enabled}
+      {if $cron_task.exists}
+        <div class="alert alert-info">
+          <p><strong>{l s='Automatic API log cleanup' mod='qlogooglehotelconnector'}</strong></p>
+          <ul>
+            {if $cron_task.active}
+              <li>{l s='API logs older than 2 months are deleted automatically. Current schedule:' mod='qlogooglehotelconnector'} <strong>{$cron_task.readable|escape:'html':'UTF-8'}</strong>.</li>
+            {else}
+              <li>{l s='Automatic API log cleanup is turned off.' mod='qlogooglehotelconnector'}</li>
+            {/if}
+          </ul>
+        </div>
+        <div class="alert alert-warning">
+          {l s='If you have set up a cron job for the API log cleanup manually on your server, we recommend removing that cron job and using the Cron Task Manager from now on.' mod='qlogooglehotelconnector'}
+        </div>
+      {else}
+        <div class="alert alert-info">
+          <p>{l s='The API log cleanup task is not present in the Cron Task Manager.' mod='qlogooglehotelconnector'}</p>
+          <button type="submit" name="submitGhcCron" class="btn btn-default">
+            <i class="icon-plus-sign"></i> {l s='Set up cron job' mod='qlogooglehotelconnector'}
+          </button>
+        </div>
+        <div class="alert alert-info">
+          <strong>
+            {l s='Or, for automatic cleanup of API logs older than 2 months, set the following cron job to run once every 24 hours:' mod='qlogooglehotelconnector'}
+          </strong>
+          <br><br>
+          <strong>
+            <code>0 0 * * * curl {$cron_url|escape:'html':'UTF-8'}</code>
+          </strong>
+        </div>
+      {/if}
+    {else}
+      <div class="alert alert-info">
+        <strong>
+          {l s='For automatic cleanup of API logs older than 2 months, set the following cron job to run once every 24 hours:' mod='qlogooglehotelconnector'}
+        </strong>
+        <br><br>
+        <strong>
+          <code>0 0 * * * curl {$cron_url|escape:'html':'UTF-8'}</code>
+        </strong>
+      </div>
+    {/if}
+
+  </div>
+</form>
 
 {* ── Connected Properties ───────────────────────────────────────────────── *}
 <div class="panel">
