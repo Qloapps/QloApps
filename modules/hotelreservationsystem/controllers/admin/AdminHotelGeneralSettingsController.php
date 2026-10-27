@@ -193,7 +193,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'default' => '0',
                     ),
                     'WK_MAX_ROOM_TYPE_FEATURE_VALUES' => array(
-                        'title' => $this->l('Max. display values for room type Featured  features'),
+                        'title' => $this->l('Max display values for room type Featured  features'),
                         'hint' => $this->l('Maximum number of room type feature values to display for each featured feature in room search results and orders. For example, if the featured feature Bed Type has the values Single, Double, and Queen, and this setting is set to 2, only Single, Double will be displayed.'),
                         'desc' => $this->l('Set to 0 to display all values of each featured feature.'),
                         'type' => 'text',
