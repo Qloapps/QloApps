@@ -127,7 +127,7 @@
 																			<dt class="col-xs-5">{l s='Guests'}</dt>
 																			<dd class="col-xs-7">
 																				{$rm_v.adults|string_format:'%02d'} {if $rm_v.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v.children}, {$rm_v.children|string_format:'%02d'} {if $rm_v.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
-																				{hook h='displayOrderConfirmationAfterOccupancy' data=$data_v room=$rm_v}
+																				{hook h='displayOrderConfirmationOccupancyAfter' data=$data_v room=$rm_v}
 																			</dd>
 																		</div>
 																	</div>

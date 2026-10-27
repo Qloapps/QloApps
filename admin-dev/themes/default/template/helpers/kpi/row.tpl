@@ -23,7 +23,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-{hook h='displayBeforeKpi'}
+{hook h='displayAdminKpiBefore'}
 <div class="panel kpi-container{if isset($no_wrapping) && $no_wrapping} no-wrapping{/if}">
 	<div class="kpis-wrap">
 		{foreach from=$kpis item=kpi}

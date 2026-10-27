@@ -9001,7 +9001,7 @@ class AdminOrdersControllerCore extends AdminController
     {
         $idHotelBookingDetail = (int) Tools::getValue('id_hotel_booking_detail');
         if (Validate::isLoadedObject($objHotelBookingDetail = new HotelBookingDetail($idHotelBookingDetail))) {
-            Hook::exec('actionAdminOnChangeRoomStatus', array(
+            Hook::exec('actionAdminRoomStatusChangeAfter', array(
                 'post_data' => Tools::getAllValues(),
                 'errors' => &$this->errors
             ));

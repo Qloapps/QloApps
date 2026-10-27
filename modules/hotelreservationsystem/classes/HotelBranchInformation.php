@@ -505,7 +505,7 @@ class HotelBranchInformation extends ObjectModel
             LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbl
             ON (hbl.`id` = hbi.`id` AND hbl.`id_lang` = '.(int)$idLang.')';
 
-        Hook::exec('actionFilterSellerHotel', array('query' => &$sql));
+        Hook::exec('actionSellerHotelQueryModifier', array('query' => &$sql));
 
         return Db::getInstance()->executeS($sql);
     }

@@ -419,7 +419,7 @@
 					<div class="submit opc-add-save clearfix">
 						<button type="submit" name="submitAccount" id="submitAccount" class="btn btn-default button button-medium pull-right"><span>{l s='Save'}<i class="icon-chevron-right right"></i></span></button>
 					</div>
-					{hook h='displayAddAccountFormBottom'}
+					{hook h='displayCustomerAccountFormBottom'}
 				{/block}
 			<!-- END Account -->
 			</div>

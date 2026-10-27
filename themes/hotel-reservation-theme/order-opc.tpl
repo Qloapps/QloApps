@@ -177,7 +177,7 @@
 																						{/if}
 																					</div>
 																				{/block}
-																				{block name='displayCheckoutGuestDetailsAfter'}{hook h='displayCheckoutGuestDetailsAfter'}{/block}
+																				{hook h='displayCheckoutGuestDetailsAfter'}
 
 																				{* proceed only if no order restrict errors are there *}
 																				{if !$orderRestrictErr}

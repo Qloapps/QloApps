@@ -158,7 +158,7 @@
 	{if $has_actions}
 		<td class="text-right">
 			{assign var='compiled_actions' value=array()}
-			{capture assign='row_actions_before_delete'}{hook h='displayAdminListRowActionsBeforeDelete' table=$table identifier=$identifier id=$tr.$identifier token=$token}{/capture}
+			{capture assign='row_actions_before_delete'}{hook h='displayAdminListRowActionsDeleteBefore' table=$table identifier=$identifier id=$tr.$identifier token=$token}{/capture}
 			{assign var='row_actions_before_delete_added' value=false}
 			{foreach $actions AS $key => $action}
 				{if isset($tr.$action)}

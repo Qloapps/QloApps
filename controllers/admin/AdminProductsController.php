@@ -152,7 +152,7 @@ class AdminProductsControllerCore extends AdminController
         }
 
         // Allow modules to override the labels of the product tabs
-        $tabNameOverrides = Hook::exec('displayUpdateProductTabName', array('id_product' => (int) Tools::getValue('id_product')), null, true);
+        $tabNameOverrides = Hook::exec('actionAdminProductTabNameModifier', array('id_product' => (int) Tools::getValue('id_product')), null, true);
         if (is_array($tabNameOverrides)) {
             foreach ($tabNameOverrides as $moduleOverrides) {
                 if (is_array($moduleOverrides)) {
