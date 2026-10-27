@@ -2004,6 +2004,10 @@ class AdminOrdersControllerCore extends AdminController
                     $this->errors[] = Tools::displayError('Please enter a reason for the booking cancellation.');
                 }
 
+                if (!$order->isReturnable()) {
+                    $this->errors[] = Tools::displayError('Refund is not allowed for this hotel.');
+                }
+
                 if (!count($this->errors)) {
                     // create refund request
                     $objOrderReturn = new OrderReturn();
@@ -3084,6 +3088,8 @@ class AdminOrdersControllerCore extends AdminController
                 $initialPaymentStatus = $this->l('Full Payment');
             } elseif (isset($orderHistory[0]['id_order_state']) && ($orderHistory[0]['id_order_state'] == Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED'))) {
                 $initialPaymentStatus = $this->l('Partial Payment');
+            } elseif (isset($orderHistory[0]['id_order_state']) && ($orderHistory[0]['id_order_state'] == Configuration::get('PS_OS_ERROR'))) {
+                $initialPaymentStatus = $this->l('Payment Error');
             } else {
                 $initialPaymentStatus = $this->l('No Payment Received');
             }
@@ -3091,7 +3097,7 @@ class AdminOrdersControllerCore extends AdminController
             $helper->icon = 'icon-home';
             $helper->color = 'color3';
             $helper->title = $this->l('Initial Payment Status');
-            $helper->tooltip = $this->l('Initial Payment Status defines whether the order was fully paid, partially paid, or had no payment received at the time the order was placed.');
+            $helper->tooltip = $this->l('Initial Payment Status defines whether the order was fully paid, partially paid, had a payment error, or had no payment received at the time the order was placed.');
             $helper->value = $initialPaymentStatus;
             $this->kpis[] = $helper;
 
@@ -9084,28 +9090,31 @@ class AdminOrdersControllerCore extends AdminController
                             ? OrderReturn::EVENT_TYPE_CANCELLATION
                             : OrderReturn::EVENT_TYPE_NO_SHOW;
 
-                        $objOrderReturn = new OrderReturn();
-                        $objOrderReturn->id_customer = $order->id_customer;
-                        $objOrderReturn->id_order = $order->id;
-                        $objOrderReturn->state = 0;
-                        $objOrderReturn->by_admin = 1;
-                        $objOrderReturn->question = $statusRemark;
-                        $objOrderReturn->refunded_amount = 0;
-                        $objOrderReturn->event_type = $eventType;
-                        $objOrderReturn->save();
+                        // no refund request is created if refund is disabled for the hotel
+                        if ($order->isReturnable()) {
+                            $objOrderReturn = new OrderReturn();
+                            $objOrderReturn->id_customer = $order->id_customer;
+                            $objOrderReturn->id_order = $order->id;
+                            $objOrderReturn->state = 0;
+                            $objOrderReturn->by_admin = 1;
+                            $objOrderReturn->question = $statusRemark;
+                            $objOrderReturn->refunded_amount = 0;
+                            $objOrderReturn->event_type = $eventType;
+                            $objOrderReturn->save();
 
-                        $objOrderReturnDetail = new OrderReturnDetail();
-                        $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
-                        $objOrderReturnDetail->id_order_detail = $objHotelBookingDetail->id_order_detail;
-                        $objOrderReturnDetail->product_quantity = HotelHelper::getNumberOfDays(
-                            $objHotelBookingDetail->date_from,
-                            $objHotelBookingDetail->date_to
-                        );
-                        $objOrderReturnDetail->id_htl_booking = $objHotelBookingDetail->id;
-                        $objOrderReturnDetail->refunded_amount = 0;
-                        $objOrderReturnDetail->save();
+                            $objOrderReturnDetail = new OrderReturnDetail();
+                            $objOrderReturnDetail->id_order_return = $objOrderReturn->id;
+                            $objOrderReturnDetail->id_order_detail = $objHotelBookingDetail->id_order_detail;
+                            $objOrderReturnDetail->product_quantity = HotelHelper::getNumberOfDays(
+                                $objHotelBookingDetail->date_from,
+                                $objHotelBookingDetail->date_to
+                            );
+                            $objOrderReturnDetail->id_htl_booking = $objHotelBookingDetail->id;
+                            $objOrderReturnDetail->refunded_amount = 0;
+                            $objOrderReturnDetail->save();
 
-                        $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
+                            $objOrderReturn->changeIdOrderReturnState(Configuration::get('PS_ORS_PENDING'));
+                        }
 
                         // the room's own status (htl_booking_detail.id_status) flips right
                         // away — that's a factual room-state decision, independent of the

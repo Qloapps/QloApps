@@ -146,6 +146,7 @@ class OrderTaxDetailCore extends ObjectModel
                  WHERE tt.`id_order` = ' . $idOrder . '
                    AND spod.`id_htl_booking_detail` != 0
                    AND spod.`is_refunded` = 0
+                   AND spod.`id_htl_booking_detail` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . ')
                    AND ex.`id_order_tax_exemption` IS NULL
                  GROUP BY spod.`id_htl_booking_detail`';
             $rows = Db::getInstance()->executeS($sql);
@@ -760,7 +761,8 @@ class OrderTaxDetailCore extends ObjectModel
                 ON tl.`id_tax` = ott.`id_tax` AND tl.`id_lang` = ' . $idLang . '
              WHERE ott.`id_order` = ' . $idOrder . '
                AND ((ott.`id_htl_booking` != 0 AND ott.`id_htl_booking` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))
-                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0))
+                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0
+                        AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL OR spod.`id_htl_booking_detail` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))))
                AND ex.`id_order_tax_exemption` IS NULL
              GROUP BY ott.`id_tax`, tl.`name`'
         );
@@ -797,7 +799,8 @@ class OrderTaxDetailCore extends ObjectModel
                 OR (ott.`id_htl_booking` = 0 AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL) AND ex.`id_service_product_order_detail` = ott.`id_service_product_order_detail` AND ex.`id_htl_booking` = 0)
              WHERE ott.`id_order` = ' . $idOrder . '
                AND ((ott.`id_htl_booking` != 0 AND ott.`id_htl_booking` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))
-                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0))
+                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0
+                        AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL OR spod.`id_htl_booking_detail` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))))
                AND ex.`id_order_tax_exemption` IS NULL
              GROUP BY ott.`id_order_detail`'
         );
