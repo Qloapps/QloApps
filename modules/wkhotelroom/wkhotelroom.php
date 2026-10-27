@@ -51,7 +51,6 @@ class WkHotelRoom extends Module
             $dateFrom = date('Y-m-d');
             $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
             $useTax = HotelBookingDetail::useTax();
-            $maxAmenities = (int) Configuration::get('WK_MAX_AMENITIES_ROOM_SEARCH');
             $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
             $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
             foreach ($hotelRoomDisplay as &$htlRoom) {
@@ -128,11 +127,7 @@ class WkHotelRoom extends Module
                     $roomFeature['value'] = implode(', ', array_slice($roomFeature['values'], 0, $maxFeatureValues ?: null));
                 }
                 unset($roomFeature);
-                $htlRoom['amenities'] = array_slice(
-                    HotelRoomTypeAmenities::getAmenities($idProduct, $idLang, true),
-                    0,
-                    $maxAmenities ?: null
-                );
+                $htlRoom['amenities'] = HotelRoomTypeAmenities::getAmenities($idProduct, $idLang, true);
                 $htlRoom['feature_price'] = $featurePrice;
                 $htlRoom['feature_price_diff'] = (float)($priceWithoutReduction - $featurePrice);
             }

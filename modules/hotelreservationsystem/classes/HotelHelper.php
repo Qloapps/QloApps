@@ -2323,23 +2323,23 @@ class HotelHelper
         return array(
             'General Rooms' => array(
                 // Internet Access Free, Power Backup, Parking, NewsPaper In Lobby, Laundry Service, Gardens, Room Service, Welcome Drinks
-                'amenities' => array(10, 25, 48, 12, 24, 55, 38, 14),
-                'featured' => array(10, 25, 48, 12, 24, 55),
+                'amenities' => array(10, 25, 48, 12, 24, 55, 38, 14, 11),
+                'featured' => array(10, 25, 48, 12, 24, 55, 38, 14),
             ),
             'Delux Rooms' => array(
-                // + Bar / Lounge
-                'amenities' => array(10, 25, 48, 38, 14, 24, 55, 99, 12),
-                'featured' => array(10, 25, 38, 14, 48, 24),
+                // + Bar / Lounge, Transfer Available
+                'amenities' => array(10, 25, 48, 38, 14, 24, 55, 99, 12, 11),
+                'featured' => array(10, 25, 38, 14, 48, 24, 55, 99),
             ),
             'Executive Rooms' => array(
                 // + Health Club / Gym, Multi Cuisine Restaurant
                 'amenities' => array(10, 25, 48, 38, 14, 24, 12, 69, 99, 100),
-                'featured' => array(10, 38, 14, 69, 100, 48),
+                'featured' => array(10, 38, 14, 69, 100, 48, 25, 24),
             ),
             'Luxury Rooms' => array(
                 // + Car Rental, Swimming Pool, Jacuzzi, Spa Services
                 'amenities' => array(10, 25, 48, 38, 14, 24, 40, 69, 93, 94, 87, 99, 100),
-                'featured' => array(10, 38, 93, 94, 87, 100),
+                'featured' => array(10, 38, 93, 94, 87, 100, 69, 99),
             ),
         );
     }
