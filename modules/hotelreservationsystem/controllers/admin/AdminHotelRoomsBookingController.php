@@ -171,9 +171,16 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
             $occupancy = Tools::getValue('occupancy');
             if (!Validate::isOccupancy($occupancy)) {
                 $occupancy = array();
+            } else {
+                foreach ($occupancy as &$roomOccupancy) {
+                    if (is_array($roomOccupancy) && !isset($roomOccupancy['children'])) {
+                        $roomOccupancy['children'] = 0;
+                    }
+                }
+                unset($roomOccupancy);
             }
 
-            $this->id_cart = (int) $this->context->cart->id;
+            $this->id_cart =(int) $this->context->cart->id;
             $this->id_guest = (int) $this->context->cookie->id_guest;
             $this->id_hotel = $id_hotel;
             $this->id_room_type = $id_room_type;

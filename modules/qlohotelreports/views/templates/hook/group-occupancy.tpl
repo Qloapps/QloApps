@@ -273,6 +273,8 @@
                         <td class="text-center">
                             {if $room.id_order}
                                 <span class="label label-danger">{l s='Occupied' mod='qlohotelreports'}</span>
+                            {elseif $room.is_disabled}
+                                <span class="label {$maintenance_status.class|escape:'html':'UTF-8'}">{$maintenance_status.label|escape:'html':'UTF-8'}</span>
                             {elseif isset($room_statuses[$room.id_status])}
                                 <span class="label {$room_statuses[$room.id_status].class|escape:'html':'UTF-8'}">{$room_statuses[$room.id_status].label|escape:'html':'UTF-8'}</span>
                             {else}

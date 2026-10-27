@@ -28,11 +28,6 @@ class SitemapControllerCore extends FrontController
 {
     public $php_self = 'sitemap';
 
-    public function init()
-    {
-        Tools::redirect($this->context->link->getPageLink('index'));
-    }
-
     public function setMedia()
     {
         parent::setMedia();
@@ -48,12 +43,74 @@ class SitemapControllerCore extends FrontController
     {
         parent::initContent();
 
-        $this->context->smarty->assign('categoriesTree', Category::getRootCategory()->recurseLiteCategTree(0));
+        $categoriesTree = Category::getRootCategory()->recurseLiteCategTree(0);
+        $this->addRoomTypes($categoriesTree);
+        $categoriesTree['children'] = $this->getHotelNodes($categoriesTree);
+        $this->context->smarty->assign('categoriesTree', $categoriesTree);
         $this->context->smarty->assign('categoriescmsTree', CMSCategory::getRecurseCategory($this->context->language->id, 1, 1, 1));
         $this->context->smarty->assign('voucherAllowed', (int)CartRule::isFeatureActive());
         $this->context->smarty->assign('PS_DISPLAY_BEST_SELLERS', Configuration::get('PS_DISPLAY_BEST_SELLERS'));
         $this->context->smarty->assign('display_store', Configuration::get('PS_STORES_DISPLAY_SITEMAP'));
 
         $this->setTemplate(_PS_THEME_DIR_.'sitemap.tpl');
+    }
+
+    /**
+     * Add the room types of each hotel to the category tree (key room_types of the hotel category node).
+     *
+     * @param array $node Category tree node, updated by reference
+     */
+    protected function addRoomTypes(&$node)
+    {
+        static $hotelCategories = null;
+        if ($hotelCategories === null) {
+            $hotelCategories = array();
+            $rows = Db::getInstance()->executeS(
+                'SELECT `id`, `id_category` FROM `'._DB_PREFIX_.'htl_branch_info` WHERE `active` = 1'
+            );
+            foreach ((array) $rows as $row) {
+                $hotelCategories[(int) $row['id_category']] = (int) $row['id'];
+            }
+        }
+
+        if (isset($hotelCategories[$node['id']])) {
+            $idLang = (int) $this->context->language->id;
+            $idShop = (int) $this->context->shop->id;
+            $node['room_types'] = array();
+            $rows = Db::getInstance()->executeS(
+                'SELECT hrt.`id_product` FROM `'._DB_PREFIX_.'htl_room_type` hrt
+                INNER JOIN `'._DB_PREFIX_.'product_shop` ps ON (ps.`id_product` = hrt.`id_product` AND ps.`id_shop` = '.$idShop.')
+                WHERE hrt.`id_hotel` = '.(int) $hotelCategories[$node['id']].' AND ps.`active` = 1 AND ps.`visibility` <> \'none\'
+                ORDER BY hrt.`id_product`'
+            );
+            foreach ((array) $rows as $row) {
+                $product = new Product((int) $row['id_product'], false, $idLang);
+                if (!$product->link_rewrite) {
+                    continue;
+                }
+                $node['room_types'][] = array(
+                    'name' => $product->name,
+                    'link' => $this->context->link->getProductLink($product, $product->link_rewrite, null, null, $idLang, $idShop),
+                );
+            }
+        }
+
+        foreach ($node['children'] as &$child) {
+            $this->addRoomTypes($child);
+        }
+    }
+    protected function getHotelNodes($node)
+    {
+        $hotels = array();
+        if (isset($node['room_types'])) {
+            $node['children'] = array();
+            $hotels[] = $node;
+        } else {
+            foreach ($node['children'] as $child) {
+                $hotels = array_merge($hotels, $this->getHotelNodes($child));
+            }
+        }
+
+        return $hotels;
     }
 }

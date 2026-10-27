@@ -308,6 +308,9 @@ class HotelBookingDetail extends ObjectModel
         if (!isset($params['amenities'])) {
             $params['amenities'] = 0;
         }
+        if (!isset($params['feature_values'])) {
+            $params['feature_values'] = 0;
+        }
         if (!isset($params['price'])) {
             $params['price'] = 0;
         }
@@ -600,11 +603,11 @@ class HotelBookingDetail extends ObjectModel
                 FROM `'._DB_PREFIX_.'htl_room_information`
                 WHERE `id_hotel`='.(int)$idHotel.' AND `id_status` = '. HotelRoomInformation::STATUS_INACTIVE.' AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.')';
 
-        // check room is temperory inactive
+        // check active room disabled for the requested dates
         $sql[] = 'SELECT hri.`id` AS `id_room`, hri.`id_product`, hri.`id_hotel`, hri.`room_num`, hri.`comment` AS `room_comment`, hri.`id_status`, hrdd.`date_from` AS `date_from`, hrdd.`date_to` AS `date_to`
                 FROM `'._DB_PREFIX_.'htl_room_information` AS hri
                 INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.	id_room = hri.`id`)
-                WHERE hri.`id_hotel`='.(int) $idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (
+                WHERE hri.`id_hotel`='.(int) $idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_ACTIVE .' AND (
                     (hrdd.`date_from` <= \''.pSQL($dateFrom).'\' AND hrdd.`date_to` > \''.pSQL($dateFrom).'\' AND hrdd.`date_to` <= \''.pSQL($dateTo).'\') OR
                     (hrdd.`date_from` >= \''.pSQL($dateFrom).'\' AND hrdd.`date_to` > \''.pSQL($dateFrom).'\' AND hrdd.`date_to` <= \''.pSQL($dateTo).'\') OR
                     (hrdd.`date_from` >= \''.pSQL($dateFrom).'\' AND hrdd.`date_from` < \''.pSQL($dateTo).'\' AND hrdd.`date_to` >= \''.pSQL($dateTo).'\') OR
@@ -779,11 +782,11 @@ class HotelBookingDetail extends ObjectModel
             (`date_from` <= \''.pSQL($dateFrom).'\' AND `date_to` >= \''.pSQL($dateTo).'\')
         )) AND IF('.(int)$idRoomType.' > 0, `id_product` = '.(int)$idRoomType.', 1) AND `id_product` IN ('.$allowedIdRoomTypes.')';
 
-        // Exclude temporary disable rooms
+        // Exclude active rooms disabled for the requested dates
         $excludeRoomId['disabled'] = 'SELECT hri.`id` AS id_room
             FROM `'._DB_PREFIX_.'htl_room_information` AS hri
             INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
-            WHERE hri.`id_hotel`='.(int)$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (hrdd.`date_from` < \''.pSql($dateTo).'\' AND hrdd.`date_to` > \''.pSql($dateFrom).'\') AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
+            WHERE hri.`id_hotel`='.(int)$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_ACTIVE .' AND (hrdd.`date_from` < \''.pSql($dateTo).'\' AND hrdd.`date_to` > \''.pSql($dateFrom).'\') AND IF('.(int)$idRoomType.' > 0, hri.`id_product` = '.(int)$idRoomType.', 1) AND hri.`id_product` IN ('.$allowedIdRoomTypes.')';
 
         // LOS Restriction. Also, Remember to check max LOS restriction is greater than zero
         if ($applyLosRestriction) {
@@ -1123,7 +1126,7 @@ class HotelBookingDetail extends ObjectModel
             FROM `'._DB_PREFIX_.'htl_room_information` AS hri
             INNER JOIN `'._DB_PREFIX_.'htl_room_type` AS hrt ON (hrt.`id_product` = hri.`id_product`)
             INNER JOIN `'._DB_PREFIX_.'htl_room_disable_dates` AS hrdd ON (hrdd.`id_room_type` = hri.`id_product` AND hrdd.`id_room` = hri.`id`)
-            WHERE hri.`id_hotel`='.(int)$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_TEMPORARY_INACTIVE .' AND (
+            WHERE hri.`id_hotel`='.(int)$idHotel.' AND hri.`id_status` = '. HotelRoomInformation::STATUS_ACTIVE .' AND (
                 (hrdd.`date_from` <= \''.pSQL($dateFrom).'\' AND hrdd.`date_to` > \''.pSQL($dateFrom).'\' AND hrdd.`date_to` < \''.pSQL($dateTo).'\') OR
                 (hrdd.`date_from` > \''.pSQL($dateFrom).'\' AND hrdd.`date_from` < \''.pSQL($dateTo).'\' AND hrdd.`date_to` >= \''.pSQL($dateTo).'\') OR
                 (hrdd.`date_from` > \''.pSQL($dateFrom).'\' AND hrdd.`date_from` < \''.pSQL($dateTo).'\' AND hrdd.`date_to` < \''.pSQL($dateTo).'\')
@@ -1855,18 +1858,34 @@ class HotelBookingDetail extends ObjectModel
 
         if (!$only_search_data) {
             if (!empty($bookingData)) {
+                $maxAmenities = (int) Configuration::get('WK_MAX_AMENITIES_ROOM_SEARCH');
+                $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
+                $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
                 foreach ($bookingData['rm_data'] as $key => $value) {
                     // featured amenities for display in room type list
-                    $product_feature = HotelRoomTypeAmenities::getAmenities(
+                    $featured_amenities = HotelRoomTypeAmenities::getAmenities(
                         $value['id_product'],
                         $context->language->id,
                         true
                     );
+                    if ($maxAmenities) {
+                        $featured_amenities = array_slice($featured_amenities, 0, $maxAmenities);
+                    }
                     if (!empty($amenities) && $amenities) {
                         $roomAmenityIds = array_column(HotelRoomTypeAmenities::getAmenities($value['id_product']), 'id');
                         if (array_diff($amenities, $roomAmenityIds)) {
                             unset($bookingData['rm_data'][$key]);
                             continue;
+                        }
+                    }
+                    if (!empty($feature_values)) {
+                        $roomFeatureValueIds = array_map('intval', array_column(Product::getFeaturesStatic($value['id_product']), 'id_feature_value'));
+                        // AND between features, OR between the values of one feature
+                        foreach ($feature_values as $featureValueGroup) {
+                            if (!array_intersect($featureValueGroup, $roomFeatureValueIds)) {
+                                unset($bookingData['rm_data'][$key]);
+                                continue 2;
+                            }
                         }
                     }
                     $productFeaturePrice = HotelRoomTypeFeaturePricing::getRoomTypeFeaturePricesPerDay($value['id_product'], $date_from, $date_to, self::useTax(), 0, 0, 0, 0, 1, 1, $bookingParams['occupancy']);
@@ -1885,7 +1904,32 @@ class HotelBookingDetail extends ObjectModel
                             $cover_img = $context->link->getImageLink($value['link_rewrite'], $context->language->iso_code.'-default', 'home_default');
                         }
                         $bookingData['rm_data'][$key]['image'] = $cover_img;
-                        $bookingData['rm_data'][$key]['feature'] = $product_feature;
+                        $bookingData['rm_data'][$key]['featured_amenities'] = $featured_amenities;
+
+                        // featured room features (is_featured) for display below the short description
+                        $featuredFeatures = array();
+                        foreach (Product::getFrontFeaturesStatic($context->language->id, $value['id_product']) as $roomFeature) {
+                            // one entry per featured feature, its values are shown together after the feature icon
+                            if ($roomFeature['is_featured']) {
+                                if (!isset($featuredFeatures[$roomFeature['id_feature']])) {
+                                    $featuredFeatures[$roomFeature['id_feature']] = $roomFeature;
+                                    $featuredFeatures[$roomFeature['id_feature']]['values'] = array();
+                                }
+                                $featuredFeatures[$roomFeature['id_feature']]['values'][] = $roomFeature['value'];
+                            }
+                        }
+                        $featuredFeatures = array_values($featuredFeatures);
+                        if ($maxFeatures) {
+                            $featuredFeatures = array_slice($featuredFeatures, 0, $maxFeatures);
+                        }
+                        foreach ($featuredFeatures as &$featuredFeature) {
+                            if ($maxFeatureValues) {
+                                $featuredFeature['values'] = array_slice($featuredFeature['values'], 0, $maxFeatureValues);
+                            }
+                            $featuredFeature['value'] = implode(', ', $featuredFeature['values']);
+                        }
+                        unset($featuredFeature);
+                        $bookingData['rm_data'][$key]['featured_features'] = $featuredFeatures;
                         $bookingData['rm_data'][$key]['price'] = $prod_price;
                         $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
                         $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;

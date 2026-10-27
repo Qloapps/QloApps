@@ -1,0 +1,206 @@
+<?php
+/**
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License version 3.0
+* that is bundled with this package in the file LICENSE.md
+* It is also available through the world-wide-web at this URL:
+* https://opensource.org/license/osl-3-0-php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@qloapps.com so we can send you a copy immediately.
+*
+* DISCLAIMER
+*
+* Do not edit or add to this file if you wish to upgrade this module to a newer
+* versions in the future. If you wish to customize this module for your needs
+* please refer to https://store.webkul.com/customisation-guidelines for more information.
+*
+* @author Webkul IN
+* @copyright Since 2010 Webkul
+* @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
+*/
+
+/**
+ * Queries for the pages added to the sitemap, and helpers for the sitemap files.
+ */
+class QsmHelper
+{
+    const QSM_MAX_URLS_PER_FILE = 25000;
+    const QSM_INDEX_FILE_NAME = 'sitemap.xml';
+    const QSM_DEFAULT_FREQUENCY = 'weekly';
+    const TYPE_ROOM_TYPES = 'type-room-types';
+    const TYPE_PROPERTIES = 'type-properties';
+    const TYPE_STANDALONE = 'type-standalone';
+    const TYPE_CMS = 'type-cms';
+
+    public static function getFrequencies()
+    {
+        return array('always', 'hourly', 'daily', 'weekly', 'monthly', 'yearly', 'never');
+    }
+    public static function getFrequency()
+    {
+        $frequency = Configuration::get('QLOSITEMAP_FREQUENCY');
+
+        return in_array($frequency, self::getFrequencies(), true) ? $frequency : self::QSM_DEFAULT_FREQUENCY;
+    }
+    public static function getDisabledPages()
+    {
+        $pages = Configuration::get('QLOSITEMAP_DISABLED_PAGES');
+
+        return $pages ? explode(',', $pages) : array();
+    }
+    public static function getModulePages()
+    {
+        $pages = array();
+        $rows = (array) Db::getInstance()->executeS(
+            'SELECT `page` FROM `'._DB_PREFIX_.'meta` WHERE `page` LIKE \'module-%\' ORDER BY `page`'
+        );
+        foreach ($rows as $row) {
+            if (!preg_match('/^module-(.+)-([a-z0-9]+)$/i', $row['page'], $match)) {
+                continue;
+            }
+            if (in_array(strtolower($match[2]), array('validation', 'payment', 'confirmation'))) {
+                continue;
+            }
+            $module = Module::getInstanceByName($match[1]);
+            if ($module && $module->tab == 'payments_gateways') {
+                continue;
+            }
+            $pages[] = $row['page'];
+        }
+
+        return $pages;
+    }
+    public static function getMetaIdByPage($page)
+    {
+        return (int) Db::getInstance()->getValue(
+            'SELECT `id_meta` FROM `'._DB_PREFIX_.'meta` WHERE `page` = \''.pSQL($page).'\''
+        );
+    }
+
+    protected static function getProductGroupJoin()
+    {
+        if (!Group::isFeatureActive() || !Configuration::get('PS_UNIDENTIFIED_GROUP')) {
+            return '';
+        }
+
+        return ' INNER JOIN (
+            SELECT DISTINCT cp.`id_product` FROM `'._DB_PREFIX_.'category_product` cp
+            INNER JOIN `'._DB_PREFIX_.'category_group` cg ON (cg.`id_category` = cp.`id_category`)
+            WHERE cg.`id_group` = '.(int) Configuration::get('PS_UNIDENTIFIED_GROUP').'
+        ) g ON ps.`id_product` = g.`id_product`';
+    }
+
+    public static function getRoomTypeIds($idShop)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT ps.`id_product` FROM `'._DB_PREFIX_.'product_shop` ps
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = ps.`id_product`)'.self::getProductGroupJoin().'
+            WHERE ps.`id_shop` = '.(int) $idShop.' AND ps.`active` = 1 AND ps.`visibility` <> \'none\' AND p.`booking_product` = 1
+            ORDER BY ps.`id_product`'
+        );
+    }
+    public static function getStandaloneProductIds($idShop)
+    {
+        $standaloneTypes = array(
+            Product::SELLING_PREFERENCE_WITH_STANDALONE,
+            Product::SELLING_PREFERENCE_WITH_STANDALONE_AND_WITH_ROOM_TYPE,
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        );
+        $withHotelTypes = array(
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_STANDALONE,
+            Product::SELLING_PREFERENCE_WITH_HOTEL_AND_WITH_ROOM_TYPE_AND_WITH_STANDALONE,
+        );
+
+        return Db::getInstance()->executeS(
+            'SELECT ps.`id_product` FROM `'._DB_PREFIX_.'product_shop` ps
+            INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = ps.`id_product`)'.self::getProductGroupJoin().'
+            WHERE ps.`id_shop` = '.(int) $idShop.' AND ps.`active` = 1 AND ps.`show_at_front` = 1
+            AND ps.`visibility` <> \'none\' AND p.`booking_product` = 0
+            AND p.`selling_preference_type` IN ('.implode(', ', array_map('intval', $standaloneTypes)).')
+            AND (
+                p.`selling_preference_type` NOT IN ('.implode(', ', array_map('intval', $withHotelTypes)).')
+                OR EXISTS (
+                    SELECT 1 FROM `'._DB_PREFIX_.'htl_room_type_service_product` rsp
+                    WHERE rsp.`id_product` = p.`id_product` AND rsp.`element_type` = '.(int) RoomTypeServiceProduct::WK_ELEMENT_TYPE_HOTEL.'
+                )
+            )
+            ORDER BY ps.`id_product`'
+        );
+    }
+
+    public static function getCategoryIds($idShop)
+    {
+        $groupJoin = '';
+        if (Group::isFeatureActive() && Configuration::get('PS_UNIDENTIFIED_GROUP')) {
+            $groupJoin = ' INNER JOIN `'._DB_PREFIX_.'category_group` cg ON (cg.`id_category` = c.`id_category`
+                AND cg.`id_group` = '.(int) Configuration::get('PS_UNIDENTIFIED_GROUP').')';
+        }
+
+        return Db::getInstance()->executeS(
+            'SELECT c.`id_category` FROM `'._DB_PREFIX_.'category` c
+            INNER JOIN `'._DB_PREFIX_.'category_shop` cs ON (cs.`id_category` = c.`id_category`)
+            INNER JOIN `'._DB_PREFIX_.'htl_branch_info` hbi ON (hbi.`id_category` = c.`id_category` AND hbi.`active` = 1)'.$groupJoin.'
+            WHERE c.`active` = 1 AND cs.`id_shop` = '.(int) $idShop.'
+            ORDER BY c.`id_category`'
+        );
+    }
+
+    public static function getCmsIds($idLang, $idShop)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT c.`id_cms` FROM `'._DB_PREFIX_.'cms` c
+            INNER JOIN `'._DB_PREFIX_.'cms_lang` cl ON (cl.`id_cms` = c.`id_cms` AND cl.`id_lang` = '.(int) $idLang.')
+            INNER JOIN `'._DB_PREFIX_.'cms_shop` cs ON (cs.`id_cms` = c.`id_cms` AND cs.`id_shop` = '.(int) $idShop.')
+            INNER JOIN `'._DB_PREFIX_.'cms_category` cc ON (cc.`id_cms_category` = c.`id_cms_category` AND cc.`active` = 1)
+            WHERE c.`active` = 1 AND c.`indexation` = 1
+            GROUP BY c.`id_cms` ORDER BY c.`id_cms`'
+        );
+    }
+
+    public static function getSitemapFiles()
+    {
+        $files = array();
+        foreach ((array) glob(_PS_ROOT_DIR_.'/*_sitemap.xml') as $path) {
+            $name = basename($path);
+            if (preg_match('/^[a-z]{2,3}(-[a-z]{2,4})?_\d+_sitemap\.xml$/i', $name)) {
+                $files[] = array('link' => $name);
+            }
+        }
+        sort($files);
+
+        return $files;
+    }
+
+    public static function deleteSitemapFiles()
+    {
+        foreach (self::getSitemapFiles() as $row) {
+            @unlink(_PS_ROOT_DIR_.'/'.$row['link']);
+        }
+        @unlink(_PS_ROOT_DIR_.'/'.self::QSM_INDEX_FILE_NAME);
+    }
+
+    public static function createIndexFile()
+    {
+        $sitemaps = self::getSitemapFiles();
+        if (!$sitemaps) {
+            return false;
+        }
+
+        $baseLink = Context::getContext()->link->getBaseLink();
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL.'<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'.PHP_EOL;
+        foreach ($sitemaps as $sitemap) {
+            $xml .= '<sitemap><loc>'.self::escapeXml($baseLink.$sitemap['link']).'</loc><lastmod>'.date('c').'</lastmod></sitemap>'.PHP_EOL;
+        }
+        $xml .= '</sitemapindex>'.PHP_EOL;
+
+        return (bool) file_put_contents(_PS_ROOT_DIR_.'/'.self::QSM_INDEX_FILE_NAME, $xml);
+    }
+
+    public static function escapeXml($string)
+    {
+        return htmlspecialchars($string, ENT_QUOTES | ENT_XML1, 'UTF-8');
+    }
+}

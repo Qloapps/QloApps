@@ -417,6 +417,10 @@ class Blockcart extends Module
         if ($useTax && TaxConfiguration::isGrossedUp($tourismTaxRoom)) {
             $totalRoomsPrice += $tourismTaxRoom;
         }
+        $tourismTaxService = (float) $tourismTaxTotals['tourism_tax_service'];
+        if ($useTax && TaxConfiguration::isGrossedUp($tourismTaxService)) {
+            $totalAdditionalServicesWithoutAutoAddPrice += $tourismTaxService;
+        }
         if ($useTax && TaxConfiguration::isGrossedUp($tourismTaxConvenienceFee)) {
             $totalConvenienceFee += $tourismTaxConvenienceFee;
         }

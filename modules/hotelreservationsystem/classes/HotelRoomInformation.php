@@ -35,7 +35,6 @@ class HotelRoomInformation extends ObjectModel
 
     const STATUS_ACTIVE = 1;
     const STATUS_INACTIVE = 2;
-    const STATUS_TEMPORARY_INACTIVE = 3;
 
     const STATUS_SEARCH_LOS_UNSATISFIED = 4;
     const STATUS_SEARCH_OCCUPANCY_UNSATISFIED = 5;
@@ -153,10 +152,6 @@ class HotelRoomInformation extends ObjectModel
                 'id' => HotelRoomInformation::STATUS_INACTIVE,
                 'status' => self::getRoomStatusTitle(HotelRoomInformation::STATUS_INACTIVE)
             ),
-            'STATUS_TEMPORARY_INACTIVE' => array(
-                'id' => HotelRoomInformation::STATUS_TEMPORARY_INACTIVE,
-                'status' => self::getRoomStatusTitle(HotelRoomInformation::STATUS_TEMPORARY_INACTIVE)
-            ),
         );
 
         Hook::exec('actionAdminRoomStatusModifier', array('status' => &$status));
@@ -170,7 +165,6 @@ class HotelRoomInformation extends ObjectModel
         $status = array(
             HotelRoomInformation::STATUS_ACTIVE => $moduleInstance->l('Active', 'hotelreservationsystem'),
             HotelRoomInformation::STATUS_INACTIVE => $moduleInstance->l('Inactive', 'hotelreservationsystem'),
-            HotelRoomInformation::STATUS_TEMPORARY_INACTIVE => $moduleInstance->l('Temporarily Inactive', 'hotelreservationsystem'),
             HotelRoomInformation::STATUS_SEARCH_LOS_UNSATISFIED => $moduleInstance->l('Length of stay restriction not satisfied', 'hotelreservationsystem'),
             HotelRoomInformation::STATUS_SEARCH_OCCUPANCY_UNSATISFIED => $moduleInstance->l('Occupancy exceeds room capacity', 'hotelreservationsystem'),
         );
@@ -358,7 +352,7 @@ class HotelRoomInformation extends ObjectModel
         $roomTypes = Db::getInstance()->executeS(
             'SELECT hri.`id_product`, pl.`name` AS room_type_name,
                 COUNT(hri.`id`) AS total_rooms,
-                SUM(CASE WHEN hri.`id_status` IN ('.(int) self::STATUS_INACTIVE.','.(int) self::STATUS_TEMPORARY_INACTIVE.') THEN 1 ELSE 0 END) AS ooo_rooms
+                SUM(CASE WHEN hri.`id_status` = '.(int) self::STATUS_INACTIVE.' THEN 1 ELSE 0 END) AS ooo_rooms
             FROM `'._DB_PREFIX_.'htl_room_information` hri
             INNER JOIN `'._DB_PREFIX_.'product` p ON (p.`id_product` = hri.`id_product` AND p.`active` = 1)
             INNER JOIN `'._DB_PREFIX_.'product_lang` pl
@@ -390,6 +384,22 @@ class HotelRoomInformation extends ObjectModel
             $bookingsByProduct[$b['id_product']][] = $b;
         }
 
+        // Active rooms blocked by a disable date range (inactive rooms are already counted as out of order)
+        $disabledRaw = Db::getInstance()->executeS(
+            'SELECT hri.`id_product`, hrdd.`id_room`, hrdd.`date_from`, hrdd.`date_to`
+            FROM `'._DB_PREFIX_.'htl_room_disable_dates` hrdd
+            INNER JOIN `'._DB_PREFIX_.'htl_room_information` hri ON (hri.`id` = hrdd.`id_room`)
+            WHERE hri.`id_status` = '.(int) self::STATUS_ACTIVE.'
+            AND hrdd.`date_from` < "'.$dateToNext.'" AND hrdd.`date_to` > "'.$dateFrom.'"'
+            .HotelBranchInformation::addHotelRestriction($idsHotel, 'hri')
+            .($idProduct ? ' AND hri.`id_product` = '.$idProduct : '')
+        );
+
+        $disabledByProduct = array();
+        foreach ($disabledRaw as $d) {
+            $disabledByProduct[$d['id_product']][] = $d;
+        }
+
         $result  = array();
         $current = $dateFrom;
         while ($current <= $dateTo) {
@@ -404,9 +414,17 @@ class HotelRoomInformation extends ObjectModel
                         }
                     }
                 }
+                $disabledRooms = array();
+                if (isset($disabledByProduct[$idProd])) {
+                    foreach ($disabledByProduct[$idProd] as $d) {
+                        if ($d['date_from'] < $next && $d['date_to'] > $current) {
+                            $disabledRooms[$d['id_room']] = true;
+                        }
+                    }
+                }
                 $booked    = count($bookedRooms);
                 $total     = (int) $rt['total_rooms'];
-                $ooo       = (int) $rt['ooo_rooms'];
+                $ooo       = (int) $rt['ooo_rooms'] + count($disabledRooms);
                 $available = max(0, $total - $booked - $ooo);
                 $result[]  = array(
                     'date'           => $current,
@@ -446,10 +464,8 @@ class HotelRoomInformation extends ObjectModel
 
         return Db::getInstance()->executeS(
             'SELECT hri.`id` AS id_room, hri.`room_num`, hri.`floor`,
-            CASE WHEN hri.`id_status` = '.(int) self::STATUS_TEMPORARY_INACTIVE.' AND hrdd.`id_room` IS NULL
-                 THEN '.(int) self::STATUS_ACTIVE.'
-                 ELSE hri.`id_status`
-            END AS id_status,
+            hri.`id_status`,
+            IF(hri.`id_status` = '.(int) self::STATUS_ACTIVE.' AND hrdd.`id_room` IS NOT NULL, 1, 0) AS is_disabled,
             hri.`id_product`, hri.`id_hotel`,
             pl.`name` AS room_type_name, hbil.`hotel_name`,
             bkgs.`id_order`, bkgs.`date_from`, bkgs.`date_to`,

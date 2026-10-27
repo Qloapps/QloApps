@@ -103,7 +103,7 @@
                                                                                         <p>{l s='qty'}: {$product['quantity']}</p>
                                                                                     {/if}
                                                                                 </div>
-                                                                                <div class="text-right">
+                                                                                <div class="text-right service-price-action">
                                                                                     <p>{displayPrice price=$product['price']}</p>
                                                                                     <a class="btn btn-sm btn-default remove_roomtype_product" data-id-product="{$product['id_product']}"><i class="icon-trash"></i></a>
                                                                                 </div>

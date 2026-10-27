@@ -141,6 +141,8 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
         $serviceGroups = array();
         $roomTypeRows = array();
 
+        $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+
         foreach ($bookings as $booking) {
             $nights = (int)HotelHelper::getNumberOfDays($booking['date_from'], $booking['date_to']);
             if ($nights <= 0) {
@@ -160,7 +162,6 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
             $bookingServices = array();
 
             // Auto-added services bundled with room price (for cost calculation only)
-            $objServiceProductOrderDetail = new ServiceProductOrderDetail();
             $autoAddedWithRoomPriceTaxExcl = (float)$objServiceProductOrderDetail->getRoomTypeServiceProducts(
                 (int)$this->order->id, 0, 0,
                 isset($booking['id_product']) ? (int)$booking['id_product'] : 0,
@@ -176,7 +177,13 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
             );
             if (isset($additionalServices[(int)$booking['id']]['additional_services'])) {
                 foreach ($additionalServices[(int)$booking['id']]['additional_services'] as $service) {
-                    $bookingServices[] = array('name' => $service['name'], 'quantity' => (int)$service['quantity']);
+                    $bookingServices[] = array(
+                        'name' => $service['name'],
+                        'quantity' => (int)$service['quantity'],
+                        'unit_price_tax_excl' => (float)$service['unit_price_tax_excl'],
+                        'total_price_tax_excl' => (float)$service['total_price_tax_excl'],
+                        'allow_multiple_quantity' => (int)$service['allow_multiple_quantity'],
+                    );
                 }
             }
 
@@ -244,6 +251,43 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
             }
         }
         unset($roomTypeRow);
+
+        // --- Hotel products ---
+        $hotelProducts = array();
+
+        $products = $objServiceProductOrderDetail->getServiceProductsInOrder(
+            (int) $this->order->id,
+            0,
+            0,
+            Product::SELLING_PREFERENCE_WITH_HOTEL
+        );
+
+        if (is_array($products)) {
+            foreach ($products as $product) {
+                $taxLabel = self::l('No tax');
+                if ($taxes = OrderDetail::getTaxListStatic((int) $product['id_order_detail'])) {
+                    $taxTemp = array();
+                    foreach ($taxes as $tax) {
+                        $objTax = new Tax($tax['id_tax']);
+                        $taxTemp[] = sprintf(self::l('%1$s%2$s%%'), $objTax->rate + 0, '&nbsp;');
+                    }
+                    $taxLabel = implode(', ', $taxTemp);
+                }
+                $hotelName = '';
+                if (!empty($product['id_hotel'])) {
+                    $objProductHotel = new HotelBranchInformation((int) $product['id_hotel'], (int) $this->order->id_lang);
+                    $hotelName = $objProductHotel->hotel_name;
+                }
+                $hotelProducts[] = array(
+                    'name' => $product['name'].(!empty($product['option_name']) ? ' : '.$product['option_name'] : ''),
+                    'hotel_name' => $hotelName,
+                    'tax_label' => $taxLabel,
+                    'quantity' => (int) $product['quantity'],
+                    'unit_price_tax_excl' => (float) $product['unit_price_tax_excl'],
+                    'total_price_tax_excl' => (float) $product['total_price_tax_excl'],
+                );
+            }
+        }
 
         $guestAddress = '';
         $guest = new Customer((int)$this->order->id_customer);
@@ -353,6 +397,7 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
             'total_room_nights' => (int)$totalRoomNights,
             'room_type_rows' => array_values($roomTypeRows),
             'service_groups' => $serviceGroups,
+            'hotel_products' => $hotelProducts,
             'payment_method' => $paymentMethod,
             'footer' => $footer,
             'payment_policy' => $paymentPolicy,
