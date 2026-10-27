@@ -166,7 +166,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('Enable to display hotels list on the contact us page.'),
                     ),
                     'WK_MAX_AMENITIES_ROOM_SEARCH' => array(
-                        'title' => $this->l('Maximum featured amenities in room search'),
+                        'title' => $this->l('Max featured amenities in room search'),
                         'hint' => $this->l('Maximum number of featured amenities to display for each room type on the front office room search page.'),
                         'desc' => $this->l('Set to 0 to display all featured amenities.'),
                         'type' => 'text',
@@ -175,7 +175,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'default' => '0',
                     ),
                     'WK_MAX_FEATURES_ROOM_SEARCH' => array(
-                        'title' => $this->l('Maximum featured features in room search'),
+                        'title' => $this->l('Max Featured room type features on room search page'),
                         'hint' => $this->l('Maximum number of featured features to display for each room type on the front office room search page.'),
                         'desc' => $this->l('Set to 0 to display all featured features.'),
                         'type' => 'text',
@@ -184,7 +184,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'default' => '0',
                     ),
                     'WK_MAX_FEATURES_CHECKOUT' => array(
-                        'title' => $this->l('Maximum featured features in checkout'),
+                        'title' => $this->l('Max Featured room type features on Checkout page'),
                         'hint' => $this->l('Maximum number of featured features to display for each room type on the front office checkout page.'),
                         'desc' => $this->l('Set to 0 to display all featured features.'),
                         'type' => 'text',
@@ -193,8 +193,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'default' => '0',
                     ),
                     'WK_MAX_ROOM_TYPE_FEATURE_VALUES' => array(
-                        'title' => $this->l('Maximum room type feature values per featured feature'),
-                        'hint' => $this->l('Maximum number of room type feature values to display for each featured feature on the front office room search and order pages. For example, if the featured feature Bed Type has the values Single, Double and Queen and this is set to 2, only "Single, Double" is displayed.'),
+                        'title' => $this->l('Max. display values for room type Featured  features'),
+                        'hint' => $this->l('Maximum number of room type feature values to display for each featured feature in room search results and orders. For example, if the featured feature Bed Type has the values Single, Double, and Queen, and this setting is set to 2, only Single, Double will be displayed.'),
                         'desc' => $this->l('Set to 0 to display all values of each featured feature.'),
                         'type' => 'text',
                         'cast' => 'intval',

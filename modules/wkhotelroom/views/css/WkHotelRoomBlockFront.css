@@ -320,7 +320,7 @@ a.htlRoomTypeBookNow:hover {
 /* no line right under the room name */
 .htlRoomTypeNameText + .htlRoomCardMeta {
     border-top: 0;
-    padding-top: 0;
+    padding-top: 12px;
 }
 
 .htlRoomCardFeatured .htlRoomFeatureMore {

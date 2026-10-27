@@ -103,7 +103,7 @@
 			{/block}
 		</div>
 		{block name='room_types_filters_mobile_apply'}
-			<div class="mf_footer"><button type="button" class="btn button button-medium mf_apply"><span>{l s='Apply' mod='wkhotelfilterblock'}</span></button></div>
+			<div class="mf_footer"><a href="javascript:void(0);" class="btn btn-default button button-medium pull-right mf_apply"><span>{l s='Apply' mod='wkhotelfilterblock'}</span></a></div>
 		{/block}
 	</div>
 	{block name='room_types_filters_js_vars'}
