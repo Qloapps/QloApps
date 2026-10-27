@@ -303,7 +303,7 @@ class ServiceProductCartDetail extends ObjectModel
                             null,
                             $product['htl_cart_booking_id']
                         ) / max($numDays, 1);
-                        
+
                         $priceTaxExcl = Product::getServiceProductPrice(
                             $objProduct->id,
                             $product['id_product_option'],

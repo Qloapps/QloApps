@@ -2316,6 +2316,7 @@
                 </div>
             </div>
 
+            {hook h="displayAdminOrderMessageBefore"}
             <div class="row">
                 <div class="order_message_right col-lg-12">
                     <div class="form-group">
@@ -2441,12 +2442,14 @@
                             <p class="help-block">{l s='Select or type the payment method using which payment for booking will be made.'}</p>
                         </div>
                     </div>
+                    {hook h="displayAdminOrderPaymentSelectionAfter"}
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
                         <label class="control-label col-lg-3">{l s='Transaction ID'}</label>
                         <div class="col-lg-9">
                             <input type="text" class="fixed-width-xxl" name="payment_transaction_id" id="payment_transaction_id" value="{if isset($smarty.post.payment_transaction_id)}{$smarty.post.payment_transaction_id}{/if}" />
                         </div>
                     </div>
+                    {hook h="displayAdminOrderFormFieldsAfter"}
                     <div class="form-group">
                         <div class="col-lg-9 col-lg-offset-3">
                             <button type="submit" name="submitAddOrder" class="btn btn-default" />

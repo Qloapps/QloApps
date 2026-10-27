@@ -29,6 +29,7 @@
             <li role="presentation">
                 <a href="#room_type_service_product_desc" aria-controls="services" role="tab" data-toggle="tab">{l s='Services'}</a>
             </li>
+            {hook h='displayAdminOrderEditRoomTab' data=$data}
         </ul>
 
         <div class="tab-content clearfix">
@@ -36,6 +37,7 @@
 
             {* below tpl contains tab contents for facilities and service products *}
             {include file='controllers/orders/modals/_partials/_room_extra_services_content.tpl'}
+            {hook h='displayAdminOrderEditRoomTabContent' data=$data}
         </div>
     </div>
 

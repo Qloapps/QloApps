@@ -178,6 +178,7 @@
 	<div class="noRoomsAvailAlert">
 		<span>{l s='No room available for this property!'}</span>
 	</div>
+	{hook h='displayNoRoomAvailableBlockAfter'}
 {/if}
 
 {block name='displayRoomTypeListAfter'}

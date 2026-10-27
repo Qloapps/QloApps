@@ -177,6 +177,7 @@
 																						{/if}
 																					</div>
 																				{/block}
+																				{hook h='displayCheckoutGuestDetailsAfter'}
 
 																				{* proceed only if no order restrict errors are there *}
 																				{if !$orderRestrictErr}

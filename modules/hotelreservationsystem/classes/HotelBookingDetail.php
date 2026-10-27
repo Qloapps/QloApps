@@ -838,6 +838,7 @@ class HotelBookingDetail extends ObjectModel
         $unavailableRoomTypes = array();
 
         $avai_rooms = Db::getInstance()->executeS($sql);
+
         if ($avai_rooms) {
             $availableRoomTypes = array(
                 'roomTypes' => array(),
