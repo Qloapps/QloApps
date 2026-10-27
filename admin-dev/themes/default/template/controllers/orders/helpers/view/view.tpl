@@ -907,6 +907,7 @@
                             {assign var=total_rooms_tax_only value=(($total_rooms_price_tax_incl - $total_rooms_price_tax_excl) - $tourism_tax_room)}
                             {assign var=total_convenience_fee_tax_only value=($total_convenience_fee_vat_incl - $total_convenience_fee_tax_excl)}
                             {assign var=total_products_tax_only value=(($total_products_price_tax_incl - $total_products_price_tax_excl) - $tourism_tax_products)}
+                            {assign var=total_room_services_tax_only value=((($total_room_services_tax_incl - $total_room_services_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) - $tourism_tax_service)}
 
                             {if $total_rooms_price_tax_excl}
                                 <tr id="total_products">
@@ -998,11 +999,11 @@
                                                         </td>
                                                     </tr>
                                                 {/if}
-                                                {if isset($total_room_services_tax_incl) && (($total_room_services_tax_incl - $total_room_services_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) > 0}
+                                                {if isset($total_room_services_tax_incl) && $total_room_services_tax_only > 0}
                                                     <tr>
                                                         <td class="text-left">{l s='Extra services Tax'}</td>
                                                         <td class="text-right nowrap">
-                                                            {displayPrice price=(($total_room_services_tax_incl - $total_room_services_tax_excl) - ($total_convenience_fee_tax_incl - $total_convenience_fee_tax_excl)) currency=$currency->id}
+                                                            {displayPrice price=$total_room_services_tax_only currency=$currency->id}
                                                         </td>
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>

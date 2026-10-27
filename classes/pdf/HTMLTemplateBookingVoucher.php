@@ -177,10 +177,12 @@ class HTMLTemplateBookingVoucherCore extends HTMLTemplate
             );
             if (isset($additionalServices[(int)$booking['id']]['additional_services'])) {
                 foreach ($additionalServices[(int)$booking['id']]['additional_services'] as $service) {
+                    $isServiceCancelled = !empty($service['is_cancelled']) || !empty($service['is_refunded'])
+                        || (float)$service['total_price_tax_excl'] <= 0;
                     $bookingServices[] = array(
                         'name' => $service['name'],
                         'quantity' => (int)$service['quantity'],
-                        'unit_price_tax_excl' => (float)$service['unit_price_tax_excl'],
+                        'unit_price_tax_excl' => $isServiceCancelled ? 0 : (float)$service['unit_price_tax_excl'],
                         'total_price_tax_excl' => (float)$service['total_price_tax_excl'],
                         'allow_multiple_quantity' => (int)$service['allow_multiple_quantity'],
                     );
