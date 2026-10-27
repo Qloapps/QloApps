@@ -609,6 +609,7 @@ class HotelReservationSystem extends Module
             'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST',
             'WK_MAX_AMENITIES_ROOM_SEARCH',
             'WK_MAX_FEATURES_ROOM_SEARCH',
+            'WK_MAX_FEATURES_CHECKOUT',
             'WK_MAX_ROOM_TYPE_FEATURE_VALUES',
             'QLO_HEADER_MEDIA_TYPE',
             'QLO_HEADER_CONTENT_ALIGN',

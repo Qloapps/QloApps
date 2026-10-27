@@ -1182,7 +1182,8 @@ class HotelHelper
 
         Configuration::updateValue('HTL_FEATURE_PRICING_PRIORITY', 'specific_date;special_day;date_range');
         Configuration::updateValue('WK_MAX_AMENITIES_ROOM_SEARCH', 6);
-        Configuration::updateValue('WK_MAX_FEATURES_ROOM_SEARCH', 3);
+        Configuration::updateValue('WK_MAX_FEATURES_ROOM_SEARCH', 4);
+        Configuration::updateValue('WK_MAX_FEATURES_CHECKOUT', 0);
         Configuration::updateValue('WK_MAX_ROOM_TYPE_FEATURE_VALUES', 2);
         Configuration::updateValue('WK_GOOGLE_ACTIVE_MAP', 0);
         Configuration::updateValue('WK_MAP_HOTEL_ACTIVE_ONLY', 1);
@@ -2297,7 +2298,50 @@ class HotelHelper
             if (isset($roomTypeFeatures[$roomTypeDataDefult['name']])) {
                 $this->saveDummyRoomTypeFeatures($product, $roomTypeFeatures[$roomTypeDataDefult['name']]);
             }
+
+            // assign amenities (with featured amenities) to the room type
+            $roomTypeAmenities = $this->getDefaultRoomTypeAmenities();
+            if (isset($roomTypeAmenities[$roomTypeDataDefult['name']])) {
+                $objRoomTypeAmenities = new HotelRoomTypeAmenities();
+                $objRoomTypeAmenities->saveRoomTypeAmenities(
+                    $product_id,
+                    $roomTypeAmenities[$roomTypeDataDefult['name']]['amenities'],
+                    $roomTypeAmenities[$roomTypeDataDefult['name']]['featured']
+                );
+            }
         }
+    }
+
+    /**
+     * Return the amenity ids (and the featured ones) of each demo room type, keyed by the room type name.
+     * Amenity ids are the ids of the default amenities created by insertHotelCommonAmenities().
+     *
+     * @return array
+     */
+    protected function getDefaultRoomTypeAmenities()
+    {
+        return array(
+            'General Rooms' => array(
+                // Internet Access Free, Power Backup, Parking, NewsPaper In Lobby, Laundry Service, Gardens, Room Service, Welcome Drinks
+                'amenities' => array(10, 25, 48, 12, 24, 55, 38, 14),
+                'featured' => array(10, 25, 48, 12, 24, 55),
+            ),
+            'Delux Rooms' => array(
+                // + Bar / Lounge
+                'amenities' => array(10, 25, 48, 38, 14, 24, 55, 99, 12),
+                'featured' => array(10, 25, 38, 14, 48, 24),
+            ),
+            'Executive Rooms' => array(
+                // + Health Club / Gym, Multi Cuisine Restaurant
+                'amenities' => array(10, 25, 48, 38, 14, 24, 12, 69, 99, 100),
+                'featured' => array(10, 38, 14, 69, 100, 48),
+            ),
+            'Luxury Rooms' => array(
+                // + Car Rental, Swimming Pool, Jacuzzi, Spa Services
+                'amenities' => array(10, 25, 48, 38, 14, 24, 40, 69, 93, 94, 87, 99, 100),
+                'featured' => array(10, 38, 93, 94, 87, 100),
+            ),
+        );
     }
 
     /**

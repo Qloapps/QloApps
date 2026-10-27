@@ -56,20 +56,12 @@
                                                 <p class="htlRoomTypeNameText">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
                                                 {if $roomDisplay.feature}
                                                     <div class="htlRoomCardFeatured">
-                                                        {* the card shows one line, so features are added until the character budget is used and the last one is shortened *}
-                                                        {assign var='maxFeatureChars' value=40}
-                                                        {assign var='featChars' value=0}
+                                                        {* one line: the row is cut with an ellipsis by the css when it is wider than the card *}
                                                         {foreach from=$roomDisplay.feature item=feat}
-                                                            {if $featChars < $maxFeatureChars}
-                                                                {assign var='featLeft' value=$maxFeatureChars-$featChars}
-                                                                {assign var='featText' value=$feat.value|truncate:$featLeft:'…':true}
-                                                                {if $featChars}<span class="htlRoomFeatureSep">|</span>{/if}
-                                                                <span title="{$feat.name|escape:'htmlall':'UTF-8'}">
-                                                                    {if $feat.logo_type == 'icon'}<i class="{$feat.logo|escape:'htmlall':'UTF-8'}"></i>{else}<img class="htlRoomFeatureImg" src="{$smarty.const._PS_IMG_}rf/{$feat.logo_image|escape:'htmlall':'UTF-8'}" alt="{$feat.name|escape:'htmlall':'UTF-8'}" onerror="this.style.display='none'">{/if}
-                                                                    {$featText|escape:'htmlall':'UTF-8'}
-                                                                </span>
-                                                                {assign var='featChars' value=$featChars+$feat.value|count_characters:true+4}
-                                                            {/if}
+                                                            <span title="{$feat.name|escape:'htmlall':'UTF-8'}">
+                                                                {if $feat.logo_type == 'icon'}<i class="{$feat.logo|escape:'htmlall':'UTF-8'}"></i>{else}<img class="htlRoomFeatureImg" src="{$smarty.const._PS_IMG_}rf/{$feat.logo_image|escape:'htmlall':'UTF-8'}" alt="{$feat.name|escape:'htmlall':'UTF-8'}" onerror="this.style.display='none'">{/if}
+                                                                {$feat.value|escape:'htmlall':'UTF-8'}
+                                                            </span>
                                                         {/foreach}
                                                     </div>
                                                 {/if}

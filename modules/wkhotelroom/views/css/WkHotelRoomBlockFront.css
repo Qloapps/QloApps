@@ -135,12 +135,11 @@ a.htlRoomTypeBookNow {
     font-size: 22px;
 }
 .htlRoomCardFeatured {
-    padding: 16px 0;
+    padding: 12px 0;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
     color: #555;
-    font-size: 15px;
+    font-size: 14px;
 }
 .htlRoomCardFeatured img.htlRoomFeatureImg {
     display: inline-block;
@@ -157,7 +156,14 @@ a.htlRoomTypeBookNow {
     max-width: 18px;
     object-fit: contain;
 }
-.htlRoomCardFeatured .htlRoomFeatureSep {
+/* one line for all features. Each feature, with the | in front of it, is one block, so when the row is wider
+   than the card the whole feature is dropped and the ellipsis never follows a lonely | */
+.htlRoomCardFeatured > span {
+    display: inline-block;
+    vertical-align: top;
+}
+.htlRoomCardFeatured > span + span:not(.htlRoomFeatureMore):before {
+    content: "|";
     margin: 0 5px;
     color: #BBB;
 }
@@ -181,9 +187,21 @@ a.htlRoomTypeBookNow {
 }
 .htlRoomCardAmen {
     display: flex;
+    flex: 1 1 auto;
     gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+}
+.htlRoomCardAmen > span.htlRoomAmenMore {
+    width: auto;
+    min-width: 32px;
+    padding: 0 8px;
+    border-radius: 16px;
+    font-size: 12px;
+    white-space: nowrap;
 }
 .htlRoomCardAmen > span {
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -297,4 +315,14 @@ a.htlRoomTypeBookNow:hover {
 .htlRoom-owlCarousel .owl-nav > div i {
     position: relative;
     left: 1px;
+}
+
+/* no line right under the room name */
+.htlRoomTypeNameText + .htlRoomCardMeta {
+    border-top: 0;
+    padding-top: 0;
+}
+
+.htlRoomCardFeatured .htlRoomFeatureMore {
+    margin-left: 5px;
 }

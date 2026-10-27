@@ -48,7 +48,7 @@
                                     {if $smarty.foreach.intImg.iteration%4 == 1}
                                     <div class="interiorImgWrapper">
                                     {/if}
-                                        <div class="interiorbox" data-fancybox-group="interiorGallery" rel="interiorGallery" href="{$link->getMediaLink("`$module_dir|escape:'htmlall':'UTF-8'`views/img/hotel_interior/`$img_name['name']|escape:'htmlall':'UTF-8'`.jpg")}" title="{$img_name['display_name']|escape:'htmlall':'UTF-8'}">
+                                        <div class="interiorbox{if !empty($img_name['is_filler'])} interiorbox-filler{/if}" data-fancybox-group="interiorGallery" rel="interiorGallery" href="{$link->getMediaLink("`$module_dir|escape:'htmlall':'UTF-8'`views/img/hotel_interior/`$img_name['name']|escape:'htmlall':'UTF-8'`.jpg")}" title="{$img_name['display_name']|escape:'htmlall':'UTF-8'}">
                                             <div class="interiorboxInner">
                                                 <img src="{$link->getMediaLink("`$module_dir|escape:'htmlall':'UTF-8'`views/img/hotel_interior/`$img_name['name']|escape:'htmlall':'UTF-8'`.jpg")}" class="interiorImg" alt="{$img_name['display_name']|escape:'htmlall':'UTF-8'}">
                                             </div>

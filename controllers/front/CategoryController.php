@@ -223,6 +223,28 @@ class CategoryControllerCore extends FrontController
 
             if ($booking_data = $objBookingDetail->dataForFrontSearch($bookingParams)) {
                 $booking_data['rm_data'] = array_values($booking_data['rm_data']);
+                $maxAmenities = (int) Configuration::get('WK_MAX_AMENITIES_ROOM_SEARCH');
+                $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
+                $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
+                foreach ($booking_data['rm_data'] as &$roomData) {
+                    if ($maxAmenities && !empty($roomData['featured_amenities'])) {
+                        $roomData['featured_amenities'] = array_slice($roomData['featured_amenities'], 0, $maxAmenities);
+                    }
+                    if (!empty($roomData['featured_features'])) {
+                        if ($maxFeatures) {
+                            $roomData['featured_features'] = array_slice($roomData['featured_features'], 0, $maxFeatures);
+                        }
+                        foreach ($roomData['featured_features'] as &$featuredFeature) {
+                            if ($maxFeatureValues) {
+                                $featuredFeature['values'] = array_slice($featuredFeature['values'], 0, $maxFeatureValues);
+                            }
+                            $featuredFeature['value'] = implode(', ', $featuredFeature['values']);
+                        }
+                        unset($featuredFeature);
+                    }
+                }
+                unset($roomData);
+
                 if ($sort_by && $sort_value) {
                     $indi_arr = array();
 

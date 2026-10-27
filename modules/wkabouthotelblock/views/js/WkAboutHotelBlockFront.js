@@ -146,7 +146,7 @@ $(document).ready(function(){
                 var items = [];
                 var index = 0;
                 var clicked = $(e.currentTarget).attr('href');
-                $slider.find('.owl-item:not(.cloned) ' + settings.itemSelector).each(function(i) {
+                $slider.find('.owl-item:not(.cloned) ' + settings.itemSelector).not('.interiorbox-filler').each(function(i) {
                     items.push({href: $(this).attr('href'), title: $(this).attr('title') || ''});
                     if ($(this).attr('href') === clicked) {
                         index = i;

@@ -1832,9 +1832,6 @@ class HotelBookingDetail extends ObjectModel
 
         if (!$only_search_data) {
             if (!empty($bookingData)) {
-                $maxAmenities = (int) Configuration::get('WK_MAX_AMENITIES_ROOM_SEARCH');
-                $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
-                $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
                 foreach ($bookingData['rm_data'] as $key => $value) {
                     // featured amenities for display in room type list
                     $featured_amenities = HotelRoomTypeAmenities::getAmenities(
@@ -1842,9 +1839,6 @@ class HotelBookingDetail extends ObjectModel
                         $context->language->id,
                         true
                     );
-                    if ($maxAmenities) {
-                        $featured_amenities = array_slice($featured_amenities, 0, $maxAmenities);
-                    }
                     if (!empty($amenities) && $amenities) {
                         $roomAmenityIds = array_column(HotelRoomTypeAmenities::getAmenities($value['id_product']), 'id');
                         if (array_diff($amenities, $roomAmenityIds)) {
@@ -1892,18 +1886,7 @@ class HotelBookingDetail extends ObjectModel
                                 $featuredFeatures[$roomFeature['id_feature']]['values'][] = $roomFeature['value'];
                             }
                         }
-                        $featuredFeatures = array_values($featuredFeatures);
-                        if ($maxFeatures) {
-                            $featuredFeatures = array_slice($featuredFeatures, 0, $maxFeatures);
-                        }
-                        foreach ($featuredFeatures as &$featuredFeature) {
-                            if ($maxFeatureValues) {
-                                $featuredFeature['values'] = array_slice($featuredFeature['values'], 0, $maxFeatureValues);
-                            }
-                            $featuredFeature['value'] = implode(', ', $featuredFeature['values']);
-                        }
-                        unset($featuredFeature);
-                        $bookingData['rm_data'][$key]['featured_features'] = $featuredFeatures;
+                        $bookingData['rm_data'][$key]['featured_features'] = array_values($featuredFeatures);
                         $bookingData['rm_data'][$key]['price'] = $prod_price;
                         $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
                         $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;

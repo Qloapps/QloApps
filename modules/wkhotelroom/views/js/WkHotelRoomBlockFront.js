@@ -20,8 +20,71 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
+/**
+ * Keeps the items of a room card row (featured features, amenity icons) on one line. Items that do not fit are
+ * hidden whole, so a lone separator or icon is never left at the end, and a "more" marker is added at the end.
+ *
+ * @param {jQuery} $slider slider holding the room cards
+ * @param {Object} row
+ * @param {string} row.selector  the row element
+ * @param {string} row.more      class of the "more" marker
+ * @param {function(number): string} row.moreText  text of the marker, gets the number of hidden items
+ * @param {boolean} [row.partial]  show the first hidden item shortened with an ellipsis when enough room is left
+ */
+function fitRoomCardRow($slider, row) {
+    var MIN_PARTIAL_WIDTH = 100; // narrowest width a shortened item is shown in
+
+    $slider.find(row.selector).each(function() {
+        var $row = $(this);
+        var $items = $row.children(':not(.' + row.more + ')').css({display: '', maxWidth: ''});
+        var fits = function() {
+            return $row.prop('scrollWidth') <= $row.innerWidth();
+        };
+
+        $row.children('.' + row.more).remove();
+        if (fits()) {
+            return;
+        }
+
+        // the marker takes room too, so it is added before the items are hidden
+        var $more = $('<span class="' + row.more + '"></span>').appendTo($row);
+        var shown = $items.length;
+
+        while (shown > 1 && !fits()) {
+            $items.eq(--shown).hide();
+            $more.html(row.moreText($items.length - shown));
+        }
+
+        var $next = $items.eq(shown);
+        var $last = $items.eq(shown - 1);
+        var room = Math.floor($row.offset().left + $row.innerWidth() - ($last.offset().left + $last.outerWidth(true)));
+
+        if (row.partial && $next.length && room >= MIN_PARTIAL_WIDTH) {
+            $more.remove();
+            $next.css({display: 'inline-block', maxWidth: room - 4, overflow: 'hidden', textOverflow: 'ellipsis'});
+        }
+    });
+}
+
+/** Fits the featured features and the amenity icons of every room card of the slider. */
+function fitRoomCards($slider) {
+    fitRoomCardRow($slider, {
+        selector: '.htlRoomCardFeatured',
+        more: 'htlRoomFeatureMore',
+        moreText: function() { return '&hellip;'; },
+        partial: true
+    });
+    fitRoomCardRow($slider, {
+        selector: '.htlRoomCardAmen',
+        more: 'htlRoomAmenMore',
+        moreText: function(hidden) { return '+' + hidden; }
+    });
+}
+
 $(document).ready(function() {
-    $('.htlRoom-owlCarousel .owl-carousel').owlCarousel({
+    $('.htlRoom-owlCarousel .owl-carousel').on('initialized.owl.carousel refreshed.owl.carousel resized.owl.carousel', function() {
+        fitRoomCards($(this));
+    }).owlCarousel({
         loop: true,
         nav: true,
         navText: ['<i class="icon-angle-left"></i>', '<i class="icon-angle-right"></i>'],
@@ -33,6 +96,10 @@ $(document).ready(function() {
             768: { items: 2 },
             992: { items: 3 }
         }
+    });
+    // fonts and icons can change the widths after the page is shown
+    $(window).on('load', function() {
+        fitRoomCards($('.htlRoom-owlCarousel .owl-carousel'));
     });
     applyChangesToDescription();
     $(window).on('resize', function() {
