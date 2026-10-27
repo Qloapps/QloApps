@@ -526,6 +526,10 @@ img.rm_amen
     .catSortBlock {
         display: none;
     }
+    #category_data_cont .room_cont:first-child {
+        border-top: 0;
+        padding-top: 0;
+    }
     .mf_bar {
         display: flex;
         position: fixed;
