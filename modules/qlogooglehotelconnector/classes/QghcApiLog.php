@@ -101,7 +101,6 @@ class QghcApiLog extends ObjectModel
         if (!Db::getInstance()->delete('qghc_api_log', '`date_add` < \'' . pSQL($cutoff) . '\'')) {
             return false;
         }
-        $count = (int) Db::getInstance()->Affected_Rows();
 
         // Daily file logs follow the same retention window as the DB rows.
         $logDir = _PS_MODULE_DIR_ . 'qlogooglehotelconnector/logs/';
@@ -114,6 +113,6 @@ class QghcApiLog extends ObjectModel
             }
         }
 
-        return array('count' => $count, 'cutoff' => $cutoff);
+        return true;
     }
 }
