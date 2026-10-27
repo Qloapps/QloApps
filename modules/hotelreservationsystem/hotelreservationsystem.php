@@ -446,7 +446,8 @@ class HotelReservationSystem extends Module
                 'htl_branch_info',
                 'htl_amenity',
                 'htl_order_refund_rules',
-                'htl_settings_link'
+                'htl_settings_link',
+                'htl_header_image'
             );
             //If Admin update new language when we do entry in module all lang tables.
             HotelHelper::updateLangTables($newIdLang, $langTables);

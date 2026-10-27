@@ -18,6 +18,13 @@ $cms_accesses = Profile::getProfileAccess(Context::getContext()->employee->id_pr
 if (!$products_accesses['edit'] && !$cms_accesses['edit']) {
     die(Tools::displayError());
 }
+
+$tokenTab = $products_accesses['edit'] ? 'AdminProducts' : 'AdminCmsContent';
+$isMutatingRequest = isset($_POST['submit']) || in_array(basename($_SERVER['SCRIPT_NAME']), array('execute.php', 'upload.php', 'ajax_calls.php'), true);
+
+if ($isMutatingRequest && (!isset($_REQUEST['token']) || !hash_equals(Tools::getAdminTokenLite($tokenTab), (string) $_REQUEST['token']))) {
+    die('invalid token');
+}
 //------------------------------------------------------------------------------
 // DON'T COPY THIS VARIABLES IN FOLDERS config.php FILES
 //------------------------------------------------------------------------------

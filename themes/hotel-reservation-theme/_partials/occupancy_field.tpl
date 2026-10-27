@@ -46,7 +46,7 @@
                     {assign var=countRoom value=1}
                     {foreach from=$occupancies key=key item=$occupancy name=occupancyInfo}
                         <div class="occupancy_info_block selected" occ_block_index="{$key|escape:'htmlall':'UTF-8'}">
-                            <div class="occupancy_info_head"><span class="room_num_wrapper">{$room_type_info['selling_object_name']|escape:'htmlall':'UTF-8'} - {$countRoom|escape:'htmlall':'UTF-8'} </span>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-stay-link pull-right" href="#">{l s='Remove'}</a>{/if}</div>
+                            <div class="occupancy_info_head"><span class="room_num_wrapper">{$room_type_info['selling_object_name']|escape:'htmlall':'UTF-8'} - {$countRoom|escape:'htmlall':'UTF-8'} </span>{if !$smarty.foreach.occupancyInfo.first}<a class="remove-room-link pull-right" href="#">{l s='Remove'}</a>{/if}</div>
                             <div class="row">
                                 <div class="form-group col-sm-5 col-xs-6 occupancy_count_block">
                                     <div class="row">

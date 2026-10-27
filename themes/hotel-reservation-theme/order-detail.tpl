@@ -334,6 +334,7 @@
                                         {assign var=room_services_price_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_ROOM_TYPE))}
 
                                         {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl) - ($total_tourism_tax|default:0))}
+                                        {if $total_tax_without_discount < 0}{assign var=total_tax_without_discount value=0}{/if}
 
                                         {assign var=total_standard_products_tax_incl value=($order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE) + $order->getTotalProductsWithTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL))}
                                         {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL))}
@@ -773,6 +774,7 @@
                                         {assign var=total_standard_products_tax_excl value=($order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_STANDALONE) + $order->getTotalProductsWithoutTaxes(false, false, Product::SELLING_PREFERENCE_WITH_HOTEL))}
 
                                         {assign var=total_tax_without_discount value=(($room_price_tax_incl - $room_price_tax_excl) + ($room_services_price_tax_incl - $room_services_price_tax_excl) + ($total_standard_products_tax_incl - $total_standard_products_tax_excl) - ($total_tourism_tax|default:0))}
+                                        {if $total_tax_without_discount < 0}{assign var=total_tax_without_discount value=0}{/if}
 
                                         {if isset($cart_htl_data) && $cart_htl_data}
                                             <tr>
@@ -1034,7 +1036,7 @@
                                                                                     </label>
 
                                                                                     <span>({$hotel_booking_detail.adults|string_format:'%02d'} {if $hotel_booking_detail.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $hotel_booking_detail.children > 0}{l s=', '}{$hotel_booking_detail.children|string_format:'%02d'} {if $hotel_booking_detail.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if})</span>
-                                                                                    {if $hotel_booking_detail.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{else if $hotel_booking_detail.is_refunded}<span class="badge badge-danger badge-cancelled">{l s='Refunded'}</span>{else if $hotel_booking_detail.refund_denied}<span class="badge badge-danger badge-cancelled">{l s='Refund denied'}</span> {include file='_partials/ui-tooltip.tpl' tooltip_content={l s='Refund for this booking is denied. Please contact admin for more detail.'}}{else if $hotel_booking_detail.id_status != $ROOM_STATUS_ASSIGNED}<span class="badge badge-danger badge-cancelled">{if $hotel_booking_detail.id_status == $ROOM_STATUS_CHECKED_OUT}{l s='Checked-Out'}{else}{l s='Checked-In'}{/if}</span>{/if}
+                                                                                    {if $hotel_booking_detail.is_cancelled}<span class="badge badge-danger badge-cancelled">{l s='Cancelled'}</span>{else if $hotel_booking_detail.is_refunded}<span class="badge badge-danger badge-cancelled">{l s='Refunded'}</span>{else if $hotel_booking_detail.refund_denied}<span class="badge badge-danger badge-cancelled">{l s='Refund denied'}</span> {include file='_partials/ui-tooltip.tpl' tooltip_content={l s='Refund for this booking is denied. Please contact admin for more detail.'}}{else if $hotel_booking_detail.id_status != $ROOM_STATUS_ASSIGNED}<span class="badge badge-danger badge-cancelled">{if $hotel_booking_detail.id_status == $ROOM_STATUS_CHECKED_OUT}{l s='Checked-Out'}{else if $hotel_booking_detail.id_status == $ROOM_STATUS_NO_SHOW}{l s='No-show'}{else}{l s='Checked-In'}{/if}</span>{/if}
                                                                                 </div>
                                                                             </div>
 
