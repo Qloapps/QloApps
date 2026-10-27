@@ -3404,14 +3404,6 @@ class ProductCore extends ObjectModel
             }
         }
 
-        Hook::exec(
-			'actionProductPriceModifier',
-			array(
-				'price' => &$price,
-				'type' => 'pre_tax'
-			)
-		);
-
         // Tax
         $address->id_country = $id_country;
         $address->id_state = $id_state;
@@ -3423,10 +3415,16 @@ class ProductCore extends ObjectModel
             $id_tax_rule_group = Product::getIdTaxRulesGroupByIdProduct((int)$id_product, $context);
         }
 
-        Hook::exec('actionProductTaxRuleGroupModifier', array(
-            'id_product' => $id_product,
-            'id_tax_rule_group' => &$id_tax_rule_group
-        ));
+        Hook::exec(
+			'actionProductPriceModifier',
+			array(
+				'price' => &$price,
+				'type' => 'pre_tax',
+                'id_product' => $id_product,
+                'id_tax_rule_group' => &$id_tax_rule_group
+
+			)
+		);
 
         $tax_manager = TaxManagerFactory::getManager($address, $id_tax_rule_group);
         $product_tax_calculator = $tax_manager->getTaxCalculator();

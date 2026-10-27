@@ -424,7 +424,7 @@ class MailCore extends ObjectModel
             Hook::exec('actionMailAlterMessageBeforeSend', array(
                 'template' => &$template,
                 'message' => &$email,
-                'template_vars' => $template_vars,
+                'template_vars' => &$template_vars,
             ));
 
             $mailer->send($email);

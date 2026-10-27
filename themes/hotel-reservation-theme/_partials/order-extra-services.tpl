@@ -68,7 +68,7 @@
                                                                 {/capture}
                                                                 {include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}
                                                             </div>
-                                                            {hook h='displayOrderedServiceProduct' product_order_detail=$additionalService}
+                                                            {hook h='displayOrderDetailServiceProductNameBlockAfter' product_order_detail=$additionalService}
                                                         </div>
                                                         <div class="">
                                                             <span>

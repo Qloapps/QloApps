@@ -245,8 +245,6 @@ class AdminNormalProductsControllerCore extends AdminController
         // Code For Standard product working
         $this->_where .= ' AND a.`selling_preference_type` = '.(int)Product::SELLING_PREFERENCE_WITH_ROOM_TYPE;
 
-        Hook::exec('actionAdminProductsQueryModifier', array('join' => &$this->_join, 'where' => &$this->_where));
-
         $this->_group = 'GROUP BY a.`id_product`';
 
         $this->fields_list = array();

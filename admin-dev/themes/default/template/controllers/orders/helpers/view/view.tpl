@@ -518,7 +518,7 @@
                                         {if $customer->phone}
                                             <dd><i class="icon-phone"></i>  &nbsp;<b><a  href="tel:{$customer->phone}">{$customer->phone}</a></b></dd>
                                         {/if}
-                                        {hook h='displayAdminOrderPhoneAfter'}
+                                        {hook h='displayAdminOrderCustomerPhoneAfter'}
                                     </dl>
                                     <dl class="list-detail col-sm-6">
                                         <label class="label-title">{l s='Customer Info'}</label>

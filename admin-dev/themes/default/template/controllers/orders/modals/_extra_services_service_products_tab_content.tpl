@@ -46,7 +46,7 @@
                             <th>{l s='Total Price (tax excl.)'}</th>
                             <th>{l s='Total Price (tax incl.)'}</th>
                             <th class="text-right">{l s='Action'}</th>
-                            {hook h="displayAdminOrderExtraServicesTabContentHeading"}
+                            {hook h="displayAdminOrderSelectedServicesHeading"}
                         </tr>
                     </thead>
                     <tbody>
@@ -106,7 +106,7 @@
                                     <td>{displayPrice price=$service['total_price_tax_excl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
                                     <td>{displayPrice price=$service['total_price_tax_incl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
                                     <td class="text-right"><a class="btn btn-danger pull-right del_room_additional_service" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
-                                    {hook h="displayAdminOrderExtraServicesTabContentData" id_service_product=$service['id_product'] id_htl_booking_detail=$id_booking_detail id_service_product_order_detail=$service['id_service_product_order_detail'] room_type_id_product=$additionalServices['room_type_id_product']}
+                                    {hook h="displayAdminOrderSelectedServicesData" id_service_product=$service['id_product'] id_htl_booking_detail=$id_booking_detail id_service_product_order_detail=$service['id_service_product_order_detail'] room_type_id_product=$additionalServices['room_type_id_product']}
                                 </tr>
                             {/foreach}
                         {else}
@@ -137,7 +137,7 @@
 								<th class="fixed-width-sm"> </th>
 								<th class="fixed-width-sm text-center">{l s='Quantity'}</th>
 								<th>{l s='Unit Price (tax excl.)'}</th>
-								{hook h="displayAdminOrderExtraServicesTabContentHeading"}
+								{hook h="displayAdminOrderAvailableServicesHeading"}
 							</tr>
 						</thead>
 						<tbody>
@@ -186,7 +186,7 @@
 											<input type="text" class="form-control unit_price" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]" value="{$product['price_tax_exc']}" data-id-product="{$product.id_product}">
 										</div>
 									</td>
-									{hook h="displayAdminOrderExtraServicesTabContentData" id_service_product=$product['id_product'] id_htl_booking_detail=$id_booking_detail}
+									{hook h="displayAdminOrderAvailableServicesData" id_service_product=$product['id_product'] id_htl_booking_detail=$id_booking_detail}
 								</tr>
 							{/foreach}
 						</tbody>
@@ -317,7 +317,7 @@
 					<th>{l s='Unit Price (tax excl.)'}</th>
 					<th>{l s='Total Price (tax excl.)'}</th>
 					<th>{l s='Total Price (tax incl.)'}</th>
-					{hook h="displayAdminOrderExtraServicesTabContentHeading"}
+					{hook h="displayAdminOrderViewServicesHeading"}
 				</tr>
 			</thead>
 			</tbody>
@@ -366,6 +366,7 @@
                         <td>
 							{displayPrice price=$service['total_price_tax_incl'] currency=$orderCurrency}
 						</td>
+						{hook h="displayAdminOrderViewServicesData" id_service_product=$service['id_product'] id_htl_booking_detail=$id_booking_detail id_service_product_order_detail=$service['id_service_product_order_detail'] room_type_id_product=$additionalServices['room_type_id_product']}
 					</tr>
 				{/foreach}
 			</tbody>

@@ -633,11 +633,6 @@ class AdminOrdersControllerCore extends AdminController
             unset($this->toolbar_btn['new']);
         }
 
-        Hook::exec('actionOrderDetailToolbarModifier', array(
-            'toolbar_btn' => &$this->toolbar_btn,
-            'id_order' => (int) Tools::getValue('id_order')
-        ));
-
         return $res;
     }
 

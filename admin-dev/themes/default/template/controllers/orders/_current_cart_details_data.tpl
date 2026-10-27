@@ -26,7 +26,7 @@
 	<div class="panel-heading">
 		<i class="icon-shopping-cart"></i>
 		{l s='Cart Details'}
-		{hook h='displayAdminCartDetailsHeader'}
+		{hook h='displayAdminCartDetailsPanelTitleAfter'}
 	</div>
 	<div class="row">
 		<div class="col-lg-12 table-responsive">
