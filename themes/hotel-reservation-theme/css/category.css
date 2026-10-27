@@ -77,6 +77,16 @@
     margin-bottom: 10px;
 }
 
+#category_data_cont a:focus > .rm_heading
+{
+    outline: none;
+}
+
+#category_data_cont a:focus:has(> .rm_heading)
+{
+    outline: none;
+}
+
 .rm_desc
 {
     line-height: 22px;
