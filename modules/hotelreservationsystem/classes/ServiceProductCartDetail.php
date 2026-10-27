@@ -288,14 +288,6 @@ class ServiceProductCartDetail extends ObjectModel
                             $product['date_to']
                         );
 
-                        Hook::exec('actionCalculateDaysForServiceUnitPrice', array(
-                            'date_from' => $product['date_from'],
-                            'date_to' => $product['date_to'],
-                            'numdays' => &$numDays,
-                            'id_service_product' => (int) $product['id_product'],
-                            'id_cart' => $idCart
-                        ));
-
                         $priceTaxIncl = Product::getServiceProductPrice(
                             $objProduct->id,
                             $product['id_product_option'],
@@ -311,7 +303,7 @@ class ServiceProductCartDetail extends ObjectModel
                             null,
                             $product['htl_cart_booking_id']
                         ) / max($numDays, 1);
-                        
+
                         $priceTaxExcl = Product::getServiceProductPrice(
                             $objProduct->id,
                             $product['id_product_option'],

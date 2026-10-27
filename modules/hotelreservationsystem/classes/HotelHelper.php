@@ -3343,8 +3343,6 @@ class HotelHelper
         INNER JOIN `'._DB_PREFIX_.'category` AS c ON (hbi.`id_category` = c.`id_category`)
         WHERE 1';
 
-        Hook::exec('actionSellerHotelQueryModifier', array('treeQuery' => &$sql));
-
         if ($cities) {
             $sql .= ' AND c.`id_parent` IN ('.implode(', ', $cities).')';
         }
