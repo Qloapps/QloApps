@@ -172,62 +172,47 @@
       {l s='Cron job setting' mod='qlogooglehotelconnector'}
     </div>
 
-    {if $cron_task}
-      <div class="form-group">
-        <label class="control-label col-lg-3" for="ghc_cron">
-          <span class="label-tooltip" data-toggle="tooltip" title="{l s='How often should the API logs older than 2 months be deleted automatically?' mod='qlogooglehotelconnector'}">
-            {l s='API log cleanup schedule' mod='qlogooglehotelconnector'}
-          </span>
-        </label>
-        <div class="col-lg-3">
-          <select name="QGHC_CRON" id="ghc_cron" class="form-control">
-            {if !$cron_task.option}
-              <option value="" selected="selected" disabled="disabled">{l s='Custom' mod='qlogooglehotelconnector'}: {$cron_task.readable|escape:'html':'UTF-8'}</option>
-            {/if}
-            {foreach from=$cron_options key=cron_value item=cron_label}
-              <option value="{$cron_value|escape:'html':'UTF-8'}"{if $cron_value == $cron_task.option} selected="selected"{/if}>{$cron_label|escape:'html':'UTF-8'}</option>
-            {/foreach}
-          </select>
-        </div>
-      </div>
-    {/if}
-
-    <div class="alert alert-info">
-      {if $cron_manager_enabled}
-        <p><strong>{l s='Automatic API log cleanup' mod='qlogooglehotelconnector'}</strong></p>
-        <ul>
-          {if $cron_task && !$cron_task.active}
-            <li>{l s='Automatic API log cleanup is turned off.' mod='qlogooglehotelconnector'}</li>
-            <li>{l s='To turn it on, select Daily, Weekly or Monthly from the API log cleanup schedule.' mod='qlogooglehotelconnector'}</li>
-          {elseif $cron_task}
-            <li>{l s='API logs older than 2 months are deleted automatically. Current schedule:' mod='qlogooglehotelconnector'} <strong>{$cron_task.readable|escape:'html':'UTF-8'}</strong>.</li>
-            <li>{l s='To change it, select another option from the API log cleanup schedule.' mod='qlogooglehotelconnector'}</li>
-          {else}
-            <li>{l s='API logs older than 2 months are deleted automatically. You can configure the schedule in the' mod='qlogooglehotelconnector'} <a href="{$cron_manager_link|escape:'html':'UTF-8'}">{l s='Cron Task Manager' mod='qlogooglehotelconnector'}</a>.</li>
-          {/if}
-        </ul>
-      {else}
-        <ul>
-          <li>
-            {if $cron_manager_installed}
-              <strong>{l s='Automatic:' mod='qlogooglehotelconnector'}</strong> {l s='the Cron Task Manager module is disabled, so the API logs are not cleaned up automatically.' mod='qlogooglehotelconnector'}
-              <a href="{$cron_manager_link|escape:'html':'UTF-8'}">{l s='Enable the module' mod='qlogooglehotelconnector'}</a>
-              {l s='to turn on the automatic cleanup.' mod='qlogooglehotelconnector'}
-            {elseif $cron_manager_link}
-              <strong>{l s='Automatic:' mod='qlogooglehotelconnector'}</strong> {l s='the Cron Task Manager module is not installed, so the API logs are not cleaned up automatically.' mod='qlogooglehotelconnector'}
-              <a href="{$cron_manager_link|escape:'html':'UTF-8'}">{l s='Install the module' mod='qlogooglehotelconnector'}</a>
-              {l s='to turn on the automatic cleanup.' mod='qlogooglehotelconnector'}
+    {if $cron_manager_enabled}
+      {if $cron_task.exists}
+        <div class="alert alert-info">
+          <p><strong>{l s='Automatic API log cleanup' mod='qlogooglehotelconnector'}</strong></p>
+          <ul>
+            {if $cron_task.active}
+              <li>{l s='API logs older than 2 months are deleted automatically. Current schedule:' mod='qlogooglehotelconnector'} <strong>{$cron_task.readable|escape:'html':'UTF-8'}</strong>.</li>
             {else}
-              <strong>{l s='Automatic:' mod='qlogooglehotelconnector'}</strong> {l s='the Cron Task Manager module (qlocrontaskmanager) is not present, so the API logs are not cleaned up automatically. Add the module to turn on the automatic cleanup.' mod='qlogooglehotelconnector'}
+              <li>{l s='Automatic API log cleanup is turned off.' mod='qlogooglehotelconnector'}</li>
             {/if}
-          </li>
-        </ul>
+          </ul>
+        </div>
+        <div class="alert alert-warning">
+          {l s='If you have set up a cron job for the API log cleanup manually on your server, we recommend removing that cron job and using the Cron Task Manager from now on.' mod='qlogooglehotelconnector'}
+        </div>
+      {else}
+        <div class="alert alert-info">
+          <p>{l s='The API log cleanup task is not present in the Cron Task Manager.' mod='qlogooglehotelconnector'}</p>
+          <button type="submit" name="submitGhcCron" class="btn btn-default">
+            <i class="icon-plus-sign"></i> {l s='Set up cron job' mod='qlogooglehotelconnector'}
+          </button>
+        </div>
+        <div class="alert alert-info">
+          <strong>
+            {l s='Or, for automatic cleanup of API logs older than 2 months, set the following cron job to run once every 24 hours:' mod='qlogooglehotelconnector'}
+          </strong>
+          <br><br>
+          <strong>
+            <code>0 0 * * * curl {$cron_url|escape:'html':'UTF-8'}</code>
+          </strong>
+        </div>
       {/if}
-    </div>
-
-    {if $cron_task}
-      <div class="panel-footer">
-        <button type="submit" name="submitGhcCron" class="btn btn-default pull-right"><i class="process-icon-save"></i> {l s='Save' mod='qlogooglehotelconnector'}</button>
+    {else}
+      <div class="alert alert-info">
+        <strong>
+          {l s='For automatic cleanup of API logs older than 2 months, set the following cron job to run once every 24 hours:' mod='qlogooglehotelconnector'}
+        </strong>
+        <br><br>
+        <strong>
+          <code>0 0 * * * curl {$cron_url|escape:'html':'UTF-8'}</code>
+        </strong>
       </div>
     {/if}
 

@@ -37,7 +37,8 @@ if ($token !== Tools::encrypt('qlogooglehotelconnector')) {
 }
 
 // Delete qghc_api_log rows and daily file logs older than 2 months
-$result = Module::getInstanceByName('qlogooglehotelconnector')->cleanupApiLogs();
+Module::getInstanceByName('qlogooglehotelconnector'); // loads the module classes
+$result = QghcApiLog::cleanupApiLogs();
 
 if ($result !== false) {
     echo 'OK — ' . (int)$result['count'] . ' log(s) deleted (older than ' . $result['cutoff'] . ').';
