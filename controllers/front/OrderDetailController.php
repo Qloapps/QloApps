@@ -464,6 +464,7 @@ class OrderDetailControllerCore extends FrontController
                         'deliveryAddressFormatedValues' => $deliveryAddressFormatedValues,
                         'deliveryState' => (Validate::isLoadedObject($addressDelivery) && $addressDelivery->id_state) ? new State($addressDelivery->id_state) : false,
                         'is_guest' => false,
+                        'has_room_booking' => (bool) HotelBookingDetail::getIdHotelByIdOrder((int) $order->id, false),
                         'messages' => CustomerMessage::getMessagesByOrderId((int) $order->id, false),
                         'CUSTOMIZE_FILE' => Product::CUSTOMIZE_FILE,
                         'CUSTOMIZE_TEXTFIELD' => Product::CUSTOMIZE_TEXTFIELD,
@@ -474,6 +475,7 @@ class OrderDetailControllerCore extends FrontController
                         'ROOM_STATUS_ASSIGNED' => HotelBookingDetail::STATUS_ASSIGNED,
                         'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
                         'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
+                        'ROOM_STATUS_NO_SHOW' => HotelBookingDetail::STATUS_NO_SHOW,
                     )
                 );
 
@@ -574,6 +576,8 @@ class OrderDetailControllerCore extends FrontController
             $objOrderReturn = new OrderReturn();
             if (!(Validate::isLoadedObject($objOrder) && $objOrder->id_customer == $this->context->customer->id)) {
                 $this->errors[] = Tools::displayError('Something went wrong. Please try later.');
+            } elseif (!$objOrder->isReturnable()) {
+                $this->errors[] = Tools::displayError('Refund is not allowed for this hotel.');
             } else {
                 if ($idsHtlBooking) {
                     foreach ($idsHtlBooking as $idHtlBooking) {
@@ -585,7 +589,7 @@ class OrderDetailControllerCore extends FrontController
 
                         // the room has already been checked in/checked out, room will not be able to be cancelled by the customer
                         if ($objHotelBookingDetail->id_status != HotelBookingDetail::STATUS_ASSIGNED) {
-                            $this->errors[] = Tools::displayError('Some selected rooms have already been checked-in/checked-out.');
+                            $this->errors[] = Tools::displayError('Some selected rooms have already been checked-in/checked-out or marked as no-show.');
                             break;
                         }
 
@@ -599,6 +603,16 @@ class OrderDetailControllerCore extends FrontController
                 }
                 if ($idServiceProductOrderDetails) {
                     foreach ($idServiceProductOrderDetails as $idServiceProductOrderDetail) {
+                        $objServiceProductOrderDetail = new ServiceProductOrderDetail((int) $idServiceProductOrderDetail);
+
+                        // the service line must exist and belong to the customer's own order
+                        if (!Validate::isLoadedObject($objServiceProductOrderDetail)
+                            || $objServiceProductOrderDetail->id_order != $objOrder->id
+                        ) {
+                            $this->errors[] = Tools::displayError('Something went wrong. Please try later.');
+                            break;
+                        }
+
                         if (OrderReturn::getOrdersReturnDetail($objOrder->id, 0, 0, $idServiceProductOrderDetail)) {
                             $this->errors[] = Tools::displayError('Some selected rooms have already been requested for cancellation.');
                             break;
@@ -837,7 +851,6 @@ class OrderDetailControllerCore extends FrontController
             ));
 
             $this->addJqueryPlugin(array('fancybox', 'scrollTo', 'footable', 'footable-sort'));
-            $this->addJqueryUI(array('ui.tooltip'), 'base', true);
 
             // load Google Maps library if configured
             if ($idHotel = HotelBookingDetail::getIdHotelByIdOrder(Tools::getValue('id_order'))) {

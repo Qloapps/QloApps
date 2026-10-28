@@ -146,6 +146,7 @@ class OrderTaxDetailCore extends ObjectModel
                  WHERE tt.`id_order` = ' . $idOrder . '
                    AND spod.`id_htl_booking_detail` != 0
                    AND spod.`is_refunded` = 0
+                   AND spod.`id_htl_booking_detail` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . ')
                    AND ex.`id_order_tax_exemption` IS NULL
                  GROUP BY spod.`id_htl_booking_detail`';
             $rows = Db::getInstance()->executeS($sql);
@@ -760,7 +761,8 @@ class OrderTaxDetailCore extends ObjectModel
                 ON tl.`id_tax` = ott.`id_tax` AND tl.`id_lang` = ' . $idLang . '
              WHERE ott.`id_order` = ' . $idOrder . '
                AND ((ott.`id_htl_booking` != 0 AND ott.`id_htl_booking` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))
-                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0))
+                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0
+                        AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL OR spod.`id_htl_booking_detail` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))))
                AND ex.`id_order_tax_exemption` IS NULL
              GROUP BY ott.`id_tax`, tl.`name`'
         );
@@ -797,7 +799,8 @@ class OrderTaxDetailCore extends ObjectModel
                 OR (ott.`id_htl_booking` = 0 AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL) AND ex.`id_service_product_order_detail` = ott.`id_service_product_order_detail` AND ex.`id_htl_booking` = 0)
              WHERE ott.`id_order` = ' . $idOrder . '
                AND ((ott.`id_htl_booking` != 0 AND ott.`id_htl_booking` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))
-                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0))
+                    OR (ott.`id_htl_booking` = 0 AND spod.`is_refunded` = 0
+                        AND (spod.`id_htl_booking_detail` = 0 OR spod.`id_htl_booking_detail` IS NULL OR spod.`id_htl_booking_detail` NOT IN (' . OrderReturn::getRefundedBookingIdsSubquery() . '))))
                AND ex.`id_order_tax_exemption` IS NULL
              GROUP BY ott.`id_order_detail`'
         );
@@ -883,7 +886,8 @@ class OrderTaxDetailCore extends ObjectModel
             return false;
         }
 
-        $unitPriceTaxExcl = Tools::ps_round((float) $booking->total_price_tax_excl / $numNights, 6);
+        // getTaxesAmount() expects the price in the default currency and converts the amount to 'idCurrency' itself
+        $unitPriceTaxExcl = Tools::ps_round(Tools::convertPrice((float) $booking->total_price_tax_excl / $numNights, (int) $order->id_currency, false), 6);
 
         $childrenAges = array();
         if ($booking->child_ages) {
@@ -967,7 +971,7 @@ class OrderTaxDetailCore extends ObjectModel
         return array(
             'idTaxRulesGroup' => $idTaxRulesGroup,
             'address' => $address,
-            'unitPriceTaxExcl' => (float) $serviceLine->unit_price_tax_excl,
+            'unitPriceTaxExcl' => Tools::convertPrice((float) $serviceLine->unit_price_tax_excl, (int) $order->id_currency, false),
             'checkInDate' => $checkInDate,
             'numNights' => $numNights,
             'numAdults' => $numAdults,
@@ -1257,21 +1261,25 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
-     * Exempt tourism tax for every booking (room + attached services) and every standalone service line
-     * of an order; returns only the failing entries.
+     * Exempt tourism tax for the bookings (room + attached services) and standalone service lines
+     * of an order — every one of them by default, or only the given ids; returns only the failing entries.
      *
      * @param int         $idOrder
      * @param int         $idEmployee
      * @param string|null $note  Reason for exemption, applied to every booking/line in the order
      * @param string|null $autoMsgLabel  Pre-translated "Tourism Tax Exempted" label — null skips the Order Notes entry entirely, for every booking/line in the order
      * @param string      $remarkLabel   Pre-translated "Remark" label
+     * @param int[]|null  $idsHtlBooking  Only these bookings are exempted (ids that don't belong to the order are ignored); null = every booking
+     * @param int[]|null  $idsServiceLines  Only these standalone service lines are exempted (ids that don't belong to the order are ignored); null = every line
      * @return array  [{'id_htl_booking' => int, 'result' => int}, ...] plus
      *                [{'id_service_product_order_detail' => int, 'result' => int}, ...] — failures only
      */
-    public static function exemptForOrder($idOrder, $idEmployee = 0, $note = null, $autoMsgLabel = null, $remarkLabel = 'Remark')
+    public static function exemptForOrder($idOrder, $idEmployee = 0, $note = null, $autoMsgLabel = null, $remarkLabel = 'Remark', $idsHtlBooking = null, $idsServiceLines = null)
     {
         $idOrder = (int) $idOrder;
         $failures = array();
+        $selectedBookingIds = ($idsHtlBooking !== null) ? array_flip(array_map('intval', $idsHtlBooking)) : null;
+        $selectedServiceLineIds = ($idsServiceLines !== null) ? array_flip(array_map('intval', $idsServiceLines)) : null;
         $objBookingDetail = new HotelBookingDetail();
         $bookings = $objBookingDetail->getBookingDataByOrderId($idOrder);
         if ($bookings) {
@@ -1281,6 +1289,9 @@ class OrderTaxDetailCore extends ObjectModel
             ));
             foreach ($bookings as $booking) {
                 if (isset($refundedIds[$booking['id']]) || $booking['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
+                    continue;
+                }
+                if ($selectedBookingIds !== null && !isset($selectedBookingIds[(int) $booking['id']])) {
                     continue;
                 }
                 $result = self::exemptBooking($booking['id'], $idEmployee, $note, $autoMsgLabel, $remarkLabel);
@@ -1290,6 +1301,9 @@ class OrderTaxDetailCore extends ObjectModel
             }
         }
         foreach (ServiceProductOrderDetail::getActiveStandaloneIdsByOrder($idOrder) as $idServiceLine) {
+            if ($selectedServiceLineIds !== null && !isset($selectedServiceLineIds[$idServiceLine])) {
+                continue;
+            }
             $result = self::exemptServiceLine($idServiceLine, $idEmployee, $note, $autoMsgLabel, $remarkLabel);
             if ($result !== self::EXEMPT_OK) {
                 $failures[] = array('id_service_product_order_detail' => $idServiceLine, 'result' => $result);
@@ -1299,21 +1313,25 @@ class OrderTaxDetailCore extends ObjectModel
     }
 
     /**
-     * Apply tourism tax for every booking and every standalone service line of an order; returns only
-     * the failing entries. A booking/line with nothing applicable (neither the room nor any attached
+     * Apply tourism tax for the bookings and standalone service lines of an order — every one of them by
+     * default, or only the given ids; returns only the failing entries. A booking/line with nothing applicable (neither the room nor any attached
      * service, or the standalone line itself, has a tourism tax rule) is not a failure — it's silently
      * skipped, same as if it had simply been left alone.
      *
      * @param int         $idOrder
      * @param int         $idEmployee    PS employee id (0 = resolved from Context)
      * @param string|null $autoMsgLabel  Pre-translated "Tourism Tax Applied" label — null skips the Order Notes entry entirely, for every booking/line in the order
+     * @param int[]|null  $idsHtlBooking  Only these bookings are applied (ids that don't belong to the order are ignored); null = every booking
+     * @param int[]|null  $idsServiceLines  Only these standalone service lines are applied (ids that don't belong to the order are ignored); null = every line
      * @return array  [{'id_htl_booking' => int, 'result' => int}, ...] plus
      *                [{'id_service_product_order_detail' => int, 'result' => int}, ...] — failures only
      */
-    public static function applyForOrder($idOrder, $idEmployee = 0, $autoMsgLabel = null)
+    public static function applyForOrder($idOrder, $idEmployee = 0, $autoMsgLabel = null, $idsHtlBooking = null, $idsServiceLines = null)
     {
         $idOrder = (int) $idOrder;
         $failures = array();
+        $selectedBookingIds = ($idsHtlBooking !== null) ? array_flip(array_map('intval', $idsHtlBooking)) : null;
+        $selectedServiceLineIds = ($idsServiceLines !== null) ? array_flip(array_map('intval', $idsServiceLines)) : null;
         $objBookingDetail = new HotelBookingDetail();
         $bookings = $objBookingDetail->getBookingDataByOrderId($idOrder);
         if ($bookings) {
@@ -1325,6 +1343,9 @@ class OrderTaxDetailCore extends ObjectModel
                 if (isset($refundedIds[$booking['id']]) || $booking['id_status'] == HotelBookingDetail::STATUS_CANCELLED) {
                     continue;
                 }
+                if ($selectedBookingIds !== null && !isset($selectedBookingIds[(int) $booking['id']])) {
+                    continue;
+                }
                 $result = self::applyBooking($booking['id'], $idEmployee, $autoMsgLabel);
                 if ($result !== self::APPLY_OK && $result !== self::APPLY_ERROR_NOT_APPLICABLE) {
                     $failures[] = array('id_htl_booking' => (int) $booking['id'], 'result' => $result);
@@ -1332,6 +1353,9 @@ class OrderTaxDetailCore extends ObjectModel
             }
         }
         foreach (ServiceProductOrderDetail::getActiveStandaloneIdsByOrder($idOrder) as $idServiceLine) {
+            if ($selectedServiceLineIds !== null && !isset($selectedServiceLineIds[$idServiceLine])) {
+                continue;
+            }
             $result = self::applyServiceLine($idServiceLine, $idEmployee, $autoMsgLabel);
             if ($result !== self::APPLY_OK && $result !== self::APPLY_ERROR_NOT_APPLICABLE) {
                 $failures[] = array('id_service_product_order_detail' => $idServiceLine, 'result' => $result);

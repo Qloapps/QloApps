@@ -427,6 +427,7 @@ class ProductCore extends ObjectModel
             //     )
             // ),
             'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'id_tourism_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
             'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
             // 'manufacturer_name' => array(
             //     'getter' => 'getWsManufacturerName',
@@ -523,6 +524,7 @@ class ProductCore extends ObjectModel
                 )
             ),
             'id_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
+            'id_tourism_tax_rules_group' => array('xlink_resource' => array('resourceName' => 'tax_rule_groups')),
             'position_in_category' => array('getter' => 'getWsPositionInCategory', 'setter' => 'setWsPositionInCategory'),
             // 'manufacturer_name' => array(
             //     'getter' => 'getWsManufacturerName',
@@ -3319,6 +3321,14 @@ class ProductCore extends ObjectModel
                 $sql->select('product_option.id_product_option, product_option.price_impact as option_impact_price');
                 $sql->leftJoin('product_option', 'product_option', '(product_option.id_product = p.id_product AND product_option.id_product_option = '.(int)$id_product_option.')');
             }
+
+            Hook::exec('actionAdminProductPriceSqlModifier', array(
+                'id_product' => $id_product,
+                'id_product_option' => $id_product_option,
+                'id_shop' => $id_shop,
+                'sql' => &$sql,
+            ));
+
             $res = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS($sql);
 
             if (is_array($res) && count($res)) {
@@ -3394,14 +3404,6 @@ class ProductCore extends ObjectModel
             }
         }
 
-        Hook::exec(
-			'actionProductPriceModifier',
-			array(
-				'price' => &$price,
-				'type' => 'pre_tax'
-			)
-		);
-
         // Tax
         $address->id_country = $id_country;
         $address->id_state = $id_state;
@@ -3412,6 +3414,17 @@ class ProductCore extends ObjectModel
         } else {
             $id_tax_rule_group = Product::getIdTaxRulesGroupByIdProduct((int)$id_product, $context);
         }
+
+        Hook::exec(
+			'actionProductPriceModifier',
+			array(
+				'price' => &$price,
+				'type' => 'pre_tax',
+                'id_product' => $id_product,
+                'id_tax_rule_group' => &$id_tax_rule_group
+
+			)
+		);
 
         $tax_manager = TaxManagerFactory::getManager($address, $id_tax_rule_group);
         $product_tax_calculator = $tax_manager->getTaxCalculator();
@@ -4857,7 +4870,7 @@ class ProductCore extends ObjectModel
         }
         if (!array_key_exists($id_product.'-'.$id_lang, self::$_frontFeaturesCache)) {
             self::$_frontFeaturesCache[$id_product.'-'.$id_lang] = Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS('
-				SELECT name, value, pf.id_feature
+				SELECT name, value, pf.id_feature, f.logo_type, f.logo, f.is_featured
 				FROM '._DB_PREFIX_.'feature_product pf
 				LEFT JOIN '._DB_PREFIX_.'feature_lang fl ON (fl.id_feature = pf.id_feature AND fl.id_lang = '.(int)$id_lang.')
 				LEFT JOIN '._DB_PREFIX_.'feature_value_lang fvl ON (fvl.id_feature_value = pf.id_feature_value AND fvl.id_lang = '.(int)$id_lang.')
@@ -4866,6 +4879,10 @@ class ProductCore extends ObjectModel
 				WHERE pf.id_product = '.(int)$id_product.'
 				ORDER BY f.position ASC'
             );
+            foreach (self::$_frontFeaturesCache[$id_product.'-'.$id_lang] as &$frontFeature) {
+                $frontFeature['logo_image'] = Feature::getLogoImageName($frontFeature['id_feature'], $frontFeature['logo']);
+            }
+            unset($frontFeature);
         }
         return self::$_frontFeaturesCache[$id_product.'-'.$id_lang];
     }
@@ -6859,6 +6876,13 @@ class ProductCore extends ObjectModel
 
         $price = $price * $quantity;
 
+         if (!$specificPrice || ($specificPrice['id_cart'] == 0 && $specificPrice['id_htl_cart_booking'] == 0)) {
+            if (!$idGroup || !Validate::isLoadedObject(new Group((int)$idGroup))) {
+                $idGroup = (int)Group::getCurrent()->id;
+            }
+            $price = Product::applyGroupDiscount($price, $idProduct, $idGroup);
+        }
+
         $tourismTaxHotelId = $idHotel;
         if (!$tourismTaxHotelId && $idProductRoomType) {
             $objRoomType = new HotelRoomType();
@@ -6900,12 +6924,6 @@ class ProductCore extends ObjectModel
             );
         }
 
-        if (!$specificPrice || ($specificPrice['id_cart'] == 0 && $specificPrice['id_htl_cart_booking'] == 0)) {
-            if (!$idGroup || !Validate::isLoadedObject(new Group((int)$idGroup))) {
-                $idGroup = (int)Group::getCurrent()->id;
-            }
-            $price =  Product::applyGroupDiscount($price, $idProduct, $idGroup);
-        }
         return $price;
     }
 
@@ -7043,6 +7061,12 @@ class ProductCore extends ObjectModel
             $feature['value'] = (int) $feature['id_feature'];
             $feature['input_name'] = 'feature_value_parents';
             $feature['children'] = array();
+            if (!empty($feature['is_featured'])) {
+                $feature['badge'] = array(
+                    'class' => 'badge-success',
+                    'title' => Translate::getAdminTranslation('Featured', 'AdminProducts'),
+                );
+            }
             $selectedValues = isset($selectedFeatureValues[(int) $feature['id_feature']])
                 ? $selectedFeatureValues[(int) $feature['id_feature']]
                 : array();

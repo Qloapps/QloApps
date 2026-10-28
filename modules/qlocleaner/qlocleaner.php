@@ -693,6 +693,7 @@ class QloCleaner extends Module
                 array('htl_room_type_feature_pricing_group', 'id_group', 'group', 'id_group'),
                 array('htl_booking_detail', 'id_product', 'product', 'id_product'),
                 array('htl_booking_detail', 'id_order', 'orders', 'id_order'),
+                array('htl_booking_status_history', 'id_htl_booking', 'htl_booking_detail', 'id'),
                 array('htl_cart_booking_data', 'id_order', 'orders', 'id_order'),
                 array('htl_cart_booking_data', 'id_customer', 'customer', 'id_customer'),
                 array('htl_branch_amenity', 'id_hotel', 'htl_branch_info', 'id'),
@@ -866,6 +867,7 @@ class QloCleaner extends Module
             //Qlo modules order tables
             'htl_cart_booking_data',
             'htl_booking_detail',
+            'htl_booking_status_history',
             'service_product_order_detail',
             'service_product_cart_detail',
             'order_customer_guest_detail',

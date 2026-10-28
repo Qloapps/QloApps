@@ -190,6 +190,12 @@
 					<td colspan="7">{l s='Total cost:'}</td>
 					<td class="text-right">{displayWtPriceWithCurrency price=$total_products currency=$currency}</td>
 				</tr>
+				{if $total_tourism_tax > 0}
+				<tr>
+					<td colspan="7">{l s='Tourism tax:'}</td>
+					<td class="text-right">{displayWtPriceWithCurrency price=$total_tourism_tax currency=$currency}</td>
+				</tr>
+				{/if}
 				{if $total_discounts != 0}
 				<tr>
 					<td colspan="7">{l s='Total value of vouchers:'}</td>

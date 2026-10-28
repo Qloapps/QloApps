@@ -343,10 +343,8 @@ class StatsCheckUp extends Module
             $totals['total_rooms'] += (int)$scores['total_rooms'];
             $descriptions = $this->getDescriptions($this->id_hotel ? 'room_type' : 'hotel', $row['id_object']);
             foreach ($descriptions as $description) {
-                if (isset($description['iso_code']) && isset($description['description'])) {
-                    $row['desclength_'.$description['iso_code']] = Tools::strlen(strip_tags($description['description']));
-                }
                 if (isset($description['iso_code'])) {
+                    $row['desclength_'.$description['iso_code']] = isset($description['description']) ? Tools::strlen(strip_tags($description['description'])) : 0;
                     $scores['description_'.$description['iso_code']] = ($row['desclength_'.$description['iso_code']] < $confCheckup['DESCRIPTIONS_LT'] ? 0 : ($row['desclength_'.$description['iso_code']] > $confCheckup['DESCRIPTIONS_GT'] ? 2 : 1));
                     $totals['description_'.$description['iso_code']] += $scores['description_'.$description['iso_code']];
                 }
@@ -584,10 +582,8 @@ class StatsCheckUp extends Module
             $totals['orders'] += (int)$scores['orders'];
             $descriptions = $this->getDescriptions('service', $row['id_object']);
             foreach ($descriptions as $description) {
-                if (isset($description['iso_code']) && isset($description['description_short'])) {
-                    $row['desclength_'.$description['iso_code']] = Tools::strlen(strip_tags($description['description_short']));
-                }
                 if (isset($description['iso_code'])) {
+                    $row['desclength_'.$description['iso_code']] = isset($description['description_short']) ? Tools::strlen(strip_tags($description['description_short'])) : 0;
                     $scores['description_'.$description['iso_code']] = ($row['desclength_'.$description['iso_code']] < $confCheckup['DESCRIPTIONS_SHORT_LT'] ? 0 : ($row['desclength_'.$description['iso_code']] > $confCheckup['DESCRIPTIONS_SHORT_GT'] ? 2 : 1));
                     $totals['description_'.$description['iso_code']] += $scores['description_'.$description['iso_code']];
                 }

@@ -95,6 +95,7 @@
 																				{$data_v['name']}
 																			</a>
 																		</p>
+																		{hook h='displayOrderConfirmationRoomTypeNameAfter' id_product=$data_v['id_product']}
 																	</div>
 																</div>
 
@@ -126,6 +127,7 @@
 																			<dt class="col-xs-5">{l s='Guests'}</dt>
 																			<dd class="col-xs-7">
 																				{$rm_v.adults|string_format:'%02d'} {if $rm_v.adults > 1}{l s='Adults'}{else}{l s='Adult'}{/if}{if $rm_v.children}, {$rm_v.children|string_format:'%02d'} {if $rm_v.children > 1}{l s='Children'}{else}{l s='Child'}{/if}{/if}
+																				{hook h='displayOrderConfirmationOccupancyAfter' data=$data_v room=$rm_v}
 																			</dd>
 																		</div>
 																	</div>
@@ -160,36 +162,26 @@
 																				{/if}
 																				{if isset($rm_v['additional_services']) && $rm_v['additional_services']}
 																					{capture name='htl_order_price_tooltip'}
-																					<div class="htl-tooltip-cont">
-																						<div class="htl-tooltip-row">
-																							<div>
-																								<p>{l s='%s cost' sprintf=$data_v['selling_object_plural_name']} : </p>
-																							</div>
-																							<div class="text-right">
-																								<p>
-																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['additional_services_price_auto_add_ti']) currency=$objOrderCurrency}
-																									{else}
-																										{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['additional_services_price_auto_add_te']) currency=$objOrderCurrency}
-																									{/if}
-																								</p>
-																							</div>
-																						</div>
-																						<div class="htl-tooltip-row">
-																							<div><p>{l s='Service cost'} : </p></div>
-																							<div class="text-right">
-																								<p>
-																									{if $group_use_tax}
-																										{displayWtPriceWithCurrency price=($rm_v['additional_services_price_ti']) currency=$objOrderCurrency}
-																									{else}
-																										{displayWtPriceWithCurrency price=($rm_v['additional_services_price_te']) currency=$objOrderCurrency}
-																									{/if}
-																								</p>
-																							</div>
-																						</div>
+																					<div class="ui-tooltip-body">
+																						<div class="ui-tooltip-label">{l s='%s cost' sprintf=$data_v['selling_object_plural_name']} : </div>
+																						<span class="ui-tooltip-elem-txt">
+																							{if $group_use_tax}
+																								{displayWtPriceWithCurrency price=($rm_v['amount_tax_incl'] + $rm_v['additional_services_price_auto_add_ti']) currency=$objOrderCurrency}
+																							{else}
+																								{displayWtPriceWithCurrency price=($rm_v['amount_tax_excl'] + $rm_v['additional_services_price_auto_add_te']) currency=$objOrderCurrency}
+																							{/if}
+																						</span>
+																						<div class="ui-tooltip-label">{l s='Service cost'} : </div>
+																						<span class="ui-tooltip-elem-txt">
+																							{if $group_use_tax}
+																								{displayWtPriceWithCurrency price=($rm_v['additional_services_price_ti']) currency=$objOrderCurrency}
+																							{else}
+																								{displayWtPriceWithCurrency price=($rm_v['additional_services_price_te']) currency=$objOrderCurrency}
+																							{/if}
+																						</span>
 																					</div>
 																					{/capture}
-																					{include file='_partials/htl-tooltip.tpl' tooltip_content=$smarty.capture.htl_order_price_tooltip allow_html=true}
+																					{include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.htl_order_price_tooltip allow_html=true}
 																				{/if}
 																			</dd>
 																		</div>

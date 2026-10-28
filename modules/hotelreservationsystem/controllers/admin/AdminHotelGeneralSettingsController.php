@@ -124,24 +124,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
             'generalsetting' => array(
                 'title' => $this->l('Website Configuration'),
                 'fields' => array(
-                    'WK_HTL_CHAIN_NAME' => array(
-                        'title' => $this->l('Property Brand Name'),
-                        'type' => 'textLang',
-                        'lang' => true,
-                        'required' => true,
-                        'validation' => 'isGenericName',
-                        'hint' => $this->l('Enter Property name in case of single property or enter your properties chain name in case of multiple properties.'),
-                    ),
-                    'WK_HTL_SHORT_DESC' => array(
-                        'title' => $this->l('Property Short Description'),
-                        'type' => 'textareaLang',
-                        'lang' => true,
-                        'required' => true,
-                        'rows' => '4',
-                        'cols' => '2',
-                        'validation' => 'isGenericName',
-                        'hint' => $this->l('This will display property short description in footer. Note: number of letters must be less than 220.'),
-                    ),
                     'WK_PRIMARY_HOTEL' => array(
                         'title' => $this->l('Primary property'),
                         'hint' => $this->l('Primary property is used to default address for your business. The property address will be considered as your registered business address.'),
@@ -149,14 +131,8 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'identifier' => 'id',
                         'list' => $hotelsInfo,
                     ),
-                    'WK_HTL_ESTABLISHMENT_YEAR' => array(
-                        'title' => $this->l('Website Launch Year'),
-                        'hint' => $this->l('The year when your hotel site was launched.'),
-                        'type' => 'text',
-                        'class' => 'fixed-width-xxl',
-                    ),
                      'WK_DISPLAY_PROPERTIES_LINK_IN_HEADER' => array(
-                        'title' => $this->l('Display Our Properties link in Header'),
+                        'title' => $this->l('Display Properties link in Header'),
                         'cast' => 'intval',
                         'type' => 'bool',
                         'default' => '0',
@@ -170,7 +146,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('Display Our Properties link in header in the front office'),
+                        'hint' => $this->l('Display Properties link in header in the front office'),
                     ),
                     'WK_DISPLAY_CONTACT_PAGE_HOTEL_LIST' => array(
                         'title' => $this->l('Display Contact Page Hotel List'),
@@ -188,6 +164,33 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                             ),
                         ),
                         'hint' => $this->l('Enable to display hotels list on the contact us page.'),
+                    ),
+                    'WK_MAX_AMENITIES_ROOM_SEARCH' => array(
+                        'title' => $this->l('Maximum featured amenities in room search'),
+                        'hint' => $this->l('Maximum number of featured amenities to display for each room type on the front office room search page.'),
+                        'desc' => $this->l('Set to 0 to display all featured amenities.'),
+                        'type' => 'text',
+                        'cast' => 'intval',
+                        'class' => 'fixed-width-xl',
+                        'default' => '0',
+                    ),
+                    'WK_MAX_FEATURES_ROOM_SEARCH' => array(
+                        'title' => $this->l('Maximum featured features in room search'),
+                        'hint' => $this->l('Maximum number of featured features to display for each room type on the front office room search page.'),
+                        'desc' => $this->l('Set to 0 to display all featured features.'),
+                        'type' => 'text',
+                        'cast' => 'intval',
+                        'class' => 'fixed-width-xl',
+                        'default' => '0',
+                    ),
+                    'WK_MAX_ROOM_TYPE_FEATURE_VALUES' => array(
+                        'title' => $this->l('Maximum room type feature values per featured feature'),
+                        'hint' => $this->l('Maximum number of room type feature values to display for each featured feature on the front office room search and order pages. For example, if the featured feature Bed Type has the values Single, Double and Queen and this is set to 2, only "Single, Double" is displayed.'),
+                        'desc' => $this->l('Set to 0 to display all values of each featured feature.'),
+                        'type' => 'text',
+                        'cast' => 'intval',
+                        'class' => 'fixed-width-xl',
+                        'default' => '0',
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save')),
@@ -231,6 +234,12 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'validation' => 'isEmail',
                         'required' => true,
                         'type' => 'text'
+                    ),
+                    'WK_HTL_ESTABLISHMENT_YEAR' => array(
+                        'title' => $this->l('Website Launch Year'),
+                        'hint' => $this->l('The year when your hotel site was launched.'),
+                        'type' => 'text',
+                        'class' => 'fixed-width-xxl',
                     ),
                     'PS_SHOP_PHONE' => array(
                         'title' => $this->l('Phone'),
@@ -423,7 +432,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                         'hint' => $this->l('If yes, only active hotels will be displayed on map.'),
                     ),
                     'WK_DISPLAY_PROPERTIES_PAGE_GOOGLE_MAP' => array(
-                        'title' => $this->l('Display Our Properties page Google map'),
+                        'title' => $this->l('Display Properties page Google map'),
                         'cast' => 'intval',
                         'type' => 'bool',
                         'default' => '0',
@@ -437,7 +446,7 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                                 'value' => 0,
                             ),
                         ),
-                        'hint' => $this->l('Enable to display map with hotels locations on the our properties page.'),
+                        'hint' => $this->l('Enable to display map with hotels locations on the properties page.'),
                     ),
                     'WK_DISPLAY_CONTACT_PAGE_GOOLGE_MAP' => array(
                         'title' => $this->l('Display Contact Us page Google map'),
@@ -540,35 +549,21 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 $this->errors[] = $this->l('Property name search threshold field is invalid.');
             }
 
-            if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Property chain name is required at least in ').$objDefaultLanguage['name'];
-            } else {
-                foreach ($languages as $lang) {
-                    if (trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
-                        if (!Validate::isGenericName(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid property chain name in ').$lang['name'];
-                        }
-                    }
-                }
-            }
-            if (!trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$defaultLangId))) {
-                $this->errors[] = $this->l('Property short description is required at least in ').
-                $objDefaultLanguage['name'];
-            } else {
-                foreach ($languages as $lang) {
-                    if (trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
-                        if (!Validate::isGenericName(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
-                            $this->errors[] = $this->l('Invalid property short description in ').$lang['name'];
-                        }
-                    }
-                }
-            }
             if (!Validate::isUnsignedInt(Tools::getValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT'))) {
                 $this->errors[] = $this->l('Invalid minimum partial payment percentage.');
             } elseif (Tools::getValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT') <= 0) {
                 $this->errors[] = $this->l('Minimum partial payment percentage should be more than 0.');
             } elseif (Tools::getValue('WK_ADVANCED_PAYMENT_GLOBAL_MIN_AMOUNT') > 100) {
                 $this->errors[] = $this->l('Minimum partial payment percentage should not be more than 100.');
+            }
+            if (!Validate::isUnsignedInt(Tools::getValue('WK_MAX_AMENITIES_ROOM_SEARCH'))) {
+                $this->errors[] = $this->l('Maximum featured amenities in room search is invalid. Enter 0 or a positive number.');
+            }
+            if (!Validate::isUnsignedInt(Tools::getValue('WK_MAX_FEATURES_ROOM_SEARCH'))) {
+                $this->errors[] = $this->l('Maximum featured features in room search is invalid. Enter 0 or a positive number.');
+            }
+            if (!Validate::isUnsignedInt(Tools::getValue('WK_MAX_ROOM_TYPE_FEATURE_VALUES'))) {
+                $this->errors[] = $this->l('Maximum room type feature values per featured feature is invalid. Enter 0 or a positive number.');
             }
             if (Tools::getValue('WK_GOOGLE_ACTIVE_MAP')) {
                 if (!Tools::getValue('PS_API_KEY')) {
@@ -602,20 +597,6 @@ class AdminHotelGeneralSettingsController extends ModuleAdminController
                 if ($hotelsInfo = $objHotelInfo->hotelBranchesInfo(false, 1)) {
                     if (count($hotelsInfo) > 1) {
                         $_POST['WK_HOTEL_NAME_ENABLE'] = 1;
-                    }
-                }
-                foreach ($languages as $lang) {
-                    // if lang fileds are at least in default language and not available in other languages then
-                    // set empty fields value to default language value
-                    if (!trim(Tools::getValue('WK_HTL_CHAIN_NAME_'.$lang['id_lang']))) {
-                        $_POST['WK_HTL_CHAIN_NAME_'.$lang['id_lang']] = trim(
-                            Tools::getValue('WK_HTL_CHAIN_NAME_'.$defaultLangId)
-                        );
-                    }
-                    if (!trim(Tools::getValue('WK_HTL_SHORT_DESC_'.$lang['id_lang']))) {
-                        $_POST['WK_HTL_SHORT_DESC_'.$lang['id_lang']] = trim(
-                            Tools::getValue('WK_HTL_SHORT_DESC_'.$defaultLangId)
-                        );
                     }
                 }
                 parent::postProcess();

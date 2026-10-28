@@ -171,26 +171,63 @@
                 <table class="bordered-table" width="100%" cellpadding="5" cellspacing="0">
                     <tbody>
                         <tr>
-                            <th colspan="3" class="header-left small">{l s='SERVICES DETAILS' pdf='true'}</th>
+                            <th colspan="5" class="header-left small">{l s='SERVICES DETAILS' pdf='true'}</th>
                         </tr>
                         <tr>
-                            <th class="header-left small" width="35%">{l s='Room Type' pdf='true'}</th>
-                            <th class="header-left small" width="45%">{l s='Service Name' pdf='true'}</th>
-                            <th class="header-left small" width="20%">{l s='Qty' pdf='true'}</th>
+                            <th class="header-left small" width="25%">{l s='Room Type' pdf='true'}</th>
+                            <th class="header-left small" width="25%">{l s='Service Name' pdf='true'}</th>
+                            <th class="header-left small" width="20%">{l s='Unit Price (tax excl.)' pdf='true'}</th>
+                            <th class="header-left small" width="10%">{l s='Qty' pdf='true'}</th>
+                            <th class="header-left small" width="20%">{l s='Total (tax excl.)' pdf='true'}</th>
                         </tr>
                         {foreach from=$service_groups item=group}
                             {foreach from=$group.services item=service name=service_loop}
                                 <tr>
                                     {if $smarty.foreach.service_loop.first}
-                                        <td class="small white" width="35%" rowspan="{$group.services|@count}">{$group.room_type_name|escape:'html':'UTF-8'}<br />
+                                        <td class="small white" width="25%" rowspan="{$group.services|@count}">{$group.room_type_name|escape:'html':'UTF-8'}<br />
                                             {$group.check_in_date|escape:'html':'UTF-8'} - {$group.check_out_date|escape:'html':'UTF-8'}<br />
                                             {l s='Room' pdf='true'} - {$group.room_count|intval}
                                         </td>
                                     {/if}
-                                    <td class="small white" width="45%">{$service.name|escape:'html':'UTF-8'}</td>
-                                    <td class="small white" width="20%">{$service.quantity|intval}</td>
+                                    <td class="small white" width="25%">{$service.name|escape:'html':'UTF-8'}</td>
+                                    <td class="small white" width="20%">{displayPrice currency=$order->id_currency price=$service.unit_price_tax_excl}</td>
+                                    <td class="small white" width="10%">{if $service.allow_multiple_quantity}{$service.quantity|intval}{else}--{/if}</td>
+                                    <td class="small white" width="20%">{displayPrice currency=$order->id_currency price=$service.total_price_tax_excl}</td>
                                 </tr>
                             {/foreach}
+                        {/foreach}
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    {/if}
+
+    {if $hotel_products}
+        <tr>
+            <td colspan="12" height="12">&nbsp;</td>
+        </tr>
+        <tr>
+            <td colspan="12">
+                <table class="bordered-table" width="100%" cellpadding="5" cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <th colspan="5" class="header-left small">{l s='PRODUCTS DETAILS' pdf='true'}</th>
+                        </tr>
+                        <tr>
+                            <th class="header-left small" width="40%">{l s='Product Name' pdf='true'}</th>
+                            <th class="header-left small" width="12%">{l s='Tax' pdf='true'}</th>
+                            <th class="header-left small" width="18%">{l s='Unit Price (tax excl.)' pdf='true'}</th>
+                            <th class="header-left small" width="10%">{l s='Qty' pdf='true'}</th>
+                            <th class="header-left small" width="20%">{l s='Total (tax excl.)' pdf='true'}</th>
+                        </tr>
+                        {foreach from=$hotel_products item=product}
+                            <tr>
+                                <td class="small white" width="40%">{$product.name|escape:'html':'UTF-8'}{if $product.hotel_name}<br />{$product.hotel_name|escape:'html':'UTF-8'}{/if}</td>
+                                <td class="small white" width="12%">{$product.tax_label nofilter}</td>
+                                <td class="small white" width="18%">{displayPrice currency=$order->id_currency price=$product.unit_price_tax_excl}</td>
+                                <td class="small white" width="10%">{$product.quantity|intval}</td>
+                                <td class="small white" width="20%">{displayPrice currency=$order->id_currency price=$product.total_price_tax_excl}</td>
+                            </tr>
                         {/foreach}
                     </tbody>
                 </table>

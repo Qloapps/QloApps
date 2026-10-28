@@ -560,6 +560,7 @@ class GuestTrackingControllerCore extends FrontController
             'refund_allowed' => false,
             'invoiceAllowed' => (int)Configuration::get('PS_INVOICE'),
             'is_guest' => true,
+            'has_room_booking' => (bool) HotelBookingDetail::getIdHotelByIdOrder((int) $order->id, false),
             'group_use_tax' => (Group::getPriceDisplayMethod($customer->id_default_group) == PS_TAX_INC),
             'CUSTOMIZE_FILE' => Product::CUSTOMIZE_FILE,
             'CUSTOMIZE_TEXTFIELD' => Product::CUSTOMIZE_TEXTFIELD,
@@ -590,7 +591,6 @@ class GuestTrackingControllerCore extends FrontController
             ));
 
             $this->addJqueryPlugin(array('fancybox', 'scrollTo', 'footable', 'footable-sort'));
-            $this->addJqueryUI(array('ui.tooltip'), 'base', true);
 
             // load Google Maps library if configured
             if (!count($this->errors)) {

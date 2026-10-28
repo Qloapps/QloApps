@@ -446,11 +446,11 @@ class AdminModulesPositionsControllerCore extends AdminController
             $file_list = ($file_list) ? array($file_list) : array();
         }
 
-        $content = '<p><input type="text" name="exceptions['.$shop_id.']" value="'.implode(', ', $file_list).'" id="em_text_'.$shop_id.'" placeholder="'.$this->l('E.g. address, addresses, attachment').'"/></p>';
+        $content = '<p><input type="text" name="exceptions['.(int) $shop_id.']" value="'.Tools::safeOutput(implode(', ', $file_list)).'" id="em_text_'.(int) $shop_id.'" placeholder="'.$this->l('E.g. address, addresses, attachment').'"/></p>';
 
         if ($shop_id) {
             $shop = new Shop($shop_id);
-            $content .= ' ('.$shop->name.')';
+            $content .= ' ('.Tools::safeOutput($shop->name).')';
         }
 
         $content .= '<p>
@@ -463,14 +463,14 @@ class AdminModulesPositionsControllerCore extends AdminController
 
         foreach ($file_list as $k => $v) {
             if (! array_key_exists($v, $controllers)) {
-                $content .= '<option value="'.$v.'">'.$v.'</option>';
+                $content .= '<option value="'.Tools::safeOutput($v).'">'.Tools::safeOutput($v).'</option>';
             }
         }
 
         $content .= '<option disabled="disabled">'.$this->l('____________ CORE ____________').'</option>';
 
         foreach ($controllers as $k => $v) {
-            $content .= '<option value="'.$k.'">'.$k.'</option>';
+            $content .= '<option value="'.Tools::safeOutput($k).'">'.Tools::safeOutput($k).'</option>';
         }
 
         $modules_controllers_type = array('admin' => $this->l('Admin modules controller'), 'front' => $this->l('Front modules controller'));
@@ -479,7 +479,7 @@ class AdminModulesPositionsControllerCore extends AdminController
             $all_modules_controllers = Dispatcher::getModuleControllers($type);
             foreach ($all_modules_controllers as $module => $modules_controllers) {
                 foreach ($modules_controllers as $cont) {
-                    $content .= '<option value="module-'.$module.'-'.$cont.'">module-'.$module.'-'.$cont.'</option>';
+                    $content .= '<option value="module-'.Tools::safeOutput($module.'-'.$cont).'">module-'.Tools::safeOutput($module.'-'.$cont).'</option>';
                 }
             }
         }

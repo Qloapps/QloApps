@@ -22,11 +22,6 @@
 *  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 *}
-<style>
-.ui-tooltip.price_info-tooltip { border: unset; padding: 10px; box-shadow: 0px 0px 15px 0px #00000026; }
-.ui-tooltip.price_info-tooltip span { margin-left: 15px; }
-.ui-tooltip.price_info-tooltip label { font-weight: 600; }
-</style>
 <script type="text/javascript">
 	{if isset($cart->id) && $cart->id}
 		var id_cart = {$cart->id|intval};
@@ -52,6 +47,7 @@
 	var currency_sign = '';
 	var currency_blank = false;
 	var priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval};
+	var current_order_total = {$order_total|floatval};
 
 	$(document).ready(function() {
 		$(document).on('change', '#add_new_room_services_form select[name="price_calculation_type"]', function() {
@@ -62,31 +58,8 @@
 			}
 		});
 
-		$('.total_taxes_price_info img').tooltip({
-			content: function () {
-				return $(this).closest('.data-focus').find('.price_info_container').html();
-			},
-			items: 'img',
-			trigger: 'hover',
-			tooltipClass: 'price_info-tooltip',
-			open: function (event, ui) {
-				if (typeof(event.originalEvent) === 'undefined') {
-					return false;
-				}
-				var $id = $(ui.tooltip).attr('id');
-				if ($('div.ui-tooltip').not('#' + $id).length) {
-					return false;
-				}
-			},
-			close: function (event, ui) {
-				ui.tooltip.hover(function () {
-					$(this).stop(true).fadeTo(400, 1);
-				}, function () {
-					$(this).fadeOut('400', function () {
-						$(this).remove();
-					});
-				});
-			}
+		$(document).on('admin-theme.js.ready', function () {
+			initUITooltip();
 		});
 
 		$('#customer').typeWatch({
@@ -746,6 +719,10 @@
 				updateCartLine(response.curr_booking_info, cart_row);
 				updateCartSummaryData(response.cart_info);
 				updateCartVouchers(response.cart_info.summary.discounts);
+				var $totalTaxesTrigger = $('#total_taxes').closest('.data-focus').find('.ui-tooltip-trigger');
+				initUITooltip($totalTaxesTrigger, function() {
+					return $totalTaxesTrigger.next('.tooltip-content').html();
+				});
 			}
 		});
 	}
@@ -810,9 +787,8 @@
 		$('#total_taxes_tourism').html(formatCurrency(totalTaxesTourismAmt, currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
-		if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-			$('#payment_amount').val(jsonSummary.summary.total_price);
-		}
+		current_order_total = parseFloat(jsonSummary.summary.total_price);
+		$('#payment_amount').val(jsonSummary.summary.total_price);
 		$('#full_payment_amount_value').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
 		if (jsonSummary.summary.is_advance_payment_active) {
@@ -1350,9 +1326,8 @@
 		}
 		$('#order_message').val(jsonSummary.order_message);
 		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
-		if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-			$('#payment_amount').val(jsonSummary.summary.total_price);
-		}
+		current_order_total = parseFloat(jsonSummary.summary.total_price);
+		$('#payment_amount').val(jsonSummary.summary.total_price);
 		$('#full_payment_amount_value').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
 		if (jsonSummary.summary.is_advance_payment_active) {
@@ -1462,7 +1437,7 @@
 			{
 				$("#customer_cart_details").empty();
 				$("#customer_cart_details").append(res.cart_detail_html);
-				initTooltip();
+				initUITooltip();
 
 				displaySummary(res);
 			}
@@ -1667,7 +1642,7 @@
 				},
                 complete: function() {
                     $(".loading_overlay").hide();
-					initTooltip();
+					initUITooltip();
                 }
 			});
 		});
@@ -1699,12 +1674,12 @@
 
 		$(document).on('change', 'input[name="is_full_payment"]', function() {
 			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-				$('#payment_amount').val({$order_total|floatval}).attr('disabled', true);
+				$('#payment_amount').val(current_order_total).attr('disabled', true);
 				$('#payment_amount').closest('.form-group').hide(200);
 
 				$('#payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
 			} else {
-				$('#payment_amount').val({$order_total|floatval}).attr('disabled', false);
+				$('#payment_amount').val(current_order_total).attr('disabled', false);
 				$('#payment_amount').closest('.form-group').show(200);
 
 				managePaymentOptions();
@@ -1803,7 +1778,7 @@
 				},
 				complete: function() {
 					$(".loading_overlay").hide();
-					initTooltip();
+					initUITooltip();
 				}
 			});
 		});
@@ -1854,7 +1829,7 @@
                 },
                 complete: function() {
                     $(".loading_overlay").hide();
-					initTooltip();
+					initUITooltip();
                 }
             });
         });
@@ -2308,20 +2283,22 @@
 					</div>
 					<div class="col-lg-2">
 						<div class="data-focus">
-							<span>{l s='Total taxes'}
-								<span class="price_info total_taxes_price_info">&nbsp;<img src="{$info_icon_path|escape:'htmlall':'UTF-8'}" /></span>
-							</span><br/>
+							<span>{l s='Total taxes'}</span>
+							{capture name='total_taxes_tooltip_content'}
+								<div class="ui-tooltip-body">
+									<div class="ui-tooltip-service-tax-row">
+										<label class="ui-tooltip-label">{l s='Room & Service Tax:'}</label>
+										<span class="ui-tooltip-elem-txt" id="total_taxes_vat"></span>
+									</div>
+									<div class="ui-tooltip-tourism-tax-row">
+										<label class="ui-tooltip-label">{l s='Tourism Tax:'}</label>
+										<span class="ui-tooltip-elem-txt" id="total_taxes_tourism"></span>
+									</div>
+								</div>
+							{/capture}
+							{include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.total_taxes_tooltip_content}
+							<br/>
 							<span id="total_taxes" class="size_l"></span>
-							<div class="price_info_container" style="display: none;">
-								<div>
-									<label>{l s='Room & Service Tax:'}</label>
-									<span class="pull-right" id="total_taxes_vat"></span>
-								</div>
-								<div>
-									<label>{l s='Tourism Tax:'}</label>
-									<span class="pull-right" id="total_taxes_tourism"></span>
-								</div>
-							</div>
 						</div>
 					</div>
                     <div class="col-lg-2">
@@ -2339,6 +2316,7 @@
                 </div>
             </div>
 
+            {hook h="displayAdminOrderMessageBefore"}
             <div class="row">
                 <div class="order_message_right col-lg-12">
                     <div class="form-group">
@@ -2464,12 +2442,14 @@
                             <p class="help-block">{l s='Select or type the payment method using which payment for booking will be made.'}</p>
                         </div>
                     </div>
+                    {hook h="displayAdminOrderPaymentSelectionAfter"}
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
                         <label class="control-label col-lg-3">{l s='Transaction ID'}</label>
                         <div class="col-lg-9">
                             <input type="text" class="fixed-width-xxl" name="payment_transaction_id" id="payment_transaction_id" value="{if isset($smarty.post.payment_transaction_id)}{$smarty.post.payment_transaction_id}{/if}" />
                         </div>
                     </div>
+                    {hook h="displayAdminOrderFormFieldsAfter"}
                     <div class="form-group">
                         <div class="col-lg-9 col-lg-offset-3">
                             <button type="submit" name="submitAddOrder" class="btn btn-default" />

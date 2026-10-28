@@ -1073,6 +1073,7 @@ class CartCore extends ObjectModel
             unset(self::$_totalWeight[$this->id]);
         }
 
+        $isCatalogMode = (Configuration::get('PS_CATALOG_MODE') && !defined('_PS_ADMIN_DIR_'));
         Hook::exec('actionBeforeCartUpdateQty', array(
             'cart' => $this,
             'product' => $product,
@@ -1083,11 +1084,12 @@ class CartCore extends ObjectModel
             'id_address_delivery' => $id_address_delivery,
             'shop' => $shop,
             'auto_add_cart_rule' => $auto_add_cart_rule,
+            'enable_catalog_mode' => &$isCatalogMode
         ));
 
         if ((int)$quantity <= 0) {
             return $this->deleteProduct($id_product, $id_product_attribute, (int)$id_customization, 0, $auto_add_cart_rule);
-        } elseif (Configuration::get('PS_CATALOG_MODE') && !defined('_PS_ADMIN_DIR_')) {
+        } elseif ($isCatalogMode) {
             return false;
         } else {
             /* Check if the product is already in the cart */
@@ -2732,7 +2734,6 @@ class CartCore extends ObjectModel
         }
 
         $final_package_list = $hotelWisePackageList;
-     ///   ddd($final_package_list);
         // END $package_list hotel wise
         $cache[$cache_key] = $final_package_list;
         return $final_package_list;

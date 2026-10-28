@@ -40,7 +40,6 @@ class ProductControllerCore extends FrontController
         if (count($this->errors)) {
             return;
         }
-        $this->addJqueryUI(array('ui.tooltip'), 'base', true);
 
         if (!$this->useMobileTheme()) {
             $this->addCSS(_THEME_CSS_DIR_.'product.css');
@@ -412,6 +411,23 @@ class ProductControllerCore extends FrontController
                     $roomAmenities = HotelRoomTypeAmenities::getAmenities($this->product->id, $this->context->language->id);
                     $hotelAmenities = HotelBranchAmenities::getAmenities($hotel_id, $this->context->language->id);
 
+                    // featured amenities: room type level first, then hotel level, without duplicates
+                    $featuredAmenities = array();
+                    $featuredAmenitiesList = array_merge(
+                        HotelRoomTypeAmenities::getAmenities($this->product->id, $this->context->language->id, true),
+                        HotelBranchAmenities::getAmenities($hotel_id, $this->context->language->id, true)
+                    );
+                    
+                    $featuredAmenities = array_values(array_column(
+                        array_reverse($featuredAmenitiesList),
+                        null,
+                        'id'
+                    ));
+
+                    usort($featuredAmenities, function ($a, $b) {
+                        return strcmp($a['name'], $b['name']);
+                    });
+
                     $this->context->smarty->assign(
                         array(
                             'id_hotel' => $hotel_id,
@@ -441,6 +457,7 @@ class ProductControllerCore extends FrontController
                             'room_type_features' => $roomFeatures,
                             'room_dynamic_amenities' => $roomAmenities,
                             'hotel_dynamic_amenities' => $hotelAmenities,
+                            'featured_amenities' => $featuredAmenities,
                             'amenity_img_dir' => _MODULE_DIR_.'hotelreservationsystem/views/img/hotel_amenities/',
                             'hotel_image_link' => $hotelImageLink,
                             'hotel_has_images' => (bool) HotelImage::getCover($hotel_id),

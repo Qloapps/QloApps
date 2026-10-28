@@ -46,6 +46,7 @@
                             <th>{l s='Total Price (tax excl.)'}</th>
                             <th>{l s='Total Price (tax incl.)'}</th>
                             <th class="text-right">{l s='Action'}</th>
+                            {hook h="displayAdminOrderSelectedServicesHeading"}
                         </tr>
                     </thead>
                     <tbody>
@@ -57,9 +58,11 @@
                                             {$service['name']|escape:'html':'UTF-8'}
                                             {capture name='room_type_service_tooltip_content'}
                                             {assign var="priceCalcMethod" value=$service['price_calculation_method']|default:0}
-                                            <div class="tooltip-cont">
-                                                <div class="tooltip-popup-row"><label>{l s='Applied on:'}</label></div>
-                                                <ul class="tooltip-days">
+                                            <div class="ui-tooltip-header">
+                                                <div class="ui-tooltip-label">{l s='Applied on:'}</div>
+                                            </div>
+                                            <div class="ui-tooltip-body">
+                                                <ul>
                                                     {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
                                                         <li>{$pcmDayLabel}</li>
                                                     {/foreach}
@@ -67,7 +70,7 @@
                                             </div>
                                             {/capture}
 
-                                            {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_tooltip_content allow_html=true}
+                                            {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_tooltip_content allow_html=true}
                                         </div>
                                         </div>
                                         <input value="{$service['id_service_product_order_detail']|escape:'html':'UTF-8'}" name="id_service_product_order_detail[]" type="hidden"/>
@@ -103,6 +106,7 @@
                                     <td>{displayPrice price=$service['total_price_tax_excl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
                                     <td>{displayPrice price=$service['total_price_tax_incl']|escape:'html':'UTF-8' currency=$orderCurrency}</td>
                                     <td class="text-right"><a class="btn btn-danger pull-right del_room_additional_service" data-id_service_product_order_detail="{$service['id_service_product_order_detail']}" href="#"><i class="icon-trash"></i></a></td>
+                                    {hook h="displayAdminOrderSelectedServicesData" id_service_product=$service['id_product'] id_htl_booking_detail=$id_booking_detail id_service_product_order_detail=$service['id_service_product_order_detail'] room_type_id_product=$additionalServices['room_type_id_product']}
                                 </tr>
                             {/foreach}
                         {else}
@@ -133,6 +137,7 @@
 								<th class="fixed-width-sm"> </th>
 								<th class="fixed-width-sm text-center">{l s='Quantity'}</th>
 								<th>{l s='Unit Price (tax excl.)'}</th>
+								{hook h="displayAdminOrderAvailableServicesHeading"}
 							</tr>
 						</thead>
 						<tbody>
@@ -145,16 +150,18 @@
 										{$product['name']|escape:'html':'UTF-8'}
                                         {capture name='adm_pcm_tooltip_content'}
                                             {assign var="priceCalcMethod" value=$product['price_calculation_method']|default:0}
-                                            <div class="tooltip-cont">
-                                                <div class="tooltip-popup-row"><label>{l s='Applied on:'}</label></div>
-                                                <ul class="tooltip-days">
+                                            <div class="ui-tooltip-header">
+                                                <div class="ui-tooltip-label">{l s='Applied on:'}</div>
+                                            </div>
+                                            <div class="ui-tooltip-body">
+                                                <ul>
                                                     {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
                                                         <li>{$pcmDayLabel}</li>
                                                     {/foreach}
                                                 </ul>
                                             </div>
                                         {/capture}
-                                        {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.adm_pcm_tooltip_content allow_html=true}
+                                        {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.adm_pcm_tooltip_content allow_html=true}
                                     </td>
 									<td class="text-center">
 										{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
@@ -179,6 +186,7 @@
 											<input type="text" class="form-control unit_price" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]" value="{$product['price_tax_exc']}" data-id-product="{$product.id_product}">
 										</div>
 									</td>
+									{hook h="displayAdminOrderAvailableServicesData" id_service_product=$product['id_product'] id_htl_booking_detail=$id_booking_detail}
 								</tr>
 							{/foreach}
 						</tbody>
@@ -309,6 +317,7 @@
 					<th>{l s='Unit Price (tax excl.)'}</th>
 					<th>{l s='Total Price (tax excl.)'}</th>
 					<th>{l s='Total Price (tax incl.)'}</th>
+					{hook h="displayAdminOrderViewServicesHeading"}
 				</tr>
 			</thead>
 			</tbody>
@@ -321,16 +330,18 @@
                             {$service['name']|escape:'html':'UTF-8'}
                                 {capture name='room_type_service_pcm_tooltip_content'}
                                     {assign var="priceCalcMethod" value=$service['price_calculation_method']|default:0}
-                                    <div class="tooltip-cont">
-                                        <div class="tooltip-popup-row"><label>{l s='Applied on:'}</label></div>
-                                        <ul class="tooltip-days">
+                                    <div class="ui-tooltip-header">
+                                        <div class="ui-tooltip-label">{l s='Applied on:'}</div>
+                                    </div>
+                                    <div class="ui-tooltip-body">
+                                        <ul>
                                             {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
                                                 <li>{$pcmDayLabel}</li>
                                             {/foreach}
                                         </ul>
                                     </div>
                                 {/capture}
-                            {include file='helpers/tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_pcm_tooltip_content allow_html=true}                        </td>
+                            {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_pcm_tooltip_content allow_html=true}                        </td>
 						<td>
 							{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}
 								<span class="badge badge-info label">{l s='Convenience fee'}</span>
@@ -355,6 +366,7 @@
                         <td>
 							{displayPrice price=$service['total_price_tax_incl'] currency=$orderCurrency}
 						</td>
+						{hook h="displayAdminOrderViewServicesData" id_service_product=$service['id_product'] id_htl_booking_detail=$id_booking_detail id_service_product_order_detail=$service['id_service_product_order_detail'] room_type_id_product=$additionalServices['room_type_id_product']}
 					</tr>
 				{/foreach}
 			</tbody>

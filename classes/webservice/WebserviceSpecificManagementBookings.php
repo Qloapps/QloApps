@@ -998,8 +998,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                             $objOrder = new Order($idOrder);
                             foreach ($roomsToUpdate as $roomInfo) {
                                 $objHotelBookingDetail = new HotelBookingDetail((int) $roomInfo['id']);
-                                $taxMultiplier = $objHotelBookingDetail->total_price_tax_incl / $objHotelBookingDetail->total_price_tax_excl;
-                                $roomNewPrice = ($objHotelBookingDetail->total_price_tax_incl / $roomsTotal) * $requestedPrice;
+                                $taxMultiplier = $objHotelBookingDetail->total_price_tax_excl > 0 ? $objHotelBookingDetail->total_price_tax_incl / $objHotelBookingDetail->total_price_tax_excl : 1;
+                                $roomNewPrice = $roomsTotal > 0 ? ($objHotelBookingDetail->total_price_tax_incl / $roomsTotal) * $requestedPrice : $requestedPrice / count($roomsToUpdate);
 
                                 $oldPriceTaxIncl = $objHotelBookingDetail->total_price_tax_incl;
                                 $oldPriceTaxExcl = $objHotelBookingDetail->total_price_tax_excl;
@@ -1177,8 +1177,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                     $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
                                     $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
 
-                                    $objOrderDetail->unit_price_tax_excl = Tools::ps_round(($objOrderDetail->total_price_tax_excl / $objOrderDetail->product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
-                                    $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
+                                    $objOrderDetail->unit_price_tax_excl = Tools::ps_round(($objOrderDetail->total_price_tax_excl / max(1, $objOrderDetail->product_quantity)), _PS_PRICE_COMPUTE_PRECISION_);
+                                    $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / max(1, $objOrderDetail->product_quantity)), _PS_PRICE_COMPUTE_PRECISION_);
 
                                     $objOrder->total_paid_tax_excl += $priceDiffTaxExcl;
                                     $objOrder->total_paid_tax_incl += $priceDiffTaxIncl;
@@ -1186,8 +1186,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                 } else if (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_price_without_tax'])) {
                                     $totalPriceTaxExcl = $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_price_without_tax'];
                                     $totalPriceTaxIncl = $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_price_without_tax'] * $oldTaxMultiplier;
-                                    $unitPriceTaxExcl = $totalPriceTaxExcl / $quantity;
-                                    $unitPriceTaxIncl = $totalPriceTaxIncl / $quantity;
+                                    $unitPriceTaxExcl = $totalPriceTaxExcl / max(1, $quantity);
+                                    $unitPriceTaxIncl = $totalPriceTaxIncl / max(1, $quantity);
 
                                     $objServiceProductOrderDetail->unit_price_tax_excl = Tools::ps_round($unitPriceTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
                                     $objServiceProductOrderDetail->unit_price_tax_incl = Tools::ps_round($unitPriceTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
@@ -1200,8 +1200,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                     $objOrderDetail->total_price_tax_excl += $priceDiffTaxExcl;
                                     $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
 
-                                    $objOrderDetail->unit_price_tax_excl = Tools::ps_round(($objOrderDetail->total_price_tax_excl / $objOrderDetail->product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
-                                    $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
+                                    $objOrderDetail->unit_price_tax_excl = Tools::ps_round(($objOrderDetail->total_price_tax_excl / max(1, $objOrderDetail->product_quantity)), _PS_PRICE_COMPUTE_PRECISION_);
+                                    $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / max(1, $objOrderDetail->product_quantity)), _PS_PRICE_COMPUTE_PRECISION_);
 
                                     $objOrder->total_paid_tax_excl += $priceDiffTaxExcl;
                                     $objOrder->total_paid_tax_incl += $priceDiffTaxIncl;
@@ -1244,7 +1244,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                             }
 
                             $objOrderDetail->total_price_tax_incl += $priceDiffTaxIncl;
-                            $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
+                            $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / max(1, $objOrderDetail->product_quantity)), _PS_PRICE_COMPUTE_PRECISION_);
 
                             $objOrder->total_paid_tax_incl += $priceDiffTaxIncl;
                             $objOrder->total_paid += $priceDiffTaxIncl;
@@ -1774,7 +1774,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
         if (isset($service['unit_price_without_tax'])) {
             $price = $service['unit_price_without_tax'];
         } else if (isset($service['total_price_without_tax'])) {
-            $price = $service['total_price_without_tax'] / $quantity;
+            $price = $service['total_price_without_tax'] / max(1, $quantity);
         }
 
         $objProduct->booking_product = false;
@@ -2221,8 +2221,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                     $objBookingDetail->date_from,
                                     $objBookingDetail->date_to
                                 );
-                                $unitPriceTaxExcl = $totalPriceTaxExcl / ($numDays * $service['quantity']);
-                                $unitPriceTaxIncl = $totalPriceTaxIncl / ($numDays * $service['quantity']);
+                                $unitPriceTaxExcl = $totalPriceTaxExcl / max(1, $numDays * $service['quantity']);
+                                $unitPriceTaxIncl = $totalPriceTaxIncl / max(1, $numDays * $service['quantity']);
                                 if ($unitPriceTaxExcl > 0) {
                                     $taxMultiplier = $unitPriceTaxIncl / $unitPriceTaxExcl;
                                 } else {
@@ -2244,15 +2244,15 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                     }
 
                                     if ($totalPriceTaxExcl > 0) {
-                                        $unitPriceTaxExcl = $totalPriceTaxExcl / $quantity;
-                                        $unitPriceTaxIncl = $totalPriceTaxIncl / $quantity;
+                                        $unitPriceTaxExcl = $totalPriceTaxExcl / max(1, $quantity);
+                                        $unitPriceTaxIncl = $totalPriceTaxIncl / max(1, $quantity);
                                     }
                                 } else if (isset($this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_price_without_tax'])) {
                                     $totalPriceTaxExcl = $this->wsRequestedRoomTypes[$dateRoomJoinKey]['services'][$service['id_product']]['total_price_without_tax'];
                                     $totalPriceTaxIncl = $totalPriceTaxExcl * $taxMultiplier;
 
-                                    $unitPriceTaxExcl = $totalPriceTaxExcl / $quantity;
-                                    $unitPriceTaxIncl =  $totalPriceTaxIncl / $quantity;
+                                    $unitPriceTaxExcl = $totalPriceTaxExcl / max(1, $quantity);
+                                    $unitPriceTaxIncl =  $totalPriceTaxIncl / max(1, $quantity);
                                 }
 
                                 $objAddress = new Address((int) $objOrder->id_address_tax);
@@ -2283,8 +2283,8 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                 $objOrderDetail->total_price_tax_excl += Tools::ps_round($priceDiffTaxExcl, _PS_PRICE_COMPUTE_PRECISION_);
                                 $objOrderDetail->total_price_tax_incl += Tools::ps_round($priceDiffTaxIncl, _PS_PRICE_COMPUTE_PRECISION_);
 
-                                $objOrderDetail->unit_price_tax_excl = Tools::ps_round(($objOrderDetail->total_price_tax_excl / $objOrderDetail->product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
-                                $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / $objOrderDetail->product_quantity), _PS_PRICE_COMPUTE_PRECISION_);
+                                $objOrderDetail->unit_price_tax_excl = Tools::ps_round(($objOrderDetail->total_price_tax_excl / max(1, $objOrderDetail->product_quantity)), _PS_PRICE_COMPUTE_PRECISION_);
+                                $objOrderDetail->unit_price_tax_incl = Tools::ps_round(($objOrderDetail->total_price_tax_incl / max(1, $objOrderDetail->product_quantity)), _PS_PRICE_COMPUTE_PRECISION_);
                                 $objOrderDetail->save();
 
                                 $objServiceProductOrderDetail = new ServiceProductOrderDetail();
@@ -3155,7 +3155,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         $objHotelBookingDetail->date_from,
                         $objHotelBookingDetail->date_to,
                         $objCart->id
-                    )/ $numDays;
+                    )/ max(1, $numDays);
                     $unitPriceTaxIncl = Product::getServiceProductPrice(
                         (int) $product['id_product'],
                         0,
@@ -3166,7 +3166,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         $objHotelBookingDetail->date_from,
                         $objHotelBookingDetail->date_to,
                         $objCart->id
-                    )/ $numDays;
+                    )/ max(1, $numDays);
 
                     if ($unitPriceTaxIncl > 0) {
                         $oldTaxMultiplier = $unitPriceTaxExcl / $unitPriceTaxIncl;
@@ -3189,14 +3189,14 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                         $totalPriceTaxExcl = $services[$product['id_product']]['total_price_without_tax'];
                         $totalPriceTaxIncl = $totalPriceTaxExcl * $oldTaxMultiplier;
 
-                        $unitPriceTaxExcl = $totalPriceTaxExcl / $quantity;
-                        $unitPriceTaxIncl =  $totalPriceTaxIncl / $quantity;
+                        $unitPriceTaxExcl = $totalPriceTaxExcl / max(1, $quantity);
+                        $unitPriceTaxIncl =  $totalPriceTaxIncl / max(1, $quantity);
                     }
 
                     if (!empty($services[$product['id_product']]['total_tax'])) {
                         $totalPriceTaxIncl = $totalPriceTaxExcl + $services[$product['id_product']]['total_tax'];
                         $totalPriceTaxIncl = Tools::ps_round(($totalPriceTaxIncl), _PS_PRICE_COMPUTE_PRECISION_);
-                        $unitPriceTaxIncl = Tools::ps_round($totalPriceTaxIncl / $quantity, _PS_PRICE_COMPUTE_PRECISION_);
+                        $unitPriceTaxIncl = Tools::ps_round($totalPriceTaxIncl / max(1, $quantity), _PS_PRICE_COMPUTE_PRECISION_);
                     } else if (isset($services[$product['id_product']]['total_tax'])) {
                         $objOrderDetail->id_tax_rules_group = 0;
                         Db::getInstance()->execute(
@@ -3692,7 +3692,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
                                 $services['id_service'] = (int) $service['id_product'];
                                 $services['name'] = $service['name'];
                                 $services['quantity'] = (int) $service['quantity'];
-                                $services['unit_price_without_tax'] = Tools::ps_round(($service['total_price_tax_excl'] / $services['quantity']), _PS_PRICE_COMPUTE_PRECISION_);
+                                $services['unit_price_without_tax'] = Tools::ps_round(($service['total_price_tax_excl'] / max(1, $services['quantity'])), _PS_PRICE_COMPUTE_PRECISION_);
                                 $services['total_price_without_tax'] = Tools::ps_round(($service['total_price_tax_excl']), _PS_PRICE_COMPUTE_PRECISION_);
                                 $services['total_tax'] = Tools::ps_round(($service['total_price_tax_incl'] - $service['total_price_tax_excl']), _PS_PRICE_COMPUTE_PRECISION_);
 
