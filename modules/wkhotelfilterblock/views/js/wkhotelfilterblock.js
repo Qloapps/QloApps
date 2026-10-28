@@ -132,6 +132,7 @@ $(document).ready(function()
 	triggerFilter(1, 0, 0, 0);
 	$('.filter').on('click', function()
 	{
+		$(this).parent().toggleClass('checked', this.checked);
 		triggerFilter();
 	});
 
@@ -201,5 +202,48 @@ $(document).ready(function()
             }
         });
 		return 1;
+	}
+	var $conts = $('#filter_results > .col-sm-12 > .layered_filter_cont');
+	if ($conts.length) {
+		var $nav = $('<div class="mf_nav"></div>');
+		$conts.each(function () {
+			$nav.append($('<button type="button" class="mf_tab"></button>').text($(this).find('.lf_headingmain_wrapper span').first().text()).append('<b></b>'));
+		});
+		$('#filter_results > .col-sm-12').prepend($nav);
+
+		var $sheet = $('<div class="mf_sheet"><div class="mf_sheet_box"><div class="mf_sheet_head"><span>' + mfSortByTxt + '</span><button type="button">&times;</button></div><ul></ul></div></div>');
+		$('.sort_result').each(function () {
+			$sheet.find('ul').append($('<li></li>').text($(this).text()).data('source', $(this)));
+		});
+		var $bar = $('<div class="mf_bar"><button type="button" class="mf_sort"><i class="icon-sort"></i> ' + mfSortTxt + '</button><button type="button" class="mf_filter"><i class="icon-filter"></i> ' + mfFilterTxt + ' <b></b></button></div>');
+		$('body').append($sheet, $bar);
+
+		function selectTab(i) {
+			$nav.children().removeClass('mf_active').eq(i).addClass('mf_active');
+			$conts.removeClass('mf_active').eq(i).addClass('mf_active');
+		}
+		selectTab(0);
+
+		function updateCounts() {
+			var total = 0;
+			$conts.each(function (i) {
+				var n = $(this).find('input.filter:checked').length;
+				var v = $(this).find('#filter_price_silder').length ? $('#filter_price_silder').slider('values') : 0;
+				n += v && (v[0] != min_price || v[1] != max_price) ? 1 : 0;
+				total += n;
+				$nav.children().eq(i).children('b').text(n || '');
+			});
+			$bar.find('.mf_filter b').text(total || '');
+		}
+		$(document).on('click change slidechange', '#filter_results', function () { setTimeout(updateCounts, 50); });
+
+		$nav.on('click', '.mf_tab', function () { selectTab($(this).index()); });
+		$bar.find('.mf_filter').on('click', function () { $('body').addClass('mf_filter_open'); });
+		$bar.find('.mf_sort').on('click', function () { $sheet.addClass('mf_open'); });
+		$('.mf_back, .mf_apply').on('click', function () { $('body').removeClass('mf_filter_open'); });
+		$('.mf_clear_all').on('click', function () { $('.clear_filter').trigger('click'); });
+		$sheet.on('click', function (e) { if (e.target === this || $(e.target).is('button')) $sheet.removeClass('mf_open'); });
+		$sheet.on('click', 'li', function () { $(this).addClass('mf_selected').siblings().removeClass('mf_selected').end().data('source').trigger('click'); $sheet.removeClass('mf_open'); });
+		$sheet.find('li').first().addClass('mf_selected');
 	}
 });

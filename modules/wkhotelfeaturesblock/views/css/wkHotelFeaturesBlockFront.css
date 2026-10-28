@@ -63,3 +63,11 @@
   border-top: 1px solid #333333;
   width: 60px;
 }
+@media (max-width: 767px) {
+  #hotelAmenitiesBlock .visible-xs .amenity_img_secondary {
+    margin: 0 15px;
+  }
+  #hotelAmenitiesBlock .visible-xs .amenity_desc_secondary {
+    padding: 30px 15px;
+  }
+}

@@ -227,7 +227,7 @@
 															{include file="$tpl_dir./order-carrier.tpl"}
 															<!-- END Carrier -->
 														</div> *}
-														<div class="card">
+														<div class="card" id="order-payment-block">
 															<div class="card-header" id="order-payment-head">
 																{block name='order_opc_payment_heading'}
 																	<h5 class="accordion-header" data-toggle="collapse" data-target="#collapse-order-payment" aria-expanded="true" aria-controls="collapse-order-payment">

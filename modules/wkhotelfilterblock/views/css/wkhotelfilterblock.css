@@ -58,7 +58,7 @@
 
 .layered_filt
 {
-	margin-bottom: 5px;
+	margin-bottom: 8px;
 }
 
 .layered_filt_category
@@ -111,4 +111,11 @@
 
 #filter_price_silder.ui-widget-content {
 	border: none;
+}
+
+.layered_filt_label {
+	display: block;
+	margin: 0;
+	font-weight: normal;
+	cursor: pointer;
 }

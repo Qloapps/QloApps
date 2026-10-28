@@ -30,6 +30,12 @@
     margin-bottom: 0;
 }
 
+@media (max-width: 767px) {
+    .fancybox-wrap.fancybox-extra-services .card {
+        width: calc(100vw - 40px);
+    }
+}
+
 .fancybox-wrap.fancybox-extra-services .fancybox-close {
     background: none;
     top: 12px;
@@ -254,6 +260,12 @@
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    .table.table-summary {
+        margin-bottom: 0;
+        border: none;
+    }
+}
 .table.table-summary.table-sm td {
     padding: 8px 0;
 }

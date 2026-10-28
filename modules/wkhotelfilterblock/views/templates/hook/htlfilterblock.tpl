@@ -22,6 +22,12 @@
 
 {block name='room_types_filters_block'}
 	<div id="filter_results" class="row block">
+		{* mobile only: header of the full screen filters panel *}
+		<div class="mf_header">
+			<button type="button" class="mf_back">&larr;</button>
+			<span class="mf_title">{l s='Filters' mod='wkhotelfilterblock'}</span>
+			<button type="button" class="mf_clear_all">{l s='Clear all' mod='wkhotelfilterblock'}</button>
+		</div>
 		<div class="col-sm-12">
 			{block name='room_types_price_filter'}
 				{if isset($config) && $config['SHOW_PRICE_FILTER']}
@@ -61,8 +67,10 @@
 						<div class="col-sm-12 lf_sub_cont">
 							{foreach $all_amenities as $amenity}
 								<div class="layered_filt">
-									<input type="checkbox" class="filter" data-type="amenities" value="{$amenity.id_amenity}">
-									<span class="filters_name">{$amenity.name}</span>
+									<label class="layered_filt_label">
+										<div class="checker"><span><input type="checkbox" class="filter not_uniform" data-type="amenities" value="{$amenity.id_amenity}"></span></div>
+										<span class="filters_name">{$amenity.name}</span>
+									</label>
 								</div>
 							{/foreach}
 						</div>
@@ -86,8 +94,10 @@
 							<div class="col-sm-12 lf_sub_cont">
 								{foreach $feature.values as $featureValue}
 									<div class="layered_filt">
-										<input type="checkbox" class="filter" data-type="features" data-feature-group="{$feature.id_feature|intval}" value="{$featureValue.id_feature_value|intval}">
-										<span class="filters_name">{$featureValue.value|escape:'html':'UTF-8'}</span>
+										<label class="layered_filt_label">
+											<div class="checker"><span><input type="checkbox" class="filter not_uniform" data-type="features" data-feature-group="{$feature.id_feature|intval}" value="{$featureValue.id_feature_value|intval}"></span></div>
+											<span class="filters_name">{$featureValue.value|escape:'html':'UTF-8'}</span>
+										</label>
 									</div>
 								{/foreach}
 							</div>
@@ -96,6 +106,9 @@
 				{/if}
 			{/block}
 		</div>
+		{block name='room_types_filters_mobile_apply'}
+			<div class="mf_footer"><a href="javascript:void(0);" class="btn btn-default button button-medium pull-right mf_apply"><span>{l s='Apply' mod='wkhotelfilterblock'}</span></a></div>
+		{/block}
 	</div>
 	{block name='room_types_filters_js_vars'}
 		{strip}
@@ -108,6 +121,9 @@
 			{addJsDef max_price = $max_price}
 			{addJsDef warning_num = $warning_num}
 
+			{addJsDefL name=mfSortTxt}{l s='Sort' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
+			{addJsDefL name=mfSortByTxt}{l s='Sort by' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
+			{addJsDefL name=mfFilterTxt}{l s='Filter' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
 			{addJsDefL name=viewMoreTxt}{l s='View More' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
 			{addJsDefL name=bookNowTxt}{l s='Book Now' js=1 mod='wkhotelfilterblock'}{/addJsDefL}
 		{/strip}
