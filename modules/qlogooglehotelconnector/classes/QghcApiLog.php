@@ -95,4 +95,24 @@ class QghcApiLog extends ObjectModel
             return false;
         }
     }
+    public static function cleanupApiLogs()
+    {
+        $cutoff = date('Y-m-d H:i:s', strtotime('-2 months'));
+        if (!Db::getInstance()->delete('qghc_api_log', '`date_add` < \'' . pSQL($cutoff) . '\'')) {
+            return false;
+        }
+
+        // Daily file logs follow the same retention window as the DB rows.
+        $logDir = _PS_MODULE_DIR_ . 'qlogooglehotelconnector/logs/';
+        if (is_dir($logDir)) {
+            foreach (glob($logDir . '*.log') as $file) {
+                $fileDate = basename($file, '.log');
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $fileDate) && strtotime($fileDate) < strtotime($cutoff)) {
+                    @unlink($file);
+                }
+            }
+        }
+
+        return true;
+    }
 }

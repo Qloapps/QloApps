@@ -373,6 +373,10 @@ class CountryCore extends ObjectModel
      */
     public function checkZipCode($zip_code)
     {
+        if (empty($this->zip_code_format)) {
+            return true;
+        }
+
         $zip_regexp = '/^'.$this->zip_code_format.'$/ui';
         $zip_regexp = str_replace(' ', '( |)', $zip_regexp);
         $zip_regexp = str_replace('-', '(-|)', $zip_regexp);

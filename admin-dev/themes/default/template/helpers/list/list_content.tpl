@@ -158,17 +158,26 @@
 	{if $has_actions}
 		<td class="text-right">
 			{assign var='compiled_actions' value=array()}
+			{capture assign='row_actions_before_delete'}{hook h='displayAdminListRowActionsDeleteBefore' table=$table identifier=$identifier id=$tr.$identifier token=$token}{/capture}
+			{assign var='row_actions_before_delete_added' value=false}
 			{foreach $actions AS $key => $action}
 				{if isset($tr.$action)}
 					{if $key == 0}
 						{assign var='action' value=$action}
 					{/if}
-					{if $action == 'delete' && $actions|@count > 2}
-						{$compiled_actions[] = 'divider'}
+					{if $action == 'delete'}
+						{if $row_actions_before_delete}
+							{$compiled_actions[] = $row_actions_before_delete}
+							{assign var='row_actions_before_delete_added' value=true}
+						{/if}
+						{if $actions|@count > 2}
+							{$compiled_actions[] = 'divider'}
+						{/if}
 					{/if}
 					{$compiled_actions[] = $tr.$action}
 				{/if}
 			{/foreach}
+			{if $row_actions_before_delete && !$row_actions_before_delete_added}{$compiled_actions[] = $row_actions_before_delete}{/if}
 			{if $compiled_actions|count > 0}
 				{if $compiled_actions|count > 1}<div class="btn-group-action">{/if}
 				<div class="btn-group pull-right">

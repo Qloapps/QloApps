@@ -253,6 +253,7 @@ $(document).ready(function () {
 				</div>
 			</div>
 		</div>
+		{hook h='displayAdminProductPriceCalculationMethodAfter' product=$product}
 		<script type="text/javascript">
 			$(document).ready(function() {
 				var togglePcmDays = function() {

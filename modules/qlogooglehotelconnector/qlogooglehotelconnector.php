@@ -34,8 +34,14 @@ class QloGoogleHotelConnector extends Module
     /** PS Configuration key that stores the module connection status (0 = off, 1 = connected). */
     const CONFIG_STATUS = 'QGHC_STATUS';
 
+    /** Cron task name registered in the Cron Task Manager module. */
+    const CRON_TASK_CLEANUP_LOGS = 'cleanup_api_logs';
+
     public $debugging = false;
     public $logger;
+
+    /** Default schedule of the API log cleanup task (daily at midnight), as a cron expression. */
+    protected $cronExpression = '0 0 * * *';
 
     /** Sets up module properties (name, version, author) and initialises the file logger. */
     public function __construct()
@@ -192,7 +198,100 @@ class QloGoogleHotelConnector extends Module
             'actionObjectHotelOrderRestrictDateUpdateBefore',
             // Front-end structured data markup
             'displayFooterBefore',
+            // Cron Task Manager
+            'registerCronTasks',
         ));
+    }
+
+    /** Tells the Cron Task Manager module which tasks this module provides. */
+    public function hookRegisterCronTasks()
+    {
+        return array(
+            array(
+                'name' => self::CRON_TASK_CLEANUP_LOGS,
+                'description' => $this->l('Delete Google Hotel API logs older than 2 months'),
+                'cron' => $this->cronExpression,
+                'callback' => 'cronCleanupApiLogs',
+            ),
+        );
+    }
+
+    /** Cron Task Manager callback for the API log cleanup. */
+    public function cronCleanupApiLogs()
+    {
+        if (QghcApiLog::cleanupApiLogs() === false) {
+            throw new Exception('Unable to delete the old API logs.');
+        }
+    }
+
+    /**
+     * Creates the API log cleanup task in the Cron Task Manager when it does not exist.
+     *
+     * @return string|bool Error message, true on success.
+     */
+    public function setupCronTask()
+    {
+        if (!Module::isEnabled('qlocrontaskmanager')) {
+            return $this->l('The Cron Task Manager module is not enabled.');
+        }
+
+        if ($this->getCronTask()) {
+            return true;
+        }
+
+        (new QctmCronTask())->registerTasksForModule((int) $this->id, $this->hookRegisterCronTasks());
+        if (!$this->getCronTask()) {
+            return $this->l('Unable to create the cleanup cron task in the Cron Task Manager.');
+        }
+
+        return true;
+    }
+
+    /** Returns the log cleanup task of the Cron Task Manager, false when it does not exist. */
+    protected function getCronTask()
+    {
+        if (!Module::isEnabled('qlocrontaskmanager')) {
+            return false;
+        }
+
+        require_once _PS_MODULE_DIR_ . 'qlocrontaskmanager/classes/QctmRequiredClasses.php';
+
+        $idTask = QctmCronTask::getByModuleAndName((int) $this->id, self::CRON_TASK_CLEANUP_LOGS);
+        if (!$idTask) {
+            return false;
+        }
+
+        $cronTask = new QctmCronTask((int) $idTask);
+
+        return Validate::isLoadedObject($cronTask) ? $cronTask : false;
+    }
+
+    /** Returns the cleanup task state for display, false when the Cron Task Manager is not enabled. */
+    public function getCronTaskSchedule()
+    {
+        if (!Module::isEnabled('qlocrontaskmanager')) {
+            return false;
+        }
+
+        $cronTask = $this->getCronTask();
+        if (!$cronTask) {
+            return array(
+                'exists' => false,
+                'active' => false,
+                'readable' => '',
+            );
+        }
+
+        $readable = $cronTask->cron_expression;
+        if (\Cron\CronExpression::isValidExpression($cronTask->cron_expression)) {
+            $readable = (new QctmCronExpressionTranslator())->getCronExpressionTranslation($cronTask->cron_expression);
+        }
+
+        return array(
+            'exists' => true,
+            'active' => (bool) $cronTask->active,
+            'readable' => $readable,
+        );
     }
 
     /** Adds the Google Hotel Connector menu group with Configuration and API Logs sub-tabs to the admin sidebar. */

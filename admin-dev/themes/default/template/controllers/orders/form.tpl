@@ -47,6 +47,7 @@
 	var currency_sign = '';
 	var currency_blank = false;
 	var priceDisplayPrecision = {$smarty.const._PS_PRICE_DISPLAY_PRECISION_|intval};
+	var current_order_total = {$order_total|floatval};
 
 	$(document).ready(function() {
 		$(document).on('change', '#add_new_room_services_form select[name="price_calculation_type"]', function() {
@@ -718,6 +719,10 @@
 				updateCartLine(response.curr_booking_info, cart_row);
 				updateCartSummaryData(response.cart_info);
 				updateCartVouchers(response.cart_info.summary.discounts);
+				var $totalTaxesTrigger = $('#total_taxes').closest('.data-focus').find('.ui-tooltip-trigger');
+				initUITooltip($totalTaxesTrigger, function() {
+					return $totalTaxesTrigger.next('.tooltip-content').html();
+				});
 			}
 		});
 	}
@@ -782,9 +787,8 @@
 		$('#total_taxes_tourism').html(formatCurrency(totalTaxesTourismAmt, currency_format, currency_sign, currency_blank));
 		$('#total_with_taxes').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
-		if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-			$('#payment_amount').val(jsonSummary.summary.total_price);
-		}
+		current_order_total = parseFloat(jsonSummary.summary.total_price);
+		$('#payment_amount').val(jsonSummary.summary.total_price);
 		$('#full_payment_amount_value').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
 		if (jsonSummary.summary.is_advance_payment_active) {
@@ -1322,9 +1326,8 @@
 		}
 		$('#order_message').val(jsonSummary.order_message);
 		$('#payment_amount').siblings('.input-group-addon').html(currency_sign);
-		if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-			$('#payment_amount').val(jsonSummary.summary.total_price);
-		}
+		current_order_total = parseFloat(jsonSummary.summary.total_price);
+		$('#payment_amount').val(jsonSummary.summary.total_price);
 		$('#full_payment_amount_value').html(formatCurrency(parseFloat(jsonSummary.summary.total_price), currency_format, currency_sign, currency_blank));
 
 		if (jsonSummary.summary.is_advance_payment_active) {
@@ -1671,12 +1674,12 @@
 
 		$(document).on('change', 'input[name="is_full_payment"]', function() {
 			if (parseInt($('input[name="is_full_payment"]:checked').val())) {
-				$('#payment_amount').val({$order_total|floatval}).attr('disabled', true);
+				$('#payment_amount').val(current_order_total).attr('disabled', true);
 				$('#payment_amount').closest('.form-group').hide(200);
 
 				$('#payment_type, #payment_module_name, #payment_transaction_id').closest('.form-group').show(200);
 			} else {
-				$('#payment_amount').val({$order_total|floatval}).attr('disabled', false);
+				$('#payment_amount').val(current_order_total).attr('disabled', false);
 				$('#payment_amount').closest('.form-group').show(200);
 
 				managePaymentOptions();
@@ -2313,6 +2316,7 @@
                 </div>
             </div>
 
+            {hook h="displayAdminOrderMessageBefore"}
             <div class="row">
                 <div class="order_message_right col-lg-12">
                     <div class="form-group">
@@ -2438,12 +2442,14 @@
                             <p class="help-block">{l s='Select or type the payment method using which payment for booking will be made.'}</p>
                         </div>
                     </div>
+                    {hook h="displayAdminOrderPaymentSelectionAfter"}
                     <div class="form-group" {if $order_total <= 0}style="display: none;"{/if}>
                         <label class="control-label col-lg-3">{l s='Transaction ID'}</label>
                         <div class="col-lg-9">
                             <input type="text" class="fixed-width-xxl" name="payment_transaction_id" id="payment_transaction_id" value="{if isset($smarty.post.payment_transaction_id)}{$smarty.post.payment_transaction_id}{/if}" />
                         </div>
                     </div>
+                    {hook h="displayAdminOrderFormFieldsAfter"}
                     <div class="form-group">
                         <div class="col-lg-9 col-lg-offset-3">
                             <button type="submit" name="submitAddOrder" class="btn btn-default" />

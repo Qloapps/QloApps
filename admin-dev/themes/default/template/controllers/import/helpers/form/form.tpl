@@ -311,8 +311,8 @@
 			</div>
 
 			<div class="list-group">
-				<a class="list-group-item _blank" href="../docs/csv_import/hotels_import.csv">
-					{l s='Sample Hotels file'}
+				<a class="list-group-item _blank" href="../docs/csv_import/properties_import.csv">
+					{l s='Sample Properties file'}
 				</a>
 				<a class="list-group-item _blank" href="../docs/csv_import/room_types_import.csv">
 					{l s='Sample Room Types file'}
