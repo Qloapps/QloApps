@@ -98,18 +98,6 @@ abstract class InstallControllerHttp
         }
 
         $session = InstallSession::getInstance();
-
-        $process_validated = $session->process_validated;
-        $installing = !empty($process_validated['generateSettingsFile']) && empty($process_validated['installTheme']);
-        if (!$installing && file_exists(_PS_ROOT_DIR_.'/config/settings.inc.php')) {
-            @include_once _PS_ROOT_DIR_.'/config/settings.inc.php';
-            if (!defined('_PS_VERSION_') || !version_compare(_PS_VERSION_, _PS_INSTALL_VERSION_, '<')) {
-                header('Location: ../');
-                exit;
-            }
-        }
-
-        
         if (!$session->last_step || $session->last_step == 'welcome') {
             Tools::generateIndex();
         }
