@@ -2,7 +2,7 @@
 	<a href="https://www.qloapps.com"><img src="https://forums.qloapps.com/assets/uploads/system/site-logo.png?v=hkl8e1230fo" alt="QloApps"></a>
 	<br>
 	<p>
-		<b>QloApps - An open source and free platform to launch your own hotel booking website</b>
+		<b>QloApps - An Open Source and Free Platform to Launch your own Hotel Booking website</b>
 	</p>
 </div>
 
