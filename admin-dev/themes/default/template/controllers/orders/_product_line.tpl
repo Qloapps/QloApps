@@ -147,7 +147,7 @@
 	{if ($can_edit)}
 		<td class="product_action center">
             <div class="btn-group pull-right">
-                {if isset($refundReqBookings) && $refundReqBookings && $data.id|in_array:$refundReqBookings && ($data.id_status == $ROOM_STATUS_CANCELLED || $data.id_status == $ROOM_STATUS_NO_SHOW)}
+                {if $data.id_status == $ROOM_STATUS_CANCELLED || $data.id_status == $ROOM_STATUS_NO_SHOW}
                     <button href="#" class="btn btn-default delete_room_line">
                         <i class="icon-trash"></i>
                         {l s='Delete'}
