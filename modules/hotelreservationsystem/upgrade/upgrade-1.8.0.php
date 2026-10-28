@@ -45,6 +45,10 @@ class UpgradeHotelreservationSystem180
     {
         return $this->updateTables()
             && $this->seedBookingStatuses()
+            && $this->seedPropertyTypes()
+            && $this->backfillHotelPropertyType()
+            && $this->installPropertyTypesTab()
+            && $this->installRemainingTabs()
             && $this->migrateFeaturesToAmenities()
             && $this->migrateBranchFeaturesToBranchAmenities()
             && $this->dropMigratedFeatureTables()
@@ -216,6 +220,9 @@ class UpgradeHotelreservationSystem180
                 ADD COLUMN `id_htl_image_category` int(10) unsigned DEFAULT NULL,
                 ADD KEY `id_hotel` (`id_hotel`),
                 ADD KEY `id_htl_image_category` (`id_htl_image_category`);",
+
+            "ALTER TABLE `"._DB_PREFIX_."htl_room_type`
+                ADD COLUMN `id_selling_object` int(10) unsigned DEFAULT NULL;",
         );
     }
 
@@ -231,6 +238,79 @@ class UpgradeHotelreservationSystem180
         }
 
         return (new HotelHelper())->createDefaultBookingStatuses();
+    }
+
+    /**
+     * Fresh installs seed the property-type catalog via HotelHelper::createHotelDefaultPropertyTypes()
+     * (hotelreservationsystem.php::install()) - reuse that exact same method here, same reasoning
+     * as seedBookingStatuses() above.
+     */
+    public function seedPropertyTypes()
+    {
+        if (Db::getInstance()->getValue('SELECT `id_htl_property_type` FROM `'._DB_PREFIX_.'htl_property_type`')) {
+            return true;
+        }
+
+        return (new HotelHelper())->createHotelDefaultPropertyTypes();
+    }
+
+    /**
+     * htl_branch_info.id_property_type is added by updateTables() above with DEFAULT '0', which
+     * is not a real row in htl_property_type - every pre-existing hotel would otherwise point at
+     * a non-existent property type after upgrade. Point them at "Hotel" (the first seeded type,
+     * matching the same default HotelHelper::$obj_hotel_info->id_property_type = 1 assumes
+     * elsewhere) until the admin picks something else.
+     */
+    public function backfillHotelPropertyType()
+    {
+        $idDefaultPropertyType = (int) Db::getInstance()->getValue(
+            'SELECT MIN(`id_htl_property_type`) FROM `'._DB_PREFIX_.'htl_property_type`'
+        );
+
+        if (!$idDefaultPropertyType) {
+            return true;
+        }
+
+        Db::getInstance()->execute(
+            'UPDATE `'._DB_PREFIX_.'htl_branch_info`
+            SET `id_property_type` = '.$idDefaultPropertyType.'
+            WHERE `id_property_type` = 0'
+        );
+
+        return true;
+    }
+
+    /**
+     * Fresh installs register this tab in callInstallTab() (hotelreservationsystem.php::install());
+     * upgraded sites never go through that method, so the tab - and therefore the "Manage Property
+     * Types" sidebar entry - would otherwise never appear after upgrading.
+     */
+    public function installPropertyTypesTab()
+    {
+        if (Tab::getIdFromClassName('AdminHotelPropertyTypes')) {
+            return true;
+        }
+
+        $this->module->installTab('AdminHotelPropertyTypes', 'Manage Property Types', 'AdminHotelReservationSystemManagement');
+
+        return true;
+    }
+
+    public function installRemainingTabs()
+    {
+        if (!Tab::getIdFromClassName('AdminHotelAmenities')) {
+            $this->module->installTab('AdminHotelAmenities', 'Manage Amenities', 'AdminHotelReservationSystemManagement');
+        }
+
+        if (!Tab::getIdFromClassName('AdminHotelHeaderImage')) {
+            $this->module->installTab('AdminHotelHeaderImage', 'Header Image Configuration', 'AdminHotelConfigurationSetting', false);
+        }
+
+        if (!Tab::getIdFromClassName('AdminHotelImageCategory')) {
+            $this->module->installTab('AdminHotelImageCategory', 'Hotel Image Category', false, false);
+        }
+
+        return true;
     }
 
     /**
@@ -332,6 +412,15 @@ class UpgradeHotelreservationSystem180
 
         foreach ($bookings as $booking) {
             $idStatusTo = $booking['is_cancelled'] ? HotelBookingDetail::STATUS_CANCELLED : HotelBookingDetail::STATUS_ASSIGNED;
+
+            // HotelBookingDetail::changeStatus() always writes id_status and the history row
+            // together - the history row alone is not enough, every booking query in the
+            // codebase reads id_status directly, not the history table.
+            Db::getInstance()->execute(
+                'UPDATE `'._DB_PREFIX_.'htl_booking_detail`
+                SET `id_status` = '.(int) $idStatusTo.'
+                WHERE `id` = '.(int) $booking['id']
+            );
 
             Db::getInstance()->execute(
                 'INSERT INTO `'._DB_PREFIX_.'htl_booking_status_history`

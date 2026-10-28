@@ -209,3 +209,5 @@ LEFT JOIN `PREFIX_htl_booking_detail` hbd ON hbd.`id_order_detail` = od.`id_orde
 LEFT JOIN `PREFIX_service_product_order_detail` spod ON spod.`id_order_detail` = od.`id_order_detail`;
 
 DROP TABLE IF EXISTS `PREFIX_order_detail_tax`;
+
+/* PHP:add_new_tabs_180(); */;
