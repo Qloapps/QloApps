@@ -13,6 +13,9 @@
   - #1671: Connected rooms feature to room management in back-office.
   - #1696: "QloApps Booking iCalendar (.ics) File Export" module in modules catalog.
   - #1610: Add new payment module (Duitku payment module ) in QloApps by default.
+  - #1926: Qlositemap module for XML sitemaps generation, and fixed the HTML sitemap page.
+  - #1838: Google hotel connector module in the default QloApps.
+  - #1784: Hooks to add an extra column for additional information in order details in back-office.
 
 ## Back Office:
 - Improvements:
@@ -42,6 +45,7 @@
   - #1827: Updated localization import flow in the back-office.
   - #1819: Replaced stale third-party URLs and branding with QloApps equivalents in the back-office.
   - #1828: Removed the "QloApps Booking iCalendar (.ics) File Export" module (added in #1696) from the modules catalog before release.
+  - #1946: Make room disable dates independent of room status.
 
 - Bugs Fixed:
   - #1815: Calendar not working properly throughout admin panel backoffice.
@@ -122,6 +126,32 @@
   - #1909: Text issue in Room Type in the back office.
   - #1885: Text issue in GRC option.
   - #1878: Display consistent customer total spent amount regardless of order in the back office.
+  - #1960: Error on the Account Creation Page with Standard Registration when submitting empty fields.
+  - #1953: Undefined array key "children" on the Admin Book Now page when modifying occupancy in the URL.
+  - #1928: Add missing token check to file manager requests on back-office.
+  - #1930: Prevented refund requests for service order lines belonging to other customers.
+  - #1933: CSV export column misalignment when a cart contains multiple order IDs.
+  - #1888: Apply advance price rule when stay duration enters the applicable range in order detail in the back office.
+  - #1932: Module list incomplete XML error on back office from QloApps API.
+  - #1927: Tasks of already-installed modules are not registered after reinstalling the module.
+  - #1921: Fatal error when deactivating the primary hotel in back-office.
+  - #1925: Fatal error when opening customer KPI.
+  - #1920: Revenue KPI not updating after order refund.
+  - #1918: Email log section not updating without page refresh in the back office.
+  - #1899: Implement input validation across back office forms and templates.
+  - #1877: Display issue caused by uploading large language flag images.
+  - #1915: Apply changes to the single invoice in the order detail in the back office.
+  - #1943: Delete Brand name and short description from general setting in back-office.
+  - #1945: Document text and logo issues in the PDF header.
+  - #1931: 404 icon displayed on some module cards on the Module Catalog page.
+  - #1904: Hide Room Type selection in cart rule when fewer than two room types exist in back-office.
+  - #1936: Standalone products contain room and room type-related fields in the booking voucher.
+  - #1907: Added Room From Appearing as Non-Ordered Cart in Back Office.
+  - #1917: Restrict check-in before arrival and add room status change hooks in the admin order controller.
+  - #1976: Multiple order and refund related bugs in back-office.
+  - #1905: Tax Amount issues when changing currency on Order Detail.
+  - #1823: Prevent raw HTML in admin cart rule and order tooltips in the back-office.
+  - #1895: Apply the correct refund rule based on the configured cancellation rule in the back office.
 
 ## Front Office:
 - Improvements:
@@ -159,6 +189,15 @@
   - #1871: Resolve incorrect price display on the home page.
   - #1868: Fix price mismatch on the order confirmation page for bookings across two different hotels.
   - #1906: Remove night label from service unit price.
+  - #1937: New thread created when name, phone, title or email differs in front-office.
+  - #1912: Guest order details exposed by changing cart id on order confirmation page in front-office.
+  - #1898: Room booking type not reset to occupancy when search type is switched back to occupancy wise search in the front-office.
+  - #1944: Footer copyright text design in front-office.
+  - #1978: UI and other bugs in front-office.
+  - #1938: Tax labels (incl./excl.) shown in front office even when taxes are disabled.
+  - #1919: Align both icons below the price in the front-office.
+  - #1924: Missing address validation for standalone product booking.
+  - #1923: Fatal error when creating booking.
 
 ## Core:
 - Improvements:
@@ -184,6 +223,8 @@
   - #1826: PayPal Commerce module compatibility and issues fixed, with license text comments updated.
   - #1688: Improved the price calculation method for service products, and made the selling type of service products more flexible.
   - #1713: Added per-room booking methods, standardized selling object type across order pages, and implemented default property and room type values.
+  - #1971: Updated minimum supported PHP version to 8.2.
+  - #1935: Added missing fields in lists and CSV exports in the back-office.
 
 - Bugs Fixed:
   - #1689: Upgraded the password hashing algorithm from MD5 to bcrypt.
@@ -243,6 +284,7 @@
   - #1900: Validate hotel ID input in the room search algorithm.
   - #1896: Removed/updated prestashop images from imgs folder.
   - #1848: Resolve duplicate English language entries when installing another language.
+  - #1939: Add the missing table to Data Cleaner so order notes are deleted as well.
 
 ## Web Services:
 - Bugs Fixed:

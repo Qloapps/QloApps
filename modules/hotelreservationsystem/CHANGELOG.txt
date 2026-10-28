@@ -4,6 +4,8 @@
 
 ## Improved/Changed Features:
 
+* [BO] : [#1946] Make room disable dates independent of room status.
+* [BO] : [#1823] Prevent raw HTML in admin cart rule and order tooltips in the back-office.
 * [BO] : [#1903] Unable to upload pdf in the documents at order detail page in back-office.
 * [BO] : [#1884] Validate checkout date to be after check-in date in back office.
 * [BO] : [#1876] Preserve advance payment setting when creating duplicate rooms in the back office.
