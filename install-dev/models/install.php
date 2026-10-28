@@ -120,7 +120,8 @@ class InstallModelInstall extends InstallAbstractModel
     {
         // Clear database (only tables with same prefix)
         require_once _PS_ROOT_DIR_.'/'.self::SETTINGS_FILE;
-        if ($clear_database) {
+        // Tables left from a previous install (e.g. settings file deleted) must not break the new one
+        if ($clear_database || Db::hasTableWithSamePrefix(_DB_SERVER_, _DB_USER_, _DB_PASSWD_, _DB_NAME_, _DB_PREFIX_)) {
             $this->clearDatabase();
         }
 
