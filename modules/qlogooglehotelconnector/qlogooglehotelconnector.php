@@ -903,7 +903,7 @@ class QloGoogleHotelConnector extends Module
         $oldStatus = (int)$oldRoom->id_status;
         $newStatus = isset($newRoomInfo['id_status']) ? (int)$newRoomInfo['id_status'] : $oldStatus;
 
-        if (($newStatus !== HotelRoomInformation::STATUS_TEMPORARY_INACTIVE) && ($oldStatus !== $newStatus)) {
+        if ($oldStatus !== $newStatus) {
             $objHotelRoomInfo = new HotelRoomInformation();
             $roomInfoArray = $objHotelRoomInfo->getHotelRoomInfoByProductId((int)$oldRoom->id_product);
             if (empty($roomInfoArray)) {
