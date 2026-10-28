@@ -67,8 +67,10 @@
 						<div class="col-sm-12 lf_sub_cont">
 							{foreach $all_amenities as $amenity}
 								<div class="layered_filt">
-									<div class="checker"><span><input type="checkbox" class="filter not_uniform" data-type="amenities" value="{$amenity.id_amenity}"></span></div>
-									<span class="filters_name">{$amenity.name}</span>
+									<label class="layered_filt_label">
+										<div class="checker"><span><input type="checkbox" class="filter not_uniform" data-type="amenities" value="{$amenity.id_amenity}"></span></div>
+										<span class="filters_name">{$amenity.name}</span>
+									</label>
 								</div>
 							{/foreach}
 						</div>
@@ -92,8 +94,10 @@
 							<div class="col-sm-12 lf_sub_cont">
 								{foreach $feature.values as $featureValue}
 									<div class="layered_filt">
-										<div class="checker"><span><input type="checkbox" class="filter not_uniform" data-type="features" data-feature-group="{$feature.id_feature|intval}" value="{$featureValue.id_feature_value|intval}"></span></div>
-										<span class="filters_name">{$featureValue.value|escape:'html':'UTF-8'}</span>
+										<label class="layered_filt_label">
+											<div class="checker"><span><input type="checkbox" class="filter not_uniform" data-type="features" data-feature-group="{$feature.id_feature|intval}" value="{$featureValue.id_feature_value|intval}"></span></div>
+											<span class="filters_name">{$featureValue.value|escape:'html':'UTF-8'}</span>
+										</label>
 									</div>
 								{/foreach}
 							</div>
