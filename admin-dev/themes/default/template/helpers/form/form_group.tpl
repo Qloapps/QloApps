@@ -64,7 +64,7 @@
 	</div>
 </div>
 {else}
-<p>
+<p class="form-control-static">
 	{l s='No group created'}
 </p>
 {/if}

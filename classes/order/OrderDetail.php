@@ -503,7 +503,7 @@ class OrderDetailCore extends ObjectModel
                             $this->product_price_calculation_method,
                             $cartServiceItem['date_from'],
                             $cartServiceItem['date_to']
-                        );  
+                        ); 
                         $itemQuantity = (isset($cartServiceItem['quantity']) ? $cartServiceItem['quantity'] : 0) * $itemNumDays;
                         $quantity += $itemQuantity;
                         $totalPriceTaxExcl += $itemQuantity * (isset($cartServiceItem['unit_price_tax_excl']) ? $cartServiceItem['unit_price_tax_excl'] : 0);
@@ -527,7 +527,7 @@ class OrderDetailCore extends ObjectModel
                 if (isset($quantity) && isset($unit_price_tax_excl)) {
                     foreach ($this->tax_calculator->getTaxesAmount($unit_price_tax_excl) as $id_tax => $amount) {
 
-                        $total_amount = Tools::processPriceRounding($amount, $quantity, $order->round_type, $order->round_mode);
+                        $total_amount = $amount * $quantity;
 
                         $values .= '('.(int)$order->id.','.(int)$this->id.',0,0,'.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.',NOW()),';
                     }
@@ -561,7 +561,7 @@ class OrderDetailCore extends ObjectModel
 
             foreach ($this->tax_calculator->getTaxesAmount($this->unit_price_tax_excl) as $id_tax => $amount) {
 
-                $total_amount = Tools::processPriceRounding($amount, $this->product_quantity, $order->round_type, $order->round_mode);
+                $total_amount = $amount * $this->product_quantity;
 
                 $values .= '('.(int)$order->id.','.(int)$this->id.',0,0,'.(int)$id_tax.','.(float)$amount.','.(float)$total_amount.',NOW()),';
             }
