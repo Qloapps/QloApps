@@ -73,7 +73,7 @@ class AdminOrdersControllerCore extends AdminController
         ) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests,
         (SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as los,
         hbd.`id_room` AS id_room_information,
-                (SELECT GROUP_CONCAT(CONCAT(hbd_sub.`date_from`, \'|\', hbd_sub.`date_to`) SEPARATOR \'::\') FROM `'._DB_PREFIX_.'htl_booking_detail` hbd_sub WHERE hbd_sub.`id_order` = a.`id_order`) AS stay_periods,
+        (SELECT GROUP_CONCAT(CONCAT(hbd_sub.`date_from`, \'|\', hbd_sub.`date_to`) SEPARATOR \'::\') FROM `'._DB_PREFIX_.'htl_booking_detail` hbd_sub WHERE hbd_sub.`id_order` = a.`id_order`) AS stay_periods,
         (SELECT COUNT(spod_sub.`id_service_product_order_detail`) FROM `'._DB_PREFIX_.'service_product_order_detail` spod_sub WHERE spod_sub.`id_order` = a.`id_order` AND spod_sub.`id_htl_booking_detail`=0) as num_products';
 
         $this->_select .= ',
@@ -401,7 +401,7 @@ class AdminOrdersControllerCore extends AdminController
         return Tools::safeOutput($echo);
     }
 
-public function formatStayPeriods($value, $row)
+    public function formatStayPeriods($value, $row)
     {
         if (empty($value)) {
             return '--';
