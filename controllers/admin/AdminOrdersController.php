@@ -401,24 +401,38 @@ class AdminOrdersControllerCore extends AdminController
         return Tools::safeOutput($echo);
     }
 
-    public function formatStayPeriods($value, $row)
+public function formatStayPeriods($value, $row)
     {
         if (empty($value)) {
             return '--';
         }
 
+        $rawPeriods = explode('::', $value);
+        $countByPeriod = array();
+        foreach ($rawPeriods as $period) {
+            if (!empty($period)) {
+                if (!isset($countByPeriod[$period])) {
+                    $countByPeriod[$period] = 0;
+                }
+                $countByPeriod[$period]++;
+            }
+        }
+
         $stayPeriods = array();
-        foreach (explode('::', $value) as $stays) {
-            $countStays = explode('~', $stays);
-            $stayDates  = explode('|', $countStays[0]);
+        foreach ($countByPeriod as $period => $count) {
+            $stayDates = explode('|', $period);
             if (count($stayDates) === 2) {
                 $stayPeriods[] = array(
                     'from'  => Tools::displayDate(trim($stayDates[0])),
                     'to'    => Tools::displayDate(trim($stayDates[1])),
-                    'count' => isset($countStays[1]) ? (int)$countStays[1] : 1,
+                    'count' => (int) $count,
                 );
             }
         }
+
+        usort($stayPeriods, function ($a, $b) {
+            return strcmp($a['from'], $b['from']);
+        });
 
         $datesDisplay = array();
         foreach (array_slice($stayPeriods, 0, 1) as $stayPeriod) {
@@ -428,7 +442,7 @@ class AdminOrdersControllerCore extends AdminController
         $stayPeriodHtml = implode('<br>', $datesDisplay);
         $uniqueStayPeriods = count($stayPeriods);
 
-        if ($uniqueStayPeriods > 1) {
+        if ($uniqueStayPeriods > 1 || (isset($stayPeriods[0]) && $stayPeriods[0]['count'] > 1)) {
             $this->context->smarty->assign(array(
                 'stay_periods' => $stayPeriods,
                 'extra_stay_periods_count' => $uniqueStayPeriods - 1,
