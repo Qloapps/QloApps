@@ -63,6 +63,8 @@ class HotelAmenities extends ObjectModel
             if (file_exists($imgFile)) {
                 unlink($imgFile);
             }
+            Db::getInstance()->delete('htl_branch_amenity', '`amenity_id` = '.(int)$id);
+            Db::getInstance()->delete('htl_room_type_amenity', '`amenity_id` = '.(int)$id);
             return parent::delete();
         }
         return false;

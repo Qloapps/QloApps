@@ -47,6 +47,7 @@ class WkAboutHotelBlock extends Module
 
     public function hookDisplayHome()
     {
+        $this->context->controller->addJqueryPlugin('fancybox');
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.carousel.min.css');
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.theme.default.min.css');
         $this->context->controller->addJS(_PS_JS_DIR_.'owl-carousel/owl.carousel.min.js');
@@ -58,6 +59,13 @@ class WkAboutHotelBlock extends Module
 
         $objHtlInteriorImg = new WkHotelInteriorImage();
         $InteriorImg = $objHtlInteriorImg->getHotelInteriorImg(1);
+        // every slide shows 4 photos, so the last slide is completed with photos from the start
+        if ($InteriorImg && ($missing = (4 - count($InteriorImg) % 4) % 4)) {
+            foreach (array_slice($InteriorImg, 0, $missing) as $filler) {
+                $filler['is_filler'] = 1;
+                $InteriorImg[] = $filler;
+            }
+        }
 
         $this->context->smarty->assign(
             array(

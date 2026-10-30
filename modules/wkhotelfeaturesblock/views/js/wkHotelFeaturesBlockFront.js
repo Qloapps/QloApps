@@ -37,6 +37,12 @@ function setAmenitiesWrapperHeight() {
 
 function setAmenitiesDescContHeight() {
 	$('.amenity_desc_cont').each(function () {
+		// on mobile the image and text stack instead of sitting side by side,
+		// so matching the text box's height to the combined row height leaves a large blank gap
+		if ($(this).closest('.visible-xs').length) {
+			$(this).css('height', 'auto');
+			return;
+		}
 		var amenityDescParentHeight = $(this).parent('div.amenity_content').height();
 		$(this).css('height', amenityDescParentHeight);
 	});

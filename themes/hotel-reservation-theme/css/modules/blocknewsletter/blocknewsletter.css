@@ -178,6 +178,10 @@
   position: relative;
   padding: 0px 20px;
 }
+.button.button-medium.newsletter-btn:hover, .button.button-medium.newsletter-btn:focus {
+  background: #0f7fe0;
+  background-image: none;
+}
 #newsletter-input
 {
   background-color: #3a3a3a;

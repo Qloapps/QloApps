@@ -255,7 +255,6 @@ class DashProducts extends Module
 				hbd.`id_product`,
 				hbd.`room_type_name` AS `product_name`,
 				COUNT(hbd.`id_room`) AS `total`,
-				hbd.`total_price_tax_excl` AS `price`,
 				SUM(hbd.`total_price_tax_excl`) AS `sales`
 			FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
 			LEFT JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order`)
@@ -285,8 +284,6 @@ class DashProducts extends Module
 				$img = ImageManager::thumbnail($path_to_image, 'product_mini_'.$product_obj->id.'.'.$this->context->controller->imageType, 45, $this->context->controller->imageType);
 			}
 
-			$productPrice = $product['price'];
-
 			$body[] = array(
 				array(
 					'id' => 'product',
@@ -297,8 +294,7 @@ class DashProducts extends Module
 					'id' => 'product',
 					'value' => '<a href="'.$this->context->link->getAdminLink('AdminProducts', true).
 						'&id_product='.$product_obj->id.'&updateproduct" target="_blank">'.
-						Tools::htmlentitiesUTF8($product['product_name']).'</a>'.
-						'<br/>'.Tools::displayPrice($productPrice),
+						Tools::htmlentitiesUTF8($product['product_name']).'</a>',
 					'class' => 'text-center'
 				),
 				array(

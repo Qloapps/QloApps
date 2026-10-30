@@ -152,8 +152,7 @@ class HotelReservationSystemDb
                 `date_add` datetime NOT NULL,
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_branch_amenity`),
-                CONSTRAINT `fk_htl_branch_amenity_amenity` FOREIGN KEY (`amenity_id`)
-                    REFERENCES `"._DB_PREFIX_."htl_amenity` (`id_amenity`) ON DELETE CASCADE
+                KEY `amenity_id` (`amenity_id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_room_type_amenity` (
@@ -165,8 +164,7 @@ class HotelReservationSystemDb
                 `date_upd` datetime NOT NULL,
                 PRIMARY KEY (`id_room_type_amenity`),
                 KEY `id_product` (`id_product`),
-                CONSTRAINT `fk_htl_room_type_amenity_amenity` FOREIGN KEY (`amenity_id`)
-                    REFERENCES `"._DB_PREFIX_."htl_amenity` (`id_amenity`) ON DELETE CASCADE
+                KEY `amenity_id` (`amenity_id`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;",
 
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_cart_booking_data` (
