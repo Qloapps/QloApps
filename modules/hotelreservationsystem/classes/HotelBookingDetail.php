@@ -4423,6 +4423,7 @@ class HotelBookingDetail extends ObjectModel
      */
     public static function getPaymentMethodStats(array $params)
     {
+        $paymentMethod = isset($params['payment_method']) ? pSQL($params['payment_method']) : '';
         $dateFrom    = pSQL($params['date_from']);
         $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
         $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
@@ -4441,11 +4442,31 @@ class HotelBookingDetail extends ObjectModel
             AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idCustomer  ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
             .($bookingType ? ' AND hbd.`booking_type` = '.$bookingType : '')
+            .($paymentMethod ? ' AND o.`payment` = \''.$paymentMethod.'\'' : '')
             .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
             GROUP BY o.`payment`, o.`module`
             ORDER BY revenue_incl DESC'
         );
     }
+
+    /**
+     * Distinct payment method names stored on valid hotel orders, used to filter the Payment Methods report.
+     *
+     * @param int|false $idHotel
+     * @return array rows: payment_method
+     */
+    public static function getDistinctOrderPaymentMethods($idHotel = false)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT DISTINCT o.`payment` AS payment_method
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
+            WHERE hbd.`id_status` != '.self::STATUS_CANCELLED.' AND o.`payment` != ""'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            ORDER BY o.`payment`'
+        );
+    }
+
 
     /**
      * Tax breakdown per booking line for the Tax Report.
