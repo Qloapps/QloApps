@@ -61,3 +61,53 @@
     padding: 10px 5px;}
 
 }
+
+/* searched details and the close icon are for mobile and tablet only */
+.header-rmsearch-details-wrapper,
+.header-rmsearch-wrapper .close_room_serach_wrapper {
+  display: none;}
+/* mobile and tablet: show the searched details, the search form opens with the edit button */
+@media (max-width: 991px) {
+  .header-rmsearch-wrapper {
+    display: none;
+    position: relative;}
+  .header-rmsearch-details-wrapper {
+    display: block;}
+  .header-rmsearch-wrapper .close_room_serach_wrapper {
+    display: block;
+    position: absolute;
+    top: 8px;
+    right: 15px;
+    z-index: 1;}
+  .close_room_serach_wrapper img {
+    width: 18px;}
+  .header-rmsearch-details-wrapper {
+    padding: 0 0 15px;}
+  .header-rmsearch-details-wrapper .filter_header {
+    font-size: 12px;
+    color: #333;
+    line-height: 25px;}
+  .header-rmsearch-details-wrapper .filter_header p {
+    margin: 0;}
+  .header-rmsearch-details-wrapper .search_result_info {
+    font-size: 15px;
+    font-weight: bold;
+    line-height: 30px;
+    color: #333333;}
+  .header-rmsearch-details-wrapper .modify_roomtype_search_btn {
+    border: 1px solid #777777;
+    font-weight: bold;
+    border-radius: 4px;
+    font-size: 13px;
+    padding: 6px 12px;
+    color: #333333;
+    text-align: center;
+    text-transform: uppercase;}
+  .header-rmsearch-details-wrapper .faded-txt {
+    color: #777777;}
+}
+/* desktop always shows the search form, even if it was closed on a smaller screen */
+@media (min-width: 992px) {
+  .header-rmsearch-wrapper {
+    display: block !important;}
+}

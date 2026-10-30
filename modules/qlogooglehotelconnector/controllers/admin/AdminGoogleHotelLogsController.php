@@ -36,12 +36,12 @@ class AdminGoogleHotelLogsController extends ModuleAdminController
         // Every QghcApiLog::TYPE_* must have an entry here, or it shows as its raw
         // value in the filter dropdown, the list column, and the detail view.
         $this->typeLabels = array(
-            QghcApiLog::TYPE_ARI_FULL => 'Full Availability & Rates Update',
-            QghcApiLog::TYPE_ARI_CHANGE => 'Availability & Rates Change Update',
-            QghcApiLog::TYPE_GOOGLE_STATUS => 'Google Status',
-            QghcApiLog::TYPE_CONNECTION => 'Connection',
-            QghcApiLog::TYPE_DELETE_CONNECTION => 'Delete Connection',
-            QghcApiLog::TYPE_HOTEL_LIST_FEED => 'Property Detail',
+            QghcApiLog::TYPE_ARI_FULL => $this->l('Full Availability & Rates Update'),
+            QghcApiLog::TYPE_ARI_CHANGE => $this->l('Availability & Rates Change Update'),
+            QghcApiLog::TYPE_GOOGLE_STATUS => $this->l('Google Status'),
+            QghcApiLog::TYPE_CONNECTION => $this->l('Connection'),
+            QghcApiLog::TYPE_DELETE_CONNECTION => $this->l('Delete Connection'),
+            QghcApiLog::TYPE_HOTEL_LIST_FEED => $this->l('Properties Details'),
         );
 
         $this->bootstrap = true;

@@ -50,16 +50,23 @@
         float :right;
     }
 }
+@media (min-width: 768px) and (max-width: 991px) {
+    #hotelRoomsBlock .col-md-6 {
+        width: 50%;
+        float: left;
+    }
+}
 @media (max-width: 530px) {
+    #hotelRoomsBlock .col-md-6 > a img.width-100 {
+        width: 100%;
+        margin: 0;
+    }
     .hotelRoomDescContainer{
-        padding: 10px;
+        padding: 15px 0px;
     }
     .wk_roomType_price_type{
         font-size: 16px;
         font-weight: 400;
-    }
-    .htlRoomTypeNameText {
-        width: 100%;
     }
 
     .room_type_old_price {
@@ -91,12 +98,231 @@ a.htlRoomTypeBookNow {
     text-transform: capitalize;
 }
 
-.btn.htlRoomTypeBookNow:hover{
-	border: 1px solid #333333;
-}
 
 .room_type_old_price {
    text-decoration: line-through;
    color:#555555;
    font-size:14px;
+}
+
+/* room type cards slider */
+.htlRoom-owlCarousel .owl-carousel {
+    padding: 0 0 6px;
+}
+.htlRoomCard {
+    background: #fff;
+    border: 1px solid #E5E5E5;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+}
+.htlRoomCardImg {
+    display: block;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+}
+.htlRoomCardImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.htlRoomCardBody {
+    padding: 16px;
+}
+.htlRoomCardBody .htlRoomTypeNameText {
+    float: none;
+    margin: 0 0 12px;
+    font-size: 22px;
+}
+.htlRoomCardFeatured {
+    padding: 12px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #555;
+    font-size: 14px;
+}
+.htlRoomCardFeatured img.htlRoomFeatureImg {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    max-width: 16px;
+    margin-right: 4px;
+    object-fit: contain;
+    vertical-align: -3px;
+}
+.htlRoomCardAmen > span img.htlRoomAmenityImg {
+    width: 18px;
+    height: 18px;
+    max-width: 18px;
+    object-fit: contain;
+}
+/* one line for all features. Each feature, with the | in front of it, is one block, so when the row is wider
+   than the card the whole feature is dropped and the ellipsis never follows a lonely | */
+.htlRoomCardFeatured > span {
+    display: inline-block;
+    vertical-align: top;
+}
+.htlRoomCardFeatured > span + span:not(.htlRoomFeatureMore):before {
+    content: "|";
+    margin: 0 5px;
+    color: #BBB;
+}
+.htlRoomCardFeatured i {
+    margin-right: 4px;
+    color: #777;
+}
+.htlRoomCardMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 0;
+    border-top: 1px solid #E5E5E5;
+    color: #555;
+    font-size: 15px;
+}
+.htlRoomCardGuests i {
+    margin-right: 4px;
+    color: #777;
+}
+.htlRoomCardAmen {
+    display: flex;
+    flex: 1 1 auto;
+    gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+}
+.htlRoomCardAmen > span.htlRoomAmenMore {
+    width: auto;
+    min-width: 32px;
+    padding: 0 8px;
+    border-radius: 16px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+.htlRoomCardAmen > span {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #D6D6D6;
+    border-radius: 50%;
+    font-size: 14px;
+    color: #666;
+}
+.htlRoomCardFoot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #E5E5E5;
+    gap: 10px;
+    padding-top: 14px;
+}
+.htlRoomCardFoot .htlRoomTypePriceText {
+    float: none;
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.htlRoomCardFoot .wk_roomType_price_type {
+    font-size: 14px;
+    font-weight: 400;
+    color: #777;
+}
+.htlRoomCardFoot .room_type_old_price {
+    display: block;
+    width: auto;
+    font-size: 14px;
+    font-weight: 400;
+}
+a.htlRoomTypeBookNow {
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 3px;
+    background: #379BF0;
+    color: #fff;
+    font-weight: 700;
+    white-space: nowrap;
+}
+a.htlRoomTypeBookNow:hover {
+    background: #2d86d3;
+    color: #fff;
+}
+.htlRoom-owlCarousel .owl-nav .owl-prev,
+.htlRoom-owlCarousel .owl-nav .owl-next {
+    position: absolute;
+    top: 38%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+    font-size: 22px;
+    line-height: 1;
+}
+.htlRoom-owlCarousel .owl-nav .owl-prev {
+    left: -15px;
+}
+.htlRoom-owlCarousel .owl-nav .owl-next {
+    right: -12px;
+}
+.htlRoom-owlCarousel .owl-nav .disabled {
+    display: none;
+}
+@media (max-width: 767px) {
+    .htlRoomCardBody .htlRoomTypeNameText {
+        font-size: 20px;
+    }
+}
+
+/* equal height cards: price row sits at the bottom, occupancy row keeps the same height with or without amenities */
+.htlRoom-owlCarousel .owl-stage {
+    display: flex;
+}
+.htlRoom-owlCarousel .owl-item {
+    display: flex;
+}
+.htlRoomCard {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.htlRoomCardBody {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+.htlRoomCardFoot {
+    margin-top: auto;
+}
+.htlRoomCardGuests {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+}
+
+.htlRoomCard {
+    width: calc(100% - 4px);
+    margin: 2px;
+}
+.htlRoom-owlCarousel .owl-nav > div i {
+    position: relative;
+    left: 1px;
+}
+
+/* no line right under the room name */
+.htlRoomTypeNameText + .htlRoomCardMeta {
+    border-top: 0;
+    padding-top: 12px;
+}
+
+.htlRoomCardFeatured .htlRoomFeatureMore {
+    margin-left: 5px;
 }

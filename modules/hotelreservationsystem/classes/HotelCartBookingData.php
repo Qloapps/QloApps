@@ -1515,7 +1515,7 @@ class HotelCartBookingData extends ObjectModel
             $objCartBookingData = new HotelCartBookingData();
             $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
             $objServiceProductCartDetail = new ServiceProductCartDetail();
-            $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
+            $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_CHECKOUT');
             $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
 
             foreach ($cartRoomTypes as $prodKey => $product) {

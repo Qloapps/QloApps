@@ -1833,9 +1833,6 @@ class HotelBookingDetail extends ObjectModel
 
         if (!$only_search_data) {
             if (!empty($bookingData)) {
-                $maxAmenities = (int) Configuration::get('WK_MAX_AMENITIES_ROOM_SEARCH');
-                $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
-                $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
                 foreach ($bookingData['rm_data'] as $key => $value) {
                     // featured amenities for display in room type list
                     $featured_amenities = HotelRoomTypeAmenities::getAmenities(
@@ -1843,9 +1840,6 @@ class HotelBookingDetail extends ObjectModel
                         $context->language->id,
                         true
                     );
-                    if ($maxAmenities) {
-                        $featured_amenities = array_slice($featured_amenities, 0, $maxAmenities);
-                    }
                     if (!empty($amenities) && $amenities) {
                         $roomAmenityIds = array_column(HotelRoomTypeAmenities::getAmenities($value['id_product']), 'id');
                         if (array_diff($amenities, $roomAmenityIds)) {
@@ -1893,18 +1887,7 @@ class HotelBookingDetail extends ObjectModel
                                 $featuredFeatures[$roomFeature['id_feature']]['values'][] = $roomFeature['value'];
                             }
                         }
-                        $featuredFeatures = array_values($featuredFeatures);
-                        if ($maxFeatures) {
-                            $featuredFeatures = array_slice($featuredFeatures, 0, $maxFeatures);
-                        }
-                        foreach ($featuredFeatures as &$featuredFeature) {
-                            if ($maxFeatureValues) {
-                                $featuredFeature['values'] = array_slice($featuredFeature['values'], 0, $maxFeatureValues);
-                            }
-                            $featuredFeature['value'] = implode(', ', $featuredFeature['values']);
-                        }
-                        unset($featuredFeature);
-                        $bookingData['rm_data'][$key]['featured_features'] = $featuredFeatures;
+                        $bookingData['rm_data'][$key]['featured_features'] = array_values($featuredFeatures);
                         $bookingData['rm_data'][$key]['price'] = $prod_price;
                         $bookingData['rm_data'][$key]['feature_price'] = $productFeaturePrice;
                         $bookingData['rm_data'][$key]['price_without_reduction'] = $productPriceWithoutReduction;
@@ -4440,6 +4423,7 @@ class HotelBookingDetail extends ObjectModel
      */
     public static function getPaymentMethodStats(array $params)
     {
+        $paymentMethod = isset($params['payment_method']) ? pSQL($params['payment_method']) : '';
         $dateFrom    = pSQL($params['date_from']);
         $dateTo      = pSQL(isset($params['date_to']) ? $params['date_to'] : $params['date_from']);
         $idsHotel = isset($params['ids_hotel']) ? $params['ids_hotel'] : (isset($params['id_hotel']) ? $params['id_hotel'] : false);
@@ -4458,11 +4442,31 @@ class HotelBookingDetail extends ObjectModel
             AND hbd.`date_add` BETWEEN "'.$dateFrom.' 00:00:00" AND "'.$dateTo.' 23:59:59"'
             .($idCustomer  ? ' AND hbd.`id_customer` = '.$idCustomer  : '')
             .($bookingType ? ' AND hbd.`booking_type` = '.$bookingType : '')
+            .($paymentMethod ? ' AND o.`payment` = \''.$paymentMethod.'\'' : '')
             .HotelBranchInformation::addHotelRestriction($idsHotel, 'hbd').'
             GROUP BY o.`payment`, o.`module`
             ORDER BY revenue_incl DESC'
         );
     }
+
+    /**
+     * Distinct payment method names stored on valid hotel orders, used to filter the Payment Methods report.
+     *
+     * @param int|false $idHotel
+     * @return array rows: payment_method
+     */
+    public static function getDistinctOrderPaymentMethods($idHotel = false)
+    {
+        return Db::getInstance(_PS_USE_SQL_SLAVE_)->executeS(
+            'SELECT DISTINCT o.`payment` AS payment_method
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+            INNER JOIN `'._DB_PREFIX_.'orders` o ON (o.`id_order` = hbd.`id_order` AND o.`valid` = 1)
+            WHERE hbd.`id_status` != '.self::STATUS_CANCELLED.' AND o.`payment` != ""'
+            .HotelBranchInformation::addHotelRestriction($idHotel, 'hbd').'
+            ORDER BY o.`payment`'
+        );
+    }
+
 
     /**
      * Tax breakdown per booking line for the Tax Report.

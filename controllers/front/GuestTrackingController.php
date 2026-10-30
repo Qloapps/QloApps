@@ -252,7 +252,6 @@ class GuestTrackingControllerCore extends FrontController
                     if ($orderProducts = $order->getProducts()) {
                         $total_convenience_fee_te = 0;
                         $total_convenience_fee_ti = 0;
-                        $total_tourism_tax = OrderTaxDetail::getOrderTourismTaxTotal($idOrder);
 
                         $objOrderReturn = new OrderReturn();
                         $refundReqBookings = $objOrderReturn->getOrderRefundRequestedBookings($order->id, 0, 1);
@@ -536,6 +535,7 @@ class GuestTrackingControllerCore extends FrontController
                 // set order specific values
                 $order->total_convenience_fee_ti = $total_convenience_fee_ti;
                 $order->total_convenience_fee_te = $total_convenience_fee_te;
+                $order->total_tourism_tax = OrderTaxDetail::getOrderTourismTaxTotal($idOrder);
                 $order->any_back_order = $anyBackOrder;
                 $order->shw_bo_msg = Configuration::get('WK_SHOW_MSG_ON_BO');
                 $order->back_ord_msg = Configuration::get('WK_BO_MESSAGE');
@@ -567,7 +567,6 @@ class GuestTrackingControllerCore extends FrontController
             'use_tax' => Configuration::get('PS_TAX'),
             'guestInformations' => (array)$customer,
             'view_on_map' => Configuration::get('WK_GOOGLE_ACTIVE_MAP'),
-            'total_tourism_tax' => isset($total_tourism_tax) ? $total_tourism_tax : 0,
             'show_tourism_tax_separately' => (bool) Configuration::get('QLO_TOURISM_TAX_SHOW_SEPARATE'),
         ));
     }

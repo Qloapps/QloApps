@@ -161,8 +161,8 @@
 												{/if}
 											{/block}
 											{block name='blockcart_shopping_cart_total_convenience_fee'}
-												{if isset($total_convenience_fee) && $total_convenience_fee}
-													<div class="cart-prices-line">
+												{if isset($total_convenience_fee)}
+													<div class="cart-prices-line"{if !$total_convenience_fee} style="display:none"{/if}>
 														<span class="price cart_block_convenience_fee ajax_cart_convenience_fee">{convertPrice price=$total_convenience_fee}</span>
 														<span class="price">{l s='Convenience Fees' mod='blockcart'}</strong>
 													</div>
@@ -343,8 +343,8 @@
 								</span>
 							</div> -->
 							{block name='blockcart_layer_cart_total_convenience_fee'}
-								{if isset($total_convenience_fee) && $total_convenience_fee}
-									<div class="layer_cart_row">
+								{if isset($total_convenience_fee)}
+									<div class="layer_cart_row"{if !$total_convenience_fee} style="display:none"{/if}>
 										<strong class="dark">
 											{l s='Convenience Fees' mod='blockcart'}
 											{if $use_taxes && $display_tax_label}

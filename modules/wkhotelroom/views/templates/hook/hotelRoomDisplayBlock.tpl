@@ -38,64 +38,72 @@
                     </div>
                 {/if}
                 {block name='hotel_room_block_content'}
-                    <div class="row home_block_content">
+                    <div class="row home_block_content htlRoom-owlCarousel">
                         <div class="col-sm-12 col-xs-12">
-                            {assign var='htlRoomBlockIteration' value=0}
-                            {foreach from=$hotelRoomDisplay item=roomDisplay name=htlRoom}
-                                {if $smarty.foreach.htlRoom.iteration%2}
-                                    <div class="row">
-                                {/if}
-                                        <div class="col-sm-12 col-md-6 margin-btm-30">
-                                            {block name='hotel_room_block_room_type_image'}
-                                                <a href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}">
-                                                    <img src="{$roomDisplay.image|escape:'htmlall':'UTF-8'}" alt="{$roomDisplay.name|escape:'htmlall':'UTF-8'}" class="img-responsive width-100">
-                                                </a>
+                            <div class="owl-carousel owl-theme">
+                                {foreach from=$hotelRoomDisplay item=roomDisplay name=htlRoom}
+                                    <div class="htlRoomCard">
+                                        {block name='hotel_room_block_room_type_image'}
+                                            <a class="htlRoomCardImg" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}">
+                                                <img src="{$roomDisplay.image|escape:'htmlall':'UTF-8'}" alt="{$roomDisplay.name|escape:'htmlall':'UTF-8'}">
+                                            </a>
+                                        {/block}
+                                        {block name='displayHotelRoomsBlockImageAfter'}
+                                            {hook h='displayHotelRoomsBlockImageAfter' room_type=$roomDisplay}
+                                        {/block}
+                                        <div class="htlRoomCardBody">
+                                            {block name='hotel_room_block_room_type_description'}
+                                                <p class="htlRoomTypeNameText">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
+                                                {if $roomDisplay.feature}
+                                                    <div class="htlRoomCardFeatured">
+                                                        {* one line: the row is cut with an ellipsis by the css when it is wider than the card *}
+                                                        {foreach from=$roomDisplay.feature item=feat}
+                                                            <span title="{$feat.name|escape:'htmlall':'UTF-8'}">
+                                                                {if $feat.logo_type == 'icon'}<i class="{$feat.logo|escape:'htmlall':'UTF-8'}"></i>{else}<img class="htlRoomFeatureImg" src="{$smarty.const._PS_IMG_}rf/{$feat.logo_image|escape:'htmlall':'UTF-8'}" alt="{$feat.name|escape:'htmlall':'UTF-8'}" onerror="this.style.display='none'">{/if}
+                                                                {$feat.value|escape:'htmlall':'UTF-8'}
+                                                            </span>
+                                                        {/foreach}
+                                                    </div>
+                                                {/if}
+                                                {if $roomDisplay.amenities}
+                                                    <div class="htlRoomCardMeta">
+                                                            <span class="htlRoomCardAmen">
+                                                                {foreach from=$roomDisplay.amenities item=amenity}
+                                                                    {if $amenity.logo}
+                                                                        <span title="{$amenity.name|escape:'htmlall':'UTF-8'}">
+                                                                            {if $amenity.logo_type == 'icon'}<i class="{$amenity.logo|escape:'htmlall':'UTF-8'}"></i>{else}<img class="htlRoomAmenityImg" src="{$amenity_img_dir|escape:'htmlall':'UTF-8'}{$amenity.logo|escape:'htmlall':'UTF-8'}" alt="{$amenity.name|escape:'htmlall':'UTF-8'}">{/if}
+                                                                        </span>
+                                                                    {/if}
+                                                                {/foreach}
+                                                            </span>
+                                                    </div>
+                                                {/if}
                                             {/block}
-                                            {block name='displayHotelRoomsBlockImageAfter'}
-                                                {hook h='displayHotelRoomsBlockImageAfter' room_type=$roomDisplay}
-                                            {/block}
-                                            <div class="hotelRoomDescContainer">
-                                                {block name='hotel_room_block_room_type_description'}
-                                                    <div class="row margin-lr-0">
-                                                        <p class="htlRoomTypeNameText pull-left">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
-                                                        {if $roomDisplay.show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
-                                                            <p class="htlRoomTypePriceText pull-right">
-                                                                {if $roomDisplay.feature_price_diff >= 0}
-                                                                    <span class="wk_roomType_price {if $roomDisplay.feature_price_diff>0}room_type_old_price{/if}">{convertPrice price = $roomDisplay.price_without_reduction}</span>
-                                                                {/if}
-                                                                {if $roomDisplay.feature_price_diff}
-                                                                    <span class="wk_roomType_price">{convertPrice price = $roomDisplay.feature_price}</span>
-                                                                {/if}
-                                                                <span class="wk_roomType_price_type">
-                                                                    /&nbsp;{l s='Per Night' mod='wkhotelroom'}
-                                                                </span>
-                                                            </p>
+                                            <div class="htlRoomCardFoot">
+                                                {if $roomDisplay.show_price && !isset($restricted_country_mode) && !$PS_CATALOG_MODE}
+                                                    <p class="htlRoomTypePriceText">
+                                                        {if $roomDisplay.feature_price_diff >= 0}
+                                                            <span class="wk_roomType_price {if $roomDisplay.feature_price_diff>0}room_type_old_price{/if}">{convertPrice price = $roomDisplay.price_without_reduction}</span>
                                                         {/if}
-                                                    </div>
-                                                    <div class="row margin-lr-0 htlRoomTypeDescText htlRoomTypeDescTextContainer">{$roomDisplay.description|escape:'html':'UTF-8'}</div>
-                                                    <div class="row htlRoomTypeDescOriginal" hidden>{$roomDisplay.description|escape:'html':'UTF-8'}</div>
-                                                    <div class="htlRoomTypeDescExtras"><span class='htlRoomTypeDescReadmore'>...{l s='Read More.' mod='wkhotelroom'}</span><span class='htlRoomTypeDescReadless'>...{l s='Read Less.' mod='wkhotelroom'}</span></div>
-                                                {/block}
+                                                        {if $roomDisplay.feature_price_diff}
+                                                            <span class="wk_roomType_price">{convertPrice price = $roomDisplay.feature_price}</span>
+                                                        {/if}
+                                                        <span class="wk_roomType_price_type">/&nbsp;{l s='night' mod='wkhotelroom'}</span>
+                                                    </p>
+                                                {/if}
                                                 {block name='hotel_room_block_action'}
-                                                    <div class="row margin-lr-0">
-                                                        <a class="btn htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE}{l s='book now' mod='wkhotelroom'}{else}{l s='View' mod='wkhotelroom'}{/if}</span></a>
-                                                    </div>
+                                                    <a class="btn htlRoomTypeBookNow" href="{$link->getProductLink($roomDisplay.id_product)|escape:'html':'UTF-8'}"><span>{if !isset($restricted_country_mode) && !$PS_CATALOG_MODE}{l s='Book now' mod='wkhotelroom'}{else}{l s='View' mod='wkhotelroom'}{/if}</span></a>
                                                 {/block}
                                             </div>
                                         </div>
-                                {if !($smarty.foreach.htlRoom.iteration%2)}
                                     </div>
-                                {/if}
-                                {assign var='htlRoomBlockIteration' value=$smarty.foreach.htlRoom.iteration}
-                            {/foreach}
-                            {if $htlRoomBlockIteration%2}
-                                </div>
-                            {/if}
+                                {/foreach}
+                            </div>
                         </div>
                     </div>
                 {/block}
             </div>
-            <hr class="home_block_seperator"/>
+           <hr class="home_block_seperator"/>
         </div>
     {/if}
 {/block}

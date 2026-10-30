@@ -20,8 +20,11 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 */
 
-.htlInterior-owlCarousel .owl-stage-outer {
-    border: 1px solid #ccc;
+@media (max-width: 767px) {
+    .htlInterior-owlCarousel .owl-carousel {
+        width: 100%;
+        margin: 0;
+    }
 }
 .interiorImgWrapper {
     width: 100%;
@@ -46,32 +49,24 @@
    height: 100%;
    object-fit: cover;
 }
-.htlInterior-owlCarousel .owl-prev, .htlInterior-owlCarousel .owl-next{
-    font-size: 40px;
-    font-weight: 200;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 10;
-}
-.htlInterior-owlCarousel .owl-prev {
-    left: 0;
-}
-.htlInterior-owlCarousel .owl-next {
-    right: 0;
-}
 .nav-direction-wrapper{
-	display: table;
-    height: 100%;
+	display: block;
 }
 .nav-direction-primary {
-	display: table-cell;
-    vertical-align: middle;
+	display: block;
 }
 .nav-direction-secondary {
-	padding: 40px 18px;
-	opacity: 0.85;
-	background-color: #ffffff;
+	background: rgba(0, 0, 0, 0.4);
+	color: #fff;
+	border-radius: 2px;
+	padding: 8px 14px;
+	font-size: 20px;
+	line-height: 1;
+	transition: background 0.2s;
+}
+.htlInterior-owlCarousel .owl-prev:hover .nav-direction-secondary,
+.htlInterior-owlCarousel .owl-next:hover .nav-direction-secondary {
+	background: rgba(0, 0, 0, 0.65);
 }
 .interiorHoverBlockWrapper {
 	position: absolute;
@@ -79,7 +74,7 @@
 	right: 0;
 	top: 0;
 	bottom: 0;
-	background-image: url("../img/black-opacity-5.png");
+	background-color: rgba(0, 0, 0, 0.5);
 	cursor: pointer;
 	display: none;
 }
@@ -94,4 +89,88 @@
     font-size: 50px;
     text-align: center;
     vertical-align: middle;
+}
+
+/* gallery: pages of 8 square photos (4 x 2) with dots below */
+.htlInterior-owlCarousel .owl-stage-outer {
+    border: 0;
+}
+.interiorImgWrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    height: auto;
+}
+.interiorbox {
+    padding-bottom: 100%;
+}
+.interiorboxInner {
+    border: 0;
+    border-radius: 3px;
+}
+.htlInterior-owlCarousel .owl-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 24px;
+}
+.htlInterior-owlCarousel .owl-dots .owl-dot span {
+    display: block;
+    width: 7px;
+    height: 7px;
+    margin: 0;
+    border-radius: 50%;
+    background: #C4C4C4;
+}
+.htlInterior-owlCarousel .owl-dots .owl-dot.active span {
+    background: #333;
+}
+/* touch screens have no hover, so always show the zoom badge */
+@media (hover: none) {
+    #hotelInteriorBlock .interiorbox::after {
+        content: "\f00e";
+        font-family: "FontAwesome";
+        position: absolute;
+        right: 8px;
+        top: 8px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, .45);
+        color: #fff;
+        font-size: 14px;
+        line-height: 28px;
+        text-align: center;
+        pointer-events: none;
+    }
+}
+
+/* gallery lightbox: square photo, dark overlay, thumbnail strip with round prev/next at the bottom */
+html body .htl-gallery-fancybox .fancybox-skin, html body .htl-light-fancybox .fancybox-skin { border-radius: 5px; }
+html body .htl-gallery-fancybox .fancybox-skin { padding: 0 !important; background: transparent; border-radius: 5px; box-shadow: none; }
+html body .htl-gallery-fancybox .fancybox-outer, html body .htl-gallery-fancybox .fancybox-inner { border-radius: 5px; overflow: hidden; }
+html body .htl-gallery-fancybox .fancybox-image { border-radius: 5px; }
+html body .htl-light-fancybox .fancybox-title-outside-wrap { position: static; display: table; width: auto; margin: 14px auto 0; padding: 6px 20px; border-radius: 16px; background: #2b2b2b; font-size: 13px; font-weight: 700; line-height: 1.4; color: #fff; text-align: center; }
+html body .htl-gallery-fancybox .fancybox-title-outside-wrap { position: static; display: table; width: auto; margin: 14px auto 0; padding: 6px 20px; border: 1px solid rgba(255, 255, 255, .35); border-radius: 16px; background: #111; font-size: 13px; font-weight: 700; line-height: 1.4; color: #fff; text-align: center; }
+.htl-gal-thumbs { position: fixed; left: 0; right: 0; bottom: 49px; z-index: 8040; display: flex; align-items: center; gap: 16px; padding: 0 28px; }
+.htl-gal-thumbs__track { flex: 1 1 auto; display: flex; gap: 12px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; padding: 2px 0; }
+.htl-gal-thumbs__track::-webkit-scrollbar { display: none; }
+.htl-gal-thumbs__item { flex: 0 0 auto; width: 96px; height: 96px; padding: 0; border: 2px solid transparent; border-radius: 2px; background: #000; overflow: hidden; opacity: .6; cursor: pointer; transition: opacity .2s ease, border-color .2s ease; }
+.htl-gal-thumbs__item img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.htl-gal-thumbs__item:hover, .htl-gal-thumbs__item.is-active { opacity: 1; }
+.htl-gal-thumbs__item.is-active { border-color: #fff; }
+.htl-gal-thumbs__nav { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; padding: 8px 15px; border: 0; border-radius: 50%; background: #fff; color: #333; font-size: 22px; line-height: 1; box-shadow: 0 2px 10px rgba(0, 0, 0, .3); cursor: pointer; transition: transform .2s ease; }
+.htl-gal-thumbs__nav i { display: block; line-height: 1; }
+@media (max-width: 767px) {
+    .htl-gal-thumbs { bottom: 20px; padding: 0 12px; gap: 8px; }
+    .htl-gal-thumbs__item { width: 60px; height: 60px; }
+    .htl-gal-thumbs__nav { width: 36px; height: 36px; font-size: 20px; }
+    html body .htl-gallery-fancybox .fancybox-close { top: 8px; right: 8px; }
+}
+html body .fancybox-overlay.htl-gallery-overlay { opacity: 1 !important; background: rgba(43, 43, 43, 0.95) !important; }
+
+/* the theme's a:focus outline would cover half of the photo after a click on next/prev, keep it for keyboard users only */
+html body .htl-light-fancybox .fancybox-nav:focus:not(:focus-visible),
+html body .htl-gallery-fancybox .fancybox-nav:focus:not(:focus-visible) {
+    outline: 0;
 }

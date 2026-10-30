@@ -60,8 +60,14 @@
     column-gap: 0px;
   }
   .header-rmsearch-wrapper {
-    height: calc(100vw - 60px);
+    height: auto;
     width: calc(100vw - 60px);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  /* the date picker opens inside this popup, so don't clip it */
+  .fancybox-inner:has(#xs_room_search_form) {
+    overflow: visible !important;
   }
 }
 .fancy_search_header_xs {
