@@ -1,1 +1,0 @@
-## Channel Manager Connector
