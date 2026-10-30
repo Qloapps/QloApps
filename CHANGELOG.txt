@@ -16,6 +16,7 @@
   - #1926: Qlositemap module for XML sitemaps generation, and fixed the HTML sitemap page.
   - #1838: Google hotel connector module in the default QloApps.
   - #1784: Hooks to add an extra column for additional information in order details in back-office.
+  - #1952: Removed the default "Channel Manager Connector" module (qlochannelmanagerconnector); replaced by the combined "Channel Manager & API Connector" module (qlocmconnector), now bundled by default.
 
 ## Back Office:
 - Improvements:

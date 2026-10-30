@@ -45,6 +45,7 @@ class UpgradeQloCMConnector700{
     {
         return $this->module->registerHook(
             array(
+                'addWebserviceResources',
                 'displayAdminListBefore',
                 'displayBackOfficeHeader',
                 'actionAdminControllerSetMedia',
