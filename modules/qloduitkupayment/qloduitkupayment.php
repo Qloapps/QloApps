@@ -446,6 +446,34 @@ class QloDuitkuPayment extends PaymentModule
         );
     }
 
+    /**
+     * Confirm a transaction's real status with Duitku's own server-to-server API, rather
+     * than trusting the unsigned browser return redirect. Must be called at most once per
+     * return hit - Duitku rate-limits repeated calls to this endpoint.
+     *
+     * @param string $merchantOrderId
+     *
+     * @return array
+     */
+    public function checkDuitkuTransactionStatus($merchantOrderId)
+    {
+        $merchantCode = Configuration::get('QDP_DUITKU_PAYMENT_MERCHANT_CODE');
+        $apiKey = Configuration::get('QDP_DUITKU_PAYMENT_API_KEY');
+        $signature = hash_hmac('sha256', $merchantCode . $merchantOrderId, $apiKey);
+
+        $params = array(
+            'merchantCode'    => $merchantCode,
+            'merchantOrderId' => $merchantOrderId,
+            'signature'       => $signature,
+        );
+
+        return QdpDuitkuServiceRequest::makeRequest(
+            'transactionStatus',
+            QdpDuitkuTransaction::QDP_CURL_REQUEST_TYPE_POST,
+            $params
+        );
+    }
+
     private function getCustomerPhone($customer, $addressId)
     {
         if (!empty($customer->phone)) {
