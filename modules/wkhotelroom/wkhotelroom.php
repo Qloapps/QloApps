@@ -155,6 +155,22 @@ class WkHotelRoom extends Module
             )
         );
 
+        $autoplay = Configuration::get('HOTEL_ROOM_DISPLAY_AUTOPLAY');
+        $navType = (int) Configuration::get('HOTEL_ROOM_DISPLAY_NAV_TYPE');
+        if (!in_array($navType, array(
+            WkHotelRoomDisplay::NAV_TYPE_DOTS,
+            WkHotelRoomDisplay::NAV_TYPE_ARROWS,
+            WkHotelRoomDisplay::NAV_TYPE_BOTH,
+        ))) {
+            $navType = WkHotelRoomDisplay::NAV_TYPE_ARROWS;
+        }
+        Media::addJsDef(array(
+            'htlRoomSliderArrows' => $navType != WkHotelRoomDisplay::NAV_TYPE_DOTS,
+            'htlRoomSliderDots' => $navType != WkHotelRoomDisplay::NAV_TYPE_ARROWS,
+            'htlRoomSliderAutoplay' => $autoplay === false ? true : (bool) $autoplay,
+            'htlRoomSliderInterval' => max(500, (int) Configuration::get('HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL') ?: 5000),
+        ));
+
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.carousel.min.css');
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.theme.default.min.css');
         $this->context->controller->addJS(_PS_JS_DIR_.'owl-carousel/owl.carousel.min.js');
@@ -296,7 +312,10 @@ class WkHotelRoom extends Module
         $configVars = array(
             'HOTEL_ROOM_DISPLAY_HEADING',
             'HOTEL_ROOM_DISPLAY_DESCRIPTION',
-            'HOTEL_ROOM_DISPLAY_PROPERTY'
+            'HOTEL_ROOM_DISPLAY_PROPERTY',
+            'HOTEL_ROOM_DISPLAY_NAV_TYPE',
+            'HOTEL_ROOM_DISPLAY_AUTOPLAY',
+            'HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL',
         );
         foreach ($configVars as $key) {
             if (!Configuration::deleteByName($key)) {

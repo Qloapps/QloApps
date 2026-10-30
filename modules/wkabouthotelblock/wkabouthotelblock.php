@@ -67,6 +67,22 @@ class WkAboutHotelBlock extends Module
             }
         }
 
+        $navType = (int) Configuration::get('HOTEL_INTERIOR_NAV_TYPE');
+        if (!in_array($navType, array(
+            WkHotelInteriorImage::NAV_TYPE_DOTS,
+            WkHotelInteriorImage::NAV_TYPE_ARROWS,
+            WkHotelInteriorImage::NAV_TYPE_BOTH,
+        ))) {
+            $navType = WkHotelInteriorImage::NAV_TYPE_DOTS;
+        }
+        $autoplay = Configuration::get('HOTEL_INTERIOR_AUTOPLAY');
+        Media::addJsDef(array(
+            'htlInteriorSliderArrows' => $navType != WkHotelInteriorImage::NAV_TYPE_DOTS,
+            'htlInteriorSliderDots' => $navType != WkHotelInteriorImage::NAV_TYPE_ARROWS,
+            'htlInteriorSliderAutoplay' => $autoplay === false ? true : (bool) $autoplay,
+            'htlInteriorSliderInterval' => max(500, (int) Configuration::get('HOTEL_INTERIOR_AUTOPLAY_INTERVAL') ?: 5000),
+        ));
+
         $this->context->smarty->assign(
             array(
                 'HOTEL_INTERIOR_HEADING' => $HOTEL_INTERIOR_HEADING,
@@ -204,7 +220,13 @@ class WkAboutHotelBlock extends Module
 
     public function deleteConfigKeys()
     {
-        $var = array('HOTEL_INTERIOR_HEADING', 'HOTEL_INTERIOR_DESCRIPTION');
+        $var = array(
+            'HOTEL_INTERIOR_HEADING',
+            'HOTEL_INTERIOR_DESCRIPTION',
+            'HOTEL_INTERIOR_NAV_TYPE',
+            'HOTEL_INTERIOR_AUTOPLAY',
+            'HOTEL_INTERIOR_AUTOPLAY_INTERVAL',
+        );
         foreach ($var as $key) {
             if (!Configuration::deleteByName($key)) {
                 return false;

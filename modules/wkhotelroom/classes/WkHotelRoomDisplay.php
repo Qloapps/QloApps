@@ -23,6 +23,10 @@
 
 class WkHotelRoomDisplay extends ObjectModel
 {
+    const NAV_TYPE_DOTS = 1;
+    const NAV_TYPE_ARROWS = 2;
+    const NAV_TYPE_BOTH = 3;
+
     public $id_product;
     public $active;
     public $position;
@@ -189,6 +193,9 @@ class WkHotelRoomDisplay extends ObjectModel
         Configuration::updateValue('HOTEL_ROOM_DISPLAY_HEADING', $HOTEL_ROOM_DISPLAY_HEADING);
         Configuration::updateValue('HOTEL_ROOM_DISPLAY_DESCRIPTION', $HOTEL_ROOM_DISPLAY_DESCRIPTION);
         Configuration::updateValue('HOTEL_ROOM_DISPLAY_PROPERTY', 0);
+        Configuration::updateValue('HOTEL_ROOM_DISPLAY_NAV_TYPE', self::NAV_TYPE_ARROWS);
+        Configuration::updateValue('HOTEL_ROOM_DISPLAY_AUTOPLAY', 1);
+        Configuration::updateValue('HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL', 5000);
         if ($roomTypes = HotelHelper::getPsProducts(Configuration::get('PS_LANG_DEFAULT'), 0, 5, 1)) {
             foreach ($roomTypes as $product) {
                 if (Validate::isLoadedObject($objProduct = new Product($product['id_product']))) {

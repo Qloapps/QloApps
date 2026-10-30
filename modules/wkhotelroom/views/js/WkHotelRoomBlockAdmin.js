@@ -21,6 +21,13 @@
 */
 
 $(document).ready(function() {
+    $(document).on('change', 'input[name="HOTEL_ROOM_DISPLAY_AUTOPLAY"]', function () {
+        if ($(this).val() === '1') {
+            $('input[name="HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL"]').closest('.form-group').show(200);
+        } else {
+            $('input[name="HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL"]').closest('.form-group').hide(200);
+        }
+    });
     var trigger_ajax = '';
     $('#productName').on('keyup', function(event) {
         var suggestion_ul = $(this).siblings("ul.prod_suggest_ul");

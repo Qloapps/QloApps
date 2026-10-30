@@ -334,7 +334,7 @@ a.htlRoomTypeBookNow:hover {
     text-overflow: ellipsis;
     white-space: nowrap;
     color: #777;
-    font-size: 14px;
+    font-size: 13px;
 }
 .htlRoomCardProperty > span + span:before {
     margin: 0 10px;
@@ -354,4 +354,23 @@ a.htlRoomTypeBookNow:hover {
 .htlRoomCardProperty + .htlRoomCardMeta {
     border-top: 1px solid #E5E5E5;
     padding-top: 12px;
+}
+
+/* dots under the room cards */
+.htlRoom-owlCarousel .owl-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+}
+.htlRoom-owlCarousel .owl-dots .owl-dot span {
+    display: block;
+    width: 7px;
+    height: 7px;
+    margin: 0;
+    border-radius: 50%;
+    background: #C4C4C4;
+}
+.htlRoom-owlCarousel .owl-dots .owl-dot.active span {
+    background: #333;
 }

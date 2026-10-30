@@ -31,6 +31,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
         $this->_defaultOrderBy = 'position';
         $this->bootstrap = true;
         $this->context = Context::getContext();
+        parent::__construct();
 
         $this->_select = ' pl.`name`, hbil.`hotel_name` ';
 
@@ -70,6 +71,33 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                         'type' => 'bool',
                         'default' => '0',
                         'hint' => $this->l('Show the property name and the city under the room type name in the room cards.'),
+                    ),
+                    'HOTEL_ROOM_DISPLAY_NAV_TYPE' => array(
+                        'title' => $this->l('Navigation Type'),
+                        'type' => 'select',
+                        'identifier' => 'id',
+                        'list' => array(
+                            array('id' => WkHotelRoomDisplay::NAV_TYPE_ARROWS, 'name' => $this->l('Arrows')),
+                            array('id' => WkHotelRoomDisplay::NAV_TYPE_DOTS, 'name' => $this->l('Dots')),
+                            array('id' => WkHotelRoomDisplay::NAV_TYPE_BOTH, 'name' => $this->l('Arrows and dots')),
+                        ),
+                        'hint' => $this->l('How the room cards slider of the home page is navigated.'),
+                    ),
+                    'HOTEL_ROOM_DISPLAY_AUTOPLAY' => array(
+                        'title' => $this->l('Auto slide'),
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'default' => '1',
+                        'hint' => $this->l('Slide the room cards automatically on the home page.'),
+                    ),
+                    'HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL' => array(
+                        'title' => $this->l('Slide Interval'),
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'class' => 'fixed-width-sm',
+                        'suffix' => $this->l('ms'),
+                        'default' => '5000',
+                        'desc' => $this->l('Milliseconds between slides. Min: 500. Example: 5000 = 5 s.'),
                     ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
@@ -138,7 +166,6 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
         );
         $this->identifier = 'id_room_block';
 
-        parent::__construct();
         if ($this->hotelList = HotelBranchInformation::getProfileAccessedHotels($this->context->employee->id_profile, 1)) {
             $objHotelRoomType = new HotelRoomType();
             if ($this->loadObject(true)
@@ -364,6 +391,21 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                         }
                     }
                 }
+            }
+            if (!in_array((int) Tools::getValue('HOTEL_ROOM_DISPLAY_NAV_TYPE'), array(
+                WkHotelRoomDisplay::NAV_TYPE_DOTS,
+                WkHotelRoomDisplay::NAV_TYPE_ARROWS,
+                WkHotelRoomDisplay::NAV_TYPE_BOTH,
+            ))) {
+                $this->errors[] = $this->l('Invalid navigation type.');
+            }
+            if (Tools::getValue('HOTEL_ROOM_DISPLAY_AUTOPLAY')) {
+                $slideInterval = Tools::getValue('HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL');
+                if (!Validate::isUnsignedInt($slideInterval) || $slideInterval < 500) {
+                    $this->errors[] = $this->l('Slide interval must be a whole number of at least 500 milliseconds.');
+                }
+            } else {
+                $_POST['HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL'] = Configuration::get('HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL');
             }
             if (!count($this->errors)) {
                 foreach ($languages as $lang) {
