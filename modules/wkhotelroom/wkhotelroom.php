@@ -117,10 +117,9 @@ class WkHotelRoom extends Module
                 if ($displayProperty && $roomTypeInfo) {
                     $objHotelBranch = new HotelBranchInformation((int) $roomTypeInfo['id_hotel'], $idLang);
                     $htlRoom['property_name'] = $objHotelBranch->hotel_name;
-                    // same format as the property location of the room type page
                     $addressInfo = HotelBranchInformation::getAddress((int) $roomTypeInfo['id_hotel'], $idLang);
-                    $htlRoom['property_city'] = $addressInfo['city'].
-                        ($addressInfo['id_state'] ? ', '.$addressInfo['state'] : '').', '.$addressInfo['country'];
+                    $htlRoom['property_location'] = $addressInfo['city'].
+                        ($addressInfo['state'] ? ', '.$addressInfo['state'] : '').', '.$addressInfo['country'];
                 }
                 $htlRoom['max_adults'] = $roomTypeInfo ? (int) $roomTypeInfo['max_adults'] : 0;
                 $htlRoom['max_children'] = $roomTypeInfo ? (int) $roomTypeInfo['max_children'] : 0;

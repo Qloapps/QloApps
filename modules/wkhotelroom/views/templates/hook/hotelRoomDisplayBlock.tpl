@@ -55,8 +55,8 @@
                                             {block name='hotel_room_block_room_type_description'}
                                                 <p class="htlRoomTypeNameText">{$roomDisplay.name|escape:'htmlall':'UTF-8'}</p>
                                                 {if isset($roomDisplay.property_name) && $roomDisplay.property_name}
-                                                    <p class="htlRoomCardProperty" title="{$roomDisplay.property_name|escape:'htmlall':'UTF-8'}{if isset($roomDisplay.property_city) && $roomDisplay.property_city}, {$roomDisplay.property_city|escape:'htmlall':'UTF-8'}{/if}">
-                                                        <span><i class="icon-map-marker"></i> {$roomDisplay.property_name|escape:'htmlall':'UTF-8'}{if isset($roomDisplay.property_city) && $roomDisplay.property_city},  {$roomDisplay.property_city|escape:'htmlall':'UTF-8'}</span>{/if}
+                                                    <p class="htlRoomCardProperty" title="{$roomDisplay.property_name|escape:'htmlall':'UTF-8'}{if isset($roomDisplay.property_location) && $roomDisplay.property_location}, {$roomDisplay.property_location|escape:'htmlall':'UTF-8'}{/if}">
+                                                        <span><i class="icon-map-marker"></i> {$roomDisplay.property_name|escape:'htmlall':'UTF-8'}{if isset($roomDisplay.property_location) && $roomDisplay.property_location},  {$roomDisplay.property_location|escape:'htmlall':'UTF-8'}</span>{/if}
                                                     </p>
                                                 {/if}
                                                 {if $roomDisplay.feature}
