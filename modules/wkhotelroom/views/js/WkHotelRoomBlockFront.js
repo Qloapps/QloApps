@@ -86,11 +86,13 @@ $(document).ready(function() {
         fitRoomCards($(this));
     }).owlCarousel({
         loop: true,
-        nav: true,
+        nav: htlRoomSliderArrows,
         navText: ['<i class="icon-angle-left"></i>', '<i class="icon-angle-right"></i>'],
-        dots: false,
-        autoplay: true,
+        dots: htlRoomSliderDots,
+        autoplay: htlRoomSliderAutoplay,
+        autoplayTimeout: htlRoomSliderInterval,
         autoplaySpeed: 1000,
+        autoplayHoverPause: true,
         margin: 24,
         items: 1,
         rtl: typeof language_is_rtl != 'undefined' && language_is_rtl,

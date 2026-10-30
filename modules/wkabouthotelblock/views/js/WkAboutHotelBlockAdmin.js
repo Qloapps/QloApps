@@ -21,6 +21,14 @@
 */
 
 $(document).ready(function(){
+    $(document).on('change', 'input[name="HOTEL_INTERIOR_AUTOPLAY"]', function () {
+        if ($(this).val() === '1') {
+            $('input[name="HOTEL_INTERIOR_AUTOPLAY_INTERVAL"]').closest('.form-group').show(200);
+        } else {
+            $('input[name="HOTEL_INTERIOR_AUTOPLAY_INTERVAL"]').closest('.form-group').hide(200);
+        }
+    });
+	
 	$("#interior_img").on("change", function(event) {
 		if (typeof this.files[0] != 'undefined') {
 			if (this.files[0].size > maxSizeAllowed) {

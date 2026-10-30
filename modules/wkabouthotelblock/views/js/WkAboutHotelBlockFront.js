@@ -23,16 +23,19 @@
 $(document).ready(function(){
   	$('.htlInterior-owlCarousel .owl-carousel').owlCarousel({
   		loop:true,
-	    nav:false,
-	    dots:true,
+	    nav: htlInteriorSliderArrows,
+	    navText: [
+	        '<div class="nav-direction-wrapper"><div class="nav-direction-primary"><div class="nav-direction-secondary"><i class="icon-angle-left"></i></div></div></div>',
+	        '<div class="nav-direction-wrapper"><div class="nav-direction-primary"><div class="nav-direction-secondary"><i class="icon-angle-right"></i></div></div></div>'
+	    ],
+	    dots: htlInteriorSliderDots,
 	    items: 1,
 	    margin: 8,
-	    slideBy: 'page',
 	    responsive: {576: {items: 2}},
 	    autoHeight:true,
-	    autoplay:true,
+	    autoplay: htlInteriorSliderAutoplay,
 	    autoplaySpeed:1000,
-	    autoplayTimeout:5000,
+	    autoplayTimeout: htlInteriorSliderInterval,
 		autoplayHoverPause:true,
 	    responsiveClass:true,
 		rtl: language_is_rtl
