@@ -106,31 +106,40 @@ class QloDuitkuPaymentReturnModuleFrontController extends ModuleFrontController
                         $this->module->logger->log('After Cart Validation in return.', FileLogger::DEBUG);
                         $objDuitkuTransaction->addCartLock((int) $idCart);
                         if (!$res) {
-                            $objDuitkuTransaction->save(); 
+                            $objDuitkuTransaction->save();
                         }
 
-                        if ($this->module->validateOrder(
-                            (int) $idCart,
-                            $orderStatus,
-                            $cartAmount,
-                            $this->module->l('Duitku Payment', 'return'),
-                            null,
-                            $extraVars,
-                            (int) $id_currency,
-                            false,
-                            $objCustomer->secure_key
-                        )) {
+                        $statusResponse = $this->module->checkDuitkuTransactionStatus($merchantOrderId);
+                        $statusCode = isset($statusResponse['response']['statusCode']) ? $statusResponse['response']['statusCode'] : null;
 
-                            $this->module->logger->log('Return Process Order created.', FileLogger::DEBUG);
+                        if ($statusResponse['status'] === true && ($statusCode == '00' || $statusCode == '01')) {
+                            if ($this->module->validateOrder(
+                                (int) $idCart,
+                                $orderStatus,
+                                $cartAmount,
+                                $this->module->l('Duitku Payment', 'return'),
+                                null,
+                                $extraVars,
+                                (int) $id_currency,
+                                false,
+                                $objCustomer->secure_key
+                            )) {
 
-                            $url = $this->context->link->getPageLink('order-confirmation', true, null, [
-                                'id_cart'   => $idCart,
-                                'id_module' => $this->module->id,
-                                'id_order'  => Order::getOrderByCartId($idCart),
-                                'success'   => 1,
-                                'key'       => $objCustomer->secure_key,
-                            ]);
-                            Tools::redirect($url);
+                                $this->module->logger->log('Return Process Order created.', FileLogger::DEBUG);
+
+                                $url = $this->context->link->getPageLink('order-confirmation', true, null, [
+                                    'id_cart'   => $idCart,
+                                    'id_module' => $this->module->id,
+                                    'id_order'  => Order::getOrderByCartId($idCart),
+                                    'success'   => 1,
+                                    'key'       => $objCustomer->secure_key,
+                                ]);
+                                Tools::redirect($url);
+                            }
+                        } else {
+                            $this->module->logger->log('Duitku could not confirm transaction for merchantOrderId ' . $merchantOrderId, FileLogger::DEBUG);
+                            $objDuitkuTransaction->removeCartLock($idCart);
+                            Tools::redirect($this->context->link->getModuleLink('qloduitkupayment', 'error') . '?validation_err=1&id=' . $merchantOrderId);
                         }
                     }
 

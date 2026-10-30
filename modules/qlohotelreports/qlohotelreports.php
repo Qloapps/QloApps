@@ -760,16 +760,27 @@ class QloHotelReports extends Module
 
         if ($report === 'source' || $report === 'payment-method') {
             $bookingSource = pSQL(Tools::getValue('booking_source', ''));
+            $paymentMethod = pSQL(Tools::getValue('payment_method', ''));
             $filterBaseUrl = $baseUrl . '&tab=' . $report
-                . ($idHotel      ? '&id_hotel='       . $idHotel      : '')
-                . ($bookingSource ? '&booking_source=' . $bookingSource : '');
+                . ($idHotel ? '&id_hotel=' . $idHotel : '');
 
             $baseParams = array(
-                'date_from'      => $dateFrom,
-                'date_to'        => $dateTo,
-                'id_hotel'       => $idHotel ?: false,
-                'booking_source' => $bookingSource,
+                'date_from' => $dateFrom,
+                'date_to'   => $dateTo,
+                'id_hotel'  => $idHotel ?: false,
             );
+
+            if ($report === 'payment-method') {
+                $filterBaseUrl .= ($paymentMethod ? '&payment_method=' . urlencode($paymentMethod) : '');
+                $baseParams['payment_method'] = $paymentMethod;
+                $this->context->smarty->assign(array(
+                    'filter_payment_method' => $paymentMethod,
+                    'payment_methods'       => HotelBookingDetail::getDistinctOrderPaymentMethods($idHotel ?: false),
+                ));
+            } else {
+                $filterBaseUrl .= ($bookingSource ? '&booking_source=' . $bookingSource : '');
+                $baseParams['booking_source'] = $bookingSource;
+            }
 
             $this->context->smarty->assign(array(
                 'filter_base_url'    => $filterBaseUrl,
@@ -1657,6 +1668,10 @@ class QloHotelReports extends Module
             'date_to'   => $dateTo,
             'id_hotel'  => $idHotel ?: false,
         );
+
+        if ($report === 'payment-method') {
+            $baseParams['payment_method'] = pSQL(Tools::getValue('payment_method', ''));
+        }
 
         if ($report === 'source') {
             $rows = HotelBookingDetail::getChannelStats($baseParams);

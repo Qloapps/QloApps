@@ -40,6 +40,21 @@
                 </select>
             </div>
         </div>
+        {if $active_report == 'payment-method'}
+        <div class="row">
+            <label class="col-xs-3">{l s='Payment Method' mod='qlohotelreports'}</label>
+            <div class="col-xs-9">
+                <select name="payment_method" class="form-control">
+                    <option value=""{if !$filter_payment_method} selected="selected"{/if}>{l s='All' mod='qlohotelreports'}</option>
+                    {foreach $payment_methods as $pm}
+                    <option value="{$pm.payment_method|escape:'html':'UTF-8'}"{if $filter_payment_method == $pm.payment_method} selected="selected"{/if}>
+                        {$pm.payment_method|escape:'html':'UTF-8'}
+                    </option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        {else}
         <div class="row">
             <label class="col-xs-3">{l s='Booking Source' mod='qlohotelreports'}</label>
             <div class="col-xs-9">
@@ -48,6 +63,7 @@
                     placeholder="{l s='All sources' mod='qlohotelreports'}">
             </div>
         </div>
+        {/if}
         <div class="actions">
             <hr>
             <span class="pull-right">

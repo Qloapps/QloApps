@@ -25,9 +25,9 @@
 if (!defined('_PS_VERSION_'))
 	exit;
 
-function upgrade_module_5_0_5($module)
+function upgrade_module_7_0_0($module)
 {
-    $objCMConnector = new UpgradeQloCMConnector505($module);
+    $objCMConnector = new UpgradeQloCMConnector700($module);
     return (
         $objCMConnector->registerHooks()
         && $objCMConnector->removeOldModule()
@@ -35,7 +35,7 @@ function upgrade_module_5_0_5($module)
     );
 }
 
-class UpgradeQloCMConnector505{
+class UpgradeQloCMConnector700{
     public function __construct($module)
     {
         $this->module = $module;
