@@ -64,6 +64,13 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                         'cols' => '2',
                         'hint' => $this->l('Enter a description for the property rooms block.'),
                     ),
+                    'HOTEL_ROOM_DISPLAY_PROPERTY' => array(
+                        'title' => $this->l('Display property name and city'),
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'default' => '0',
+                        'hint' => $this->l('Show the property name and the city under the room type name in the room cards.'),
+                    ),
                 ),
                 'submit' => array('title' => $this->l('Save'))
             ),

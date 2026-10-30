@@ -51,6 +51,7 @@ class WkHotelRoom extends Module
             $dateFrom = date('Y-m-d');
             $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
             $useTax = HotelBookingDetail::useTax();
+            $displayProperty = (bool) Configuration::get('HOTEL_ROOM_DISPLAY_PROPERTY');
             $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
             $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
             foreach ($hotelRoomDisplay as &$htlRoom) {
@@ -113,6 +114,14 @@ class WkHotelRoom extends Module
                 );
                 $objRoomType = new HotelRoomType();
                 $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
+                if ($displayProperty && $roomTypeInfo) {
+                    $objHotelBranch = new HotelBranchInformation((int) $roomTypeInfo['id_hotel'], $idLang);
+                    $htlRoom['property_name'] = $objHotelBranch->hotel_name;
+                    // same format as the property location of the room type page
+                    $addressInfo = HotelBranchInformation::getAddress((int) $roomTypeInfo['id_hotel'], $idLang);
+                    $htlRoom['property_city'] = $addressInfo['city'].
+                        ($addressInfo['id_state'] ? ', '.$addressInfo['state'] : '').', '.$addressInfo['country'];
+                }
                 $htlRoom['max_adults'] = $roomTypeInfo ? (int) $roomTypeInfo['max_adults'] : 0;
                 $htlRoom['max_children'] = $roomTypeInfo ? (int) $roomTypeInfo['max_children'] : 0;
                 $features = array();
@@ -287,7 +296,8 @@ class WkHotelRoom extends Module
     {
         $configVars = array(
             'HOTEL_ROOM_DISPLAY_HEADING',
-            'HOTEL_ROOM_DISPLAY_DESCRIPTION'
+            'HOTEL_ROOM_DISPLAY_DESCRIPTION',
+            'HOTEL_ROOM_DISPLAY_PROPERTY'
         );
         foreach ($configVars as $key) {
             if (!Configuration::deleteByName($key)) {

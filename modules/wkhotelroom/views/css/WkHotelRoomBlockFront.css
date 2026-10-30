@@ -326,3 +326,32 @@ a.htlRoomTypeBookNow:hover {
 .htlRoomCardFeatured .htlRoomFeatureMore {
     margin-left: 5px;
 }
+
+/* property name and city under the room type name */
+.htlRoomCardBody .htlRoomCardProperty {
+    margin: 0px 0 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #777;
+    font-size: 14px;
+}
+.htlRoomCardProperty > span + span:before {
+    margin: 0 10px;
+    color: #CCC;
+}
+.htlRoomCardProperty i {
+    margin-right: 4px;
+    color: #999;
+}
+
+/* with the property line, the features get a line above them */
+.htlRoomCardProperty + .htlRoomCardFeatured {
+    border-top: 1px solid #E5E5E5;
+}
+
+/* the amenities keep their line under the property line */
+.htlRoomCardProperty + .htlRoomCardMeta {
+    border-top: 1px solid #E5E5E5;
+    padding-top: 12px;
+}
