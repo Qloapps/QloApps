@@ -631,7 +631,7 @@ class InstallModelInstall extends InstallAbstractModel
     public function setNotification($notificationData)
     {
         if (function_exists('curl_version')) {
-            $url = _QLO_API_URL_.'/getNotification.php';
+            $url = _QLO_API_URL_.'/hotel-reservation-clients/getNotification.php';
             $params = [
                 'method' => 'POST',
                 'headers' => array('Content-Type: application/json'),
@@ -721,7 +721,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'qlostatsserviceproducts',
                 'blockcart',
                 'blockuserinfo',
-                'qlochannelmanagerconnector',
+                'qlocmconnector',
                 'qlogooglehotelconnector'
             );
         }

@@ -1,4 +1,13 @@
 ------------------------------
+# V1.0.3 to V1.0.4
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1786] Added No Show booking status data to the Guest Cycle dashboard widget and its KPI listing.
+* [BO] : [#1713] Renamed "Hotel" to "Property" in the Guest Cycle dashboard widget column headers.
+
+------------------------------
 # V1.0.2 to V1.0.3
 ------------------------------
 

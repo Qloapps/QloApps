@@ -1,4 +1,12 @@
 ------------------------------
+# V1.4.3 to V1.4.4
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1603] Fixed undefined array key warnings when exporting registration stats as CSV in the back office.
+
+------------------------------
 # V1.4.2 to V1.4.3
 ------------------------------
 

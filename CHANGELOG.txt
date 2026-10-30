@@ -1,4 +1,298 @@
 ####################################
+# V1.8.0
+####################################
+
+## Added Features:
+  - #1786: No Show and Cancellation booking status in back-office, and updated refund request management.
+  - #1760: Tourism tax system with per-hotel configurable, rate tiers, child pricing, and exemption.
+  - #1782: Implement Source & Business Source Management.
+  - #1663: Filtered responses for the QloApps bookings API.
+  - #1791: Hotel reports module and functions needed for reports in their respective classes.
+  - #1765: Image categorisation for hotel images at back-office.
+  - #1714: Add CronTaskManager module in default QloApps.
+  - #1671: Connected rooms feature to room management in back-office.
+  - #1696: "QloApps Booking iCalendar (.ics) File Export" module in modules catalog.
+  - #1610: Add new payment module (Duitku payment module ) in QloApps by default.
+  - #1926: Qlositemap module for XML sitemaps generation, and fixed the HTML sitemap page.
+  - #1838: Google hotel connector module in the default QloApps.
+  - #1784: Hooks to add an extra column for additional information in order details in back-office.
+  - #1952: Removed the default "Channel Manager Connector" module (qlochannelmanagerconnector); replaced by the combined "Channel Manager & API Connector" module (qlocmconnector), now bundled by default.
+
+## Back Office:
+- Improvements:
+  - #1764: Dynamic homepage header media (image slider / video) display.
+  - #1790: Reset button and available variables for email template translations in back-office.
+  - #1803: Nationality field for customers in the back-office and front-office.
+  - #1659: A new “Add Credit Slip” button has been added to Credit Slip controller in back-office.
+  - #1762: Hotel selection in Cart Rule in back-office.
+  - #1720: Arrival Date and Departure Date to the order list in back-office.
+  - #1749: Booking calendar UI design in back-office.
+  - #1717: Hotel amenities, and room features, and added room amenities.
+  - #1698: Guest registration form button in order detail page, and made a new tab for Guest Registration in back office.
+  - #1732: Fix service product price removal from cart total after occupancy change for orders created via the back-office.
+  - #1691: Added view booking voucher button in order detail page in back-office to view booking voucher pdf.
+  - #1664: Download and print functionality for payment receipts in the back-office.
+  - #1656: Customer Service  Enhancements, bug fixes, and new features.
+  - #1709: Remove extra hook related to KPI from AdminOrderController in the back-office.
+  - #1665: Add configuration for infant age in GeneralSetting controller in back-office.
+  - #1652: Preview of Seo fields added in backoffice.
+  - #1597: Add bulk action to enable or disable modules in back-office.
+  - #1648: Debug Mode Option in Performance Tab.
+  - #1618: Ensured that all order bills are cleared before the last room is checked out.
+  - #1594: Refund remarks should be displayed in the PayPal transaction refund list in the Back Office.
+  - #1601: Show a success message when adding or deleting a room from the cart via Book Now in the back-office.
+  - #1568: Admin search configuration controller from the back-office.
+  - #1830: Configurable options to show or hide tourism tax from the price summary on front office, invoices, and booking voucher.
+  - #1827: Updated localization import flow in the back-office.
+  - #1819: Replaced stale third-party URLs and branding with QloApps equivalents in the back-office.
+  - #1828: Removed the "QloApps Booking iCalendar (.ics) File Export" module (added in #1696) from the modules catalog before release.
+  - #1946: Make room disable dates independent of room status.
+
+- Bugs Fixed:
+  - #1815: Calendar not working properly throughout admin panel backoffice.
+  - #1825: Fatal error on admin search page and no visibility of searched service on back-office.
+  - #1781: Payment amount field behavior for Full/Partial payment on order creation in back-office.
+  - #1805: Enable the currently disabled Latitude and Longitude fields in back-office.
+  - #1811: Undefined array key warning on SEO tab when adding a new hotel on Back office.
+  - #1792: Refactor group discount calculation.
+  - #1801: Improve input validaiton and file-upload validation across admin flows.
+  - #1797: Made Google Map ID optional and enabled hotel-location maps to work without one in back-office.
+  - #1802: Centralize and Optimize Tooltip Handling  in the back-office.
+  - #1773: Address fields added in Customer Available fields section in back-office.
+  - #1678: Price not updating when 'Booking Carts' edit permission is not enabled in back office.
+  - #1798: Date range picker not working in order edit in the back office, and added/removed the left column where needed in the front office.
+  - #1778: Export CSV fields according to the selected Available Fields in the back-office.
+  - #1796: Added validation for child features in hotel.
+  - #1735: Incorrect order status update when adding extra products to an order via the back-office.
+  - #1641: Admin Order Controller permission issue on the order details page in the back-office.
+  - #1767: Decimal precision mismatch causing pricing inconsistencies.
+  - #1779: Restriction on bulk room creation in back-office.
+  - #1748: "Translation Server Unreachable" Error While Adding ISO Code of a Language in Backoffice.
+  - #1771: Merged Room Status and Rooms Detail section in back-office.
+  - #1761: Make status optional in Bulk Update Rooms in back-office.
+  - #1750: Incorrect KPI implementation in AdminCartController view page in the back-office.
+  - #1733: Rating should not be a required field, as ratings are not applicable to all hotels.
+  - #1699: KPI access is now under employee permission in back-office.
+  - #1719: Validate translation import files in back-office.
+  - #1708: Added vat number field in hotel branch info, and showing its value in Invoice PDF if present in hotel address.
+  - #1703: Module visibility on manage module and module catalog section in back-office.
+  - #1670: Unable to update check-in/check-out time without changing the room status.
+  - #1653: Dashboard occupancy to show data based on booked nights instead of date range in the back-office.
+  - #1637: Incorrect message on the admin products on trying to enable the room type if the hotel is inactive in the back-office.
+  - #1660: When creating a new booking, the selected customer is lost when services are added or removed in the back office.
+  - #1655: Prevent duplicate advanced price rules with same restrictions from being enabled in bulk in back-office.
+  - #1658: Warning in the Admin Theme Controller when exporting the theme in the back office.
+  - #1604: Getting deprecated warning while importing the room type CSV with 'ISO 8859-1 encoded file' field enabled in the back office .
+  - #1621: Warning displayed when adding an order message via the Order Controller from the order details page in the back-office.
+  - #1606: ‘Trying to access array offset on false’ warning on the admin order details page when update service product in the back office.
+  - #1672: Undefined index at Book Now Page in back-office.
+  - #1661: Unable to add additional links from modules on the admin order details page in the back-office.
+  - #1593: Warning error when trying to set an invalid ID or modify the id_paypal_commerce_order parameter name.
+  - #1613: A fatal error occurs when deleting an installed theme from the back office.
+  - #1609: Display incorrect validation alert when issuing a full refund via PayPal after a partial refund in the back-office.
+  - #1616: Show incorrect theme compatibility version when trying to export the theme in the back-office.
+  - #1605: Display deprecation warning on PayPal transaction details page.
+  - #1632: Room type “Room” tab warning text issue while creating a room type in back-office.
+  - #1649: Employees without hotel access could not create a room type for that hotel.
+  - #1646: Module search filter on the Manage Modules controller in back-office.
+  - #1650: Hotel-wise access permission for the credit slip in back-office.
+  - #1627: Unable to update the position of the service products in the back office.
+  - #1626: Getting error in growl while deleting the hotel image or while changing the hotel cover image in the admin office.
+  - #1612: Dashboard shows a fatal error when the ‘number of decimals’ value is set to 0 in the back office.
+  - #1860: Validate minimum length of stay when it exceeds maximum length of stay.
+  - #1859: Resolve group discount calculation for multiple nights.
+  - #1856: Resolve warning when changing booking status on the Order Detail page in the back office.
+  - #1855: Add missing option to export hotels in the back office.
+  - #1850: Prevent duplicate entry fatal error when clicking the Save button twice on the Room Type Features tab in the back office.
+  - #1846: Resolve invalid menu name issue in the back office.
+  - #1844: Resolve warning on the admin login page.
+  - #1840: Resolve error on the SEO tab of Hotel and Room Type after changing the language in the back office.
+  - #1836: Resolve warning when saving Room Feature configuration in the back office.
+  - #1834: Manage Hotel Features menu causes Controller not found error in back-office.
+  - #1831: Fatal issue while creating a backoffice order in the back-office.
+  - #1903: Unable to upload pdf in the documents at order detail page in back-office.
+  - #1886: Resolve saving advance price above 100% for room types in the back office.
+  - #1884: Validate checkout date to be after check-in date in back office.
+  - #1880: Allow restoring the original service product price in the cart in the back office.
+  - #1876: Preserve advance payment setting when creating duplicate rooms in the back office.
+  - #1875: Resolve fatal error when generating a voucher with zero amount and prevent credit slip generation with zero amount in the back office.
+  - #1869: Correct refund amount on credit slip when tax is applied to the room in the back office.
+  - #1867: Resolve fatal error when admin views guest cart in the back office.
+  - #1866: Assign the selected room number during reallocation instead of the first available room in the back office.
+  - #1864: Display anonymous consistently after customer deletion in the back office.
+  - #1853: Resolve missing email and password icons on the admin login page.
+  - #1852: Resolve issue preventing admin actions after displaying the unverified module warning in the back office.
+  - #1845: Resolve issue where retail price shows as "NaN" after entering the pre-tax retail price in the back office.
+  - #1841: Resolve fatal error when installing language localization in the back office.
+  - #1909: Text issue in Room Type in the back office.
+  - #1885: Text issue in GRC option.
+  - #1878: Display consistent customer total spent amount regardless of order in the back office.
+  - #1960: Error on the Account Creation Page with Standard Registration when submitting empty fields.
+  - #1953: Undefined array key "children" on the Admin Book Now page when modifying occupancy in the URL.
+  - #1928: Add missing token check to file manager requests on back-office.
+  - #1930: Prevented refund requests for service order lines belonging to other customers.
+  - #1933: CSV export column misalignment when a cart contains multiple order IDs.
+  - #1888: Apply advance price rule when stay duration enters the applicable range in order detail in the back office.
+  - #1932: Module list incomplete XML error on back office from QloApps API.
+  - #1927: Tasks of already-installed modules are not registered after reinstalling the module.
+  - #1921: Fatal error when deactivating the primary hotel in back-office.
+  - #1925: Fatal error when opening customer KPI.
+  - #1920: Revenue KPI not updating after order refund.
+  - #1918: Email log section not updating without page refresh in the back office.
+  - #1899: Implement input validation across back office forms and templates.
+  - #1877: Display issue caused by uploading large language flag images.
+  - #1915: Apply changes to the single invoice in the order detail in the back office.
+  - #1943: Delete Brand name and short description from general setting in back-office.
+  - #1945: Document text and logo issues in the PDF header.
+  - #1931: 404 icon displayed on some module cards on the Module Catalog page.
+  - #1904: Hide Room Type selection in cart rule when fewer than two room types exist in back-office.
+  - #1936: Standalone products contain room and room type-related fields in the booking voucher.
+  - #1907: Added Room From Appearing as Non-Ordered Cart in Back Office.
+  - #1917: Restrict check-in before arrival and add room status change hooks in the admin order controller.
+  - #1976: Multiple order and refund related bugs in back-office.
+  - #1905: Tax Amount issues when changing currency on Order Detail.
+  - #1823: Prevent raw HTML in admin cart rule and order tooltips in the back-office.
+  - #1895: Apply the correct refund rule based on the configured cancellation rule in the back office.
+
+## Front Office:
+- Improvements:
+  - #1722: Fix booking flow to work independently of blockcart with Ajax cart feature compatibility.
+  - #1766: Font awesome library upgraded to version 4.7 for both front-office and back-office.
+  - #1669: Quantity-based pricing for room services.
+  - #1674: LOS error information on the Product page in front-office.
+  - #1697: Added changes to get QloApps detectable for builtwith.
+  - #1631: The text of the 'view room' button to the 'View property' on our properties page in the front-office.
+
+- Bugs Fixed:
+  - #1814: Extra services details are not visible on order confirmation page.
+  - #1813: Used the large image instead of the medium image on the Our Properties and Contact Us pages in the front office.
+  - #1787: Partial and full payment issue in paypal module.
+  - #1795: Added sufficient validation checks when fetching and displaying order-related data on the order detail page in the front-office.
+  - #1757: Ensure all required parameters are passed before processing request in front-office.
+  - #1777: Warning on search results when hotel is disabled after search in the front-office.
+  - #1643: Issue while uploading images in hotel reviews in front-office.
+  - #1746: Remove deprecated <font> tags from template and email files.
+  - #1737: Correct price aggregation for grouped rooms in OrderConfirmationController in front-office.
+  - #1576: Incorrect information on the room type page regarding max capacity in the front-office.
+  - #1596: Show the payment option in the payment information on the checkout page when pay using the PayPal payment method.
+  - #1623: Remove blank white space when all landing page blocks are disabled in Front-office.
+  - #1595: Paypal transaction ID not visible on the order details page, in the payment section of the back-office.
+  - #1622: On the room type list page, the room type name was not clickable. It has now been made clickable in the front-office.
+  - #1835: Resolve undefined variable warning on the frontend Order Detail page.
+  - #1851: Resolve issue where the parent room feature is displayed instead of the child features on the checkout page.
+  - #1837: Resolve error on the Order Detail page after room reallocation on the frontend.
+  - #1829: Include all service prices in the booking total calculation on the block cart popup.
+  - #1913: Validate PayPal captured currency along with amount before creating order and updating status in the front-office.
+  - #1910: Prevent duplicate hotel display for attached service products in the frontend.
+  - #1908: Match nationality field shape with other fields on the checkout page in the frontend.
+  - #1881: Resolve fatal error on the cart summary.
+  - #1873: Resolve fatal error when accessing footer.php, header.php, or init.php from the front office.
+  - #1871: Resolve incorrect price display on the home page.
+  - #1868: Fix price mismatch on the order confirmation page for bookings across two different hotels.
+  - #1906: Remove night label from service unit price.
+  - #1937: New thread created when name, phone, title or email differs in front-office.
+  - #1912: Guest order details exposed by changing cart id on order confirmation page in front-office.
+  - #1898: Room booking type not reset to occupancy when search type is switched back to occupancy wise search in the front-office.
+  - #1944: Footer copyright text design in front-office.
+  - #1978: UI and other bugs in front-office.
+  - #1938: Tax labels (incl./excl.) shown in front office even when taxes are disabled.
+  - #1919: Align both icons below the price in the front-office.
+  - #1924: Missing address validation for standalone product booking.
+  - #1923: Fatal error when creating booking.
+
+## Core:
+- Improvements:
+  - #1809: Additional facility feature from QloApps.
+  - #1774: Updated the old files from docs folder and deleted unnecessary files.
+  - #1780: Language-wise XML files  to  latest localization information .
+  - #1745: Room numbers must be unique on invoice in extra services when multiple rooms of the same room type are booked for the same date range.
+  - #1707: Footer text in front-office.
+  - #1701: Update PHP version constraint and required extensions in composer.json.
+  - #1715: Added hook in uninstall function of the module.php class.
+  - #1712: Add sendMails flag to OrderReturn::changeIdOrderReturnState to skip unwanted email notifications.
+  - #1711: Incorrect total tax calculation in invoice for multi-room bookings with service products in back-office.
+  - #1682: Informational modal for disabled status reasons on admin order detail page in the back-office.
+  - #1583: Open Redirection.
+  - #1638: Update the license notice in the function in Tools.php that creates the index file.
+  - #1647: VAT Number to invoice summary PDF when available.
+  - #1684: Feat(ai): add AGENTS.md for QloApps.
+  - #1639: Hotel name column from room information table in the order confirmation email.
+  - #1567: Auto upgrade module from QloApps core.
+  - #1849: Change the default service product price calculation constant.
+  - #1832: Renamed the admin and install folders to admin-dev and install-dev.
+  - #1768: QloApps must be compatible with PHP version 8.1 to 8.5.
+  - #1826: PayPal Commerce module compatibility and issues fixed, with license text comments updated.
+  - #1688: Improved the price calculation method for service products, and made the selling type of service products more flexible.
+  - #1713: Added per-room booking methods, standardized selling object type across order pages, and implemented default property and room type values.
+  - #1971: Updated minimum supported PHP version to 8.2.
+  - #1935: Added missing fields in lists and CSV exports in the back-office.
+
+- Bugs Fixed:
+  - #1689: Upgraded the password hashing algorithm from MD5 to bcrypt.
+  - #1812: Warning triggered when subscription controller is accessed without a token from front-office.
+  - #1824: Admin dashboard KPI tabs are distorted.
+  - #1821: Undefined array key warning in room type configuration section on back office.
+  - #1820: Uncaught TypeError on Preference's Orders page on Back-office.
+  - #1822: Incorrect check-in and check-out dates for other rooms on the invoice when one room in the booking is checked out.
+  - #1818: Downgrade the Cron Expression Library in the Cron Task Manager Module.
+  - #1794: CCC-combined JS bundle throws SyntaxError, breaking language/currency selectors in front-office.
+  - #1800: Use English as the default fallback when the requested language pack is unavailable.
+  - #1793: Correct remaining voucher balance after partial voucher usage.
+  - #1783: Improve request parameter validation for filter queries.
+  - #1772: Exportation of Rooms, Orders, Hotels, etc. via SQL Manager throws error.
+  - #1755: Room unit price in the order confirmation email.
+  - #1754: Add SSL argument support to the CLI installer.
+  - #1752: Undefined array key warning for invalid conf query parameter in the back-office.
+  - #1747: Incorrect refund rules display on the order details page in the back-office.
+  - #1730: Removed Hotel Prime from the index page title and removed unnecessary pages from the back-office.
+  - #1731: Fix invalid price display when base price is set via catalog rule.
+  - #1739: Incorrect Total Amount Calculation When Adding Multiple Rooms to Cart with Partial Payment Selected.
+  - #1725: Display dynamic check-in and check-out times in invoice PDF based on room booking status.
+  - #1734: Remove config.xml from the default QloApps core module WkFooterLangCurrencyBlock.
+  - #1718: Hotel list dropdown and occupancy popup issues in front-office.
+  - #1710: Incorrect total price calculation in multi-hotel bookings.
+  - #1700: Datepicker Next button not working in Arabic in back-office.
+  - #1654: Disabled room types should not be visible in the suggestions during room reallocation in the back-office.
+  - #1644: Disable location and Hotel field for 1 property .
+  - #1642: Warning when adding or editing a room type after enabling cache in the back-office.
+  - #1577: Access denied warning displayed for employees with full back-office access.
+  - #1636: The export option does not work correctly when exporting filtered data from the back-office.
+  - #1635: Issue with room type tax calculation when the room type price is 0 and an advance rule uses a fixed amount.
+  - #1630: Incorrect order status during reallocation after room category upgrade.
+  - #1615: ‘Add New Service’ button disappeared during back-office booking creation when service products were unavailable, even though additional facilities existed.
+  - #1608: Notices in the admin stats (Sales and orders tab ) while trying to export the data using the CSV export in the back office.
+  - #1581: Improper Session Invalidation.
+  - #1591: Passed the parameter directly into the function, preventing the undefined-variable error in the startTree callback.
+  - #1590: Undefined variable issue in AdminController.php in the back office.
+  - #1598: Show undefined property warning in Admin Stats during CSV export in the back-office.
+  - #1603: Show undefined key warning when exporting CSV from Admin Stats (Customer Account tab) in the back-office.
+  - #1592: Show undefined array key warning when trying to delete a cart rule in the back-office.
+  - #1600: Show warning in manage room types when adding a room in the back-office.
+  - #1589: Show warnings in admin SQL manager when writing incorrect SQL syntax in the back-office.
+  - #1611: Show undefined variable warning in admin stats (extra services overview tab) during csv export in the back-office.
+  - #1640: Runtime error on the order confirmation page in the front-office.
+  - #1633: Toolbar button design issue in the module configuration in the back-office.
+  - #1588: Duplicate category is created for hotel having same name and same parent category.
+  - #1629: Getting fatal error while trying to override a class having any parent::function() call.
+  - #1602: Order by and Order way not working for the lists in the Back office.
+  - #1614: Service product quantity not showing on the order details page in the back office.
+  - #1587: Undefined variable numdays while creating order from the BO.
+  - #1628: Added our property page in theme meta on install.
+  - #1625: Undefined variable in module.php.
+  - #1571: Price filter related issue in the front office on the room type listing page.
+  - #1858: Display and validate hotel-restricted vouchers correctly when the hotel matches.
+  - #1902: Same language added multiple times during installation.
+  - #1900: Validate hotel ID input in the room search algorithm.
+  - #1896: Removed/updated prestashop images from imgs folder.
+  - #1848: Resolve duplicate English language entries when installing another language.
+  - #1939: Add the missing table to Data Cleaner so order notes are deleted as well.
+
+## Web Services:
+- Bugs Fixed:
+  - #1681: Cart rule creation at booking time failed if no prior cart rules existed.
+
+
+####################################
 # V1.7.0
 ####################################
 

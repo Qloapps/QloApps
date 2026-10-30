@@ -1,4 +1,12 @@
 ------------------------------
+# V1.4.5 to V1.4.6
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1791] Fixed a possible division-by-zero error in the forecast calculation.
+
+------------------------------
 # V1.4.4 to V1.4.5
 ------------------------------
 

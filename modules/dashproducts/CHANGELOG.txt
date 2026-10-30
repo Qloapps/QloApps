@@ -1,4 +1,13 @@
 ------------------------------
+# V1.0.4 to V1.0.5
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1786] Updated refund detection in the best-selling products query to use the new refund tracking method instead of the removed is_refunded flag.
+* [BO] : [#1713] Renamed "Hotel" to "Property" in the dashboard products widget column headers.
+
+------------------------------
 # V1.0.3 to V1.0.4
 ------------------------------
 

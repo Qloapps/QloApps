@@ -1,4 +1,12 @@
 ------------------------------
+# V1.5.5 to V1.5.6
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1713] Renamed "Hotel name" to "Property Name" in the stats grid column header.
+
+------------------------------
 # V1.5.4 to V1.5.5
 ------------------------------
 

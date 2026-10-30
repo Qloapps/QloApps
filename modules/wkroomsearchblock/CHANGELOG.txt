@@ -1,4 +1,13 @@
 ------------------------------
+# V1.1.5 to V1.1.6
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#1718] Fixed the children age selector to no longer be limited by a maximum children per room validation in the front-office search block.
+* [FO] : [#1713] Renamed "Hotel" to "Property" in the room search block's location field, hotel selector, and validation messages.
+
+------------------------------
 # V1.1.4 to V1.1.5
 ------------------------------
 

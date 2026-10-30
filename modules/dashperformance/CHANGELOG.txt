@@ -1,4 +1,12 @@
 ------------------------------
+# V1.0.3 to V1.0.4
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1809] Updated the TrevPAR and GOPPAR tooltip text to remove references to the removed Additional Facilities feature.
+
+------------------------------
 # V1.0.2 to V1.0.3
 ------------------------------
 

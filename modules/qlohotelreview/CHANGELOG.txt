@@ -1,4 +1,13 @@
 ------------------------------
+# V1.0.2 to V1.0.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#1786] Added a new front controller and updated review request/reply emails and JS as part of the refund and booking status updates.
+* [BO] : [#1713] Renamed "Hotel" to "Property" labels in the hotel review list in the back-office.
+
+------------------------------
 # V1.0.1 to V1.0.2
 ------------------------------
 

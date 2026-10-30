@@ -1,4 +1,14 @@
 ------------------------------
+# V1.0.5 to V1.0.6
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#1809] Updated the PayPal Commerce payment flow to use native PHP JSON functions instead of the internal Tools wrapper, and other flow improvements.
+* [CO] : [#1826] PayPal Commerce module compatibility and issues fixed, with license text comments updated.
+* [FO] : [#1913] Validate PayPal captured currency along with amount before creating order and updating status in the front-office.
+
+------------------------------
 # V1.0.4 to V1.0.5
 ------------------------------
 

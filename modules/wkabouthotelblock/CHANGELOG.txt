@@ -1,4 +1,12 @@
 ------------------------------
+# V1.2.0 to V1.2.1
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1713] Renamed "Hotel Interior" to "Property Interior" throughout the module's settings form.
+
+------------------------------
 # V1.1.9 to V1.2.0
 ------------------------------
 

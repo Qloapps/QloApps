@@ -1,4 +1,12 @@
 ------------------------------
+# V1.1.8 to V1.1.9
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1713] Renamed "Hotel Testimonial" to "Property Testimonial" throughout the module's display name and settings form.
+
+------------------------------
 # V1.1.7 to V1.1.8
 ------------------------------
 
