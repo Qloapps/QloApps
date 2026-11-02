@@ -43,7 +43,7 @@ class AdminPaymentReceiptsControllerCore extends AdminControllerCore
                     ),
                     'PS_PAYMENT_RECEIPTS_PREFIX' => array(
                         'title' => $this->l('Receipt prefix'),
-                        'desc' => $this->l('Prefix used for receipt name (e.g. #IN00001).'),
+                        'desc' => $this->l('Prefix used for receipt name (e.g. REC000001).'),
                         'size' => 6,
                         'type' => 'textLang'
                     ),

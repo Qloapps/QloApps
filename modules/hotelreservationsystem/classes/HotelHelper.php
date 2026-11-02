@@ -1532,7 +1532,7 @@ class HotelHelper
             ),
             array(
                 'id' => HotelBookingDetail::STATUS_NO_SHOW,
-                'color' => '#DC143C',
+                'color' => '#FF8C00',
                 'is_terminal' => 1,
                 'name' => array(
                     'en' => 'No-show',
@@ -1545,7 +1545,7 @@ class HotelHelper
             ),
             array(
                 'id' => HotelBookingDetail::STATUS_CANCELLED,
-                'color' => '#FF8C00',
+                'color' => '#DC143C',
                 'is_terminal' => 1,
                 'name' => array(
                     'en' => 'Cancelled',
