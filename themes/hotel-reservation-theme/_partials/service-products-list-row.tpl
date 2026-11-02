@@ -100,8 +100,11 @@
                         {/if}
                     {/block}
                 </div>
+                {if !isset($product->id)}{assign var=id_product value=0}{else}{assign var=id_product value=$product->id}{/if}
+                {block name='displayServiceProductActionsAfter'}
+                    {hook h='displayServiceProductActionsAfter' id_product=$id_product id_service_product=$service_product['id_product']}
+                {/block}
             </div>
-            {if !isset($product->id)}{assign var=id_product value=0}{else}{assign var=id_product value=$product->id}{/if}
             {block name='displayServiceProductListRowBottom'}
                 {hook h='displayServiceProductListRowBottom' id_product=$id_product id_service_product=$service_product['id_product']}
             {/block}
