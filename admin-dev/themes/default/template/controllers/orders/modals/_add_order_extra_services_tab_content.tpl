@@ -47,6 +47,7 @@
                                 </thead>
                                 <tbody>
                                     {foreach $serviceProducts as $product}
+                                        {if !empty($selectedRoomServiceProduct['date_from']) && !(isset($selectedRoomServiceProduct['selected_service'][$product['id_product']])) && $product['price_calculation_method'] != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING && !(Product::getServicePriceApplicableDates($product['price_calculation_method'], $selectedRoomServiceProduct['date_from'], $selectedRoomServiceProduct['date_to'])|@array_filter)}{continue}{/if}
                                         {if isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}
                                             {assign var='serviceSelected' value=true}
                                             {$product.price_tax_incl = $selectedRoomServiceProduct['selected_service'][$product['id_product']]['unit_price_tax_incl']}
@@ -63,21 +64,7 @@
                                             <td>
                                                 <div>
                                                     {$product['name']|escape:'html':'UTF-8'}
-                                                    {capture name='room_type_service_tooltip_content'}
-                                                    {assign var="priceCalcMethod" value=$product['price_calculation_method']|default:0}
-                                                        <div class="ui-tooltip-header">
-                                                            <div class="ui-tooltip-label">{l s='Applied on:'}</div>
-                                                        </div>
-                                                        <div class="ui-tooltip-body">
-                                                            <ul>
-                                                                {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
-                                                                    <li>{$pcmDayLabel}</li>
-                                                                {/foreach}
-                                                            </ul>
-                                                        </div>
-                                                    {/capture}
-
-                                                    {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_tooltip_content allow_html=true}
+                                                    {include file='helpers/service-applied-days.tpl' price_calculation_method=$product['price_calculation_method'] date_from=$selectedRoomServiceProduct['date_from']|default:'' date_to=$selectedRoomServiceProduct['date_to']|default:''}
                                                 </div>
                                             </td>
                                             <td>
@@ -108,6 +95,7 @@
                                                             {$cartCurrency->sign}
                                                         </span>
                                                         <input class="service_cart_price_input" id="service_cart_price_{$selectedRoomServiceProduct['id']}_{$product['id_product']}" type="text" value="{$product.price_tax_exc}" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]"{if isset($can_edit) && !$can_edit} readonly{/if}/>
+                                                        {if ($product['price_calculation_method']) != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}<span class="input-group-addon">{l s='/ Night'}</span>{/if}
                                                     </div>
                                                 {/if}
                                             </td>
