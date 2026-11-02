@@ -63,7 +63,9 @@ class AdminOrdersControllerCore extends AdminController
         cu.iso_code AS currency,
         IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
         IF(a.valid, 1, 0) badge_success,
-        hbil.`hotel_name`,
+        (SELECT hbil_sub.hotel_name FROM `'._DB_PREFIX_.'htl_branch_info_lang` hbil_sub 
+         WHERE hbil_sub.id = (SELECT hbd_sub.id_hotel FROM `'._DB_PREFIX_.'htl_booking_detail` hbd_sub WHERE hbd_sub.id_order = a.id_order LIMIT 1) 
+         AND hbil_sub.id_lang = '.(int)$this->context->language->id.' LIMIT 1) AS hotel_name,
         (SELECT COUNT(hbd.`id`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as num_rooms,
         (SELECT SUM(hbd.`adults`) + SUM(hbd.`children`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests_count,
         (SELECT CONCAT(
@@ -87,7 +89,6 @@ class AdminOrdersControllerCore extends AdminController
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = a.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'service_product_order_detail` spod ON (spod.`id_order` = a.`id_order`)
-        LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (IF(hbd.`id_hotel`, (hbil.`id` = hbd.`id_hotel`), (hbil.`id` = spod.`id_hotel`)))
         LEFT JOIN (
             SELECT hbd2.`id`, IF(hbd2.`id` IN ('.OrderReturn::getRefundedBookingIdsSubquery().'), 1, 0) AS is_room_refunded
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd2
