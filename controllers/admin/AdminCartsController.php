@@ -286,7 +286,7 @@ class AdminCartsControllerCore extends AdminController
         $summary = $cart->getSummaryDetails();
 
         /* Display orders information */
-        $cartOrders = Order::getAllOrdersByCartId($cart->id);
+        $cartOrders = Order::getAllOrdersLinkedToCart($cart->id);
         if ($cartOrders) {
             $objOrder = new Order($cartOrders[0]['id_order']);
             if (Validate::isLoadedObject($objOrder)) {

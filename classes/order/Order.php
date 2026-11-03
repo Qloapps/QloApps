@@ -2832,6 +2832,27 @@ class OrderCore extends ObjectModel
     }
 
     /**
+     * Get all orders linked to a cart, either as the order's own cart or through a room
+     * added to an existing order from the back office (that creates a new cart whose
+     * rooms belong to the order, while orders.id_cart still points at the original cart).
+     *
+     * @param int $idCart
+     * @return array of orders
+     */
+    public static function getAllOrdersLinkedToCart($idCart)
+    {
+        return Db::getInstance()->executeS(
+            'SELECT o.* FROM `'._DB_PREFIX_.'orders` o
+            WHERE o.`id_cart` = '.(int) $idCart.'
+            OR o.`id_order` IN (
+                SELECT hbd.`id_order` FROM `'._DB_PREFIX_.'htl_booking_detail` hbd
+                WHERE hbd.`id_cart` = '.(int) $idCart.'
+            )
+            ORDER BY o.`id_order` ASC'
+        );
+    }
+
+    /**
      * Function to check if order has been completely refunded
      * @param integer action: can have 3 values as below
      * Order::ORDER_COMPLETE_REFUND_FLAG for complete refunded and

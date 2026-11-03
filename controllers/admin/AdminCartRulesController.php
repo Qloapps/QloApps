@@ -47,7 +47,7 @@ class AdminCartRulesControllerCore extends AdminController
         $this->fields_list = array(
             'id_cart_rule' => array('title' => $this->l('ID'), 'align' => 'center', 'class' => 'fixed-width-xs'),
             'name' => array('title' => $this->l('Name')),
-            'hotel_names' => array('title' => $this->l('Hotels'), 'orderby' => false, 'havingFilter' => true, 'filter_key' => 'hotel_names', 'callback' => 'formatHotelNames'),
+            'hotel_names' => array('title' => $this->l('Properties'), 'orderby' => false, 'havingFilter' => true, 'filter_key' => 'hotel_names', 'callback' => 'formatHotelNames'),
             'priority' => array('title' => $this->l('Priority'), 'align' => 'center', 'class' => 'fixed-width-xs'),
             'code' => array('title' => $this->l('Code'), 'class' => 'fixed-width-sm'),
             'quantity' => array('title' => $this->l('Quantity'), 'align' => 'center', 'class' => 'fixed-width-xs'),
@@ -274,7 +274,7 @@ class AdminCartRulesControllerCore extends AdminController
         Media::addJsDef(
             array(
                 'admin_cart_rule_tab_link' => $this->context->link->getAdminLink('AdminCartRules'),
-                'room_access_err' => $this->l('You can only select room types which hotel(s) access is provided to this employee.'),
+                'room_access_err' => $this->l('You can only select room types of the properties this employee has access to.'),
                 'room_rmv_txt' => $this->l('Unselect below room types'),
             )
         );

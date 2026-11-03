@@ -135,7 +135,7 @@
       <value>#IN</value>
     </configuration>
 	<configuration id="PS_PAYMENT_RECEIPTS_PREFIX" name="PS_PAYMENT_RECEIPTS_PREFIX">
-      <value>#IN</value>
+      <value>REC</value>
     </configuration>
     <configuration id="PS_INVCE_INVOICE_ADDR_RULES" name="PS_INVCE_INVOICE_ADDR_RULES">
       <value>{"avoid":[]}</value>

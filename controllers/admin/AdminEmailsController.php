@@ -119,7 +119,7 @@ class AdminEmailsControllerCore extends AdminController
                         'type' => 'bool'
                     )
                 ),
-                'submit' => array('title' => $this->l('Save'))
+                'submit' => array('title' => $this->l('Save'), 'name' => 'submitOptions')
             ),
             'smtp' => array(
                 'title' => $this->l('Email'),
@@ -181,7 +181,7 @@ class AdminEmailsControllerCore extends AdminController
                         'class' => 'fixed-width-sm'
                     ),
                 ),
-                'submit' => array('title' => $this->l('Save'))
+                'submit' => array('title' => $this->l('Save'), 'name' => 'submitOptions')
             ),
             'test' => array(
                 'title' =>    $this->l('Test your email configuration'),
