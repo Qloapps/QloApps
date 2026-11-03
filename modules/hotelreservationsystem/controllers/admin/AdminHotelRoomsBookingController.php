@@ -119,33 +119,6 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
         $hotelBranchesInfo = HotelBranchInformation::filterDataByHotelAccess($hotelBranchesInfo, $this->context->employee->id_profile, 'id');
 
         if ($hotelBranchesInfo) {
-            if (Tools::getValue('date_from') && Validate::isDate(Tools::getValue('date_from'))) {
-                $date_from = date('Y-m-d', strtotime(Tools::getValue('date_from')));
-            } else {
-                $date_from = date('Y-m-d');
-            }
-            if ($this->context->employee->isSuperAdmin()) {
-                $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-            } else {
-                $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-            }
-            if (!Configuration::get($backOrderConfigKey)) {
-                if (strtotime(date('Y-m-d')) > strtotime($date_from)) {
-                    $date_from = date('Y-m-d');
-                }
-            }
-            if (!Validate::isDate($date_from)) {
-                $date_from = date('Y-m-d');
-            }
-            $date_to = Tools::getValue('date_to');
-            if (!$date_to || !Validate::isDate($date_to)) {
-                $date_to = date('Y-m-d');
-            }
-            // Check-out date must always be after check-in date
-            if (strtotime($date_from) >= strtotime($date_to)) {
-                $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
-            }
-
             if (Tools::getValue('id_hotel')) {
                 $id_hotel = (int) Tools::getValue('id_hotel');
             } else {
@@ -160,6 +133,39 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 } else {
                     $id_hotel = 0;
                 }
+            }
+
+            $currentDate = date('Y-m-d');
+            Hook::exec('actionHotelCurrentDateModifier', array(
+                'id_hotel' => (int) $id_hotel,
+                'current_date' => &$currentDate,
+            ));
+
+            if (Tools::getValue('date_from') && Validate::isDate(Tools::getValue('date_from'))) {
+                $date_from = date('Y-m-d', strtotime(Tools::getValue('date_from')));
+            } else {
+                $date_from = $currentDate;
+            }
+            if ($this->context->employee->isSuperAdmin()) {
+                $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
+            } else {
+                $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
+            }
+            if (!Configuration::get($backOrderConfigKey)) {
+                if (strtotime($currentDate) > strtotime($date_from)) {
+                    $date_from = $currentDate;
+                }
+            }
+            if (!Validate::isDate($date_from)) {
+                $date_from = $currentDate;
+            }
+            $date_to = Tools::getValue('date_to');
+            if (!$date_to || !Validate::isDate($date_to)) {
+                $date_to = $currentDate;
+            }
+            // Check-out date must always be after check-in date
+            if (strtotime($date_from) >= strtotime($date_to)) {
+                $date_to = date('Y-m-d', strtotime('+1 day', strtotime($date_from)));
             }
 
             if (Tools::getValue('id_room_type')) {
@@ -1106,6 +1112,14 @@ public function ajaxProcessGetCalenderData()
             $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
         }
         $PS_BACKDATE_ORDER_ALLOW = (int)Configuration::get($backOrderConfigKey);
+        if (!$PS_BACKDATE_ORDER_ALLOW && $this->id_hotel) {
+            $currentDate = date('Y-m-d');
+            Hook::exec('actionHotelCurrentDateModifier', array(
+                'id_hotel' => (int) $this->id_hotel,
+                'current_date' => &$currentDate,
+            ));
+            $PS_BACKDATE_ORDER_ALLOW = ($currentDate < date('Y-m-d')) ? 1 : 0;
+        }
 
         $jsVars = array(
             'currency_prefix' => $currency->prefix,

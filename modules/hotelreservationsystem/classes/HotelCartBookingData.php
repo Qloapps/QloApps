@@ -754,7 +754,12 @@ class HotelCartBookingData extends ObjectModel
         if ($cartBookingData = $this->getCartCurrentDataByCartId($idCart)) {
             $res = true;
             foreach ($cartBookingData as $cartRoom) {
-                if (strtotime($cartRoom['date_from']) < strtotime(date('Y-m-d'))) {
+                $currentDate = date('Y-m-d');
+                Hook::exec('actionHotelCurrentDateModifier', array(
+                    'id_hotel' => (int) $cartRoom['id_hotel'],
+                    'current_date' => &$currentDate,
+                ));
+                if (strtotime($cartRoom['date_from']) < strtotime($currentDate)) {
                     $res = $res && $this->deleteRoomDataFromOrderLine(
                         $cartRoom['id_cart'],
                         $cartRoom['id_guest'],

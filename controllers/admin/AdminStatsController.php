@@ -1867,6 +1867,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
         }
 
+        Hook::exec('actionHotelStatsDataModifier', array(
+            'method' => __FUNCTION__,
+            'id_hotel' => $idHotel,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'result' => &$result,
+        ));
+
         return $result;
     }
 
@@ -1907,6 +1915,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
         }
+
+        Hook::exec('actionHotelStatsDataModifier', array(
+            'method' => __FUNCTION__,
+            'id_hotel' => $idHotel,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'result' => &$result,
+        ));
 
         return $result;
     }
@@ -1951,6 +1967,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $result[$discreteDate['timestamp_from']] = $totalServicesRevenue;
         }
 
+        Hook::exec('actionHotelStatsDataModifier', array(
+            'method' => __FUNCTION__,
+            'id_hotel' => $idHotel,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'result' => &$result,
+        ));
+
         return $result;
     }
 
@@ -1963,6 +1987,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
                 $result[$key] = (isset($servicesRevenueByDates[$key]) ? $servicesRevenueByDates[$key] : 0) + $value;
             }
         }
+
+        Hook::exec('actionHotelStatsDataModifier', array(
+            'method' => __FUNCTION__,
+            'id_hotel' => $idHotel,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'result' => &$result,
+        ));
 
         return $result;
     }
@@ -2042,6 +2074,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
         }
+
+        Hook::exec('actionHotelStatsDataModifier', array(
+            'method' => __FUNCTION__,
+            'id_hotel' => $idHotel,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'result' => &$result,
+        ));
 
         return $result;
     }
@@ -2187,6 +2227,14 @@ class AdminStatsControllerCore extends AdminStatsTabController
 
             $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
         }
+
+        Hook::exec('actionHotelStatsDataModifier', array(
+            'method' => __FUNCTION__,
+            'id_hotel' => $idHotel,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'result' => &$result,
+        ));
 
         return $result;
     }
