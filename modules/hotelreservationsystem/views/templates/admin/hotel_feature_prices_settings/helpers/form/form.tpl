@@ -40,7 +40,7 @@
 			<div class="col-lg-3">
 				{foreach from=$languages item=language}
 					{assign var="feature_price_name" value="feature_price_name_`$language.id_lang`"}
-					<input type="text" id="{$feature_price_name}" name="{$feature_price_name}" value="{if isset($objFeaturePrice->feature_price_name[$language.id_lang]) && $objFeaturePrice->feature_price_name[$language.id_lang]}{$objFeaturePrice->feature_price_name[$language.id_lang]}{else if isset($smarty.post.$feature_price_name)}{$smarty.post.$feature_price_name}{/if}" data-lang-name="{$language.name}" placeholder="{l s='Enter advanced price rule name' mod='hotelreservationsystem'}" class="form-control feature_price_name_all" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}/>
+					<input type="text" id="{$feature_price_name}" name="{$feature_price_name}" value="{if isset($objFeaturePrice->feature_price_name[$language.id_lang]) && $objFeaturePrice->feature_price_name[$language.id_lang]}{$objFeaturePrice->feature_price_name[$language.id_lang]|escape:'htmlall':'UTF-8'}{else if isset($smarty.post.$feature_price_name)}{$smarty.post.$feature_price_name|escape:'htmlall':'UTF-8'}{/if}" data-lang-name="{$language.name}" placeholder="{l s='Enter advanced price rule name' mod='hotelreservationsystem'}" class="form-control feature_price_name_all" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}/>
 				{/foreach}
 			</div>
 			{if $languages|@count > 1}
@@ -182,7 +182,7 @@
 			<div class="col-lg-3">
 				<div class="input-group">
 					<span class="input-group-addon payment_type_icon">{if isset($edit)} {if $objFeaturePrice->impact_type == HotelRoomTypeFeaturePricing::IMPACT_TYPE_FIXED_PRICE}{$defaultcurrency_sign}{else}%{/if}{else}%{/if}</span>
-					<input type="text" id="impact_value" name="impact_value" value="{if isset($smarty.post.impact_value) && $smarty.post.impact_value}{$smarty.post.impact_value}{elseif isset($objFeaturePrice->impact_value)}{$objFeaturePrice->impact_value}{/if}"/>
+					<input type="text" id="impact_value" name="impact_value" value="{if isset($smarty.post.impact_value) && $smarty.post.impact_value}{$smarty.post.impact_value|escape:'htmlall':'UTF-8'}{elseif isset($objFeaturePrice->impact_value)}{$objFeaturePrice->impact_value|escape:'htmlall':'UTF-8'}{/if}"/>
 				</div>
 			</div>
 		</div>
