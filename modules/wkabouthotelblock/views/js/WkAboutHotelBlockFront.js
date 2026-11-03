@@ -34,11 +34,19 @@ $(document).ready(function(){
 	    responsive: {576: {items: 2}},
 	    autoHeight:true,
 	    autoplay: htlInteriorSliderAutoplay,
-	    autoplaySpeed:1000,
+	    autoplaySpeed: 500,
+        smartSpeed: 500,
 	    autoplayTimeout: htlInteriorSliderInterval,
 		autoplayHoverPause:true,
 	    responsiveClass:true,
 		rtl: language_is_rtl
+	});
+
+    $('.htlInterior-owlCarousel .owl-carousel').on('translated.owl.carousel mouseleave', function() {
+		var owl = $(this).data('owl.carousel');
+		if (owl && owl.settings.autoplay && owl._plugins.autoplay && !owl._plugins.autoplay._paused) {
+			owl._plugins.autoplay._setAutoPlayInterval();
+		}
 	});
 
 	$('.interiorbox').on('mouseenter', function(){

@@ -91,7 +91,8 @@ $(document).ready(function() {
         dots: htlRoomSliderDots,
         autoplay: htlRoomSliderAutoplay,
         autoplayTimeout: htlRoomSliderInterval,
-        autoplaySpeed: 1000,
+        autoplaySpeed: 500,
+        smartSpeed: 500,
         autoplayHoverPause: true,
         margin: 24,
         items: 1,
@@ -101,6 +102,13 @@ $(document).ready(function() {
             992: { items: 3 }
         }
     });
+
+    $('.htlRoom-owlCarousel .owl-carousel').on('translated.owl.carousel mouseleave', function() {
+		var owl = $(this).data('owl.carousel');
+		if (owl && owl.settings.autoplay && owl._plugins.autoplay && !owl._plugins.autoplay._paused) {
+			owl._plugins.autoplay._setAutoPlayInterval();
+		}
+	});
     // fonts and icons can change the widths after the page is shown
     $(window).on('load', function() {
         fitRoomCards($('.htlRoom-owlCarousel .owl-carousel'));

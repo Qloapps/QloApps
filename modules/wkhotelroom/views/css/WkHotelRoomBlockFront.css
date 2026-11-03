@@ -134,6 +134,13 @@ a.htlRoomTypeBookNow {
     margin: 0 0 12px;
     font-size: 22px;
 }
+.htlRoomTypeNameText a:focus,
+.htlRoomTypeNameText a:active,
+.htlRoomCardImg:focus,
+.htlRoomTypeBookNow:focus {
+    outline: none;
+    text-decoration: none;
+}
 .htlRoomCardFeatured {
     padding: 12px 0;
     overflow: hidden;
