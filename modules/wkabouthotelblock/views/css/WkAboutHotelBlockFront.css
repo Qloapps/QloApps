@@ -174,3 +174,35 @@ html body .htl-light-fancybox .fancybox-nav:focus:not(:focus-visible),
 html body .htl-gallery-fancybox .fancybox-nav:focus:not(:focus-visible) {
     outline: 0;
 }
+
+/* arrows of the interior slider */
+.htlInterior-owlCarousel .owl-nav .owl-prev,
+.htlInterior-owlCarousel .owl-nav .owl-next {
+    position: absolute;
+    top: 42%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+    cursor: pointer;
+}
+.htlInterior-owlCarousel .owl-nav .owl-prev {
+    left: -17px;
+}
+.htlInterior-owlCarousel .owl-nav .owl-next {
+    right: -17px;
+}
+.htlInterior-owlCarousel .owl-nav .nav-direction-secondary,
+.htlInterior-owlCarousel .owl-nav .owl-prev:hover .nav-direction-secondary,
+.htlInterior-owlCarousel .owl-nav .owl-next:hover .nav-direction-secondary {
+    padding: 0;
+    background: none;
+    color: #333;
+}
+.htlInterior-owlCarousel .owl-nav .disabled {
+    display: none;
+}

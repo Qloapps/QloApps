@@ -99,6 +99,15 @@
                                                                             <div class="services-list-row">
                                                                                 <div>
                                                                                     {$product['name']}
+                                                                                    {assign var='appliedDays' value=0}
+                                                                                    {if $product['price_calculation_method'] != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}
+                                                                                        {foreach Product::getServicePriceApplicableDates($product['price_calculation_method'], $date_from, $date_to) as $appliedGroupDates}
+                                                                                            {assign var='appliedDays' value=$appliedDays + count($appliedGroupDates)}
+                                                                                        {/foreach}
+                                                                                    {/if}
+                                                                                    {if $appliedDays}
+                                                                                        <p><span class="badge badge-success service-applied-days">{if $appliedDays == 1}{l s='Applied for 1 Day'}{else}{l s='Applied for %s Days' sprintf=$appliedDays}{/if}</span></p>
+                                                                                    {/if}
                                                                                     {if $product['allow_multiple_quantity']}
                                                                                         <p>{l s='qty'}: {$product['quantity']}</p>
                                                                                     {/if}

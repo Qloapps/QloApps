@@ -23,6 +23,10 @@
 
 class WkHotelInteriorImage extends ObjectModel
 {
+    const NAV_TYPE_DOTS = 1;
+    const NAV_TYPE_ARROWS = 2;
+    const NAV_TYPE_BOTH = 3;
+
     public $name;
     public $display_name;
     public $active;
@@ -172,6 +176,9 @@ class WkHotelInteriorImage extends ObjectModel
         // update global configuration values in multilang
         Configuration::updateValue('HOTEL_INTERIOR_HEADING', $HOTEL_INTERIOR_HEADING);
         Configuration::updateValue('HOTEL_INTERIOR_DESCRIPTION', $HOTEL_INTERIOR_DESCRIPTION);
+        Configuration::updateValue('HOTEL_INTERIOR_NAV_TYPE', self::NAV_TYPE_DOTS);
+        Configuration::updateValue('HOTEL_INTERIOR_AUTOPLAY', 1);
+        Configuration::updateValue('HOTEL_INTERIOR_AUTOPLAY_INTERVAL', 5000);
 
         // Database Entry
         for ($i = 1; $i <= 12; $i++) {

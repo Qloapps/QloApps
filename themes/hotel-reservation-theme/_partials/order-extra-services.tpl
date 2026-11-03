@@ -53,20 +53,7 @@
                                                                 {if $additionalService['allow_multiple_quantity']}
                                                                     <span class="quantity">{l s='(Quantity: %s)' sprintf=[$additionalService['quantity']|string_format:'%02d']}</span>
                                                                 {/if}
-                                                                {assign var='priceCalcMethod' value=$additionalService.price_calculation_method|default:0}
-                                                                {capture name='htl_pcm_tooltip'}
-                                                                <div class="ui-tooltip-header">
-                                                                    <div class="ui-tooltip-label">{l s='Applied on:'}</div>
-                                                                </div>
-                                                                <div class="ui-tooltip-body">
-                                                                    <ul>
-                                                                        {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
-                                                                            <li>{$pcmDayLabel}</li>
-                                                                        {/foreach}
-                                                                    </ul>
-                                                                </div>
-                                                                {/capture}
-                                                                {include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}
+                                                                {include file='_partials/service-applied-days.tpl' price_calculation_method=$additionalService.price_calculation_method|default:0 date_from=$roomAdditionalService['date_from'] date_to=$roomAdditionalService['date_to']}
                                                             </div>
                                                             {hook h='displayOrderDetailServiceProductNameBlockAfter' product_order_detail=$additionalService}
                                                         </div>
@@ -78,6 +65,9 @@
                                                                     {displayPrice price=$additionalService['total_price_tax_excl']|escape:'html':'UTF-8' currency=$objOrder->id_currency}
                                                                 {/if}
                                                             </span>
+                                                            {if ($additionalService.price_calculation_method|default:0) != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}
+                                                                <br><small>{if $useTax}{displayPrice price=$additionalService['unit_price_tax_incl']|escape:'html':'UTF-8' currency=$objOrder->id_currency}{else}{displayPrice price=$additionalService['unit_price_tax_excl']|escape:'html':'UTF-8' currency=$objOrder->id_currency}{/if} {l s='/Night'}</small>
+                                                            {/if}
                                                         </div>
                                                     </div>
                                                 {/foreach}
