@@ -6973,6 +6973,36 @@ class ProductCore extends ObjectModel
         }
     }
 
+    public static function getServicePriceApplicableDates($priceCalculationMethod, $dateFrom, $dateTo)
+    {
+        $priceCalculationMethod = (int) $priceCalculationMethod;
+        $dates = array();
+        if (empty($dateFrom) || empty($dateTo)) {
+            return $dates;
+        }
+
+        $checkinDate = new DateTime(date('Y-m-d', strtotime($dateFrom)));
+        $checkoutDate = new DateTime(date('Y-m-d', strtotime($dateTo)));
+
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY) {
+            $dates['checkin'] = array($checkinDate->format('Y-m-d'));
+        }
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_DURING_STAY) {
+            $dates['stay'] = array();
+            $stayDate = clone $checkinDate;
+            $stayDate->modify('+1 day');
+            while ($stayDate < $checkoutDate) {
+                $dates['stay'][] = $stayDate->format('Y-m-d');
+                $stayDate->modify('+1 day');
+            }
+        }
+        if ($priceCalculationMethod & self::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY) {
+            $dates['checkout'] = array($checkoutDate->format('Y-m-d'));
+        }
+
+        return $dates;
+    }
+
     public static function getPriceCalculationMethodDaysLabel($priceCalculationMethod)
     {
         $priceCalculationMethod = (int) $priceCalculationMethod;
