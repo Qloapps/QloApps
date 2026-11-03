@@ -56,7 +56,7 @@
                                     <td width="22%">
                                         <div>
                                             {$service['name']|escape:'html':'UTF-8'}
-                                            {include file='helpers/service-applied-days.tpl' price_calculation_method=$service['price_calculation_method']|default:0 date_from=$additionalServices['date_from'] date_to=$additionalServices['date_to']}
+                                            {include file='controllers/orders/modals/_partials/service-applied-days.tpl' price_calculation_method=$service['price_calculation_method']|default:0 date_from=$additionalServices['date_from'] date_to=$additionalServices['date_to']}
                                         </div>
                                         </div>
                                         <input value="{$service['id_service_product_order_detail']|escape:'html':'UTF-8'}" name="id_service_product_order_detail[]" type="hidden"/>
@@ -137,7 +137,7 @@
 									</td>
 									<td>
 										{$product['name']|escape:'html':'UTF-8'}
-										{include file='helpers/service-applied-days.tpl' price_calculation_method=$product['price_calculation_method'] date_from=$date_from|default:'' date_to=$date_to|default:''}
+										{include file='controllers/orders/modals/_partials/service-applied-days.tpl' price_calculation_method=$product['price_calculation_method'] date_from=$date_from|default:'' date_to=$date_to|default:''}
                                     </td>
 									<td class="text-center">
 										{if $product['auto_add_to_cart'] && $product['price_addition_type'] == Product::PRICE_ADDITION_TYPE_WITH_ROOM}
@@ -305,7 +305,7 @@
 						</td>
 						<td>
                             {$service['name']|escape:'html':'UTF-8'}
-                            {include file='helpers/service-applied-days.tpl' price_calculation_method=$service['price_calculation_method']|default:0 date_from=$additionalServices['date_from'] date_to=$additionalServices['date_to']}
+                            {include file='controllers/orders/modals/_partials/service-applied-days.tpl' price_calculation_method=$service['price_calculation_method']|default:0 date_from=$additionalServices['date_from'] date_to=$additionalServices['date_to']}
 </td>
 						<td>
 							{if $service['product_auto_add'] && $service['product_price_addition_type'] == Product::PRICE_ADDITION_TYPE_INDEPENDENT}

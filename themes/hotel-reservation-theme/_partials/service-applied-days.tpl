@@ -39,7 +39,7 @@
                             {if $serviceAppliedGroup == 'checkin'}{l s='Check-in day'}{elseif $serviceAppliedGroup == 'stay'}{l s='During-stay days'}{else}{l s='Check-out day'}{/if}
                             <ul>
                                 {foreach from=$serviceAppliedGroupDates item='serviceAppliedDate'}
-                                    <li>{$serviceAppliedDate|date_format:'%d-%m-%Y'}</li>
+                                    <li>{Tools::displayDate($serviceAppliedDate)}</li>
                                 {/foreach}
                             </ul>
                         </li>

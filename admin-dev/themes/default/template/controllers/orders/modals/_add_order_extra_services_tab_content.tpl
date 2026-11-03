@@ -64,7 +64,7 @@
                                             <td>
                                                 <div>
                                                     {$product['name']|escape:'html':'UTF-8'}
-                                                    {include file='helpers/service-applied-days.tpl' price_calculation_method=$product['price_calculation_method'] date_from=$selectedRoomServiceProduct['date_from']|default:'' date_to=$selectedRoomServiceProduct['date_to']|default:''}
+                                                    {include file='controllers/orders/modals/_partials/service-applied-days.tpl' price_calculation_method=$product['price_calculation_method'] date_from=$selectedRoomServiceProduct['date_from']|default:'' date_to=$selectedRoomServiceProduct['date_to']|default:''}
                                                 </div>
                                             </td>
                                             <td>
