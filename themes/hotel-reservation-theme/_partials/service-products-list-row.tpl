@@ -63,6 +63,9 @@
                                         {l s='Maximum'} {$service_product.max_quantity} {l s='quantity can be added'}.
                                     </div>
                                 {/if}
+                                {block name='displayServiceProductActionsAfter'}
+                                    {hook h='displayServiceProductActionsAfter' id_service_product=$service_product['id_product']}
+                                {/block}
                             </div>
                         {/if}
                     {/block}
