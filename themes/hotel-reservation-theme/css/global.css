@@ -9495,6 +9495,8 @@ div a.our_properties_link{
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 5px 15px;
+    max-height: 250px;
+    overflow-y: auto;
 }
 
 .ui-tooltip-elem-txt {
