@@ -196,40 +196,6 @@
                 </div>
                 <div class="row form-group">
                     <div class="col-sm-6">
-                        <label class="control-label required">{l s='Price calculation method'}</label>
-                        <select id="new_service_pcm_type" name="price_calculation_type">
-                            <option value="{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}" selected="selected">{l s='Once for the booking range'}</option>
-                            <option value="0">{l s='Select applicable days'}</option>
-                        </select>
-                        <div id="new_service_pcm_days_container" style="margin-top: 10px; display:none;">
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <label class="control-label required">{l s='Applied on:'}</label>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" id="pcm_checkin" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY|intval}">
-                                            {l s='Check-in day'}
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" id="pcm_checkout" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY|intval}">
-                                            {l s='Check-out day'}
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" id="pcm_duringstay" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY|intval}"/>
-                                            {l s='During-stay days'}
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
                         <label class="control-label">{l s='Auto added service'}</label>
                         <div>
                             <span class="switch prestashop-switch fixed-width-lg">
@@ -245,9 +211,7 @@
                             </span>
                         </div>
                     </div>
-                </div>
-                <div class="row form-group">
-                    <div id="new_service_price_tax_rule_container" class="col-sm-6">
+                     <div id="new_service_price_tax_rule_container" class="col-sm-6">
                         <label class="control-label">{l s='Tax rule'}</label>
                         <select name="new_service_price_tax_rule_group">
                             <option value="0">{l s='No Tax'}</option>
@@ -263,9 +227,39 @@
                             <option value="{Product::PRICE_ADDITION_TYPE_INDEPENDENT}">{l s='Add price as convenience Fee'}</option>
                         </select>
                     </div>
+                </div>
+                <div class="row form-group">
                     <div id="new_service_qty_container" class="col-sm-6">
                         <label class="control-label required">{l s='Quantity'}</label>
                         <input type="number" class="form-control qty" min="1" name="new_service_qty" value="1">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="control-label required">{l s='Price calculation method'}</label>
+                        <select id="new_service_pcm_type" name="price_calculation_type">
+                            <option value="{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}" selected="selected">{l s='Once for the booking range'}</option>
+                            <option value="0">{l s='Select applicable days'}</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="new_service_pcm_days_container" style="display:none;">
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <label class="control-label required">{l s='Applied on:'}</label>
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="pcm_checkin" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY|intval}">
+                                {l s='Check-in day'}
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="pcm_checkout" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY|intval}">
+                                {l s='Check-out day'}
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="pcm_duringstay" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY|intval}"/>
+                                {l s='During-stay days'}
+                            </label>
+                        </div>
                     </div>
                 </div>
                 {if $roomTypeTaxRuleGroupExist}
