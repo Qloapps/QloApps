@@ -1059,6 +1059,8 @@ class AdminOrdersControllerCore extends AdminController
                 $smartyVars['link'] = $this->context->link;
 
                 $smartyVars['id_booking_detail'] = $productLineData['id'];
+                $smartyVars['date_from'] = $dateFrom;
+                $smartyVars['date_to'] = $dateTo;
 
                 // set context currency So that we can get prices in the order currency
                 $this->context->currency = $objCurrency;
@@ -7881,6 +7883,8 @@ class AdminOrdersControllerCore extends AdminController
         $smartyVars['link'] = $this->context->link;
 
         $smartyVars['id_booking_detail'] = $idHtlBookingDetail;
+        $smartyVars['date_from'] = $dateFrom;
+        $smartyVars['date_to'] = $dateTo;
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
         if ($additionalServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
             0,

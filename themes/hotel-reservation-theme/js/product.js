@@ -1114,7 +1114,7 @@ $(document).ready(function() {
 
     var ajax_check_var = '';
 
-    $('#service_products_cont .get-service-products').on('click', function(e) {
+    $('#service_products_cont').on('click', '.get-service-products', function(e) {
         var triggerElement = $(this);
         var p = $(this).data('page');
         var id_category = $(this).data('id_category');
@@ -1131,6 +1131,8 @@ $(document).ready(function() {
                 id_category: id_category,
                 p: p,
                 id_product: $('#product_page_product_id').val(),
+                date_from: $('#room_check_in').val(),
+                date_to: $('#room_check_out').val(),
                 action: 'getServiceProducts',
                 ajax: true,
                 token: static_token
@@ -1393,7 +1395,7 @@ var BookingForm = {
         }).on('datepicker-change', function(event,obj){
             $('#room_check_in').val($.datepicker.formatDate('yy-mm-dd', obj.date1));
             $('#room_check_out').val($.datepicker.formatDate('yy-mm-dd', obj.date2));
-            BookingForm.refresh();
+            BookingForm.refresh(false, true);
         });
 
         $('body button').on('click', '', function() {
@@ -1413,9 +1415,12 @@ var BookingForm = {
         formData.append('room_service_products', JSON.stringify(getRoomsServiceProducts()));
         return formData;
     },
-    refresh: function(resetOccupancy = false) {
+    refresh: function(resetOccupancy = false, refreshServices = false) {
         return new Promise((resolve, reject) => {
             let formData = BookingForm.getFormData();
+            if (refreshServices) {
+                formData.append('refresh_services', 1);
+            }
             formData.append('ajax', true);
             formData.append('action', 'refreshBookingForm');
             BookingForm.currentRequest = $.ajax({
@@ -1437,6 +1442,19 @@ var BookingForm = {
                     if (response.status == true) {
                         $('.booking-form').replaceWith(response.html_booking_form);
                         BookingForm.init();
+
+                        if (typeof response.html_service_products !== 'undefined') {
+                            $('#service_products_cont').html(response.html_service_products);
+                            initUITooltip();
+                            $('#additional_products input.service_product').each(function () {
+                                let id = $(this).data('id_product');
+                                $('#room_service_product_qty_' + id).val($(this).val()).closest('.qty_container').find('.qty_count span').text($(this).val());
+                                $('.select_room_service_' + id).text(unselect_txt).removeClass('btn-success add_roomtype_product').addClass('btn-danger remove_roomtype_product');
+                            });
+                            if (!$('.max_avail_type_qty').length || $('.max_avail_type_qty').val() < 1) {
+                                disableRoomTypeServices(1);
+                            }
+                        }
 
                         if (resetOccupancy) {
                             BookingForm.resetOccupancy();

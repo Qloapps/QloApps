@@ -45,6 +45,10 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
                 'title' => $this->l('Name'),
                 'align' => 'left',
             ),
+            'plural_name' => array(
+                'title' => $this->l('Plural Name'),
+                'align' => 'left',
+            ),
             'active' => array(
                 'title' => $this->l('Status'),
                 'align' => 'center',
@@ -110,6 +114,14 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
                     'hint' => $this->l('Displayed name for this property type.'),
                 ),
                 array(
+                    'type' => 'text',
+                    'label' => $this->l('Plural Name'),
+                    'name' => 'plural_name',
+                    'lang' => true,
+                    'required' => true,
+                    'hint' => $this->l('Displayed name when referring to more than one property of this type.'),
+                ),
+                array(
                     'type' => 'switch',
                     'label' => $this->l('Enabled'),
                     'name' => 'active',
@@ -161,6 +173,18 @@ class AdminHotelPropertyTypesController extends ModuleAdminController
                     if (trim(Tools::getValue('name_'.$lang['id_lang']))) {
                         if (!Validate::isGenericName(Tools::getValue('name_'.$lang['id_lang']))) {
                             $this->errors[] = $this->l('Invalid Name in ').$lang['name'];
+                        }
+                    }
+                }
+            }
+
+            if (!trim(Tools::getValue('plural_name_'.$defaultLangId))) {
+                $this->errors[] = $this->l('Plural Name is required at least in ').$objDefaultLanguage['name'];
+            } else {
+                foreach ($languages as $lang) {
+                    if (trim(Tools::getValue('plural_name_'.$lang['id_lang']))) {
+                        if (!Validate::isGenericName(Tools::getValue('plural_name_'.$lang['id_lang']))) {
+                            $this->errors[] = $this->l('Invalid Plural Name in ').$lang['name'];
                         }
                     }
                 }

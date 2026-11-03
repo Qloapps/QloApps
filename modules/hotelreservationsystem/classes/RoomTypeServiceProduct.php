@@ -184,7 +184,7 @@ class RoomTypeServiceProduct extends ObjectModel
         return false;
     }
 
-    public function getServiceProductsData($idProductRoomType, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $subCategory = false, $idLang = false)
+    public function getServiceProductsData($idProductRoomType, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $subCategory = false, $idLang = false, $dateFrom = null, $dateTo = null)
     {
         $context = Context::getContext();
         if (!$idLang) {
@@ -207,6 +207,18 @@ class RoomTypeServiceProduct extends ObjectModel
                 if (!$serviceProduct['allow_oosp'] && $serviceProduct['quantity'] <= 0) {
                     unset($serviceProducts[$key]);
                     continue;
+                }
+
+                if ($dateFrom && $dateTo) {
+                    $priceCalcMethod = (int) $serviceProduct['price_calculation_method'];
+                    if ($priceCalcMethod != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING && !array_filter(Product::getServicePriceApplicableDates($priceCalcMethod, $dateFrom, $dateTo))) {
+                        unset($serviceProducts[$key]);
+                        continue;
+                    }
+
+                    $serviceProduct['price_calculation_method'] = $priceCalcMethod;
+                    $serviceProduct['stay_date_from'] = $dateFrom;
+                    $serviceProduct['stay_date_to'] = $dateTo;
                 }
 
                 $serviceProduct['price_tax_exc'] = Product::getServiceProductPrice(
@@ -352,7 +364,7 @@ class RoomTypeServiceProduct extends ObjectModel
         return $pricingByBookingAndProduct;
     }
 
-    public function getServiceProductsGroupByCategory($idProduct, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $idLang = false)
+    public function getServiceProductsGroupByCategory($idProduct, $p = 1, $n = 0, $front = false, $available_for_order = 2, $auto_add_to_cart = 0, $idLang = false, $dateFrom = null, $dateTo = null)
     {
         if (!$idLang) {
             $idLang = Context::getContext()->language->id;
@@ -361,7 +373,7 @@ class RoomTypeServiceProduct extends ObjectModel
         $objProduct = new Product($idProduct);
         if ($serviceProductsCategories = $objProduct->getAvailableServiceProductsCategories($idLang, 1)) {
             foreach ($serviceProductsCategories as $key => $category) {
-                if ($products = $this->getServiceProductsData($idProduct, $p, $n, $front, $available_for_order, $auto_add_to_cart, $category['id_category'], $idLang)) {
+                if ($products = $this->getServiceProductsData($idProduct, $p, $n, $front, $available_for_order, $auto_add_to_cart, $category['id_category'], $idLang, $dateFrom, $dateTo)) {
                     $serviceProductsCategories[$key]['products'] = $products;
                 } else {
                     unset($serviceProductsCategories[$key]);

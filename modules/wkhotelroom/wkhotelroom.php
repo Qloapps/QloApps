@@ -51,6 +51,7 @@ class WkHotelRoom extends Module
             $dateFrom = date('Y-m-d');
             $dateTo = date('Y-m-d', strtotime($dateFrom) + 86400);
             $useTax = HotelBookingDetail::useTax();
+            $displayProperty = (bool) Configuration::get('HOTEL_ROOM_DISPLAY_PROPERTY');
             $maxFeatures = (int) Configuration::get('WK_MAX_FEATURES_ROOM_SEARCH');
             $maxFeatureValues = (int) Configuration::get('WK_MAX_ROOM_TYPE_FEATURE_VALUES');
             foreach ($hotelRoomDisplay as &$htlRoom) {
@@ -113,6 +114,13 @@ class WkHotelRoom extends Module
                 );
                 $objRoomType = new HotelRoomType();
                 $roomTypeInfo = $objRoomType->getRoomTypeInfoByIdProduct($idProduct);
+                if ($displayProperty && $roomTypeInfo) {
+                    $objHotelBranch = new HotelBranchInformation((int) $roomTypeInfo['id_hotel'], $idLang);
+                    $htlRoom['property_name'] = $objHotelBranch->hotel_name;
+                    $addressInfo = HotelBranchInformation::getAddress((int) $roomTypeInfo['id_hotel'], $idLang);
+                    $htlRoom['property_location'] = $addressInfo['city'].
+                        ($addressInfo['state'] ? ', '.$addressInfo['state'] : '').', '.$addressInfo['country'];
+                }
                 $htlRoom['max_adults'] = $roomTypeInfo ? (int) $roomTypeInfo['max_adults'] : 0;
                 $htlRoom['max_children'] = $roomTypeInfo ? (int) $roomTypeInfo['max_children'] : 0;
                 $features = array();
@@ -146,6 +154,22 @@ class WkHotelRoom extends Module
                 'hotelRoomDisplay' => $hotelRoomDisplay
             )
         );
+
+        $autoplay = Configuration::get('HOTEL_ROOM_DISPLAY_AUTOPLAY');
+        $navType = (int) Configuration::get('HOTEL_ROOM_DISPLAY_NAV_TYPE');
+        if (!in_array($navType, array(
+            WkHotelRoomDisplay::NAV_TYPE_DOTS,
+            WkHotelRoomDisplay::NAV_TYPE_ARROWS,
+            WkHotelRoomDisplay::NAV_TYPE_BOTH,
+        ))) {
+            $navType = WkHotelRoomDisplay::NAV_TYPE_ARROWS;
+        }
+        Media::addJsDef(array(
+            'htlRoomSliderArrows' => $navType != WkHotelRoomDisplay::NAV_TYPE_DOTS,
+            'htlRoomSliderDots' => $navType != WkHotelRoomDisplay::NAV_TYPE_ARROWS,
+            'htlRoomSliderAutoplay' => $autoplay === false ? true : (bool) $autoplay,
+            'htlRoomSliderInterval' => max(500, (int) Configuration::get('HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL') ?: 5000),
+        ));
 
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.carousel.min.css');
         $this->context->controller->addCSS(_PS_JS_DIR_.'owl-carousel/assets/owl.theme.default.min.css');
@@ -287,7 +311,11 @@ class WkHotelRoom extends Module
     {
         $configVars = array(
             'HOTEL_ROOM_DISPLAY_HEADING',
-            'HOTEL_ROOM_DISPLAY_DESCRIPTION'
+            'HOTEL_ROOM_DISPLAY_DESCRIPTION',
+            'HOTEL_ROOM_DISPLAY_PROPERTY',
+            'HOTEL_ROOM_DISPLAY_NAV_TYPE',
+            'HOTEL_ROOM_DISPLAY_AUTOPLAY',
+            'HOTEL_ROOM_DISPLAY_AUTOPLAY_INTERVAL',
         );
         foreach ($configVars as $key) {
             if (!Configuration::deleteByName($key)) {
