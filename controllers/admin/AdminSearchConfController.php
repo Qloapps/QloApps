@@ -335,11 +335,11 @@ class AdminSearchConfControllerCore extends AdminController
             $this->errors[] = $this->l('Aliases and results are both required.');
         }
         if (!Validate::isValidSearch($search)) {
-            $this->errors[] = $search.' '.$this->l('Is not a valid result');
+            $this->errors[] = Tools::safeOutput($search).' '.$this->l('Is not a valid result');
         }
         foreach ($aliases as $alias) {
             if (!Validate::isValidSearch($alias)) {
-                $this->errors[] = $alias.' '.$this->l('Is not a valid alias');
+                $this->errors[] = Tools::safeOutput($alias).' '.$this->l('Is not a valid alias');
             }
         }
 

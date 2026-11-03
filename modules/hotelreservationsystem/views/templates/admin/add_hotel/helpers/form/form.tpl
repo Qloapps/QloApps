@@ -183,7 +183,7 @@
 									id="short_description_{$language.id_lang}"
 									{if isset($PS_SHORT_DESC_LIMIT) && $PS_SHORT_DESC_LIMIT} maxlength="{$PS_SHORT_DESC_LIMIT|intval}"{/if}
 									cols="2" rows="3"
-									class="form-control">{if isset($smarty.post.$short_desc_name)}{$smarty.post.$short_desc_name}{elseif isset($edit)}{$hotel_info.short_description[{$language.id_lang}]}{/if}</textarea>
+									class="form-control">{if isset($smarty.post.$short_desc_name)}{$smarty.post.$short_desc_name|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.short_description[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}</textarea>
 								</div>
 							{/foreach}
 						</div>
@@ -201,7 +201,7 @@
 									name="description_{$language.id_lang}"
 									id="description_{$language.id_lang}"
 									cols="2" rows="3"
-									class="wk_tinymce form-control">{if isset($smarty.post.$description)}{$smarty.post.$description}{elseif isset($edit)}{$hotel_info.description[{$language.id_lang}]}{/if}</textarea>
+									class="wk_tinymce form-control">{if isset($smarty.post.$description)}{$smarty.post.$description|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.description[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}</textarea>
 								</div>
 							{/foreach}
 						</div>
@@ -209,7 +209,7 @@
 					<div class="form-group">
 						<label class="col-sm-3 control-label required">{l s='Phone :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<input type="text" name="phone" id="phone" value="{if isset($smarty.post.phone)}{$smarty.post.phone}{elseif isset($edit)}{$address_info.phone|escape:'htmlall':'UTF-8'}{/if}"/>
+							<input type="text" name="phone" id="phone" value="{if isset($smarty.post.phone)}{$smarty.post.phone|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$address_info.phone|escape:'htmlall':'UTF-8'}{/if}"/>
 						</div>
 					</div>
 					<div class="form-group">
@@ -219,7 +219,7 @@
 								<span class="input-group-addon">
 									<i class="icon-envelope-o"></i>
 								</span>
-								<input class="reg_sel_input form-control-static" type="text" name="email" id="hotel_email" value="{if isset($smarty.post.email)}{$smarty.post.email}{elseif isset($edit)}{$hotel_info.email|escape:'htmlall':'UTF-8'}{/if}"/>
+								<input class="reg_sel_input form-control-static" type="text" name="email" id="hotel_email" value="{if isset($smarty.post.email)}{$smarty.post.email|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.email|escape:'htmlall':'UTF-8'}{/if}"/>
 							</div>
 						</div>
 					</div>
@@ -232,13 +232,13 @@
 					<div class="form-group">
 						<label class="col-sm-3 control-label required">{l s='Address :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<textarea name="address" rows="4" cols="35" >{if isset($smarty.post.address)}{$smarty.post.address}{elseif isset($edit)}{$address_info.address1|escape:'htmlall':'UTF-8'}{/if}</textarea>
+							<textarea name="address" rows="4" cols="35" >{if isset($smarty.post.address)}{$smarty.post.address|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$address_info.address1|escape:'htmlall':'UTF-8'}{/if}</textarea>
 						</div>
 					</div>
 					<div class="form-group check_in_div" style="position:relative">
 						<label class="col-sm-3 control-label" for="fax">{l s='Fax' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<input autocomplete="off" type="text" class="form-control" id="fax" name="fax" value="{if isset($smarty.post.fax)}{$smarty.post.fax}{elseif isset($edit)}{$hotel_info.fax|escape:'htmlall':'UTF-8'}{/if}" />
+							<input autocomplete="off" type="text" class="form-control" id="fax" name="fax" value="{if isset($smarty.post.fax)}{$smarty.post.fax|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.fax|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
@@ -261,7 +261,7 @@
 							{l s='Check-in:' mod='hotelreservationsystem'}
 						</label>
 						<div class="col-sm-2">
-							<input autocomplete="off" type="text" class="form-control" id="check_in_time" name="check_in" value="{if isset($smarty.post.check_in)}{$smarty.post.check_in}{elseif isset($edit)}{$hotel_info.check_in|escape:'htmlall':'UTF-8'}{/if}" />
+							<input autocomplete="off" type="text" class="form-control" id="check_in_time" name="check_in" value="{if isset($smarty.post.check_in)}{$smarty.post.check_in|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.check_in|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group check_out_div" style="position:relative">
@@ -269,7 +269,7 @@
 							{l s='Check-out:' mod='hotelreservationsystem'}
 						</label>
 						<div class="col-sm-2">
-							<input autocomplete="off" type="text" class="form-control" id="check_out_time" name="check_out" value="{if isset($smarty.post.check_out)}{$smarty.post.check_out}{elseif isset($edit)}{$hotel_info.check_out|escape:'htmlall':'UTF-8'}{/if}" />
+							<input autocomplete="off" type="text" class="form-control" id="check_out_time" name="check_out" value="{if isset($smarty.post.check_out)}{$smarty.post.check_out|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.check_out|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
@@ -305,13 +305,13 @@
 					<div class="form-group">
 						<label class="control-label col-sm-3 required" for="hotel_city">{l s='City :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<input class="form-control" type="" data-validate="" id="hotel_city" name="hotel_city" value="{if isset($smarty.post.hotel_city)}{$smarty.post.hotel_city}{elseif isset($edit)}{$address_info.city|escape:'htmlall':'UTF-8'}{/if}" />
+							<input class="form-control" type="" data-validate="" id="hotel_city" name="hotel_city" value="{if isset($smarty.post.hotel_city)}{$smarty.post.hotel_city|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$address_info.city|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
 						<label class="control-label col-sm-3 required" for="hotel_postal_code">{l s='Zip Code :' mod='hotelreservationsystem'}</label>
 						<div class="col-sm-6">
-							<input class="form-control" type="" data-validate="" id="hotel_postal_code" name="hotel_postal_code" value="{if isset($smarty.post.hotel_postal_code)}{$smarty.post.hotel_postal_code}{elseif isset($edit)}{$address_info.postcode|escape:'htmlall':'UTF-8'}{/if}" />
+							<input class="form-control" type="" data-validate="" id="hotel_postal_code" name="hotel_postal_code" value="{if isset($smarty.post.hotel_postal_code)}{$smarty.post.hotel_postal_code|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$address_info.postcode|escape:'htmlall':'UTF-8'}{/if}" />
 						</div>
 					</div>
 					<div class="form-group">
@@ -339,7 +339,7 @@
 									name="policies_{$language.id_lang}"
 									id="policies_{$language.id_lang}"
 									cols="2" rows="3"
-									class="wk_tinymce form-control">{if isset($smarty.post.$policies)}{$smarty.post.$policies}{elseif isset($edit)}{$hotel_info.policies[{$language.id_lang}]}{/if}</textarea>
+									class="wk_tinymce form-control">{if isset($smarty.post.$policies)}{$smarty.post.$policies|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$hotel_info.policies[{$language.id_lang}]|escape:'htmlall':'UTF-8'}{/if}</textarea>
 								</div>
 							{/foreach}
 						</div>
@@ -519,7 +519,7 @@
 						<div class="form-group" {if isset($smarty.post.enable_use_global_max_checkout_offset)} {if !$smarty.post.enable_use_global_max_checkout_offset} style="display:block;" {else} style="display:none;" {/if} {elseif isset($order_restrict_date_info.use_global_max_checkout_offset) && !$order_restrict_date_info.use_global_max_checkout_offset} style="display:block;" {else} style="display:none;" {/if}>
 							<label class="control-label col-sm-3 required" for="max_checkout_offset">{l s='Maximum checkout offset :' mod='hotelreservationsystem'}</label>
 							<div class="col-sm-2">
-								<input type="text" class="form-control" id="max_checkout_offset" name="max_checkout_offset" value="{if isset($smarty.post.max_checkout_offset)}{$smarty.post.max_checkout_offset}{elseif isset($order_restrict_date_info.max_checkout_offset)}{$order_restrict_date_info.max_checkout_offset|escape:'htmlall':'UTF-8'}{/if}" />
+								<input type="text" class="form-control" id="max_checkout_offset" name="max_checkout_offset" value="{if isset($smarty.post.max_checkout_offset)}{$smarty.post.max_checkout_offset|escape:'htmlall':'UTF-8'}{elseif isset($order_restrict_date_info.max_checkout_offset)}{$order_restrict_date_info.max_checkout_offset|escape:'htmlall':'UTF-8'}{/if}" />
 							</div>
 						</div>
 						<div class="form-group">
