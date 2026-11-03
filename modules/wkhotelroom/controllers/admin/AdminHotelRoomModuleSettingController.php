@@ -70,7 +70,7 @@ class AdminHotelRoomModuleSettingController extends ModuleAdminController
                         'cast' => 'intval',
                         'type' => 'bool',
                         'default' => '0',
-                        'hint' => $this->l('Show the property name and the city under the room type name in the room cards.'),
+                        'hint' => $this->l('Display the property location below the room type name in the room cards, or hide it if it is not required.'),
                     ),
                     'HOTEL_ROOM_DISPLAY_NAV_TYPE' => array(
                         'title' => $this->l('Navigation Type'),
