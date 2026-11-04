@@ -628,30 +628,22 @@ class InstallModelInstall extends InstallAbstractModel
         return true;
     }
 
+    /**
+     * @param array $notificationData
+     * @return bool
+     */
     public function setNotification($notificationData)
     {
-        if (function_exists('curl_version')) {
-            $url = _QLO_API_URL_.'/getNotification.php';
-            $params = [
-                'method' => 'POST',
-                'headers' => array('Content-Type: application/json'),
-                'postdata' => json_encode($notificationData),
-            ];
-
-            $curlInit = curl_init();
-            curl_setopt($curlInit, CURLOPT_URL, $url);
-            curl_setopt($curlInit, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-            curl_setopt($curlInit, CURLOPT_HTTPHEADER, $params['headers']);
-            curl_setopt($curlInit, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($curlInit, CURLOPT_CUSTOMREQUEST, $params['method']);
-            curl_setopt($curlInit, CURLOPT_RETURNTRANSFER, 1);
-            if (isset($params['postdata'])) {
-                curl_setopt($curlInit, CURLOPT_POSTFIELDS, $params['postdata']);
-            }
-            $response = curl_exec($curlInit);
-        } else {
-            // Mail Code
-        }
+        Tools::addonsRequest('notification', array(
+            'notification_data' => $notificationData,
+            'version' => _QLO_INSTALL_VERSION_,
+            'iso_lang' => $this->language->getLanguageIso(),
+            'iso_country' => $notificationData['countryCode'],
+            'shop_url' => $notificationData['shopDomain'],
+            'shop_url_ssl' => $notificationData['shopDomainSsl'],
+            'physical_uri' => $notificationData['physicalUri'],
+            'email' => $notificationData['email'],
+        ));
 
         return true;
     }
