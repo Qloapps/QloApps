@@ -47,6 +47,7 @@
   - #1819: Replaced stale third-party URLs and branding with QloApps equivalents in the back-office.
   - #1828: Removed the "QloApps Booking iCalendar (.ics) File Export" module (added in #1696) from the modules catalog before release.
   - #1946: Make room disable dates independent of room status.
+  - #1998: Redesigned the service products price-application popup to show which stay dates a service's price applies to, in both order edit (back-office) and the booking flow (front-office).
 
 - Bugs Fixed:
   - #1815: Calendar not working properly throughout admin panel backoffice.
@@ -153,6 +154,7 @@
   - #1905: Tax Amount issues when changing currency on Order Detail.
   - #1823: Prevent raw HTML in admin cart rule and order tooltips in the back-office.
   - #1895: Apply the correct refund rule based on the configured cancellation rule in the back office.
+  - #2001: Escaped form values across the admin search configuration, add-hotel, and refund-rules forms in back-office.
 
 ## Front Office:
 - Improvements:
@@ -162,6 +164,7 @@
   - #1674: LOS error information on the Product page in front-office.
   - #1697: Added changes to get QloApps detectable for builtwith.
   - #1631: The text of the 'view room' button to the 'View property' on our properties page in the front-office.
+  - #1993: Added configuration to display hotel name and location in the "Our Rooms" section, plus navigation and autoplay settings for the About Hotel interior images slider, in front-office.
 
 - Bugs Fixed:
   - #1814: Extra services details are not visible on order confirmation page.
