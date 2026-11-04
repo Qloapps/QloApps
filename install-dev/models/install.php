@@ -622,27 +622,27 @@ class InstallModelInstall extends InstallAbstractModel
             'marketingConsent' => $data['marketing_consent'],
         ];
 
-        // Qlo Notification
-        $this->setNotification($qloData);
+        // Register install
+        $this->registerInstall($qloData);
 
         return true;
     }
 
     /**
-     * @param array $notificationData
+     * @param array $installData
      * @return bool
      */
-    public function setNotification($notificationData)
+    public function registerInstall($installData)
     {
-        Tools::addonsRequest('notification', array(
-            'notification_data' => $notificationData,
+        Tools::addonsRequest('register-install', array(
+            'install_data' => $installData,
             'version' => _QLO_INSTALL_VERSION_,
             'iso_lang' => $this->language->getLanguageIso(),
-            'iso_country' => $notificationData['countryCode'],
-            'shop_url' => $notificationData['shopDomain'],
-            'shop_url_ssl' => $notificationData['shopDomainSsl'],
-            'physical_uri' => $notificationData['physicalUri'],
-            'email' => $notificationData['email'],
+            'iso_country' => $installData['countryCode'],
+            'shop_url' => $installData['shopDomain'],
+            'shop_url_ssl' => $installData['shopDomainSsl'],
+            'physical_uri' => $installData['physicalUri'],
+            'email' => $installData['email'],
         ));
 
         return true;

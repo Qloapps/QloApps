@@ -3003,6 +3003,12 @@ class AdminControllerCore extends Controller
             Media::addJsDef(array('host_cluster' => defined('_PS_HOST_CLUSTER_') ? _PS_HOST_CLUSTER_ : 'fr1'));
         }
 
+        // upgrade info is read from cache only, the cache is refreshed in background by ajaxProcessCheckUpgrade()
+        Media::addJsDef(array(
+            'upgrade_check_needed' => !Tools::isFresh(Upgrader::CACHE_FILE_UPGRADE_AVAILABE, _TIME_1_DAY_),
+            'upgrade_check_url' => 'index.php?controller='.$this->controller_name.'&ajax=1&action=checkUpgrade&token='.$this->token,
+        ));
+
         // Execute Hook AdminController SetMedia
         Hook::exec('actionAdminControllerSetMedia');
     }
@@ -3112,10 +3118,6 @@ class AdminControllerCore extends Controller
         ));
 
         // get upgrade available info from cache only, the cache is refreshed in background by ajaxProcessCheckUpgrade()
-        Media::addJsDef(array(
-            'upgrade_check_needed' => !Tools::isFresh(Upgrader::CACHE_FILE_UPGRADE_AVAILABE, _TIME_1_DAY_),
-            'upgrade_check_url' => 'index.php?controller='.$this->controller_name.'&ajax=1&action=checkUpgrade&token='.$this->token,
-        ));
         if (file_exists(_PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE)) {
             $content = Tools::file_get_contents( _PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE);
             $upgradeInfo = simplexml_load_string($content);

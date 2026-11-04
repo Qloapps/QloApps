@@ -3449,8 +3449,8 @@ exit;
                 $post_data .= (isset($params['controller']) ? $params['controller'] : Context::getContext()->controller->controller_name);
                 $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
                 break;
-            case 'notification':
-                $post_data .= '&method=notification&data='.urlencode(json_encode($params['notification_data']));
+            case 'register-install':
+                $post_data .= '&method=register-install&data='.urlencode(json_encode($params['install_data']));
                 break;
             case 'check-version':
                 $post_data .= '&method=check-version&autoupgrade='.(int)(Module::isInstalled('qloautoupgrade') && Module::isEnabled('qloautoupgrade'));
