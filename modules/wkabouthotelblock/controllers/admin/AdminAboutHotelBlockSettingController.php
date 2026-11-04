@@ -33,6 +33,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
         $this->context = Context::getContext();
         $this->identifier_name = 'display_name';
         $this->identifier = 'id_interior_image';
+        parent::__construct();
 
         $this->fields_options = array(
             'global' => array(
@@ -56,6 +57,33 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                         'required' => true,
                         'validation' => 'isGenericName',
                         'hint' => $this->l('Enter a description for the interior block.')
+                    ),
+                    'HOTEL_INTERIOR_NAV_TYPE' => array(
+                        'title' => $this->l('Navigation Type'),
+                        'type' => 'select',
+                        'identifier' => 'id',
+                        'list' => array(
+                            array('id' => WkHotelInteriorImage::NAV_TYPE_DOTS, 'name' => $this->l('Dots')),
+                            array('id' => WkHotelInteriorImage::NAV_TYPE_ARROWS, 'name' => $this->l('Arrows')),
+                            array('id' => WkHotelInteriorImage::NAV_TYPE_BOTH, 'name' => $this->l('Arrows and dots')),
+                        ),
+                        'hint' => $this->l('How the interior photos slider of the home page is navigated.'),
+                    ),
+                    'HOTEL_INTERIOR_AUTOPLAY' => array(
+                        'title' => $this->l('Auto slide'),
+                        'cast' => 'intval',
+                        'type' => 'bool',
+                        'default' => '1',
+                        'hint' => $this->l('Slide the interior photos automatically on the home page.'),
+                    ),
+                    'HOTEL_INTERIOR_AUTOPLAY_INTERVAL' => array(
+                        'title' => $this->l('Slide Interval'),
+                        'cast' => 'intval',
+                        'type' => 'text',
+                        'class' => 'fixed-width-sm',
+                        'suffix' => $this->l('ms'),
+                        'default' => '5000',
+                        'desc' => $this->l('Milliseconds between slides. Min: 500. Example: 5000 = 5 s.'),
                     ),
                 ),
                 'submit' => array(
@@ -124,7 +152,7 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                 'icon' => 'icon-power-off text-danger',
             ),
         );
-        parent::__construct();
+
     }
 
     public function initContent()
@@ -334,6 +362,21 @@ class AdminAboutHotelBlockSettingController extends ModuleAdminController
                         }
                     }
                 }
+            }
+            if (!in_array((int) Tools::getValue('HOTEL_INTERIOR_NAV_TYPE'), array(
+                WkHotelInteriorImage::NAV_TYPE_DOTS,
+                WkHotelInteriorImage::NAV_TYPE_ARROWS,
+                WkHotelInteriorImage::NAV_TYPE_BOTH,
+            ))) {
+                $this->errors[] = $this->l('Invalid navigation type.');
+            }
+            if (Tools::getValue('HOTEL_INTERIOR_AUTOPLAY')) {
+                $slideInterval = Tools::getValue('HOTEL_INTERIOR_AUTOPLAY_INTERVAL');
+                if (!Validate::isUnsignedInt($slideInterval) || $slideInterval < 500) {
+                    $this->errors[] = $this->l('Slide interval must be a whole number of at least 500 milliseconds.');
+                }
+            } else {
+                $_POST['HOTEL_INTERIOR_AUTOPLAY_INTERVAL'] = Configuration::get('HOTEL_INTERIOR_AUTOPLAY_INTERVAL');
             }
             if (!count($this->errors)) {
                 foreach ($languages as $lang) {

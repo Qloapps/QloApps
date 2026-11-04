@@ -1643,10 +1643,16 @@ $(document).ready(function() {
     });
 
     $(document).on('click', '#initiateRefund', function(e) {
+        if ($(this).data('submitted')) {
+            return false;
+        }
+
         if ($.trim($('.cancellation_reason').val()) == '') {
             $('.cancellation_reason').focus().css('border', '1px solid red');
             return false;
         }
+
+        $(this).data('submitted', true);
     });
     // End: CancelRoomBookingModal: Processes
     // ======================================

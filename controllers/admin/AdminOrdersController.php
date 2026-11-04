@@ -481,7 +481,15 @@ class AdminOrdersControllerCore extends AdminController
                 }
 
                 if ($this->tabAccess['edit'] === 1) {
-                    if ((int) $order->isReturnable()) {
+                    // nothing left to refund once every room and service line is deleted
+                    // (amount is not checked: a free order can still be refunded)
+                    $objHotelBookingDetail = new HotelBookingDetail();
+                    $objServiceProductOrderDetail = new ServiceProductOrderDetail();
+                    if ((int) $order->isReturnable()
+                        && ($objHotelBookingDetail->getBookingDataByOrderId($order->id)
+                            || $objServiceProductOrderDetail->getServiceProductsInOrder($order->id)
+                        )
+                    ) {
                         // always "Initiate refund" now, regardless of order status —
                         // cancelling a booking happens through Room Status only
                         $this->page_header_toolbar_btn['cancel'] = array(
@@ -1051,6 +1059,8 @@ class AdminOrdersControllerCore extends AdminController
                 $smartyVars['link'] = $this->context->link;
 
                 $smartyVars['id_booking_detail'] = $productLineData['id'];
+                $smartyVars['date_from'] = $dateFrom;
+                $smartyVars['date_to'] = $dateTo;
 
                 // set context currency So that we can get prices in the order currency
                 $this->context->currency = $objCurrency;
@@ -7219,6 +7229,12 @@ class AdminOrdersControllerCore extends AdminController
                 $order_invoice->total_discount_tax_excl = 0;
                 $res &= $order_invoice->update();
             }
+
+            // the order's own discount totals must follow the deleted cart rules
+            $order->total_discounts = 0;
+            $order->total_discounts_tax_incl = 0;
+            $order->total_discounts_tax_excl = 0;
+            $res &= $order->update();
         }
 
         if (isset($order_invoice) && $order_invoice->id) {
@@ -7867,6 +7883,8 @@ class AdminOrdersControllerCore extends AdminController
         $smartyVars['link'] = $this->context->link;
 
         $smartyVars['id_booking_detail'] = $idHtlBookingDetail;
+        $smartyVars['date_from'] = $dateFrom;
+        $smartyVars['date_to'] = $dateTo;
         $objServiceProductOrderDetail = new ServiceProductOrderDetail();
         if ($additionalServices = $objServiceProductOrderDetail->getRoomTypeServiceProducts(
             0,

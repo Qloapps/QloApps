@@ -142,6 +142,7 @@ class HotelReservationSystemDb
                 `id_htl_property_type` int(10) unsigned NOT NULL,
                 `id_lang` int(10) unsigned NOT NULL,
                 `name` varchar(255) NOT NULL,
+                `plural_name` varchar(255) NOT NULL,
                 PRIMARY KEY (`id_htl_property_type`, `id_lang`)
             ) ENGINE="._MYSQL_ENGINE_." DEFAULT CHARSET=utf8;",
             "CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."htl_branch_amenity` (

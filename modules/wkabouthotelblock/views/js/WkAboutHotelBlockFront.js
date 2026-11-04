@@ -23,19 +23,30 @@
 $(document).ready(function(){
   	$('.htlInterior-owlCarousel .owl-carousel').owlCarousel({
   		loop:true,
-	    nav:false,
-	    dots:true,
+	    nav: htlInteriorSliderArrows,
+	    navText: [
+	        '<div class="nav-direction-wrapper"><div class="nav-direction-primary"><div class="nav-direction-secondary"><i class="icon-angle-left"></i></div></div></div>',
+	        '<div class="nav-direction-wrapper"><div class="nav-direction-primary"><div class="nav-direction-secondary"><i class="icon-angle-right"></i></div></div></div>'
+	    ],
+	    dots: htlInteriorSliderDots,
 	    items: 1,
 	    margin: 8,
-	    slideBy: 'page',
 	    responsive: {576: {items: 2}},
 	    autoHeight:true,
-	    autoplay:true,
-	    autoplaySpeed:1000,
-	    autoplayTimeout:5000,
+	    autoplay: htlInteriorSliderAutoplay,
+	    autoplaySpeed: 500,
+        smartSpeed: 500,
+	    autoplayTimeout: htlInteriorSliderInterval,
 		autoplayHoverPause:true,
 	    responsiveClass:true,
 		rtl: language_is_rtl
+	});
+
+    $('.htlInterior-owlCarousel .owl-carousel').on('translated.owl.carousel mouseleave', function() {
+		var owl = $(this).data('owl.carousel');
+		if (owl && owl.settings.autoplay && owl._plugins.autoplay && !owl._plugins.autoplay._paused) {
+			owl._plugins.autoplay._setAutoPlayInterval();
+		}
 	});
 
 	$('.interiorbox').on('mouseenter', function(){
