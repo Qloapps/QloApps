@@ -211,3 +211,5 @@ LEFT JOIN `PREFIX_service_product_order_detail` spod ON spod.`id_order_detail` =
 DROP TABLE IF EXISTS `PREFIX_order_detail_tax`;
 
 /* PHP:add_new_tabs_180(); */;
+
+/* PHP:migrate_channel_manager_connector_180(); */;
