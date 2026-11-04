@@ -2002,20 +2002,26 @@ class HotelBookingDetail extends ObjectModel
         *
         * @return [array|false] [Returs array of the available rooms for swapping if rooms found else returnss false]
         */
-    public function getAvailableRoomsForSwapping($date_from, $date_to, $id_room_type, $hotel_id, $id_room)
+    public function getAvailableRoomsForSwapping($date_from, $date_to, $id_room_type, $hotel_id, $id_room, $cache = false)
     {
+        // When $cache is true, reuse the result for the same room, dates and hotel
         $cacheKey = 'HotelBookingDetail::getAvailableRoomsForSwapping_'.(int) $hotel_id.'_'.(int) $id_room_type.'_'.(int) $id_room.'_'.$date_from.'_'.$date_to;
-        if (!Cache::isStored($cacheKey)) {
-            $sql = 'SELECT `id` as `id_hotel_booking`, `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
-                FROM `'._DB_PREFIX_.'htl_booking_detail`
-                WHERE `id_hotel` = '.(int)$hotel_id.' AND `id_product` = '.(int)$id_room_type.'
-                AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'
-                AND `id_room`!='.(int)$id_room.' AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND `id_status` NOT IN ('.HotelBookingDetail::STATUS_CANCELLED.', '.HotelBookingDetail::STATUS_NO_SHOW.') AND `is_back_order` = 0';
-
-            Cache::store($cacheKey, Db::getInstance()->executeS($sql));
+        if ($cache && Cache::isStored($cacheKey)) {
+            return Cache::retrieve($cacheKey);
         }
 
-        return Cache::retrieve($cacheKey);
+        $sql = 'SELECT `id` as `id_hotel_booking`, `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
+            FROM `'._DB_PREFIX_.'htl_booking_detail`
+            WHERE `id_hotel` = '.(int)$hotel_id.' AND `id_product` = '.(int)$id_room_type.'
+            AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'
+            AND `id_room`!='.(int)$id_room.' AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND `id_status` NOT IN ('.HotelBookingDetail::STATUS_CANCELLED.', '.HotelBookingDetail::STATUS_NO_SHOW.') AND `is_back_order` = 0';
+
+        $result = Db::getInstance()->executeS($sql);
+        if ($cache) {
+            Cache::store($cacheKey, $result);
+        }
+
+        return $result;
     }
 
     /**
