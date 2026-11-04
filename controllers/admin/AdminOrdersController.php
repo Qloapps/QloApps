@@ -63,7 +63,9 @@ class AdminOrdersControllerCore extends AdminController
         cu.iso_code AS currency,
         IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
         IF(a.valid, 1, 0) badge_success,
-        hbil.`hotel_name`,
+        (SELECT hbil_sub.hotel_name FROM `'._DB_PREFIX_.'htl_branch_info_lang` hbil_sub 
+         WHERE hbil_sub.id = (SELECT hbd_sub.id_hotel FROM `'._DB_PREFIX_.'htl_booking_detail` hbd_sub WHERE hbd_sub.id_order = a.id_order LIMIT 1) 
+         AND hbil_sub.id_lang = '.(int)$this->context->language->id.' LIMIT 1) AS hotel_name,
         (SELECT COUNT(hbd.`id`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as num_rooms,
         (SELECT SUM(hbd.`adults`) + SUM(hbd.`children`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests_count,
         (SELECT CONCAT(
@@ -73,8 +75,8 @@ class AdminOrdersControllerCore extends AdminController
         ) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests,
         (SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as los,
         hbd.`id_room` AS id_room_information,
-        (SELECT GROUP_CONCAT(CONCAT(ps.period, \'~\', ps.cnt) ORDER BY ps.period SEPARATOR \'::\') FROM (SELECT CONCAT(hbd.`date_from`, \'|\', hbd.`date_to`) AS period, COUNT(*) AS cnt FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order` GROUP BY hbd.`date_from`, hbd.`date_to`) AS ps) AS stay_periods,
-        (SELECT COUNT(spod.`id_service_product_order_detail`) FROM `'._DB_PREFIX_.'service_product_order_detail` spod WHERE spod.`id_order` = a.`id_order` AND spod.`id_htl_booking_detail`=0) as num_products';
+        (SELECT GROUP_CONCAT(CONCAT(hbd_sub.`date_from`, \'|\', hbd_sub.`date_to`) SEPARATOR \'::\') FROM `'._DB_PREFIX_.'htl_booking_detail` hbd_sub WHERE hbd_sub.`id_order` = a.`id_order`) AS stay_periods,
+        (SELECT COUNT(spod_sub.`id_service_product_order_detail`) FROM `'._DB_PREFIX_.'service_product_order_detail` spod_sub WHERE spod_sub.`id_order` = a.`id_order` AND spod_sub.`id_htl_booking_detail`=0) as num_products';
 
         $this->_select .= ',
         (SELECT sl.`name` FROM `'._DB_PREFIX_.'source` s LEFT JOIN `'._DB_PREFIX_.'source_lang` sl ON (sl.`id_source` = s.`id_source` AND sl.`id_lang` = '.(int)$this->context->language->id.') WHERE s.`id_source` = a.`id_source`) AS `booking_source_name`,
@@ -87,7 +89,6 @@ class AdminOrdersControllerCore extends AdminController
         LEFT JOIN `'._DB_PREFIX_.'order_state_lang` osl ON (os.`id_order_state` = osl.`id_order_state` AND osl.`id_lang` = '.(int) $this->context->language->id.')
         LEFT JOIN `'._DB_PREFIX_.'htl_booking_detail` hbd ON (hbd.`id_order` = a.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'service_product_order_detail` spod ON (spod.`id_order` = a.`id_order`)
-        LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (IF(hbd.`id_hotel`, (hbil.`id` = hbd.`id_hotel`), (hbil.`id` = spod.`id_hotel`)))
         LEFT JOIN (
             SELECT hbd2.`id`, IF(hbd2.`id` IN ('.OrderReturn::getRefundedBookingIdsSubquery().'), 1, 0) AS is_room_refunded
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd2
@@ -407,18 +408,32 @@ class AdminOrdersControllerCore extends AdminController
             return '--';
         }
 
+        $rawPeriods = explode('::', $value);
+        $countByPeriod = array();
+        foreach ($rawPeriods as $period) {
+            if (!empty($period)) {
+                if (!isset($countByPeriod[$period])) {
+                    $countByPeriod[$period] = 0;
+                }
+                $countByPeriod[$period]++;
+            }
+        }
+
         $stayPeriods = array();
-        foreach (explode('::', $value) as $stays) {
-            $countStays = explode('~', $stays);
-            $stayDates  = explode('|', $countStays[0]);
+        foreach ($countByPeriod as $period => $count) {
+            $stayDates = explode('|', $period);
             if (count($stayDates) === 2) {
                 $stayPeriods[] = array(
                     'from'  => Tools::displayDate(trim($stayDates[0])),
                     'to'    => Tools::displayDate(trim($stayDates[1])),
-                    'count' => isset($countStays[1]) ? (int)$countStays[1] : 1,
+                    'count' => (int) $count,
                 );
             }
         }
+
+        usort($stayPeriods, function ($a, $b) {
+            return strcmp($a['from'], $b['from']);
+        });
 
         $datesDisplay = array();
         foreach (array_slice($stayPeriods, 0, 1) as $stayPeriod) {
@@ -428,7 +443,7 @@ class AdminOrdersControllerCore extends AdminController
         $stayPeriodHtml = implode('<br>', $datesDisplay);
         $uniqueStayPeriods = count($stayPeriods);
 
-        if ($uniqueStayPeriods > 1) {
+        if ($uniqueStayPeriods > 1 || (isset($stayPeriods[0]) && $stayPeriods[0]['count'] > 1)) {
             $this->context->smarty->assign(array(
                 'stay_periods' => $stayPeriods,
                 'extra_stay_periods_count' => $uniqueStayPeriods - 1,
