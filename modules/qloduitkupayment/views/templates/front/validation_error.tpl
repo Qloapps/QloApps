@@ -22,11 +22,11 @@
 
 <h2 class="page-heading">{l s='Order Error' mod='qloduitkupayment'}</h2>
 <p class="alert alert-danger">
-    {l s='Somthing went wrong during order creation. Contact admin from ' mod='qloduitkupayment'}
+    {l s='Something went wrong during order creation. Contact admin from ' mod='qloduitkupayment'}
     <a href="{$link->getPageLink('contact')}" target="_blank">{l s='contact us' mod='qloduitkupayment'}</a>
     {l s='page.' mod='qloduitkupayment'}
     <br>
-    {l s='Please Quote following trasaction id during conversation.' mod='qloduitkupayment'}
+    {l s='Please Quote following transaction id during conversation.' mod='qloduitkupayment'}
     <br>
-    {l s='Trasaction Id: ' mod='qloduitkupayment'}<strong>{$txn_id|escape:'html':'UTF-8'}</strong>
+    {l s='Transaction Id: ' mod='qloduitkupayment'}<strong>{$txn_id|escape:'html':'UTF-8'}</strong>
 </p>

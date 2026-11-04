@@ -27,5 +27,5 @@
 {elseif $type == 'abandoned'}
     <span class="badge badge-danger">{l s='Abandoned cart'}</span>
 {elseif $type == 'non_orderd'}
-    <span class="badge badge-danger">{l s='Non-orderd cart'}</span>
+    <span class="badge badge-danger">{l s='Non-ordered cart'}</span>
 {/if}

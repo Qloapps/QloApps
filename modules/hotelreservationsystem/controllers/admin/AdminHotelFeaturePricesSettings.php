@@ -509,7 +509,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
 
         $rowsToHighlight = [];
         if (!$restrictions) {
-            $this->errors[] = $this->l('Atleast one restriction is required while creating advance price rule.');
+            $this->errors[] = $this->l('At least one restriction is required while creating advance price rule.');
         } else {
             foreach ($restrictions as $restrictionKey => $restriction) {
                 if (!$restriction['is_special_days_exists']) {
@@ -665,7 +665,7 @@ class AdminHotelFeaturePricesSettingsController extends ModuleAdminController
                     Tools::redirectAdmin(self::$currentIndex.'&conf='.$conf.'&token='.$this->token);
                 }
             } else {
-                $this->errors[] = $this->l('Some error occured while saving advanced price rule.');
+                $this->errors[] = $this->l('Some error occurred while saving advanced price rule.');
             }
         }
         if (isset($idFeaturePrice) && $idFeaturePrice) {

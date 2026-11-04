@@ -98,12 +98,12 @@ class QloCleaner extends Module
         } elseif (Tools::getValue('submitTruncateCatalog') && Tools::getValue('checkTruncateCatalog')) {
             self::truncate('catalog');
             Hook::exec('actionCleanData', array('method' => 'catalog'));
-            $html .= $this->displayConfirmation($this->l('Catalog truncated successfuly, please run functional Integrity constraints to clean the database.'));
+            $html .= $this->displayConfirmation($this->l('Catalog truncated successfully, please run functional Integrity constraints to clean the database.'));
             Cache::getInstance()->flush();
         } elseif (Tools::getValue('submitTruncateSales') && Tools::getValue('checkTruncateSales')) {
             self::truncate('sales');
             Hook::exec('actionCleanData', array('method' => 'sales'));
-            $html .= $this->displayConfirmation($this->l('Orders and customers truncated successfuly, please run functional Integrity constraints to clean the database'));
+            $html .= $this->displayConfirmation($this->l('Orders and customers truncated successfully, please run functional Integrity constraints to clean the database'));
             Cache::getInstance()->flush();
         }
 

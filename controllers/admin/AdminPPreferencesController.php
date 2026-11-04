@@ -189,8 +189,8 @@ class AdminPPreferencesControllerCore extends AdminController
                         'identifier' => 'id',
                     ),
                     'PS_LOS_RESTRICTION_BO' => array(
-                        'title' => $this->l('Apply Min and Max lenght of stay restrictions for back-office search'),
-                        'hint' => $this->l('While searching for available rooms from back-office, apply minimum and maximum lenght of stay restrictions'),
+                        'title' => $this->l('Apply Min and Max length of stay restrictions for back-office search'),
+                        'hint' => $this->l('While searching for available rooms from back-office, apply minimum and maximum length of stay restrictions'),
                         'validation' => 'isBool',
                         'cast' => 'intval',
                         'required' => false,

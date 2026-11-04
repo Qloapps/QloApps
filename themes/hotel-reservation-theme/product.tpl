@@ -896,7 +896,7 @@
 			{addJsDef currency_format = $currency->format}
 			{addJsDef currency_blank = $currency->blank}
 			{addJsDefL name=correct_date_cond}{l s='Check Out Date should be greater than Check in date.' js=1}{/addJsDefL}
-			{addJsDefL name=some_error_cond}{l s='Some error occured .Please try again.' js=1}{/addJsDefL}
+			{addJsDefL name=some_error_cond}{l s='Some error occurred .Please try again.' js=1}{/addJsDefL}
 			{addJsDefL name=unavail_qty_text}{l s='Required quantity of rooms are Not available.' js=1}{/addJsDefL}
 			{addJsDefL name=out_of_stock_cond}{l s='No room is available for this period.' js=1}{/addJsDefL}
 			{addJsDefL name=wrong_qty_cond}{l s='you are trying for a invalid quantity.' js=1}{/addJsDefL}
@@ -907,7 +907,7 @@
 			{addJsDefL name=service_removed_txt}{l s='Service removed' js=1}{/addJsDefL}
 			{addJsDefL name=service_updated_txt}{l s='Service updated' js=1}{/addJsDefL}
 			{addJsDefL name=max_service_product_qty_txt}{l s='Maximum allowed quantity in the cart is' js=1}{/addJsDefL}
-			{addJsDefL name=out_of_stock_text}{l s='Requested quantitity is out of stock' js=1}{/addJsDefL}
+			{addJsDefL name=out_of_stock_text}{l s='Requested quantity is out of stock' js=1}{/addJsDefL}
 		{/strip}
 	{/block}
 	{/if}
