@@ -61,20 +61,20 @@ class AdminOrdersControllerCore extends AdminController
         CONCAT(c.`firstname`, \' \', c.`lastname`) AS `customer`,
         osl.`name` AS `osname`, os.`color`,
         cu.iso_code AS currency,
-        IF((SELECT so.id_order FROM `'._DB_PREFIX_.'orders` so WHERE so.id_customer = a.id_customer AND so.id_order < a.id_order LIMIT 1) > 0, 0, 1) as new,
+        IF(fo.`first_order` IS NULL OR fo.`first_order` = a.`id_order`, 1, 0) as new,
         IF(a.valid, 1, 0) badge_success,
         hbil.`hotel_name`,
-        (SELECT COUNT(hbd.`id`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as num_rooms,
-        (SELECT SUM(hbd.`adults`) + SUM(hbd.`children`) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests_count,
-        (SELECT CONCAT(
-            SUM(hbd.`adults`),
+        hba.`num_rooms` AS num_rooms,
+        hba.`total_guests_count` AS total_guests_count,
+        CONCAT(
+            hba.`adults`,
             \' '.$this->l('Adult(s)').' \',
-            IF(SUM(hbd.`children`), CONCAT(SUM(hbd.`children`), \' '.$this->l('Children').'\'), \'\')
-        ) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as total_guests,
-        (SELECT SUM(DATEDIFF(hbd.`date_to`, hbd.`date_from`)) FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order`) as los,
+            IF(hba.`children`, CONCAT(hba.`children`, \' '.$this->l('Children').'\'), \'\')
+        ) AS total_guests,
+        hba.`los` AS los,
         hbd.`id_room` AS id_room_information,
-        (SELECT GROUP_CONCAT(CONCAT(ps.period, \'~\', ps.cnt) ORDER BY ps.period SEPARATOR \'::\') FROM (SELECT CONCAT(hbd.`date_from`, \'|\', hbd.`date_to`) AS period, COUNT(*) AS cnt FROM `'._DB_PREFIX_.'htl_booking_detail` hbd WHERE hbd.`id_order` = a.`id_order` GROUP BY hbd.`date_from`, hbd.`date_to`) AS ps) AS stay_periods,
-        (SELECT COUNT(spod.`id_service_product_order_detail`) FROM `'._DB_PREFIX_.'service_product_order_detail` spod WHERE spod.`id_order` = a.`id_order` AND spod.`id_htl_booking_detail`=0) as num_products';
+        hsp.`stay_periods` AS stay_periods,
+        IFNULL(spn.`num_products`, 0) AS num_products';
 
         $this->_select .= ',
         (SELECT sl.`name` FROM `'._DB_PREFIX_.'source` s LEFT JOIN `'._DB_PREFIX_.'source_lang` sl ON (sl.`id_source` = s.`id_source` AND sl.`id_lang` = '.(int)$this->context->language->id.') WHERE s.`id_source` = a.`id_source`) AS `booking_source_name`,
@@ -89,8 +89,36 @@ class AdminOrdersControllerCore extends AdminController
         LEFT JOIN `'._DB_PREFIX_.'service_product_order_detail` spod ON (spod.`id_order` = a.`id_order`)
         LEFT JOIN `'._DB_PREFIX_.'htl_branch_info_lang` hbil ON (IF(hbd.`id_hotel`, (hbil.`id` = hbd.`id_hotel`), (hbil.`id` = spod.`id_hotel`)))
         LEFT JOIN (
-            SELECT hbd2.`id`, IF(hbd2.`id` IN ('.OrderReturn::getRefundedBookingIdsSubquery().'), 1, 0) AS is_room_refunded
+            SELECT so.`id_customer`, MIN(so.`id_order`) AS first_order
+            FROM `'._DB_PREFIX_.'orders` so
+            GROUP BY so.`id_customer`
+        ) fo ON (fo.`id_customer` = a.`id_customer`)
+        LEFT JOIN (
+            SELECT hbd3.`id_order`, COUNT(hbd3.`id`) AS num_rooms, SUM(hbd3.`adults`) AS adults, SUM(hbd3.`children`) AS children,
+            SUM(hbd3.`adults`) + SUM(hbd3.`children`) AS total_guests_count,
+            SUM(DATEDIFF(hbd3.`date_to`, hbd3.`date_from`)) AS los
+            FROM `'._DB_PREFIX_.'htl_booking_detail` hbd3
+            GROUP BY hbd3.`id_order`
+        ) hba ON (hba.`id_order` = a.`id_order`)
+        LEFT JOIN (
+            SELECT sp.`id_order`, GROUP_CONCAT(CONCAT(sp.`period`, \'~\', sp.`cnt`) ORDER BY sp.`period` SEPARATOR \'::\') AS stay_periods
+            FROM (
+                SELECT hbd4.`id_order`, CONCAT(hbd4.`date_from`, \'|\', hbd4.`date_to`) AS period, COUNT(*) AS cnt
+                FROM `'._DB_PREFIX_.'htl_booking_detail` hbd4
+                GROUP BY hbd4.`id_order`, hbd4.`date_from`, hbd4.`date_to`
+            ) sp
+            GROUP BY sp.`id_order`
+        ) hsp ON (hsp.`id_order` = a.`id_order`)
+        LEFT JOIN (
+            SELECT spod2.`id_order`, COUNT(spod2.`id_service_product_order_detail`) AS num_products
+            FROM `'._DB_PREFIX_.'service_product_order_detail` spod2
+            WHERE spod2.`id_htl_booking_detail` = 0
+            GROUP BY spod2.`id_order`
+        ) spn ON (spn.`id_order` = a.`id_order`)
+        LEFT JOIN (
+            SELECT hbd2.`id`, IF(rb.`id_htl_booking` IS NULL, 0, 1) AS is_room_refunded
             FROM `'._DB_PREFIX_.'htl_booking_detail` hbd2
+            LEFT JOIN ('.OrderReturn::getRefundedBookingIdsSubquery().' GROUP BY ord.`id_htl_booking`) rb ON (rb.`id_htl_booking` = hbd2.`id`)
         ) rrb ON (rrb.`id` = hbd.`id`)';
 
         $this->_orderBy = 'id_order';
