@@ -713,7 +713,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'qlostatsserviceproducts',
                 'blockcart',
                 'blockuserinfo',
-                'qlochannelmanagerconnector',
+                'qlocmconnector',
                 'qlogooglehotelconnector'
             );
         }
