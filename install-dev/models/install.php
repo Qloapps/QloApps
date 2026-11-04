@@ -622,8 +622,8 @@ class InstallModelInstall extends InstallAbstractModel
             'marketingConsent' => $data['marketing_consent'],
         ];
 
-        // Register install
-        $this->registerInstall($qloData);
+        // Qlo Notification
+        $this->setNotification($qloData);
 
         return true;
     }
@@ -632,9 +632,9 @@ class InstallModelInstall extends InstallAbstractModel
      * @param array $installData
      * @return bool
      */
-    public function registerInstall($installData)
+    public function setNotification($installData)
     {
-        Tools::addonsRequest('register-install', array(
+        Tools::addonsRequest('installation', array(
             'install_data' => $installData,
             'version' => _QLO_INSTALL_VERSION_,
             'iso_lang' => $this->language->getLanguageIso(),

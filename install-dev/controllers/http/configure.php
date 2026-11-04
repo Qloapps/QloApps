@@ -64,7 +64,7 @@ class InstallControllerHttpConfigure extends InstallControllerHttp
                     'marketingConsent' => Tools::getValue('marketing_consent'),
                 ];
                 $objModelInstall = new InstallModelInstall();
-                $objModelInstall->registerInstall($qloData);
+                $objModelInstall->setNotification($qloData);
                 // END
             }
 

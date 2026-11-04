@@ -3117,7 +3117,6 @@ class AdminControllerCore extends Controller
             'submit_form_ajax' => (int)Tools::getValue('submitFormAjax')
         ));
 
-        // get upgrade available info from cache only, the cache is refreshed in background by ajaxProcessCheckUpgrade()
         if (file_exists(_PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE)) {
             $content = Tools::file_get_contents( _PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE);
             $upgradeInfo = simplexml_load_string($content);
