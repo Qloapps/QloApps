@@ -27,6 +27,7 @@ class HotelPropertyType extends ObjectModel
     public $date_add;
     public $date_upd;
     public $name;
+    public $plural_name;
 
     public static $definition = array(
         'table' => 'htl_property_type',
@@ -37,6 +38,7 @@ class HotelPropertyType extends ObjectModel
             'date_add' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'date_upd' => array('type' => self::TYPE_DATE, 'validate' => 'isDate', 'copy_post' => false),
             'name' => array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true, 'size' => 255),
+            'plural_name' => array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true, 'size' => 255),
         ),
     );
 
@@ -46,6 +48,7 @@ class HotelPropertyType extends ObjectModel
         'objectMethods' => array('update' => 'updateWs', 'delete' => 'deleteWs'),
         'fields' => array(
             'name' => array('required' => true),
+            'plural_name' => array('required' => true),
             'active' => array('required' => false),
         ),
     );
@@ -121,7 +124,7 @@ class HotelPropertyType extends ObjectModel
         $cacheKey = 'HotelPropertyType::getPropertyTypes'.$idLang.'_'.(int) $active;
 
         if (!Cache::isStored($cacheKey)) {
-            $sql = 'SELECT hpt.`id_htl_property_type` AS `id_property_type`, hptl.`name`
+            $sql = 'SELECT hpt.`id_htl_property_type` AS `id_property_type`, hptl.`name`, hptl.`plural_name`
                 FROM `'._DB_PREFIX_.'htl_property_type` hpt
                 LEFT JOIN `'._DB_PREFIX_.'htl_property_type_lang` hptl
                     ON (hpt.`id_htl_property_type` = hptl.`id_htl_property_type`

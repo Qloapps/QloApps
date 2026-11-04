@@ -47,6 +47,7 @@
                                 </thead>
                                 <tbody>
                                     {foreach $serviceProducts as $product}
+                                        {if !empty($selectedRoomServiceProduct['date_from']) && !(isset($selectedRoomServiceProduct['selected_service'][$product['id_product']])) && $product['price_calculation_method'] != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING && !(Product::getServicePriceApplicableDates($product['price_calculation_method'], $selectedRoomServiceProduct['date_from'], $selectedRoomServiceProduct['date_to'])|@array_filter)}{continue}{/if}
                                         {if isset($selectedRoomServiceProduct['selected_service']) && $selectedRoomServiceProduct['selected_service'] && ($product['id_product']|array_key_exists:$selectedRoomServiceProduct['selected_service'])}
                                             {assign var='serviceSelected' value=true}
                                             {$product.price_tax_incl = $selectedRoomServiceProduct['selected_service'][$product['id_product']]['unit_price_tax_incl']}
@@ -63,21 +64,7 @@
                                             <td>
                                                 <div>
                                                     {$product['name']|escape:'html':'UTF-8'}
-                                                    {capture name='room_type_service_tooltip_content'}
-                                                    {assign var="priceCalcMethod" value=$product['price_calculation_method']|default:0}
-                                                        <div class="ui-tooltip-header">
-                                                            <div class="ui-tooltip-label">{l s='Applied on:'}</div>
-                                                        </div>
-                                                        <div class="ui-tooltip-body">
-                                                            <ul>
-                                                                {foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
-                                                                    <li>{$pcmDayLabel}</li>
-                                                                {/foreach}
-                                                            </ul>
-                                                        </div>
-                                                    {/capture}
-
-                                                    {include file='helpers/ui-tooltip.tpl' tooltip_content=$smarty.capture.room_type_service_tooltip_content allow_html=true}
+                                                    {include file='controllers/orders/modals/_partials/service-applied-days.tpl' price_calculation_method=$product['price_calculation_method'] date_from=$selectedRoomServiceProduct['date_from']|default:'' date_to=$selectedRoomServiceProduct['date_to']|default:''}
                                                 </div>
                                             </td>
                                             <td>
@@ -108,6 +95,7 @@
                                                             {$cartCurrency->sign}
                                                         </span>
                                                         <input class="service_cart_price_input" id="service_cart_price_{$selectedRoomServiceProduct['id']}_{$product['id_product']}" type="text" value="{$product.price_tax_exc}" name="service_price[{$product['id_product']|escape:'html':'UTF-8'}]"{if isset($can_edit) && !$can_edit} readonly{/if}/>
+                                                        {if ($product['price_calculation_method']) != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING}<span class="input-group-addon">{l s='/ Night'}</span>{/if}
                                                     </div>
                                                 {/if}
                                             </td>
@@ -144,40 +132,6 @@
                 </div>
                 <div class="row form-group">
                     <div class="col-sm-6">
-                        <label class="control-label required">{l s='Price calculation method'}</label>
-                        <select id="new_service_pcm_type" name="price_calculation_type">
-                            <option value="{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}" selected="selected">{l s='Once for the booking range'}</option>
-                            <option value="0">{l s='Select applicable days'}</option>
-                        </select>
-                        <div id="new_service_pcm_days_container" style="margin-top: 10px; display:none;">
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <label class="control-label required">{l s='Applied on:'}</label>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" id="pcm_checkin" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY|intval}">
-                                            {l s='Check-in day'}
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" id="pcm_checkout" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY|intval}">
-                                            {l s='Check-out day'}
-                                        </label>
-                                    </div>
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" id="pcm_duringstay" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY|intval}"/>
-                                            {l s='During-stay days'}
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
                         <label class="control-label">{l s='Auto added service'}</label>
                         <div>
                             <span class="switch prestashop-switch fixed-width-lg">
@@ -193,8 +147,6 @@
                             </span>
                         </div>
                     </div>
-                </div>
-                <div class="row form-group">
                     <div id="new_service_price_tax_rule_container" class="col-sm-6">
                         <label class="control-label">{l s='Tax rule'}</label>
                         <select name="new_service_price_tax_rule_group">
@@ -211,9 +163,39 @@
                             <option value="{Product::PRICE_ADDITION_TYPE_INDEPENDENT}">{l s='Add price as convenience Fee'}</option>
                         </select>
                     </div>
+                </div>
+                <div class="row form-group">
                     <div id="new_service_qty_container" class="col-sm-6">
                         <label class="control-label required">{l s='Quantity'}</label>
                         <input type="number" class="form-control qty" min="1" name="new_service_qty" value="1">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="control-label required">{l s='Price calculation method'}</label>
+                        <select id="new_service_pcm_type" name="price_calculation_type">
+                            <option value="{Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING|intval}" selected="selected">{l s='Once for the booking range'}</option>
+                            <option value="0">{l s='Select applicable days'}</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="new_service_pcm_days_container" style="display:none;">
+                    <div class="row form-group">
+                        <div class="col-sm-12">
+                            <label class="control-label required">{l s='Applied on:'}</label>
+                        </div>
+                        <div class="col-sm-12">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="pcm_checkin" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKIN_DAY|intval}">
+                                {l s='Check-in day'}
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="pcm_checkout" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_CHECKOUT_DAY|intval}">
+                                {l s='Check-out day'}
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="pcm_duringstay" name="new_service_price_calc_method[]" value="{Product::PRICE_CALCULATION_METHOD_ON_DURING_STAY|intval}"/>
+                                {l s='During-stay days'}
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <input type="hidden" name="id_hotel_cart_booking" value="{$id_hotel_cart_booking}">

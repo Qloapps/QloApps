@@ -127,7 +127,7 @@
 							<div class="col-lg-10">
 								{foreach from=$languages item=language}
 									{assign var="navigation_link_name" value="navigation_link_name_`$language.id_lang`"}
-									<input type="text" id="{$navigation_link_name}" name="{$navigation_link_name}" value="{if isset($navigationLinkInfo.name[$language.id_lang]) && $navigationLinkInfo.name[$language.id_lang]}{$navigationLinkInfo.name[$language.id_lang]}{else if isset($smarty.post.$navigation_link_name)}{$smarty.post.$navigation_link_name}{/if}" data-lang-name="{$language.name}" placeholder="{l s='Enter exlore link name' mod='blocknavigationmenu'}" class="form-control navigation_link_name_all" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}/>
+									<input type="text" id="{$navigation_link_name}" name="{$navigation_link_name}" value="{if isset($navigationLinkInfo.name[$language.id_lang]) && $navigationLinkInfo.name[$language.id_lang]}{$navigationLinkInfo.name[$language.id_lang]|escape:'htmlall':'UTF-8'}{else if isset($smarty.post.$navigation_link_name)}{$smarty.post.$navigation_link_name|escape:'htmlall':'UTF-8'}{/if}" data-lang-name="{$language.name}" placeholder="{l s='Enter exlore link name' mod='blocknavigationmenu'}" class="form-control navigation_link_name_all" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}/>
 								{/foreach}
 							</div>
 							{if $languages|@count > 1}
@@ -176,7 +176,7 @@
 						</span>
 					</label>
 					<div class="col-lg-5">
-						<input type="text" name="link" {if isset($smarty.post.link)}value="{$smarty.post.link}"{elseif isset($navigationLinkInfo['link'])}value="{$navigationLinkInfo['link']}"{/if}>
+						<input type="text" name="link" {if isset($smarty.post.link)}value="{$smarty.post.link|escape:'htmlall':'UTF-8'}"{elseif isset($navigationLinkInfo['link'])}value="{$navigationLinkInfo['link']|escape:'htmlall':'UTF-8'}"{/if}>
 					</div>
 				</div>
 				<div class="form-group custom_redirect_page_div {if isset($smarty.post.is_custom_redirect_link)}{if $smarty.post.is_custom_redirect_link}hidden{/if}{elseif isset($navigationLinkInfo['is_custom_link']) && $navigationLinkInfo['is_custom_link']}hidden{/if}">

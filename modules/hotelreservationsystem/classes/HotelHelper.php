@@ -1312,30 +1312,79 @@ class HotelHelper
     public function createHotelDefaultPropertyTypes()
     {
         $propertyTypes = array(
-            'Hotel',
-            'Motel',
-            'Resort',
-            'Hostel',
-            'Guest House',
-            'Bed & Breakfast',
-            'Lodge',
-            'Apartment',
-            'Vacation Rental',
-            'Homestay',
-            'Co-Living',
-            'Camping',
-            'Glamping',
-            'Farm Stay',
-            'Houseboat',
-            'Boat Stay',
+            array(
+                'name' => 'Hotel',
+                'plural_name' => 'Hotels',
+            ),
+            array(
+                'name' => 'Motel',
+                'plural_name' => 'Motels',
+            ),
+            array(
+                'name' => 'Resort',
+                'plural_name' => 'Resorts',
+            ),
+            array(
+                'name' => 'Hostel',
+                'plural_name' => 'Hostels',
+            ),
+            array(
+                'name' => 'Guest House',
+                'plural_name' => 'Guest Houses',
+            ),
+            array(
+                'name' => 'Bed & Breakfast',
+                'plural_name' => 'Bed & Breakfasts',
+            ),
+            array(
+                'name' => 'Lodge',
+                'plural_name' => 'Lodges',
+            ),
+            array(
+                'name' => 'Apartment',
+                'plural_name' => 'Apartments',
+            ),
+            array(
+                'name' => 'Vacation Rental',
+                'plural_name' => 'Vacation Rentals',
+            ),
+            array(
+                'name' => 'Homestay',
+                'plural_name' => 'Homestays',
+            ),
+            array(
+                'name' => 'Co-Living',
+                'plural_name' => 'Co-Livings',
+            ),
+            array(
+                'name' => 'Camping',
+                'plural_name' => 'Campings',
+            ),
+            array(
+                'name' => 'Glamping',
+                'plural_name' => 'Glampings',
+            ),
+            array(
+                'name' => 'Farm Stay',
+                'plural_name' => 'Farm Stays',
+            ),
+            array(
+                'name' => 'Houseboat',
+                'plural_name' => 'Houseboats',
+            ),
+            array(
+                'name' => 'Boat Stay',
+                'plural_name' => 'Boat Stays',
+            ),
         );
 
         $languages = Language::getLanguages(true);
-        foreach ($propertyTypes as $typeName) {
+        foreach ($propertyTypes as $propertyType) {
             $objType = new HotelPropertyType();
             $objType->active = 1;
             foreach ($languages as $lang) {
-                $objType->name[$lang['id_lang']] = $typeName;
+                $objType->name[$lang['id_lang']] = $propertyType['name'];
+                $objType->plural_name[$lang['id_lang']] = $propertyType['plural_name'];
             }
             $objType->save();
         }
@@ -1532,7 +1581,7 @@ class HotelHelper
             ),
             array(
                 'id' => HotelBookingDetail::STATUS_NO_SHOW,
-                'color' => '#DC143C',
+                'color' => '#FF8C00',
                 'is_terminal' => 1,
                 'name' => array(
                     'en' => 'No-show',
@@ -1545,7 +1594,7 @@ class HotelHelper
             ),
             array(
                 'id' => HotelBookingDetail::STATUS_CANCELLED,
-                'color' => '#FF8C00',
+                'color' => '#DC143C',
                 'is_terminal' => 1,
                 'name' => array(
                     'en' => 'Cancelled',

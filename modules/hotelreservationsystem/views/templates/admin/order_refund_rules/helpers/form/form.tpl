@@ -65,7 +65,7 @@
 						name="description_{$language.id_lang|escape:'htmlall':'UTF-8'}"
 						id="description_{$language.id_lang|escape:'htmlall':'UTF-8'}"
 						cols="2" rows="3"
-						class="form-control">{if isset($smarty.post.$description)}{$smarty.post.$description}{elseif isset($edit)}{$refund_rules_info.description[$language.id_lang]|escape:'htmlall':'UTF-8'}{/if}</textarea>
+						class="form-control">{if isset($smarty.post.$description)}{$smarty.post.$description|escape:'htmlall':'UTF-8'}{elseif isset($edit)}{$refund_rules_info.description[$language.id_lang]|escape:'htmlall':'UTF-8'}{/if}</textarea>
 					</div>
 				{/foreach}
 			</div>

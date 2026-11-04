@@ -9495,6 +9495,8 @@ div a.our_properties_link{
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 5px 15px;
+    max-height: 250px;
+    overflow-y: auto;
 }
 
 .ui-tooltip-elem-txt {
@@ -9502,4 +9504,16 @@ div a.our_properties_link{
     margin: 0;
     text-align: right;
     white-space: nowrap;
+}
+
+.service-applied-days {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  background-color: #72c279;
+  color: #fff;
+  border-radius: 4px;
+  padding: 3px 9px;
+  vertical-align: text-top;
 }

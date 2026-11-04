@@ -928,7 +928,7 @@
                                     <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                 </tr>
                             {/if}
-                            {if isset($total_room_services_tax_excl) && $total_room_services_tax_excl > 0}
+                            {if isset($total_room_services_tax_excl) && ($total_room_services_tax_excl - $total_convenience_fee_tax_excl) > 0}
                                 <tr id="total_products">
                                     <td class="text-right">{l s='Total Extra services (Tax excl.)'}</td>
                                     <td class="amount text-right nowrap">
@@ -1036,7 +1036,7 @@
                                                         <td class="partial_refund_fields current-edit" style="display:none;"></td>
                                                     </tr>
                                                 {/if}
-                                                {if isset($total_convenience_fee_tax_excl) && $total_convenience_fee_tax_excl > 0}
+                                                {if isset($total_convenience_fee_tax_only) && $total_convenience_fee_tax_only > 0}
                                                     <tr id="total_products">
                                                         <td class="text-left">{l s='Convenience Fee Tax'}</td>
                                                         <td class="amount text-right nowrap">

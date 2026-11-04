@@ -679,6 +679,10 @@ $(document).ready(function()
 			success: function(jsonData) {
 				if (!jsonData.hasError) {
 					showSuccessMessage(txtExtraServiceSucc);
+					// refresh the header cart dropdown too
+					if (typeof ajaxCart !== 'undefined') {
+						ajaxCart.refresh();
+					}
 				} else {
 					showErrorMessage(jsonData.errors);
 

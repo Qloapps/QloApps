@@ -56,6 +56,8 @@
 														{else}
 															{assign var='serviceSelected' value=false}
 														{/if}
+														{* services applied on selected days only are not shown when none of those days exist in the stay *}
+														{if $serviceSelected || $product['price_calculation_method'] == Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING || (Product::getServicePriceApplicableDates($product['price_calculation_method'], $cartRoom['date_from'], $cartRoom['date_to'])|@array_filter)}
 														<div class="row room_service_block">
 															<div class="col-xs-8">
 																<div class="row">
@@ -68,20 +70,8 @@
 																	</div>
 																	<div class="col-xs-10">
 																			<span>{$product['name']|escape:'html':'UTF-8'}</span>
-																			{assign var='priceCalcMethod' value=$product.price_calculation_method|default:0}
-																			{capture name='htl_pcm_tooltip'}
-																			<div class="ui-tooltip-header">
-																				<div class="ui-tooltip-label">{l s='Applied on:'}</div>
-																			</div>
-																			<div class="ui-tooltip-body">
-																				<ul>
-																					{foreach from=Product::getPriceCalculationMethodDaysLabel($priceCalcMethod) item='pcmDayLabel'}
-																						<li>{$pcmDayLabel}</li>
-																					{/foreach}
-																				</ul>
-																			</div>
-																			{/capture}
-																			{include file='_partials/ui-tooltip.tpl' tooltip_content=$smarty.capture.htl_pcm_tooltip allow_html=true}																		{if $product.allow_multiple_quantity}
+																						{include file='_partials/service-applied-days.tpl' price_calculation_method=$product.price_calculation_method|default:0 date_from=$cartRoom['date_from'] date_to=$cartRoom['date_to']}
+																						{if $product.allow_multiple_quantity}
 																			<div class="qty_container">
 																				<input type="text" class="form-control qty" id="qty_{$product.id_product}" name="room_service_product_qty_{$product.id_product}" data-id-product="{$product.id_product}" data-max_quantity="{$product.max_quantity}" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}1{/if}">
 																				<input type="hidden" class="qty_hidden" id="qty_{$product.id_product}_hidden" value="{if $serviceSelected}{$cartRoom['selected_service'][$product['id_product']]['quantity']}{else}0{/if}">
@@ -96,10 +86,25 @@
 															</div>
 															<div class="col-xs-4">
 																{if ($product.show_price && !isset($restricted_country_mode)) || isset($groups)}
-																	<span class="pull-right">{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}</span>
+																	{assign var='serviceDayBased' value=(($product.price_calculation_method|default:0) != Product::PRICE_CALCULATION_METHOD_ONCE_FOR_BOOKING)}
+																	{assign var='serviceTotal' value=false}
+																	{if $serviceSelected}
+																		{assign var='serviceTotal' value=$cartRoom['selected_service'][$product['id_product']]}
+																	{elseif isset($cartRoom['available_service_pricing'][$product['id_product']])}
+																		{assign var='serviceTotal' value=$cartRoom['available_service_pricing'][$product['id_product']]}
+																	{/if}
+																	<div class="pull-right text-right">
+																		{if $serviceDayBased && $serviceTotal}
+																			{if !$priceDisplay}{convertPrice price=$serviceTotal.total_price_tax_incl}{else}{convertPrice price=$serviceTotal.total_price_tax_excl}{/if}
+																			<br><small>{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if} {l s='/Night'}</small>
+																		{else}
+																			{if !$priceDisplay}{convertPrice price=$product.price_tax_incl}{else}{convertPrice price=$product.price_tax_exc}{/if}
+																		{/if}
+																	</div>
 																{/if}
 															</div>
 														</div>
+														{/if}
 													{/foreach}
 												{/if}
 											</div>
