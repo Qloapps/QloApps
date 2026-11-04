@@ -3948,6 +3948,102 @@ class HotelBookingDetail extends ObjectModel
         return $result;
     }
 
+    /**
+     * Error messages from modules that refuse a status change of this room booking.
+     *
+     * @param int $newStatus
+     * @param string|null $statusDate Y-m-d H:i:s
+     *
+     * @return array
+     */
+    public function getStatusChangeErrors($newStatus, $statusDate = null)
+    {
+        $errors = array();
+        Hook::exec('actionRoomBookingStatusUpdateBefore', array(
+            'id_hotel_booking_detail' => (int) $this->id,
+            'id_order' => (int) $this->id_order,
+            'id_hotel' => (int) $this->id_hotel,
+            'id_room' => (int) $this->id_room,
+            'id_status' => (int) $this->id_status,
+            'new_status' => (int) $newStatus,
+            'status_date' => $statusDate,
+            'errors' => &$errors,
+        ));
+
+        return $errors;
+    }
+
+    /**
+     * "Today" of a hotel for back-office bookings (modifiable by hook).
+     *
+     * @param int $idHotel
+     *
+     * @return string Date in Y-m-d format
+     */
+    public static function getCurrentDate($idHotel = 0)
+    {
+        $currentDate = date('Y-m-d');
+        Hook::exec('actionHotelCurrentDateModifier', array(
+            'id_hotel' => (int) $idHotel,
+            'id_employee' => (int) (Validate::isLoadedObject(Context::getContext()->employee) ? Context::getContext()->employee->id : 0),
+            'current_date' => &$currentDate,
+        ));
+
+        return $currentDate;
+    }
+
+    /**
+     * Whether the current employee may choose past dates in back-office bookings.
+     *
+     * @param int $idHotel
+     *
+     * @return bool
+     */
+    public static function isBackdateOrderAllowed($idHotel = 0)
+    {
+        $employee = Context::getContext()->employee;
+        if (!Validate::isLoadedObject($employee)) {
+            return false;
+        }
+        if (Configuration::get($employee->isSuperAdmin() ? 'PS_BACKDATE_ORDER_SUPERADMIN' : 'PS_BACKDATE_ORDER_EMPLOYEES')) {
+            return true;
+        }
+
+        return $idHotel && self::getCurrentDate($idHotel) < date('Y-m-d');
+    }
+
+    /**
+     * New total price of this room booking when its dates change (modifiable by hook).
+     *
+     * @param string $newDateFrom
+     * @param string $newDateTo
+     * @param float $priceTaxExcl
+     * @param float $priceTaxIncl
+     *
+     * @return array total_price_tax_excl, total_price_tax_incl
+     */
+    public function getDurationPrice($newDateFrom, $newDateTo, $priceTaxExcl, $priceTaxIncl)
+    {
+        Hook::exec('actionRoomBookingDurationPriceModifier', array(
+            'id_htl_booking' => (int) $this->id,
+            'id_order' => (int) $this->id_order,
+            'id_hotel' => (int) $this->id_hotel,
+            'id_room' => (int) $this->id_room,
+            'id_product' => (int) $this->id_product,
+            'old_date_from' => $this->date_from,
+            'old_date_to' => $this->date_to,
+            'new_date_from' => $newDateFrom,
+            'new_date_to' => $newDateTo,
+            'price_tax_excl' => &$priceTaxExcl,
+            'price_tax_incl' => &$priceTaxIncl,
+        ));
+
+        return array(
+            'total_price_tax_excl' => (float) $priceTaxExcl,
+            'total_price_tax_incl' => (float) $priceTaxIncl,
+        );
+    }
+
     public function add($auto_date = true, $null_values = false)
     {
         if (!$this->planned_check_out) {

@@ -135,23 +135,14 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                 }
             }
 
-            $currentDate = date('Y-m-d');
-            Hook::exec('actionHotelCurrentDateModifier', array(
-                'id_hotel' => (int) $id_hotel,
-                'current_date' => &$currentDate,
-            ));
+            $currentDate = HotelBookingDetail::getCurrentDate($id_hotel);
 
             if (Tools::getValue('date_from') && Validate::isDate(Tools::getValue('date_from'))) {
                 $date_from = date('Y-m-d', strtotime(Tools::getValue('date_from')));
             } else {
                 $date_from = $currentDate;
             }
-            if ($this->context->employee->isSuperAdmin()) {
-                $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-            } else {
-                $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-            }
-            if (!Configuration::get($backOrderConfigKey)) {
+            if (!HotelBookingDetail::isBackdateOrderAllowed()) {
                 if (strtotime($currentDate) > strtotime($date_from)) {
                     $date_from = $currentDate;
                 }
@@ -1106,20 +1097,7 @@ public function ajaxProcessGetCalenderData()
         if (Configuration::get('PS_BACKOFFICE_ROOM_BOOKING_TYPE') == HotelBookingDetail::PS_ROOM_UNIT_SELECTION_TYPE_OCCUPANCY) {
             $occupancyRequiredForBooking = true;
         }
-        if ($this->context->employee->isSuperAdmin()) {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-        } else {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-        }
-        $PS_BACKDATE_ORDER_ALLOW = (int)Configuration::get($backOrderConfigKey);
-        if (!$PS_BACKDATE_ORDER_ALLOW && $this->id_hotel) {
-            $currentDate = date('Y-m-d');
-            Hook::exec('actionHotelCurrentDateModifier', array(
-                'id_hotel' => (int) $this->id_hotel,
-                'current_date' => &$currentDate,
-            ));
-            $PS_BACKDATE_ORDER_ALLOW = ($currentDate < date('Y-m-d')) ? 1 : 0;
-        }
+        $PS_BACKDATE_ORDER_ALLOW = (int) HotelBookingDetail::isBackdateOrderAllowed($this->id_hotel);
 
         $jsVars = array(
             'currency_prefix' => $currency->prefix,

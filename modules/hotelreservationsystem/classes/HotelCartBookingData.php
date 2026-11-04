@@ -754,12 +754,7 @@ class HotelCartBookingData extends ObjectModel
         if ($cartBookingData = $this->getCartCurrentDataByCartId($idCart)) {
             $res = true;
             foreach ($cartBookingData as $cartRoom) {
-                $currentDate = date('Y-m-d');
-                Hook::exec('actionHotelCurrentDateModifier', array(
-                    'id_hotel' => (int) $cartRoom['id_hotel'],
-                    'current_date' => &$currentDate,
-                ));
-                if (strtotime($cartRoom['date_from']) < strtotime($currentDate)) {
+                if (strtotime($cartRoom['date_from']) < strtotime(HotelBookingDetail::getCurrentDate($cartRoom['id_hotel']))) {
                     $res = $res && $this->deleteRoomDataFromOrderLine(
                         $cartRoom['id_cart'],
                         $cartRoom['id_guest'],
@@ -1045,12 +1040,7 @@ class HotelCartBookingData extends ObjectModel
 
             // for admin/employee remove bookings of the back dates from cart if not allowed
             if ($forAdminCart) {
-                if ($context->employee->isSuperAdmin()) {
-                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-                } else {
-                    $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-                }
-                if (!Configuration::get($backOrderConfigKey)) {
+                if (!HotelBookingDetail::isBackdateOrderAllowed()) {
                     $objHotelCartBookingData = new HotelCartBookingData();
                     $objHotelCartBookingData->removeBackdateRoomsFromCart($context->cart->id);
                 }

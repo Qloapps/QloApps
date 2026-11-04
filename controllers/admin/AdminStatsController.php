@@ -1828,6 +1828,24 @@ class AdminStatsControllerCore extends AdminStatsTabController
         return $result ? $result : 0;
     }
 
+    /**
+     * Lets modules change the result of a stats method.
+     *
+     * @return array
+     */
+    protected static function applyStatsModifiers($method, $dateFrom, $dateTo, $idHotel, $result)
+    {
+        Hook::exec('actionHotelStatsDataModifier', array(
+            'method' => $method,
+            'id_hotel' => $idHotel,
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+            'result' => &$result,
+        ));
+
+        return $result;
+    }
+
     public static function getOccupiedRoomsForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
     {
         $dateTo = !$dateTo ? date('Y-m-d', strtotime('+1 day', strtotime($dateFrom))) : $dateTo;
@@ -1867,15 +1885,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
         }
 
-        Hook::exec('actionHotelStatsDataModifier', array(
-            'method' => __FUNCTION__,
-            'id_hotel' => $idHotel,
-            'date_from' => $dateFrom,
-            'date_to' => $dateTo,
-            'result' => &$result,
-        ));
-
-        return $result;
+        return self::applyStatsModifiers(__FUNCTION__, $dateFrom, $dateTo, $idHotel, $result);
     }
 
     public static function getRoomsRevenueForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
@@ -1916,15 +1926,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
         }
 
-        Hook::exec('actionHotelStatsDataModifier', array(
-            'method' => __FUNCTION__,
-            'id_hotel' => $idHotel,
-            'date_from' => $dateFrom,
-            'date_to' => $dateTo,
-            'result' => &$result,
-        ));
-
-        return $result;
+        return self::applyStatsModifiers(__FUNCTION__, $dateFrom, $dateTo, $idHotel, $result);
     }
 
     // Calculate total services revenue (services )
@@ -1967,15 +1969,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $result[$discreteDate['timestamp_from']] = $totalServicesRevenue;
         }
 
-        Hook::exec('actionHotelStatsDataModifier', array(
-            'method' => __FUNCTION__,
-            'id_hotel' => $idHotel,
-            'date_from' => $dateFrom,
-            'date_to' => $dateTo,
-            'result' => &$result,
-        ));
-
-        return $result;
+        return self::applyStatsModifiers(__FUNCTION__, $dateFrom, $dateTo, $idHotel, $result);
     }
 
     public static function getTotalRevenueForDiscreteDates($dateFrom, $dateTo = null, $idHotel = null, $useCache = true)
@@ -1988,15 +1982,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             }
         }
 
-        Hook::exec('actionHotelStatsDataModifier', array(
-            'method' => __FUNCTION__,
-            'id_hotel' => $idHotel,
-            'date_from' => $dateFrom,
-            'date_to' => $dateTo,
-            'result' => &$result,
-        ));
-
-        return $result;
+        return self::applyStatsModifiers(__FUNCTION__, $dateFrom, $dateTo, $idHotel, $result);
     }
 
     /**
@@ -2075,15 +2061,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
         }
 
-        Hook::exec('actionHotelStatsDataModifier', array(
-            'method' => __FUNCTION__,
-            'id_hotel' => $idHotel,
-            'date_from' => $dateFrom,
-            'date_to' => $dateTo,
-            'result' => &$result,
-        ));
-
-        return $result;
+        return self::applyStatsModifiers(__FUNCTION__, $dateFrom, $dateTo, $idHotel, $result);
     }
 
     /**
@@ -2228,15 +2206,7 @@ class AdminStatsControllerCore extends AdminStatsTabController
             $result[$discreteDate['timestamp_from']] = Cache::retrieve($cacheKey);
         }
 
-        Hook::exec('actionHotelStatsDataModifier', array(
-            'method' => __FUNCTION__,
-            'id_hotel' => $idHotel,
-            'date_from' => $dateFrom,
-            'date_to' => $dateTo,
-            'result' => &$result,
-        ));
-
-        return $result;
+        return self::applyStatsModifiers(__FUNCTION__, $dateFrom, $dateTo, $idHotel, $result);
     }
 
     public static function getTotalFrequentCustomers($dateFrom, $dateTo, $nbOrders = 5, $idHotel = null)

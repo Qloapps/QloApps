@@ -47,6 +47,7 @@ class OrderCore extends ObjectModel
     const ORDER_COMPLETE_CANCELLATION_OR_REFUND_REQUEST_FLAG = 3;
     const ORDER_COMPLETE_NOSHOW_FLAG = 4;
 
+    public $payment_errors = array();
 
     /** @var int Delivery address id */
     public $id_address_delivery;
@@ -1883,6 +1884,26 @@ class OrderCore extends ObjectModel
      */
     public function addOrderPayment($amount_paid, $payment_method = null, $payment_transaction_id = null, $currency = null, $date = null, $order_invoice = null, $payment_type = null, $update_payment_detail = true)
     {
+        // modules can refuse a payment: they add a message to 'errors', nothing is saved
+        $paymentDate = ($date ? $date : date('Y-m-d H:i:s'));
+        $paymentErrors = array();
+        Hook::exec('actionOrderPaymentValidate', array(
+            'order' => $this,
+            'id_order' => (int) $this->id,
+            'amount' => $amount_paid,
+            'id_currency' => (int) ($currency ? $currency->id : $this->id_currency),
+            'payment_method' => ($payment_method ? $payment_method : $this->payment),
+            'payment_type' => ($payment_type ? $payment_type : $this->payment_type),
+            'transaction_id' => $payment_transaction_id,
+            'payment_date' => $paymentDate,
+            'id_order_invoice' => ($order_invoice ? (int) $order_invoice->id : 0),
+            'errors' => &$paymentErrors,
+        ));
+        $this->payment_errors = $paymentErrors;
+        if ($this->payment_errors) {
+            return false;
+        }
+
         $order_payment = new OrderPayment();
         $order_payment->order_reference = $this->reference;
         $order_payment->id_currency = ($currency ? $currency->id : $this->id_currency);

@@ -2111,18 +2111,6 @@ class AdminOrdersControllerCore extends AdminController
                     }
                 }
 
-                $hookErrors = array();
-                Hook::exec('actionAdminOrderPaymentAddBefore', array(
-                    'id_order' => (int) $order->id,
-                    'payment_date' => Tools::getValue('payment_date'),
-                    'amount' => $amount,
-                    'payment_method' => Tools::getValue('payment_method'),
-                    'errors' => &$hookErrors,
-                ));
-                if ($hookErrors) {
-                    $this->errors = array_merge($this->errors, $hookErrors);
-                }
-
                 if (!count($this->errors)) {
                     if (!$order->addOrderPayment(
                         $amount,
@@ -2133,7 +2121,9 @@ class AdminOrdersControllerCore extends AdminController
                         $order_invoice,
                         $payment_type
                     )) {
-                        if (!validate::isPrice($order->total_paid_real)) {
+                        if ($order->payment_errors) {
+                            $this->errors = array_merge($this->errors, $order->payment_errors);
+                        } elseif (!validate::isPrice($order->total_paid_real)) {
                             $this->errors[] = Tools::displayError('Order total payments cannot be less than 0.');
                         } else {
                             $this->errors[] = Tools::displayError('An error occurred during payment.');
@@ -3798,20 +3788,7 @@ class AdminOrdersControllerCore extends AdminController
         // hotel booking statuses
         $htlOrderStatus = HotelBookingDetail::getAllHotelOrderStatus();
 
-        if ($this->context->employee->isSuperAdmin()) {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-        } else {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-        }
-        $allowBackdateOrder = Configuration::get($backOrderConfigKey);
-        if (!$allowBackdateOrder && $htlBookingDetail) {
-            $currentDate = date('Y-m-d');
-            Hook::exec('actionHotelCurrentDateModifier', array(
-                'id_hotel' => (int) $htlBookingDetail[0]['id_hotel'],
-                'current_date' => &$currentDate,
-            ));
-            $allowBackdateOrder = ($currentDate < date('Y-m-d'));
-        }
+        $allowBackdateOrder = HotelBookingDetail::isBackdateOrderAllowed($htlBookingDetail ? (int) $htlBookingDetail[0]['id_hotel'] : 0);
 
         // applicable refund policies
         $applicableRefundPolicies = array();
@@ -5058,11 +5035,7 @@ class AdminOrdersControllerCore extends AdminController
         /*By Webkul Code is added to add order information In our table while adding product in the process order edit from order detail page.*/
         $date_from = date('Y-m-d H:i:s', strtotime($product_informations['date_from']));
         $date_to = date('Y-m-d H:i:s', strtotime($product_informations['date_to']));
-        $curr_date = date('Y-m-d');
-        Hook::exec('actionHotelCurrentDateModifier', array(
-            'id_hotel' => (int) HotelBookingDetail::getIdHotelByIdOrder($order->id),
-            'current_date' => &$curr_date,
-        ));
+        $curr_date = HotelBookingDetail::getCurrentDate((int) HotelBookingDetail::getIdHotelByIdOrder($order->id));
         $occupancy = Tools::getValue('occupancy');
         /*Validations*/
         if ($date_from == '') {
@@ -5086,12 +5059,7 @@ class AdminOrdersControllerCore extends AdminController
                 'error' => Tools::displayError('Please Enter a valid Check out Date.'),
             )));
         }
-        if ($this->context->employee->isSuperAdmin()) {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-        } else {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-        }
-        if (!Configuration::get($backOrderConfigKey)) {
+        if (!HotelBookingDetail::isBackdateOrderAllowed()) {
             if ($date_from < $curr_date) {
                 die(json_encode(array(
                     'result' => false,
@@ -6426,15 +6394,9 @@ class AdminOrdersControllerCore extends AdminController
             $totalRoomPriceAfterTI = Tools::processPriceRounding($roomPriceTI, $product_quantity, $order->round_type, $order->round_mode);
         }
 
-        Hook::exec('actionRoomBookingDurationPriceModifier', array(
-            'id_htl_booking' => (int) $obj_booking_detail->id,
-            'old_date_from' => $old_date_from,
-            'old_date_to' => $old_date_to,
-            'new_date_from' => $new_date_from,
-            'new_date_to' => $new_date_to,
-            'price_tax_excl' => &$totalRoomPriceAfterTE,
-            'price_tax_incl' => &$totalRoomPriceAfterTI,
-        ));
+        $newPrices = $obj_booking_detail->getDurationPrice($new_date_from, $new_date_to, $totalRoomPriceAfterTE, $totalRoomPriceAfterTI);
+        $totalRoomPriceAfterTE = $newPrices['total_price_tax_excl'];
+        $totalRoomPriceAfterTI = $newPrices['total_price_tax_incl'];
 
         // delete cart feature prices after booking update success
         HotelRoomTypeFeaturePricing::deleteFeaturePrices($cart->id);
@@ -7563,18 +7525,8 @@ class AdminOrdersControllerCore extends AdminController
             }
         }
 
-        if ($this->context->employee->isSuperAdmin()) {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_SUPERADMIN';
-        } else {
-            $backOrderConfigKey = 'PS_BACKDATE_ORDER_EMPLOYEES';
-        }
-        if (!Configuration::get($backOrderConfigKey)) {
-            $currentDate = date('Y-m-d');
-            Hook::exec('actionHotelCurrentDateModifier', array(
-                'id_hotel' => (int) $id_hotel,
-                'current_date' => &$currentDate,
-            ));
-            $compareDate = min($currentDate, $old_date_from);
+        if (!HotelBookingDetail::isBackdateOrderAllowed()) {
+            $compareDate = min(HotelBookingDetail::getCurrentDate($id_hotel), $old_date_from);
             if ($new_date_from < $compareDate) {
                 die(json_encode(array(
                     'result' => false,
@@ -9051,6 +9003,8 @@ class AdminOrdersControllerCore extends AdminController
                 $statusDate = date('Y-m-d H:i:s', strtotime($statusDate));
             }
 
+            $this->errors = array_merge($this->errors, $objHotelBookingDetail->getStatusChangeErrors($newStatus, $statusDate));
+
             $dateFrom = date('Y-m-d H:i:s', strtotime(date('Y-m-d', strtotime($objHotelBookingDetail->date_from))));
             $dateTo = date('Y-m-d H:i:s', strtotime(date('Y-m-d', strtotime($objHotelBookingDetail->date_to)).' 23:59:59'));
             if (!$newStatus) {
@@ -9100,15 +9054,6 @@ class AdminOrdersControllerCore extends AdminController
                     );
                 }
             }
-
-            Hook::exec('actionRoomBookingStatusUpdateBefore', array(
-                'id_hotel_booking_detail' => $objHotelBookingDetail->id,
-                'id_order' => $objHotelBookingDetail->id_order,
-                'id_room' => $objHotelBookingDetail->id_room,
-                'new_status' => $newStatus,
-                'status_date' => $statusDate,
-                'errors' => &$this->errors
-            ));
 
             if (empty($this->errors)) {
 
