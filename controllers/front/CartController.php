@@ -282,7 +282,7 @@ class CartControllerCore extends FrontController
             $this->id_address_delivery,
             (int)Tools::getValue('new_id_address_delivery')
         )) {
-            //$error_message = $this->l('Error durring product duplication');
+            //$error_message = $this->l('Error during product duplication');
             // For the moment no translations
             $error_message = 'Error durring product duplication';
         }
@@ -318,7 +318,7 @@ class CartControllerCore extends FrontController
                 if ($occupancy = Tools::getValue('occupancy')) {
                     $this->qty = count($occupancy);
                 } else {
-                    $this->errors[] = Tools::displayError('Invalid occupnacy.');
+                    $this->errors[] = Tools::displayError('Invalid occupancy.');
                 }
             } else {
                 $occupancy = Tools::getValue('qty');

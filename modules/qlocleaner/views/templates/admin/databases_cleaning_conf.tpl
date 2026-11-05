@@ -20,7 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 
-<p>{l s='The following queries successfuly cleaned your database:' mod='qlocleaner'}<p>
+<p>{l s='The following queries successfully cleaned your database:' mod='qlocleaner'}<p>
 <ul>
 	{foreach $logs as $query => $entries}
     <li> 

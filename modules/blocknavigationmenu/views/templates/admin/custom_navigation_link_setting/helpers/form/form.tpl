@@ -127,7 +127,7 @@
 							<div class="col-lg-10">
 								{foreach from=$languages item=language}
 									{assign var="navigation_link_name" value="navigation_link_name_`$language.id_lang`"}
-									<input type="text" id="{$navigation_link_name}" name="{$navigation_link_name}" value="{if isset($navigationLinkInfo.name[$language.id_lang]) && $navigationLinkInfo.name[$language.id_lang]}{$navigationLinkInfo.name[$language.id_lang]|escape:'htmlall':'UTF-8'}{else if isset($smarty.post.$navigation_link_name)}{$smarty.post.$navigation_link_name|escape:'htmlall':'UTF-8'}{/if}" data-lang-name="{$language.name}" placeholder="{l s='Enter exlore link name' mod='blocknavigationmenu'}" class="form-control navigation_link_name_all" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}/>
+									<input type="text" id="{$navigation_link_name}" name="{$navigation_link_name}" value="{if isset($navigationLinkInfo.name[$language.id_lang]) && $navigationLinkInfo.name[$language.id_lang]}{$navigationLinkInfo.name[$language.id_lang]|escape:'htmlall':'UTF-8'}{else if isset($smarty.post.$navigation_link_name)}{$smarty.post.$navigation_link_name|escape:'htmlall':'UTF-8'}{/if}" data-lang-name="{$language.name}" placeholder="{l s='Enter explore link name' mod='blocknavigationmenu'}" class="form-control navigation_link_name_all" {if $currentLang.id_lang != $language.id_lang}style="display:none;"{/if}/>
 								{/foreach}
 							</div>
 							{if $languages|@count > 1}
@@ -171,7 +171,7 @@
 				<div class="form-group custom_redirect_link_div {if isset($smarty.post.is_custom_redirect_link)}{if $smarty.post.is_custom_redirect_link}hidden{/if}{elseif isset($navigationLinkInfo['is_custom_link']) && !$navigationLinkInfo['is_custom_link']}hidden{elseif !isset($navigationLinkInfo['is_custom_link'])}hidden{/if}">
 					<label class="control-label col-lg-3">
 						<span class="label-tooltip" data-toggle="tooltip"
-						title="{l s='enter the url to which you want to redirect your guests for this nevigation link.' mod='blocknavigationmenu'}">
+						title="{l s='enter the url to which you want to redirect your guests for this navigation link.' mod='blocknavigationmenu'}">
 							{l s='Custom redirect url' mod='blocknavigationmenu'}
 						</span>
 					</label>

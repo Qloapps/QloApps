@@ -740,7 +740,7 @@
 	{addJsDefL name=coverImgErrorMsg}{l s='Error while changing cover image' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 
 	{addJsDefL name=deleteImgSuccessMsg}{l s='Image deleted successfully' js=1 mod='hotelreservationsystem'}{/addJsDefL}
-	{addJsDefL name=deleteImgErrorMsg}{l s='Something went wrong while deleteing image. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
+	{addJsDefL name=deleteImgErrorMsg}{l s='Something went wrong while deleting image. Please try again later !!' js=1 mod='hotelreservationsystem'}{/addJsDefL}
 
 	{addJsDef enabledDisplayMap = $enabledDisplayMap}
 	{addJsDef defaultCountry = $defaultCountry}

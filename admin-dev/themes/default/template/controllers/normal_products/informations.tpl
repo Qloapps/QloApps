@@ -329,7 +329,7 @@
 						<li>
 							<b>{l s='Add price in room price'}</b> : {l s='Service price will be added in room base price.'}<br>{l s='(e.g., Room price : 500, service price: 50, final room price : 550)'}
 						</li>
-						<li><b>{l s='Add price as convenience fee'}</b> : {l s='Service price will be dispalyed in order summary as "Convenience Fees"'}</li>
+						<li><b>{l s='Add price as convenience fee'}</b> : {l s='Service price will be displayed in order summary as "Convenience Fees"'}</li>
 					</ul>
 				</div>
 			</div>
@@ -358,7 +358,7 @@
 	<div class="form-group" id="available_for_order_container" {if (!$product->show_at_front  && $product->isAssociatedToShop()) || $product->auto_add_to_cart}style="display:none;"{/if}>
 		<label class="control-label col-lg-3" for="">
 			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Enable if you want this product to be sold from front office of your website.'}">
-				{l s='Availabe for order'}
+				{l s='Available for order'}
 			</span>
 		</label>
 		<div class="col-lg-3">
@@ -377,7 +377,7 @@
 	</div>
 	<div class="form-group" id="show_price_container" {if $product->available_for_order || (!$product->show_at_front  && $product->isAssociatedToShop()) || !$product->isAssociatedToShop() || $product->auto_add_to_cart}style="display:none;"{/if}>
 		<label class="control-label col-lg-3" for="">
-			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Enable if you want show product price even when product is not availabe to be sold at front office.'}">
+			<span class="label-tooltip" data-toggle="tooltip" title="{l s='Enable if you want show product price even when product is not available to be sold at front office.'}">
 				{l s='Show price'}
 			</span>
 		</label>
@@ -447,7 +447,7 @@
 			<div class="form-group">
 				<div class="col-lg-6 col-lg-offset-3">
 					<div class="alert alert-info">
-					{l s='By default all products have infinte quantity, Using this setting you can restrict customer to purchase only one product per room.'}
+					{l s='By default all products have infinite quantity, Using this setting you can restrict customer to purchase only one product per room.'}
 					</div>
 				</div>
 			</div>

@@ -1633,7 +1633,7 @@ class AdminCartsControllerCore extends AdminController
                                 }
                             } elseif ($serviceQuantities[$idServiceProduct] > 1) {
                                 $response['hasError'] = true;
-                                $response['errors'][] = Tools::displayError('Can not order multiple quanitity for service').': '.$objProduct->name;
+                                $response['errors'][] = Tools::displayError('Can not order multiple quantity for service').': '.$objProduct->name;
                             }
 
                             if (!isset($serviceUnitPrices[$idServiceProduct])
@@ -1770,7 +1770,7 @@ class AdminCartsControllerCore extends AdminController
 
                         if (!$result) {
                             $response['hasError'] = true;
-                            $response['errors'][] = Tools::displayError('Error while updating services, please try again after refresing the page');
+                            $response['errors'][] = Tools::displayError('Error while updating services, please try again after refreshing the page');
                         }
                     }
                 } else {
