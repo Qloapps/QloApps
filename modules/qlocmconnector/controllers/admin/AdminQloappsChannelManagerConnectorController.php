@@ -67,7 +67,7 @@ class AdminQloappsChannelManagerConnectorController extends ModuleAdminControlle
                 'callback' => 'setPriceCurrency',
             ),
             'total_paid_real' => array(
-                'title' => $this->l('Recieved amount'),
+                'title' => $this->l('Received amount'),
                 'align' => 'text-center',
                 'type' => 'range',
                 'validation' => 'isFloat',

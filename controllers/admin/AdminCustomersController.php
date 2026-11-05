@@ -1208,7 +1208,7 @@ class AdminCustomersControllerCore extends AdminController
                 $objCustomer->email = 'anonymous'.'-'.$objCustomer->id.'@'.Tools::link_rewrite(Configuration::get('PS_SHOP_NAME')).'_anonymous.com';
                 $objCustomer->deleted = Customer::STATUS_DELETED;
                 if (!$objCustomer->update()) {
-                    $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer');
+                    $this->errors[] = Tools::displayError('Some error occurred while deleting the Customer');
                     return;
                 } else {
                     if ($idCustomerGuest = CustomerGuestDetail::getCustomerGuestByEmail($customerEmail, false)) {
@@ -1276,7 +1276,7 @@ class AdminCustomersControllerCore extends AdminController
                                 // not processed customers will be deleted with default process if no errors are there
                                 unset($this->boxes[$key]);
                             } else {
-                                $this->errors[] = Tools::displayError('Some error ocurred while deleting the Customer with id').': '.$idCustomer;
+                                $this->errors[] = Tools::displayError('Some error occurred while deleting the Customer with id').': '.$idCustomer;
                             }
                         }
                     } else {

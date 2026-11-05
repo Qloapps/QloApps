@@ -144,7 +144,7 @@ class StatsOrigin extends ModuleGraph
     {
         $this->_titles['main'][] = $this->l('Top ten referral websites');
         if (Tools::getValue('export')) {
-            $this->_titles['main'][] = $this->l('Referal percentage');
+            $this->_titles['main'][] = $this->l('Referral percentage');
         }
         $websites = $this->getOrigins($this->getDate());
         $total = 0;

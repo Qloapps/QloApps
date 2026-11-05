@@ -186,7 +186,7 @@ class AdminImportControllerCore extends AdminController
                         'help' => $this->l('Required if advance payment allowed.')
                     ),
                     'min_len_stay' => array('label' => $this->l('Minimum length of stay (1 = No Limit)')),
-                    'max_len_stay' => array('label' => $this->l('Maximum lenght of stay (0 = No Limit)')),
+                    'max_len_stay' => array('label' => $this->l('Maximum length of stay (0 = No Limit)')),
                     'base_adults' => array('label' => $this->l('Base adults')),
                     'base_children' => array('label' => $this->l('Base children')),
                     'max_adults' => array('label' => $this->l('Maximum adults')),

@@ -1627,7 +1627,7 @@ class ProductControllerCore extends FrontController
                     $objRoomTypeServiceProduct = new RoomTypeServiceProduct();
                     $n = RoomTypeServiceProduct::WK_NUM_RESULTS;
                     if (Configuration::get('PS_SERVICE_PRODUCT_CATEGORY_FILTER') && !$id_category) {
-                        $response['error'] = Tools::displayError('Invaild Request, please try again');
+                        $response['error'] = Tools::displayError('Invalid Request, please try again');
                     }
                     if (empty($response['error'])) {
                         $response['status'] = true;
@@ -1656,7 +1656,7 @@ class ProductControllerCore extends FrontController
                     $response['error'] = Tools::displayError('Room Type not Found');
                 }
             } else {
-                $response['error'] = Tools::displayError('Invaild Request, please try again');
+                $response['error'] = Tools::displayError('Invalid Request, please try again');
             }
         } else {
             $response['error'] = Tools::displayError('Unable to process request, please try again');

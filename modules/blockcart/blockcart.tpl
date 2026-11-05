@@ -429,7 +429,7 @@
 	{/block}
 	{block name='blockcart_js_vars'}
 		{strip}
-		{addJsDefL name=someErrorCondition}{l s='Some Error occured.Please try again.' mod='blockcart' js=1}{/addJsDefL}
+		{addJsDefL name=someErrorCondition}{l s='Some Error occurred.Please try again.' mod='blockcart' js=1}{/addJsDefL}
 		{addJsDef CUSTOMIZE_TEXTFIELD=$CUSTOMIZE_TEXTFIELD}
 		{addJsDef img_dir=$img_dir|escape:'quotes':'UTF-8'}
 		{addJsDef generated_date=$smarty.now|intval}

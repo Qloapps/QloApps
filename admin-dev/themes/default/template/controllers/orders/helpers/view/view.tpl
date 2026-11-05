@@ -431,7 +431,7 @@
                                     </select>
                                 </div>
                                 <div class="col-lg-6 col-md-4">
-                                    <button type="submit" class="btn btn-primary" name="submitChangeCurrency"><i class="icon-refresh"></i> {l s='Change Currencly'}</button>
+                                    <button type="submit" class="btn btn-primary" name="submitChangeCurrency"><i class="icon-refresh"></i> {l s='Change Currency'}</button>
                                 </div>
                             </div>
                             <p class="help-block">{l s='Do not forget to update your exchange rate before making this change.'}</p>
