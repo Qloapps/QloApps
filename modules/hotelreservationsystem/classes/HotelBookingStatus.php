@@ -66,6 +66,13 @@ class HotelBookingStatus extends ObjectModel
                 HotelBookingDetail::STATUS_ASSIGNED,
                 HotelBookingDetail::STATUS_CHECKED_IN,
             ),
+            // only reachable when No-show is not marked as terminal (is_terminal = 0)
+            HotelBookingDetail::STATUS_NO_SHOW => array(
+                // revert: undo an accidental no-show
+                HotelBookingDetail::STATUS_ASSIGNED,
+                // late arrival: guest checks in after being marked no-show
+                HotelBookingDetail::STATUS_CHECKED_IN,
+            ),
         );
 
         return isset($transitions[$currentStatus]) ? $transitions[$currentStatus] : array();

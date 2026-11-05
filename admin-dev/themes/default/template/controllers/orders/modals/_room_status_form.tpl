@@ -30,7 +30,7 @@
                 {/foreach}
             </select>
         </div>
-        <div class="form-group" {if $current_room_status == $ROOM_STATUS_ASSIGNED}style="display:none;"{/if}>
+        <div class="form-group" {if $current_room_status != $ROOM_STATUS_CHECKED_IN && $current_room_status != $ROOM_STATUS_CHECKED_OUT}style="display:none;"{/if}>
             <label class="control-label">{l s='Date'}</label>
             <div class="input-group">
                 <input type="text" name="status_date" class="room_status_date wk-input-date" value="" />

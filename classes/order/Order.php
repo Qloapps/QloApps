@@ -3095,6 +3095,49 @@ class OrderCore extends ObjectModel
         return true;
     }
 
+    /**
+     * Restore the order status from the paid amount once the order is no longer
+     * completely No-show/Cancelled, e.g. when the admin reverts a No-show room back
+     * to Assigned or Checked-in.
+     *
+     * Paid amount 0 => Awaiting payment, less than order total => Partial payment
+     * accepted, otherwise => Payment accepted.
+     *
+     * @param bool $useEmail whether to email the customer about the change
+     * @return bool whether the order status was actually changed
+     */
+    public function syncPaymentStatusAfterBookingRevert($useEmail = true)
+    {
+        if (!in_array($this->current_state, array(
+            Configuration::get('PS_OS_NO_SHOW'),
+            Configuration::get('PS_OS_CANCELED'),
+        ))) {
+            return false;
+        }
+
+        // every room is still No-show/Cancelled, keep the order status as it is
+        if ($this->getOrderCompleteRefundStatus()) {
+            return false;
+        }
+
+        $totalPaid = $this->getTotalPaid();
+        if ($totalPaid <= 0) {
+            $idOrderState = Configuration::get('PS_OS_AWAITING_PAYMENT');
+        } elseif ($totalPaid < $this->getOrderTotal()) {
+            $idOrderState = Configuration::get('PS_OS_PARTIAL_PAYMENT_ACCEPTED');
+        } else {
+            $idOrderState = Configuration::get('PS_OS_PAYMENT_ACCEPTED');
+        }
+
+        $objOrderHistory = new OrderHistory();
+        $objOrderHistory->id_order = (int) $this->id;
+        $objOrderHistory->id_employee = isset(Context::getContext()->employee->id) ? (int) Context::getContext()->employee->id : 0;
+        $objOrderHistory->changeIdOrderState($idOrderState, $this, !$this->hasInvoice());
+        $useEmail ? $objOrderHistory->addWithemail() : $objOrderHistory->add();
+
+        return true;
+    }
+
     public function getWsBookings()
     {
         return Db::getInstance()->executeS(

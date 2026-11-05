@@ -61,9 +61,31 @@ class AdminRoomStatusesController extends ModuleAdminController
         );
     }
 
+    /**
+     * List column callback: display the terminal (final) flag as a Yes/No badge.
+     *
+     * @param mixed $value 1 or 0
+     * @return string
+     */
     public function getTerminalStatusLabel($value)
     {
-        return $value ? $this->l('Yes') : $this->l('No');
+        if ($value) {
+            return '<span class="badge badge-success">'.$this->l('Yes').'</span>';
+        }
+
+        return '<span class="badge badge-danger">'.$this->l('No').'</span>';
+    }
+
+    /**
+     * Whether the terminal (final) flag of the given status can be changed by the admin.
+     * Only No-show is configurable for now; every other status keeps its fixed value.
+     *
+     * @param int $idBookingStatus
+     * @return bool
+     */
+    protected function isTerminalEditable($idBookingStatus)
+    {
+        return (int) $idBookingStatus == HotelBookingDetail::STATUS_NO_SHOW;
     }
 
     public function initToolbar()
@@ -92,12 +114,38 @@ class AdminRoomStatusesController extends ModuleAdminController
             return;
         }
 
-        // decoupled from the real 'is_terminal' field name on purpose: copyFromPost()
-        // writes any POST key matching a real object property, and 'disabled' on the
-        // switch only blocks submission client-side (removable via devtools). Using
-        // a name with no matching property makes server-side tampering impossible,
-        // not just hidden.
-        $this->fields_value['is_terminal_display'] = $this->object->is_terminal;
+        // Only No-show gets an editable switch posting the real 'is_terminal' field.
+        // Every other status shows a read-only Yes/No badge and posts nothing for it;
+        // processSave() also rejects a tampered 'is_terminal' for those statuses.
+        if ($this->isTerminalEditable($this->object->id)) {
+            $this->fields_value['is_terminal'] = $this->object->is_terminal;
+            $terminalInput = array(
+                'type' => 'switch',
+                'label' => $this->l('Terminal (final) status'),
+                'name' => 'is_terminal',
+                'hint' => $this->l('If set to Yes, a room with this status cannot be edited, only deleted. If No, the room status can still be changed, e.g. to undo an accidental no-show or for a late check-in.'),
+                'values' => array(
+                    array(
+                        'id' => 'is_terminal_on',
+                        'value' => 1,
+                        'label' => $this->l('Yes'),
+                    ),
+                    array(
+                        'id' => 'is_terminal_off',
+                        'value' => 0,
+                        'label' => $this->l('No'),
+                    ),
+                ),
+            );
+        } else {
+            $terminalInput = array(
+                'type' => 'html',
+                'label' => $this->l('Terminal (final) status'),
+                'name' => 'is_terminal_display',
+                'hint' => $this->l('If set to Yes, a room with this status cannot be edited, only deleted. If No, the room can still be edited. This setting is fixed for this status and cannot be changed.'),
+                'html_content' => '<p class="form-control-static">'.$this->getTerminalStatusLabel($this->object->is_terminal).'</p>',
+            );
+        }
 
         $this->fields_form = array(
             'legend' => array(
@@ -119,25 +167,7 @@ class AdminRoomStatusesController extends ModuleAdminController
                     'name' => 'color',
                     'required' => true,
                 ),
-                array(
-                    'type' => 'switch',
-                    'label' => $this->l('Terminal (final) status'),
-                    'name' => 'is_terminal_display',
-                    'hint' => $this->l('If set to Yes, a room with this status cannot be edited, only deleted. If No, the room can still be edited. This setting is fixed for each status, so it is disabled here.'),
-                    'disabled' => true,
-                    'values' => array(
-                        array(
-                            'id' => 'is_terminal_on',
-                            'value' => 1,
-                            'label' => $this->l('Yes'),
-                        ),
-                        array(
-                            'id' => 'is_terminal_off',
-                            'value' => 0,
-                            'label' => $this->l('No'),
-                        ),
-                    ),
-                ),
+                $terminalInput,
             ),
             'submit' => array(
                 'title' => $this->l('Save'),
@@ -157,6 +187,22 @@ class AdminRoomStatusesController extends ModuleAdminController
         $objDefaultLanguage = Language::getLanguage((int) $defaultLangId);
         if (!trim(Tools::getValue('name_'.$defaultLangId))) {
             $this->errors[] = $this->l('Status name is required at least in ').$objDefaultLanguage['name'];
+        }
+
+        if (Tools::getIsset('is_terminal')) {
+            $isTerminal = Tools::getValue('is_terminal');
+            if (!$this->isTerminalEditable($this->object->id)) {
+                if ((int) $isTerminal != (int) $this->object->is_terminal) {
+                    $this->errors[] = $this->l('Terminal (final) status can not be changed for this room status.');
+                }
+            } elseif (!Validate::isBool($isTerminal)) {
+                $this->errors[] = $this->l('Invalid value for terminal (final) status.');
+            }
+        }
+
+        if (!empty($this->errors)) {
+            $this->display = 'edit';
+            return false;
         }
 
         return parent::processSave();
