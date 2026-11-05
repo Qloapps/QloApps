@@ -72,6 +72,8 @@ class HotelBookingStatus extends ObjectModel
                 HotelBookingDetail::STATUS_ASSIGNED,
                 // late arrival: guest checks in after being marked no-show
                 HotelBookingDetail::STATUS_CHECKED_IN,
+                // booking cancelled after being marked no-show
+                HotelBookingDetail::STATUS_CANCELLED,
             ),
         );
 
