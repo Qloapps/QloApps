@@ -69,9 +69,9 @@
 						{if isset($showTaxName) && $showTaxName}
 							<td class="white">{$line.tax_name|escape:'html':'UTF-8'}</td>
 						{/if}
-						<td class="white">—</td>
+						<td class="white">-</td>
 						{if $display_tax_bases_in_breakdowns}
-							<td class="white">—</td>
+							<td class="white">-</td>
 						{/if}
 						<td class="white">
 							{displayPrice currency=$order->id_currency price=$line.total_amount}

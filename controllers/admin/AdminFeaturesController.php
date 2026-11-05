@@ -779,7 +779,7 @@ class AdminFeaturesControllerCore extends AdminController
                         $objFeature->logo = $imageName;
                         $objFeature->update();
                     } else {
-                        $this->errors[] = $this->l('Some error occurred while uploding room feature logo. Please try again.');
+                        $this->errors[] = $this->l('Some error occurred while uploading room feature logo. Please try again.');
                     }
                 }
             }

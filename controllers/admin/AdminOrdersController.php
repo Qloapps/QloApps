@@ -1765,7 +1765,7 @@ class AdminOrdersControllerCore extends AdminController
 	                        $message->save();
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=52&token='.$this->token);
                     } else {
-                        $this->errors[] = $this->l('Some error occured. Please try again.');
+                        $this->errors[] = $this->l('Some error occurred. Please try again.');
                     }
                 }
             } else {
@@ -1822,7 +1822,7 @@ class AdminOrdersControllerCore extends AdminController
 	                        $message->save();
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$idOrder.'&vieworder&conf=53&token='.$this->token);
                     } else {
-                        $this->errors[] = $this->l('Some error occured. Please try again.');
+                        $this->errors[] = $this->l('Some error occurred. Please try again.');
                     }
                 }
             } else {
@@ -5210,13 +5210,13 @@ class AdminOrdersControllerCore extends AdminController
             } else {
                 die(json_encode(array(
                     'result' => false,
-                    'error' => Tools::displayError('Some error occured Please try again.'),
+                    'error' => Tools::displayError('Some error occurred. Please try again.'),
                     )));
             }
         } else {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Some error occured Please try again.'),
+                'error' => Tools::displayError('Some error occurred. Please try again.'),
             )));
         }
 
@@ -7491,7 +7491,7 @@ class AdminOrdersControllerCore extends AdminController
         if ($id_hotel == '') {
             die(json_encode(array(
                 'result' => false,
-                'error' => Tools::displayError('Hotel Id is mising.'),
+                'error' => Tools::displayError('Hotel ID is missing.'),
             )));
         } elseif ($id_room == '') {
             die(json_encode(array(
@@ -8040,7 +8040,7 @@ class AdminOrdersControllerCore extends AdminController
                             }
                         } elseif (is_array($serviceQuantities) && isset($serviceQuantities[$idRoomTypeServiceProductOrderDetail]) && $serviceQuantities[$idRoomTypeServiceProductOrderDetail] > 1) {
                             $response['hasError'] = true;
-                            $response['errors'][] = Tools::displayError('Can not order multiple quanitity for service').': '.$objServiceProductOrderDetail->name;
+                            $response['errors'][] = Tools::displayError('Cannot order multiple quantity for service').': '.$objServiceProductOrderDetail->name;
                         }
 
                         if (!isset($serviceUnitPrices[$idRoomTypeServiceProductOrderDetail])
@@ -8176,7 +8176,7 @@ class AdminOrdersControllerCore extends AdminController
 
                     if (!$result) {
                         $response['hasError'] = true;
-                        $response['errors'][] = Tools::displayError('Error while updating service, please try again after refresing the page');
+                        $response['errors'][] = Tools::displayError('Error while updating service, please try again after refreshing the page');
                     } else {
                         $this->sendChangedNotification($objOrder);
                         $response['service_panel']= $servicesBlock = $this->processRenderServicesPanel(

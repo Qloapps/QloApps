@@ -168,7 +168,7 @@ class QghcApiService
     public function createConnection($pmsUrl, $apiKey)
     {
         $this->setApiType(QghcApiLog::TYPE_CONNECTION);
-        $this->setEndpoint('/api/google-hotel-connection');
+        $this->setEndpoint('/api/google-hotel/v1/connection');
         $this->setMethod('POST');
         $this->addHeaders(array(
             'Content-Type: application/json',
@@ -190,7 +190,7 @@ class QghcApiService
     public function deleteConnection($pmsUrl, $apiKey)
     {
         $this->setApiType(QghcApiLog::TYPE_DELETE_CONNECTION);
-        $this->setEndpoint('/api/google-hotel-connection');
+        $this->setEndpoint('/api/google-hotel/v1/connection');
         $this->setMethod('DELETE');
         $this->addHeaders(array(
             'Content-Type: application/json',

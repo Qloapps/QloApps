@@ -628,30 +628,22 @@ class InstallModelInstall extends InstallAbstractModel
         return true;
     }
 
-    public function setNotification($notificationData)
+    /**
+     * @param array $installData
+     * @return bool
+     */
+    public function setNotification($installData)
     {
-        if (function_exists('curl_version')) {
-            $url = _QLO_API_URL_.'/getNotification.php';
-            $params = [
-                'method' => 'POST',
-                'headers' => array('Content-Type: application/json'),
-                'postdata' => json_encode($notificationData),
-            ];
-
-            $curlInit = curl_init();
-            curl_setopt($curlInit, CURLOPT_URL, $url);
-            curl_setopt($curlInit, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-            curl_setopt($curlInit, CURLOPT_HTTPHEADER, $params['headers']);
-            curl_setopt($curlInit, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($curlInit, CURLOPT_CUSTOMREQUEST, $params['method']);
-            curl_setopt($curlInit, CURLOPT_RETURNTRANSFER, 1);
-            if (isset($params['postdata'])) {
-                curl_setopt($curlInit, CURLOPT_POSTFIELDS, $params['postdata']);
-            }
-            $response = curl_exec($curlInit);
-        } else {
-            // Mail Code
-        }
+        Tools::addonsRequest('installation', array(
+            'install_data' => $installData,
+            'version' => _QLO_INSTALL_VERSION_,
+            'iso_lang' => $this->language->getLanguageIso(),
+            'iso_country' => $installData['countryCode'],
+            'shop_url' => $installData['shopDomain'],
+            'shop_url_ssl' => $installData['shopDomainSsl'],
+            'physical_uri' => $installData['physicalUri'],
+            'email' => $installData['email'],
+        ));
 
         return true;
     }
@@ -721,7 +713,7 @@ class InstallModelInstall extends InstallAbstractModel
                 'qlostatsserviceproducts',
                 'blockcart',
                 'blockuserinfo',
-                'qlochannelmanagerconnector',
+                'qlocmconnector',
                 'qlogooglehotelconnector'
             );
         }

@@ -3084,7 +3084,7 @@ class AdminProductsControllerCore extends AdminController
         // add text for normal product and booking product
         $this->tpl_form_vars['booking_product_text'] = array(
             'name'=> $this->l('Room Type'),
-            'name_title'=> $this->l('Write the name of the Room Type for ex. Delux, Executive etc. Invalid characters <>;=#{}')
+            'name_title'=> $this->l('Write the name of the Room Type for ex. Deluxe, Executive etc. Invalid characters <>;=#{}')
         );
         $this->tpl_form_vars['normal_product_text'] = array(
             'name'=> $this->l('Name'),

@@ -1117,6 +1117,26 @@ class AdminControllerCore extends Controller
         $this->context->cookie->$cookieKey = (int) Tools::getValue('is_visible');
     }
 
+    /**
+     * Refreshes the upgrade available cache from api.qloapps.com in the background.
+     * A failed or invalid response never replaces the existing cache.
+     */
+    protected function ajaxProcessCheckUpgrade()
+    {
+        if (Tools::isFresh(Upgrader::CACHE_FILE_UPGRADE_AVAILABE, _TIME_1_DAY_)) {
+            return;
+        }
+
+        $cacheFile = _PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE;
+        $content = Tools::addonsRequest('check-version');
+        if ($content && @simplexml_load_string($content)) {
+            file_put_contents($cacheFile, $content);
+        } elseif (file_exists($cacheFile) && filesize($cacheFile) > 0) {
+            // API unreachable: keep the last known info and retry after the cache lifetime
+            @touch($cacheFile);
+        }
+    }
+
     protected function ajaxProcessSaveKpiView()
     {
         $cookieKey = 'kpi_wrapping_'.$this->context->controller->className;
@@ -2983,6 +3003,12 @@ class AdminControllerCore extends Controller
             Media::addJsDef(array('host_cluster' => defined('_PS_HOST_CLUSTER_') ? _PS_HOST_CLUSTER_ : 'fr1'));
         }
 
+        // upgrade info is read from cache only, the cache is refreshed in background by ajaxProcessCheckUpgrade()
+        Media::addJsDef(array(
+            'upgrade_check_needed' => !Tools::isFresh(Upgrader::CACHE_FILE_UPGRADE_AVAILABE, _TIME_1_DAY_),
+            'upgrade_check_url' => 'index.php?controller='.$this->controller_name.'&ajax=1&action=checkUpgrade&token='.$this->token,
+        ));
+
         // Execute Hook AdminController SetMedia
         Hook::exec('actionAdminControllerSetMedia');
     }
@@ -3091,10 +3117,6 @@ class AdminControllerCore extends Controller
             'submit_form_ajax' => (int)Tools::getValue('submitFormAjax')
         ));
 
-        // get upgrade available info
-        if (!Tools::isFresh(Upgrader::CACHE_FILE_UPGRADE_AVAILABE, _TIME_1_DAY_)) {
-            file_put_contents(_PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE, Tools::addonsRequest('check-version'));
-        }
         if (file_exists(_PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE)) {
             $content = Tools::file_get_contents( _PS_ROOT_DIR_.Upgrader::CACHE_FILE_UPGRADE_AVAILABE);
             $upgradeInfo = simplexml_load_string($content);

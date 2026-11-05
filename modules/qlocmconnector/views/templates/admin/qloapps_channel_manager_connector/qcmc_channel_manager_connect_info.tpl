@@ -113,7 +113,7 @@
                             </ul>
                         </div>
                         <div class="qcm_info_explore">
-                            {l s='To know channel manager freatures and work-flow in details' mod='qlocmconnector'} <a class="qcm-link" href="https://qloapps.com/qloapps-channel-manager/">{l s='Visit Documentation' mod='qlocmconnector'}</a>
+                            {l s='To know channel manager features and work-flow in details' mod='qlocmconnector'} <a class="qcm-link" href="https://qloapps.com/qloapps-channel-manager/">{l s='Visit Documentation' mod='qlocmconnector'}</a>
                         </div>
                     </div>
                 </div>

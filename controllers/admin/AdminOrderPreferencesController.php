@@ -287,9 +287,9 @@ class AdminOrderPreferencesControllerCore extends AdminController
                         'js' => "changeOverbookingOrderAction()"
                     ),
                     'PS_MAX_OVERBOOKING_PER_HOTEL_PER_DAY' => array(
-                        'title' => $this->l('Maximun hotel overbookings per date'),
+                        'title' => $this->l('Maximum hotel overbookings per date'),
                         'hint' => $this->l('Enter the maximum number of the overbookings on any date can be created for a hotel.(Set 0 for no limit)'),
-                        'desc' => $this->l('When maximun number of the overbookings on any date in the booking duration is reached, then the new overbooking order will be cancelled.(Set 0 for no limit)'),
+                        'desc' => $this->l('When maximum number of the overbookings on any date in the booking duration is reached, then the new overbooking order will be cancelled.(Set 0 for no limit)'),
                         'validation' => 'isInt',
                         'type' => 'text',
                         'class' => 'fixed-width-xxl',
@@ -444,7 +444,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
             if (!$idCountry) {
                 $this->errors[] = Tools::displayError('Field country is required');
             } elseif (!Validate::isLoadedObject($objCountry = new Country($idCountry))) {
-                $this->errors[] = Tools::displayError('Invaid country');
+                $this->errors[] = Tools::displayError('Invalid country');
             } elseif ($objCountry->zip_code_format && !$objCountry->checkZipCode($postcode)) {
                 $this->errors[] = sprintf($this->l('The Zip/Postal code you\'ve entered is invalid. It must follow this format: %s'), str_replace('C', $objCountry->iso_code, str_replace('N', '0', str_replace('L', 'A', $objCountry->zip_code_format))));
             } elseif (!$postcode && $objCountry->need_zip_code) {
@@ -456,7 +456,7 @@ class AdminOrderPreferencesControllerCore extends AdminController
             } elseif ($objCountry->contains_states && !$idSate) {
                 $this->errors[] = Tools::displayError('Field State is required');
             } elseif (!Validate::isLoadedObject(new State($idSate))) {
-                $this->errors[] = Tools::displayError('Invaid state');
+                $this->errors[] = Tools::displayError('Invalid state');
             }
 
             if (!$city || $city == '') {

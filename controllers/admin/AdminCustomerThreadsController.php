@@ -668,7 +668,7 @@ class AdminCustomerThreadsControllerCore extends AdminController
                 if (($error = $cm->validateField('message', $cm->message, null, array(), true)) !== true) {
                     $this->errors[] = $error;
                 } elseif (!$cm->add()) {
-                    $this->errors[] = Tools::displayError('Some error occured while saving the message');
+                    $this->errors[] = Tools::displayError('Some error occurred while saving the message');
                 }
             }
         }

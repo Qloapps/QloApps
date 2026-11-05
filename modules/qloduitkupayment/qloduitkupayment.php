@@ -175,7 +175,7 @@ class QloDuitkuPayment extends PaymentModule
                     array(
                         'type' => 'select',
                         'label' => $this->l('Environment'),
-                        'hint' => $this->l('Select current environment to use for Cashfree transaction. Select Sanbox to test configurations and production to accept payment live.'),
+                        'hint' => $this->l('Select current environment to use for Cashfree transaction. Select Sandbox to test configurations and production to accept payment live.'),
                         'name' => 'QDP_DUITKU_PAYMENT_ENVIRONMENT',
                         'class' => 'input fixed-width-lg',
                         'options' => array(

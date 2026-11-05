@@ -244,7 +244,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     if ($objBookingDetail->reallocateBooking($idHtlBookingFrom, $idRoomToReallocate, $priceDiff)) {
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int) $idOrder.'&vieworder&conf=52&token='.$this->token);
                     } else {
-                        $this->errors[] = $this->l('Some error occured. Please try again.');
+                        $this->errors[] = $this->l('Some error occurred. Please try again.');
                     }
                 }
             } else {
@@ -286,7 +286,7 @@ class AdminHotelRoomsBookingController extends ModuleAdminController
                     if ($objBookingDetail->swapBooking($idHtlBookingFrom, $idHtlBookingToSwap)) {
                         Tools::redirectAdmin(self::$currentIndex.'&id_order='.(int)$idOrder.'&vieworder&conf=53&token='.$this->token);
                     } else {
-                        $this->errors[] = $this->l('Some error occured. Please try again.');
+                        $this->errors[] = $this->l('Some error occurred. Please try again.');
                     }
                 }
             } else {
@@ -763,7 +763,7 @@ public function ajaxProcessGetCalenderData()
             }
             if ($product->booking_product || !Product::isSellableAsStandalone($product->id)) {
                 // cannot be added without room type or is a booking product.
-                $this->errors[] = $this->l('This product is either a room type or extra service and cannot be added thorugh this method.');
+                $this->errors[] = $this->l('This product is either a room type or extra service and cannot be added through this method.');
             } elseif (!$product->allow_multiple_quantity) {
                 // check if product already exists in cart.
                 if ($id_cart) {

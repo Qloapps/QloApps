@@ -20,7 +20,7 @@
 * @license https://opensource.org/license/osl-3-0-php Open Software License version 3.0
 *}
 {* {$query|escape:'htmlall':'UTF-8'} *}
-<p>{l s='The following queries successfuly fixed broken data:' mod='qlocleaner'}<p>
+<p>{l s='The following queries successfully fixed broken data:' mod='qlocleaner'}<p>
 <ul>
 	{foreach $logs as $query => $entries}
 	    <li> 

@@ -1794,7 +1794,7 @@ class AdminModulesControllerCore extends AdminController
 
         if (count($this->errors)) {
             $response['data']['callback']['process'] = 'delete';
-            $response['data']['callback']['msg'] = $this->l('There was some error while installing the module, do you want to delete the uploded module');
+            $response['data']['callback']['msg'] = $this->l('There was some error while installing the module, do you want to delete the uploaded module');
             $response['errors'] = $this->errors;
         }
         $this->logAndResponseAjax($response);
