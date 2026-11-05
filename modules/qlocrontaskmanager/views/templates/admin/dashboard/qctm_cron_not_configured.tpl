@@ -21,10 +21,10 @@
 *}
 <div class="col-sm-12">
     <section class="dash_links widget panel">
-        <h3><i class="icon-exclamation"></i> {l s='Cron Task Manager' mod='qlocrontaskmanager'}</h3>
+        <h3><i class="icon-warning"></i> {l s='Cron Task Manager' mod='qlocrontaskmanager'}</h3>
         <dl>
-            <dt><a href="{$qctmConfigureLink|escape:'html':'UTF-8'}">{l s='Server cron job not detected' mod='qlocrontaskmanager'}</a></dt>
-            <dd>{l s='Scheduled tasks will not run automatically until the cron command is added to your server. Click here to view it.' mod='qlocrontaskmanager'}</dd>
+            <dt class="text-danger">{l s='Server cron job not detected' mod='qlocrontaskmanager'}</dt>
+            <dd>{l s='Scheduled tasks will not run automatically until the cron command is added to your server.' mod='qlocrontaskmanager'} <a href="{$qctmConfigureLink|escape:'html':'UTF-8'}">{l s='configure cron job' mod='qlocrontaskmanager'}</a></dd>
         </dl>
     </section>
 </div>
