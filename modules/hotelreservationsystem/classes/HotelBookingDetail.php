@@ -1919,8 +1919,14 @@ class HotelBookingDetail extends ObjectModel
         return $bookingData;
     }
 
-    public function getAvailableRoomsForReallocation($dateFrom, $dateTo, $idRoomType, $idHotel, $roomTypesToUpgrade = 0)
+    public function getAvailableRoomsForReallocation($dateFrom, $dateTo, $idRoomType, $idHotel, $roomTypesToUpgrade = 0, $cache = false)
     {
+        // When $cache is true, reuse the result for bookings sharing the same dates and hotel
+        $cacheKey = 'HotelBookingDetail::getAvailableRoomsForReallocation_'.(int) $idHotel.'_'.(int) $idRoomType.'_'.(int) $roomTypesToUpgrade.'_'.$dateFrom.'_'.$dateTo;
+        if ($cache && Cache::isStored($cacheKey)) {
+            return Cache::retrieve($cacheKey);
+        }
+
         $context = Context::getContext();
         $bookingParams = array(
             'date_from' => $dateFrom,
@@ -1938,6 +1944,10 @@ class HotelBookingDetail extends ObjectModel
 
         $searchRoomsInfo = $this->getBookingData($bookingParams);
         if (empty($searchRoomsInfo['rm_data']) || !is_array($searchRoomsInfo['rm_data'])) {
+            if ($cache) {
+                Cache::store($cacheKey, false);
+            }
+
             return false;
         }
  
@@ -1974,11 +1984,13 @@ class HotelBookingDetail extends ObjectModel
             }
         }
 
-        if ($roomTypesToUpgrade) {
-            return $availableRoomTypes ? $availableRoomTypes : false;
+        $result = $roomTypesToUpgrade ? $availableRoomTypes : $availableRooms;
+        $result = $result ? $result : false;
+        if ($cache) {
+            Cache::store($cacheKey, $result);
         }
 
-        return $availableRooms ? $availableRooms : false;
+        return $result;
     }
 
     /**
@@ -1990,15 +2002,26 @@ class HotelBookingDetail extends ObjectModel
         *
         * @return [array|false] [Returs array of the available rooms for swapping if rooms found else returnss false]
         */
-    public function getAvailableRoomsForSwapping($date_from, $date_to, $id_room_type, $hotel_id, $id_room)
+    public function getAvailableRoomsForSwapping($date_from, $date_to, $id_room_type, $hotel_id, $id_room, $cache = false)
     {
+        // When $cache is true, reuse the result for the same room, dates and hotel
+        $cacheKey = 'HotelBookingDetail::getAvailableRoomsForSwapping_'.(int) $hotel_id.'_'.(int) $id_room_type.'_'.(int) $id_room.'_'.$date_from.'_'.$date_to;
+        if ($cache && Cache::isStored($cacheKey)) {
+            return Cache::retrieve($cacheKey);
+        }
+
         $sql = 'SELECT `id` as `id_hotel_booking`, `id_room`, `id_product`, `id_hotel`, `room_num`, `comment` AS `room_comment`
             FROM `'._DB_PREFIX_.'htl_booking_detail`
             WHERE `id_hotel` = '.(int)$hotel_id.' AND `id_product` = '.(int)$id_room_type.'
             AND `date_from` = \''.pSQL($date_from).'\' AND `date_to` = \''.pSQL($date_to).'\'
             AND `id_room`!='.(int)$id_room.' AND `id` NOT IN ('.OrderReturn::getRefundedBookingIdsSubquery().') AND `id_status` NOT IN ('.HotelBookingDetail::STATUS_CANCELLED.', '.HotelBookingDetail::STATUS_NO_SHOW.') AND `is_back_order` = 0';
 
-        return Db::getInstance()->executeS($sql);
+        $result = Db::getInstance()->executeS($sql);
+        if ($cache) {
+            Cache::store($cacheKey, $result);
+        }
+
+        return $result;
     }
 
     /**
@@ -2039,6 +2062,8 @@ class HotelBookingDetail extends ObjectModel
      */
     public function reallocateBooking($idHotelBooking, $idRoom, $priceDiffTaxExcl = 0)
     {
+        // Rooms availability changes with this, so remove the cached availability lists
+        Cache::clean('HotelBookingDetail::getAvailableRoomsFor*');
         $result = true;
         $reallocatedBookingId = 0;
         // get the cart booking data for the given booking
@@ -2551,10 +2576,13 @@ class HotelBookingDetail extends ObjectModel
                     AND id_room = '.(int) $objOldHotelBooking->id_room.' AND `id_order` = '.(int) $objOldHotelBooking->id_order
                 );
                 $objCartBookingData = new HotelCartBookingData($idHotelCartBookingData);
-                $objCartBookingData->id_room = $idRoom;
+                // update only the existing row, else saving would insert an empty cart booking row
+                if (Validate::isLoadedObject($objCartBookingData)) {
+                    $objCartBookingData->id_room = $idRoom;
+                    $objCartBookingData->save();
+                }
                 // set backorder to 0 as available reallocate rooms will always be free
                 $objOldHotelBooking->is_back_order = 0;
-                $objCartBookingData->save();
 
                 // update in the hotel booking detail table
                 $objOldHotelBooking->id_room = $idRoom;
@@ -2633,6 +2661,8 @@ class HotelBookingDetail extends ObjectModel
 
     public function swapBooking($idHotelBookingFrom, $idHotelBookingTo)
     {
+        // Rooms availability changes with this, so remove the cached availability lists
+        Cache::clean('HotelBookingDetail::getAvailableRoomsFor*');
         $result = true;
         // get the cart booking data for the given booking
         if (Validate::isLoadedObject($objHotelBookingFrom = new HotelBookingDetail($idHotelBookingFrom))
