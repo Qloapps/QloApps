@@ -1,4 +1,12 @@
 ------------------------------
+# V1.3.4 to V1.3.5
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1608] Fixed undefined array key warnings when exporting sales stats as CSV in the back office.
+
+------------------------------
 # V1.3.3 to V1.3.4
 ------------------------------
 

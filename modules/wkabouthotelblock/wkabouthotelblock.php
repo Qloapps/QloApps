@@ -33,7 +33,7 @@ class WkAboutHotelBlock extends Module
     {
         $this->name = 'wkabouthotelblock';
         $this->tab = 'front_office_features';
-        $this->version = '1.2.0';
+        $this->version = '1.2.1';
         $this->author = 'Webkul';
         $this->need_instance = 0;
 

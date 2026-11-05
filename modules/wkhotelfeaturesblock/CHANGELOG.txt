@@ -1,4 +1,12 @@
 ------------------------------
+# V2.0.8 to V2.0.9
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1713] Renamed "Hotel Amenity"/"Hotel Features" to "Property Amenity"/"Property Features" throughout the module's display name and settings form.
+
+------------------------------
 # V2.0.7 to V2.0.8
 ------------------------------
 

@@ -37,7 +37,7 @@ class QloCleaner extends Module
     {
         $this->name = 'qlocleaner';
         $this->tab = 'administration';
-        $this->version = '1.0.2';
+        $this->version = '1.0.3';
         $this->author = 'PrestaShop';
         $this->need_instance = 0;
 

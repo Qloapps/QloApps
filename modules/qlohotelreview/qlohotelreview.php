@@ -34,7 +34,7 @@ class QloHotelReview extends Module
     {
         $this->name = 'qlohotelreview';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.2';
+        $this->version = '1.0.3';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6');
         $this->author = 'Webkul';
         $this->bootstrap = true;

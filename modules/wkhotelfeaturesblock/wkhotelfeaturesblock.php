@@ -35,7 +35,7 @@ class WkHotelFeaturesBlock extends Module
     {
         $this->name = 'wkhotelfeaturesblock';
         $this->tab = 'front_office_features';
-        $this->version = '2.0.8';
+        $this->version = '2.0.9';
         $this->author = 'Webkul';
         $this->bootstrap = true;
         parent::__construct();

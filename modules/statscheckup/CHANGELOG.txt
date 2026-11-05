@@ -1,4 +1,12 @@
 ------------------------------
+# V1.5.4 to V1.5.5
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1713] Renamed "Hotel(s)" to "Property/Properties" in the stats check-up tab labels.
+
+------------------------------
 # V1.5.3 to V1.5.4
 ------------------------------
 

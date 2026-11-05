@@ -1,4 +1,12 @@
 ------------------------------
+# V1.0.2 to V1.0.3
+------------------------------
+
+## Improved/Changed Features:
+
+* [BO] : [#1713] Renamed "Hotel" to "Property" in the dashboard insights widget labels and series names.
+
+------------------------------
 # V1.0.1 to V1.0.2
 ------------------------------
 

@@ -1,4 +1,14 @@
 -----------------------------
+# V1.6.7 to V1.6.8
+-----------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#1760] Updated the cart block flow and templates to reflect the tourism tax system changes.
+* [FO] : [#1830] Integrated the configurable tourism tax show/hide setting into the cart popup total breakdown.
+* [FO] : [#1829] Include all service prices in the booking total calculation on the block cart popup.
+
+-----------------------------
 # V1.6.6 to V1.6.7
 -----------------------------
 

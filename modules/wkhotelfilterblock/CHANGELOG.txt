@@ -1,4 +1,13 @@
 ------------------------------
+# V1.0.7 to V1.0.8
+------------------------------
+
+## Improved/Changed Features:
+
+* [FO] : [#1717] Updated the room type filter block to use the new Hotel Amenities system instead of core Feature.
+* [BO] : [#1713] Renamed the module description from "Hotel filter and sorting block" to "Property filter and sorting block".
+
+------------------------------
 # V1.0.6 to V1.0.7
 ------------------------------
 
