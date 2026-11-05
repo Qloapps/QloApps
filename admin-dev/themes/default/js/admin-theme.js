@@ -101,6 +101,11 @@ function scroll_if_anchor(href, fromTop = 120) {
 }
 
 $(document).ready(function() {
+	// refresh the upgrade info cache in background, result is shown on next page load
+	if (typeof upgrade_check_needed !== 'undefined' && upgrade_check_needed) {
+		$.ajax({url: upgrade_check_url, type: 'GET'});
+	}
+
 	//set main navigation aside
 	/* global employee_token */
 	function navSidebar(){

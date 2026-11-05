@@ -94,13 +94,6 @@ class QloGoogleHotelConnector extends Module
         ) {
             return false;
         }
-
-        // Best-effort: a failed CM connection or hotel enrollment must never fail install() —
-        // any issue is surfaced via hookDashboardZoneThree instead.
-        if ($this->connectToChannelManager()) {
-            $this->autoEnrollHotels((int) Configuration::get('PS_LANG_DEFAULT'));
-        }
-
         return true;
     }
 
@@ -119,31 +112,6 @@ class QloGoogleHotelConnector extends Module
         return $isConnected;
     }
 
-    /** Enables every hotel that passes required-field validation, selecting all its room
-     *  types regardless of active status. Hotels that fail are left unenrolled — surfaced by
-     *  QghcPropertyService::getHotelsWithIssues() on the dashboard. */
-    private function autoEnrollHotels($idLang)
-    {
-        $hotels = QghcProperty::getAllHotels($idLang);
-        if (!$hotels) {
-            return;
-        }
-
-        $objHotelRoomType = new HotelRoomType();
-        foreach ($hotels as $hotel) {
-            $idHotel = (int) $hotel['id'];
-            if (QghcPropertyService::validateRequiredFields($idHotel, $idLang)) {
-                continue;
-            }
-
-            $roomTypeIds = array();
-            foreach ((array) $objHotelRoomType->getRoomTypeByHotelId($idHotel, $idLang) as $roomType) {
-                $roomTypeIds[] = (int) $roomType['id_product'];
-            }
-
-            QghcPropertyService::enable($idHotel, $roomTypeIds);
-        }
-    }
 
     /** Registers all PrestaShop / QloApps hooks the module needs. */
     public function registerModuleHooks()

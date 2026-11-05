@@ -3384,7 +3384,7 @@ exit;
             'iso_code' => Tools::strtolower(isset($params['iso_country']) ? $params['iso_country'] : Country::getIsoById(Configuration::get('PS_COUNTRY_DEFAULT'))),
             'shop_url' => isset($params['shop_url']) ? $params['shop_url'] : Tools::getShopDomain(),
             'shop_url_ssl' => isset($params['shop_url_ssl']) ? $params['shop_url_ssl'] : Tools::getShopDomainSsl(),
-            'physical_uri' => Context::getContext()->shop->physical_uri,
+            'physical_uri' => isset($params['physical_uri']) ? $params['physical_uri'] : Context::getContext()->shop->physical_uri,
             'mail' => isset($params['email']) ? $params['email'] : Configuration::get('PS_SHOP_EMAIL')
         ));
 
@@ -3448,6 +3448,9 @@ exit;
                 $post_data .= '&method=recommendation&controller=';
                 $post_data .= (isset($params['controller']) ? $params['controller'] : Context::getContext()->controller->controller_name);
                 $post_data .= defined('_PS_HOST_MODE_') ? '-od' : '';
+                break;
+            case 'installation':
+                $post_data .= '&method=installation&data='.urlencode(json_encode($params['install_data']));
                 break;
             case 'check-version':
                 $post_data .= '&method=check-version&autoupgrade='.(int)(Module::isInstalled('qloautoupgrade') && Module::isEnabled('qloautoupgrade'));
