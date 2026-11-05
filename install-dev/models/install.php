@@ -714,6 +714,8 @@ class InstallModelInstall extends InstallAbstractModel
                 'blockcart',
                 'blockuserinfo',
                 'qlocmconnector',
+                'qlocrontaskmanager',
+                'qlohotelreports',
                 'qlogooglehotelconnector'
             );
         }
