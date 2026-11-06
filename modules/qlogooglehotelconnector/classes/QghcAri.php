@@ -154,7 +154,7 @@ class QghcAri
         // to Google, regardless of what's requested. Changed rows in qghc_ari_updates
         // are written by hotel-wide events (e.g. booking-offset changes) that don't check QGHC
         // connection, so only_change=1 must re-filter here too, not just the full-sync path.
-        $connectedProducts = QghcRoomType::getConnectedProductIds($idProperty);
+        $connectedProducts = QghcRoomType::getConnectedProductIds($idProperty, 1);
 
         if (!empty($params['id_room_type'])) {
             $requested  = array_filter(array_map('intval', explode('|', $params['id_room_type'])));

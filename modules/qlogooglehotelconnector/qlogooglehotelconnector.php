@@ -33,6 +33,8 @@ class QloGoogleHotelConnector extends Module
     const CONFIG_WS_KEY = 'QGHC_WS_KEY';
     /** PS Configuration key that stores the module connection status (0 = off, 1 = connected). */
     const CONFIG_STATUS = 'QGHC_STATUS';
+    /** Query fragment that opens the Google Hotel tab (id "hotel-tab") on the hotel edit form — read by the core form via htl_active_tab. */
+    const HOTEL_TAB_QUERY = '&htl_active_tab=%23hotel-tab';
 
     /** Cron task name registered in the Cron Task Manager module. */
     const CRON_TASK_CLEANUP_LOGS = 'cleanup_api_logs';
@@ -459,7 +461,7 @@ class QloGoogleHotelConnector extends Module
         foreach (QghcPropertyService::getHotelsWithIssues($idLang) as $idHotel => $hotelName) {
             $hotels[] = array(
                 'name' => $hotelName,
-                'url' => $hotelEditBase . '&id=' . (int) $idHotel . '&updatehtl_branch_info',
+                'url' => $hotelEditBase . '&id=' . (int) $idHotel . '&updatehtl_branch_info' . QloGoogleHotelConnector::HOTEL_TAB_QUERY,
             );
         }
 
@@ -482,7 +484,7 @@ class QloGoogleHotelConnector extends Module
         foreach (QghcPropertyService::getHotelsWithIssues($idLang) as $idHotel => $hotelName) {
             $hotels[] = array(
                 'hotel_name' => $hotelName,
-                'edit_url' => $editBaseUrl . '&id=' . (int) $idHotel . '&updatehtl_branch_info',
+                'edit_url' => $editBaseUrl . '&id=' . (int) $idHotel . '&updatehtl_branch_info' . QloGoogleHotelConnector::HOTEL_TAB_QUERY,
             );
         }
 
@@ -542,7 +544,7 @@ class QloGoogleHotelConnector extends Module
         foreach (QghcPropertyService::getHotelsWithIssues($idLang) as $idHotel => $hotelName) {
             $hotelsWithIssues[] = array(
                 'hotel_name' => $hotelName,
-                'edit_url' => $editBaseUrl . '&id=' . $idHotel . '&updatehtl_branch_info',
+                'edit_url' => $editBaseUrl . '&id=' . $idHotel . '&updatehtl_branch_info' . QloGoogleHotelConnector::HOTEL_TAB_QUERY,
             );
         }
 

@@ -127,12 +127,17 @@ class QghcRoomType
      * @param int $idHotel
      * @return int[]
      */
-    public static function getConnectedProductIds($idHotel)
+    public static function getConnectedProductIds($idHotel, $onlySellable = 0)
     {
-        $rows = Db::getInstance()->executeS(
-            'SELECT `id_product` FROM `' . _DB_PREFIX_ . 'htl_room_type`
-             WHERE `id_hotel` = ' . (int) $idHotel . ' AND `is_google_hotel_enabled` = 1'
-        );
+        $sql = 'SELECT hrt.`id_product` FROM `' . _DB_PREFIX_ . 'htl_room_type` hrt INNER JOIN `' . _DB_PREFIX_ . 'product` p ON (p.`id_product` = hrt.`id_product`';
+
+        if ($onlySellable) {
+            $sql .= ' AND p.`active` = 1 AND p.`show_at_front` = 1';
+        }
+
+        $sql .= ') WHERE hrt.`id_hotel` = ' . (int) $idHotel . ' AND hrt.`is_google_hotel_enabled` = 1';
+
+        $rows = Db::getInstance()->executeS($sql);
 
         $ids = array();
         if ($rows) {
@@ -151,6 +156,20 @@ class QghcRoomType
      */
     public static function getMappingsForHotel($idHotel)
     {
-        return self::getConnectedProductIds($idHotel);
+        // Deliberately NOT filtered by product.active (unlike getConnectedProductIds()):
+        // inactive room types stay selectable on the tab, so their ticked state must
+        // reflect the real enrollment flag or saving the hotel would un-enroll them.
+        $rows = Db::getInstance()->executeS(
+            'SELECT `id_product` FROM `' . _DB_PREFIX_ . 'htl_room_type`
+             WHERE `id_hotel` = ' . (int) $idHotel . ' AND `is_google_hotel_enabled` = 1'
+        );
+
+        $ids = array();
+        if ($rows) {
+            foreach ($rows as $row) {
+                $ids[] = (int) $row['id_product'];
+            }
+        }
+        return $ids;
     }
 }

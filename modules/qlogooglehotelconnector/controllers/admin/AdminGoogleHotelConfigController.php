@@ -153,7 +153,7 @@ class AdminGoogleHotelConfigController extends ModuleAdminController
                     'id_hotel' => (int)$row['id_hotel'],
                     'hotel_name' => $row['hotel_name'],
                     'date_add' => $row['date_add'],
-                    'edit_url' => $hotelEditBase . '&id=' . (int)$row['id_hotel'] . '&updatehtl_branch_info',
+                    'edit_url' => $hotelEditBase . '&id=' . (int)$row['id_hotel'] . '&updatehtl_branch_info' . QloGoogleHotelConnector::HOTEL_TAB_QUERY,
                     'status_class' => $badge['class'],
                     'status_icon' => $badge['icon'],
                     'status_label' => $badge['label'],
