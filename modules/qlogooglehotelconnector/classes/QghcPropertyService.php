@@ -597,6 +597,8 @@ class QghcPropertyService
              INNER JOIN `' . _DB_PREFIX_ . 'product_lang` pl
                  ON pl.`id_product` = hrt.`id_product`
                 AND pl.`id_lang` = ' . (int)$idLang . '
+             INNER JOIN `' . _DB_PREFIX_ . 'product` p
+                 ON p.`id_product` = hrt.`id_product` AND p.`active` = 1 AND p.`show_at_front` = 1
              WHERE hrt.`id_hotel` = ' . (int)$idHotel . '
                AND hrt.`is_google_hotel_enabled` = 1'
         );
@@ -681,6 +683,9 @@ class QghcPropertyService
             INNER JOIN `' . _DB_PREFIX_ . 'htl_room_type` hrt
                 ON hrt.`id_hotel` = hbi.`id`
                AND hrt.`is_google_hotel_enabled` = 1
+
+            INNER JOIN `' . _DB_PREFIX_ . 'product` p
+                ON p.`id_product` = hrt.`id_product` AND p.`active` = 1 AND p.`show_at_front` = 1
 
             LEFT JOIN `' . _DB_PREFIX_ . 'product_lang` pl
                 ON pl.`id_product` = hrt.`id_product`
