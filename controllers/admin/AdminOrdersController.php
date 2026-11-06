@@ -9267,7 +9267,7 @@ class AdminOrdersControllerCore extends AdminController
                             // a No-show room reverted back: the order is no longer completely
                             // No-show/Cancelled, so restore its status from the paid amount
                             $order = new Order($order->id);
-                            $order->syncPaymentStatusAfterBookingRevert();
+                            $order->changeOrderStatusOnRoomBookingStatusChange();
                         }
                         $success = $statusChanged;
                     }

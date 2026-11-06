@@ -3106,7 +3106,7 @@ class OrderCore extends ObjectModel
      * @param bool $useEmail whether to email the customer about the change
      * @return bool whether the order status was actually changed
      */
-    public function syncPaymentStatusAfterBookingRevert($useEmail = true)
+    public function changeOrderStatusOnRoomBookingStatusChange($useEmail = true)
     {
         if (!in_array($this->current_state, array(
             Configuration::get('PS_OS_NO_SHOW'),
