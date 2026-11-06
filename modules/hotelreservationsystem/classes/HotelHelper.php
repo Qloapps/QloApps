@@ -1582,7 +1582,7 @@ class HotelHelper
             array(
                 'id' => HotelBookingDetail::STATUS_NO_SHOW,
                 'color' => '#FF8C00',
-                'is_terminal' => 1,
+                'is_terminal' => 0,
                 'name' => array(
                     'en' => 'No-show',
                     'nl' => 'Niet verschenen',

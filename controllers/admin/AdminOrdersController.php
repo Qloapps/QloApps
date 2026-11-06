@@ -925,6 +925,11 @@ class AdminOrdersControllerCore extends AdminController
             $currentRoomStatus = (int) Tools::getValue('current_room_status');
             $htlOrderStatus = $objHotelBookingStatus->getAllStatuses($this->context->language->id);
             $allowedStatuses = HotelBookingStatus::getAllowedTransitions($currentRoomStatus);
+            // no transition is allowed out of a terminal (final) status
+            $objCurrentStatus = new HotelBookingStatus($currentRoomStatus);
+            if (Validate::isLoadedObject($objCurrentStatus) && $objCurrentStatus->is_terminal) {
+                $allowedStatuses = array();
+            }
             foreach ($htlOrderStatus as &$status) {
                 $status['disabled'] = !in_array((int) $status['id_status'], $allowedStatuses);
             }
@@ -935,6 +940,8 @@ class AdminOrdersControllerCore extends AdminController
                     'current_index' => self::$currentIndex,
                     'hotel_order_status' => $htlOrderStatus,
                     'ROOM_STATUS_ASSIGNED' => HotelBookingDetail::STATUS_ASSIGNED,
+                    'ROOM_STATUS_CHECKED_IN' => HotelBookingDetail::STATUS_CHECKED_IN,
+                    'ROOM_STATUS_CHECKED_OUT' => HotelBookingDetail::STATUS_CHECKED_OUT,
                     'current_room_status' => $currentRoomStatus
                 )
             );
@@ -9060,6 +9067,11 @@ class AdminOrdersControllerCore extends AdminController
                 $this->errors[] = Tools::displayError('Invalid booking status found.');
             } elseif ($newStatus == $objHotelBookingDetail->id_status) {
                 $this->errors[] = Tools::displayError('This room is already set to the selected status.');
+            } elseif (($objCurrentStatus = new HotelBookingStatus((int) $objHotelBookingDetail->id_status))
+                && Validate::isLoadedObject($objCurrentStatus)
+                && $objCurrentStatus->is_terminal
+            ) {
+                $this->errors[] = Tools::displayError('Room status cannot be changed as the current status of this room is final.');
             } elseif (($newStatus == HotelBookingDetail::STATUS_NO_SHOW || $newStatus == HotelBookingDetail::STATUS_CANCELLED)
                 && ($objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_CHECKED_IN
                     || $objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_CHECKED_OUT)
@@ -9081,6 +9093,24 @@ class AdminOrdersControllerCore extends AdminController
                 }
             } elseif ($newStatus == HotelBookingDetail::STATUS_NO_SHOW && strtotime($dateFrom) > time()) {
                 $this->errors[] = Tools::displayError('Room cannot be marked as No-show before the booking\'s check-in date.');
+            }
+
+            // reverting a No-show/Cancelled room makes it occupy the inventory again
+            if (empty($this->errors)
+                && ($objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_NO_SHOW
+                    || $objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_CANCELLED)
+                && $newStatus != HotelBookingDetail::STATUS_NO_SHOW
+                && $newStatus != HotelBookingDetail::STATUS_CANCELLED
+            ) {
+                if ((new OrderReturn())->hasCompletelyRefundedBooking($objHotelBookingDetail->id)) {
+                    $this->errors[] = Tools::displayError('Room status cannot be changed as this room booking has already been refunded.');
+                } elseif ($objHotelBookingDetail->chechRoomBooked(
+                    $objHotelBookingDetail->id_room,
+                    $objHotelBookingDetail->date_from,
+                    $objHotelBookingDetail->date_to
+                )) {
+                    $this->errors[] = Tools::displayError('Room status cannot be changed as this room is already booked in another booking for the same dates. Please reallocate the room first.');
+                }
             }
 
             if ($objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_CHECKED_OUT
@@ -9169,8 +9199,29 @@ class AdminOrdersControllerCore extends AdminController
                             ? OrderReturn::EVENT_TYPE_CANCELLATION
                             : OrderReturn::EVENT_TYPE_NO_SHOW;
 
+                        // a No-show room moved to Cancelled usually already has a refund
+                        // request from the No-show: reuse it instead of creating a duplicate
+                        $existingRefundRequest = false;
+                        if ($objHotelBookingDetail->id_status == HotelBookingDetail::STATUS_NO_SHOW
+                            && ($refundRequests = OrderReturn::getOrdersReturnDetail($order->id, 0, $objHotelBookingDetail->id))
+                        ) {
+                            // latest request first
+                            $latestRequest = reset($refundRequests);
+                            if (!$latestRequest['denied']) {
+                                $existingRefundRequest = true;
+                                if (!$latestRequest['refunded']) {
+                                    // still pending: it now stands for the cancellation
+                                    $objOrderReturn = new OrderReturn((int) $latestRequest['id_order_return']);
+                                    if (Validate::isLoadedObject($objOrderReturn)) {
+                                        $objOrderReturn->event_type = $eventType;
+                                        $objOrderReturn->save();
+                                    }
+                                }
+                            }
+                        }
+
                         // no refund request is created if refund is disabled for the hotel
-                        if ($order->isReturnable()) {
+                        if (!$existingRefundRequest && $order->isReturnable()) {
                             $objOrderReturn = new OrderReturn();
                             $objOrderReturn->id_customer = $order->id_customer;
                             $objOrderReturn->id_order = $order->id;
@@ -9211,6 +9262,13 @@ class AdminOrdersControllerCore extends AdminController
                         $success = $statusChanged;
                     } else {
                         $statusChanged = $objHotelBookingDetail->changeStatus($newStatus, $changeParams);
+
+                        if ($statusChanged) {
+                            // a No-show room reverted back: the order is no longer completely
+                            // No-show/Cancelled, so restore its status from the paid amount
+                            $order = new Order($order->id);
+                            $order->changeOrderStatusOnRoomBookingStatusChange();
+                        }
                         $success = $statusChanged;
                     }
 
