@@ -154,7 +154,7 @@ return array(
 		'Drop existing tables (mode dev)' => 'Bestaande tabellen verwijderen (modus dev)',
 		'Test your database connection now!' => 'Test nu uw databaseverbinding!',
 		'Next' => 'Volgende',
-		'Back' => 'Rug',
+		'Back' => 'Terug',
 		'If you need some assistance, you can <a href="%1$s" onclick="return !window.open(this.href);">get tailored help</a> from our support team. <a href="%2$s" onclick="return !window.open(this.href);">The official documentation</a> is also here to guide you.' => 'Als u hulp nodig heeft, kunt u <a href="%1$s" onclick="return !window.open(this.href);">hulp op maat</a> krijgen van ons ondersteuningsteam. <a href="%2$s" onclick="return !window.open(this.href);">De officiële documentatie</a> is hier ook om u te begeleiden.',
 		'Official forum' => 'Officieel forum',
 		'Support' => 'Steun',
