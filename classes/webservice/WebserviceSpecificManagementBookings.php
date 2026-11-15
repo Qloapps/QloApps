@@ -3868,9 +3868,7 @@ class WebserviceSpecificManagementBookingsCore Extends ObjectModel implements We
             $params['associations']['price_details'] = $priceDetails;
             $params['associations']['cart_rules'] = $orderCartRules;
             $roomTypeInfo = array();
-            if (Group::getPriceDisplayMethod($objCustomer->id_default_group) == PS_TAX_INC) {
-                $useTax = 1;
-            }
+            $useTax = (Group::getPriceDisplayMethod($objCustomer->id_default_group) == PS_TAX_INC) ? 1 : 0;
 
             $params['associations']['remarks'] = array();
             if ($customerMessages = Message::getMessagesByOrderId($objOrder->id)) {
